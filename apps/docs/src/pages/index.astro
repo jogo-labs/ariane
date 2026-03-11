@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import manifest from '@cem';
+import { getSlug } from '../utils/tag-name.ts';
 
 // Extraire tous les composants déclarés dans le manifest
 const components = manifest.modules
@@ -12,9 +13,13 @@ const components = manifest.modules
 
 <Layout title="Accueil">
     <Fragment slot="nav">
-        {components.map((c: { tagName?: string; name: string }) => (
-            <a href={`/components/${c.tagName?.replace(/^mr-/, '')}`}>{c.tagName}</a>
-        ))}
+        <ul>
+            {components.map((c: { tagName?: string; name: string }) => (
+                <li>
+                    <a href={`/components/${getSlug(c.tagName ?? '')}`}>{c.name}</a>
+                </li>
+            ))}
+        </ul>
     </Fragment>
 
     <h1>mARIAnne</h1>
@@ -24,7 +29,7 @@ const components = manifest.modules
     <ul>
         {components.map((c: { tagName?: string; name: string; summary?: string }) => (
             <li>
-                <a href={`/components/${c.tagName?.replace(/^mr-/, '')}`}>
+                <a href={`/components/${getSlug(c.tagName ?? '')}`}>
                     <code>{c.tagName}</code>
                 </a>
                 {c.summary && <span> — {c.summary}</span>}

@@ -107,6 +107,7 @@ import styles from './${fileName}.styles.js';
  * @slot         - Contenu principal.
  *
  * @csspart base - L'élément racine du composant.
+ * @cssprop [--${tagName}-size=auto] - Taille du composant.
  *
  * @event {CustomEvent} ${tagName}-change - Émis lors d'un changement.
  */
