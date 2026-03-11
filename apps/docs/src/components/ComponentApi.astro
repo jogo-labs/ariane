@@ -1,0 +1,267 @@
+---
+/**
+ * ComponentApi.astro
+ *
+ * Affiche l'API complète d'un composant à partir des données du Custom Elements Manifest.
+ * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
+ * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
+ */
+interface CemMember {
+    name:        string;
+    type?:       { text: string };
+    description?: string;
+    default?:    string;
+    attribute?:  string;
+    reflects?:   boolean;
+    kind?:       string;
+    privacy?:    string;
+}
+
+interface CemAttribute {
+    name:         string;
+    type?:        { text: string };
+    description?: string;
+    default?:     string;
+}
+
+interface CemEvent {
+    name:         string;
+    type?:        { text: string };
+    description?: string;
+}
+
+interface CemCssPart {
+    name:         string;
+    description?: string;
+}
+
+interface CemCssProperty {
+    name:         string;
+    description?: string;
+    default?:     string;
+}
+
+interface CemSlot {
+    name:         string;
+    description?: string;
+}
+
+interface ComponentDeclaration {
+    name:           string;
+    tagName?:       string;
+    summary?:       string;
+    description?:   string;
+    attributes?:    CemAttribute[];
+    members?:       CemMember[];
+    events?:        CemEvent[];
+    cssParts?:      CemCssPart[];
+    cssProperties?: CemCssProperty[];
+    slots?:         CemSlot[];
+}
+
+interface Props {
+    component: ComponentDeclaration;
+}
+
+const { component } = Astro.props;
+
+// Filtrer les membres publics qui sont des propriétés (pas les méthodes privées)
+const publicProperties = (component.members ?? []).filter(
+    (m) => m.kind === 'field' && m.privacy !== 'private' && m.privacy !== 'protected',
+);
+---
+
+<div class="component-api">
+
+    {/* ── Attributs & Propriétés ── */}
+    {component.attributes && component.attributes.length > 0 && (
+        <section>
+            <h2>Attributs &amp; Propriétés</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribut</th>
+                            <th>Type</th>
+                            <th>Défaut</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.attributes.map((attr) => (
+                            <tr>
+                                <td><code>{attr.name}</code></td>
+                                <td><code>{attr.type?.text ?? '—'}</code></td>
+                                <td><code>{attr.default ?? '—'}</code></td>
+                                <td>{attr.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
+    {/* ── Événements ── */}
+    {component.events && component.events.length > 0 && (
+        <section>
+            <h2>Événements</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Événement</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.events.map((event) => (
+                            <tr>
+                                <td><code>{event.name}</code></td>
+                                <td><code>{event.type?.text ?? 'CustomEvent'}</code></td>
+                                <td>{event.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
+    {/* ── CSS Parts ── */}
+    {component.cssParts && component.cssParts.length > 0 && (
+        <section>
+            <h2>CSS Parts</h2>
+            <p class="hint">
+                Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
+            </p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.cssParts.map((part) => (
+                            <tr>
+                                <td><code>{part.name}</code></td>
+                                <td>{part.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
+    {/* ── CSS Custom Properties ── */}
+    {component.cssProperties && component.cssProperties.length > 0 && (
+        <section>
+            <h2>CSS Custom Properties</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Défaut</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.cssProperties.map((prop) => (
+                            <tr>
+                                <td><code>{prop.name}</code></td>
+                                <td><code>{prop.default ?? '—'}</code></td>
+                                <td>{prop.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
+    {/* ── Slots ── */}
+    {component.slots && component.slots.length > 0 && (
+        <section>
+            <h2>Slots</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Slot</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.slots.map((slot) => (
+                            <tr>
+                                <td><code>{slot.name || '(default)'}</code></td>
+                                <td>{slot.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+</div>
+
+<style>
+    .component-api {
+        margin-top: 2rem;
+    }
+
+    section {
+        margin-bottom: 2.5rem;
+    }
+
+    h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .hint {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.75rem;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        background: #f9fafb;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: top;
+    }
+
+    code {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.8rem;
+        background: #f3f4f6;
+        padding: 0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+</style>

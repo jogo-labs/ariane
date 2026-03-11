@@ -1,0 +1,47 @@
+{
+    "name": "@marianne/core",
+    "version": "0.1.0",
+    "type": "module",
+    "description": "Accessible web components library",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./cdn": "./cdn/index.js",
+        "./cdn/autoloader": "./cdn/autoloader.js",
+        "./themes/*": "./dist/styles/themes/*.css",
+        "./custom-elements.json": "./dist/custom-elements.json",
+        "./dist/*": "./dist/*"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "cdn"
+    ],
+    "scripts": {
+        "build": "npm run build:manifest && npm run build:bundles && npm run build:css && npm run build:types",
+        "build:manifest": "cem analyze --config cem.config.js",
+        "build:bundles": "node scripts/build-bundles.js",
+        "build:css": "node scripts/build-css.js",
+        "build:types": "tsc --emitDeclarationOnly --declarationMap",
+        "dev": "npm run build:manifest && node scripts/build-bundles.js --watch",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "lint": "eslint src",
+        "create": "node scripts/create-component.js"
+    },
+    "dependencies": {
+        "lit": "^3.2.1"
+    },
+    "devDependencies": {
+        "@custom-elements-manifest/analyzer": "^0.10.3",
+        "@vitest/coverage-v8": "^3.0.4",
+        "esbuild": "^0.24.2",
+        "happy-dom": "^15.11.7",
+        "vitest": "^3.0.4"
+    },
+    "customElements": "dist/custom-elements.json"
+}

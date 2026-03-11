@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import manifest from '@cem';
+
+// Extraire tous les composants déclarés dans le manifest
+const components = manifest.modules
+    .flatMap((m: { declarations?: Array<{ kind: string; customElement?: boolean; tagName?: string; name: string; summary?: string }> }) =>
+        m.declarations ?? [],
+    )
+    .filter((d: { kind: string; customElement?: boolean }) => d.kind === 'class' && d.customElement === true);
+---
+
+<Layout title="Accueil">
+    <Fragment slot="nav">
+        {components.map((c: { tagName?: string; name: string }) => (
+            <a href={`/components/${c.tagName?.replace(/^mr-/, '')}`}>{c.tagName}</a>
+        ))}
+    </Fragment>
+
+    <h1>mARIAnne</h1>
+    <p>Librairie de web components accessibles.</p>
+
+    <h2>Composants disponibles</h2>
+    <ul>
+        {components.map((c: { tagName?: string; name: string; summary?: string }) => (
+            <li>
+                <a href={`/components/${c.tagName?.replace(/^mr-/, '')}`}>
+                    <code>{c.tagName}</code>
+                </a>
+                {c.summary && <span> — {c.summary}</span>}
+            </li>
+        ))}
+    </ul>
+</Layout>

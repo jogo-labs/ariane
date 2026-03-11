@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "astro-build.astro-vscode",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "runem.lit-plugin",
+    "streetsidesoftware.code-spell-checker",
+    "vitest.explorer"
+  ]
+}

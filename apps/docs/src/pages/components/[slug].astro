@@ -1,0 +1,135 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ComponentApi from '../../components/ComponentApi.astro';
+import manifest from '@cem';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface CemDeclaration {
+    kind:           string;
+    customElement?: boolean;
+    tagName?:       string;
+    name:           string;
+    summary?:       string;
+    description?:   string;
+    attributes?:    unknown[];
+    events?:        unknown[];
+    cssParts?:      unknown[];
+    cssProperties?: unknown[];
+    slots?:         unknown[];
+    members?:       unknown[];
+}
+
+// ─── Génération statique des routes ──────────────────────────────────────────
+
+/**
+ * getStaticPaths est appelé au build time par Astro.
+ * Pour chaque composant dans le CEM → une page /components/<slug>.
+ * Aucun fichier à créer manuellement : ajouter un @customElement → page créée automatiquement.
+ */
+export function getStaticPaths() {
+    const components: CemDeclaration[] = manifest.modules
+        .flatMap((m: { declarations?: CemDeclaration[] }) => m.declarations ?? [])
+        .filter((d: CemDeclaration) => d.kind === 'class' && d.customElement === true);
+
+    return components.map((component) => ({
+        // mr-button → slug = 'button'
+        params: { slug: component.tagName!.replace(/^mr-/, '') },
+        props:  { component },
+    }));
+}
+
+const { component } = Astro.props as { component: CemDeclaration };
+
+// Tous les composants pour le menu de navigation
+const allComponents: CemDeclaration[] = manifest.modules
+    .flatMap((m: { declarations?: CemDeclaration[] }) => m.declarations ?? [])
+    .filter((d: CemDeclaration) => d.kind === 'class' && d.customElement === true);
+---
+
+<Layout title={component.name}>
+    <!-- Navigation latérale -->
+    <Fragment slot="nav">
+        {allComponents.map((c) => (
+            <a
+                href={`/components/${c.tagName?.replace(/^mr-/, '')}`}
+                aria-current={c.tagName === component.tagName ? 'page' : undefined}
+            >
+                {c.tagName}
+            </a>
+        ))}
+    </Fragment>
+
+    <!-- En-tête du composant -->
+    <h1>
+        <code>{component.tagName}</code>
+    </h1>
+
+    {component.summary && <p class="summary">{component.summary}</p>}
+    {component.description && <p>{component.description}</p>}
+
+    <!-- Démo live interactive -->
+    <!-- Le bundle CDN est chargé pour le playground -->
+    <section class="demo-section">
+        <h2>Démo</h2>
+        <div class="demo-preview" id="demo-preview">
+            <!-- Remplacer par le playground spécifique au composant via MDX/slots -->
+            <slot />
+
+            <!-- Démo par défaut basée sur le tag name -->
+            {component.tagName === 'mr-button' && (
+                <div style="display:flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <mr-button>Filled</mr-button>
+                    <mr-button variant="outlined">Outlined</mr-button>
+                    <mr-button variant="ghost">Ghost</mr-button>
+                    <mr-button variant="danger">Danger</mr-button>
+                    <mr-button disabled>Disabled</mr-button>
+                </div>
+            )}
+        </div>
+    </section>
+
+    <!-- Tableau API auto-généré depuis le CEM -->
+    <ComponentApi component={component as Parameters<typeof ComponentApi>[0]['component']} />
+</Layout>
+
+<!-- Charger le bundle CDN pour le playground -->
+<script
+    type="module"
+    src="/cdn/index.js"
+></script>
+
+<style>
+    h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    h1 code {
+        font-size: 1.75rem;
+        background: none;
+        padding: 0;
+        color: inherit;
+    }
+
+    .summary {
+        font-size: 1.1rem;
+        color: #4b5563;
+        margin-bottom: 2rem;
+    }
+
+    .demo-section h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .demo-preview {
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: #fff;
+        margin-bottom: 2rem;
+    }
+</style>
