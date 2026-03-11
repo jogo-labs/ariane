@@ -1,0 +1,29 @@
+---
+tagName: mr-alert
+title: Alert
+description: Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+variants:
+  - name: Par défaut
+    description: Rendu par défaut du composant.
+    html: |
+      <mr-alert>
+        <span slot="title">Alerte par defaut</span>
+        <span slot="content">Je suis une alerte par defaut (erreur).</span>
+      </mr-alert>
+  - name: Succès
+    description: Rendu en mode succès.
+    html: |
+      <mr-alert version="success">
+        <span slot="title">Alerte de succès</span>
+        <span slot="content">Je suis une alerte de succès.</span>
+      </mr-alert>
+  - name: Dismissible
+    description: Rendu d'une alerte qui peut être fermée. L'ID fourni doit être un élément existant dans la page qui recevra le focus à la fermeture du composant
+    html: |
+      <mr-alert next-focus="idBoutonFocused">
+        <span slot="title">Alerte de succès</span>
+        <span slot="content">Je suis une alerte de succès.</span>
+      </mr-alert>
+---
+
+Documentation narrative du composant `mr-alert`.
