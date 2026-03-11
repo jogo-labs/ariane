@@ -7,3 +7,4 @@
 export { MrButton } from './components/button/button.js';
 export { MrAlert } from './components/alert/alert.js';
 export { MrBreadcrumb } from './components/breadcrumb/breadcrumb.js';
+export { MrProgressbar } from './components/progressbar/progressbar.js';
