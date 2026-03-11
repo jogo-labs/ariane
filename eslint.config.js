@@ -1,4 +1,5 @@
-import { defineConfig } from "eslint/config";
+import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
     // Exclusions globales
@@ -34,7 +35,7 @@ export default defineConfig(
             // Enforce la cohérence des assertions non-null
             '@typescript-eslint/no-non-null-assertion': 'warn',
 
-            "@typescript-eslint/ban-types": "off",
+            '@typescript-eslint/ban-types': 'off',
         },
     },
 );
