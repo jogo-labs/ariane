@@ -8,6 +8,9 @@
  *
  * @type {import('@custom-elements-manifest/analyzer').UserConfig}
  */
+
+import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
+
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
     globs: ['src/**/*.ts'],
@@ -42,5 +45,8 @@ export default {
                 }
             },
         },
+        customElementVsCodePlugin({
+            outdir: 'dist',
+        }),
     ],
 };

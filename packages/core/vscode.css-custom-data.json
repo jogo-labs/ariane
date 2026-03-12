@@ -1,0 +1,259 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vscode-css-languageservice/main/docs/customData.schema.json",
+  "version": 1.1,
+  "properties": [
+    {
+      "name": "--mr--bg-info",
+      "description": "Couleur de fond pour une alerte de type \"info\".",
+      "values": []
+    },
+    {
+      "name": "--mr--border-info",
+      "description": "Couleur de la bordure pour une alerte de type \"info\".",
+      "values": []
+    },
+    {
+      "name": "--mr--icon-info",
+      "description": "Couleur de l'icône pour une alerte de type \"info\".",
+      "values": []
+    },
+    {
+      "name": "--mr--bg-warning",
+      "description": "Couleur de fond pour une alerte de type \"warning\".",
+      "values": []
+    },
+    {
+      "name": "--mr--border-warning",
+      "description": "Couleur de la bordure pour une alerte de type \"warning\".",
+      "values": []
+    },
+    {
+      "name": "--mr--icon-warning",
+      "description": "Couleur de l'icône pour une alerte de type \"warning\".",
+      "values": []
+    },
+    {
+      "name": "--mr--bg-error",
+      "description": "Couleur de fond pour une alerte de type \"error\".",
+      "values": []
+    },
+    {
+      "name": "--mr--border-error",
+      "description": "Couleur de la bordure pour une alerte de type \"error\".",
+      "values": []
+    },
+    {
+      "name": "--mr--icon-error",
+      "description": "Couleur de l'icône pour une alerte de type \"error\".",
+      "values": []
+    },
+    {
+      "name": "--mr--bg-success",
+      "description": "Couleur de fond pour une alerte de type \"success\".",
+      "values": []
+    },
+    {
+      "name": "--mr--border-success",
+      "description": "Couleur de la bordure pour une alerte de type \"success\".",
+      "values": []
+    },
+    {
+      "name": "--mr--icon-success",
+      "description": "Couleur de l'icône pour une alerte de type \"success\".",
+      "values": []
+    },
+    {
+      "name": "--mr-button-bg",
+      "description": "Couleur de fond (variant filled/danger).",
+      "values": []
+    },
+    {
+      "name": "--mr-button-color",
+      "description": "Couleur du texte.",
+      "values": []
+    },
+    {
+      "name": "--mr-button-border-color",
+      "description": "Couleur de la bordure (variant outlined).",
+      "values": []
+    },
+    {
+      "name": "--mr-button-font-size",
+      "description": "Taille de police.",
+      "values": []
+    },
+    {
+      "name": "--mr-button-font-weight",
+      "description": "Graisse de police.",
+      "values": []
+    },
+    {
+      "name": "--mr-button-border-radius",
+      "description": "Arrondi des coins.",
+      "values": []
+    },
+    {
+      "name": "--mr-button-padding-x",
+      "description": "Padding horizontal.",
+      "values": []
+    },
+    {
+      "name": "--mr-button-padding-y",
+      "description": "Padding vertical.",
+      "values": []
+    },
+    {
+      "name": "--mr-focus-ring-color",
+      "description": "Couleur du focus ring (accessibilité).",
+      "values": []
+    },
+    {
+      "name": "--mr-progressbar-height",
+      "description": "Hauteur de la barre. Défaut : `8px`.",
+      "values": []
+    },
+    {
+      "name": "--mr-progressbar-bg",
+      "description": "Couleur du rail (fond). Défaut : `#e5e7eb`.",
+      "values": []
+    },
+    {
+      "name": "--mr-progressbar-fill",
+      "description": "Couleur de la progression. Défaut : `#2563eb`.",
+      "values": []
+    },
+    {
+      "name": "--mr-progressbar-border-radius",
+      "description": "Arrondi de la barre. Défaut : `9999px`.",
+      "values": []
+    },
+    {
+      "name": "--mr--spinner-stroke-color",
+      "description": "Couleur du trait SVG. Défaut : `currentColor`.",
+      "values": []
+    },
+    {
+      "name": "--mr-stepper-gap",
+      "description": "Espacement entre les étapes.",
+      "values": []
+    },
+    {
+      "name": "--mr-stepper-active-color",
+      "description": "Couleur de l'étape active.",
+      "values": []
+    },
+    {
+      "name": "--mr-stepper-done-color",
+      "description": "Couleur des étapes complétées.",
+      "values": []
+    },
+    {
+      "name": "--mr-stepper-inactive-color",
+      "description": "Couleur des étapes inactives.",
+      "values": []
+    },
+    {
+      "name": "--mr-stepper-connector-color",
+      "description": "Couleur du connecteur entre étapes.",
+      "values": []
+    }
+  ],
+  "pseudoElements": [
+    {
+      "name": "::part(container)",
+      "description": "Le `<div>` englobant l'alerte."
+    },
+    {
+      "name": "::part(icon)",
+      "description": "Le conteneur de l'icône de version."
+    },
+    {
+      "name": "::part(body)",
+      "description": "Le conteneur du titre et du contenu."
+    },
+    {
+      "name": "::part(close)",
+      "description": "Le bouton de fermeture (présent uniquement si `next-focus` est défini)."
+    },
+    { "name": "::part(nav)", "description": "L'élément `<nav>` englobant." },
+    {
+      "name": "::part(list)",
+      "description": "L'élément `<ol>` de la liste des liens (desktop)."
+    },
+    { "name": "::part(item)", "description": "Chaque `<li>` de la liste." },
+    { "name": "::part(link)", "description": "Les `<a>` de navigation." },
+    {
+      "name": "::part(current)",
+      "description": "Le `<span>` de la page courante (dernier élément, non cliquable)."
+    },
+    {
+      "name": "::part(dropdown)",
+      "description": "Le conteneur du dropdown mobile."
+    },
+    { "name": "::part(base)", "description": "L'élément `<button>` natif." },
+    { "name": "::part(label)", "description": "Le conteneur du label." },
+    { "name": "::part(prefix)", "description": "Le conteneur du slot prefix." },
+    { "name": "::part(suffix)", "description": "Le conteneur du slot suffix." },
+    { "name": "::part(nav)", "description": "L'élément `<nav>` englobant." },
+    {
+      "name": "::part(list)",
+      "description": "L'élément `<ul>` de la liste des pages."
+    },
+    { "name": "::part(item)", "description": "Chaque `<li>` de la liste." },
+    {
+      "name": "::part(link)",
+      "description": "Les `<a>` cliquables de chaque page."
+    },
+    {
+      "name": "::part(current)",
+      "description": "Le `<span>` de la page courante (non cliquable)."
+    },
+    { "name": "::part(prev)", "description": "Le bouton \"Page précédente\"." },
+    { "name": "::part(next)", "description": "Le bouton \"Page suivante\"." },
+    {
+      "name": "::part(container)",
+      "description": "Le `<div>` englobant l'ensemble du composant."
+    },
+    {
+      "name": "::part(label)",
+      "description": "Le `<p>` contenant le slot et le pourcentage."
+    },
+    {
+      "name": "::part(label-text)",
+      "description": "Le `<span>` autour du slot."
+    },
+    {
+      "name": "::part(percent)",
+      "description": "Le `<strong>` affichant la valeur numérique du pourcentage."
+    },
+    {
+      "name": "::part(track)",
+      "description": "Le `<div>` représentant le fond de la barre (rail)."
+    },
+    {
+      "name": "::part(bar)",
+      "description": "Le `<div>` représentant la progression (la partie remplie)."
+    },
+    {
+      "name": "::part(spinner)",
+      "description": "L'élément `<svg>` du spinner (visible quand `done` est false)."
+    },
+    {
+      "name": "::part(status)",
+      "description": "Le `<div role=\"alert\">` lu par les lecteurs d'écran."
+    },
+    { "name": "::part(nav)", "description": "L'élément `<nav>` englobant." },
+    { "name": "::part(list)", "description": "La liste des étapes (desktop)." },
+    { "name": "::part(step)", "description": "Une étape de premier niveau." },
+    { "name": "::part(substep)", "description": "Une sous-étape." },
+    { "name": "::part(step-link)", "description": "Le lien d'une étape." },
+    {
+      "name": "::part(dropdown)",
+      "description": "Le conteneur dropdown (mobile uniquement)."
+    },
+    {
+      "name": "::part(dropdown-btn)",
+      "description": "Le bouton d'ouverture du dropdown mobile."
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vscode-html-languageservice/main/docs/customData.schema.json",
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "mr-alert",
+      "description": "Affiche un message d'alerte accessible avec différents niveaux de sévérité.\n---\n\n\n### **Events:**\n - **mr-alert-close** - Émis après la fermeture de l'alerte (fin de transition).\n\n### **Slots:**\n - **title** - Titre de l'alerte.\n- **content** - Corps du message de l'alerte.\n\n### **CSS Properties:**\n - **--mr--bg-info** - Couleur de fond pour une alerte de type \"info\". _(default: #dfe9ff)_\n- **--mr--border-info** - Couleur de la bordure pour une alerte de type \"info\". _(default: #dfe9ff)_\n- **--mr--icon-info** - Couleur de l'icône pour une alerte de type \"info\". _(default: #2c74ff)_\n- **--mr--bg-warning** - Couleur de fond pour une alerte de type \"warning\". _(default: #fffaeb)_\n- **--mr--border-warning** - Couleur de la bordure pour une alerte de type \"warning\". _(default: #fffaeb)_\n- **--mr--icon-warning** - Couleur de l'icône pour une alerte de type \"warning\". _(default: #f79009)_\n- **--mr--bg-error** - Couleur de fond pour une alerte de type \"error\". _(default: #ffeceb)_\n- **--mr--border-error** - Couleur de la bordure pour une alerte de type \"error\". _(default: #ffeceb)_\n- **--mr--icon-error** - Couleur de l'icône pour une alerte de type \"error\". _(default: #f04438)_\n- **--mr--bg-success** - Couleur de fond pour une alerte de type \"success\". _(default: #d9f6e8)_\n- **--mr--border-success** - Couleur de la bordure pour une alerte de type \"success\". _(default: #d9f6e8)_\n- **--mr--icon-success** - Couleur de l'icône pour une alerte de type \"success\". _(default: #09aa5f)_\n\n### **CSS Parts:**\n - **container** - Le `<div>` englobant l'alerte.\n- **icon** - Le conteneur de l'icône de version.\n- **body** - Le conteneur du titre et du contenu.\n- **close** - Le bouton de fermeture (présent uniquement si `next-focus` est défini).",
+      "attributes": [
+        {
+          "name": "next-focus",
+          "description": "ID de l'élément à focus après la fermeture de l'alerte.\nQuand défini, affiche le bouton de fermeture.",
+          "values": []
+        },
+        {
+          "name": "without-notification",
+          "description": "Désactive la notification ARIA lors de l'apparition de l'alerte.\nPar défaut, les lecteurs d'écran sont notifiés via `role=\"alert\"` ou `role=\"status\"`.",
+          "values": []
+        },
+        {
+          "name": "version",
+          "description": "Type d'alerte. Détermine la couleur et l'icône affichées.",
+          "values": [
+            { "name": "success" },
+            { "name": "warning" },
+            { "name": "error" },
+            { "name": "info" }
+          ]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-breadcrumb",
+      "description": "Fil d'ariane accessible avec affichage adaptatif mobile/desktop.\n\nEn dessous de 768px, les liens intermédiaires sont masqués derrière un dropdown.\nLe premier lien reste toujours visible sous forme d'un bouton \"Retour\".\n---\n\n\n### **Events:**\n - **mr-breadcrumb-open** - Émis à l'ouverture du dropdown mobile.\n- **mr-breadcrumb-close** - Émis à la fermeture du dropdown mobile.\n\n### **Slots:**\n - _default_ - Non utilisé. Les liens sont passés via la propriété `links`.\n\n### **CSS Parts:**\n - **nav** - L'élément `<nav>` englobant.\n- **list** - L'élément `<ol>` de la liste des liens (desktop).\n- **item** - Chaque `<li>` de la liste.\n- **link** - Les `<a>` de navigation.\n- **current** - Le `<span>` de la page courante (dernier élément, non cliquable).\n- **dropdown** - Le conteneur du dropdown mobile.",
+      "attributes": [
+        {
+          "name": "links",
+          "description": "Liste des liens du fil d'ariane, dans l'ordre de la hiérarchie.\nLe dernier élément représente la page courante et ne doit pas avoir de `href`.",
+          "values": [{ "name": "MrBreadcrumbLink[]" }]
+        },
+        {
+          "name": "dark",
+          "description": "Active le thème sombre du composant.",
+          "values": [{ "name": "Boolean" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-button",
+      "description": "Bouton accessible et personnalisable.\n---\n\n\n### **Events:**\n - **eventName**\n- **mr-click** - Émis au clic. Pas émis si `disabled`.\n- **mr-focus** - Émis quand le bouton reçoit le focus.\n- **mr-blur** - Émis quand le bouton perd le focus.\n\n### **Slots:**\n - _default_ - Contenu principal du bouton (label).\n- **prefix** - Icône ou élément avant le label.\n- **suffix** - Icône ou élément après le label.\n\n### **CSS Properties:**\n - **--mr-button-bg** - Couleur de fond (variant filled/danger). _(default: undefined)_\n- **--mr-button-color** - Couleur du texte. _(default: undefined)_\n- **--mr-button-border-color** - Couleur de la bordure (variant outlined). _(default: undefined)_\n- **--mr-button-font-size** - Taille de police. _(default: undefined)_\n- **--mr-button-font-weight** - Graisse de police. _(default: undefined)_\n- **--mr-button-border-radius** - Arrondi des coins. _(default: undefined)_\n- **--mr-button-padding-x** - Padding horizontal. _(default: undefined)_\n- **--mr-button-padding-y** - Padding vertical. _(default: undefined)_\n- **--mr-focus-ring-color** - Couleur du focus ring (accessibilité). _(default: undefined)_\n\n### **CSS Parts:**\n - **base** - L'élément `<button>` natif.\n- **label** - Le conteneur du label.\n- **prefix** - Le conteneur du slot prefix.\n- **suffix** - Le conteneur du slot suffix.",
+      "attributes": [
+        {
+          "name": "variant",
+          "description": "Variant visuel du bouton.",
+          "values": [
+            { "name": "filled" },
+            { "name": "outlined" },
+            { "name": "ghost" },
+            { "name": "danger" }
+          ]
+        },
+        {
+          "name": "size",
+          "description": "Taille du bouton.",
+          "values": [{ "name": "small" }, { "name": "medium" }, { "name": "large" }]
+        },
+        {
+          "name": "disabled",
+          "description": "Désactive le bouton et prévient toute interaction.",
+          "values": []
+        },
+        {
+          "name": "type",
+          "description": "Type natif pour la soumission de formulaire.",
+          "values": [{ "name": "button" }, { "name": "submit" }, { "name": "reset" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-pagination",
+      "description": "Pagination accessible avec numérotation dynamique et ellipses automatiques.\n\nLes pages intermédiaires sont calculées automatiquement selon le nombre total.\nDes ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.\n---\n\n\n### **Events:**\n - **mr-pagination-page-change** - Émis à chaque changement de page. Contient `from` et `to`.\n\n### **Methods:**\n - **renderPage(page: _number_, active: _boolean_, variant: _MrPaginationVariant_): _TemplateResult_** - Génère le `<li>` d'une page.\nRendu public pour permettre la surcharge dans les sous-classes.\n- **renderPageLink(page: _number_, active: _boolean_, variant: _MrPaginationVariant_): _TemplateResult_** - Génère le lien ou le span (si page active) d'une page\n- **renderPageLabel(page: _number_): _TemplateResult_** - Génère le label d'une page avec texte sr-only pour les lecteurs d'écran\n\n### **CSS Parts:**\n - **nav** - L'élément `<nav>` englobant.\n- **list** - L'élément `<ul>` de la liste des pages.\n- **item** - Chaque `<li>` de la liste.\n- **link** - Les `<a>` cliquables de chaque page.\n- **current** - Le `<span>` de la page courante (non cliquable).\n- **prev** - Le bouton \"Page précédente\".\n- **next** - Le bouton \"Page suivante\".",
+      "attributes": [
+        {
+          "name": "current",
+          "description": "Numéro de la page courante (commence à 1).",
+          "values": []
+        },
+        {
+          "name": "total",
+          "description": "Nombre total de pages.",
+          "values": []
+        },
+        {
+          "name": "variant",
+          "description": "Variante de style. Adapter selon la couleur de fond de la page.",
+          "values": [{ "name": "MrPaginationVariant" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-progressbar",
+      "description": "Barre de progression accessible avec label et affichage du pourcentage.\n\nLa valeur de `percent` est automatiquement bornée entre 0 et 100.\nLe label est fourni via le slot par défaut, affiché avant le pourcentage.\n---\n\n\n### **Slots:**\n - _default_ - Label décrivant ce que mesure la barre (ex: \"Chargement du fichier\").\n\n### **CSS Properties:**\n - **--mr-progressbar-height** - Hauteur de la barre. Défaut : `8px`. _(default: undefined)_\n- **--mr-progressbar-bg** - Couleur du rail (fond). Défaut : `#e5e7eb`. _(default: undefined)_\n- **--mr-progressbar-fill** - Couleur de la progression. Défaut : `#2563eb`. _(default: undefined)_\n- **--mr-progressbar-border-radius** - Arrondi de la barre. Défaut : `9999px`. _(default: undefined)_\n\n### **CSS Parts:**\n - **container** - Le `<div>` englobant l'ensemble du composant.\n- **label** - Le `<p>` contenant le slot et le pourcentage.\n- **label-text** - Le `<span>` autour du slot.\n- **percent** - Le `<strong>` affichant la valeur numérique du pourcentage.\n- **track** - Le `<div>` représentant le fond de la barre (rail).\n- **bar** - Le `<div>` représentant la progression (la partie remplie).",
+      "attributes": [
+        {
+          "name": "percent",
+          "description": "Pourcentage de complétion. Automatiquement borné entre 0 et 100.",
+          "values": []
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-spinner",
+      "description": "Indicateur de chargement accessible avec états \"en cours\" et \"terminé\".\n\nLe spinner SVG est masqué (`hidden`) quand `done` est `true`.\nUn `<div role=\"alert\">` annonce aux lecteurs d'écran le changement d'état,\nque ce soit l'état de chargement ou de fin.\n---\n\n\n### **CSS Properties:**\n - **--mr--spinner-stroke-color** - Couleur du trait SVG. Défaut : `currentColor`. _(default: #5b5d65)_\n\n### **CSS Parts:**\n - **spinner** - L'élément `<svg>` du spinner (visible quand `done` est false).\n- **status** - Le `<div role=\"alert\">` lu par les lecteurs d'écran.",
+      "attributes": [
+        {
+          "name": "done",
+          "description": "Passe le spinner en état \"terminé\" : masque le SVG et met à jour l'annonce ARIA.",
+          "values": []
+        },
+        {
+          "name": "loading-label",
+          "description": "Texte annoncé aux lecteurs d'écran pendant le chargement.",
+          "values": []
+        },
+        {
+          "name": "done-label",
+          "description": "Texte annoncé aux lecteurs d'écran quand le chargement est terminé.",
+          "values": []
+        },
+        {
+          "name": "size",
+          "values": [{ "name": "xs" }, { "name": "sm" }, { "name": "md" }]
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-stepper",
+      "description": "Stepper de navigation accessible, adaptatif desktop/mobile.\n\nLes étapes sont déclarées via des éléments `<mr-stepper-item>` enfants.\nLe composant les collecte automatiquement via `@lit/context` et construit\nl'arbre de navigation. Un item peut avoir des sous-étapes (enfants imbriqués).\n\nEn mode `mobile`, les étapes sont affichées dans un dropdown.\nEn mode `desktop`, elles sont affichées dans une liste verticale.\n---\n\n\n### **Events:**\n - **mr-stepper-step-changed** - Émis au clic sur une étape. Contient le `path` de l'étape.\n- **step-changed** - Alias court du même événement (usage interne).\n\n### **Slots:**\n - _default_ - Contenu additionnel affiché après la liste d'étapes (ex: boutons de navigation).\n\n### **CSS Properties:**\n - **--mr-stepper-gap** - Espacement entre les étapes. _(default: undefined)_\n- **--mr-stepper-active-color** - Couleur de l'étape active. _(default: undefined)_\n- **--mr-stepper-done-color** - Couleur des étapes complétées. _(default: undefined)_\n- **--mr-stepper-inactive-color** - Couleur des étapes inactives. _(default: undefined)_\n- **--mr-stepper-connector-color** - Couleur du connecteur entre étapes. _(default: undefined)_\n\n### **CSS Parts:**\n - **nav** - L'élément `<nav>` englobant.\n- **list** - La liste des étapes (desktop).\n- **step** - Une étape de premier niveau.\n- **substep** - Une sous-étape.\n- **step-link** - Le lien d'une étape.\n- **dropdown** - Le conteneur dropdown (mobile uniquement).\n- **dropdown-btn** - Le bouton d'ouverture du dropdown mobile.",
+      "attributes": [
+        {
+          "name": "current-path",
+          "description": "Chemin de l'étape courante. Doit correspondre au `href` d'un `<mr-stepper-item>`.\nMettre à jour cette propriété pour naviguer programmatiquement entre les étapes.",
+          "values": []
+        },
+        {
+          "name": "mode",
+          "description": "Mode de navigation : `create` (formulaire de création) ou `edit` (modification).\nDétermine quelles étapes sont accessibles au clic.",
+          "values": [{ "name": "NavigationMode" }]
+        },
+        {
+          "name": "version",
+          "description": "Version d'affichage. Passer `mobile` pour activer le rendu dropdown.\nEn pratique, gérer ce changement via un `ResizeObserver` ou une media query externe.",
+          "values": [{ "name": "MrStepperVersion" }]
+        },
+        {
+          "name": "follow-scroll",
+          "description": "Active le mode \"scroll follow\" : la propriété `current-path` se met à jour\nautomatiquement quand l'utilisateur scrolle vers une section de la page.",
+          "values": []
+        }
+      ],
+      "references": []
+    },
+    {
+      "name": "mr-stepper-item",
+      "description": "Élément enfant de mr-stepper.\n---\n",
+      "attributes": [
+        { "name": "path", "values": [] },
+        { "name": "label", "values": [] },
+        { "name": "href", "values": [] }
+      ],
+      "references": []
+    }
+  ]
+}
