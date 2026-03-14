@@ -1,0 +1,139 @@
+---
+/**
+ * tokens.astro
+ *
+ * Page auto-générée depuis le fichier de thème default.css.
+ * Aucune duplication manuelle : ajouter un token dans le CSS → apparaît ici.
+ */
+import Layout from '../../layouts/Layout.astro';
+import { parseTokens, isColor } from '../../utils/parse-tokens.ts';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+// process.cwd() est stable entre dev et build (racine du workspace docs)
+const themePath = resolve(process.cwd(), '../../packages/core/src/styles/themes/default.css');
+const css = readFileSync(themePath, 'utf-8');
+
+const categories = parseTokens(css);
+---
+
+<Layout title="Design Tokens" currentPath="/foundations/tokens">
+
+    <h1>Design Tokens</h1>
+    <p class="intro">
+        Tokens extraits automatiquement du thème <code>default.css</code>.
+        Modifiez le fichier de thème, ces valeurs se mettent à jour à la compilation.
+    </p>
+
+    {categories.map((category) => (
+        <section>
+            <h2>{category.label}</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {category.tokens.map((token) => (
+                            <tr>
+                                <td><code>{token.name}</code></td>
+                                <td>
+                                    {isColor(token.value) && (
+                                        <span
+                                            class="swatch"
+                                            style={`background: ${token.value}`}
+                                            title={token.value}
+                                        />
+                                    )}
+                                    <code class="value">{token.value}</code>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    ))}
+
+</Layout>
+
+<style>
+    .intro {
+        font-size:     0.95rem;
+        color:         #4b5563;
+        margin-bottom: 2rem;
+    }
+
+    .intro code {
+        font-size:     0.85em;
+        background:    #f3f4f6;
+        padding:       0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+
+    section {
+        margin-bottom: 2.5rem;
+    }
+
+    h2 {
+        font-size:      1.1rem;
+        font-weight:    600;
+        border-bottom:  1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+        margin-bottom:  1rem;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        width:           100%;
+        border-collapse: collapse;
+        font-size:       0.875rem;
+    }
+
+    th {
+        text-align:    left;
+        padding:       0.5rem 0.75rem;
+        background:    #f9fafb;
+        font-weight:   600;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+        padding:       0.5rem 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+    }
+
+    code {
+        font-family:   'Fira Code', 'Cascadia Code', monospace;
+        font-size:     0.8rem;
+        background:    #f3f4f6;
+        padding:       0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+
+    .value {
+        color: #6b7280;
+    }
+
+    .swatch {
+        display:       inline-block;
+        width:         1.5rem;
+        height:        1.5rem;
+        border-radius: 0.25rem;
+        border:        1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .ref {
+        font-size:  0.75rem;
+        color:      #9ca3af;
+        font-style: italic;
+    }
+</style>
