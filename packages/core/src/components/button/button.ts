@@ -4,6 +4,7 @@ import styles from './button.styles.js';
 
 /**
  * @summary Bouton accessible et personnalisable.
+ * @display demo
  *
  * @slot             - Contenu principal du bouton (label).
  * @slot prefix      - Icône ou élément avant le label.

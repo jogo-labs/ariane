@@ -6,6 +6,7 @@ import styles from './spinner.styles.js';
 
 /**
  * @summary Indicateur de chargement accessible avec états "en cours" et "terminé".
+ * @display demo
  *
  * Le spinner SVG est masqué (`hidden`) quand `done` est `true`.
  * Un `<div role="alert">` annonce aux lecteurs d'écran le changement d'état,
@@ -36,7 +37,7 @@ export class MrSpinner extends LitElement {
     /**
      * Texte annoncé aux lecteurs d'écran pendant le chargement.
      * @attr loading-label
-     * @default Contenu en cours de chargement
+     * @default 'Contenu en cours de chargement'
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'loading-label' })
     loadingLabel: string = MrSpinner.DEFAULT_LOADING_LABEL;
@@ -44,17 +45,16 @@ export class MrSpinner extends LitElement {
     /**
      * Texte annoncé aux lecteurs d'écran quand le chargement est terminé.
      * @attr done-label
-     * @default Chargement terminé
+     * @default 'Chargement terminé'
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'done-label' })
     doneLabel: string = MrSpinner.DEFAULT_DONE_LABEL;
 
     @property({ reflect: true, type: String, useDefault: true })
-    size: "xs" | "sm" | "md" | null = null
+    size: 'xs' | 'sm' | 'lg' | undefined = undefined;
 
     override render(): TemplateResult {
-        return html`
-            <svg
+        return html` <svg
                 part="spinner"
                 class="spinner"
                 viewBox="25 25 50 50"

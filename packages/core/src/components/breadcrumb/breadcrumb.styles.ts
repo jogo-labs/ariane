@@ -10,7 +10,6 @@ export default css`
         --mr--color-text-color: #fff;
         /* Pour assurer la retro-compatibilité tant que la nouvelle charte n'est pas en prod */
         --mr--text-color-default: #fff;
-
     }
     :host([dark]) .breadcrumb-desktop .breadcrumb-text {
         color: var(--mr--color-text-color, var(--mr--text-color-default));
@@ -21,19 +20,21 @@ export default css`
     }
 
     .breadcrumb-container {
-        padding-right: .25rem
+        padding-right: 0.25rem;
     }
 
     .breadcrumb-container.dark .breadcrumb-desktop {
-        --mr--color-text-color: #fff
+        --mr--color-text-color: #fff;
     }
 
-    .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-link,.breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-text {
-        color: var(--mr--color-text-color)
+    .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-link,
+    .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-text {
+        color: var(--mr--color-text-color);
     }
 
-    .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-item:before,.high-contrast .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-item:before {
-        background-color: var(--mr--color-text-color, var(--mr--text-color-default))
+    .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-item:before,
+    .high-contrast .breadcrumb-container.dark .breadcrumb-desktop .breadcrumb-item:before {
+        background-color: var(--mr--color-text-color, var(--mr--text-color-default));
     }
 
     .breadcrumb {
@@ -41,18 +42,20 @@ export default css`
         padding: 0;
         border-radius: 0;
         background-color: transparent;
-        color: var(--mr--color-text-color)
+        color: var(--mr--color-text-color);
     }
 
     .breadcrumb-link {
-        text-decoration: underline
+        text-decoration: underline;
     }
 
     .breadcrumb-link:hover {
-        color: inherit
+        color: inherit;
     }
 
-    .breadcrum-text,.breadcrumb-link,.breadcrumb-link:visited {
+    .breadcrum-text,
+    .breadcrumb-link,
+    .breadcrumb-link:visited {
         display: -webkit-inline-box;
         display: -ms-inline-flexbox;
         display: inline-flex;
@@ -61,11 +64,13 @@ export default css`
         align-items: center;
         color: inherit;
         background-color: inherit;
-        font-weight: 400
+        font-weight: 400;
     }
 
-    .breadcrum-text .icon:first-child,.breadcrumb-link .icon:first-child,.breadcrumb-link:visited .icon:first-child {
-        margin-right: .5rem
+    .breadcrum-text .icon:first-child,
+    .breadcrumb-link .icon:first-child,
+    .breadcrumb-link:visited .icon:first-child {
+        margin-right: 0.5rem;
     }
 
     .breadcrumb-item {
@@ -74,29 +79,29 @@ export default css`
         display: flex;
         -webkit-box-align: center;
         -ms-flex-align: center;
-        align-items: center
+        align-items: center;
     }
 
     .breadcrumb-item.active {
         color: #171717;
-        font-weight: 700
+        font-weight: 700;
     }
 
     .high-contrast .breadcrumb-item.active {
-        color: #000
+        color: #000;
     }
 
     .breadcrumb-desktop {
-        display: none
+        display: none;
     }
 
-    .breadcrumb-desktop .breadcrumb-item+.breadcrumb-item {
-        padding: 0
+    .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item {
+        padding: 0;
     }
 
-    .breadcrumb-desktop .breadcrumb-item+.breadcrumb-item:before {
-        content: "";
-        margin: .125rem .5rem 0;
+    .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item:before {
+        content: '';
+        margin: 0.125rem 0.5rem 0;
         padding: 0;
         background-color: #b5b8c5;
         height: 65%;
@@ -104,11 +109,11 @@ export default css`
         -webkit-transform: rotate(15deg);
         transform: rotate(15deg);
         -webkit-transform-origin: center;
-        transform-origin: center
+        transform-origin: center;
     }
 
-    .high-contrast .breadcrumb-desktop .breadcrumb-item+.breadcrumb-item:before {
-        background-color: #2e2e31
+    .high-contrast .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item:before {
+        background-color: #2e2e31;
     }
 
     .breadcrumb-mobile {
@@ -116,85 +121,100 @@ export default css`
         -webkit-box-direction: normal;
         -ms-flex-direction: column;
         flex-direction: column;
-        margin: 0
+        margin: 0;
     }
 
-    .breadcrumb-mobile,.breadcrumb-mobile .breadcrumb-item {
+    .breadcrumb-mobile,
+    .breadcrumb-mobile .breadcrumb-item {
         position: relative;
-        padding: 0
+        padding: 0;
     }
 
     .breadcrumb-mobile .breadcrumb-item:before {
-        content: "";
+        content: '';
         padding: 0;
         border-radius: 100rem;
-        width: .375rem;
-        height: .375rem;
+        width: 0.375rem;
+        height: 0.375rem;
         background-color: #cdcfd8;
-        margin: 0 .75rem;
+        margin: 0 0.75rem;
         -ms-flex-negative: 0;
         flex-shrink: 0;
         -webkit-box-shadow: 0 0 0 2px #fff;
-        box-shadow: 0 0 0 2px #fff
+        box-shadow: 0 0 0 2px #fff;
     }
 
     .high-contrast .breadcrumb-mobile .breadcrumb-item:before {
-        background-color: #888b99
+        background-color: #888b99;
     }
 
-    .breadcrumb-mobile .breadcrumb-item:first-child:before,.breadcrumb-mobile .breadcrumb-item:last-child:before {
-        width: .625rem;
-        height: .625rem;
-        margin: 0 .625rem
+    .breadcrumb-mobile .breadcrumb-item:first-child:before,
+    .breadcrumb-mobile .breadcrumb-item:last-child:before {
+        width: 0.625rem;
+        height: 0.625rem;
+        margin: 0 0.625rem;
     }
 
     .breadcrumb-mobile .breadcrumb-item:last-child:before {
-        background-color: var(--mr--color-primary)
+        background-color: var(--mr--color-primary);
     }
 
-    .breadcrumb-mobile .breadcrumb-link,.breadcrumb-mobile .breadcrumb-text {
+    .breadcrumb-mobile .breadcrumb-link,
+    .breadcrumb-mobile .breadcrumb-text {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
         -webkit-box-flex: 1;
         -ms-flex-positive: 1;
         flex-grow: 1;
-        padding: .5rem .25rem
+        padding: 0.5rem 0.25rem;
     }
 
     .breadcrumb-mobile:before {
-        content: "";
+        content: '';
         display: block;
         position: absolute;
         width: 1.875rem;
         top: 1.5rem;
         bottom: 1.5rem;
         left: 0;
-        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(25%,#e6e7ec),color-stop(25%,transparent));
-        background-image: linear-gradient(#e6e7ec 25%,transparent 0);
+        background-image: -webkit-gradient(
+            linear,
+            left top,
+            left bottom,
+            color-stop(25%, #e6e7ec),
+            color-stop(25%, transparent)
+        );
+        background-image: linear-gradient(#e6e7ec 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 4px;
-        background-repeat: repeat-y
+        background-repeat: repeat-y;
     }
 
     .high-contrast .breadcrumb-mobile:before {
-        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(25%,#b5b8c5),color-stop(25%,transparent));
-        background-image: linear-gradient(#b5b8c5 25%,transparent 0)
+        background-image: -webkit-gradient(
+            linear,
+            left top,
+            left bottom,
+            color-stop(25%, #b5b8c5),
+            color-stop(25%, transparent)
+        );
+        background-image: linear-gradient(#b5b8c5 25%, transparent 0);
     }
 
-    @media (min-width: 768px) {
-        .breadcrumb-dropdown {
+    /* @media (min-width: 768px) { */
+    /* .breadcrumb-dropdown {
             display:none!important
-        }
+        } */
 
-        .breadcrumb-desktop {
-            display: -webkit-box!important;
-            display: -ms-flexbox!important;
-            display: flex!important;
-            -webkit-box-orient: horizontal;
-            -webkit-box-direction: normal;
-            -ms-flex-flow: row wrap;
-            flex-flow: row wrap
-        }
+    .breadcrumb-desktop {
+        display: -webkit-box !important;
+        display: -ms-flexbox !important;
+        display: flex !important;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-flow: row wrap;
+        flex-flow: row wrap;
     }
-`
+    /* } */
+`;

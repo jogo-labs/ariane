@@ -1,6 +1,6 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
 import { type ClassInfo, classMap } from 'lit/directives/class-map.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 
 export function warn(name: string, message: string, error?: Error) {
@@ -30,6 +30,7 @@ const VERSION_TO_CLASS: Record<MrAlertVersion, string> = {
 
 /**
  * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+ * @display demo
  *
  * @slot title   - Titre de l'alerte.
  * @slot content - Corps du message de l'alerte.
@@ -61,17 +62,21 @@ export class MrAlert extends LitElement {
     static override styles = [styles];
 
     /** Nom du composant affiché dans les logs */
+    // @ignore
     static readonly NAME = 'MrAlert';
+    // @ignore
     static readonly DEFAULT_VERSION: MrAlertVersion = 'error';
+    // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
 
     /**
      * ID de l'élément à focus après la fermeture de l'alerte.
      * Quand défini, affiche le bouton de fermeture.
      * @attr next-focus
+     * @default undefined
      */
     @property({ reflect: true, type: String, attribute: 'next-focus' })
-    nextFocus?: string | null = null;
+    nextFocus?: string;
 
     /**
      * Désactive la notification ARIA lors de l'apparition de l'alerte.
@@ -86,7 +91,7 @@ export class MrAlert extends LitElement {
      * @attr version
      */
     @property({ reflect: true, type: String, useDefault: true })
-    version: 'success' | 'warning' | 'error' | 'info' = 'error';
+    version?: 'success' | 'warning' | 'error' | 'info';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
@@ -105,41 +110,46 @@ export class MrAlert extends LitElement {
     override render(): TemplateResult {
         const containerClassMap: ClassInfo = {
             alert: true,
-            'alert-dismissible': this.nextFocus !== null,
+            'alert-dismissible': this.nextFocus !== undefined,
         };
-        containerClassMap[`alert-${this.version}`] = true;
+        containerClassMap[`alert-${this.version ?? MrAlert.DEFAULT_VERSION}`] = true;
 
-        return html`
-            <div
-                part="container"
-                class=${classMap(containerClassMap)}
-                .role=${this.withoutNotification
+        return html` <div
+            part="container"
+            class=${classMap(containerClassMap)}
+            .role=${this.withoutNotification
                 ? nothing
-                : this.version === 'info' ? 'status' : 'alert'}
-            >
-                <div part="icon" class="alert-icon-container has-icon-top">
-                    <span aria-hidden="true" class="icon icon-${VERSION_TO_CLASS[this.version]}"></span>
-                </div>
-                <div part="body" class="alert-body">
-                    <p class="alert-title"><slot name="title"></slot></p>
-                    <p class="alert-content"><slot name="content"></slot></p>
-                </div>
-                ${this.canBeHidden
-                ? html`
-                        <button
-                            part="close"
-                            @click=${this._hide}
-                            class="btn btn-sm btn-tertiary light close"
-                            type="button"
-                            aria-label="Fermer l'alerte"
-                        >X</button>`
+                : this.version === 'info'
+                  ? 'status'
+                  : 'alert'}
+        >
+            <div part="icon" class="alert-icon-container has-icon-top">
+                <span
+                    aria-hidden="true"
+                    class="icon icon-${VERSION_TO_CLASS[this.version ?? MrAlert.DEFAULT_VERSION]}"
+                ></span>
+            </div>
+            <div part="body" class="alert-body">
+                <p class="alert-title"><slot name="title"></slot></p>
+                <p class="alert-content"><slot name="content"></slot></p>
+            </div>
+            ${this.canBeHidden
+                ? html` <button
+                      part="close"
+                      @click=${this._hide}
+                      class="btn btn-sm btn-tertiary light close"
+                      type="button"
+                      aria-label="Fermer l'alerte"
+                  >
+                      X
+                  </button>`
                 : nothing}
-            </div>`;
+        </div>`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */
     get canBeHidden(): boolean {
-        return this.nextFocus !== null && this.nextFocus?.replaceAll(' ', '') !== '';
+        return this.nextFocus !== undefined && this.nextFocus?.replaceAll(' ', '') !== '';
     }
 
     private _hide = (): void => {
@@ -151,11 +161,15 @@ export class MrAlert extends LitElement {
         if (!this.canBeHidden) return;
 
         if (this.hiding) {
-            this.dispatchEvent(new CustomEvent('mr-alert-close', { bubbles: true, composed: true }));
+            this.dispatchEvent(
+                new CustomEvent('mr-alert-close', { bubbles: true, composed: true }),
+            );
             this.remove();
         }
 
-        const $focusableElement = document.getElementById(`${this.nextFocus!.replace('#', '')}`);
+        const $focusableElement = document.getElementById(
+            `${(this.nextFocus as string).replace('#', '')}`,
+        );
         if (!$focusableElement) {
             console.error(
                 `${MrAlert.NAME} - L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,

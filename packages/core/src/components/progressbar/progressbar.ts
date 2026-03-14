@@ -12,6 +12,7 @@ export class MrProgressbarConfig {
 
 /**
  * @summary Barre de progression accessible avec label et affichage du pourcentage.
+ * @display demo
  *
  * La valeur de `percent` est automatiquement bornée entre 0 et 100.
  * Le label est fourni via le slot par défaut, affiché avant le pourcentage.
@@ -48,26 +49,25 @@ export class MrProgressbar extends LitElement {
         // Clamp défensif : même si la propriété est bornée, une valeur HTML arbitraire peut passer
         const percentValue = Math.max(0, Math.min(100, this.percent));
 
-        return html`
-            <div part="container" class="progressbar-container">
-                <p part="label" class="progress-label">
-                    <span part="label-text" class="content-label">
-                        <slot></slot>
-                    </span>
-                    <strong part="percent" class="progress-percent">${percentValue}%</strong>
-                </p>
-                <div part="track" class="progress d-inline-flex">
-                    <div
-                        part="bar"
-                        class="progress-bar"
-                        style=${styleMap({ width: percentValue + '%' })}
-                        role="progressbar"
-                        aria-valuenow="${percentValue}"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    ></div>
-                </div>
-            </div>`;
+        return html` <div part="container" class="progressbar-container">
+            <p part="label" class="progress-label">
+                <span part="label-text" class="content-label">
+                    <slot></slot>
+                </span>
+                <strong part="percent" class="progress-percent">${percentValue}%</strong>
+            </p>
+            <div part="track" class="progress d-inline-flex">
+                <div
+                    part="bar"
+                    class="progress-bar"
+                    style=${styleMap({ width: percentValue + '%' })}
+                    role="progressbar"
+                    aria-valuenow="${percentValue}"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                ></div>
+            </div>
+        </div>`;
     }
 }
 

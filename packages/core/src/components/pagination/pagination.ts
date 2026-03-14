@@ -9,7 +9,7 @@ import { mrPaginationUtils } from './pagination.utils.js';
 /** Objet de configuration d'un webcomposant MrPagination */
 export class MrPaginationConfig {
     current?: number = 1;
-    total?: number = 1;
+    total?: number = 5;
     variant?: MrPaginationVariant = 'light';
 }
 
@@ -26,6 +26,7 @@ export interface MrPaginationPageChangeDetail {
 
 /**
  * @summary Pagination accessible avec numérotation dynamique et ellipses automatiques.
+ * @display demo
  *
  * Les pages intermédiaires sont calculées automatiquement selon le nombre total.
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
@@ -38,7 +39,7 @@ export interface MrPaginationPageChangeDetail {
  * @csspart prev     - Le bouton "Page précédente".
  * @csspart next     - Le bouton "Page suivante".
  *
- * @event {CustomEvent<MrPaginationPageChangeDetail>} mr-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
+ * @event {CustomEvent<{from: number, to: number}>} mr-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
 @customElement('mr-pagination')
 export class MrPagination extends LitElement {
@@ -67,102 +68,107 @@ export class MrPagination extends LitElement {
     /**
      * Variante de style. Adapter selon la couleur de fond de la page.
      * @attr variant
-     * @default light
+     * @default 'light'
      */
     @property({ reflect: true, type: String, useDefault: true })
-    variant: MrPaginationVariant = MrPagination.DEFAULT_VARIANT;
+    variant: 'light' | 'dark' = MrPagination.DEFAULT_VARIANT;
 
     override render(): TemplateResult {
         const isNextDisabled = this.current >= this.total;
         const isPreviousDisabled = this.current <= 1;
         const previousPageNumber = mrPaginationUtils._clamp(
-            this.current - 1, 1, this.total > 1 ? this.total - 1 : 1,
+            this.current - 1,
+            1,
+            this.total > 1 ? this.total - 1 : 1,
         );
         const nextPageNumber = mrPaginationUtils._clamp(this.current + 1, 1, this.total);
         const current = mrPaginationUtils._clamp(this.current, 1, this.total);
 
-        return html`
-            <nav part="nav" role="navigation" aria-labelledby="mr-pagination">
-                <p id="mr-pagination" class="sr-only">Pagination</p>
-                <ul part="list" class="pagination" @click=${this._onPageChange}>
-                    <li part="item" class="pagination-item">
-                        <a
-                            part="prev"
-                            class="btn btn-tertiary light btn-ratio-square"
-                            href="javascript:;"
-                            .ariaDisabled=${isPreviousDisabled}
-                            aria-disabled=${isPreviousDisabled}
-                            @click=${this._onPreviousPage}
-                        >
-                            <span aria-hidden="true" class="icon icon-chevron-l">&lt;</span>
-                            <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
-                        </a>
-                    </li>
+        return html` <nav part="nav" role="navigation" aria-labelledby="mr-pagination">
+            <p id="mr-pagination" class="sr-only">Pagination</p>
+            <ul part="list" class="pagination" @click=${this._onPageChange}>
+                <li part="item" class="pagination-item">
+                    <a
+                        part="prev"
+                        class="btn btn-tertiary light btn-ratio-square"
+                        href="javascript:;"
+                        .ariaDisabled=${isPreviousDisabled}
+                        aria-disabled=${isPreviousDisabled}
+                        @click=${this._onPreviousPage}
+                    >
+                        <span aria-hidden="true" class="icon icon-chevron-l">&lt;</span>
+                        <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
+                    </a>
+                </li>
 
-                    ${repeat(
-            mrPaginationUtils._calculatePages(this.current, this.total),
-            (page) => page,
-            (page) => {
-                // -1 et -2 sont des sentinelles représentant les ellipses
-                return page === -1 || page === -2
-                    ? html`
-                                    <li part="item" class="pagination-item" aria-hidden="true">
-                                        <span class="btn btn-tertiary ${this.variant}">...</span>
-                                    </li>`
-                    : this.renderPage(page, page === current, this.variant);
-            },
-        )}
+                ${repeat(
+                    mrPaginationUtils._calculatePages(this.current, this.total),
+                    (page) => page,
+                    (page) => {
+                        // -1 et -2 sont des sentinelles représentant les ellipses
+                        return page === -1 || page === -2
+                            ? html` <li part="item" class="pagination-item" aria-hidden="true">
+                                  <span class="btn btn-tertiary ${this.variant}">...</span>
+                              </li>`
+                            : this.renderPage(page, page === current, this.variant);
+                    },
+                )}
 
-                    <li part="item" class="pagination-item">
-                        <a
-                            part="next"
-                            class="btn btn-tertiary light btn-ratio-square"
-                            href="javascript:;"
-                            .ariaDisabled=${isNextDisabled}
-                            aria-disabled=${isNextDisabled}
-                            @click=${this._onNextPage}
-                        >
-                            <span aria-hidden="true" class="icon icon-chevron-r">&gt;</span>
-                            <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>`;
+                <li part="item" class="pagination-item">
+                    <a
+                        part="next"
+                        class="btn btn-tertiary light btn-ratio-square"
+                        href="javascript:;"
+                        .ariaDisabled=${isNextDisabled}
+                        aria-disabled=${isNextDisabled}
+                        @click=${this._onNextPage}
+                    >
+                        <span aria-hidden="true" class="icon icon-chevron-r">&gt;</span>
+                        <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>`;
     }
 
     /**
      * Génère le `<li>` d'une page.
      * Rendu public pour permettre la surcharge dans les sous-classes.
      */
-    renderPage(page: number, active: boolean, variant: MrPaginationVariant = 'light'): TemplateResult {
-        return html`
-            <li part="item" class="pagination-item${active ? ' active' : ''}">
-                ${this.renderPageLink(page, active, variant)}
-            </li>`;
+    renderPage(
+        page: number,
+        active: boolean,
+        variant: MrPaginationVariant = 'light',
+    ): TemplateResult {
+        return html` <li part="item" class="pagination-item${active ? ' active' : ''}">
+            ${this.renderPageLink(page, active, variant)}
+        </li>`;
     }
 
     /** Génère le lien ou le span (si page active) d'une page */
-    renderPageLink(page: number, active: boolean, variant: MrPaginationVariant = 'light'): TemplateResult {
+    renderPageLink(
+        page: number,
+        active: boolean,
+        variant: MrPaginationVariant = 'light',
+    ): TemplateResult {
         if (active) {
-            return html`
-                <span
-                    part="current"
-                    aria-current="true"
-                    class="btn btn-tertiary ${variant}"
-                    data-mr-pagination-page="${page}"
-                >
-                    ${this.renderPageLabel(page)}
-                </span>`;
-        }
-        return html`
-            <a
-                part="link"
+            return html` <span
+                part="current"
+                aria-current="true"
                 class="btn btn-tertiary ${variant}"
                 data-mr-pagination-page="${page}"
-                href="javascript:;"
             >
                 ${this.renderPageLabel(page)}
-            </a>`;
+            </span>`;
+        }
+        return html` <a
+            part="link"
+            class="btn btn-tertiary ${variant}"
+            data-mr-pagination-page="${page}"
+            href="javascript:;"
+        >
+            ${this.renderPageLabel(page)}
+        </a>`;
     }
 
     /** Génère le label d'une page avec texte sr-only pour les lecteurs d'écran */

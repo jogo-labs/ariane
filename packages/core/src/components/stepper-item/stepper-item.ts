@@ -6,7 +6,8 @@ import { stepperContext, type StepperRegistry } from '../../context/stepper.cont
 
 /**
  * @summary Élément enfant de mr-stepper.
- * @subcomponent mr-stepper
+ * @parent mr-stepper
+ * @display docs
  */
 @customElement('mr-stepper-item')
 export class MrStepperItem extends LitElement {

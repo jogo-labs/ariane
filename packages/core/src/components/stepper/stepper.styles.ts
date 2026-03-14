@@ -51,9 +51,9 @@ export default css`
         }
     }
 
-    .stepper-desktop {
+    /* .stepper-desktop {
         display: none;
-    }
+    } */
 
     .stepper-dropdown {
         display: -webkit-box;

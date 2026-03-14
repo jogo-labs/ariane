@@ -9,14 +9,11 @@ import dropdownStyles from '../../styles/components/dropdown.styles.js';
 import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
-import { type NavigationMode } from '../../types/navigation-nodes.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { DropdownController } from '../../controllers/dropdown.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { type MrStepperItem } from '../stepper-item/stepper-item.js';
-
-export type MrStepperVersion = 'desktop' | 'mobile';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
 export interface MrStepperStepChangeDetail {
@@ -26,6 +23,7 @@ export interface MrStepperStepChangeDetail {
 
 /**
  * @summary Stepper de navigation accessible, adaptatif desktop/mobile.
+ * @display demo
  *
  * Les étapes sont déclarées via des éléments `<mr-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
@@ -34,7 +32,7 @@ export interface MrStepperStepChangeDetail {
  * En mode `mobile`, les étapes sont affichées dans un dropdown.
  * En mode `desktop`, elles sont affichées dans une liste verticale.
  *
- * @slot - Contenu additionnel affiché après la liste d'étapes (ex: boutons de navigation).
+ * @slot - Un ou plusieurs composant <mr-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
  * @csspart nav          - L'élément `<nav>` englobant.
  * @csspart list         - La liste des étapes (desktop).
@@ -50,8 +48,7 @@ export interface MrStepperStepChangeDetail {
  * @cssprop --mr-stepper-inactive-color   - Couleur des étapes inactives.
  * @cssprop --mr-stepper-connector-color  - Couleur du connecteur entre étapes.
  *
- * @event {CustomEvent<MrStepperStepChangeDetail>} mr-stepper-step-changed - Émis au clic sur une étape. Contient le `path` de l'étape.
- * @event {CustomEvent<MrStepperStepChangeDetail>} step-changed            - Alias court du même événement (usage interne).
+ * @event {CustomEvent<{ path: string }>} mr-stepper-step-changed - Émis au clic sur une étape.
  */
 @customElement('mr-stepper')
 export class MrStepper extends LitElement {
@@ -77,7 +74,7 @@ export class MrStepper extends LitElement {
      * @attr mode
      */
     @property({ type: String, attribute: 'mode', useDefault: true })
-    mode: NavigationMode = 'create';
+    mode: 'create' | 'edit' = 'create';
 
     /**
      * Version d'affichage. Passer `mobile` pour activer le rendu dropdown.
@@ -85,7 +82,7 @@ export class MrStepper extends LitElement {
      * @attr version
      */
     @property({ type: String })
-    version: MrStepperVersion = 'desktop';
+    version: 'desktop' | 'mobile' = 'desktop';
 
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
