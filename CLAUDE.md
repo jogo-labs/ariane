@@ -122,7 +122,64 @@ async function fixture(html: string): Promise<MrComponent> {
 - `custom-elements.json` — component API (props, events, slots, CSS parts/props)
 - `vscode.html-custom-data.json` / `vscode.css-custom-data.json` — IDE completions
 
-JSDoc in component files drives documentation. Use the `@subcomponent` tag for parent-child relationships.
+JSDoc tags used in component files:
+
+| Tag                | Effect                                                |
+| ------------------ | ----------------------------------------------------- |
+| `@display demo`    | Page shows variants + playground + API ref (default)  |
+| `@display docs`    | Page shows only API ref (no playground)               |
+| `@parent mr-<tag>` | Marks as sub-component; adds back-link to parent page |
+| `@ignore`          | Hides a member from the playground controls           |
+
+### Docs site architecture (`apps/docs/`)
+
+The docs site is a custom Astro 5 + MDX static site. **No Starlight, no api-viewer.**
+
+**Page structure per component** (`/components/[slug]`):
+
+1. **Exemples** — variants stacked vertically, all server-side rendered via `<Fragment set:html>`
+2. **Playground** — server-side initial render + live controls generated from CEM members
+3. **Référence API** — static tables (attributes, events, slots, CSS parts/props)
+4. **Sticky TOC** — right column, `IntersectionObserver`-driven active highlighting
+
+**Key files:**
+
+| File                                   | Role                                                                                         |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `src/pages/components/[slug].astro`    | Dynamic route — resolves playground HTML, builds controls array from CEM, builds TOC entries |
+| `src/components/Playground.astro`      | Variants + playground + ComponentApi; loads `public/js/playground.js`                        |
+| `src/components/ComponentApi.astro`    | API tables from CEM; color swatches on CSS custom property defaults                          |
+| `src/components/TableOfContents.astro` | Sticky TOC right column; receives `entries[]` via props                                      |
+| `src/components/SiteNav.astro`         | Left nav; auto-generated from CEM with parent/child hierarchy                                |
+| `src/layouts/Layout.astro`             | 3-column grid (`260px 1fr 220px`) when `showToc={true}`                                      |
+| `src/content/config.ts`                | Zod schema for MDX frontmatter                                                               |
+| `public/js/playground.js`              | Copy buttons + live attribute manipulation via `setAttribute`                                |
+| `src/utils/parse-tokens.ts`            | Parses `default.css` and categorizes CSS custom properties                                   |
+| `src/pages/foundations/tokens.astro`   | Design tokens page; auto-extracts from theme CSS                                             |
+
+**MDX frontmatter schema** (per component content file):
+
+```yaml
+tagName: mr-button # required
+title: Bouton # required
+description: … # optional, shown under title
+playgroundTemplate: default # optional, name of variant used to init playground (defaults to first)
+variants:
+    - name: default
+      label: Par défaut
+      description: …
+      html: '<mr-button>Label</mr-button>'
+```
+
+**Playground control type detection** (in `[slug].astro`):
+
+| CEM type                         | Control                                              |
+| -------------------------------- | ---------------------------------------------------- |
+| `'a' \| 'b' \| …` (string union) | `<select>`                                           |
+| `'a' \| 'b' \| undefined`        | `<select>` with "Par défaut" first option (value="") |
+| `boolean`                        | `<input type="checkbox">`                            |
+| `number` / `number \| undefined` | `<input type="number">`                              |
+| anything else                    | `<input type="text">`                                |
 
 ## Tooling Notes
 
