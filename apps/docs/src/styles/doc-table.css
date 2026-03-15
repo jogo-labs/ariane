@@ -1,0 +1,51 @@
+/**
+ * doc-table.css
+ *
+ * Styles partagés pour les tableaux de la documentation :
+ * utilisés par ComponentApi.astro et tokens.astro.
+ */
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    background: var(--doc-nav-bg, #f9fafb);
+    color: var(--doc-text, #111827);
+    font-weight: 600;
+    border-bottom: 1px solid var(--doc-border, #e5e7eb);
+}
+
+td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--doc-border, #f3f4f6);
+    vertical-align: top;
+    color: var(--doc-text, #111827);
+}
+
+code {
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
+    background: var(--doc-nav-bg, #f3f4f6);
+    color: var(--doc-text, #111827);
+    padding: 0.1em 0.35em;
+    border-radius: 0.25em;
+}
+
+.swatch {
+    display: inline-block;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 0.2rem;
+    border: 1px solid var(--doc-border, #e5e7eb);
+    vertical-align: middle;
+    margin-right: 0.3rem;
+}

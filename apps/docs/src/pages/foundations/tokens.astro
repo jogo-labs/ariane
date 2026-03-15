@@ -61,17 +61,12 @@ const categories = parseTokens(css);
 </Layout>
 
 <style>
+    @import '../../styles/doc-table.css';
+
     .intro {
         font-size:     0.95rem;
-        color:         #4b5563;
+        color:         var(--doc-text-muted, #4b5563);
         margin-bottom: 2rem;
-    }
-
-    .intro code {
-        font-size:     0.85em;
-        background:    #f3f4f6;
-        padding:       0.1em 0.35em;
-        border-radius: 0.25em;
     }
 
     section {
@@ -81,59 +76,25 @@ const categories = parseTokens(css);
     h2 {
         font-size:      1.1rem;
         font-weight:    600;
-        border-bottom:  1px solid #e5e7eb;
+        border-bottom:  1px solid var(--doc-border, #e5e7eb);
         padding-bottom: 0.5rem;
         margin-bottom:  1rem;
+        color:          var(--doc-text, #111827);
     }
 
-    .table-wrap {
-        overflow-x: auto;
-    }
-
-    table {
-        width:           100%;
-        border-collapse: collapse;
-        font-size:       0.875rem;
-    }
-
-    th {
-        text-align:    left;
-        padding:       0.5rem 0.75rem;
-        background:    #f9fafb;
-        font-weight:   600;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    td {
-        padding:       0.5rem 0.75rem;
-        border-bottom: 1px solid #f3f4f6;
-        vertical-align: middle;
-    }
-
-    code {
-        font-family:   'Fira Code', 'Cascadia Code', monospace;
-        font-size:     0.8rem;
-        background:    #f3f4f6;
-        padding:       0.1em 0.35em;
-        border-radius: 0.25em;
+    /* Tokens page : swatch un peu plus grande que dans ComponentApi */
+    .swatch {
+        width:  1.5rem;
+        height: 1.5rem;
     }
 
     .value {
-        color: #6b7280;
-    }
-
-    .swatch {
-        display:       inline-block;
-        width:         1.5rem;
-        height:        1.5rem;
-        border-radius: 0.25rem;
-        border:        1px solid #e5e7eb;
-        vertical-align: middle;
+        color: var(--doc-text-muted, #6b7280);
     }
 
     .ref {
         font-size:  0.75rem;
-        color:      #9ca3af;
+        color:      var(--doc-text-muted, #9ca3af);
         font-style: italic;
     }
 </style>
