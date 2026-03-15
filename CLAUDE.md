@@ -194,3 +194,42 @@ variants:
 - **TypeScript**: strict mode; use inline type imports (`import type`)
 - **Prettier config**: 100 char width, 4 spaces, single quotes
 - **Node requirement**: >=20, npm >=10
+
+## Lessons — décisions techniques et erreurs à ne pas reproduire
+
+### Docs site
+
+**Highlight.js plutôt que Shiki pour la coloration syntaxique**
+Shiki est 100% serveur — impossible de re-coloriser côté client après que le playground ait réécrit le DOM. Utiliser uniquement highlight.js (CDN cdnjs, thème `github-dark`) : `hljs.highlightAll()` au chargement, `hljs.highlightElement(el)` après chaque mise à jour (après avoir réinitialisé l'attribut `data-highlighted`). Ne pas mélanger les deux outils — leurs palettes divergent même avec le même thème.
+
+**Overlay nav mobile — `pointer-events`**
+Un overlay avec `opacity: 0` bloque quand même les clics. Toujours ajouter `pointer-events: none` par défaut sur `.nav-overlay`, et `pointer-events: auto` uniquement avec la classe `.open`.
+
+**IntersectionObserver double-init (TableOfContents)**
+`TableOfContents.astro` est monté deux fois (desktop sticky + mobile inline). Utiliser un guard `window.__tocObserverInit` — seule la première instance crée l'observer. Les deux partagent les mêmes classes CSS `.toc-link`, un seul observer suffit.
+
+**Sous-composants : `@parent` JSDoc seul suffit**
+`index.astro` et `SiteNav.astro` lisent tous les deux `c['x-parent']` depuis le CEM. Le champ MDX `parent` a été supprimé du schéma Zod. L'annotation `@parent mr-<tag>` dans le composant Lit est la seule source de vérité — ne pas ajouter de champ MDX.
+
+**Types CEM : ne pas dupliquer, utiliser `cem-types.ts`**
+Toutes les interfaces CEM et helpers (`getCustomElements`, `buildControls`) sont dans `src/utils/cem-types.ts`. Avant d'écrire une interface CEM dans un fichier Astro, vérifier si elle existe déjà.
+
+**Astro scoped styles et imports CSS partagés**
+Pour partager du CSS entre composants, utiliser `@import` au début d'un bloc `<style>`. Astro résout les imports relatifs et applique quand même le scoping.
+
+**`<script is:inline src="...">` plutôt que `defer`**
+`defer` charge le script après le DOM, ce qui posait un problème pour `hljs.highlightAll()`. Utiliser `is:inline` explicitement pour un chargement synchrone — highlight.js est assez petit pour ça.
+
+**Preview de composants indépendante du thème global**
+Les éléments `.preview` ont leur propre attribut `data-theme="light|dark"` et redéfinissent les tokens `--mr-color-*` pour un contexte CSS isolé. Un bouton toggle local permet de basculer indépendamment du thème global.
+
+**Variables CSS `--doc-*` pour les couleurs de la doc**
+Ne jamais mettre de couleurs hex hardcodées dans `apps/docs/`. Le site supporte les thèmes light/dark via les variables `--doc-*` (ex : `--doc-text`, `--doc-border`, `--doc-text-muted`). Toujours vérifier si une variable existe avant d'écrire une valeur fixe.
+
+### Package core
+
+**`reflect: true` obligatoire**
+Sans `reflect: true`, l'attribut n'est pas synchronisé dans le DOM — le `outerHTML` du playground affichera des attributs absents même si la propriété a changé côté JS.
+
+**`{ bubbles: true, composed: true }` sur tous les événements custom**
+Sans `composed: true`, les événements ne traversent pas la frontière Shadow DOM. Sans `bubbles: true`, ils ne remontent pas non plus dans le DOM shadow.
