@@ -280,5 +280,35 @@ describe('MrAlert', () => {
 
             expect(handler).not.toHaveBeenCalled();
         });
+
+        it('logue une erreur si next-focus pointe vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            el = await fixture('<mr-alert next-focus="id-inexistant"></mr-alert>');
+
+            (getPart(el, 'close') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy.mock.calls[0][0]).toContain('id-inexistant');
+            spy.mockRestore();
+        });
+
+        it("reporte le focus sur l'élément cible à la fermeture", async () => {
+            // Crée un bouton focusable avec l'ID attendu dans le document de test
+            const target = document.createElement('button');
+            target.id = 'btn-retour-focus';
+            document.body.appendChild(target);
+
+            el = await fixture('<mr-alert next-focus="btn-retour-focus"></mr-alert>');
+
+            (getPart(el, 'close') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(document.activeElement).toBe(target);
+
+            target.remove();
+        });
     });
 });
