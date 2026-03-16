@@ -1,135 +1,144 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import ComponentApi from '../../components/ComponentApi.astro';
+import Playground from '../../components/Playground.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
 import manifest from '@cem';
+import { getSlug } from '../../utils/tag-name.ts';
+import { type CemDeclaration, getCustomElements, buildControls } from '../../utils/cem-types.ts';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+type MdxEntry = Awaited<ReturnType<typeof getCollection<'components'>>>[number];
 
-interface CemDeclaration {
-    kind:           string;
-    customElement?: boolean;
-    tagName?:       string;
-    name:           string;
-    summary?:       string;
-    description?:   string;
-    attributes?:    unknown[];
-    events?:        unknown[];
-    cssParts?:      unknown[];
-    cssProperties?: unknown[];
-    slots?:         unknown[];
-    members?:       unknown[];
-}
+// ─── Routes statiques ─────────────────────────────────────────────────────────
 
-// ─── Génération statique des routes ──────────────────────────────────────────
+export async function getStaticPaths() {
+    const components: CemDeclaration[] = getCustomElements(manifest);
 
-/**
- * getStaticPaths est appelé au build time par Astro.
- * Pour chaque composant dans le CEM → une page /components/<slug>.
- * Aucun fichier à créer manuellement : ajouter un @customElement → page créée automatiquement.
- */
-export function getStaticPaths() {
-    const components: CemDeclaration[] = manifest.modules
-        .flatMap((m: { declarations?: CemDeclaration[] }) => m.declarations ?? [])
-        .filter((d: CemDeclaration) => d.kind === 'class' && d.customElement === true);
+    const mdxEntries = await getCollection('components');
+    const mdxByTag   = Object.fromEntries(mdxEntries.map((e) => [e.data.tagName, e]));
 
     return components.map((component) => ({
-        // mr-button → slug = 'button'
-        params: { slug: component.tagName!.replace(/^mr-/, '') },
-        props:  { component },
+        params: { slug: getSlug(component.tagName!) },
+        props:  { component, mdx: mdxByTag[component.tagName!] ?? null },
     }));
 }
 
-const { component } = Astro.props as { component: CemDeclaration };
+// ─── Props de la page ─────────────────────────────────────────────────────────
 
-// Tous les composants pour le menu de navigation
-const allComponents: CemDeclaration[] = manifest.modules
-    .flatMap((m: { declarations?: CemDeclaration[] }) => m.declarations ?? [])
-    .filter((d: CemDeclaration) => d.kind === 'class' && d.customElement === true);
+const { component, mdx } = Astro.props as {
+    component: CemDeclaration;
+    mdx: MdxEntry | null;
+};
+
+const { Content } = mdx ? await mdx.render() : { Content: null };
+
+const variants    = mdx?.data.variants ?? [];
+const pageTitle   = mdx?.data.title ?? component.name;
+const pageDesc    = mdx?.data.description ?? component.summary;
+const displayMode = component['x-display'] ?? 'demo';
+const parentTag   = component['x-parent'];
+
+// ─── HTML initial du playground ───────────────────────────────────────────────
+
+const playgroundVariantName = mdx?.data.playgroundTemplate;
+const playgroundVariant = playgroundVariantName
+    ? variants.find((v: { name: string }) => v.name === playgroundVariantName)
+    : variants[0];
+const playgroundHtml = playgroundVariant?.html ?? '';
+
+// ─── Contrôles du playground ──────────────────────────────────────────────────
+
+const controls = buildControls(component.members ?? []);
+
+// ─── TOC ──────────────────────────────────────────────────────────────────────
+
+const tocEntries = [
+    ...(variants.length > 0
+        ? [
+            { id: 'exemples', label: 'Exemples', level: 1 as const },
+            ...variants.map((v: { name: string; label?: string }) => ({
+                id:    `exemple-${v.name}`,
+                label: v.label ?? v.name,
+                level: 2 as const,
+            })),
+          ]
+        : []),
+    ...(displayMode === 'demo'
+        ? [{ id: 'playground', label: 'Playground', level: 1 as const }]
+        : []),
+    { id: 'reference-api', label: 'Référence API', level: 1 as const },
+];
 ---
 
-<Layout title={component.name}>
-    <!-- Navigation latérale -->
-    <Fragment slot="nav">
-        {allComponents.map((c) => (
-            <a
-                href={`/components/${c.tagName?.replace(/^mr-/, '')}`}
-                aria-current={c.tagName === component.tagName ? 'page' : undefined}
-            >
-                {c.tagName}
-            </a>
-        ))}
-    </Fragment>
+<Layout
+    title={pageTitle}
+    currentPath={'/components/' + getSlug(component.tagName!)}
+    showToc={true}
+>
+    {/* TOC mobile : visible uniquement sur mobile, injectée dans le flux principal */}
+    <div class="toc-mobile-inline">
+        <TableOfContents entries={tocEntries} mobileOnly={true} />
+    </div>
 
-    <!-- En-tête du composant -->
-    <h1>
-        <code>{component.tagName}</code>
-    </h1>
+    <h2>{pageTitle}</h2>
+    <code>&lt;{component.tagName}&gt;</code>
+    {pageDesc && <p class="summary">{pageDesc}</p>}
 
-    {component.summary && <p class="summary">{component.summary}</p>}
-    {component.description && <p>{component.description}</p>}
 
-    <!-- Démo live interactive -->
-    <!-- Le bundle CDN est chargé pour le playground -->
-    <section class="demo-section">
-        <h2>Démo</h2>
-        <div class="demo-preview" id="demo-preview">
-            <!-- Remplacer par le playground spécifique au composant via MDX/slots -->
-            <slot />
+    <Playground
+        variants={variants}
+        tagName={component.tagName!}
+        displayMode={displayMode}
+        parentTag={parentTag}
+        playgroundHtml={playgroundHtml}
+        controls={controls}
+        component={component}
+    />
 
-            <!-- Démo par défaut basée sur le tag name -->
-            {component.tagName === 'mr-button' && (
-                <div style="display:flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-                    <mr-button>Filled</mr-button>
-                    <mr-button variant="outlined">Outlined</mr-button>
-                    <mr-button variant="ghost">Ghost</mr-button>
-                    <mr-button variant="danger">Danger</mr-button>
-                    <mr-button disabled>Disabled</mr-button>
-                </div>
-            )}
-        </div>
-    </section>
+    {Content && (
+        <section class="narrative">
+            <Content />
+        </section>
+    )}
 
-    <!-- Tableau API auto-généré depuis le CEM -->
-    <ComponentApi component={component as Parameters<typeof ComponentApi>[0]['component']} />
+    <TableOfContents entries={tocEntries} slot="toc" />
 </Layout>
 
-<!-- Charger le bundle CDN pour le playground -->
-<script
-    type="module"
-    src="/cdn/index.js"
-></script>
-
 <style>
-    h1 {
-        margin-bottom: 0.5rem;
+    /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
+    .toc-mobile-inline { display: none; }
+    @media (max-width: 768px) {
+        .toc-mobile-inline { display: block; }
     }
 
-    h1 code {
-        font-size: 1.75rem;
+    h1 { margin-bottom: 0.25rem; }
+
+    h1 + code {
+        font-size:  1rem;
         background: none;
-        padding: 0;
-        color: inherit;
+        padding:    0;
+        color:      var(--doc-text-muted, #6b7280);
     }
 
     .summary {
-        font-size: 1.1rem;
-        color: #4b5563;
-        margin-bottom: 2rem;
+        font-size:     1.05rem;
+        color:         var(--doc-text-muted, #4b5563);
+        margin-bottom: 0.25rem;
     }
 
-    .demo-section h2 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
+    .narrative {
+        margin:      1.5rem 0;
+        color:       var(--doc-text, #374151);
+        line-height: 1.7;
     }
 
-    .demo-preview {
-        padding: 2rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        background: #fff;
-        margin-bottom: 2rem;
+    .narrative :global(p)    { margin-bottom: 0.75rem; }
+
+    .narrative :global(code) {
+        font-size:     0.85em;
+        background:    var(--doc-nav-bg, #f3f4f6);
+        color:         var(--doc-text, #111827);
+        padding:       0.1em 0.35em;
+        border-radius: 0.25em;
     }
 </style>

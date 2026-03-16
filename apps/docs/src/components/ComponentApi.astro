@@ -6,69 +6,18 @@
  * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
-interface CemMember {
-    name:        string;
-    type?:       { text: string };
-    description?: string;
-    default?:    string;
-    attribute?:  string;
-    reflects?:   boolean;
-    kind?:       string;
-    privacy?:    string;
-}
-
-interface CemAttribute {
-    name:         string;
-    type?:        { text: string };
-    description?: string;
-    default?:     string;
-}
-
-interface CemEvent {
-    name:         string;
-    type?:        { text: string };
-    description?: string;
-}
-
-interface CemCssPart {
-    name:         string;
-    description?: string;
-}
-
-interface CemCssProperty {
-    name:         string;
-    description?: string;
-    default?:     string;
-}
-
-interface CemSlot {
-    name:         string;
-    description?: string;
-}
-
-interface ComponentDeclaration {
-    name:           string;
-    tagName?:       string;
-    summary?:       string;
-    description?:   string;
-    attributes?:    CemAttribute[];
-    members?:       CemMember[];
-    events?:        CemEvent[];
-    cssParts?:      CemCssPart[];
-    cssProperties?: CemCssProperty[];
-    slots?:         CemSlot[];
-}
+import { type CemDeclaration } from '../utils/cem-types.ts';
 
 interface Props {
-    component: ComponentDeclaration;
+    component: CemDeclaration;
 }
 
 const { component } = Astro.props;
 
-// Filtrer les membres publics qui sont des propriétés (pas les méthodes privées)
-const publicProperties = (component.members ?? []).filter(
-    (m) => m.kind === 'field' && m.privacy !== 'private' && m.privacy !== 'protected',
-);
+function isColorValue(value: string | undefined): boolean {
+    if (!value) return false;
+    return /^#[0-9a-fA-F]{3,8}$/.test(value) || /^rgba?\(/.test(value);
+}
 ---
 
 <div class="component-api">
@@ -76,7 +25,7 @@ const publicProperties = (component.members ?? []).filter(
     {/* ── Attributs & Propriétés ── */}
     {component.attributes && component.attributes.length > 0 && (
         <section>
-            <h2>Attributs &amp; Propriétés</h2>
+            <h2 id="api-attributs">Attributs &amp; Propriétés</h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -105,7 +54,7 @@ const publicProperties = (component.members ?? []).filter(
     {/* ── Événements ── */}
     {component.events && component.events.length > 0 && (
         <section>
-            <h2>Événements</h2>
+            <h2 id="api-evenements">Événements</h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -132,7 +81,7 @@ const publicProperties = (component.members ?? []).filter(
     {/* ── CSS Parts ── */}
     {component.cssParts && component.cssParts.length > 0 && (
         <section>
-            <h2>CSS Parts</h2>
+            <h2 id="api-css-parts">CSS Parts</h2>
             <p class="hint">
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
             </p>
@@ -160,7 +109,7 @@ const publicProperties = (component.members ?? []).filter(
     {/* ── CSS Custom Properties ── */}
     {component.cssProperties && component.cssProperties.length > 0 && (
         <section>
-            <h2>CSS Custom Properties</h2>
+            <h2 id="api-css-props">CSS Custom Properties</h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -174,7 +123,16 @@ const publicProperties = (component.members ?? []).filter(
                         {component.cssProperties.map((prop) => (
                             <tr>
                                 <td><code>{prop.name}</code></td>
-                                <td><code>{prop.default ?? '—'}</code></td>
+                                <td>
+                                    {isColorValue(prop.default) && (
+                                        <span
+                                            class="swatch"
+                                            style={`background: ${prop.default}`}
+                                            title={prop.default}
+                                        />
+                                    )}
+                                    <code>{prop.default ?? '—'}</code>
+                                </td>
                                 <td>{prop.description ?? ''}</td>
                             </tr>
                         ))}
@@ -187,7 +145,7 @@ const publicProperties = (component.members ?? []).filter(
     {/* ── Slots ── */}
     {component.slots && component.slots.length > 0 && (
         <section>
-            <h2>Slots</h2>
+            <h2 id="api-slots">Slots</h2>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -211,6 +169,8 @@ const publicProperties = (component.members ?? []).filter(
 </div>
 
 <style>
+    @import '../styles/doc-table.css';
+
     .component-api {
         margin-top: 2rem;
     }
@@ -220,48 +180,17 @@ const publicProperties = (component.members ?? []).filter(
     }
 
     h2 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-bottom: 1px solid #e5e7eb;
+        font-size:      1.1rem;
+        font-weight:    600;
+        border-bottom:  1px solid var(--doc-border, #e5e7eb);
         padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom:  1rem;
+        color:          var(--doc-text, #111827);
     }
 
     .hint {
-        font-size: 0.875rem;
-        color: #6b7280;
+        font-size:     0.875rem;
+        color:         var(--doc-text-muted, #6b7280);
         margin-bottom: 0.75rem;
-    }
-
-    .table-wrap {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.875rem;
-    }
-
-    th {
-        text-align: left;
-        padding: 0.5rem 0.75rem;
-        background: #f9fafb;
-        font-weight: 600;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    td {
-        padding: 0.5rem 0.75rem;
-        border-bottom: 1px solid #f3f4f6;
-        vertical-align: top;
-    }
-
-    code {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 0.8rem;
-        background: #f3f4f6;
-        padding: 0.1em 0.35em;
-        border-radius: 0.25em;
     }
 </style>

@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*" # Déclenché sur les tags semver : v1.0.0, v2.3.1, etc.
+      - 'v*.*.*' # Déclenché sur les tags semver : v1.0.0, v2.3.1, etc.
 
 jobs:
   release:
@@ -15,14 +15,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version:       "22"
-          cache:              "npm"
-          registry-url:       "https://registry.npmjs.org"
+          node-version: '22'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci --frozen-lockfile

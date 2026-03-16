@@ -1,0 +1,8 @@
+# Formatage délégué à l'extension VSCode Astro
+*.astro
+
+# Générés
+dist/
+.astro/
+node_modules/
+coverage/

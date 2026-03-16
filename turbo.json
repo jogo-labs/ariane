@@ -1,40 +1,86 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "ui": "tui",
-    "tasks": {
-        "build:manifest": {
-            "inputs":  ["src/**/*.ts", "cem.config.js"],
-            "outputs": ["dist/custom-elements.json"]
-        },
-        "build:bundles": {
-            "dependsOn": ["build:manifest"],
-            "inputs":    ["src/**/*.ts", "scripts/build-bundles.js"],
-            "outputs":   ["dist/**", "cdn/**"]
-        },
-        "build:css": {
-            "inputs":  ["src/styles/**/*.css"],
-            "outputs": ["dist/styles/**"]
-        },
-        "build:types": {
-            "dependsOn": ["build:manifest"],
-            "inputs":    ["src/**/*.ts", "tsconfig.json"],
-            "outputs":   ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
-        },
-        "build": {
-            "dependsOn": ["build:manifest", "build:bundles", "build:css", "build:types", "^build"],
-            "outputs":   ["dist/**", "cdn/**"]
-        },
-        "dev": {
-            "cache":      false,
-            "persistent": true,
-            "dependsOn":  ["^build"]
-        },
-        "test": {
-            "dependsOn": ["^build:bundles"],
-            "outputs":   ["coverage/**"]
-        },
-        "lint": {
-            "outputs": []
-        }
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build:manifest": {
+      "inputs": [
+        "src/**/*.ts",
+        "cem.config.js"
+      ],
+      "outputs": [
+        "dist/custom-elements.json"
+      ]
+    },
+    "build:bundles": {
+      "dependsOn": [
+        "build:manifest"
+      ],
+      "inputs": [
+        "src/**/*.ts",
+        "scripts/build-bundles.js"
+      ],
+      "outputs": [
+        "dist/**",
+        "cdn/**"
+      ]
+    },
+    "build:css": {
+      "inputs": [
+        "src/styles/**/*.css"
+      ],
+      "outputs": [
+        "dist/styles/**"
+      ]
+    },
+    "build:types": {
+      "dependsOn": [
+        "build:manifest"
+      ],
+      "inputs": [
+        "src/**/*.ts",
+        "tsconfig.json"
+      ],
+      "outputs": [
+        "dist/**/*.d.ts",
+        "dist/**/*.d.ts.map"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "build:manifest",
+        "build:bundles",
+        "build:css",
+        "build:types",
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        "cdn/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^build:bundles"
+      ],
+      "outputs": []
+    },
+    "test:coverage": {
+      "dependsOn": [
+        "^build:bundles"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "lint": {
+      "outputs": []
     }
+  }
 }

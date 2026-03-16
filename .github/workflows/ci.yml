@@ -7,7 +7,7 @@ on:
     branches: [main, next]
 
 concurrency:
-  group:  ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true # Annule le run précédent si un nouveau push arrive sur la même branche
 
 jobs:
@@ -17,21 +17,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: '22'
+          cache: 'npm'
 
       # Restaure le cache Turborepo entre les runs
       # Évite de tout rebuilder si les inputs n'ont pas changé
       - name: Cache Turborepo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
-          path:         .turbo
-          key:          ${{ runner.os }}-turbo-${{ github.sha }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: ${{ runner.os }}-turbo-
 
       - name: Install dependencies
@@ -48,7 +48,7 @@ jobs:
 
       # Upload la couverture de code pour le reporting
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: coverage-report
