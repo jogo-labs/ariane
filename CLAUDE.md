@@ -233,3 +233,9 @@ Sans `reflect: true`, l'attribut n'est pas synchronisé dans le DOM — le `oute
 
 **`{ bubbles: true, composed: true }` sur tous les événements custom**
 Sans `composed: true`, les événements ne traversent pas la frontière Shadow DOM. Sans `bubbles: true`, ils ne remontent pas non plus dans le DOM shadow.
+
+**Tests : `textContent` des Text nodes Lit interpolés dans happy-dom**
+happy-dom ne sérialise pas correctement les Text nodes dynamiques générés par Lit (`${this.prop}` dans un template html`...`). `element.textContent` retourne `''` même si le rendu est correct visuellement. Pour tester le contenu textuel, vérifier la propriété JS directement (`el.myProp`) plutôt que `element.textContent`. Les attributs, `hasAttribute`, `getAttribute` et la structure DOM (présence d'éléments, `hidden`) fonctionnent correctement.
+
+**Tests : helpers `fixture()`, `waitForUpdate()`, `getPart()` pour les composants Lit**
+Extraire ces trois helpers dans chaque fichier de test pour éviter les non-null assertions (`!`) bloquées par `lint-staged --max-warnings=0`. `getPart(el, 'name')` cible les éléments par `part="…"` — l'API publique stable du composant.
