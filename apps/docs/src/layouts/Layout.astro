@@ -54,7 +54,7 @@ const {
                 --doc-nav-bg:     #f8f9fb;
                 --doc-nav-border: #e2e4e9;
                 --doc-border:     #e5e7eb;
-                --doc-header-bg:  #ffffff;
+                --doc-header-bg:  color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 4%, #ffffff);
                 --doc-header-h:   3.25rem;
             }
 
@@ -65,16 +65,44 @@ const {
                 --doc-nav-bg:     #161b22;
                 --doc-nav-border: #21262d;
                 --doc-border:     #21262d;
-                --doc-header-bg:  #161b22;
+                --doc-header-bg:  color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 8%, #0f1117);
+            }
+
+            html {
+                /* Le motif de fond est sur html pour ne pas être masqué par body */
+                background: var(--doc-bg);
+                transition: background 0.2s;
             }
 
             html, body {
                 margin:     0;
                 min-height: 100vh;
-                background: var(--doc-bg);
                 color:      var(--doc-text);
                 font-family: system-ui, -apple-system, sans-serif;
-                transition: background 0.2s, color 0.2s;
+                transition: color 0.2s;
+            }
+
+            body {
+                background-image: radial-gradient(circle,var(--mr-color-primary-500, #2563eb) 1px,transparent 2px);
+                background-size:  28px 28px;
+                background-color: transparent;
+            }
+
+            /* Fond opaque entre le motif (body bg-image) et le contenu */
+            body::before {
+                content:        '';
+                position:       fixed;
+                inset:          0;
+                background:     var(--doc-bg);
+                opacity:        0.92;
+                pointer-events: none;
+                z-index:        0;
+            }
+
+            /* Tout le contenu au-dessus du voile */
+            .site-header, .nav-overlay, .layout-body {
+                position: relative;
+                z-index:  1;
             }
 
             /* ── Header (toujours visible) ──────────────── */
@@ -188,35 +216,49 @@ const {
                 grid-template-columns: 260px 1fr;
             }
 
-            .layout-body.with-nav.with-toc {
-                grid-template-columns: 260px 1fr 220px;
-            }
-
             .nav-column {
                 height:     100%;
                 overflow-y: auto;
-                display: flex;
+                display:    flex;
                 flex-direction: column;
-                flex-grow: 1;
+                flex-grow:  1;
             }
 
             main {
-                padding:    3rem;
-                width:      80%;
-                max-width:  1000px;
-                margin:     0 auto;
+                padding:    0;
                 height:     100%;
                 overflow-y: auto;
             }
 
-            .layout-body:not(.with-nav) main {
-                max-width: 90%;
+            /* Contenu centré dans main */
+            .main-inner {
+                padding:   4rem 3rem;
+                max-width: 1100px;
                 margin:    0 auto;
             }
 
+            /* Avec TOC fixe à droite : on réserve de la place côté droit */
+            .layout-body.with-toc .main-inner {
+                padding-right: 260px;
+            }
+
+            .layout-body:not(.with-nav) main {
+                width: 100%;
+            }
+
+            .layout-body:not(.with-nav) .main-inner {
+                max-width: 100%;
+                padding:   0;
+            }
+
+            /* Aside TOC — position fixe à droite, indépendante du flux */
             .toc-column {
+                position:   fixed;
+                top:        var(--doc-header-h);
+                right:      0;
+                width:      220px;
+                height:     calc(100vh - var(--doc-header-h));
                 padding:    3rem 1rem 3rem 0;
-                height:     100%;
                 overflow-y: auto;
             }
 
@@ -230,8 +272,7 @@ const {
                 #burger-btn  { display: flex; }
                 .nav-overlay { display: block; }
 
-                .layout-body.with-nav,
-                .layout-body.with-nav.with-toc {
+                .layout-body.with-nav {
                     display: block;
                 }
 
@@ -256,12 +297,15 @@ const {
                 }
 
                 main {
-                    padding:    1.5rem 1rem;
                     width:      100%;
-                    max-width:  100%;
-                    margin:     0;
                     height:     auto;
                     overflow-y: visible;
+                }
+
+                .main-inner,
+                .layout-body.with-toc .main-inner {
+                    padding:   1.5rem 1rem;
+                    max-width: 100%;
                 }
 
                 .toc-column { display: none; }
@@ -315,7 +359,9 @@ const {
                 </div>
             )}
             <main>
-                <slot />
+                <div class="main-inner">
+                    <slot />
+                </div>
             </main>
             {showToc && (
                 <aside class="toc-column">
