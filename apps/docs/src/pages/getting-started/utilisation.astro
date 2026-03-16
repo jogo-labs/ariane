@@ -1,0 +1,181 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'import',           label: 'Import des composants', level: 1 as const },
+    { id: 'personnalisation', label: 'Personnalisation CSS',  level: 1 as const },
+    { id: 'tokens',           label: 'Design Tokens',         level: 1 as const },
+];
+
+const codeImportGlobal = `import '@marianne/core';
+import '@marianne/core/themes/default.css';`;
+
+const codeImportIndividuel = `import '@marianne/core/dist/components/button/button.js';
+import '@marianne/core/dist/components/alert/alert.js';
+import '@marianne/core/themes/default.css';`;
+
+const codeHtml = `<mr-button variant="filled">Valider</mr-button>
+
+<mr-alert variant="success">
+    Votre message a bien été envoyé.
+</mr-alert>
+
+<mr-spinner></mr-spinner>`;
+
+const codeCustomProps = `/* Personnaliser mr-button */
+mr-button {
+    --mr-button-bg:            #7c3aed;
+    --mr-button-border-radius: 2rem;
+}
+
+/* Cibler une variante spécifique */
+mr-button[variant="outlined"] {
+    --mr-button-border-color: #7c3aed;
+    --mr-button-color:        #7c3aed;
+}`;
+
+const codeTokens = `:root {
+    --mr-color-primary-500: #7c3aed; /* remplace le bleu par du violet */
+    --mr-border-radius-md:  0.75rem;
+}`;
+---
+
+<Layout
+    title="Utilisation"
+    currentPath="/getting-started/utilisation"
+    showToc={true}
+>
+    <h2>Utilisation</h2>
+
+    <section class="gs-section" id="import">
+        <h3>Import des composants</h3>
+        <p>
+            Une fois <a href="/getting-started/installation">installée</a>, la bibliothèque s'utilise
+            directement en HTML. Les composants sont des Custom Elements natifs — aucun framework requis.
+        </p>
+
+        <h4>Import global (tous les composants)</h4>
+        <pre><code class="language-typescript" set:text={codeImportGlobal} /></pre>
+
+        <h4>Import individuel <span class="badge-subtle">Tree-shaking</span></h4>
+        <p>Pour inclure uniquement les composants effectivement utilisés :</p>
+        <pre><code class="language-typescript" set:text={codeImportIndividuel} /></pre>
+
+        <h4>Dans votre HTML</h4>
+        <pre><code class="language-html" set:text={codeHtml} /></pre>
+    </section>
+
+    <section class="gs-section" id="personnalisation">
+        <h3>Personnalisation CSS</h3>
+        <p>
+            Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
+            l'apparence sans surcharger les styles internes.
+        </p>
+        <pre><code class="language-css" set:text={codeCustomProps} /></pre>
+        <p>
+            Les propriétés disponibles par composant sont listées dans la section
+            <strong>Référence API</strong> de chaque page de composant.
+        </p>
+    </section>
+
+    <section class="gs-section" id="tokens">
+        <h3>Design Tokens</h3>
+        <p>
+            Les valeurs par défaut (couleurs, espacements, typographie…) viennent du fichier de thème
+            <code>themes/default.css</code>. Vous pouvez les surcharger globalement :
+        </p>
+        <pre><code class="language-css" set:text={codeTokens} /></pre>
+        <p>
+            Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste complète
+            des variables disponibles.
+        </p>
+    </section>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    h2 {
+        color:       var(--doc-text, #111827);
+        font-size: 2em;
+        margin: 0;
+
+        + p, + section {
+            margin-top: 1.5rem;
+        }
+    }
+
+    .gs-section {
+        margin: 2.5rem 0;
+    }
+
+    h3 {
+        font-size:      1.1rem;
+        font-weight:    700;
+        border-bottom:  2px solid var(--doc-border, #e5e7eb);
+        padding-bottom: 0.5rem;
+        margin-bottom:  1rem;
+        color:          var(--doc-text, #111827);
+    }
+
+    h4 {
+        font-size:   0.95rem;
+        font-weight: 600;
+        color:       var(--doc-text, #111827);
+        margin:      1.25rem 0 0.4rem;
+        display:     flex;
+        align-items: center;
+        gap:         0.5rem;
+    }
+
+    p {
+        font-size:     0.95rem;
+        color:         var(--doc-text, #374151);
+        margin-bottom: 0.75rem;
+        line-height:   1.65;
+    }
+
+    a {
+        color:           var(--mr-color-primary-500, #2563eb);
+        text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    pre {
+        background:    #0d1117;
+        border-radius: 0.5rem;
+        padding:       1rem 1.25rem;
+        overflow-x:    auto;
+        margin:        0.5rem 0 1rem;
+    }
+
+    pre code {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size:   0.82rem;
+        line-height: 1.6;
+        color:       #e6edf3;
+        background:  transparent;
+        padding:     0;
+    }
+
+    :global(p code),
+    :global(li code) {
+        font-size:     0.85em;
+        background:    var(--doc-nav-bg, #f3f4f6);
+        color:         var(--doc-text, #111827);
+        padding:       0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+
+    .badge-subtle {
+        font-size:      0.7rem;
+        font-weight:    600;
+        padding:        0.15em 0.5em;
+        border-radius:  0.25rem;
+        background:     color-mix(in srgb, var(--doc-border, #e5e7eb) 80%, transparent);
+        color:          var(--doc-text-muted, #6b7280);
+        letter-spacing: 0.02em;
+    }
+</style>
