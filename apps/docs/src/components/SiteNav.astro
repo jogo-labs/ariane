@@ -26,6 +26,14 @@ interface NavLink {
     ariaCurrent: 'page' | undefined;
 }
 
+const gettingStartedLinks: NavLink[] = [
+    { href: '/getting-started/installation', label: 'Installation', ariaCurrent: undefined },
+    { href: '/getting-started/utilisation',  label: 'Utilisation',  ariaCurrent: undefined },
+].map((link) => ({
+    ...link,
+    ariaCurrent: currentPath === link.href ? ('page' as const) : undefined,
+}));
+
 const foundationsLinks: NavLink[] = [
     { href: '/foundations/tokens', label: 'Design Tokens', ariaCurrent: undefined },
 ].map((link) => ({
@@ -88,6 +96,17 @@ const componentItems: NavItem[] = allComponents
 <nav aria-label="Design System">
     <div class="nav-container">
         <div class="nav-section">
+            <h2>Bien démarrer</h2>
+            <ul class="nav-list">
+                {gettingStartedLinks.map((link) => (
+                    <li>
+                        <a href={link.href} aria-current={link.ariaCurrent}>{link.label}</a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+
+        <div class="nav-section">
             <h2>Fondations</h2>
             <ul class="nav-list">
                 {foundationsLinks.map((link) => (
@@ -122,7 +141,7 @@ const componentItems: NavItem[] = allComponents
     </div>
 
     <footer class="nav-footer">
-        <h5 class="nav-brand">mARIAnne</h5>
+        <p class="nav-brand">mARIAnne</p>
         <p class="nav-footer-version">Version {version}</p>
         <div class="nav-footer-meta">
             {/* <div class="nav-footer-social">

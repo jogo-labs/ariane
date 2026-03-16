@@ -25,7 +25,7 @@ function isColorValue(value: string | undefined): boolean {
     {/* ── Attributs & Propriétés ── */}
     {component.attributes && component.attributes.length > 0 && (
         <section>
-            <h2 id="api-attributs">Attributs &amp; Propriétés</h2>
+            <h4 id="api-attributs">Attributs &amp; Propriétés</h4>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -54,7 +54,7 @@ function isColorValue(value: string | undefined): boolean {
     {/* ── Événements ── */}
     {component.events && component.events.length > 0 && (
         <section>
-            <h2 id="api-evenements">Événements</h2>
+            <h4 id="api-evenements">Événements</h4>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -81,7 +81,7 @@ function isColorValue(value: string | undefined): boolean {
     {/* ── CSS Parts ── */}
     {component.cssParts && component.cssParts.length > 0 && (
         <section>
-            <h2 id="api-css-parts">CSS Parts</h2>
+            <h4 id="api-css-parts">CSS Parts</h4>
             <p class="hint">
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
             </p>
@@ -109,7 +109,7 @@ function isColorValue(value: string | undefined): boolean {
     {/* ── CSS Custom Properties ── */}
     {component.cssProperties && component.cssProperties.length > 0 && (
         <section>
-            <h2 id="api-css-props">CSS Custom Properties</h2>
+            <h4 id="api-css-props">CSS Custom Properties</h4>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -145,7 +145,7 @@ function isColorValue(value: string | undefined): boolean {
     {/* ── Slots ── */}
     {component.slots && component.slots.length > 0 && (
         <section>
-            <h2 id="api-slots">Slots</h2>
+            <h4 id="api-slots">Slots</h4>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -179,7 +179,7 @@ function isColorValue(value: string | undefined): boolean {
         margin-bottom: 2.5rem;
     }
 
-    h2 {
+    h4 {
         font-size:      1.1rem;
         font-weight:    600;
         border-bottom:  1px solid var(--doc-border, #e5e7eb);

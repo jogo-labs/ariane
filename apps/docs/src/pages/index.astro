@@ -1,148 +1,287 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import manifest from '@cem';
-import { getSlug } from '../utils/tag-name.ts';
+import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
-
-interface ComponentListItem {
-    name:    string;
-    tagName: string;
-    href:    string;
-    summary: string | undefined;
-}
+import { getSlug } from '../utils/tag-name.ts';
 
 const allComponents: CemDeclaration[] = getCustomElements(manifest);
-
-const allMdx   = await getCollection('components');
-const mdxByTag = Object.fromEntries(allMdx.map((e) => [e.data.tagName, e]));
-
-const componentList: ComponentListItem[] = allComponents
-    .filter((c) => !c['x-parent'])
-    .map((c) => ({
-        name: c.name,
-        tagName: c.tagName!,
-        href:    '/components/' + getSlug(c.tagName!),
-        summary: mdxByTag[c.tagName!]?.data.description ?? c.summary,
-    }));
+const rootComponents = allComponents.filter((c) => !c['x-parent']);
+const componentCount = rootComponents.length;
+const firstComponentHref = rootComponents[0]?.tagName
+    ? '/components/' + getSlug(rootComponents[0].tagName)
+    : '/components/button';
 ---
 
 <Layout title="Accueil" showNav={false}>
-    <section>
-        <h2>Fondations</h2>
-        <p>Les bases du design system : tokens, typographie, couleurs et espacements.</p>
-        <ul class="card-list">
-            <li class="card">
-                <a href="/foundations/tokens" class="card-action">
-                    <strong>Design Tokens</strong>
-                    <span>Couleurs, typographie, espacements et formes</span>
-                </a>
-            </li>
-        </ul>
-    </section>
+    <div class="landing">
 
-    <section>
-        <h2>Composants</h2>
-        <ul class="card-list">
-            {componentList.map((c) => (
-            <li class="card">
-                <a href={c.href} class="card-action">
-                    <span class="card-name">{c.name}</span>
-                    <span class="card-description"></span>{c.summary && <span>{c.summary}</span>}</span>
-                </a>
-            </li>
-            ))}
-        </ul>
-    </section>
+        <div class="landing-inner">
 
+            {/* Texte + CTA — gauche */}
+            <div class="landing-content">
+                <h1 class="tagline">
+                    Des composants accessibles,<br>
+                    <span class="tagline-accent">pour tous les frameworks.</span>
+                </h1>
+                <p class="description">
+                    mARIAnne est une bibliothèque de Custom Elements natifs construite avec Lit 3.
+                    Accessible, framework-agnostique, personnalisable via CSS Custom Properties.
+                </p>
+                <div class="cta-group">
+                    <a href="/getting-started/installation" class="btn-primary">Bien démarrer</a>
+                    <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
+                </div>
+                <div class="meta-badges">
+                    <span class="meta-badge">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        v{version}
+                    </span>
+                    <span class="meta-badge">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        {componentCount} composants
+                    </span>
+                    <span class="meta-badge">MIT</span>
+                </div>
+            </div>
+
+            {/* Illustration — droite */}
+            <div class="landing-visual" aria-hidden="true">
+                <svg class="illus-svg" viewBox="0 0 320 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                    {/* ── Grille de briques (composants) ── */}
+                    {/* Ligne 1 */}
+                    <rect x="0"   y="0"   width="148" height="52" rx="10" class="brick brick-a"/>
+                    <rect x="160" y="0"   width="160" height="52" rx="10" class="brick brick-b"/>
+                    {/* Ligne 2 */}
+                    <rect x="0"   y="64"  width="64"  height="52" rx="10" class="brick brick-b"/>
+                    <rect x="76"  y="64"  width="244" height="52" rx="10" class="brick brick-a"/>
+                    {/* Ligne 3 */}
+                    <rect x="0"   y="128" width="200" height="52" rx="10" class="brick brick-c"/>
+                    <rect x="212" y="128" width="108" height="52" rx="10" class="brick brick-b"/>
+                    {/* Ligne 4 */}
+                    <rect x="0"   y="192" width="100" height="52" rx="10" class="brick brick-b"/>
+                    <rect x="112" y="192" width="208" height="52" rx="10" class="brick brick-a"/>
+
+                    {/* ── Icône accessibilité — cercle avec silhouette ── */}
+                    <circle cx="240" cy="316" r="60" class="a11y-ring"/>
+                    {/* tête */}
+                    <circle cx="240" cy="296" r="10" class="a11y-figure"/>
+                    {/* corps */}
+                    <line x1="240" y1="308" x2="240" y2="338" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
+                    {/* bras */}
+                    <line x1="218" y1="322" x2="262" y2="322" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
+                    {/* jambes */}
+                    <line x1="240" y1="338" x2="224" y2="360" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
+                    <line x1="240" y1="338" x2="256" y2="360" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
+
+                    {/* ── Petite brique décorative sous le cercle ── */}
+                    <rect x="0" y="260" width="148" height="36" rx="8" class="brick brick-a"/>
+                    <rect x="160" y="260" width="60" height="36" rx="8" class="brick brick-b"/>
+                </svg>
+            </div>
+
+        </div>
+    </div>
 </Layout>
 
 <style>
-    /* ── Marque ──────────────────────────────────────────────── */
-
-    .nav-brand {
-        display:         block;
-        font-weight:     800;
-        font-size:       3rem;
-        letter-spacing:  -0.02em;
-        color:           #1a1d26;
-        text-decoration: none;
+    .landing {
+        position:        relative;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        min-height:      calc(100vh - var(--doc-header-h, 3.25rem));
+        width:           100%;
+        overflow:        hidden;
     }
 
-    .brand-accent {
-        color: var(--mr-color-primary-500, #2563eb);
-        /* font-weight: 700; */
+    /* Container deux colonnes */
+    .landing-inner {
+        position:        relative;
+        display:         flex;
+        align-items:     center;
+        justify-content: space-between;
+        gap:             4rem;
+        padding:         4rem 3rem;
+        width:           100%;
+        max-width:       1100px;
+    }
+
+    /* ── Texte ──────────────────────────────────────────── */
+
+    .landing-content {
+        flex:      0 1 720px;
+        min-width: 0;
     }
 
     .tagline {
-        font-size:     1.1rem;
-        color:         #4b5563;
-        margin-bottom: 2rem;
+        font-size:      2.5rem;
+        font-weight:    800;
+        line-height:    1.18;
+        letter-spacing: -0.025em;
+        color:          var(--doc-text, #111827);
+        margin:         0 0 1.1rem;
     }
 
-    h2 {
-        font-size:      1.1rem;
-        font-weight:    600;
-        border-bottom:  1px solid #e5e7eb;
-        padding-bottom: 0.5rem;
-        margin:         2rem 0 0.75rem;
+    .tagline-accent {
+        color: var(--mr-color-primary-500, #2563eb);
     }
 
-    h2 + p {
-        font-size:     0.9rem;
-        color:         #6b7280;
-        margin-bottom: 1rem;
+    .description {
+        font-size:   1rem;
+        line-height: 1.7;
+        color:       var(--doc-text-muted, #6b7280);
+        margin:      0 0 2rem;
+        max-width:   440px;
     }
 
-    .card-list {
-        list-style: none;
-        padding:    0;
-        margin:     0;
-        display:    flex;
-        flex-wrap: wrap;
-        gap:        0.75rem;
+    .cta-group {
+        display:       flex;
+        gap:           0.75rem;
+        flex-wrap:     wrap;
+        margin-bottom: 1.25rem;
     }
 
-    .card {
-        display:         block;
-        border:          1px solid #e5e7eb;
+    .btn-primary {
+        display:         inline-flex;
+        align-items:     center;
+        padding:         0.75rem 1.6rem;
+        background:      var(--mr-color-primary-500, #2563eb);
+        color:           #fff;
+        font-weight:     600;
+        font-size:       0.95rem;
         border-radius:   0.5rem;
         text-decoration: none;
-        width: 25%;
-        transition:      border-color 0.15s, box-shadow 0.15s;
+        transition:      background 0.15s;
     }
 
-    .card-action {
-        display: flex;
-        flex-direction: column;
-        row-gap: .25rem;
+    .btn-primary:hover {
+        background: var(--mr-color-primary-600, #1d4ed8);
+    }
+
+    .btn-secondary {
+        display:         inline-flex;
+        align-items:     center;
+        padding:         0.75rem 1.6rem;
+        border:          1px solid var(--doc-border, #e5e7eb);
+        color:           var(--doc-text, #111827);
+        font-weight:     600;
+        font-size:       0.95rem;
+        border-radius:   0.5rem;
         text-decoration: none;
-        padding:         1rem 1.25rem;
+        transition:      border-color 0.15s, background 0.15s;
+    }
 
-        &:active {
-            color:           #374151;
+    .btn-secondary:hover {
+        border-color: var(--mr-color-primary-500, #2563eb);
+        background:   color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 5%, transparent);
+    }
+
+    /* ── Badges méta ────────────────────────────────────── */
+
+    .meta-badges {
+        display:     flex;
+        gap:         0.5rem;
+        flex-wrap:   wrap;
+        align-items: center;
+    }
+
+    .meta-badge {
+        display:      inline-flex;
+        align-items:  center;
+        gap:          0.3rem;
+        padding:      0.25em 0.65em;
+        border:       1px solid var(--doc-border, #e5e7eb);
+        border-radius: 2rem;
+        font-size:    0.73rem;
+        font-weight:  500;
+        color:        var(--doc-text-muted, #6b7280);
+        font-family:  'Fira Code', 'Cascadia Code', monospace;
+        background:   var(--doc-nav-bg, #f8f9fb);
+    }
+
+    /* ── Illustration ───────────────────────────────────── */
+
+    .landing-visual {
+        flex:            0 0 420px;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+    }
+
+    .illus-svg {
+        width: 420px;
+        height: 380px;
+    }
+
+    /* Briques */
+    .brick {
+        transition: opacity 0.2s;
+    }
+
+    .brick-a {
+        fill:    var(--mr-color-primary-500, #2563eb);
+        opacity: 0.15;
+    }
+
+    .brick-b {
+        fill:    var(--mr-color-primary-500, #2563eb);
+        opacity: 0.25;
+    }
+
+    .brick-c {
+        fill:    var(--mr-color-primary-500, #2563eb);
+        opacity: 0.08;
+    }
+
+    /* Accessibilité */
+    .a11y-ring {
+        fill:         var(--mr-color-primary-500, #2563eb);
+        opacity:      0.08;
+        stroke:       var(--mr-color-primary-500, #2563eb);
+        stroke-width: 1.5;
+        stroke-opacity: 0.3;
+    }
+
+    .a11y-figure {
+        fill:    var(--mr-color-primary-500, #2563eb);
+        opacity: 0.6;
+    }
+
+    .a11y-stroke {
+        stroke:       var(--mr-color-primary-500, #2563eb);
+        opacity:      0.6;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+
+    @media (max-width: 860px) {
+        .landing-inner {
+            flex-direction: column-reverse;
+            align-items:    flex-start;
+            gap:            1rem;
+            padding:        2.5rem;
         }
 
-        &:active {
-            color:           #374151;
+        .landing-visual {
+            flex:      0 0 auto;
+            width:     100%;
+            max-width: 200px;
+            margin: auto
+        }
+
+        .illus-svg {
+            width:  260px;
+            height: 308px;
+        }
+
+        .tagline {
+            font-size: 1.9rem;
         }
     }
 
-    .card:hover {
-        border-color: #2563eb;
-        box-shadow:   0 0 0 1px #2563eb;
-
-        .card-name {
-            text-decoration: underline;
-        }
-    }
-
-    .card-name {
-        font-size:     1rem;
-        color: var(--mr-color-primary-500, #2563eb);
-        font-weight: 700;
-        border-radius: 0.25rem;
-        display: inline-block;
-
+    @media (max-width: 480px) {
+        .tagline { font-size: 1.6rem; }
     }
 </style>
