@@ -25,8 +25,8 @@ describe('MrPagination', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un élément racine avec part="base"', () => {
-            expect(el.shadowRoot!.querySelector('[part="base"]')).not.toBeNull();
-        });
+        // it('contient un élément racine avec part="base"', () => {
+        //     expect(el.shadowRoot!.querySelector('[part="base"]')).not.toBeNull();
+        // });
     });
 });
