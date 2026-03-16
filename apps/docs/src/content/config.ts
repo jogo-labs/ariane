@@ -13,6 +13,8 @@ const variantSchema = z.object({
     description: z.string().optional(),
     /** HTML brut injecté dans le playground pour cette variante */
     html: z.string(),
+    /** Thème initial de la preview. 'dark' pour un fond sombre. Défaut: 'light'. */
+    previewTheme: z.enum(['light', 'dark']).optional(),
 });
 
 /**

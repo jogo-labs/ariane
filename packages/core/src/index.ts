@@ -7,6 +7,7 @@
 export { MrButton } from './components/button/button.js';
 export { MrAlert } from './components/alert/alert.js';
 export { MrBreadcrumb } from './components/breadcrumb/breadcrumb.js';
+export { MrBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';
 export { MrProgressbar } from './components/progressbar/progressbar.js';
 export { MrSpinner } from './components/spinner/spinner.js';
 export { MrPagination } from './components/pagination/pagination.js';

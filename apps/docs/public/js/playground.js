@@ -26,7 +26,7 @@ document.querySelectorAll('[data-preview-toggle]').forEach(function (btn) {
         if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
         if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
     }
-    syncIcons(false); // état initial : light
+    syncIcons((preview && preview.getAttribute('data-theme')) === 'dark'); // état initial depuis le DOM
 
     btn.addEventListener('click', function () {
         var next = (preview.getAttribute('data-theme') || 'light') === 'dark' ? 'light' : 'dark';

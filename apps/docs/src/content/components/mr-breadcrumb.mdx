@@ -7,8 +7,22 @@ variants:
       label: Par défaut
       description: Rendu par défaut du composant.
       html: |
-          <mr-breadcrumb
-                links="[{&quot;href&quot;:&quot;monlien&quot;,&quot;label&quot;:&quot;Accueil Espace Personnel&quot;},{&quot;href&quot;:&quot;monlien2&quot;,&quot;label&quot;:&quot;Mon journal de recherche d'emploi&quot;},{&quot;label&quot;:&quot;Publiez vos offres d'emploi&quot;}]"></mr-breadcrumb>
+          <mr-breadcrumb>
+            <mr-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></mr-breadcrumb-item>
+            <mr-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></mr-breadcrumb-item>
+            <mr-breadcrumb-item label="Publiez vos offres d'emploi"></mr-breadcrumb-item>
+          </mr-breadcrumb>
+    - name: dark
+      label: Thème sombre
+      description: Variante avec le thème sombre activé.
+      previewTheme: dark
+      html: |
+          <mr-breadcrumb dark>
+            <mr-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></mr-breadcrumb-item>
+            <mr-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></mr-breadcrumb-item>
+            <mr-breadcrumb-item label="Publiez vos offres d'emploi"></mr-breadcrumb-item>
+          </mr-breadcrumb>
 ---
 
-Documentation narrative du composant `mr-breadcrumb`.
+En dessous de 768px de largeur de viewport, les liens intermédiaires sont masqués derrière un dropdown.
+Le premier lien reste visible sous forme d'un bouton "Retour". Pour voir ce comportement, utiliser les DevTools du navigateur (mode responsive).
