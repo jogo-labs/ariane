@@ -235,6 +235,24 @@ Ne jamais mettre de couleurs hex hardcodées dans `apps/docs/`. Le site supporte
 
 ### Package core
 
+**Convention de dépréciation**
+Utiliser `warnDeprecated(tag, member, message)` depuis `src/utils/deprecated.ts` pour signaler une propriété ou un attribut obsolète. Le warning ne s'affiche qu'une fois par session (garde en `Set`). Toujours annoter avec `@deprecated` en JSDoc pour que l'IDE le signale. Annoncer la suppression cible dans le message (ex: `Sera supprimé en v1.0.0.`).
+
+Exemple d'usage dans un composant :
+
+```typescript
+import { warnDeprecated } from '../../utils/deprecated.js';
+
+// Dans updated() :
+if (this.links !== undefined) {
+    warnDeprecated(
+        'mr-breadcrumb',
+        'links',
+        'Utilisez des éléments <a> slottés. Sera supprimé en v1.0.0.',
+    );
+}
+```
+
 **`reflect: true` obligatoire**
 Sans `reflect: true`, l'attribut n'est pas synchronisé dans le DOM — le `outerHTML` du playground affichera des attributs absents même si la propriété a changé côté JS.
 

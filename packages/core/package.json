@@ -1,6 +1,6 @@
 {
   "name": "@marianne/core",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Accessible web components library",
   "exports": {
