@@ -1,5 +1,6 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
+import rootPkg from '../../../../package.json';
 
 interface Props {
     title: string;
@@ -24,7 +25,7 @@ const {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
-        <title>{title} — Ariane</title>
+        <title>{title} — {rootPkg.config.displayName}</title>
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
@@ -348,7 +349,7 @@ const {
                 </button>
                 <h1>
                     <a href="/" class="header-brand">
-                        m<span class="brand-accent">ARIA</span>nne
+                        {rootPkg.config.displayName}
                     </a>
                 </h1>
             </div>
