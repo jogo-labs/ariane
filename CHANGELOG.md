@@ -12,20 +12,20 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ## [0.1.0-alpha.1] — 2026-03-17
 
-Première pré-version publique de mARIAnne. Les composants sont fonctionnels
+Première pré-version publique de Ariane. Les composants sont fonctionnels
 mais l'API n'est pas encore stabilisée.
 
 ### Ajouté
 
-- **`mr-alert`** — Composant d'alerte avec variants `info`, `success`, `warning`, `error`
-- **`mr-breadcrumb`** — Fil d'Ariane avec support mobile (collapse), slotté via `<mr-breadcrumb-item>`
-- **`mr-breadcrumb-item`** — Élément enfant de `mr-breadcrumb`
-- **`mr-button`** — Bouton avec variants `primary`, `secondary`, `outline`, `ghost`, `danger` et tailles `sm`, `md`, `lg`
-- **`mr-pagination`** — Composant de pagination avec navigation par pages
-- **`mr-progressbar`** — Barre de progression avec valeur et label accessibles
-- **`mr-spinner`** — Indicateur de chargement animé
-- **`mr-stepper`** — Étapes de progression avec contexte parent/enfant
-- **`mr-stepper-item`** — Étape individuelle enfant de `mr-stepper`
+- **`ar-alert`** — Composant d'alerte avec variants `info`, `success`, `warning`, `error`
+- **`ar-breadcrumb`** — Fil d'Ariane avec support mobile (collapse), slotté via `<ar-breadcrumb-item>`
+- **`ar-breadcrumb-item`** — Élément enfant de `ar-breadcrumb`
+- **`ar-button`** — Bouton avec variants `primary`, `secondary`, `outline`, `ghost`, `danger` et tailles `sm`, `md`, `lg`
+- **`ar-pagination`** — Composant de pagination avec navigation par pages
+- **`ar-progressbar`** — Barre de progression avec valeur et label accessibles
+- **`ar-spinner`** — Indicateur de chargement animé
+- **`ar-stepper`** — Étapes de progression avec contexte parent/enfant
+- **`ar-stepper-item`** — Étape individuelle enfant de `ar-stepper`
 - Site de documentation Astro avec playground interactif, référence API et design tokens
 - Distribution CDN (bundle auto-contenu) et npm (ESM tree-shakeable)
 - Thème CSS personnalisable via CSS Custom Properties (`--mr-color-*`, `--mr-*`)

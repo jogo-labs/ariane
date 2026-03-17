@@ -8,20 +8,20 @@ export function warn(name: string, message: string, error?: Error) {
     else console.warn(`${name} - ${message}`);
 }
 
-/** Objet de configuration d'un webcomposant MrAlert */
-export class MrAlertConfig {
+/** Objet de configuration d'un webcomposant ArAlert */
+export class ArAlertConfig {
     /** Permet de spécifier le type d'alerte */
-    version: MrAlertVersion = MrAlert.DEFAULT_VERSION;
+    version: ArAlertVersion = ArAlert.DEFAULT_VERSION;
     /** Permet d'afficher la croix de fermeture. La valeur attendue est l'ID de l'élément à focus après fermeture */
     nextFocus?: string;
     /** Désactive la notification aux lecteurs d'écran lors de l'apparition de l'alerte */
-    withoutNotification: boolean = MrAlert.DEFAULT_NOTIFICATION;
+    withoutNotification: boolean = ArAlert.DEFAULT_NOTIFICATION;
 }
 
-/** Valeurs possibles pour la propriété version de MrAlert */
-export type MrAlertVersion = 'success' | 'warning' | 'error' | 'info';
+/** Valeurs possibles pour la propriété version de ArAlert */
+export type ArAlertVersion = 'success' | 'warning' | 'error' | 'info';
 
-const VERSION_TO_CLASS: Record<MrAlertVersion, string> = {
+const VERSION_TO_CLASS: Record<ArAlertVersion, string> = {
     success: 'check-round-full',
     warning: 'warning-full',
     error: 'error-full',
@@ -41,31 +41,31 @@ const VERSION_TO_CLASS: Record<MrAlertVersion, string> = {
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
  *
- * @cssprop [--mr--bg-info=#dfe9ff]             - Couleur de fond pour une alerte de type "info".
- * @cssprop [--mr--border-info=#dfe9ff]         - Couleur de la bordure pour une alerte de type "info".
- * @cssprop [--mr--icon-info=#2c74ff]             - Couleur de l'icône pour une alerte de type "info".
- * @cssprop [--mr--bg-warning=#fffaeb]             - Couleur de fond pour une alerte de type "warning".
- * @cssprop [--mr--border-warning=#fffaeb]         - Couleur de la bordure pour une alerte de type "warning".
- * @cssprop [--mr--icon-warning=#f79009]             - Couleur de l'icône pour une alerte de type "warning".
- * @cssprop [--mr--bg-error=#ffeceb]             - Couleur de fond pour une alerte de type "error".
- * @cssprop [--mr--border-error=#ffeceb]         - Couleur de la bordure pour une alerte de type "error".
- * @cssprop [--mr--icon-error=#f04438]             - Couleur de l'icône pour une alerte de type "error".
- * @cssprop [--mr--bg-success=#d9f6e8]             - Couleur de fond pour une alerte de type "success".
- * @cssprop [--mr--border-success=#d9f6e8]         - Couleur de la bordure pour une alerte de type "success".
- * @cssprop [--mr--icon-success=#09aa5f]             - Couleur de l'icône pour une alerte de type "success".
+ * @cssprop [--ar--bg-info=#dfe9ff]             - Couleur de fond pour une alerte de type "info".
+ * @cssprop [--ar--border-info=#dfe9ff]         - Couleur de la bordure pour une alerte de type "info".
+ * @cssprop [--ar--icon-info=#2c74ff]             - Couleur de l'icône pour une alerte de type "info".
+ * @cssprop [--ar--bg-warning=#fffaeb]             - Couleur de fond pour une alerte de type "warning".
+ * @cssprop [--ar--border-warning=#fffaeb]         - Couleur de la bordure pour une alerte de type "warning".
+ * @cssprop [--ar--icon-warning=#f79009]             - Couleur de l'icône pour une alerte de type "warning".
+ * @cssprop [--ar--bg-error=#ffeceb]             - Couleur de fond pour une alerte de type "error".
+ * @cssprop [--ar--border-error=#ffeceb]         - Couleur de la bordure pour une alerte de type "error".
+ * @cssprop [--ar--icon-error=#f04438]             - Couleur de l'icône pour une alerte de type "error".
+ * @cssprop [--ar--bg-success=#d9f6e8]             - Couleur de fond pour une alerte de type "success".
+ * @cssprop [--ar--border-success=#d9f6e8]         - Couleur de la bordure pour une alerte de type "success".
+ * @cssprop [--ar--icon-success=#09aa5f]             - Couleur de l'icône pour une alerte de type "success".
 
  *
- * @event {CustomEvent} mr-alert-close - Émis après la fermeture de l'alerte (fin de transition).
+ * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
-@customElement('mr-alert')
-export class MrAlert extends LitElement {
+@customElement('ar-alert')
+export class ArAlert extends LitElement {
     static override styles = [styles];
 
     /** Nom du composant affiché dans les logs */
     // @ignore
-    static readonly NAME = 'MrAlert';
+    static readonly NAME = 'ArAlert';
     // @ignore
-    static readonly DEFAULT_VERSION: MrAlertVersion = 'error';
+    static readonly DEFAULT_VERSION: ArAlertVersion = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
 
@@ -112,7 +112,7 @@ export class MrAlert extends LitElement {
             alert: true,
             'alert-dismissible': this.nextFocus !== undefined,
         };
-        containerClassMap[`alert-${this.version ?? MrAlert.DEFAULT_VERSION}`] = true;
+        containerClassMap[`alert-${this.version ?? ArAlert.DEFAULT_VERSION}`] = true;
 
         return html` <div
             part="container"
@@ -126,7 +126,7 @@ export class MrAlert extends LitElement {
             <div part="icon" class="alert-icon-container has-icon-top">
                 <span
                     aria-hidden="true"
-                    class="icon icon-${VERSION_TO_CLASS[this.version ?? MrAlert.DEFAULT_VERSION]}"
+                    class="icon icon-${VERSION_TO_CLASS[this.version ?? ArAlert.DEFAULT_VERSION]}"
                 ></span>
             </div>
             <div part="body" class="alert-body">
@@ -162,7 +162,7 @@ export class MrAlert extends LitElement {
 
         if (this.hiding) {
             this.dispatchEvent(
-                new CustomEvent('mr-alert-close', { bubbles: true, composed: true }),
+                new CustomEvent('ar-alert-close', { bubbles: true, composed: true }),
             );
             this.remove();
         }
@@ -172,7 +172,7 @@ export class MrAlert extends LitElement {
         );
         if (!$focusableElement) {
             console.error(
-                `${MrAlert.NAME} - L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
+                `${ArAlert.NAME} - L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
             );
             return;
         }
@@ -182,6 +182,6 @@ export class MrAlert extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-alert': MrAlert;
+        'ar-alert': ArAlert;
     }
 }

@@ -1,4 +1,4 @@
-# Guide de contribution — Site de documentation mARIAnne
+# Guide de contribution — Site de documentation Ariane
 
 Ce guide explique comment la documentation fonctionne et comment la modifier.
 Il est destiné à toute personne qui arrive sur le projet et veut ajouter un composant,
@@ -46,7 +46,7 @@ Créez `apps/docs/src/content/components/mr-<nom>.mdx` :
 
 ```yaml
 ---
-tagName: mr-button # doit correspondre exactement au tag name Lit
+tagName: ar-button # doit correspondre exactement au tag name Lit
 title: Bouton # titre affiché en haut de la page et dans la nav
 description: > # optionnel — phrase courte sous le titre
     Déclenche une action au clic.
@@ -54,12 +54,12 @@ playgroundTemplate: default # optionnel — nom de la variante utilisée dans le
 variants:
     - name: default
       label: Par défaut
-      html: '<mr-button>Valider</mr-button>'
+      html: '<ar-button>Valider</ar-button>'
 
     - name: danger
       label: Danger
       description: Utilisé pour les actions destructives.
-      html: '<mr-button variant="danger">Supprimer</mr-button>'
+      html: '<ar-button variant="danger">Supprimer</ar-button>'
 ---
 Texte narratif optionnel en MDX (affiché sous la référence API).
 ```
@@ -70,7 +70,7 @@ C'est tout. La page `/components/button` sera générée automatiquement.
 
 | Champ                | Requis | Description                                                                                                |
 | -------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| `tagName`            | ✅     | Tag name du composant (`mr-button`). Doit exister dans le CEM.                                             |
+| `tagName`            | ✅     | Tag name du composant (`ar-button`). Doit exister dans le CEM.                                             |
 | `title`              | ✅     | Titre de la page et libellé dans la nav.                                                                   |
 | `description`        | —      | Phrase courte affichée sous le titre.                                                                      |
 | `playgroundTemplate` | —      | `name` de la variante dont le HTML initialise le playground. Si absent, la première variante est utilisée. |
@@ -84,7 +84,7 @@ variants:
       label: Par défaut # libellé affiché comme sous-titre
       description: … # optionnel — texte explicatif en italique
       html: | # HTML brut injecté en preview et dans le bloc code
-          <mr-button variant="primary">Valider</mr-button>
+          <ar-button variant="primary">Valider</ar-button>
 ```
 
 Le HTML est rendu **côté serveur** via `<Fragment set:html>`. Les custom elements
@@ -105,7 +105,7 @@ Deux modes d'affichage sont disponibles, configurés via la JSDoc du composant L
 /**
  * @display docs
  */
-@customElement('mr-stepper-item')
+@customElement('ar-stepper-item')
 export class MrStepperItem extends LitElement { … }
 ```
 
@@ -117,9 +117,9 @@ et utilisée par la nav et la page d'accueil pour masquer automatiquement le sou
 
 ```typescript
 /**
- * @parent mr-stepper
+ * @parent ar-stepper
  */
-@customElement('mr-stepper-item')
+@customElement('ar-stepper-item')
 export class MrStepperItem extends LitElement { … }
 ```
 

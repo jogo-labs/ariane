@@ -6,18 +6,18 @@ import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
 import { mrPaginationUtils } from './pagination.utils.js';
 
-/** Objet de configuration d'un webcomposant MrPagination */
-export class MrPaginationConfig {
+/** Objet de configuration d'un webcomposant ArPagination */
+export class ArPaginationConfig {
     current?: number = 1;
     total?: number = 5;
-    variant?: MrPaginationVariant = 'light';
+    variant?: ArPaginationVariant = 'light';
 }
 
 /** Variantes de style disponibles */
-export type MrPaginationVariant = 'light' | 'dark';
+export type ArPaginationVariant = 'light' | 'dark';
 
 /** Détail de l'événement émis lors d'un changement de page */
-export interface MrPaginationPageChangeDetail {
+export interface ArPaginationPageChangeDetail {
     /** Numéro de la page précédente */
     from: number;
     /** Numéro de la nouvelle page */
@@ -39,15 +39,15 @@ export interface MrPaginationPageChangeDetail {
  * @csspart prev     - Le bouton "Page précédente".
  * @csspart next     - Le bouton "Page suivante".
  *
- * @event {CustomEvent<{from: number, to: number}>} mr-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
+ * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
-@customElement('mr-pagination')
-export class MrPagination extends LitElement {
+@customElement('ar-pagination')
+export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
 
     static readonly DEFAULT_CURRENT: number = 1;
     static readonly DEFAULT_TOTAL: number = 5;
-    static readonly DEFAULT_VARIANT: MrPaginationVariant = 'light';
+    static readonly DEFAULT_VARIANT: ArPaginationVariant = 'light';
 
     /**
      * Numéro de la page courante (commence à 1).
@@ -55,7 +55,7 @@ export class MrPagination extends LitElement {
      * @default 1
      */
     @property({ reflect: true, type: Number, useDefault: true })
-    current: number = MrPagination.DEFAULT_CURRENT;
+    current: number = ArPagination.DEFAULT_CURRENT;
 
     /**
      * Nombre total de pages.
@@ -63,7 +63,7 @@ export class MrPagination extends LitElement {
      * @default 5
      */
     @property({ reflect: true, type: Number, useDefault: true })
-    total: number = MrPagination.DEFAULT_TOTAL;
+    total: number = ArPagination.DEFAULT_TOTAL;
 
     /**
      * Variante de style. Adapter selon la couleur de fond de la page.
@@ -71,7 +71,7 @@ export class MrPagination extends LitElement {
      * @default 'light'
      */
     @property({ reflect: true, type: String, useDefault: true })
-    variant: 'light' | 'dark' = MrPagination.DEFAULT_VARIANT;
+    variant: 'light' | 'dark' = ArPagination.DEFAULT_VARIANT;
 
     override render(): TemplateResult {
         const isNextDisabled = this.current >= this.total;
@@ -84,8 +84,8 @@ export class MrPagination extends LitElement {
         const nextPageNumber = mrPaginationUtils._clamp(this.current + 1, 1, this.total);
         const current = mrPaginationUtils._clamp(this.current, 1, this.total);
 
-        return html` <nav part="nav" role="navigation" aria-labelledby="mr-pagination">
-            <p id="mr-pagination" class="sr-only">Pagination</p>
+        return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
+            <p id="ar-pagination" class="sr-only">Pagination</p>
             <ul part="list" class="pagination" @click=${this._onPageChange}>
                 <li part="item" class="pagination-item">
                     <a
@@ -138,7 +138,7 @@ export class MrPagination extends LitElement {
     renderPage(
         page: number,
         active: boolean,
-        variant: MrPaginationVariant = 'light',
+        variant: ArPaginationVariant = 'light',
     ): TemplateResult {
         return html` <li part="item" class="pagination-item${active ? ' active' : ''}">
             ${this.renderPageLink(page, active, variant)}
@@ -149,14 +149,14 @@ export class MrPagination extends LitElement {
     renderPageLink(
         page: number,
         active: boolean,
-        variant: MrPaginationVariant = 'light',
+        variant: ArPaginationVariant = 'light',
     ): TemplateResult {
         if (active) {
             return html` <span
                 part="current"
                 aria-current="true"
                 class="btn btn-tertiary ${variant}"
-                data-mr-pagination-page="${page}"
+                data-ar-pagination-page="${page}"
             >
                 ${this.renderPageLabel(page)}
             </span>`;
@@ -164,7 +164,7 @@ export class MrPagination extends LitElement {
         return html` <a
             part="link"
             class="btn btn-tertiary ${variant}"
-            data-mr-pagination-page="${page}"
+            data-ar-pagination-page="${page}"
             href="javascript:;"
         >
             ${this.renderPageLabel(page)}
@@ -192,16 +192,16 @@ export class MrPagination extends LitElement {
 
     private _onPageChange(event: MouseEvent): void {
         const target = event.target as HTMLElement;
-        const page = target.dataset['mrPaginationPage'];
+        const page = target.dataset['arPaginationPage'];
         if (target.tagName !== 'A' || !page) return;
         const from = this.current;
         this.current = parseInt(page);
         this._emit({ from, to: this.current });
     }
 
-    private _emit(detail: MrPaginationPageChangeDetail): void {
+    private _emit(detail: ArPaginationPageChangeDetail): void {
         this.dispatchEvent(
-            new CustomEvent<MrPaginationPageChangeDetail>('mr-pagination-page-change', {
+            new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-change', {
                 bubbles: true,
                 composed: true,
                 cancelable: true,
@@ -213,6 +213,6 @@ export class MrPagination extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-pagination': MrPagination;
+        'ar-pagination': ArPagination;
     }
 }

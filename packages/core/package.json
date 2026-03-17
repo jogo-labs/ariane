@@ -1,5 +1,5 @@
 {
-  "name": "@marianne/core",
+  "name": "@ariane-ui/core",
   "version": "0.1.0-alpha.1",
   "type": "module",
   "description": "Accessible web components library",
@@ -47,6 +47,6 @@
   },
   "customElements": "dist/custom-elements.json",
   "config": {
-    "componentPrefix": "mr"
+    "componentPrefix": "ar"
   }
 }

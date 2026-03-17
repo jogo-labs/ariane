@@ -7,7 +7,7 @@ import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
-import { type MrBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
+import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
@@ -24,11 +24,11 @@ import { type MrBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
  * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
  * @csspart dropdown   - Le conteneur du dropdown mobile.
  *
- * @event {CustomEvent} mr-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
- * @event {CustomEvent} mr-breadcrumb-close - Émis à la fermeture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
  */
-@customElement('mr-breadcrumb')
-export class MrBreadcrumb extends LitElement {
+@customElement('ar-breadcrumb')
+export class ArBreadcrumb extends LitElement {
     static override styles: CSSResultGroup = [
         utilitiesStyles,
         dropdownStyles,
@@ -44,24 +44,24 @@ export class MrBreadcrumb extends LitElement {
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
-    @state() private isMobile: boolean = MrBreadcrumb.mobileQuery.matches;
+    @state() private isMobile: boolean = ArBreadcrumb.mobileQuery.matches;
     @state() private dropdownOpen: boolean = false;
 
-    private _items = new Set<MrBreadcrumbItem>();
+    private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
 
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
         initialValue: {
-            registerItem: (item: MrBreadcrumbItem) => {
+            registerItem: (item: ArBreadcrumbItem) => {
                 this._items.add(item);
                 this._scheduleRebuild();
             },
-            unregisterItem: (item: MrBreadcrumbItem) => {
+            unregisterItem: (item: ArBreadcrumbItem) => {
                 this._items.delete(item);
                 this._scheduleRebuild();
             },
-            notifyItemChanged: (_item: MrBreadcrumbItem) => {
+            notifyItemChanged: (_item: ArBreadcrumbItem) => {
                 this._scheduleRebuild();
             },
         },
@@ -73,13 +73,13 @@ export class MrBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        MrBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
-        customElements.whenDefined('mr-breadcrumb-item').then(() => this._collectExistingItems());
+        ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
+        customElements.whenDefined('ar-breadcrumb-item').then(() => this._collectExistingItems());
     }
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        MrBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
+        ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
     // ---------------------------------------------------------------------------
@@ -161,14 +161,14 @@ export class MrBreadcrumb extends LitElement {
     // Private
     // ---------------------------------------------------------------------------
 
-    private get _orderedItems(): MrBreadcrumbItem[] {
-        return [...this.querySelectorAll<MrBreadcrumbItem>('mr-breadcrumb-item')];
+    private get _orderedItems(): ArBreadcrumbItem[] {
+        return [...this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item')];
     }
 
     private _collectExistingItems(): void {
         const registry = this._provider.value;
         if (!registry) return;
-        this.querySelectorAll<MrBreadcrumbItem>('mr-breadcrumb-item').forEach((item) =>
+        this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item').forEach((item) =>
             item.setRegistry(registry),
         );
     }
@@ -186,7 +186,7 @@ export class MrBreadcrumb extends LitElement {
         this.dropdownOpen = true;
         this.addEventListener('blur', this._hide);
         this.dispatchEvent(
-            new CustomEvent('mr-breadcrumb-open', { bubbles: true, composed: true }),
+            new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
         );
     }
 
@@ -194,17 +194,17 @@ export class MrBreadcrumb extends LitElement {
         this.dropdownOpen = false;
         this.removeEventListener('blur', this._hide);
         this.dispatchEvent(
-            new CustomEvent('mr-breadcrumb-close', { bubbles: true, composed: true }),
+            new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
         );
     }
 
     private _handleMediaChange = (): void => {
-        this.isMobile = MrBreadcrumb.mobileQuery.matches;
+        this.isMobile = ArBreadcrumb.mobileQuery.matches;
     };
 }
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-breadcrumb': MrBreadcrumb;
+        'ar-breadcrumb': ArBreadcrumb;
     }
 }

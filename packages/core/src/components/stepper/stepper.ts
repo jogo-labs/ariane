@@ -13,10 +13,10 @@ import { NavigationTreeController } from '../../controllers/navigation-tree.cont
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { DropdownController } from '../../controllers/dropdown.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
-import { type MrStepperItem } from '../stepper-item/stepper-item.js';
+import { type ArStepperItem } from '../stepper-item/stepper-item.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
-export interface MrStepperStepChangeDetail {
+export interface ArStepperStepChangeDetail {
     /** Chemin (`href`) de l'étape sélectionnée */
     path: string;
 }
@@ -25,14 +25,14 @@ export interface MrStepperStepChangeDetail {
  * @summary Stepper de navigation accessible, adaptatif desktop/mobile.
  * @display demo
  *
- * Les étapes sont déclarées via des éléments `<mr-stepper-item>` enfants.
+ * Les étapes sont déclarées via des éléments `<ar-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
  * l'arbre de navigation. Un item peut avoir des sous-étapes (enfants imbriqués).
  *
  * En mode `mobile`, les étapes sont affichées dans un dropdown.
  * En mode `desktop`, elles sont affichées dans une liste verticale.
  *
- * @slot - Un ou plusieurs composant <mr-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
+ * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
  * @csspart nav          - L'élément `<nav>` englobant.
  * @csspart list         - La liste des étapes (desktop).
@@ -42,16 +42,16 @@ export interface MrStepperStepChangeDetail {
  * @csspart dropdown     - Le conteneur dropdown (mobile uniquement).
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown mobile.
  *
- * @cssprop --mr-stepper-gap              - Espacement entre les étapes.
- * @cssprop --mr-stepper-active-color     - Couleur de l'étape active.
- * @cssprop --mr-stepper-done-color       - Couleur des étapes complétées.
- * @cssprop --mr-stepper-inactive-color   - Couleur des étapes inactives.
- * @cssprop --mr-stepper-connector-color  - Couleur du connecteur entre étapes.
+ * @cssprop --ar-stepper-gap              - Espacement entre les étapes.
+ * @cssprop --ar-stepper-active-color     - Couleur de l'étape active.
+ * @cssprop --ar-stepper-done-color       - Couleur des étapes complétées.
+ * @cssprop --ar-stepper-inactive-color   - Couleur des étapes inactives.
+ * @cssprop --ar-stepper-connector-color  - Couleur du connecteur entre étapes.
  *
- * @event {CustomEvent<{ path: string }>} mr-stepper-step-changed - Émis au clic sur une étape.
+ * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
-@customElement('mr-stepper')
-export class MrStepper extends LitElement {
+@customElement('ar-stepper')
+export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [
         resetStyles,
         utilitiesStyles,
@@ -61,7 +61,7 @@ export class MrStepper extends LitElement {
     ];
 
     /**
-     * Chemin de l'étape courante. Doit correspondre au `href` d'un `<mr-stepper-item>`.
+     * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
      * @attr current-path
      */
@@ -103,7 +103,7 @@ export class MrStepper extends LitElement {
 
     // ── Registry / Context ───────────────────────────────────────────────────
 
-    private items = new Set<MrStepperItem>();
+    private items = new Set<ArStepperItem>();
 
     private readonly _registry: StepperRegistry = {
         registerItem: (item) => {
@@ -137,7 +137,7 @@ export class MrStepper extends LitElement {
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
 
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
-        customElements.whenDefined('mr-stepper-item').then(() => {
+        customElements.whenDefined('ar-stepper-item').then(() => {
             if (!this.isConnected) return;
             this.collectExistingItems();
         });
@@ -224,7 +224,7 @@ export class MrStepper extends LitElement {
 
     /** Collecte les items déjà présents dans le light DOM (cas du premier render) */
     private collectExistingItems(): void {
-        this.querySelectorAll<MrStepperItem>('mr-stepper-item').forEach((item) =>
+        this.querySelectorAll<ArStepperItem>('ar-stepper-item').forEach((item) =>
             item.setRegistry(this._registry),
         );
     }
@@ -261,14 +261,14 @@ export class MrStepper extends LitElement {
         const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
         if (!path) return;
 
-        const detail: MrStepperStepChangeDetail = { path };
+        const detail: ArStepperStepChangeDetail = { path };
 
         // Double dispatch : nom court pour usage interne, nom préfixé pour usage externe
         this.dispatchEvent(
             new CustomEvent('step-changed', { bubbles: true, composed: true, detail }),
         );
         this.dispatchEvent(
-            new CustomEvent('mr-stepper-step-changed', { bubbles: true, composed: true, detail }),
+            new CustomEvent('ar-stepper-step-changed', { bubbles: true, composed: true, detail }),
         );
     };
 
@@ -279,6 +279,6 @@ export class MrStepper extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-stepper': MrStepper;
+        'ar-stepper': ArStepper;
     }
 }

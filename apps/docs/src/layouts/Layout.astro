@@ -24,12 +24,12 @@ const {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
-        <title>{title} — mARIAnne</title>
+        <title>{title} — Ariane</title>
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
             (function () {
-                var stored = localStorage.getItem('marianne-theme') || 'system';
+                var stored = localStorage.getItem('ariane-theme') || 'system';
                 var theme = stored === 'system'
                     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                     : stored;
@@ -332,7 +332,7 @@ const {
     <body>
         <div class="alpha-banner" role="banner">
             Librairie en cours de développement — API instable, ne pas utiliser en production.
-            <a href="https://github.com/jonTravens/mARIAnne/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
+            <a href="https://github.com/jonTravens/Ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
         </div>
 
         <!-- Header permanent (desktop + mobile) -->
@@ -361,7 +361,7 @@ const {
                 </select>
                 <!-- Lien GitHub -->
                 <a
-                    href="https://github.com/jonTravens/mARIAnne"
+                    href="https://github.com/jonTravens/Ariane"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="icon-btn header-github"
@@ -412,20 +412,20 @@ const {
             }
 
             // Lire le mode sauvegardé (défaut : 'system')
-            const savedMode = localStorage.getItem('marianne-theme') || 'system';
+            const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
             // Écouter les changements du select
             const themeSelect = document.getElementById('theme-select') as HTMLSelectElement | null;
             themeSelect?.addEventListener('change', () => {
                 const mode = themeSelect.value || 'system';
-                localStorage.setItem('marianne-theme', mode);
+                localStorage.setItem('ariane-theme', mode);
                 applyMode(mode);
             });
 
             // Réagir aux changements de préférence système quand le mode est 'system'
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('marianne-theme') || 'system') === 'system') {
+                if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
                     applyMode('system');
                 }
             });

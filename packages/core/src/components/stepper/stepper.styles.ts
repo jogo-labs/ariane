@@ -87,7 +87,7 @@ export default css`
         -webkit-box-align: center;
         -ms-flex-align: center;
         align-items: center;
-        color: var(--mr--color-background-neutral-default-strong);
+        color: var(--ar--color-background-neutral-default-strong);
     }
 
     .stepper-item-bullet {
@@ -106,8 +106,8 @@ export default css`
         margin-right: 0.5rem;
         -webkit-transform: translateY(1px);
         transform: translateY(1px);
-        -webkit-box-shadow: 0 0 0 1px var(--mr--stepper-next-bullet-border) inset;
-        box-shadow: 0 0 0 1px var(--mr--stepper-next-bullet-border) inset;
+        -webkit-box-shadow: 0 0 0 1px var(--ar--stepper-next-bullet-border) inset;
+        box-shadow: 0 0 0 1px var(--ar--stepper-next-bullet-border) inset;
         background-color: transparent;
     }
 
@@ -139,36 +139,36 @@ export default css`
 
     .stepper-item .stepper-link:focus,
     .stepper-item .stepper-link:hover {
-        color: var(--mr--stepper-bullet-hover);
+        color: var(--ar--stepper-bullet-hover);
     }
 
     .stepper-item .stepper-link:focus:before,
     .stepper-item .stepper-link:hover:before {
-        background-color: var(--mr--color-primary);
+        background-color: var(--ar--color-primary);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-label,
     .stepper-item .stepper-link:hover .stepper-item-label {
         text-decoration: none;
-        color: var(--mr--color-text-color);
+        color: var(--ar--color-text-color);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-bullet,
     .stepper-item .stepper-link:hover .stepper-item-bullet {
         color: #fff;
-        background-color: var(--mr--stepper-bullet-hover);
+        background-color: var(--ar--stepper-bullet-hover);
         -webkit-box-shadow: none;
         box-shadow: none;
     }
 
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
-        outline-color: var(--mr--color-primary);
+        outline-color: var(--ar--color-primary);
         border-radius: 0.125rem;
     }
 
     .stepper-item.active > .stepper-item-inner {
-        color: var(--mr--color-primary);
+        color: var(--ar--color-primary);
         font-weight: 700;
     }
 
@@ -186,7 +186,7 @@ export default css`
 
     .stepper-link .stepper-item-bullet {
         color: #283276;
-        background-color: var(--mr--stepper-bullet-background);
+        background-color: var(--ar--stepper-bullet-background);
     }
 
     .stepper-list.stepper-desktop,
@@ -306,6 +306,6 @@ export default css`
 
     .stepper-edition .stepper-item-bullet {
         color: #283276;
-        background-color: var(--mr--stepper-bullet-background);
+        background-color: var(--ar--stepper-bullet-background);
     }
 `;

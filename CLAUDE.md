@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**mARIAnne** is an accessible web components library (`@marianne/core`) built with **Lit 3** and **TypeScript**. It's an npm workspaces monorepo orchestrated by Turborepo with a dual distribution strategy (NPM + CDN).
+**Ariane** is an accessible web components library (`@ariane-ui/core`) built with **Lit 3** and **TypeScript**. It's an npm workspaces monorepo orchestrated by Turborepo with a dual distribution strategy (NPM + CDN).
 
 ## Commands
 
@@ -59,7 +59,7 @@ apps/docs/      # Astro 5 + MDX documentation site
 
 Each component lives in `components/<name>/` with:
 
-- `<name>.ts` — LitElement class, decorated with `@customElement('mr-<name>')`
+- `<name>.ts` — LitElement class, decorated with `@customElement('ar-<name>')`
 - `<name>.styles.ts` — Lit `css` tagged template styles
 - `<name>.test.ts` — Vitest tests
 
@@ -72,8 +72,8 @@ Complex components add:
 
 - **Tag names**: `mr-<name>` (prefix defined in `packages/core/package.json` → `config.componentPrefix`)
 - **Class names**: `Mr<Name>` (PascalCase)
-- **Custom events**: prefixed `mr-` (e.g., `mr-click`, `mr-stepper-step-changed`)
-- **CSS custom properties**: `--mr-<component>-<property>` (e.g., `--mr-button-bg`)
+- **Custom events**: prefixed `mr-` (e.g., `ar-click`, `ar-stepper-step-changed`)
+- **CSS custom properties**: `--ar-<component>-<property>` (e.g., `--ar-button-bg`)
 - **CSS parts**: `part="base"`, `part="label"`, `part="prefix"`, `part="suffix"`
 
 ### Key patterns
@@ -85,7 +85,7 @@ Complex components add:
 ```typescript
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-<name>': Mr<Name>;
+        'ar-<name>': Ar<Name>;
     }
 }
 ```
@@ -94,7 +94,7 @@ declare global {
 
 **Parent-child composition**: Use `@lit/context` — parent exposes a `ContextProvider`, child subscribes via `ContextConsumer`. See `stepper/` for reference.
 
-**No Shadow DOM components**: Data-container components (e.g., `mr-stepper-item`) override `createRenderRoot()` to return `this`.
+**No Shadow DOM components**: Data-container components (e.g., `ar-stepper-item`) override `createRenderRoot()` to return `this`.
 
 ### Build outputs
 
@@ -163,7 +163,7 @@ The docs site is a custom Astro 5 + MDX static site. **No Starlight, no api-view
 **MDX frontmatter schema** (per component content file):
 
 ```yaml
-tagName: mr-button # required
+tagName: ar-button # required
 title: Bouton # required
 description: … # optional, shown under title
 playgroundTemplate: default # optional, name of variant used to init playground (defaults to first)
@@ -171,7 +171,7 @@ variants:
     - name: default
       label: Par défaut
       description: …
-      html: '<mr-button>Label</mr-button>'
+      html: '<ar-button>Label</ar-button>'
 ```
 
 > **Sub-components**: use only `@parent mr-<tag>` JSDoc in the Lit class. No MDX field needed —
@@ -228,7 +228,7 @@ Pour partager du CSS entre composants, utiliser `@import` au début d'un bloc `<
 `defer` charge le script après le DOM, ce qui posait un problème pour `hljs.highlightAll()`. Utiliser `is:inline` explicitement pour un chargement synchrone — highlight.js est assez petit pour ça.
 
 **Preview de composants indépendante du thème global**
-Les éléments `.preview` ont leur propre attribut `data-theme="light|dark"` et redéfinissent les tokens `--mr-color-*` pour un contexte CSS isolé. Un bouton toggle local permet de basculer indépendamment du thème global.
+Les éléments `.preview` ont leur propre attribut `data-theme="light|dark"` et redéfinissent les tokens `--ar-color-*` pour un contexte CSS isolé. Un bouton toggle local permet de basculer indépendamment du thème global.
 
 **Variables CSS `--doc-*` pour les couleurs de la doc**
 Ne jamais mettre de couleurs hex hardcodées dans `apps/docs/`. Le site supporte les thèmes light/dark via les variables `--doc-*` (ex : `--doc-text`, `--doc-border`, `--doc-text-muted`). Toujours vérifier si une variable existe avant d'écrire une valeur fixe.
@@ -246,7 +246,7 @@ import { warnDeprecated } from '../../utils/deprecated.js';
 // Dans updated() :
 if (this.links !== undefined) {
     warnDeprecated(
-        'mr-breadcrumb',
+        'ar-breadcrumb',
         'links',
         'Utilisez des éléments <a> slottés. Sera supprimé en v1.0.0.',
     );

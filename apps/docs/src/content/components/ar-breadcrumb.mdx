@@ -1,0 +1,28 @@
+---
+tagName: ar-breadcrumb
+title: Breadcrumb
+description: Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
+variants:
+    - name: default
+      label: Par défaut
+      description: Rendu par défaut du composant.
+      html: |
+          <ar-breadcrumb>
+            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
+          </ar-breadcrumb>
+    - name: dark
+      label: Thème sombre
+      description: Variante avec le thème sombre activé.
+      previewTheme: dark
+      html: |
+          <ar-breadcrumb dark>
+            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
+          </ar-breadcrumb>
+---
+
+En dessous de 768px de largeur de viewport, les liens intermédiaires sont masqués derrière un dropdown.
+Le premier lien reste visible sous forme d'un bouton "Retour". Pour voir ce comportement, utiliser les DevTools du navigateur (mode responsive).

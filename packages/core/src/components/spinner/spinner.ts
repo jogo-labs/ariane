@@ -15,13 +15,13 @@ import styles from './spinner.styles.js';
  * @csspart spinner   - L'élément `<svg>` du spinner (visible quand `done` est false).
  * @csspart status    - Le `<div role="alert">` lu par les lecteurs d'écran.
  *
- * @cssprop [--mr--spinner-stroke-color=#5b5d65]     - Couleur du trait SVG. Défaut : `currentColor`.
+ * @cssprop [--ar--spinner-stroke-color=#5b5d65]     - Couleur du trait SVG. Défaut : `currentColor`.
  */
-@customElement('mr-spinner')
-export class MrSpinner extends LitElement {
+@customElement('ar-spinner')
+export class ArSpinner extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];
 
-    static readonly NAME = 'MrSpinner';
+    static readonly NAME = 'ArSpinner';
     static readonly DEFAULT_DONE: boolean = false;
     static readonly DEFAULT_LOADING_LABEL: string = 'Contenu en cours de chargement';
     static readonly DEFAULT_DONE_LABEL: string = 'Chargement terminé';
@@ -32,7 +32,7 @@ export class MrSpinner extends LitElement {
      * @default false
      */
     @property({ reflect: true, useDefault: true, type: Boolean })
-    done: boolean = MrSpinner.DEFAULT_DONE;
+    done: boolean = ArSpinner.DEFAULT_DONE;
 
     /**
      * Texte annoncé aux lecteurs d'écran pendant le chargement.
@@ -40,7 +40,7 @@ export class MrSpinner extends LitElement {
      * @default 'Contenu en cours de chargement'
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'loading-label' })
-    loadingLabel: string = MrSpinner.DEFAULT_LOADING_LABEL;
+    loadingLabel: string = ArSpinner.DEFAULT_LOADING_LABEL;
 
     /**
      * Texte annoncé aux lecteurs d'écran quand le chargement est terminé.
@@ -48,7 +48,7 @@ export class MrSpinner extends LitElement {
      * @default 'Chargement terminé'
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'done-label' })
-    doneLabel: string = MrSpinner.DEFAULT_DONE_LABEL;
+    doneLabel: string = ArSpinner.DEFAULT_DONE_LABEL;
 
     @property({ reflect: true, type: String, useDefault: true })
     size: 'xs' | 'sm' | 'lg' | undefined = undefined;
@@ -78,6 +78,6 @@ export class MrSpinner extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-spinner': MrSpinner;
+        'ar-spinner': ArSpinner;
     }
 }

@@ -11,13 +11,13 @@ export default css`
     :host([dark]) .breadcrumb-desktop .breadcrumb-text,
     :host([dark]) .breadcrumb-desktop .breadcrumb-link,
     :host([dark]) .breadcrumb-desktop .breadcrumb-link:visited {
-        --mr--color-text-color: #fff;
-        --mr--text-color-default: #fff;
-        color: var(--mr--color-text-color, var(--mr--text-color-default));
+        --ar--color-text-color: #fff;
+        --ar--text-color-default: #fff;
+        color: var(--ar--color-text-color, var(--ar--text-color-default));
     }
 
     :host([dark]) .breadcrumb-desktop .breadcrumb-item:before {
-        background-color: var(--mr--color-text-color, #fff);
+        background-color: var(--ar--color-text-color, #fff);
     }
 
     /* ── Base ────────────────────────────────────────────────── */
@@ -31,7 +31,7 @@ export default css`
         padding: 0;
         border-radius: 0;
         background-color: transparent;
-        color: var(--mr--color-text-color);
+        color: var(--ar--color-text-color);
     }
 
     .breadcrumb-link {
@@ -135,7 +135,7 @@ export default css`
     }
 
     .breadcrumb-mobile .breadcrumb-item:last-child:before {
-        background-color: var(--mr--color-primary);
+        background-color: var(--ar--color-primary);
     }
 
     .breadcrumb-mobile .breadcrumb-link,

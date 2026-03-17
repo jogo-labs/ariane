@@ -8,31 +8,31 @@ const tocEntries = [
     { id: 'tokens',           label: 'Design Tokens',         level: 1 as const },
 ];
 
-const codeImportGlobal = `import '@marianne/core';
-import '@marianne/core/themes/default.css';`;
+const codeImportGlobal = `import '@ariane-ui/core';
+import '@ariane-ui/core/themes/default.css';`;
 
-const codeImportIndividuel = `import '@marianne/core/dist/components/button/button.js';
-import '@marianne/core/dist/components/alert/alert.js';
-import '@marianne/core/themes/default.css';`;
+const codeImportIndividuel = `import '@ariane-ui/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/alert/alert.js';
+import '@ariane-ui/core/themes/default.css';`;
 
-const codeHtml = `<mr-button variant="filled">Valider</mr-button>
+const codeHtml = `<ar-button variant="filled">Valider</ar-button>
 
-<mr-alert variant="success">
+<ar-alert variant="success">
     Votre message a bien été envoyé.
-</mr-alert>
+</ar-alert>
 
-<mr-spinner></mr-spinner>`;
+<ar-spinner></ar-spinner>`;
 
-const codeCustomProps = `/* Personnaliser mr-button */
-mr-button {
-    --mr-button-bg:            #7c3aed;
-    --mr-button-border-radius: 2rem;
+const codeCustomProps = `/* Personnaliser ar-button */
+ar-button {
+    --ar-button-bg:            #7c3aed;
+    --ar-button-border-radius: 2rem;
 }
 
 /* Cibler une variante spécifique */
-mr-button[variant="outlined"] {
-    --mr-button-border-color: #7c3aed;
-    --mr-button-color:        #7c3aed;
+ar-button[variant="outlined"] {
+    --ar-button-border-color: #7c3aed;
+    --ar-button-color:        #7c3aed;
 }`;
 
 const codeTokens = `:root {

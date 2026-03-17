@@ -2,7 +2,7 @@
 
 /**
  * Extrait le prefix d'un tag name custom element.
- * "mr-button"       → "mr"
+ * "ar-button"       → "mr"
  * "ft-stepper-item" → "ft"
  */
 export function getPrefix(tagName: string): string {
@@ -11,8 +11,8 @@ export function getPrefix(tagName: string): string {
 
 /**
  * Extrait le slug (tag sans prefix) pour construire les URLs.
- * "mr-button"       → "button"
- * "mr-stepper-item" → "stepper-item"
+ * "ar-button"       → "button"
+ * "ar-stepper-item" → "stepper-item"
  */
 export function getSlug(tagName: string): string {
     return tagName.split('-').slice(1).join('-');
@@ -24,7 +24,7 @@ export function getSlug(tagName: string): string {
  * { "mr": [...], "ft": [...] }
  */
 export function groupByPrefix<T extends { tagName?: string }>(
-    components: T[]
+    components: T[],
 ): Record<string, T[]> {
     return components.reduce<Record<string, T[]>>((acc, c) => {
         const prefix = getPrefix(c.tagName ?? '');

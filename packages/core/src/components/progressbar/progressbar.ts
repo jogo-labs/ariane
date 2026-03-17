@@ -4,8 +4,8 @@ import { styleMap } from 'lit/directives/style-map.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import styles from './progressbar.styles.js';
 
-/** Objet de configuration d'un webcomposant MrProgressbar */
-export class MrProgressbarConfig {
+/** Objet de configuration d'un webcomposant ArProgressbar */
+export class ArProgressbarConfig {
     /** Pourcentage de complétion (0–100) */
     percent?: number = 0;
 }
@@ -26,17 +26,17 @@ export class MrProgressbarConfig {
  * @csspart track        - Le `<div>` représentant le fond de la barre (rail).
  * @csspart bar          - Le `<div>` représentant la progression (la partie remplie).
  *
- * @cssprop --mr-progressbar-height       - Hauteur de la barre. Défaut : `8px`.
- * @cssprop --mr-progressbar-bg           - Couleur du rail (fond). Défaut : `#e5e7eb`.
- * @cssprop --mr-progressbar-fill         - Couleur de la progression. Défaut : `#2563eb`.
- * @cssprop --mr-progressbar-border-radius - Arrondi de la barre. Défaut : `9999px`.
+ * @cssprop --ar-progressbar-height       - Hauteur de la barre. Défaut : `8px`.
+ * @cssprop --ar-progressbar-bg           - Couleur du rail (fond). Défaut : `#e5e7eb`.
+ * @cssprop --ar-progressbar-fill         - Couleur de la progression. Défaut : `#2563eb`.
+ * @cssprop --ar-progressbar-border-radius - Arrondi de la barre. Défaut : `9999px`.
  */
-@customElement('mr-progressbar')
-export class MrProgressbar extends LitElement {
+@customElement('ar-progressbar')
+export class ArProgressbar extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, styles];
 
     /** Nom du composant affiché dans les logs */
-    static readonly NAME = 'MrProgressbar';
+    static readonly NAME = 'ArProgressbar';
 
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
@@ -73,6 +73,6 @@ export class MrProgressbar extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-progressbar': MrProgressbar;
+        'ar-progressbar': ArProgressbar;
     }
 }

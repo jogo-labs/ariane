@@ -10,6 +10,7 @@ import { getCollection } from 'astro:content';
 import { getSlug } from '../utils/tag-name.ts';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
+import rootPkg from '../../../../package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
 
 interface Props {
@@ -141,14 +142,14 @@ const componentItems: NavItem[] = allComponents
     </div>
 
     <footer class="nav-footer">
-        <p class="nav-brand">mARIAnne</p>
+        <p class="nav-brand">{rootPkg.config.displayName}</p>
         <p class="nav-footer-version">Version {version}</p>
         <div class="nav-footer-meta">
             {/* <div class="nav-footer-social">
                 Emplacement réseaux sociaux — ajouter des <a> ici quand disponibles
             </div> */}
             <a
-                href="https://github.com/jonTravens/mARIAnne/"
+                href="https://github.com/jonTravens/Ariane/"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="nav-footer-link"

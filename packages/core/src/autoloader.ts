@@ -5,7 +5,7 @@
  * Destiné uniquement au bundle CDN.
  *
  * Problème central : MutationObserver ne traverse PAS les shadow DOM boundaries.
- * Un `mr-button` dans le shadowRoot d'un `mr-card` est invisible à un observer
+ * Un `ar-button` dans le shadowRoot d'un `mr-card` est invisible à un observer
  * posé sur `document.body`, même avec `subtree: true`.
  *
  * Solution :
@@ -16,7 +16,7 @@
  */
 
 const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
-    'mr-button': () => import('./components/button/button.js'),
+    'ar-button': () => import('./components/button/button.js'),
     // Ajouter les nouveaux composants ici au fil du développement
 };
 
@@ -54,7 +54,7 @@ function observeRoot(root: Node): void {
 
     mutationObserver.observe(root, {
         childList: true,
-        subtree:   true, // Capture les ajouts à n'importe quelle profondeur dans ce root
+        subtree: true, // Capture les ajouts à n'importe quelle profondeur dans ce root
     });
 
     // Scanne le contenu déjà présent dans ce root au moment où on commence à l'observer

@@ -9,24 +9,24 @@ const tocEntries = [
 ];
 
 const codeCdn = `<!-- Composants (autoloader : ne charge que ce qui est utilisé) -->
-<script type="module" src="https://unpkg.com/@marianne/core/cdn/index.js"></scr` + `ipt>
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></scr` + `ipt>
 
 <!-- Thème par défaut -->
-<link rel="stylesheet" href="https://unpkg.com/@marianne/core/themes/default.css" />`;
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
 
-const codeCdnUsage = `<mr-button variant="filled">Valider</mr-button>
-<mr-alert variant="success">Opération réussie</mr-alert>`;
+const codeCdnUsage = `<ar-button variant="filled">Valider</ar-button>
+<ar-alert variant="success">Opération réussie</ar-alert>`;
 
-const codeNpmInstall = `npm install @marianne/core`;
+const codeNpmInstall = `npm install @ariane-ui/core`;
 
-const codeNpmGlobal = `import '@marianne/core';
-import '@marianne/core/themes/default.css';`;
+const codeNpmGlobal = `import '@ariane-ui/core';
+import '@ariane-ui/core/themes/default.css';`;
 
-const codeNpmIndividuel = `import '@marianne/core/dist/components/button/button.js';
-import '@marianne/core/dist/components/alert/alert.js';
-import '@marianne/core/themes/default.css';`;
+const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/alert/alert.js';
+import '@ariane-ui/core/themes/default.css';`;
 
-const codeAutoloader = `<script type="module" src="https://unpkg.com/@marianne/core/cdn/autoloader.js"></scr` + `ipt>`;
+const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>`;
 ---
 
 <Layout
