@@ -1,9 +1,19 @@
 /**
  * doc-table.css
  *
- * Styles partagés pour les tableaux de la documentation :
+ * Styles partagés pour les tableaux et titres de section de la documentation :
  * utilisés par ComponentApi.astro et tokens.astro.
  */
+
+/* Titre de section (h3 dans tokens.astro, h4 dans ComponentApi.astro) */
+.doc-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--doc-border, #e5e7eb);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--doc-text, #111827);
+}
 
 .table-wrap {
     overflow-x: auto;

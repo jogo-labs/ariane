@@ -27,7 +27,7 @@ const categories = parseTokens(css);
 
     {categories.map((category) => (
         <section>
-            <h3>{category.label}</h3>
+            <h3 class="doc-section-title">{category.label}</h3>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -81,15 +81,6 @@ const categories = parseTokens(css);
         + p, + section {
             margin-top: 1.5rem;
         }
-    }
-
-    h3 {
-        font-size:      1.1rem;
-        font-weight:    600;
-        border-bottom:  1px solid var(--doc-border, #e5e7eb);
-        padding-bottom: 0.5rem;
-        margin-bottom:  1rem;
-        color:          var(--doc-text, #111827);
     }
 
     /* Tokens page : swatch un peu plus grande que dans ComponentApi */
