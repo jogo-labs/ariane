@@ -45,10 +45,6 @@ const {
 const showPlayground = displayMode === 'demo';
 ---
 
-{/* ── highlight.js — chargé une seule fois, colore tous les blocs de la page ── */}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
-<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
-
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section class="examples-section" id="exemples">
@@ -163,8 +159,6 @@ const showPlayground = displayMode === 'demo';
     <h4>Référence API</h4>
     <ComponentApi component={component} />
 </section>
-
-<script src="/js/playground.js" is:inline></script>
 
 <style>
     /* ── Sections communes ─────────────────────────────── */

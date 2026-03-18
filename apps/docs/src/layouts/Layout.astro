@@ -39,11 +39,16 @@ const {
             })();
         </script>
 
+        {/* ── highlight.js — chargé une seule fois, colore tous les blocs de la page ── */}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
+        <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+
         <!-- Thème par défaut de la librairie -->
         <link rel="stylesheet" href="/themes/default.css" />
 
         <!-- Composants web du DS (nécessaires pour les demos) -->
         <script type="module" src="/cdn/index.js"></script>
+        <script src="/js/playground.js" is:inline></script>
 
         <style>
             *, *::before, *::after { box-sizing: border-box; }
