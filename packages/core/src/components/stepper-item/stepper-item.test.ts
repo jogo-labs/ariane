@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type MrStepperItem } from './stepper-item.js';
+import { type ArStepperItem } from './stepper-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import './stepper-item.js';
 
-describe('MrStepperItem', () => {
-    let el: MrStepperItem;
+describe('ArStepperItem', () => {
+    let el: ArStepperItem;
 
     afterEach(() => el?.remove());
 
@@ -13,7 +13,7 @@ describe('MrStepperItem', () => {
     describe('rendu', () => {
         it("n'a pas de shadow DOM (createRenderRoot retourne this)", async () => {
             el = await fixture(
-                '<mr-stepper-item label="Étape 1" path="/step-1"></mr-stepper-item>',
+                '<ar-stepper-item label="Étape 1" path="/step-1"></ar-stepper-item>',
             );
             expect(el.shadowRoot).toBeNull();
         });
@@ -23,17 +23,17 @@ describe('MrStepperItem', () => {
 
     describe('valeurs par défaut', () => {
         it('path vaut une chaîne vide par défaut', async () => {
-            el = await fixture('<mr-stepper-item></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item></ar-stepper-item>');
             expect(el.path).toBe('');
         });
 
         it('label vaut une chaîne vide par défaut', async () => {
-            el = await fixture('<mr-stepper-item></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item></ar-stepper-item>');
             expect(el.label).toBe('');
         });
 
         it('href est undefined par défaut', async () => {
-            el = await fixture('<mr-stepper-item></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item></ar-stepper-item>');
             expect(el.href).toBeUndefined();
         });
     });
@@ -42,36 +42,36 @@ describe('MrStepperItem', () => {
 
     describe('propriétés', () => {
         it("lit path depuis l'attribut HTML", async () => {
-            el = await fixture('<mr-stepper-item path="/mon-chemin"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/mon-chemin"></ar-stepper-item>');
             expect(el.path).toBe('/mon-chemin');
         });
 
         it("lit label depuis l'attribut HTML", async () => {
-            el = await fixture('<mr-stepper-item label="Mon étape"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item label="Mon étape"></ar-stepper-item>');
             expect(el.label).toBe('Mon étape');
         });
 
         it("lit href depuis l'attribut HTML", async () => {
-            el = await fixture('<mr-stepper-item href="/lien"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item href="/lien"></ar-stepper-item>');
             expect(el.href).toBe('/lien');
         });
 
         it('met à jour path via la propriété JS', async () => {
-            el = await fixture('<mr-stepper-item path="/a"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a"></ar-stepper-item>');
             el.path = '/b';
             await waitForUpdate(el);
             expect(el.path).toBe('/b');
         });
 
         it('met à jour label via la propriété JS', async () => {
-            el = await fixture('<mr-stepper-item label="Avant"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item label="Avant"></ar-stepper-item>');
             el.label = 'Après';
             await waitForUpdate(el);
             expect(el.label).toBe('Après');
         });
 
         it('met à jour href via la propriété JS', async () => {
-            el = await fixture('<mr-stepper-item></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item></ar-stepper-item>');
             el.href = '/nouveau';
             await waitForUpdate(el);
             expect(el.href).toBe('/nouveau');
@@ -82,7 +82,7 @@ describe('MrStepperItem', () => {
 
     describe('setRegistry', () => {
         it('appelle registerItem lors du premier enregistrement', async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="A"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="A"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -94,7 +94,7 @@ describe('MrStepperItem', () => {
         });
 
         it("appelle unregisterItem sur l'ancien registry avant de s'enregistrer dans le nouveau", async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="A"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="A"></ar-stepper-item>');
             const registry1 = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -120,7 +120,7 @@ describe('MrStepperItem', () => {
 
     describe('disconnectedCallback', () => {
         it('appelle unregisterItem lors du retrait du DOM', async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="A"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="A"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -133,7 +133,7 @@ describe('MrStepperItem', () => {
         });
 
         it("ne plante pas si aucun registry n'est défini", async () => {
-            el = await fixture('<mr-stepper-item path="/a"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a"></ar-stepper-item>');
             // Pas d'appel à setRegistry — remove() ne doit pas lever d'exception
             expect(() => el.remove()).not.toThrow();
         });
@@ -143,7 +143,7 @@ describe('MrStepperItem', () => {
 
     describe('notification des changements', () => {
         it('appelle notifyItemChanged avec "path" quand path change après l\'init', async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="A"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="A"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -159,7 +159,7 @@ describe('MrStepperItem', () => {
         });
 
         it('appelle notifyItemChanged avec "label" quand label change après l\'init', async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="Avant"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="Avant"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -175,7 +175,7 @@ describe('MrStepperItem', () => {
         });
 
         it('appelle notifyItemChanged avec "href" quand href change après l\'init', async () => {
-            el = await fixture('<mr-stepper-item path="/a" href="/lien-a"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" href="/lien-a"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -191,7 +191,7 @@ describe('MrStepperItem', () => {
         });
 
         it('ne notifie pas au premier rendu (oldValue === undefined)', async () => {
-            el = await fixture('<mr-stepper-item path="/a" label="A"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a" label="A"></ar-stepper-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -203,7 +203,7 @@ describe('MrStepperItem', () => {
         });
 
         it("ne notifie pas si aucun registry n'est défini", async () => {
-            el = await fixture('<mr-stepper-item path="/a"></mr-stepper-item>');
+            el = await fixture('<ar-stepper-item path="/a"></ar-stepper-item>');
             el.path = '/b';
             await waitForUpdate(el);
             // Si on arrive ici sans exception, le test passe

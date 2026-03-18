@@ -1,11 +1,18 @@
 {
-  "name": "@marianne/root",
+  "name": "@ariane-ui/root",
   "private": true,
   "type": "module",
+  "description": "Composants web accessibles pour tous les frameworks.",
+  "homepage": "https://ariane-ui.com",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
+  "config": {
+    "displayName": "Ariane",
+    "tagline": "Composants web accessibles pour tous les frameworks.",
+    "url": "https://ariane-ui.com"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -13,7 +20,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,css,astro,md}\" --ignore-path .gitignore",
     "create": "node packages/core/scripts/create-component.js",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI) process.exit(0)\" && husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
@@ -32,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jonTravens/mARIAnne"
+    "url": "https://github.com/jogo-labs/ariane"
   },
   "packageManager": "npm@10.9.4",
   "overrides": {

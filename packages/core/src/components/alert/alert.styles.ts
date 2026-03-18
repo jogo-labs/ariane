@@ -6,7 +6,7 @@ export default css`
         box-sizing: border-box;
         opacity: 1;
         transform: scale(1);
-        color: var(--mr--color-text-color, #000, #2e2e31);
+        color: var(--ar--color-text-color, #000, #2e2e31);
     }
 
     :host([hiding]) {
@@ -116,7 +116,7 @@ export default css`
 
     .alert-title {
         font-family: system-ui, sans-serif;
-        font-size: var(--mr--font-size-text);
+        font-size: var(--ar--font-size-text);
         line-height: 1.5;
         font-weight: 700;
     }
@@ -155,42 +155,42 @@ export default css`
     }
 
     .alert-info {
-        background-color: var(--mr--bg-info, #dfe9ff);
-        border-color: var(--mr--border-info);
+        background-color: var(--ar--bg-info, #dfe9ff);
+        border-color: var(--ar--border-info);
     }
 
     .alert-info .close:focus {
-        background: var(--mr--border-info, #dfe9ff);
+        background: var(--ar--border-info, #dfe9ff);
     }
 
     .alert-info .alert-icon-container {
-        color: var(--mr--icon-info, #2c74ff);
+        color: var(--ar--icon-info, #2c74ff);
     }
 
     .alert-error {
-        background-color: var(--mr--bg-error, #ffeceb);
-        border-color: var(--mr--border-error, #ffeceb);
+        background-color: var(--ar--bg-error, #ffeceb);
+        border-color: var(--ar--border-error, #ffeceb);
     }
 
     .alert-error .alert-icon-container {
-        color: var(--mr--icon-error, #f04438);
+        color: var(--ar--icon-error, #f04438);
     }
 
     .alert-warning {
-        background-color: var(--mr--bg-warning, #fffaeb);
-        border-color: var(--mr--border-warning, #fffaeb);
+        background-color: var(--ar--bg-warning, #fffaeb);
+        border-color: var(--ar--border-warning, #fffaeb);
     }
 
     .alert-warning .alert-icon-container {
-        color: var(--mr--icon-warning, #f79009);
+        color: var(--ar--icon-warning, #f79009);
     }
 
     .alert-success {
-        background-color: var(--mr--bg-success, #d9f6e8);
-        border-color: var(--mr--border-success, #d9f6e8);
+        background-color: var(--ar--bg-success, #d9f6e8);
+        border-color: var(--ar--border-success, #d9f6e8);
     }
 
     .alert-success .alert-icon-container {
-        color: var(--mr--icon-success, #09aa5f);
+        color: var(--ar--icon-success, #09aa5f);
     }
 `;

@@ -5,12 +5,12 @@ import { ContextConsumer } from '@lit/context';
 import { breadcrumbContext, type BreadcrumbRegistry } from '../../context/breadcrumb.context.js';
 
 /**
- * @summary Élément enfant de mr-breadcrumb.
- * @parent mr-breadcrumb
+ * @summary Élément enfant de ar-breadcrumb.
+ * @parent ar-breadcrumb
  * @display docs
  */
-@customElement('mr-breadcrumb-item')
-export class MrBreadcrumbItem extends LitElement {
+@customElement('ar-breadcrumb-item')
+export class ArBreadcrumbItem extends LitElement {
     @property({ type: String }) label = '';
     @property({ type: String }) href?: string;
 
@@ -50,6 +50,6 @@ export class MrBreadcrumbItem extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-breadcrumb-item': MrBreadcrumbItem;
+        'ar-breadcrumb-item': ArBreadcrumbItem;
     }
 }

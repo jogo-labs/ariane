@@ -15,22 +15,22 @@ import styles from './button.styles.js';
  * @csspart prefix   - Le conteneur du slot prefix.
  * @csspart suffix   - Le conteneur du slot suffix.
  *
- * @cssprop --mr-button-bg            - Couleur de fond (variant filled/danger).
- * @cssprop --mr-button-color         - Couleur du texte.
- * @cssprop --mr-button-border-color  - Couleur de la bordure (variant outlined).
- * @cssprop --mr-button-font-size     - Taille de police.
- * @cssprop --mr-button-font-weight   - Graisse de police.
- * @cssprop --mr-button-border-radius - Arrondi des coins.
- * @cssprop --mr-button-padding-x     - Padding horizontal.
- * @cssprop --mr-button-padding-y     - Padding vertical.
- * @cssprop --mr-focus-ring-color     - Couleur du focus ring (accessibilité).
+ * @cssprop --ar-button-bg            - Couleur de fond (variant filled/danger).
+ * @cssprop --ar-button-color         - Couleur du texte.
+ * @cssprop --ar-button-border-color  - Couleur de la bordure (variant outlined).
+ * @cssprop --ar-button-font-size     - Taille de police.
+ * @cssprop --ar-button-font-weight   - Graisse de police.
+ * @cssprop --ar-button-border-radius - Arrondi des coins.
+ * @cssprop --ar-button-padding-x     - Padding horizontal.
+ * @cssprop --ar-button-padding-y     - Padding vertical.
+ * @cssprop --ar-focus-ring-color     - Couleur du focus ring (accessibilité).
  *
- * @event {CustomEvent} mr-click - Émis au clic. Pas émis si `disabled`.
- * @event {CustomEvent} mr-focus - Émis quand le bouton reçoit le focus.
- * @event {CustomEvent} mr-blur  - Émis quand le bouton perd le focus.
+ * @event {CustomEvent} ar-click - Émis au clic. Pas émis si `disabled`.
+ * @event {CustomEvent} ar-focus - Émis quand le bouton reçoit le focus.
+ * @event {CustomEvent} ar-blur  - Émis quand le bouton perd le focus.
  */
-@customElement('mr-button')
-export class MrButton extends LitElement {
+@customElement('ar-button')
+export class ArButton extends LitElement {
     static override styles = [styles];
 
     /** Variant visuel du bouton. */
@@ -61,7 +61,7 @@ export class MrButton extends LitElement {
             event.stopImmediatePropagation();
             return;
         }
-        this.emit('mr-click');
+        this.emit('ar-click');
     }
 
     override render() {
@@ -72,8 +72,8 @@ export class MrButton extends LitElement {
                 ?disabled=${this.disabled}
                 aria-disabled=${this.disabled ? 'true' : 'false'}
                 @click=${this.handleClick}
-                @focus=${() => this.emit('mr-focus')}
-                @blur=${() => this.emit('mr-blur')}
+                @focus=${() => this.emit('ar-focus')}
+                @blur=${() => this.emit('ar-blur')}
             >
                 <span part="prefix" class="prefix"><slot name="prefix"></slot></span>
                 <span part="label" class="label"><slot></slot></span>
@@ -86,6 +86,6 @@ export class MrButton extends LitElement {
 // Typage global pour l'autocomplétion dans les projets consommateurs
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-button': MrButton;
+        'ar-button': ArButton;
     }
 }

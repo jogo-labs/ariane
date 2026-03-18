@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type MrBreadcrumbItem } from './breadcrumb-item.js';
+import { type ArBreadcrumbItem } from './breadcrumb-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import './breadcrumb-item.js';
 
-describe('MrBreadcrumbItem', () => {
-    let el: MrBreadcrumbItem;
+describe('ArBreadcrumbItem', () => {
+    let el: ArBreadcrumbItem;
 
     afterEach(() => el?.remove());
 
@@ -12,7 +12,7 @@ describe('MrBreadcrumbItem', () => {
 
     describe('rendu', () => {
         it("n'a pas de shadow DOM (createRenderRoot retourne this)", async () => {
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             expect(el.shadowRoot).toBeNull();
         });
     });
@@ -21,12 +21,12 @@ describe('MrBreadcrumbItem', () => {
 
     describe('valeurs par défaut', () => {
         it('label vaut une chaîne vide par défaut', async () => {
-            el = await fixture('<mr-breadcrumb-item></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item></ar-breadcrumb-item>');
             expect(el.label).toBe('');
         });
 
         it('href est undefined par défaut', async () => {
-            el = await fixture('<mr-breadcrumb-item></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item></ar-breadcrumb-item>');
             expect(el.href).toBeUndefined();
         });
     });
@@ -35,26 +35,26 @@ describe('MrBreadcrumbItem', () => {
 
     describe('propriétés', () => {
         it("lit label depuis l'attribut HTML", async () => {
-            el = await fixture('<mr-breadcrumb-item label="Mon label"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Mon label"></ar-breadcrumb-item>');
             expect(el.label).toBe('Mon label');
         });
 
         it("lit href depuis l'attribut HTML", async () => {
             el = await fixture(
-                '<mr-breadcrumb-item label="Accueil" href="/accueil"></mr-breadcrumb-item>',
+                '<ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>',
             );
             expect(el.href).toBe('/accueil');
         });
 
         it('met à jour label via la propriété JS', async () => {
-            el = await fixture('<mr-breadcrumb-item></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item></ar-breadcrumb-item>');
             el.label = 'Nouveau label';
             await waitForUpdate(el);
             expect(el.label).toBe('Nouveau label');
         });
 
         it('met à jour href via la propriété JS', async () => {
-            el = await fixture('<mr-breadcrumb-item></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item></ar-breadcrumb-item>');
             el.href = '/nouveau';
             await waitForUpdate(el);
             expect(el.href).toBe('/nouveau');
@@ -65,7 +65,7 @@ describe('MrBreadcrumbItem', () => {
 
     describe('setRegistry', () => {
         it('appelle registerItem lors du premier enregistrement', async () => {
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -77,7 +77,7 @@ describe('MrBreadcrumbItem', () => {
         });
 
         it("appelle unregisterItem sur l'ancien registry avant de s'enregistrer dans le nouveau", async () => {
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             const registry1 = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -103,7 +103,7 @@ describe('MrBreadcrumbItem', () => {
 
     describe('disconnectedCallback', () => {
         it('appelle unregisterItem lors du retrait du DOM', async () => {
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -120,7 +120,7 @@ describe('MrBreadcrumbItem', () => {
 
     describe('notification des changements', () => {
         it("appelle notifyItemChanged quand label change après l'init", async () => {
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             const registry = {
                 registerItem: vi.fn(),
                 unregisterItem: vi.fn(),
@@ -137,7 +137,7 @@ describe('MrBreadcrumbItem', () => {
 
         it("appelle notifyItemChanged quand href change après l'init", async () => {
             el = await fixture(
-                '<mr-breadcrumb-item label="Accueil" href="/accueil"></mr-breadcrumb-item>',
+                '<ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>',
             );
             const registry = {
                 registerItem: vi.fn(),
@@ -154,7 +154,7 @@ describe('MrBreadcrumbItem', () => {
 
         it("ne notifie pas si aucun registry n'est défini", async () => {
             // Pas d'appel à setRegistry — ne doit pas planter
-            el = await fixture('<mr-breadcrumb-item label="Accueil"></mr-breadcrumb-item>');
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
             el.label = 'Autre';
             await waitForUpdate(el);
             // Si on arrive ici sans exception, le test passe

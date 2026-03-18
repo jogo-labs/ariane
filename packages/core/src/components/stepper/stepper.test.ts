@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { MrStepper } from './stepper.js';
+import type { ArStepper } from './stepper.js';
 import { fixture } from '../../test-utils.js';
 import './stepper.js';
 
-describe('MrStepper', () => {
-    let el: MrStepper;
+describe('ArStepper', () => {
+    let el: ArStepper;
 
     afterEach(() => el?.remove());
 
     describe('rendu', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-stepper></mr-stepper>');
+            el = await fixture('<ar-stepper></ar-stepper>');
         });
 
         it('monte un shadow DOM', () => {

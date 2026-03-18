@@ -1,4 +1,4 @@
-# Guide de contribution — Site de documentation mARIAnne
+# Guide de contribution — Site de documentation Ariane
 
 Ce guide explique comment la documentation fonctionne et comment la modifier.
 Il est destiné à toute personne qui arrive sur le projet et veut ajouter un composant,
@@ -42,11 +42,11 @@ npm run dev
 
 ### 1. Créer le fichier MDX
 
-Créez `apps/docs/src/content/components/mr-<nom>.mdx` :
+Créez `apps/docs/src/content/components/ar-<nom>.mdx` :
 
 ```yaml
 ---
-tagName: mr-button # doit correspondre exactement au tag name Lit
+tagName: ar-button # doit correspondre exactement au tag name Lit
 title: Bouton # titre affiché en haut de la page et dans la nav
 description: > # optionnel — phrase courte sous le titre
     Déclenche une action au clic.
@@ -54,12 +54,12 @@ playgroundTemplate: default # optionnel — nom de la variante utilisée dans le
 variants:
     - name: default
       label: Par défaut
-      html: '<mr-button>Valider</mr-button>'
+      html: '<ar-button>Valider</ar-button>'
 
     - name: danger
       label: Danger
       description: Utilisé pour les actions destructives.
-      html: '<mr-button variant="danger">Supprimer</mr-button>'
+      html: '<ar-button variant="danger">Supprimer</ar-button>'
 ---
 Texte narratif optionnel en MDX (affiché sous la référence API).
 ```
@@ -70,7 +70,7 @@ C'est tout. La page `/components/button` sera générée automatiquement.
 
 | Champ                | Requis | Description                                                                                                |
 | -------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| `tagName`            | ✅     | Tag name du composant (`mr-button`). Doit exister dans le CEM.                                             |
+| `tagName`            | ✅     | Tag name du composant (`ar-button`). Doit exister dans le CEM.                                             |
 | `title`              | ✅     | Titre de la page et libellé dans la nav.                                                                   |
 | `description`        | —      | Phrase courte affichée sous le titre.                                                                      |
 | `playgroundTemplate` | —      | `name` de la variante dont le HTML initialise le playground. Si absent, la première variante est utilisée. |
@@ -84,7 +84,7 @@ variants:
       label: Par défaut # libellé affiché comme sous-titre
       description: … # optionnel — texte explicatif en italique
       html: | # HTML brut injecté en preview et dans le bloc code
-          <mr-button variant="primary">Valider</mr-button>
+          <ar-button variant="primary">Valider</ar-button>
 ```
 
 Le HTML est rendu **côté serveur** via `<Fragment set:html>`. Les custom elements
@@ -105,7 +105,7 @@ Deux modes d'affichage sont disponibles, configurés via la JSDoc du composant L
 /**
  * @display docs
  */
-@customElement('mr-stepper-item')
+@customElement('ar-stepper-item')
 export class MrStepperItem extends LitElement { … }
 ```
 
@@ -117,9 +117,9 @@ et utilisée par la nav et la page d'accueil pour masquer automatiquement le sou
 
 ```typescript
 /**
- * @parent mr-stepper
+ * @parent ar-stepper
  */
-@customElement('mr-stepper-item')
+@customElement('ar-stepper-item')
 export class MrStepperItem extends LitElement { … }
 ```
 
@@ -167,13 +167,15 @@ apps/docs/
 │   │   ├── config.ts               ← Schéma Zod du frontmatter MDX
 │   │   └── components/             ← Un fichier MDX par composant
 │   ├── layouts/
-│   │   └── Layout.astro            ← Layout 3 colonnes (nav | contenu | TOC)
+│   │   └── Layout.astro            ← Layout principal + variables CSS --doc-*
 │   ├── pages/
 │   │   ├── index.astro             ← Page d'accueil (liste des composants)
 │   │   ├── components/[slug].astro ← Route dynamique — une page par composant
+│   │   ├── getting-started/        ← Pages Installation et Utilisation
 │   │   └── foundations/tokens.astro ← Page Design Tokens (auto-extraite du CSS)
 │   ├── styles/
-│   │   └── doc-table.css           ← Styles partagés pour les tableaux
+│   │   ├── doc-prose.css           ← Typographie partagée (h2→h4, p, pre, badge…)
+│   │   └── doc-table.css           ← Tableaux + .doc-section-title
 │   └── utils/
 │       ├── cem-types.ts            ← Types TypeScript + helpers CEM partagés
 │       ├── tag-name.ts             ← getSlug(), getPrefix(), groupByPrefix()
@@ -207,7 +209,7 @@ apps/docs/
 La page `/foundations/tokens` est **entièrement auto-générée** depuis
 `packages/core/src/styles/themes/default.css`.
 
-Ajouter une variable `--mr-*` dans ce fichier → elle apparaît automatiquement dans la page,
+Ajouter une variable `--ar-*` dans ce fichier → elle apparaît automatiquement dans la page,
 classée par catégorie (Couleurs, Typographie, Espacement, Forme, Focus).
 
 ---
@@ -243,10 +245,74 @@ Le playground re-colore le bloc code après chaque changement de contrôle via
 
 ---
 
+## Convention CSS
+
+### Fichiers partagés
+
+Ne jamais dupliquer du CSS entre fichiers `.astro`. Avant d'écrire une règle, vérifier si elle existe déjà dans un fichier partagé.
+
+| Fichier                    | Contenu                                                                         | Utilisé par                                           |
+| -------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `src/styles/doc-prose.css` | Typographie de contenu : titres, paragraphes, listes, liens, blocs code, badges | Pages getting-started et toute future page de contenu |
+| `src/styles/doc-table.css` | Tableaux + `.doc-section-title`                                                 | `ComponentApi.astro`, `tokens.astro`                  |
+
+Usage dans un `<style>` Astro :
+
+```css
+<style>
+    @import '../styles/doc-prose.css';
+
+    /* Styles spécifiques à cette page uniquement */
+    .ma-classe { … }
+</style>
+```
+
+### Variables CSS `--doc-*`
+
+**Jamais de couleurs hexadécimales** dans les fichiers de la doc. Utiliser exclusivement les variables `--doc-*` définies dans `Layout.astro` (voir section "Thème de la documentation").
+
+### Espacement entre sections
+
+Utiliser `display: flex; flex-direction: column; gap: Xrem` sur le conteneur parent plutôt que des `margin-bottom` sur chaque enfant. La classe `.page-content` (dans `doc-prose.css`) applique ce pattern pour les pages de contenu.
+
+### Nouvelle page de contenu
+
+1. Utiliser `Layout.astro` avec `showNav={true}`
+2. Ajouter `@import '../styles/doc-prose.css';` dans le `<style>`
+3. Envelopper les sections dans `<div class="page-content">`
+4. Ajouter la page dans `SiteNav.astro`
+
+---
+
+## Règle de mise à jour de la documentation
+
+**Toute évolution de l'architecture du site doit être reflétée dans ce fichier.**
+
+Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la section correspondante de ce `CONTRIBUTING.md` :
+
+- Ajout ou suppression d'un fichier CSS partagé → mettre à jour le tableau "Fichiers partagés"
+- Ajout d'une nouvelle page ou section → mettre à jour l'arborescence "Architecture des fichiers"
+- Changement dans le flux de données CEM → mettre à jour le schéma "Flux de données par page composant"
+- Nouvelle convention ou pattern CSS → documenter dans "Convention CSS"
+
+---
+
 ## Checklist pour ajouter un composant
 
-- [ ] Créer `packages/core/src/components/<nom>/<nom>.ts` avec les annotations JSDoc
+> **Utiliser le script de scaffolding** : `npm run create -- <nom>` génère automatiquement
+> les fichiers du composant (`.ts`, `.styles.ts`, `.test.ts`, `.mdx`), met à jour le barrel
+> (`index.ts`) et l'autoloader (`autoloader.ts`). C'est le point d'entrée recommandé.
+
+- [ ] Lancer `npm run create -- <nom>` pour scaffolder le composant
+- [ ] Implémenter le composant avec les annotations JSDoc
 - [ ] Régénérer le CEM : `cd packages/core && npm run build:manifest`
-- [ ] Créer `apps/docs/src/content/components/mr-<nom>.mdx` avec au moins une variante
+- [ ] Compléter les variantes dans `apps/docs/src/content/components/ar-<nom>.mdx`
 - [ ] Lancer `npm run dev` et vérifier la page `/components/<nom>`
-- [ ] Si sous-composant : ajouter uniquement `@parent mr-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
+- [ ] Si sous-composant : ajouter uniquement `@parent ar-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
+
+## Checklist pour modifier l'architecture du site
+
+- [ ] La modification est-elle testée visuellement en light **et** dark mode ?
+- [ ] Les couleurs utilisées sont-elles des variables `--doc-*` (pas de hex hardcodé) ?
+- [ ] Le CSS ajouté existe-t-il déjà dans `doc-prose.css` ou `doc-table.css` ?
+- [ ] Ce `CONTRIBUTING.md` est-il à jour avec les changements apportés ?

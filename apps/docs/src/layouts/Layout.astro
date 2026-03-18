@@ -1,5 +1,6 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
+import rootPkg from '../../../../package.json';
 
 interface Props {
     title: string;
@@ -24,12 +25,12 @@ const {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
-        <title>{title} — mARIAnne</title>
+        <title>{title} — {rootPkg.config.displayName}</title>
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
             (function () {
-                var stored = localStorage.getItem('marianne-theme') || 'system';
+                var stored = localStorage.getItem('ariane-theme') || 'system';
                 var theme = stored === 'system'
                     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                     : stored;
@@ -38,11 +39,16 @@ const {
             })();
         </script>
 
+        {/* ── highlight.js — chargé une seule fois, colore tous les blocs de la page ── */}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
+        <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+
         <!-- Thème par défaut de la librairie -->
         <link rel="stylesheet" href="/themes/default.css" />
 
         <!-- Composants web du DS (nécessaires pour les demos) -->
         <script type="module" src="/cdn/index.js"></script>
+        <script src="/js/playground.js" is:inline></script>
 
         <style>
             *, *::before, *::after { box-sizing: border-box; }
@@ -50,6 +56,9 @@ const {
             .alpha-banner {
                 position:        relative;
                 z-index:         200;
+                width:           100%;
+                height:          var(--doc-alpha-banner-h);
+                overflow:        hidden;
                 background:      #92400e;
                 color:           #fef3c7;
                 text-align:      center;
@@ -71,8 +80,11 @@ const {
                 --doc-nav-bg:     #f8f9fb;
                 --doc-nav-border: #e2e4e9;
                 --doc-border:     #e5e7eb;
-                --doc-header-bg:  color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 4%, #ffffff);
+                --doc-header-bg:  color-mix(in srgb, var(--ar-color-primary-500, #2563eb) 4%, #ffffff);
                 --doc-header-h:   3.25rem;
+                --doc-alpha-banner-h:   2rem;
+                --doc-code-bg:    #f3f4f6;
+                --doc-code-block-bg: #1e1e2e;
             }
 
             [data-theme="dark"] {
@@ -82,7 +94,9 @@ const {
                 --doc-nav-bg:     #161b22;
                 --doc-nav-border: #21262d;
                 --doc-border:     #21262d;
-                --doc-header-bg:  color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 8%, #0f1117);
+                --doc-header-bg:  color-mix(in srgb, var(--ar-color-primary-500, #2563eb) 8%, #0f1117);
+                --doc-code-bg:    #1e1e2e;
+                --doc-code-block-bg: #1e1e2e;
             }
 
             html {
@@ -225,7 +239,7 @@ const {
             /* ── Layout body ────────────────────────────── */
 
             .layout-body {
-                height: calc(100vh - var(--doc-header-h));
+                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
             }
 
             .layout-body.with-nav {
@@ -332,7 +346,7 @@ const {
     <body>
         <div class="alpha-banner" role="banner">
             Librairie en cours de développement — API instable, ne pas utiliser en production.
-            <a href="https://github.com/jonTravens/mARIAnne/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
+            <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
         </div>
 
         <!-- Header permanent (desktop + mobile) -->
@@ -348,7 +362,7 @@ const {
                 </button>
                 <h1>
                     <a href="/" class="header-brand">
-                        m<span class="brand-accent">ARIA</span>nne
+                        {rootPkg.config.displayName}
                     </a>
                 </h1>
             </div>
@@ -361,7 +375,7 @@ const {
                 </select>
                 <!-- Lien GitHub -->
                 <a
-                    href="https://github.com/jonTravens/mARIAnne"
+                    href="https://github.com/jogo-labs/ariane"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="icon-btn header-github"
@@ -412,20 +426,20 @@ const {
             }
 
             // Lire le mode sauvegardé (défaut : 'system')
-            const savedMode = localStorage.getItem('marianne-theme') || 'system';
+            const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
             // Écouter les changements du select
             const themeSelect = document.getElementById('theme-select') as HTMLSelectElement | null;
             themeSelect?.addEventListener('change', () => {
                 const mode = themeSelect.value || 'system';
-                localStorage.setItem('marianne-theme', mode);
+                localStorage.setItem('ariane-theme', mode);
                 applyMode(mode);
             });
 
             // Réagir aux changements de préférence système quand le mode est 'system'
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('marianne-theme') || 'system') === 'system') {
+                if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
                     applyMode('system');
                 }
             });

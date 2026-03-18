@@ -5,10 +5,10 @@
  * organisées par catégorie sémantique.
  *
  * Catégories détectées depuis le préfixe du nom de la variable :
- *   --mr-color-*, --mr--color-*       → Couleurs
- *   --mr-font-*, --mr--font-*         → Typographie
- *   --mr-spacing-*, --mr--spacing-*   → Espacement
- *   --mr-border-radius-*, --mr-focus-* → Forme & Focus
+ *   --ar-color-*, --ar--color-*       → Couleurs
+ *   --ar-font-*, --ar--font-*         → Typographie
+ *   --ar-spacing-*, --ar--spacing-*   → Espacement
+ *   --ar-border-radius-*, --ar-focus-* → Forme & Focus
  *   le reste                           → Tokens composants
  */
 
@@ -23,12 +23,12 @@ export interface TokenCategory {
 }
 
 const CATEGORY_RULES: { pattern: RegExp; label: string }[] = [
-    { pattern: /^--mr-?-?color-/, label: 'Couleurs' },
-    { pattern: /^--mr-?-?(bg|border|icon)-(error|success|warning|info)/, label: 'Couleurs' },
-    { pattern: /^--mr-?-?font-/, label: 'Typographie' },
-    { pattern: /^--mr-?-?spacing-/, label: 'Espacement' },
-    { pattern: /^--mr-?-?border-radius/, label: 'Forme' },
-    { pattern: /^--mr-?-?focus-/, label: 'Focus' },
+    { pattern: /^--ar-?-?color-/, label: 'Couleurs' },
+    { pattern: /^--ar-?-?(bg|border|icon)-(error|success|warning|info)/, label: 'Couleurs' },
+    { pattern: /^--ar-?-?font-/, label: 'Typographie' },
+    { pattern: /^--ar-?-?spacing-/, label: 'Espacement' },
+    { pattern: /^--ar-?-?border-radius/, label: 'Forme' },
+    { pattern: /^--ar-?-?focus-/, label: 'Focus' },
 ];
 
 function categorize(name: string): string {
@@ -47,8 +47,8 @@ function isColor(value: string | undefined): boolean {
 export function parseTokens(css: string): TokenCategory[] {
     const categories = new Map<string, Token[]>();
 
-    // Match toutes les déclarations --mr* : value;
-    const regex = /(--mr[\w-]+)\s*:\s*([^;]+)/g;
+    // Match toutes les déclarations --ar* : value;
+    const regex = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(css)) !== null) {

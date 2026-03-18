@@ -5,12 +5,12 @@ import { ContextConsumer } from '@lit/context';
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
 
 /**
- * @summary Élément enfant de mr-stepper.
- * @parent mr-stepper
+ * @summary Élément enfant de ar-stepper.
+ * @parent ar-stepper
  * @display docs
  */
-@customElement('mr-stepper-item')
-export class MrStepperItem extends LitElement {
+@customElement('ar-stepper-item')
+export class ArStepperItem extends LitElement {
     @property({ type: String }) path = '';
     @property({ type: String }) label = '';
     @property({ type: String }) href?: string;
@@ -79,7 +79,7 @@ export class MrStepperItem extends LitElement {
     /* RENDER                                           */
     /* ------------------------------------------------ */
 
-    // Pas de shadow DOM : mr-stepper-item est un pur conteneur de données.
+    // Pas de shadow DOM : ar-stepper-item est un pur conteneur de données.
     // Le rendu visuel est délégué à ft-stepper via NavigationNode.
     override createRenderRoot() {
         return this;
@@ -88,6 +88,6 @@ export class MrStepperItem extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-stepper-item': MrStepperItem;
+        'ar-stepper-item': ArStepperItem;
     }
 }

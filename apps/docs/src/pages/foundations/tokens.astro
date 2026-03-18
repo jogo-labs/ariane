@@ -19,83 +19,58 @@ const categories = parseTokens(css);
 
 <Layout title="Design Tokens" currentPath="/foundations/tokens">
 
-    <h2 class="page-title">Design Tokens</h2>
-    <p class="intro">
-        Tokens extraits automatiquement du thème <code>default.css</code>.
-        Modifiez le fichier de thème, ces valeurs se mettent à jour à la compilation.
-    </p>
-
-    {categories.map((category) => (
-        <section>
-            <h3>{category.label}</h3>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Token</th>
-                            <th>Valeur</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {category.tokens.map((token) => (
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Design Tokens</h2>
+            <p class="summary">
+                Tokens extraits automatiquement du thème <code>default.css</code>.
+                Modifiez le fichier de thème, ces valeurs se mettent à jour à la compilation.
+            </p>
+        </div>
+        {categories.map((category) => (
+            <section>
+                <h3 class="section-title">{category.label}</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><code>{token.name}</code></td>
-                                <td>
-                                    {isColor(token.value) && (
-                                        <span
-                                            class="swatch"
-                                            style={`background: ${token.value}`}
-                                            title={token.value}
-                                        />
-                                    )}
-                                    <code class="value">{token.value}</code>
-                                </td>
+                                <th>Token</th>
+                                <th>Valeur</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    ))}
+                        </thead>
+                        <tbody>
+                            {category.tokens.map((token) => (
+                                <tr>
+                                    <td><code>{token.name}</code></td>
+                                    <td>
+                                        {isColor(token.value) && (
+                                            <span
+                                                class="swatch"
+                                                style={`background: ${token.value}`}
+                                                title={token.value}
+                                            />
+                                        )}
+                                        <code class="value">{token.value}</code>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        ))}
+    </div>
 
 </Layout>
 
 <style>
+    @import '../../styles/doc-prose.css';
     @import '../../styles/doc-table.css';
-
-    .intro {
-        font-size:     0.95rem;
-        color:         var(--doc-text-muted, #4b5563);
-        margin-bottom: 2rem;
-    }
-
-    section {
-        margin-bottom: 2.5rem;
-    }
-
-    .page-title {
-        color:       var(--doc-text, #111827);
-        font-size: 2em;
-        margin-bottom: 0;
-
-        + p, + section {
-            margin-top: 1.5rem;
-        }
-    }
-
-    h3 {
-        font-size:      1.1rem;
-        font-weight:    600;
-        border-bottom:  1px solid var(--doc-border, #e5e7eb);
-        padding-bottom: 0.5rem;
-        margin-bottom:  1rem;
-        color:          var(--doc-text, #111827);
-    }
 
     /* Tokens page : swatch un peu plus grande que dans ComponentApi */
     .swatch {
-        width:  1.5rem;
-        height: 1.5rem;
+        width:  1.75rem;
+        height: 1.75rem;
     }
 
     .value {

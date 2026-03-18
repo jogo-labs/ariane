@@ -1,12 +1,16 @@
 /**
  * doc-table.css
  *
- * Styles partagés pour les tableaux de la documentation :
+ * Styles partagés pour les tableaux et titres de section de la documentation :
  * utilisés par ComponentApi.astro et tokens.astro.
  */
 
 .table-wrap {
     overflow-x: auto;
+}
+
+.subsection-title + .table-wrap {
+    margin-top: 1rem;
 }
 
 table {
@@ -34,7 +38,7 @@ td {
 code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.8rem;
-    background: var(--doc-nav-bg, #f3f4f6);
+    background: var(--doc-code-bg, #f3f4f6);
     color: var(--doc-text, #111827);
     padding: 0.1em 0.35em;
     border-radius: 0.25em;

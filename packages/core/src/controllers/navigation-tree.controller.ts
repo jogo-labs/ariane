@@ -2,7 +2,7 @@ import { type ReactiveController, type ReactiveControllerHost } from 'lit';
 
 import { type NavigationNode } from '../types/navigation-nodes.js';
 
-import { type MrStepperItem } from '../components/stepper-item/stepper-item.js';
+import { type ArStepperItem } from '../components/stepper-item/stepper-item.js';
 
 import { computeNavigationStates } from '../state/navigation-state.engine.js';
 
@@ -35,18 +35,18 @@ export class NavigationTreeController implements ReactiveController {
         return this.nodeMap.get(this.currentPath);
     }
 
-    buildFromItems(items: MrStepperItem[]) {
+    buildFromItems(items: ArStepperItem[]) {
         const sorted = [...items].sort((a, b) =>
             a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
         );
 
-        const itemNodeMap = new Map<MrStepperItem, NavigationNode>();
+        const itemNodeMap = new Map<ArStepperItem, NavigationNode>();
 
         this.nodeMap.clear();
 
         sorted.forEach((item) => {
             if (this.nodeMap.has(item.path)) {
-                console.warn(`[mr-stepper] duplicate path "${item.path}"`);
+                console.warn(`[ar-stepper] duplicate path "${item.path}"`);
             }
 
             const node: NavigationNode = {
@@ -64,7 +64,9 @@ export class NavigationTreeController implements ReactiveController {
         });
 
         sorted.forEach((item) => {
-            const parentItem = item.parentElement?.closest('mr-stepper-item');
+            const parentItem = item.parentElement?.closest(
+                'ar-stepper-item',
+            ) as ArStepperItem | null;
 
             if (!parentItem) return;
 

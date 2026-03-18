@@ -1,31 +1,31 @@
-# @marianne/core
+# @ariane-ui/core
 
 Bibliothèque de composants web accessibles basée sur **Lit 3**.
 
-Fait partie du monorepo [mARIAnne](../../README.md).
+Fait partie du monorepo [Ariane](../../README.md).
 
 ---
 
 ## Installation
 
 ```bash
-npm install @marianne/core
+npm install @ariane-ui/core
 ```
 
 ## Utilisation rapide
 
 ```html
 <!-- CDN -->
-<script type="module" src="node_modules/@marianne/core/cdn/index.js"></script>
-<link rel="stylesheet" href="node_modules/@marianne/core/themes/default.css" />
+<script type="module" src="node_modules/@ariane-ui/core/cdn/index.js"></script>
+<link rel="stylesheet" href="node_modules/@ariane-ui/core/themes/default.css" />
 
-<mr-button variant="filled">Valider</mr-button>
+<ar-button variant="filled">Valider</ar-button>
 ```
 
 ```typescript
 // ESM avec bundler (tree-shakeable)
-import '@marianne/core';
-import '@marianne/core/themes/default.css';
+import '@ariane-ui/core';
+import '@ariane-ui/core/themes/default.css';
 ```
 
 ---
@@ -34,14 +34,14 @@ import '@marianne/core/themes/default.css';
 
 | Composant    | Tag                 | Description                                          |
 | ------------ | ------------------- | ---------------------------------------------------- |
-| Alert        | `<mr-alert>`        | Message contextuel (info, success, warning, error)   |
-| Breadcrumb   | `<mr-breadcrumb>`   | Fil d'ariane de navigation                           |
-| Button       | `<mr-button>`       | Bouton accessible, plusieurs variantes et tailles    |
-| Pagination   | `<mr-pagination>`   | Navigation entre pages                               |
-| Progress Bar | `<mr-progressbar>`  | Barre de progression                                 |
-| Spinner      | `<mr-spinner>`      | Indicateur de chargement                             |
-| Stepper      | `<mr-stepper>`      | Navigation multi-étapes (desktop + mobile adaptatif) |
-| Stepper Item | `<mr-stepper-item>` | Étape individuelle du Stepper                        |
+| Alert        | `<ar-alert>`        | Message contextuel (info, success, warning, error)   |
+| Breadcrumb   | `<ar-breadcrumb>`   | Fil d'ariane de navigation                           |
+| Button       | `<ar-button>`       | Bouton accessible, plusieurs variantes et tailles    |
+| Pagination   | `<ar-pagination>`   | Navigation entre pages                               |
+| Progress Bar | `<ar-progressbar>`  | Barre de progression                                 |
+| Spinner      | `<ar-spinner>`      | Indicateur de chargement                             |
+| Stepper      | `<ar-stepper>`      | Navigation multi-étapes (desktop + mobile adaptatif) |
+| Stepper Item | `<ar-stepper-item>` | Étape individuelle du Stepper                        |
 
 ---
 
@@ -49,22 +49,22 @@ import '@marianne/core/themes/default.css';
 
 ```typescript
 // Enregistre tous les composants
-import '@marianne/core';
+import '@ariane-ui/core';
 
 // Import individuel (tree-shaking)
-import '@marianne/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/button/button.js';
 
 // Thème CSS
-import '@marianne/core/themes/default.css';
+import '@ariane-ui/core/themes/default.css';
 
 // CDN bundle (Lit inclus)
-import '@marianne/core/cdn';
+import '@ariane-ui/core/cdn';
 
 // CDN autoloader (charge les composants à la demande)
-import '@marianne/core/cdn/autoloader';
+import '@ariane-ui/core/cdn/autoloader';
 
 // Manifest CEM (outillage et intégrations)
-import manifest from '@marianne/core/custom-elements.json';
+import manifest from '@ariane-ui/core/custom-elements.json';
 ```
 
 ---
@@ -74,11 +74,11 @@ import manifest from '@marianne/core/custom-elements.json';
 Chaque composant expose des **CSS Custom Properties** pour la personnalisation sans modifier les sources :
 
 ```css
-/* Exemple : personnaliser mr-button */
-mr-button {
-    --mr-button-bg: #7c3aed;
-    --mr-button-border-radius: 2rem;
-    --mr-button-font-weight: 700;
+/* Exemple : personnaliser ar-button */
+ar-button {
+    --ar-button-bg: #7c3aed;
+    --ar-button-border-radius: 2rem;
+    --ar-button-font-weight: 700;
 }
 ```
 
@@ -90,10 +90,10 @@ Créez votre propre thème en surchargeant ces variables dans votre CSS global.
 Les éléments internes sont exposés via `::part()` pour un ciblage CSS précis :
 
 ```css
-mr-button::part(base) {
+ar-button::part(base) {
     /* l'élément <button> natif */
 }
-mr-button::part(label) {
+ar-button::part(label) {
     /* le conteneur du label */
 }
 ```
@@ -138,7 +138,7 @@ this.dispatchEvent(new CustomEvent('mr-change', { bubbles: true, composed: true 
 Le parent expose un `ContextProvider`, l'enfant souscrit via `ContextConsumer`.
 Voir `stepper/` et `stepper-item/` pour un exemple complet.
 
-**Composants sans Shadow DOM** — les composants conteneurs de données (ex : `mr-stepper-item`)
+**Composants sans Shadow DOM** — les composants conteneurs de données (ex : `ar-stepper-item`)
 surchargent `createRenderRoot()` pour retourner `this` et éviter l'encapsulation CSS.
 
 ---
@@ -179,7 +179,7 @@ Le fichier `custom-elements.json` est généré automatiquement par
 /**
  * @summary Description courte du composant.
  * @display demo              ← mode d'affichage dans la doc (demo | docs)
- * @parent mr-stepper         ← déclare ce composant comme enfant de mr-stepper
+ * @parent ar-stepper         ← déclare ce composant comme enfant de ar-stepper
  *
  * @slot                      ← slot par défaut
  * @slot prefix               ← slot nommé

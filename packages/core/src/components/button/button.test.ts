@@ -1,19 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MrButton } from './button.js';
+import type { ArButton } from './button.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 
 // L'import enregistre le custom element dans la registry happy-dom
 import './button.js';
 
 /** Retourne le <button> natif dans le Shadow DOM. */
-function getButton(el: MrButton): HTMLButtonElement {
+function getButton(el: ArButton): HTMLButtonElement {
     return (el.shadowRoot as ShadowRoot).querySelector('button') as HTMLButtonElement;
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('MrButton', () => {
-    let el: MrButton;
+describe('ArButton', () => {
+    let el: ArButton;
 
     afterEach(() => el?.remove());
 
@@ -21,7 +21,7 @@ describe('MrButton', () => {
 
     describe('rendu', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button>Click me</mr-button>');
+            el = await fixture('<ar-button>Click me</ar-button>');
         });
 
         it('monte un shadow DOM', () => {
@@ -50,7 +50,7 @@ describe('MrButton', () => {
 
     describe('valeurs par défaut', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button>Label</mr-button>');
+            el = await fixture('<ar-button>Label</ar-button>');
         });
 
         it('variant par défaut = "filled"', () => {
@@ -74,7 +74,7 @@ describe('MrButton', () => {
 
     describe('réflexion des attributs', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button>Label</mr-button>');
+            el = await fixture('<ar-button>Label</ar-button>');
         });
 
         it("reflète variant sur l'attribut HTML", async () => {
@@ -96,7 +96,7 @@ describe('MrButton', () => {
         });
 
         it('type="submit" est appliqué sur le <button> natif', async () => {
-            el = await fixture('<mr-button type="submit">Label</mr-button>');
+            el = await fixture('<ar-button type="submit">Label</ar-button>');
             expect(getButton(el).type).toBe('submit');
         });
     });
@@ -105,7 +105,7 @@ describe('MrButton', () => {
 
     describe('état disabled', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button disabled>Label</mr-button>');
+            el = await fixture('<ar-button disabled>Label</ar-button>');
         });
 
         it('désactive le <button> natif (propriété disabled)', () => {
@@ -116,9 +116,9 @@ describe('MrButton', () => {
             expect(getButton(el).getAttribute('aria-disabled')).toBe('true');
         });
 
-        it("n'émet PAS mr-click quand disabled", () => {
+        it("n'émet PAS ar-click quand disabled", () => {
             const handler = vi.fn();
-            el.addEventListener('mr-click', handler);
+            el.addEventListener('ar-click', handler);
 
             // Dispatch direct du click sur le bouton shadow pour simuler l'interaction
             getButton(el).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
@@ -131,7 +131,7 @@ describe('MrButton', () => {
 
     describe('état enabled (non disabled)', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button>Label</mr-button>');
+            el = await fixture('<ar-button>Label</ar-button>');
         });
 
         it('aria-disabled="false" quand le bouton est actif', () => {
@@ -143,22 +143,22 @@ describe('MrButton', () => {
 
     describe('événements', () => {
         beforeEach(async () => {
-            el = await fixture('<mr-button>Label</mr-button>');
+            el = await fixture('<ar-button>Label</ar-button>');
         });
 
-        it('émet mr-click au clic', () => {
+        it('émet ar-click au clic', () => {
             const handler = vi.fn();
-            el.addEventListener('mr-click', handler);
+            el.addEventListener('ar-click', handler);
 
             getButton(el).dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
 
             expect(handler).toHaveBeenCalledOnce();
         });
 
-        it('mr-click bulle et traverse le Shadow DOM (bubbles + composed)', () => {
+        it('ar-click bulle et traverse le Shadow DOM (bubbles + composed)', () => {
             let captured: CustomEvent | null = null;
             // On écoute sur document pour vérifier que l'event traverse le shadow DOM
-            document.addEventListener('mr-click', (e) => (captured = e as CustomEvent), {
+            document.addEventListener('ar-click', (e) => (captured = e as CustomEvent), {
                 once: true,
             });
 
@@ -167,18 +167,18 @@ describe('MrButton', () => {
             expect(captured).not.toBeNull();
         });
 
-        it('émet mr-focus quand le bouton reçoit le focus', () => {
+        it('émet ar-focus quand le bouton reçoit le focus', () => {
             const handler = vi.fn();
-            el.addEventListener('mr-focus', handler);
+            el.addEventListener('ar-focus', handler);
 
             getButton(el).dispatchEvent(new FocusEvent('focus', { bubbles: true, composed: true }));
 
             expect(handler).toHaveBeenCalledOnce();
         });
 
-        it('émet mr-blur quand le bouton perd le focus', () => {
+        it('émet ar-blur quand le bouton perd le focus', () => {
             const handler = vi.fn();
-            el.addEventListener('mr-blur', handler);
+            el.addEventListener('ar-blur', handler);
 
             getButton(el).dispatchEvent(new FocusEvent('blur', { bubbles: true, composed: true }));
 
@@ -190,7 +190,7 @@ describe('MrButton', () => {
 
     describe('slots', () => {
         it('affiche le contenu du slot principal (light DOM)', async () => {
-            el = await fixture('<mr-button>Mon label</mr-button>');
+            el = await fixture('<ar-button>Mon label</ar-button>');
             // Le contenu texte est dans le light DOM (slot), pas le shadow DOM
             expect(el.textContent?.trim()).toBe('Mon label');
         });

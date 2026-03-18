@@ -1,11 +1,11 @@
 import { createContext } from '@lit/context';
-import { type MrBreadcrumbItem } from '../components/breadcrumb-item/breadcrumb-item.js';
+import { type ArBreadcrumbItem } from '../components/breadcrumb-item/breadcrumb-item.js';
 
 export interface BreadcrumbRegistry {
-    registerItem(item: MrBreadcrumbItem): void;
-    unregisterItem(item: MrBreadcrumbItem): void;
-    notifyItemChanged(item: MrBreadcrumbItem): void;
+    registerItem(item: ArBreadcrumbItem): void;
+    unregisterItem(item: ArBreadcrumbItem): void;
+    notifyItemChanged(item: ArBreadcrumbItem): void;
 }
 
 // Clé unique par instance de module → pas de collision entre composants
-export const breadcrumbContext = createContext<BreadcrumbRegistry>(Symbol('mr-breadcrumb'));
+export const breadcrumbContext = createContext<BreadcrumbRegistry>(Symbol('ar-breadcrumb'));

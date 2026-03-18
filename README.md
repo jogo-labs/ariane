@@ -1,31 +1,31 @@
-# mARIAnne
+# Ariane
 
 Bibliothèque de composants web accessibles, construite avec **Lit 3** et **TypeScript**.
 
 ```html
-<mr-button variant="filled">Valider</mr-button>
-<mr-alert variant="success">Opération réussie</mr-alert>
+<ar-button variant="filled">Valider</ar-button>
+<ar-alert variant="success">Opération réussie</ar-alert>
 ```
 
 ---
 
 ## Ce que c'est
 
-mARIAnne est un **Design System** : un ensemble de composants UI réutilisables, autonomes et accessibles.
+Ariane est un **Design System** : un ensemble de composants UI réutilisables, autonomes et accessibles.
 Les composants sont des **Custom Elements** natifs — ils fonctionnent dans n'importe quel framework
 (React, Vue, Angular, Svelte) ou sans framework du tout.
 
-Composants disponibles : `mr-alert`, `mr-breadcrumb`, `mr-button`, `mr-pagination`,
-`mr-progressbar`, `mr-spinner`, `mr-stepper` / `mr-stepper-item`.
+Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-pagination`,
+`ar-progressbar`, `ar-spinner`, `ar-stepper` / `ar-stepper-item`.
 
 ---
 
 ## Structure du monorepo
 
 ```
-mARIAnne/
+Ariane/
 ├── packages/
-│   └── core/          # @marianne/core — la bibliothèque de composants
+│   └── core/          # @ariane-ui/core — la bibliothèque de composants
 └── apps/
     └── docs/          # Site de documentation (Astro 5)
 ```
@@ -44,8 +44,8 @@ Le monorepo est géré par **npm workspaces** et orchestré par **Turborepo**.
 ### Installation
 
 ```bash
-git clone https://github.com/jonTravens/mARIAnne
-cd mARIAnne
+git clone https://github.com/jonTravens/Ariane
+cd Ariane
 npm install
 ```
 
@@ -87,24 +87,24 @@ npm run build      # Build tous les packages et le site de doc
 ### Via CDN (sans bundler)
 
 ```html
-<script type="module" src="https://unpkg.com/@marianne/core/cdn/index.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@marianne/core/themes/default.css" />
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
 
-<mr-button>Cliquez-moi</mr-button>
+<ar-button>Cliquez-moi</ar-button>
 ```
 
 ### Via npm (avec bundler)
 
 ```bash
-npm install @marianne/core
+npm install @ariane-ui/core
 ```
 
 ```typescript
-import '@marianne/core'; // enregistre tous les composants
-import '@marianne/core/themes/default.css'; // thème par défaut
+import '@ariane-ui/core'; // enregistre tous les composants
+import '@ariane-ui/core/themes/default.css'; // thème par défaut
 
 // ou import individuel (tree-shaking)
-import '@marianne/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/button/button.js';
 ```
 
 ### Autoloader CDN
@@ -122,9 +122,9 @@ Le bundle CDN inclut un autoloader qui ne charge chaque composant que quand il e
 Les composants exposent des **CSS Custom Properties** pour la personnalisation :
 
 ```css
-mr-button {
-    --mr-button-bg: #7c3aed;
-    --mr-button-border-radius: 2rem;
+ar-button {
+    --ar-button-bg: #7c3aed;
+    --ar-button-border-radius: 2rem;
 }
 ```
 

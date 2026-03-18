@@ -1,16 +1,16 @@
 {
-    "name": "@marianne/docs",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "predev":  "node scripts/check-manifest.js",
-        "dev":     "astro dev",
-        "build":   "astro build",
-        "lint":    "astro check"
-    },
-    "dependencies": {
-        "@marianne/core": "*",
-        "astro":          "^5.1.0",
-        "@astrojs/mdx":   "^4.0.0"
-    }
+  "name": "@ariane-ui/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/check-manifest.js",
+    "dev": "astro dev",
+    "build": "astro build",
+    "lint": "astro check"
+  },
+  "dependencies": {
+    "@ariane-ui/core": "*",
+    "astro": "^5.1.0",
+    "@astrojs/mdx": "^4.0.0"
+  }
 }
