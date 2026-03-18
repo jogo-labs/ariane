@@ -42,7 +42,7 @@ npm run dev
 
 ### 1. Créer le fichier MDX
 
-Créez `apps/docs/src/content/components/mr-<nom>.mdx` :
+Créez `apps/docs/src/content/components/ar-<nom>.mdx` :
 
 ```yaml
 ---
@@ -209,7 +209,7 @@ apps/docs/
 La page `/foundations/tokens` est **entièrement auto-générée** depuis
 `packages/core/src/styles/themes/default.css`.
 
-Ajouter une variable `--mr-*` dans ce fichier → elle apparaît automatiquement dans la page,
+Ajouter une variable `--ar-*` dans ce fichier → elle apparaît automatiquement dans la page,
 classée par catégorie (Couleurs, Typographie, Espacement, Forme, Focus).
 
 ---
@@ -299,11 +299,16 @@ Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la sect
 
 ## Checklist pour ajouter un composant
 
-- [ ] Créer `packages/core/src/components/<nom>/<nom>.ts` avec les annotations JSDoc
+> **Utiliser le script de scaffolding** : `npm run create -- <nom>` génère automatiquement
+> les fichiers du composant (`.ts`, `.styles.ts`, `.test.ts`, `.mdx`), met à jour le barrel
+> (`index.ts`) et l'autoloader (`autoloader.ts`). C'est le point d'entrée recommandé.
+
+- [ ] Lancer `npm run create -- <nom>` pour scaffolder le composant
+- [ ] Implémenter le composant avec les annotations JSDoc
 - [ ] Régénérer le CEM : `cd packages/core && npm run build:manifest`
-- [ ] Créer `apps/docs/src/content/components/mr-<nom>.mdx` avec au moins une variante
+- [ ] Compléter les variantes dans `apps/docs/src/content/components/ar-<nom>.mdx`
 - [ ] Lancer `npm run dev` et vérifier la page `/components/<nom>`
-- [ ] Si sous-composant : ajouter uniquement `@parent mr-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
+- [ ] Si sous-composant : ajouter uniquement `@parent ar-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
 
 ## Checklist pour modifier l'architecture du site
 

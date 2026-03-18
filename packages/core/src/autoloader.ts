@@ -16,8 +16,16 @@
  */
 
 const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
+    'ar-alert': () => import('./components/alert/alert.js'),
+    'ar-breadcrumb': () => import('./components/breadcrumb/breadcrumb.js'),
+    'ar-breadcrumb-item': () => import('./components/breadcrumb-item/breadcrumb-item.js'),
     'ar-button': () => import('./components/button/button.js'),
-    // Ajouter les nouveaux composants ici au fil du développement
+    'ar-pagination': () => import('./components/pagination/pagination.js'),
+    'ar-progressbar': () => import('./components/progressbar/progressbar.js'),
+    'ar-spinner': () => import('./components/spinner/spinner.js'),
+    'ar-stepper': () => import('./components/stepper/stepper.js'),
+    'ar-stepper-item': () => import('./components/stepper-item/stepper-item.js'),
+    // ⚠ Mis à jour automatiquement par le script create-component.js
 };
 
 /** Roots actuellement observés (évite les doublons). */
