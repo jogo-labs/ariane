@@ -129,7 +129,7 @@ async function loadComponent(tagName: string): Promise<void> {
         // ont maintenant un shadowRoot et peuvent contenir d'autres composants
         rescanAllRoots();
     } catch (err) {
-        console.error(`[mr-lib autoloader] Failed to load <${tagName}>:`, err);
+        console.error(`[ariane autoloader] Failed to load <${tagName}>:`, err);
         // Retire du Set pour permettre un retry
         loaded.delete(tagName);
     }
@@ -151,3 +151,5 @@ function rescanAllRoots(): void {
 // Démarre l'observation depuis document.body.
 // Tous les shadowRoots découverts en cours de route seront ajoutés dynamiquement.
 observeRoot(document.body);
+
+export {};
