@@ -20,7 +20,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,css,astro,md}\" --ignore-path .gitignore",
     "create": "node packages/core/scripts/create-component.js",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI) process.exit(0)\" && husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
