@@ -51,6 +51,9 @@ const {
             .alpha-banner {
                 position:        relative;
                 z-index:         200;
+                width:           100%;
+                height:          var(--doc-alpha-banner-h);
+                overflow:        hidden;
                 background:      #92400e;
                 color:           #fef3c7;
                 text-align:      center;
@@ -74,6 +77,7 @@ const {
                 --doc-border:     #e5e7eb;
                 --doc-header-bg:  color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 4%, #ffffff);
                 --doc-header-h:   3.25rem;
+                --doc-alpha-banner-h:   2rem;
             }
 
             [data-theme="dark"] {
@@ -226,7 +230,7 @@ const {
             /* ── Layout body ────────────────────────────── */
 
             .layout-body {
-                height: calc(100vh - var(--doc-header-h));
+                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
             }
 
             .layout-body.with-nav {
