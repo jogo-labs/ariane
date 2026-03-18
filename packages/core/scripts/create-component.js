@@ -7,12 +7,12 @@
  *   - src/components/<n>/<tagname>.styles.ts
  *   - src/components/<n>/<tagname>.test.ts
  *   - ../../apps/docs/src/content/components/<tagname>.mdx
- *   Et met à jour src/index.ts (barrel)
+ *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_MAP)
  *
  * Usage :
- *   npm run create -- button              → mr-button  (prefix par défaut)
- *   npm run create -- my-component        → mr-my-component
- *   npm run create -- mr-button           → mr-button  (prefix déjà présent, pas doublé)
+ *   npm run create -- button              → ar-button  (prefix par défaut)
+ *   npm run create -- my-component        → ar-my-component
+ *   npm run create -- ar-button           → ar-button  (prefix déjà présent, pas doublé)
  *   npm run create -- button --prefix ft  → ft-button
  *   npm run create -- button --prefix ""  → erreur, prefix requis
  */
@@ -50,7 +50,7 @@ if (prefixFlagIndex !== -1) {
 }
 
 const input = args[0];
-const PREFIX = cliPrefix ?? readPackagePrefix() ?? 'mr';
+const PREFIX = cliPrefix ?? readPackagePrefix() ?? 'ar';
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -274,6 +274,19 @@ const exportLine = `export { ${className} } from './components/${dirName}/${file
 if (!barrelContent.includes(exportLine)) {
     writeFileSync(barrelPath, barrelContent + exportLine, 'utf-8');
     console.log(`  ✓ src/index.ts mis à jour`);
+}
+
+// ─── Mise à jour de l'autoloader ─────────────────────────────────────────────
+
+const autoloaderPath = join(ROOT, 'src', 'autoloader.ts');
+const autoloaderContent = readFileSync(autoloaderPath, 'utf-8');
+const autoloaderEntry = `    '${tagName}': () => import('./components/${dirName}/${fileName}.js'),`;
+const marker = '    // ⚠ Mis à jour automatiquement par le script create-component.js';
+
+if (!autoloaderContent.includes(`'${tagName}'`)) {
+    const updated = autoloaderContent.replace(marker, `${autoloaderEntry}\n${marker}`);
+    writeFileSync(autoloaderPath, updated, 'utf-8');
+    console.log(`  ✓ src/autoloader.ts mis à jour`);
 }
 
 // ─── Résumé ───────────────────────────────────────────────────────────────────
