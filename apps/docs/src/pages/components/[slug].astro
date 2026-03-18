@@ -80,55 +80,42 @@ const tocEntries = [
         <TableOfContents entries={tocEntries} mobileOnly={true} />
     </div>
 
-    <h3>{pageTitle}</h3>
-    <code>&lt;{component.tagName}&gt;</code>
-    {pageDesc && <p class="summary">{pageDesc}</p>}
+    <div class="page-container">
+        <div class="page-header">
+            <h3 class="page-title">{pageTitle}</h3>
 
+            <div class="meta">
+                <code>&lt;{component.tagName}&gt;</code>
+            </div>
 
-    <Playground
-        variants={variants}
-        tagName={component.tagName!}
-        displayMode={displayMode}
-        parentTag={parentTag}
-        playgroundHtml={playgroundHtml}
-        controls={controls}
-        component={component}
-    />
-
-    {Content && (
-        <section class="narrative">
-            <Content />
-        </section>
-    )}
+            {pageDesc && <p class="summary">{pageDesc}</p>}
+        </div>
+        <Playground
+            variants={variants}
+            tagName={component.tagName!}
+            displayMode={displayMode}
+            parentTag={parentTag}
+            playgroundHtml={playgroundHtml}
+            controls={controls}
+            component={component}
+        />
+        {Content && (
+            <section class="narrative">
+                <Content />
+            </section>
+        )}
+    </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
 </Layout>
 
 <style>
+    @import '../../styles/doc-prose.css';
+
     /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
     .toc-mobile-inline { display: none; }
     @media (max-width: 768px) {
         .toc-mobile-inline { display: block; }
-    }
-
-    h3 {
-        font-size: 2rem;
-        color:     var(--doc-text, #111827);
-        margin:    0;
-    }
-
-    h3 + code {
-        font-size:  1rem;
-        display:    block;
-        background: none;
-        padding:    0;
-        color:      var(--doc-text-muted, #6b7280);
-    }
-
-    .summary {
-        font-size: 1.05rem;
-        color:     var(--doc-text-muted, #4b5563);
-        margin:    0;
     }
 
     .narrative {

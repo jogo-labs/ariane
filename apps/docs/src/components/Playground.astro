@@ -47,29 +47,33 @@ const showPlayground = displayMode === 'demo';
 
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
-    <section class="examples-section" id="exemples">
-        <h4>Exemples</h4>
-        {variants.map((variant) => (
-            <section class="variant" id={`exemple-${variant.name}`}>
-                <h5>{variant.label ?? variant.name}</h5>
-                {variant.description && (
-                    <p class="variant-description">{variant.description}</p>
-                )}
-                <div class="preview-wrap">
-                    <button class="preview-theme-toggle" data-preview-toggle aria-label="Basculer le thème de la preview">
-                        <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                        <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    </button>
-                    <div class="preview" data-theme={variant.previewTheme ?? 'light'}>
-                        <Fragment set:html={variant.html} />
+    <section id="exemples">
+        <h4 class="section-title">Exemples</h4>
+        <div class="main-section">
+            {variants.map((variant) => (
+                <section id={`exemple-${variant.name}`}>
+                    <h5 class="subsection-title">{variant.label ?? variant.name}</h5>
+                    {variant.description && (
+                        <p class="variant-description">{variant.description}</p>
+                    )}
+                    <div>
+                        <div class="preview-wrap">
+                            <button class="preview-theme-toggle" data-preview-toggle aria-label="Basculer le thème de la preview">
+                                <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                                <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            </button>
+                            <div class="preview" data-theme={variant.previewTheme ?? 'light'}>
+                                <Fragment set:html={variant.html} />
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                            <pre><code class="language-html">{variant.html.trim()}</code></pre>
+                        </div>
                     </div>
-                </div>
-                <div class="code-block">
-                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
-                    <pre><code class="language-html">{variant.html.trim()}</code></pre>
-                </div>
-            </section>
-        ))}
+                </section>
+            ))}
+        </div>
     </section>
 )}
 
@@ -87,7 +91,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Playground interactif ── */}
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
-        <h4>Playground</h4>
+        <h4 class="subsection-title">Playground</h4>
         <div class="preview-wrap">
             <button class="preview-theme-toggle" data-preview-toggle aria-label="Basculer le thème de la preview">
                 <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -156,30 +160,12 @@ const showPlayground = displayMode === 'demo';
 
 {/* ── Référence API ── */}
 <section id="reference-api">
-    <h4>Référence API</h4>
+    <h4 class="section-title">Référence API</h4>
     <ComponentApi component={component} />
 </section>
 
 <style>
-    /* ── Sections communes ─────────────────────────────── */
-
-    /* Le wrapper Playground est rendu dans .main-inner — pas de flex ici.
-       Les sections s'espacent via margin-top pour ne pas interférer avec
-       le border-radius preview+code qui nécessite border-top:none adjacent. */
-    .examples-section,
-    .playground-section,
-    #reference-api {
-        margin-top: 2.5rem;
-    }
-
-    h4 {
-        font-size:      1.5rem;
-        font-weight:    700;
-        border-bottom:  2px solid var(--doc-border, #e5e7eb);
-        padding-bottom: 0.5rem;
-        margin-bottom:  1.5rem;
-        color:          var(--doc-text, #111827);
-    }
+    @import '../styles/doc-prose.css';
 
     /* ── Variantes ─────────────────────────────────────── */
 
@@ -189,15 +175,11 @@ const showPlayground = displayMode === 'demo';
         gap:            2.5rem;
     }
 
-    /* h4 "Exemples" sort du flux flex via margin-bottom négatif compense le gap */
-    .examples-section > h4 {
-        margin-bottom: -1rem;
-    }
-
-    .variant {
+    .variant,
+    .playground-section {
         display:        flex;
         flex-direction: column;
-        gap:            0.5rem;
+        gap:            1rem;
     }
 
     h5 {
@@ -208,10 +190,7 @@ const showPlayground = displayMode === 'demo';
     }
 
     .variant-description {
-        font-size:  0.875rem;
-        color:      var(--doc-text-muted, #6b7280);
-        font-style: italic;
-        margin:     0;
+        margin: .75rem 0;
     }
 
     /* ── Preview ─────────────────────────────────────── */
@@ -326,6 +305,10 @@ const showPlayground = displayMode === 'demo';
         font-size:   inherit;
         padding:     0;
         background:  transparent;
+    }
+
+    :global(.code-block pre) {
+        border-radius: 0 0 0.5rem 0.5rem;
     }
 
     /* ── Playground contrôles ────────────────────────── */

@@ -46,52 +46,54 @@ const codeTokens = `:root {
     currentPath="/getting-started/utilisation"
     showToc={true}
 >
-    <h2>Utilisation</h2>
-
-    <div class="page-content">
-    <section id="import">
-        <h3>Import des composants</h3>
-        <p>
-            Une fois <a href="/getting-started/installation">installée</a>, la bibliothèque s'utilise
-            directement en HTML. Les composants sont des Custom Elements natifs — aucun framework requis.
-        </p>
-
-        <h4>Import global (tous les composants)</h4>
-        <pre><code class="language-typescript" set:text={codeImportGlobal} /></pre>
-
-        <h4>Import individuel <span class="badge-subtle">Tree-shaking</span></h4>
-        <p>Pour inclure uniquement les composants effectivement utilisés :</p>
-        <pre><code class="language-typescript" set:text={codeImportIndividuel} /></pre>
-
-        <h4>Dans votre HTML</h4>
-        <pre><code class="language-html" set:text={codeHtml} /></pre>
-    </section>
-
-    <section id="personnalisation">
-        <h3>Personnalisation CSS</h3>
-        <p>
-            Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
-            l'apparence sans surcharger les styles internes.
-        </p>
-        <pre><code class="language-css" set:text={codeCustomProps} /></pre>
-        <p>
-            Les propriétés disponibles par composant sont listées dans la section
-            <strong>Référence API</strong> de chaque page de composant.
-        </p>
-    </section>
-
-    <section id="tokens">
-        <h3>Design Tokens</h3>
-        <p>
-            Les valeurs par défaut (couleurs, espacements, typographie…) viennent du fichier de thème
-            <code>themes/default.css</code>. Vous pouvez les surcharger globalement :
-        </p>
-        <pre><code class="language-css" set:text={codeTokens} /></pre>
-        <p>
-            Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste complète
-            des variables disponibles.
-        </p>
-    </section>
+    <div class="page-container">
+        <h2 class="page-title">Utilisation</h2>
+        <section id="import" class="main-section">
+            <div>
+                <h3 class="section-title">Import des composants</h3>
+                <p class="summary">
+                    Une fois <a href="/getting-started/installation">installée</a>, la bibliothèque s'utilise
+                    directement en HTML. Les composants sont des Custom Elements natifs — aucun framework requis.
+                </p>
+            </div>
+            <section class="subsection">
+                <h4 class="subsection-title">Import global (tous les composants)</h4>
+                <pre><code class="language-typescript" set:text={codeImportGlobal} /></pre>
+            </section>
+            <section class="subsection">
+                <h4 class="subsection-title">Import individuel <span class="badge-subtle">Tree-shaking</span></h4>
+                <p>Pour inclure uniquement les composants effectivement utilisés :</p>
+                <pre><code class="language-typescript" set:text={codeImportIndividuel} /></pre>
+            </section>
+            <section class="subsection">
+                <h4 class="subsection-title">Dans votre HTML</h4>
+                <pre><code class="language-html" set:text={codeHtml} /></pre>
+            </section>
+        </section>
+        <section id="personnalisation">
+            <h3 class="section-title">Personnalisation CSS</h3>
+            <p>
+                Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
+                l'apparence sans surcharger les styles internes.
+            </p>
+            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
+            <p>
+                Les propriétés disponibles par composant sont listées dans la section
+                <strong>Référence API</strong> de chaque page de composant.
+            </p>
+        </section>
+        <section id="tokens">
+            <h3 class="section-title">Design Tokens</h3>
+            <p>
+                Les valeurs par défaut (couleurs, espacements, typographie…) viennent du fichier de thème
+                <code>themes/default.css</code>. Vous pouvez les surcharger globalement :
+            </p>
+            <pre><code class="language-css" set:text={codeTokens} /></pre>
+            <p>
+                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste complète
+                des variables disponibles.
+            </p>
+        </section>
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />

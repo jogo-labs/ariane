@@ -5,50 +5,85 @@
  * Usage : @import '../styles/doc-prose.css'; dans un <style> Astro.
  */
 
-h2 {
+.page-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+}
+
+.page-header {
+    .meta {
+        display: flex;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+
+    .summary {
+        margin-top: 1.5rem;
+    }
+}
+
+.page-title {
     color: var(--doc-text, #111827);
-    font-size: 2em;
+    font-size: 3em;
     margin: 0;
 }
 
-h2 + .page-content {
+.page-title + .page-content {
     margin-top: 1.5rem;
 }
 
-.page-content {
+.main-section,
+.subsection {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
 }
 
-h3 {
-    font-size: 1.1rem;
+.main-section {
+    gap: 1.5rem;
+}
+
+.subsection {
+    gap: 0.5rem;
+
+    p {
+        margin: 0;
+    }
+}
+
+.section-title {
+    font-size: 2rem;
     font-weight: 700;
     border-bottom: 2px solid var(--doc-border, #e5e7eb);
     padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+    margin: 0 0 1rem;
     color: var(--doc-text, #111827);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-h4 {
-    font-size: 0.95rem;
+.subsection-title {
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--doc-text, #111827);
-    margin: 1.25rem 0 0.4rem;
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-p {
-    font-size: 0.95rem;
+.summary {
+    font-size: 1.05rem;
+    color: var(--doc-text-muted, #4b5563);
+    margin: 0;
+}
+
+/* p {
     color: var(--doc-text, #374151);
     margin-bottom: 0.75rem;
     line-height: 1.65;
-}
+} */
 
 ul {
     font-size: 0.95rem;
@@ -71,7 +106,7 @@ pre {
     border-radius: 0.5rem;
     padding: 1rem 1.25rem;
     overflow-x: auto;
-    margin: 0.5rem 0 1rem;
+    margin: 0;
 }
 
 pre code {
