@@ -33,11 +33,9 @@ jobs:
       - name: Test (gate de sécurité avant publication)
         run: npm run test
 
-      # Publier le package npm avec provenance pour la traçabilité
+      # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
       - name: Publish to npm
         run: npm publish --workspace packages/core --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
