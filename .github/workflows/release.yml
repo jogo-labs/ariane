@@ -35,7 +35,11 @@ jobs:
 
       # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
       - name: Publish to npm
-        run: npm publish --workspace packages/core --access public --provenance
+        uses: npm/publish@v1
+        with:
+          package: packages/core
+          access: public
+          provenance: true
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
