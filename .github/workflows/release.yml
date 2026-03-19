@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
@@ -35,11 +35,7 @@ jobs:
 
       # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
       - name: Publish to npm
-        uses: npm/publish@v1
-        with:
-          package: packages/core
-          access: public
-          provenance: true
+        run: npm publish --workspace packages/core --access public
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
