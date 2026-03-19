@@ -37,7 +37,7 @@ jobs:
       - name: Publish to npm
         run: npm publish --workspace packages/core --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
