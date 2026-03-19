@@ -34,8 +34,15 @@ jobs:
         run: npm run test
 
       # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
+      # Le tag npm est déduit automatiquement depuis la version (alpha/beta/latest)
       - name: Publish to npm
-        run: npm publish --workspace packages/core --access public
+        run: |
+          VERSION=$(node -p "require('./packages/core/package.json').version")
+          if [[ "$VERSION" == *"-alpha"* ]]; then TAG="alpha"
+          elif [[ "$VERSION" == *"-beta"* ]]; then TAG="beta"
+          else TAG="latest"
+          fi
+          npm publish --workspace packages/core --access public --tag $TAG
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
