@@ -135,11 +135,10 @@
          * Supprimer au fur et à mesure de chaque migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* @migration alert, stepper */
+        /* @migration alert */
         --ar--color-primary: var(--ar-color-interactive);
         --ar--color-text-color: var(--ar-color-text);
-
-        /* @migration alert */
+        --ar--text-color-default: var(--ar-color-text);
         --ar--bg-error: var(--ar-color-danger-50);
         --ar--border-error: var(--ar-color-danger-50);
         --ar--icon-error: var(--ar-color-danger-500);
@@ -153,15 +152,6 @@
         --ar--border-info: var(--ar-color-info-50);
         --ar--icon-info: var(--ar-color-info-500);
         --ar--font-size-text: var(--ar-font-size-md);
-
-        /* @migration stepper, alert */
-        --ar--text-color-default: var(--ar-color-text);
-
-        /* @migration stepper */
-        --ar--color-background-neutral-default-strong: var(--ar-color-text-muted);
-        --ar--stepper-bullet-background: #b0bff0;
-        --ar--stepper-bullet-hover: var(--ar-color-text-muted);
-        --ar--stepper-next-bullet-border: #b0bff0;
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);

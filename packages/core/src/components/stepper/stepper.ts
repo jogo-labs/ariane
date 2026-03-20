@@ -42,11 +42,11 @@ export interface ArStepperStepChangeDetail {
  * @csspart dropdown     - Le conteneur dropdown (mobile uniquement).
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown mobile.
  *
- * @cssprop --ar-stepper-gap              - Espacement entre les étapes.
- * @cssprop --ar-stepper-active-color     - Couleur de l'étape active.
- * @cssprop --ar-stepper-done-color       - Couleur des étapes complétées.
- * @cssprop --ar-stepper-inactive-color   - Couleur des étapes inactives.
- * @cssprop --ar-stepper-connector-color  - Couleur du connecteur entre étapes.
+ * @cssprop --ar-stepper-gap                                                 - Espacement entre les étapes.
+ * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]    - Fond de la puce de l'étape active.
+ * @cssprop [--ar-stepper-bullet-bg=#b0bff0]                               - Fond des puces des étapes visitables.
+ * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-200)] - Bordure des puces des étapes suivantes.
+ * @cssprop [--ar-stepper-bullet-hover-color=var(--ar-color-text-muted)]   - Couleur au survol des liens d'étapes.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
