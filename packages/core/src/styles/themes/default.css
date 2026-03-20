@@ -159,6 +159,30 @@
         --ar-progressbar-percent-color: var(--ar-color-text-muted);
 
         /* spinner — pas de valeur : hérite de currentColor du contexte */
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 7. ALIASES DE SIZING (temporaires — button.styles.ts non migré)
+         * Ces tokens de taille/espacement existaient dans l'ancien système.
+         * À supprimer lors de la migration de button.styles.ts et table.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* @migration button.styles.ts */
+        --ar--button-height: 2.5rem;
+        --ar--button-sm-height: 2rem;
+        --ar--button-lg-height: 3rem;
+        --ar--button-padding-x: 1rem;
+        --ar--button-sm-padding-x: 0.75rem;
+        --ar--button-lg-padding-x: 1.25rem;
+        --ar--button-border-radius: 0.75rem;
+        --ar--button-border-radius-sm: 0.5rem;
+        --ar--button-ratio-square-width: 2.5rem;
+        --ar--button-ratio-square-sm-width: 2rem;
+        --ar--button-ratio-square-lg-width: 3rem;
+        --ar--color-primary-hover: var(--ar-color-interactive-hover);
+        --ar--color-primary-active: var(--ar-color-interactive-active);
+
+        /* @migration table */
+        --ar--table-padding-x: 1rem;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
