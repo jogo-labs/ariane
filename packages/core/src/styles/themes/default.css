@@ -135,23 +135,8 @@
          * Supprimer au fur et à mesure de chaque migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* @migration alert */
+        /* @migration button.styles.ts (--ar--color-primary utilisé dans button.styles.ts) */
         --ar--color-primary: var(--ar-color-interactive);
-        --ar--color-text-color: var(--ar-color-text);
-        --ar--text-color-default: var(--ar-color-text);
-        --ar--bg-error: var(--ar-color-danger-50);
-        --ar--border-error: var(--ar-color-danger-50);
-        --ar--icon-error: var(--ar-color-danger-500);
-        --ar--bg-success: var(--ar-color-success-50);
-        --ar--border-success: var(--ar-color-success-50);
-        --ar--icon-success: var(--ar-color-success-500);
-        --ar--bg-warning: var(--ar-color-warning-50);
-        --ar--border-warning: var(--ar-color-warning-50);
-        --ar--icon-warning: var(--ar-color-warning-500);
-        --ar--bg-info: var(--ar-color-info-50);
-        --ar--border-info: var(--ar-color-info-50);
-        --ar--icon-info: var(--ar-color-info-500);
-        --ar--font-size-text: var(--ar-font-size-md);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
