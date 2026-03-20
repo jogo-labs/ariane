@@ -127,47 +127,25 @@
         --ar-button-danger-color: var(--ar-color-text-inverse);
         --ar-button-border-radius: var(--ar-border-radius-md);
         --ar-button-font-weight: var(--ar-font-weight-medium);
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 6. ALIAS DE MIGRATION (temporaires)
-         * Ces tokens sont des ponts vers les anciens noms
-         * encore utilisés dans les composants non migrés.
-         * Supprimer au fur et à mesure de chaque migration.
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-        /* @migration button.styles.ts (--ar--color-primary utilisé dans button.styles.ts) */
-        --ar--color-primary: var(--ar-color-interactive);
+        --ar-button-height: 2.5rem;
+        --ar-button-sm-height: 2rem;
+        --ar-button-lg-height: 3rem;
+        --ar-button-padding-x: 1rem;
+        --ar-button-sm-padding-x: 0.75rem;
+        --ar-button-lg-padding-x: 1.25rem;
+        --ar-button-border-radius-pill: 0.75rem;
+        --ar-button-border-radius-sm-pill: 0.5rem;
+        --ar-button-ratio-square-width: 2.5rem;
+        --ar-button-ratio-square-sm-width: 2rem;
+        --ar-button-ratio-square-lg-width: 3rem;
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
         --ar-progressbar-fill-color: var(--ar-color-interactive);
         --ar-progressbar-percent-color: var(--ar-color-text-muted);
 
-        /* spinner — pas de valeur : hérite de currentColor du contexte */
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 7. ALIASES DE SIZING (temporaires — button.styles.ts non migré)
-         * Ces tokens de taille/espacement existaient dans l'ancien système.
-         * À supprimer lors de la migration de button.styles.ts et table.
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-        /* @migration button.styles.ts */
-        --ar--button-height: 2.5rem;
-        --ar--button-sm-height: 2rem;
-        --ar--button-lg-height: 3rem;
-        --ar--button-padding-x: 1rem;
-        --ar--button-sm-padding-x: 0.75rem;
-        --ar--button-lg-padding-x: 1.25rem;
-        --ar--button-border-radius: 0.75rem;
-        --ar--button-border-radius-sm: 0.5rem;
-        --ar--button-ratio-square-width: 2.5rem;
-        --ar--button-ratio-square-sm-width: 2rem;
-        --ar--button-ratio-square-lg-width: 3rem;
-        --ar--color-primary-hover: var(--ar-color-interactive-hover);
-        --ar--color-primary-active: var(--ar-color-interactive-active);
-
-        /* @migration table */
-        --ar--table-padding-x: 1rem;
+        /* table */
+        --ar-table-padding-x: 1rem;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
