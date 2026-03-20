@@ -163,9 +163,10 @@
         --ar--stepper-bullet-hover: var(--ar-color-text-muted);
         --ar--stepper-next-bullet-border: #b0bff0;
 
-        /* @migration progressbar */
-        --ft--progressbar-container-bg-color: var(--ar-color-bg-subtle);
-        --ft--progressbar-bg-color: var(--ar-color-interactive);
+        /* progressbar */
+        --ar-progressbar-track-color: var(--ar-color-bg-subtle);
+        --ar-progressbar-fill-color: var(--ar-color-interactive);
+        --ar-progressbar-percent-color: var(--ar-color-text-muted);
 
         /* spinner */
         --ar-spinner-stroke-color: var(--ar-color-neutral-600);
