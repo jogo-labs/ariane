@@ -167,8 +167,8 @@
         --ft--progressbar-container-bg-color: var(--ar-color-bg-subtle);
         --ft--progressbar-bg-color: var(--ar-color-interactive);
 
-        /* @migration spinner */
-        --ar--spinner-stroke: var(--ar-color-neutral-600);
+        /* spinner */
+        --ar-spinner-stroke-color: var(--ar-color-neutral-600);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

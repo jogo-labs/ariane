@@ -15,7 +15,7 @@ import styles from './spinner.styles.js';
  * @csspart spinner   - L'élément `<svg>` du spinner (visible quand `done` est false).
  * @csspart status    - Le `<div role="alert">` lu par les lecteurs d'écran.
  *
- * @cssprop [--ar--spinner-stroke-color=#5b5d65]     - Couleur du trait SVG. Défaut : `currentColor`.
+ * @cssprop [--ar-spinner-stroke-color=#5b5d65] - Couleur du trait SVG.
  */
 @customElement('ar-spinner')
 export class ArSpinner extends LitElement {
