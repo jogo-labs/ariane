@@ -135,7 +135,7 @@
          * Supprimer au fur et à mesure de chaque migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* @migration alert, breadcrumb, stepper */
+        /* @migration alert, stepper */
         --ar--color-primary: var(--ar-color-interactive);
         --ar--color-text-color: var(--ar-color-text);
 
@@ -154,7 +154,7 @@
         --ar--icon-info: var(--ar-color-info-500);
         --ar--font-size-text: var(--ar-font-size-md);
 
-        /* @migration breadcrumb */
+        /* @migration stepper, alert */
         --ar--text-color-default: var(--ar-color-text);
 
         /* @migration stepper */
