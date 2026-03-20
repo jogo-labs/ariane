@@ -47,26 +47,26 @@ export default css`
 
     :host([variant='filled']) button,
     :host(:not([variant])) button {
-        background: var(--ar-button-bg, #2563eb);
+        background: var(--ar-button-bg, #283276);
         color: var(--ar-button-color, #fff);
         border-color: transparent;
     }
 
     :host([variant='outlined']) button {
         background: transparent;
-        color: var(--ar-button-color, #2563eb);
-        border-color: var(--ar-button-border-color, #2563eb);
+        color: var(--ar-button-color, #283276);
+        border-color: var(--ar-button-border-color, #283276);
     }
 
     :host([variant='ghost']) button {
         background: transparent;
-        color: var(--ar-button-color, #2563eb);
+        color: var(--ar-button-color, #283276);
         border-color: transparent;
     }
 
     :host([variant='danger']) button {
-        background: var(--ar-button-bg, #dc2626);
-        color: var(--ar-button-color, #fff);
+        background: var(--ar-button-danger-bg, #f04438);
+        color: var(--ar-button-danger-color, #fff);
         border-color: transparent;
     }
 
@@ -89,7 +89,7 @@ export default css`
     }
 
     button:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color, #2563eb);
+        outline: 2px solid var(--ar-focus-ring-color, #283276);
         outline-offset: 2px;
     }
 

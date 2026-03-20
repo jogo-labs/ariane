@@ -121,6 +121,10 @@
         /* button */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
+        --ar-button-color: var(--ar-color-text-inverse);
+        --ar-button-border-color: var(--ar-color-interactive);
+        --ar-button-danger-bg: var(--ar-color-danger-500);
+        --ar-button-danger-color: var(--ar-color-text-inverse);
         --ar-button-border-radius: var(--ar-border-radius-md);
         --ar-button-font-weight: var(--ar-font-weight-medium);
 
