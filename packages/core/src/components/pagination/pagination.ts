@@ -39,6 +39,8 @@ export interface ArPaginationPageChangeDetail {
  * @csspart prev     - Le bouton "Page précédente".
  * @csspart next     - Le bouton "Page suivante".
  *
+ * @cssprop [--ar-pagination-active-color=var(--ar-color-interactive)] - Couleur de la page active (texte + bordure).
+ *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
 @customElement('ar-pagination')

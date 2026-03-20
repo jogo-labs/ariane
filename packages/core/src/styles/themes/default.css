@@ -135,7 +135,7 @@
          * Supprimer au fur et à mesure de chaque migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* @migration alert, breadcrumb, pagination, stepper */
+        /* @migration alert, breadcrumb, stepper */
         --ar--color-primary: var(--ar-color-interactive);
         --ar--color-text-color: var(--ar-color-text);
 
