@@ -168,8 +168,7 @@
         --ar-progressbar-fill-color: var(--ar-color-interactive);
         --ar-progressbar-percent-color: var(--ar-color-text-muted);
 
-        /* spinner */
-        --ar-spinner-stroke-color: var(--ar-color-neutral-600);
+        /* spinner — pas de valeur : hérite de currentColor du contexte */
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
