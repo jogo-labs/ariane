@@ -61,11 +61,11 @@ export default css`
         font-style: italic;
         background-color: var(
             --ar-button-disabled-bg,
-            var(--ar-color-neutral-100, #e6e7ec)
+            var(--ar-color-neutral-10, #e6e7ec)
         ) !important;
         border-color: var(
             --ar-button-disabled-border,
-            var(--ar-color-neutral-200, #cdcfd8)
+            var(--ar-color-neutral-20, #cdcfd8)
         ) !important;
         color: #71747f !important;
         -webkit-box-shadow: none;
@@ -127,7 +127,7 @@ export default css`
     .btn-sort .prefix,
     .btn-sort:focus .prefix,
     .btn-sort:focus:hover .prefix {
-        color: var(--ar-color-neutral-600, #5b5d65);
+        color: var(--ar-color-neutral-60, #5b5d65);
     }
 
     .btn-sort:active .prefix,
@@ -216,8 +216,8 @@ export default css`
     .btn-primary,
     a.btn-primary {
         --ar-spinner-stroke: var(--ar-color-neutral-0, #fff);
-        background-color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
-        border-color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
+        background-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
+        border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -230,8 +230,8 @@ export default css`
     .btn-primary:hover,
     a.btn-primary:focus,
     a.btn-primary:hover {
-        background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
-        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
+        background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
+        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -239,8 +239,8 @@ export default css`
     .btn-primary:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
     a.btn-primary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     a.btn-primary:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
-        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
+        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -248,7 +248,7 @@ export default css`
     a.btn-secondary {
         background-color: var(--ar-button-secondary-bg, var(--ar-color-neutral-0, #fff));
         color: var(--ar-color-text, #2e2e31);
-        border-color: var(--ar-color-neutral-600, #5b5d65);
+        border-color: var(--ar-color-neutral-60, #5b5d65);
     }
 
     .high-contrast .btn-secondary,
@@ -260,7 +260,7 @@ export default css`
     .btn-secondary:hover,
     a.btn-secondary:focus,
     a.btn-secondary:hover {
-        background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-600, #5b5d65));
+        background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-60, #5b5d65));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -268,20 +268,20 @@ export default css`
     .high-contrast .btn-secondary:hover,
     .high-contrast a.btn-secondary:focus,
     .high-contrast a.btn-secondary:hover {
-        background-color: var(--ar-color-neutral-700, #44454b);
+        background-color: var(--ar-color-neutral-70, #44454b);
     }
 
     .btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
     a.btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     a.btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-neutral-700, #44454b);
+        background-color: var(--ar-color-neutral-70, #44454b);
         color: var(--ar-color-neutral-0, #fff);
     }
 
     .btn-transverse.dark {
-        background-color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
-        border-color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
+        background-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
+        border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -290,40 +290,40 @@ export default css`
     }
 
     .btn-transverse.dark:hover {
-        background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
-        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
+        background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
+        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
         color: var(--ar-color-neutral-0, #fff);
     }
 
     .btn-transverse.dark:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-transverse.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
-        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
+        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         color: var(--ar-color-neutral-0, #fff);
     }
 
     .btn-transverse.dark:focus {
-        background: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
-        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        background: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
+        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         color: var(--ar-color-neutral-0, #fff);
     }
 
     .btn-transverse.light {
         background-color: var(--ar-color-neutral-0, #fff);
-        border-color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
-        color: var(--ar-color-interactive, var(--ar-color-primary-500, #283276));
+        border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
+        color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
     }
 
     .btn-transverse.light:hover {
         background-color: var(--ar-color-neutral-50, #f5f5f8);
-        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
-        color: var(--ar-color-interactive-hover, var(--ar-color-primary-600, #1b2256));
+        border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
+        color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
     }
 
     .btn-transverse.light:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-transverse.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
         background-color: var(--ar-color-neutral-0, #fff);
-        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         border-width: 2px;
         -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
         box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
@@ -331,12 +331,12 @@ export default css`
 
     .btn-transverse.light:focus {
         background-color: var(--ar-color-neutral-50, #f5f5f8);
-        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
-        color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
+        color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
     }
 
     .show > .btn-primary.dropdown-toggle {
-        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
+        background-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
     }
 
     .btn-tertiary,
@@ -362,8 +362,8 @@ export default css`
 
     .high-contrast .btn-tertiary.light:hover,
     .high-contrast a.btn-tertiary:not([aria-disabled='true']).light:hover {
-        background-color: var(--ar-color-neutral-700, #44454b);
-        border-color: var(--ar-color-neutral-700, #44454b);
+        background-color: var(--ar-color-neutral-70, #44454b);
+        border-color: var(--ar-color-neutral-70, #44454b);
     }
 
     .btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
@@ -493,7 +493,7 @@ export default css`
 
     .btn-ghost:hover,
     a.btn-ghost:hover {
-        background-color: var(--ar-color-neutral-600, #5b5d65);
+        background-color: var(--ar-color-neutral-60, #5b5d65);
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -503,7 +503,7 @@ export default css`
     a.btn-ghost:focus,
     a.btn-ghost:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     a.btn-ghost:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-neutral-700, #44454b);
+        background-color: var(--ar-color-neutral-70, #44454b);
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -525,13 +525,13 @@ export default css`
 
     .btn-table:active,
     .btn-table:hover {
-        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-100, #e6e7ec));
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-10, #e6e7ec));
     }
 
     .btn-table:focus,
     .btn-table:focus:not(:focus-visible) {
         outline-offset: 0;
-        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-100, #e6e7ec));
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-10, #e6e7ec));
     }
 
     .high-contrast .btn-table {

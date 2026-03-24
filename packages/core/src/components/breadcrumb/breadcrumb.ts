@@ -24,8 +24,8 @@ import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
  * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
  * @csspart dropdown   - Le conteneur du dropdown mobile.
  *
- * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-200)] - Couleur du séparateur entre les items (desktop).
- * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-200)] - Couleur des puces de la liste mobile.
+ * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-20)] - Couleur du séparateur entre les items (desktop).
+ * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-20)] - Couleur des puces de la liste mobile.
  *
  * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
  * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
