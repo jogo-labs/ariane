@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, html, type CSSResultGroup, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import dropdownStyles from '../../styles/components/dropdown.styles.js';
@@ -38,12 +38,6 @@ export class ArBreadcrumb extends LitElement {
         buttonStyles,
         styles,
     ];
-
-    /**
-     * Active le thème sombre du composant.
-     */
-    @property({ reflect: true, type: Boolean })
-    dark: boolean = false;
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
@@ -94,8 +88,6 @@ export class ArBreadcrumb extends LitElement {
 
         if (items.length === 0) return;
 
-        const themeClass = this.dark ? 'dark' : 'light';
-
         const listTemplates: TemplateResult[] = items.map((item, index) => {
             const isCurrent = index === items.length - 1;
             return html` <li
@@ -124,11 +116,7 @@ export class ArBreadcrumb extends LitElement {
                           part="dropdown"
                           class="dropdown breadcrumb-dropdown${this.dropdownOpen ? ' show' : ''}"
                       >
-                          <a
-                              id="mobile-home-btn"
-                              class="btn btn-tertiary ${themeClass}"
-                              href="${items[0]?.href}"
-                          >
+                          <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
                               <span class="btn-content">${items[0]?.label}</span>
                           </a>

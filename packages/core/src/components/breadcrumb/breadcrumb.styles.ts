@@ -6,18 +6,6 @@ export default css`
         box-sizing: border-box;
     }
 
-    /* ── Dark theme ──────────────────────────────────────────── */
-
-    :host([dark]) .breadcrumb-desktop .breadcrumb-text,
-    :host([dark]) .breadcrumb-desktop .breadcrumb-link,
-    :host([dark]) .breadcrumb-desktop .breadcrumb-link:visited {
-        color: var(--ar-color-text-inverse, #fff);
-    }
-
-    :host([dark]) .breadcrumb-desktop .breadcrumb-item:before {
-        background-color: var(--ar-color-text-inverse, #fff);
-    }
-
     /* ── Base ────────────────────────────────────────────────── */
 
     .breadcrumb-container {
@@ -67,7 +55,7 @@ export default css`
     }
 
     .high-contrast .breadcrumb-item.active {
-        color: #000;
+        color: var(--ar-color-text);
     }
 
     /* ── Desktop layout ──────────────────────────────────────── */
@@ -96,7 +84,7 @@ export default css`
     }
 
     .high-contrast .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item:before {
-        background-color: var(--ar-color-text-base, #2e2e31);
+        background-color: var(--ar-color-text);
     }
 
     /* ── Mobile layout ───────────────────────────────────────── */
