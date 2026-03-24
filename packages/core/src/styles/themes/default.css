@@ -82,6 +82,71 @@
         --ar-color-red-90: #ffdddd /* oklch(92.57% 0.038 17.86) */;
         --ar-color-red-95: #ffefef /* oklch(96.48% 0.017 17.46) */;
 
+        /* Orange (Webawesome bright) */
+        --ar-color-orange-05: oklch(18.82% 0.061 55);
+        --ar-color-orange-10: oklch(24.08% 0.077 54);
+        --ar-color-orange-20: oklch(32.94% 0.099 52);
+        --ar-color-orange-30: oklch(40.38% 0.116 50);
+        --ar-color-orange-40: oklch(47.62% 0.132 48.51);
+        --ar-color-orange-50: #bf5712 /* oklch(57.83% 0.152 47.33) */;
+        --ar-color-orange-60: #e97331 /* oklch(68.36% 0.165 46.50) */;
+        --ar-color-orange-70: oklch(76.55% 0.165 42.51);
+        --ar-color-orange-80: oklch(84.39% 0.122 47.98);
+        --ar-color-orange-90: oklch(92.4% 0.08 53.06);
+        --ar-color-orange-95: oklch(96.41% 0.04 53.48);
+
+        /* Cyan (Webawesome bright) */
+        --ar-color-cyan-05: #00151a /* oklch(17.99% 0.032 213.85) */;
+        --ar-color-cyan-10: #002129 /* oklch(22.85% 0.041 217.17) */;
+        --ar-color-cyan-20: #003843 /* oklch(31.37% 0.056 215.61) */;
+        --ar-color-cyan-30: #014c5a /* oklch(38.37% 0.068 215.53) */;
+        --ar-color-cyan-40: #056273 /* oklch(45.73% 0.080 215.29) */;
+        --ar-color-cyan-50: #118095 /* oklch(55.34% 0.094 215.17) */;
+        --ar-color-cyan-60: #1fa3b9 /* oklch(65.92% 0.109 212.40) */;
+        --ar-color-cyan-70: #2fbfd5 /* oklch(74.14% 0.119 210.50) */;
+        --ar-color-cyan-80: #51dcee /* oklch(82.70% 0.120 207.31) */;
+        --ar-color-cyan-90: #a6f2fa /* oklch(91.44% 0.075 204.25) */;
+        --ar-color-cyan-95: #dbf9fc /* oklch(96.15% 0.031 203.97) */;
+
+        /* Indigo (Webawesome bright) */
+        --ar-color-indigo-05: #080f2f /* oklch(18.55% 0.065 269.54) */;
+        --ar-color-indigo-10: #101a45 /* oklch(23.86% 0.082 269.36) */;
+        --ar-color-indigo-20: #1e2d6c /* oklch(32.51% 0.111 269.20) */;
+        --ar-color-indigo-30: #2a3f8f /* oklch(39.97% 0.135 268.52) */;
+        --ar-color-indigo-40: #3851b3 /* oklch(47.27% 0.158 268.81) */;
+        --ar-color-indigo-50: #516ed8 /* oklch(57.14% 0.165 269.13) */;
+        --ar-color-indigo-60: #728dff /* oklch(67.66% 0.170 271.19) */;
+        --ar-color-indigo-70: #95abff /* oklch(75.79% 0.124 271.99) */;
+        --ar-color-indigo-80: #bac8ff /* oklch(84.11% 0.079 273.50) */;
+        --ar-color-indigo-90: #dce5ff /* oklch(92.31% 0.037 270.47) */;
+        --ar-color-indigo-95: #edf2ff /* oklch(96.12% 0.018 269.09) */;
+
+        /* Purple (Webawesome bright) */
+        --ar-color-purple-05: #150047 /* oklch(19.86% 0.117 283.68) */;
+        --ar-color-purple-10: #250161 /* oklch(25.28% 0.144 287.73) */;
+        --ar-color-purple-20: #371f7a /* oklch(33.31% 0.144 287.97) */;
+        --ar-color-purple-30: #493590 /* oklch(40.49% 0.143 288.41) */;
+        --ar-color-purple-40: #5c4ba7 /* oklch(47.82% 0.142 288.32) */;
+        --ar-color-purple-50: #7b65cb /* oklch(57.62% 0.152 290.77) */;
+        --ar-color-purple-60: #9e83f2 /* oklch(68.28% 0.160 292.86) */;
+        --ar-color-purple-70: #b8a0fe /* oklch(76.29% 0.134 294.76) */;
+        --ar-color-purple-80: #d1c0ff /* oklch(84.32% 0.088 296.84) */;
+        --ar-color-purple-90: #eae2ff /* oklch(92.79% 0.040 298.23) */;
+        --ar-color-purple-95: #f3f0ff /* oklch(96.18% 0.020 295.19) */;
+
+        /* Pink (Webawesome bright) */
+        --ar-color-pink-05: #240033 /* oklch(19.65% 0.098 313.47) */;
+        --ar-color-pink-10: #370047 /* oklch(24.98% 0.122 316.48) */;
+        --ar-color-pink-20: #580a68 /* oklch(34.10% 0.153 319.60) */;
+        --ar-color-pink-30: #6d247e /* oklch(41.18% 0.155 319.42) */;
+        --ar-color-pink-40: #823b94 /* oklch(48.33% 0.153 319.08) */;
+        --ar-color-pink-50: #a258b5 /* oklch(58.35% 0.156 319.13) */;
+        --ar-color-pink-60: #c576db /* oklch(68.84% 0.164 318.62) */;
+        --ar-color-pink-70: #e38ef8 /* oklch(77.16% 0.170 319.48) */;
+        --ar-color-pink-80: #edb8fa /* oklch(85.15% 0.106 319.58) */;
+        --ar-color-pink-90: #f4defb /* oklch(92.70% 0.045 317.99) */;
+        --ar-color-pink-95: #f8effc /* oklch(96.29% 0.020 315.67) */;
+
         /* Blue — utilisé pour info (Webawesome bright) */
         --ar-color-blue-05: #031225 /* oklch(18.05% 0.045 253.25) */;
         --ar-color-blue-10: #061e38 /* oklch(23.25% 0.059 252.80) */;
