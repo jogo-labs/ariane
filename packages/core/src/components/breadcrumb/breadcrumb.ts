@@ -124,7 +124,7 @@ export class ArBreadcrumb extends LitElement {
                               @click=${this.dropdownOpen ? this._hide : this._show}
                               .ariaExpanded=${this.dropdownOpen}
                               type="button"
-                              class="btn btn-tertiary ${themeClass} btn-ratio-square"
+                              class="btn btn-tertiary btn-ratio-square"
                               id="breadcrumb-dropdown"
                           >
                               <span aria-hidden="true" class="icon icon-more">v</span>

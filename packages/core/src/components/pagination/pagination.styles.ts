@@ -146,13 +146,6 @@ export default css`
         cursor: default !important;
         border-color: transparent !important;
     }
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).light {
-        color: var(--ar-color-text, #2e2e31) !important;
-    }
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).dark {
-        color: var(--ar-color-text-inverse, #fff) !important;
-    }
-
     .pagination,
     .pagination .btn-tertiary {
         display: -webkit-box;
@@ -197,11 +190,7 @@ export default css`
         border-color: transparent !important;
     }
 
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).light {
-        color: var(--ar-color-text, #2e2e31) !important;
-    }
-
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).dark {
-        color: var(--ar-color-text-inverse, #fff) !important;
+    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']) {
+        color: var(--ar-color-text) !important;
     }
 `;

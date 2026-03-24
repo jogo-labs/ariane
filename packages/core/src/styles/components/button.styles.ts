@@ -59,8 +59,14 @@ export default css`
     .btn[aria-disabled='true'],
     .btn[aria-disabled='true']:hover {
         font-style: italic;
-        background-color: var(--ar-color-neutral-100, #e6e7ec) !important;
-        border-color: var(--ar-color-neutral-200, #cdcfd8) !important;
+        background-color: var(
+            --ar-button-disabled-bg,
+            var(--ar-color-neutral-100, #e6e7ec)
+        ) !important;
+        border-color: var(
+            --ar-button-disabled-border,
+            var(--ar-color-neutral-200, #cdcfd8)
+        ) !important;
         color: #71747f !important;
         -webkit-box-shadow: none;
         box-shadow: none;
@@ -240,7 +246,7 @@ export default css`
 
     .btn-secondary,
     a.btn-secondary {
-        background-color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-button-secondary-bg, var(--ar-color-neutral-0, #fff));
         color: var(--ar-color-text, #2e2e31);
         border-color: var(--ar-color-neutral-600, #5b5d65);
     }
@@ -254,7 +260,7 @@ export default css`
     .btn-secondary:hover,
     a.btn-secondary:focus,
     a.btn-secondary:hover {
-        background-color: var(--ar-color-neutral-600, #5b5d65);
+        background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-600, #5b5d65));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -333,9 +339,11 @@ export default css`
         background-color: var(--ar-color-interactive-active, var(--ar-color-primary-700, #0f1438));
     }
 
+    .btn-tertiary,
+    a.btn-tertiary:not([aria-disabled='true']),
     .btn-tertiary.light,
     a.btn-tertiary:not([aria-disabled='true']).light {
-        background-color: rgba(26, 26, 26, 0.05);
+        background-color: var(--ar-button-tertiary-bg, rgba(26, 26, 26, 0.05));
         color: var(--ar-color-text, #2e2e31);
     }
 
@@ -344,9 +352,11 @@ export default css`
         border-color: var(--ar-color-text-base, #2e2e31);
     }
 
+    .btn-tertiary:hover,
+    a.btn-tertiary:not([aria-disabled='true']):hover,
     .btn-tertiary.light:hover,
     a.btn-tertiary:not([aria-disabled='true']).light:hover {
-        background-color: rgba(18, 20, 55, 0.7);
+        background-color: var(--ar-button-tertiary-bg-hover, rgba(18, 20, 55, 0.7));
         color: var(--ar-color-neutral-0, #fff);
     }
 
@@ -356,6 +366,14 @@ export default css`
         border-color: var(--ar-color-neutral-700, #44454b);
     }
 
+    .btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
+    .btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
+    a.btn-tertiary:not([aria-disabled='true']):not(:disabled):not(.disabled):not(
+            [aria-disabled='true']
+        ).active,
+    a.btn-tertiary:not([aria-disabled='true']):not(:disabled):not(.disabled):not(
+            [aria-disabled='true']
+        ):active,
     .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
     a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
@@ -364,17 +382,19 @@ export default css`
     a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
             [aria-disabled='true']
         ):active {
-        background-color: rgba(18, 20, 55, 0.8);
-        border-color: rgba(18, 20, 55, 0.8);
+        background-color: var(--ar-button-tertiary-bg-active, rgba(18, 20, 55, 0.8));
+        border-color: var(--ar-button-tertiary-bg-active, rgba(18, 20, 55, 0.8));
         -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
         box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
         color: var(--ar-color-neutral-0, #fff);
     }
 
+    .btn-tertiary:focus,
+    a.btn-tertiary:not([aria-disabled='true']):focus,
     .btn-tertiary.light:focus,
     a.btn-tertiary:not([aria-disabled='true']).light:focus {
-        background-color: rgba(26, 26, 26, 0.05);
-        border-color: rgba(18, 20, 55, 0.05);
+        background-color: var(--ar-button-tertiary-bg-focus, rgba(26, 26, 26, 0.05));
+        border-color: var(--ar-button-tertiary-bg-focus, rgba(18, 20, 55, 0.05));
         color: var(--ar-color-text, #2e2e31);
     }
 
@@ -505,13 +525,13 @@ export default css`
 
     .btn-table:active,
     .btn-table:hover {
-        background-color: var(--ar-color-neutral-100, #e6e7ec);
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-100, #e6e7ec));
     }
 
     .btn-table:focus,
     .btn-table:focus:not(:focus-visible) {
         outline-offset: 0;
-        background-color: var(--ar-color-neutral-100, #e6e7ec);
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-100, #e6e7ec));
     }
 
     .high-contrast .btn-table {
@@ -709,8 +729,8 @@ export default css`
         margin-left: 0.25rem;
         min-width: 1.25rem;
         min-height: 1.25rem;
-        background-color: var(--ar-color-info-500, #2c74ff);
-        border-color: var(--ar-color-info-500, #2c74ff);
+        background-color: var(--ar-button-help-bg, var(--ar-color-blue-50, #0071ec));
+        border-color: var(--ar-button-help-bg, var(--ar-color-blue-50, #0071ec));
         color: var(--ar-color-neutral-0, #fff);
     }
 
