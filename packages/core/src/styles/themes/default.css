@@ -12,7 +12,7 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * 1. PALETTE BRUTE
          * Couleurs de base — ne pas utiliser directement dans les composants.
-         * Passer par les tokens sémantiques (section 2).
+         * Passer par les tokens sémantiques (sections 2 et 3).
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* Primary (bleu France Travail) */
@@ -42,24 +42,119 @@
         /* Texte */
         --ar-color-text-base: #2e2e31;
 
-        /* États — success */
-        --ar-color-success-50: #d9f6e8;
-        --ar-color-success-500: #09aa5f;
+        /* Green — utilisé pour success */
+        --ar-color-green-05: #031608;
+        --ar-color-green-10: #052310;
+        --ar-color-green-20: #0a3a1d;
+        --ar-color-green-30: #0a5027;
+        --ar-color-green-40: #036730;
+        --ar-color-green-50: #00883c;
+        --ar-color-green-60: #00ac49;
+        --ar-color-green-70: #5dc36f;
+        --ar-color-green-80: #93da98;
+        --ar-color-green-90: #c2f2c1;
+        --ar-color-green-95: #e3f9e3;
 
-        /* États — warning */
-        --ar-color-warning-50: #fffaeb;
-        --ar-color-warning-500: #f79009;
+        /* Yellow — utilisé pour warning */
+        --ar-color-yellow-05: #220c00;
+        --ar-color-yellow-10: #331600;
+        --ar-color-yellow-20: #532600;
+        --ar-color-yellow-30: #6f3601;
+        --ar-color-yellow-40: #8c4602;
+        --ar-color-yellow-50: #b45f04;
+        --ar-color-yellow-60: #da7e00;
+        --ar-color-yellow-70: #ef9d00;
+        --ar-color-yellow-80: #fac22b;
+        --ar-color-yellow-90: #ffe495;
+        --ar-color-yellow-95: #fef3cd;
 
-        /* États — danger */
-        --ar-color-danger-50: #ffeceb;
-        --ar-color-danger-500: #f04438;
+        /* Red — utilisé pour danger */
+        --ar-color-red-05: #2a040b;
+        --ar-color-red-10: #3e0913;
+        --ar-color-red-20: #631323;
+        --ar-color-red-30: #8a132c;
+        --ar-color-red-40: #b30532;
+        --ar-color-red-50: #dc3146;
+        --ar-color-red-60: #f3676c;
+        --ar-color-red-70: #fd8f90;
+        --ar-color-red-80: #ffb8b6;
+        --ar-color-red-90: #ffdedc;
+        --ar-color-red-95: #fff0ef;
 
-        /* États — info */
-        --ar-color-info-50: #dfe9ff;
-        --ar-color-info-500: #2c74ff;
+        /* Blue — utilisé pour info */
+        --ar-color-blue-05: #000f35;
+        --ar-color-blue-10: #001a4e;
+        --ar-color-blue-20: #002d77;
+        --ar-color-blue-30: #003f9c;
+        --ar-color-blue-40: #0053c0;
+        --ar-color-blue-50: #0071ec;
+        --ar-color-blue-60: #3e96ff;
+        --ar-color-blue-70: #6eb3ff;
+        --ar-color-blue-80: #9fceff;
+        --ar-color-blue-90: #d1e8ff;
+        --ar-color-blue-95: #e8f3ff;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 2. TOKENS SÉMANTIQUES
+         * 2. VARIANTS SÉMANTIQUES D'ÉTAT
+         * Alias vers la palette brute — permet de remapper
+         * success/danger/warning/info sur une autre hue sans
+         * toucher aux composants.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Success → green */
+        --ar-color-success-05: var(--ar-color-green-05);
+        --ar-color-success-10: var(--ar-color-green-10);
+        --ar-color-success-20: var(--ar-color-green-20);
+        --ar-color-success-30: var(--ar-color-green-30);
+        --ar-color-success-40: var(--ar-color-green-40);
+        --ar-color-success-50: var(--ar-color-green-50);
+        --ar-color-success-60: var(--ar-color-green-60);
+        --ar-color-success-70: var(--ar-color-green-70);
+        --ar-color-success-80: var(--ar-color-green-80);
+        --ar-color-success-90: var(--ar-color-green-90);
+        --ar-color-success-95: var(--ar-color-green-95);
+
+        /* Warning → yellow */
+        --ar-color-warning-05: var(--ar-color-yellow-05);
+        --ar-color-warning-10: var(--ar-color-yellow-10);
+        --ar-color-warning-20: var(--ar-color-yellow-20);
+        --ar-color-warning-30: var(--ar-color-yellow-30);
+        --ar-color-warning-40: var(--ar-color-yellow-40);
+        --ar-color-warning-50: var(--ar-color-yellow-50);
+        --ar-color-warning-60: var(--ar-color-yellow-60);
+        --ar-color-warning-70: var(--ar-color-yellow-70);
+        --ar-color-warning-80: var(--ar-color-yellow-80);
+        --ar-color-warning-90: var(--ar-color-yellow-90);
+        --ar-color-warning-95: var(--ar-color-yellow-95);
+
+        /* Danger → red */
+        --ar-color-danger-05: var(--ar-color-red-05);
+        --ar-color-danger-10: var(--ar-color-red-10);
+        --ar-color-danger-20: var(--ar-color-red-20);
+        --ar-color-danger-30: var(--ar-color-red-30);
+        --ar-color-danger-40: var(--ar-color-red-40);
+        --ar-color-danger-50: var(--ar-color-red-50);
+        --ar-color-danger-60: var(--ar-color-red-60);
+        --ar-color-danger-70: var(--ar-color-red-70);
+        --ar-color-danger-80: var(--ar-color-red-80);
+        --ar-color-danger-90: var(--ar-color-red-90);
+        --ar-color-danger-95: var(--ar-color-red-95);
+
+        /* Info → blue */
+        --ar-color-info-05: var(--ar-color-blue-05);
+        --ar-color-info-10: var(--ar-color-blue-10);
+        --ar-color-info-20: var(--ar-color-blue-20);
+        --ar-color-info-30: var(--ar-color-blue-30);
+        --ar-color-info-40: var(--ar-color-blue-40);
+        --ar-color-info-50: var(--ar-color-blue-50);
+        --ar-color-info-60: var(--ar-color-blue-60);
+        --ar-color-info-70: var(--ar-color-blue-70);
+        --ar-color-info-80: var(--ar-color-blue-80);
+        --ar-color-info-90: var(--ar-color-blue-90);
+        --ar-color-info-95: var(--ar-color-blue-95);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 3. TOKENS SÉMANTIQUES
          * Relient palette → intention. Ce sont ces tokens que
          * les composants et les thèmes surchargent.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -86,8 +181,18 @@
         --ar-focus-ring-color: var(--ar-color-interactive);
         --ar-focus-ring-offset: 2px;
 
+        /* États — tokens d'usage (light mode) */
+        --ar-color-success-bg: var(--ar-color-success-95);
+        --ar-color-success-text: var(--ar-color-success-50);
+        --ar-color-warning-bg: var(--ar-color-warning-95);
+        --ar-color-warning-text: var(--ar-color-warning-50);
+        --ar-color-danger-bg: var(--ar-color-danger-95);
+        --ar-color-danger-text: var(--ar-color-danger-50);
+        --ar-color-info-bg: var(--ar-color-info-95);
+        --ar-color-info-text: var(--ar-color-info-50);
+
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 3. TOKENS GLOBAUX — TYPOGRAPHIE
+         * 4. TOKENS GLOBAUX — TYPOGRAPHIE
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         --ar-font-size-sm: 0.875rem;
@@ -99,7 +204,7 @@
         --ar-font-weight-bold: 700;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 4. TOKENS GLOBAUX — ESPACEMENT & FORME
+         * 5. TOKENS GLOBAUX — ESPACEMENT & FORME
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         --ar-spacing-xs: 0.25rem;
@@ -114,7 +219,7 @@
         --ar-border-radius-full: 9999px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 5. TOKENS COMPOSANTS
+         * 6. TOKENS COMPOSANTS
          * Enrichis au fur et à mesure de la migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
@@ -123,8 +228,18 @@
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
         --ar-button-color: var(--ar-color-text-inverse);
         --ar-button-border-color: var(--ar-color-interactive);
-        --ar-button-danger-bg: var(--ar-color-danger-500);
+        --ar-button-danger-bg: var(--ar-color-danger-50);
         --ar-button-danger-color: var(--ar-color-text-inverse);
+        --ar-button-secondary-bg: var(--ar-color-neutral-0);
+        --ar-button-secondary-bg-hover: var(--ar-color-neutral-600);
+        --ar-button-disabled-bg: var(--ar-color-neutral-100);
+        --ar-button-disabled-border: var(--ar-color-neutral-200);
+        --ar-button-table-bg-hover: var(--ar-color-neutral-100);
+        --ar-button-help-bg: var(--ar-color-info-50);
+        --ar-button-tertiary-bg: rgba(26, 26, 26, 0.05);
+        --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
+        --ar-button-tertiary-bg-active: rgba(18, 20, 55, 0.8);
+        --ar-button-tertiary-bg-focus: rgba(26, 26, 26, 0.05);
         --ar-button-border-radius: var(--ar-border-radius-md);
         --ar-button-font-weight: var(--ar-font-weight-medium);
         --ar-button-height: 2.5rem;
@@ -138,6 +253,13 @@
         --ar-button-ratio-square-width: 2.5rem;
         --ar-button-ratio-square-sm-width: 2rem;
         --ar-button-ratio-square-lg-width: 3rem;
+
+        /* breadcrumb */
+        --ar-breadcrumb-separator-color: var(--ar-color-neutral-200);
+        --ar-breadcrumb-bullet-color: var(--ar-color-neutral-200);
+
+        /* stepper */
+        --ar-stepper-bullet-bg: var(--ar-color-primary-100);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -155,22 +277,79 @@
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     :root[data-theme='dark'] {
+        /* Surface */
         --ar-color-text: var(--ar-color-neutral-50);
         --ar-color-text-muted: var(--ar-color-neutral-200);
+        --ar-color-text-inverse: var(--ar-color-neutral-900);
         --ar-color-bg: var(--ar-color-neutral-900);
         --ar-color-bg-subtle: var(--ar-color-neutral-700);
         --ar-color-border: var(--ar-color-neutral-600);
-        --ar-color-text-inverse: var(--ar-color-text-base);
+
+        /* Interaction — teinte claire pour contraste sur fond sombre */
+        --ar-color-interactive: var(--ar-color-primary-200);
+        --ar-color-interactive-hover: var(--ar-color-primary-100);
+        --ar-color-interactive-active: var(--ar-color-primary-50);
+        --ar-color-interactive-subtle: var(--ar-color-primary-700);
+
+        /* États — bg sombre, texte clair */
+        --ar-color-success-bg: var(--ar-color-success-10);
+        --ar-color-success-text: var(--ar-color-success-70);
+        --ar-color-warning-bg: var(--ar-color-warning-10);
+        --ar-color-warning-text: var(--ar-color-warning-70);
+        --ar-color-danger-bg: var(--ar-color-danger-10);
+        --ar-color-danger-text: var(--ar-color-danger-70);
+        --ar-color-info-bg: var(--ar-color-info-10);
+        --ar-color-info-text: var(--ar-color-info-70);
+
+        /* Button — surfaces adaptées au fond sombre */
+        --ar-button-secondary-bg: var(--ar-color-neutral-700);
+        --ar-button-secondary-bg-hover: var(--ar-color-neutral-600);
+        --ar-button-disabled-bg: var(--ar-color-neutral-700);
+        --ar-button-disabled-border: var(--ar-color-neutral-600);
+        --ar-button-table-bg-hover: var(--ar-color-neutral-700);
+        --ar-button-help-bg: var(--ar-color-info-40);
+        --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
+        --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
+        --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
+        --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
     }
 
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
+            /* Surface */
             --ar-color-text: var(--ar-color-neutral-50);
             --ar-color-text-muted: var(--ar-color-neutral-200);
+            --ar-color-text-inverse: var(--ar-color-neutral-900);
             --ar-color-bg: var(--ar-color-neutral-900);
             --ar-color-bg-subtle: var(--ar-color-neutral-700);
             --ar-color-border: var(--ar-color-neutral-600);
-            --ar-color-text-inverse: var(--ar-color-text-base);
+
+            /* Interaction — teinte claire pour contraste sur fond sombre */
+            --ar-color-interactive: var(--ar-color-primary-200);
+            --ar-color-interactive-hover: var(--ar-color-primary-100);
+            --ar-color-interactive-active: var(--ar-color-primary-50);
+            --ar-color-interactive-subtle: var(--ar-color-primary-700);
+
+            /* États — bg sombre, texte clair */
+            --ar-color-success-bg: var(--ar-color-success-10);
+            --ar-color-success-text: var(--ar-color-success-70);
+            --ar-color-warning-bg: var(--ar-color-warning-10);
+            --ar-color-warning-text: var(--ar-color-warning-70);
+            --ar-color-danger-bg: var(--ar-color-danger-10);
+            --ar-color-danger-text: var(--ar-color-danger-70);
+            --ar-color-info-bg: var(--ar-color-info-10);
+            --ar-color-info-text: var(--ar-color-info-70);
+
+            /* Button — surfaces adaptées au fond sombre */
+            --ar-button-secondary-bg: var(--ar-color-neutral-700);
+            --ar-button-secondary-bg-hover: var(--ar-color-neutral-600);
+            --ar-button-disabled-bg: var(--ar-color-neutral-700);
+            --ar-button-disabled-border: var(--ar-color-neutral-600);
+            --ar-button-table-bg-hover: var(--ar-color-neutral-700);
+            --ar-button-help-bg: var(--ar-color-info-40);
+            --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
+            --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
+            --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
         }
     }
 }
