@@ -45,12 +45,3 @@ jobs:
 
       - name: Test
         run: npm run test
-
-      # Upload la couverture de code pour le reporting
-      - name: Upload coverage
-        uses: actions/upload-artifact@v5
-        if: always()
-        with:
-          name: coverage-report
-          path: packages/core/coverage/
-          retention-days: 7

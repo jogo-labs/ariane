@@ -1,6 +1,6 @@
 {
   "name": "@ariane-ui/core",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "type": "module",
   "description": "Accessible web components library",
   "exports": {
@@ -44,6 +44,10 @@
     "esbuild": "^0.24.2",
     "happy-dom": "^15.11.7",
     "vitest": "^3.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jogo-labs/ariane"
   },
   "customElements": "dist/custom-elements.json",
   "config": {

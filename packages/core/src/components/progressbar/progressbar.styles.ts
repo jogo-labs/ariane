@@ -16,7 +16,7 @@ export default css`
         -webkit-box-direction: normal;
         -ms-flex-direction: column;
         flex-direction: column;
-        row-gap: .75rem
+        row-gap: 0.75rem;
     }
 
     .progress {
@@ -24,14 +24,14 @@ export default css`
         display: -ms-inline-flexbox;
         display: inline-flex;
         position: relative;
-        height: .5rem;
-        background-color: var(--ft--progressbar-container-bg-color,#e6e7ec);
-        border-radius: 50rem
+        height: 0.5rem;
+        background-color: var(--ar-progressbar-track-color, #e6e7ec);
+        border-radius: 50rem;
     }
 
     .progress-bar {
-        background-color: var(--ft--progressbar-bg-color,#406bde);
-        border-radius: 50rem
+        background-color: var(--ar-progressbar-fill-color, #283276);
+        border-radius: 50rem;
     }
 
     .progress-label {
@@ -46,7 +46,7 @@ export default css`
         -webkit-column-gap: 2rem;
         -moz-column-gap: 2rem;
         column-gap: 2rem;
-        margin: 0
+        margin: 0;
     }
 
     .progress-label .content-label {
@@ -56,19 +56,19 @@ export default css`
         line-clamp: 2;
         overflow: hidden;
         text-overflow: ellipsis;
-        word-break: break-all
+        word-break: break-all;
     }
 
     @media (min-width: 576px) {
         .progress-label .content-label {
-            -webkit-line-clamp:none;
-            line-clamp: none
+            -webkit-line-clamp: none;
+            line-clamp: none;
         }
     }
 
     .progress-label .progress-percent {
-        color: #5b5d65;
+        color: var(--ar-progressbar-percent-color, #5b5d65);
         -ms-flex-negative: 0;
-        flex-shrink: 0
+        flex-shrink: 0;
     }
 `;
