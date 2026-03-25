@@ -289,6 +289,9 @@ Pour partager du CSS entre composants, utiliser `@import` au début d'un bloc `<
 **`<script is:inline src="...">` plutôt que `defer`**
 `defer` charge le script après le DOM, ce qui posait un problème pour `hljs.highlightAll()`. Utiliser `is:inline` explicitement pour un chargement synchrone — highlight.js est assez petit pour ça.
 
+**Scripts `is:inline src="..."` dans `<head>` — envelopper dans `DOMContentLoaded`**
+Un script `is:inline src="..."` dans `<head>` s'exécute avant le parsing du `<body>`. Tout `document.querySelectorAll(...)` retourne zéro éléments. Envelopper le code dans `document.addEventListener('DOMContentLoaded', function() { ... })`. C'était la cause du dysfonctionnement complet du playground interactif (contrôles sans effet).
+
 **Preview de composants indépendante du thème global**
 Les éléments `.preview` ont leur propre attribut `data-theme="light|dark"` et redéfinissent les tokens `--ar-color-*` pour un contexte CSS isolé. Un bouton toggle local permet de basculer indépendamment du thème global.
 
