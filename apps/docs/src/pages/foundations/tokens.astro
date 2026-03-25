@@ -22,13 +22,22 @@ const categories = parseTokens(css);
 const allStops = [...new Set(hues.flatMap((h) => h.stops.map((s) => s.stop)))]
     .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
+function toSlug(label: string): string {
+    return label
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // retire les diacritiques (É→E, é→e…)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
 // Sections pour le TOC (palette brute + catégories sémantiques)
 const tocEntries = [
     { id: 'palette-brute', label: 'Palette brute', level: 1 as const },
     ...categories
         .filter((cat) => cat.label !== 'Palette brute')
         .map((cat) => ({
-            id: cat.label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+            id: toSlug(cat.label),
             label: cat.label,
             level: 1 as const,
         })),
@@ -62,10 +71,7 @@ const tocEntries = [
         {categories
             .filter((cat) => cat.label !== 'Palette brute')
             .map((category) => {
-                const id = category.label
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/(^-|-$)/g, '');
+                const id = toSlug(category.label);
                 return (
                     <section id={id}>
                         <h3 class="section-title">{category.label}</h3>
