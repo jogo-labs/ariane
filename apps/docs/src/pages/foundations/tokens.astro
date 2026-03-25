@@ -88,14 +88,15 @@ const tocEntries = [
                                         <tr>
                                             <td><code>{token.name}</code></td>
                                             <td>
-                                                {token.resolvedColor && (
+                                                {token.resolvedColor ? (
                                                     <span
                                                         class="swatch"
-                                                        style={`background: ${token.resolvedColor}`}
-                                                        title={token.resolvedColor}
+                                                        style={`background: var(${token.name})`}
+                                                        aria-hidden="true"
                                                     />
+                                                ) : (
+                                                    <code class="value">{token.value}</code>
                                                 )}
-                                                <code class="value">{token.value}</code>
                                             </td>
                                         </tr>
                                     ))}

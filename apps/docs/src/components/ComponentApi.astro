@@ -132,14 +132,15 @@ function swatchColor(value: string | undefined): string | undefined {
                                 <tr>
                                     <td><code>{prop.name}</code></td>
                                     <td>
-                                        {color && (
+                                        {color ? (
                                             <span
                                                 class="swatch"
-                                                style={`background: ${color}`}
-                                                title={prop.default}
+                                                style={`background: var(${prop.name})`}
+                                                aria-hidden="true"
                                             />
+                                        ) : (
+                                            <code>{prop.default ?? '—'}</code>
                                         )}
-                                        <code>{prop.default ?? '—'}</code>
                                     </td>
                                     <td>{prop.description ?? ''}</td>
                                 </tr>
