@@ -41,18 +41,18 @@ const VERSION_TO_CLASS: Record<ArAlertVersion, string> = {
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
  *
- * @cssprop [--ar-alert-info-bg=var(--ar-color-info-50)]         - Fond de l'alerte "info".
- * @cssprop [--ar-alert-info-border=var(--ar-color-info-50)]     - Bordure de l'alerte "info".
- * @cssprop [--ar-alert-info-icon=var(--ar-color-info-500)]      - Couleur de l'icône "info".
- * @cssprop [--ar-alert-warning-bg=var(--ar-color-warning-50)]   - Fond de l'alerte "warning".
- * @cssprop [--ar-alert-warning-border=var(--ar-color-warning-50)] - Bordure de l'alerte "warning".
- * @cssprop [--ar-alert-warning-icon=var(--ar-color-warning-500)] - Couleur de l'icône "warning".
- * @cssprop [--ar-alert-error-bg=var(--ar-color-danger-50)]      - Fond de l'alerte "error".
- * @cssprop [--ar-alert-error-border=var(--ar-color-danger-50)]  - Bordure de l'alerte "error".
- * @cssprop [--ar-alert-error-icon=var(--ar-color-danger-500)]   - Couleur de l'icône "error".
- * @cssprop [--ar-alert-success-bg=var(--ar-color-success-50)]   - Fond de l'alerte "success".
- * @cssprop [--ar-alert-success-border=var(--ar-color-success-50)] - Bordure de l'alerte "success".
- * @cssprop [--ar-alert-success-icon=var(--ar-color-success-500)] - Couleur de l'icône "success".
+ * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
+ * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
+ * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".
+ * @cssprop [--ar-alert-warning-bg=var(--ar-color-warning-bg)]     - Fond de l'alerte "warning".
+ * @cssprop [--ar-alert-warning-border=var(--ar-color-warning-bg)] - Bordure de l'alerte "warning".
+ * @cssprop [--ar-alert-warning-icon=var(--ar-color-warning-text)] - Couleur de l'icône "warning".
+ * @cssprop [--ar-alert-error-bg=var(--ar-color-danger-bg)]        - Fond de l'alerte "error".
+ * @cssprop [--ar-alert-error-border=var(--ar-color-danger-bg)]    - Bordure de l'alerte "error".
+ * @cssprop [--ar-alert-error-icon=var(--ar-color-danger-text)]    - Couleur de l'icône "error".
+ * @cssprop [--ar-alert-success-bg=var(--ar-color-success-bg)]     - Fond de l'alerte "success".
+ * @cssprop [--ar-alert-success-border=var(--ar-color-success-bg)] - Bordure de l'alerte "success".
+ * @cssprop [--ar-alert-success-icon=var(--ar-color-success-text)] - Couleur de l'icône "success".
 
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).

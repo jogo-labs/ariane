@@ -15,17 +15,17 @@ import styles from './button.styles.js';
  * @csspart prefix   - Le conteneur du slot prefix.
  * @csspart suffix   - Le conteneur du slot suffix.
  *
- * @cssprop [--ar-button-bg=#283276]           - Fond du bouton (variants filled).
- * @cssprop [--ar-button-color=#fff]           - Couleur du texte (variants filled/outlined/ghost).
- * @cssprop [--ar-button-border-color=#283276] - Bordure (variant outlined).
- * @cssprop [--ar-button-danger-bg=#f04438]    - Fond du bouton danger.
- * @cssprop [--ar-button-danger-color=#fff]    - Texte du bouton danger.
- * @cssprop --ar-button-font-size              - Taille de police.
- * @cssprop --ar-button-font-weight            - Graisse de police.
- * @cssprop --ar-button-border-radius          - Arrondi des coins.
- * @cssprop --ar-button-padding-x              - Padding horizontal.
- * @cssprop --ar-button-padding-y              - Padding vertical.
- * @cssprop [--ar-focus-ring-color=#283276]    - Couleur du focus ring (accessibilité).
+ * @cssprop [--ar-button-bg=var(--ar-color-interactive)]           - Fond du bouton (variants filled).
+ * @cssprop [--ar-button-color=var(--ar-color-text-inverse)]       - Couleur du texte (variants filled/outlined/ghost).
+ * @cssprop [--ar-button-border-color=var(--ar-color-interactive)] - Bordure (variant outlined).
+ * @cssprop [--ar-button-danger-bg=var(--ar-color-danger-50)]      - Fond du bouton danger.
+ * @cssprop [--ar-button-danger-color=var(--ar-color-text-inverse)] - Texte du bouton danger.
+ * @cssprop --ar-button-font-size                                   - Taille de police.
+ * @cssprop --ar-button-font-weight                                 - Graisse de police.
+ * @cssprop --ar-button-border-radius                               - Arrondi des coins.
+ * @cssprop --ar-button-padding-x                                   - Padding horizontal.
+ * @cssprop --ar-button-padding-y                                   - Padding vertical.
+ * @cssprop [--ar-focus-ring-color=var(--ar-color-interactive)]    - Couleur du focus ring (accessibilité).
  *
  * @event {CustomEvent} ar-click - Émis au clic. Pas émis si `disabled`.
  * @event {CustomEvent} ar-focus - Émis quand le bouton reçoit le focus.

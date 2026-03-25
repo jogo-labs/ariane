@@ -290,6 +290,20 @@
          * Enrichis au fur et à mesure de la migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
+        /* alert */
+        --ar-alert-info-bg: var(--ar-color-info-bg);
+        --ar-alert-info-border: var(--ar-color-info-bg);
+        --ar-alert-info-icon: var(--ar-color-info-text);
+        --ar-alert-warning-bg: var(--ar-color-warning-bg);
+        --ar-alert-warning-border: var(--ar-color-warning-bg);
+        --ar-alert-warning-icon: var(--ar-color-warning-text);
+        --ar-alert-error-bg: var(--ar-color-danger-bg);
+        --ar-alert-error-border: var(--ar-color-danger-bg);
+        --ar-alert-error-icon: var(--ar-color-danger-text);
+        --ar-alert-success-bg: var(--ar-color-success-bg);
+        --ar-alert-success-border: var(--ar-color-success-bg);
+        --ar-alert-success-icon: var(--ar-color-success-text);
+
         /* button */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
@@ -327,11 +341,17 @@
 
         /* stepper */
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
+        --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
+        --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
+        --ar-stepper-bullet-hover-color: var(--ar-color-text-muted);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
         --ar-progressbar-fill-color: var(--ar-color-interactive);
         --ar-progressbar-percent-color: var(--ar-color-text-muted);
+
+        /* pagination */
+        --ar-pagination-active-color: var(--ar-color-interactive);
 
         /* table */
         --ar-table-padding-x: 1rem;
