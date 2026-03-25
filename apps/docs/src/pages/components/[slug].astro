@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Playground from '../../components/Playground.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
@@ -30,7 +30,7 @@ const { component, mdx } = Astro.props as {
     mdx: MdxEntry | null;
 };
 
-const { Content } = mdx ? await mdx.render() : { Content: null };
+const { Content } = mdx ? await render(mdx) : { Content: null };
 
 const variants    = mdx?.data.variants ?? [];
 const pageTitle   = mdx?.data.title ?? component.name;
