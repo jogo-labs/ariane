@@ -13,28 +13,6 @@ if (window.hljs) {
     window.hljs.highlightAll();
 }
 
-// ── Toggle thème local des previews ─────────────────────────────────────────
-
-document.querySelectorAll('[data-preview-toggle]').forEach(function (btn) {
-    var wrap = btn.closest('.preview-wrap');
-    if (!wrap) return;
-    var preview = wrap.querySelector('.preview');
-    var sunIcon = btn.querySelector('.icon-sun');
-    var moonIcon = btn.querySelector('.icon-moon');
-
-    function syncIcons(isDark) {
-        if (sunIcon) sunIcon.style.display = isDark ? 'block' : 'none';
-        if (moonIcon) moonIcon.style.display = isDark ? 'none' : 'block';
-    }
-    syncIcons((preview && preview.getAttribute('data-theme')) === 'dark'); // état initial depuis le DOM
-
-    btn.addEventListener('click', function () {
-        var next = (preview.getAttribute('data-theme') || 'light') === 'dark' ? 'light' : 'dark';
-        preview.setAttribute('data-theme', next);
-        syncIcons(next === 'dark');
-    });
-});
-
 // ── Boutons Copier (blocs variantes) ────────────────────────────────────────
 
 document.querySelectorAll('[data-copy]').forEach(function (btn) {
