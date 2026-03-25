@@ -46,10 +46,11 @@ code {
 
 .swatch {
     display: inline-block;
-    width: 0.9rem;
-    height: 0.9rem;
-    border-radius: 0.2rem;
-    border: 1px solid var(--doc-border, #e5e7eb);
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 4px;
+    outline: var(--doc-swatch-outline, 1px solid #e5e7eb);
+    outline-offset: 1px;
     vertical-align: middle;
-    margin-right: 0.3rem;
+    margin-right: 0.5rem;
 }
