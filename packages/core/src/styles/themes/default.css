@@ -373,9 +373,9 @@
         --ar-color-border: var(--ar-color-neutral-40);
 
         /* Interaction — teinte claire pour contraste sur fond sombre */
-        --ar-color-interactive: var(--ar-color-primary-70);
-        --ar-color-interactive-hover: var(--ar-color-primary-80);
-        --ar-color-interactive-active: var(--ar-color-primary-90);
+        --ar-color-interactive: var(--ar-color-primary-50);
+        --ar-color-interactive-hover: var(--ar-color-primary-40);
+        --ar-color-interactive-active: var(--ar-color-primary-30);
         --ar-color-interactive-subtle: var(--ar-color-primary-20);
 
         /* États — bg sombre, texte clair */
@@ -412,9 +412,9 @@
             --ar-color-border: var(--ar-color-neutral-40);
 
             /* Interaction — teinte claire pour contraste sur fond sombre */
-            --ar-color-interactive: var(--ar-color-primary-70);
-            --ar-color-interactive-hover: var(--ar-color-primary-80);
-            --ar-color-interactive-active: var(--ar-color-primary-90);
+            --ar-color-interactive: var(--ar-color-primary-50);
+            --ar-color-interactive-hover: var(--ar-color-primary-40);
+            --ar-color-interactive-active: var(--ar-color-primary-30);
             --ar-color-interactive-subtle: var(--ar-color-primary-20);
 
             /* États — bg sombre, texte clair */
