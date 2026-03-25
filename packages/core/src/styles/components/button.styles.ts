@@ -61,11 +61,11 @@ export default css`
         font-style: italic;
         background-color: var(
             --ar-button-disabled-bg,
-            var(--ar-color-neutral-10, #e6e7ec)
+            var(--ar-color-neutral-90, #e6e7ec)
         ) !important;
         border-color: var(
             --ar-button-disabled-border,
-            var(--ar-color-neutral-20, #cdcfd8)
+            var(--ar-color-neutral-80, #cdcfd8)
         ) !important;
         color: #71747f !important;
         -webkit-box-shadow: none;
@@ -96,18 +96,18 @@ export default css`
         border-color: transparent;
         -webkit-box-shadow:
             0 0 0 0.125rem var(--ar-color-text-base, #2e2e31) inset,
-            0 0 0 0.25rem var(--ar-color-neutral-0, #fff) inset;
+            0 0 0 0.25rem var(--ar-color-white, #fff) inset;
         box-shadow:
             inset 0 0 0 0.125rem var(--ar-color-text-base, #2e2e31),
-            inset 0 0 0 0.25rem var(--ar-color-neutral-0, #fff);
+            inset 0 0 0 0.25rem var(--ar-color-white, #fff);
     }
 
     .btn.text-white:focus {
         -webkit-box-shadow:
-            0 0 0 0.0625rem var(--ar-color-neutral-0, #fff) inset,
+            0 0 0 0.0625rem var(--ar-color-white, #fff) inset,
             0 0 0 0.25rem transparent inset;
         box-shadow:
-            inset 0 0 0 0.0625rem var(--ar-color-neutral-0, #fff),
+            inset 0 0 0 0.0625rem var(--ar-color-white, #fff),
             inset 0 0 0 0.25rem transparent;
     }
 
@@ -127,12 +127,12 @@ export default css`
     .btn-sort .prefix,
     .btn-sort:focus .prefix,
     .btn-sort:focus:hover .prefix {
-        color: var(--ar-color-neutral-60, #5b5d65);
+        color: var(--ar-color-neutral-40, #5b5d65);
     }
 
     .btn-sort:active .prefix,
     .btn-sort:hover .prefix {
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-link {
@@ -210,20 +210,20 @@ export default css`
 
     .show > .btn.dropdown-toggle {
         background-color: var(--ar-color-text, #2e2e31);
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-primary,
     a.btn-primary {
-        --ar-spinner-stroke: var(--ar-color-neutral-0, #fff);
+        --ar-spinner-stroke: var(--ar-color-white, #fff);
         background-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .high-contrast .btn-group .btn-primary,
     .high-contrast .btn-group a.btn-primary {
-        border: 1px solid var(--ar-color-neutral-0, #fff);
+        border: 1px solid var(--ar-color-white, #fff);
     }
 
     .btn-primary:focus,
@@ -232,7 +232,7 @@ export default css`
     a.btn-primary:hover {
         background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
         border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-primary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
@@ -241,14 +241,14 @@ export default css`
     a.btn-primary:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
         background-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-secondary,
     a.btn-secondary {
-        background-color: var(--ar-button-secondary-bg, var(--ar-color-neutral-0, #fff));
+        background-color: var(--ar-button-secondary-bg, var(--ar-color-white, #fff));
         color: var(--ar-color-text, #2e2e31);
-        border-color: var(--ar-color-neutral-60, #5b5d65);
+        border-color: var(--ar-color-neutral-40, #5b5d65);
     }
 
     .high-contrast .btn-secondary,
@@ -260,69 +260,69 @@ export default css`
     .btn-secondary:hover,
     a.btn-secondary:focus,
     a.btn-secondary:hover {
-        background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-60, #5b5d65));
-        color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-40, #5b5d65));
+        color: var(--ar-color-white, #fff);
     }
 
     .high-contrast .btn-secondary:focus,
     .high-contrast .btn-secondary:hover,
     .high-contrast a.btn-secondary:focus,
     .high-contrast a.btn-secondary:hover {
-        background-color: var(--ar-color-neutral-70, #44454b);
+        background-color: var(--ar-color-neutral-30, #44454b);
     }
 
     .btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
     a.btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     a.btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-neutral-70, #44454b);
-        color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-color-neutral-30, #44454b);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-transverse.dark {
         background-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .high-contrast .btn-group .btn-transverse.dark {
-        border: 1px solid var(--ar-color-neutral-0, #fff);
+        border: 1px solid var(--ar-color-white, #fff);
     }
 
     .btn-transverse.dark:hover {
         background-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
         border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-transverse.dark:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-transverse.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
         background-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-transverse.dark:focus {
         background: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-transverse.light {
-        background-color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-color-white, #fff);
         border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
     }
 
     .btn-transverse.light:hover {
-        background-color: var(--ar-color-neutral-50, #f5f5f8);
+        background-color: var(--ar-color-neutral-95, #f5f5f8);
         border-color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
         color: var(--ar-color-interactive-hover, var(--ar-color-primary-30, #1b2256));
     }
 
     .btn-transverse.light:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     .btn-transverse.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-color-white, #fff);
         border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         border-width: 2px;
         -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
@@ -330,7 +330,7 @@ export default css`
     }
 
     .btn-transverse.light:focus {
-        background-color: var(--ar-color-neutral-50, #f5f5f8);
+        background-color: var(--ar-color-neutral-95, #f5f5f8);
         border-color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
         color: var(--ar-color-interactive-active, var(--ar-color-primary-20, #0f1438));
     }
@@ -357,13 +357,13 @@ export default css`
     .btn-tertiary.light:hover,
     a.btn-tertiary:not([aria-disabled='true']).light:hover {
         background-color: var(--ar-button-tertiary-bg-hover, rgba(18, 20, 55, 0.7));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .high-contrast .btn-tertiary.light:hover,
     .high-contrast a.btn-tertiary:not([aria-disabled='true']).light:hover {
-        background-color: var(--ar-color-neutral-70, #44454b);
-        border-color: var(--ar-color-neutral-70, #44454b);
+        background-color: var(--ar-color-neutral-30, #44454b);
+        border-color: var(--ar-color-neutral-30, #44454b);
     }
 
     .btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
@@ -386,7 +386,7 @@ export default css`
         border-color: var(--ar-button-tertiary-bg-active, rgba(18, 20, 55, 0.8));
         -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
         box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-tertiary:focus,
@@ -402,7 +402,7 @@ export default css`
     a.btn-tertiary:not([aria-disabled='true']).dark {
         background-color: hsla(0, 0%, 100%, 0.1);
         border-width: 0;
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-tertiary.dark:hover,
@@ -435,7 +435,7 @@ export default css`
     .high-contrast .btn-tertiary.dark,
     .high-contrast a.btn-tertiary:not([aria-disabled='true']).dark {
         background-color: hsla(0, 0%, 9%, 0.3);
-        border: 1px solid var(--ar-color-neutral-0, #fff) !important;
+        border: 1px solid var(--ar-color-white, #fff) !important;
     }
 
     .high-contrast .btn-tertiary.dark:hover,
@@ -486,15 +486,15 @@ export default css`
     .btn-ghost,
     a.btn-ghost {
         background-color: transparent;
-        color: var(--ar-color-neutral-0, #fff);
-        -webkit-box-shadow: 0 0 0 0.0625rem var(--ar-color-neutral-0, #fff) inset;
-        box-shadow: inset 0 0 0 0.0625rem var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
+        -webkit-box-shadow: 0 0 0 0.0625rem var(--ar-color-white, #fff) inset;
+        box-shadow: inset 0 0 0 0.0625rem var(--ar-color-white, #fff);
     }
 
     .btn-ghost:hover,
     a.btn-ghost:hover {
-        background-color: var(--ar-color-neutral-60, #5b5d65);
-        color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-color-neutral-40, #5b5d65);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-ghost:focus,
@@ -503,8 +503,8 @@ export default css`
     a.btn-ghost:focus,
     a.btn-ghost:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
     a.btn-ghost:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-color-neutral-70, #44454b);
-        color: var(--ar-color-neutral-0, #fff);
+        background-color: var(--ar-color-neutral-30, #44454b);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-table {
@@ -525,13 +525,13 @@ export default css`
 
     .btn-table:active,
     .btn-table:hover {
-        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-10, #e6e7ec));
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-90, #e6e7ec));
     }
 
     .btn-table:focus,
     .btn-table:focus:not(:focus-visible) {
         outline-offset: 0;
-        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-10, #e6e7ec));
+        background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-90, #e6e7ec));
     }
 
     .high-contrast .btn-table {
@@ -557,10 +557,10 @@ export default css`
     .btn-sm:focus {
         -webkit-box-shadow:
             0 0 0 0.125rem var(--ar-color-text-base, #2e2e31) inset,
-            0 0 0 0.1875rem var(--ar-color-neutral-0, #fff) inset;
+            0 0 0 0.1875rem var(--ar-color-white, #fff) inset;
         box-shadow:
             inset 0 0 0 0.125rem var(--ar-color-text-base, #2e2e31),
-            inset 0 0 0 0.1875rem var(--ar-color-neutral-0, #fff);
+            inset 0 0 0 0.1875rem var(--ar-color-white, #fff);
     }
 
     .btn-group-lg > .btn,
@@ -572,10 +572,10 @@ export default css`
     .show > .btn-primary.dropdown-toggle:focus {
         -webkit-box-shadow:
             0 0 0 0.125rem var(--ar-color-text-base, #2e2e31) inset,
-            0 0 0 0.1875rem var(--ar-color-neutral-0, #fff) inset;
+            0 0 0 0.1875rem var(--ar-color-white, #fff) inset;
         box-shadow:
             inset 0 0 0 0.125rem var(--ar-color-text-base, #2e2e31),
-            inset 0 0 0 0.1875rem var(--ar-color-neutral-0, #fff);
+            inset 0 0 0 0.1875rem var(--ar-color-white, #fff);
     }
 
     .btn-ratio-square {
@@ -731,7 +731,7 @@ export default css`
         min-height: 1.25rem;
         background-color: var(--ar-button-help-bg, var(--ar-color-blue-50, #0071ec));
         border-color: var(--ar-button-help-bg, var(--ar-color-blue-50, #0071ec));
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-help:active,
@@ -742,16 +742,16 @@ export default css`
     a.btn-help:hover {
         background-color: #043392;
         border-color: #043392;
-        color: var(--ar-color-neutral-0, #fff);
+        color: var(--ar-color-white, #fff);
     }
 
     .btn-help:focus,
     a.btn-help:focus {
         -webkit-box-shadow:
             0 0 0 0.125rem var(--ar-color-text-base, #2e2e31) inset,
-            0 0 0 0.1875rem var(--ar-color-neutral-0, #fff) inset;
+            0 0 0 0.1875rem var(--ar-color-white, #fff) inset;
         box-shadow:
             inset 0 0 0 0.125rem var(--ar-color-text-base, #2e2e31),
-            inset 0 0 0 0.1875rem var(--ar-color-neutral-0, #fff);
+            inset 0 0 0 0.1875rem var(--ar-color-white, #fff);
     }
 `;

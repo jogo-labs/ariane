@@ -1,0 +1,139 @@
+---
+import type { PaletteHue } from '../utils/parse-tokens.ts';
+
+interface Props {
+    hues: PaletteHue[];
+    allStops: string[]; // stops unifiés triés numériquement
+}
+
+const { hues, allStops } = Astro.props;
+
+// Affichage du plus clair (95) vers le plus foncé (05)
+const displayStops = [...allStops].reverse();
+
+function getStopValue(hue: PaletteHue, stop: string): string | undefined {
+    return hue.stops.find((s) => s.stop === stop)?.value;
+}
+
+// Couleurs claires qui ont besoin d'une bordure pour être visibles sur fond blanc
+function needsBorder(value: string): boolean {
+    if (!value) return false;
+    // hex très clair (luminosité > ~90%)
+    if (/^#[fF]{3,6}/.test(value)) return true;
+    if (/^#[eEfF][eEfF]/.test(value)) return true;
+    return false;
+}
+---
+
+<div class="palette-wrap">
+    <table class="palette-table">
+        <thead>
+            <tr>
+                <th class="hue-label"></th>
+                {displayStops.map((stop) => (
+                    <th class="stop-header">{stop}</th>
+                ))}
+            </tr>
+        </thead>
+        <tbody>
+            {hues.map((hue) => (
+                <tr>
+                    <td class="hue-label">{hue.name}</td>
+                    {displayStops.map((stop) => {
+                        const value = getStopValue(hue, stop);
+                        return (
+                            <td class="stop-cell">
+                                {value ? (
+                                    <div class="swatch-wrap">
+                                        <div
+                                            class={`swatch${needsBorder(value) ? ' swatch-bordered' : ''}`}
+                                            style={`background: ${value}`}
+                                            title={`--ar-color-${hue.name}-${stop}`}
+                                        />
+                                        <span class="stop-value">{value}</span>
+                                    </div>
+                                ) : (
+                                    <div class="swatch-empty" />
+                                )}
+                            </td>
+                        );
+                    })}
+                </tr>
+            ))}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .palette-wrap {
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+
+    .palette-table {
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+
+    .stop-header {
+        font-size: 0.65rem;
+        color: var(--doc-text-muted, #6b7280);
+        font-weight: 400;
+        text-align: center;
+        padding: 0 2px 0.4rem;
+        width: 3.5rem;
+        min-width: 3.5rem;
+    }
+
+    .hue-label {
+        font-size: 0.75rem;
+        font-family: monospace;
+        color: var(--doc-text-muted, #6b7280);
+        padding-right: 0.75rem;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    thead .hue-label {
+        /* cellule vide du coin supérieur gauche */
+        min-width: 4.5rem;
+    }
+
+    .stop-cell {
+        padding: 0 2px 0.5rem;
+        vertical-align: top;
+    }
+
+    .swatch-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .swatch {
+        width: 3.5rem;
+        height: 2rem;
+        border-radius: 4px;
+    }
+
+    .swatch-bordered {
+        border: 1px solid var(--doc-border, #e5e7eb);
+    }
+
+    .swatch-empty {
+        width: 3.5rem;
+        height: 2rem;
+    }
+
+    .stop-value {
+        font-size: 0.6rem;
+        font-family: monospace;
+        color: var(--doc-text-muted, #6b7280);
+        text-align: center;
+        max-width: 3.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>

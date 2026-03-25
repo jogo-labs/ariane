@@ -13,11 +13,11 @@ export default css`
                     linear,
                     left top,
                     left bottom,
-                    color-stop(25%, var(--ar-color-neutral-20, #cdcfd8)),
+                    color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
                     color-stop(25%, transparent)
                 );
                 background-image: linear-gradient(
-                    var(--ar-color-neutral-20, #cdcfd8) 25%,
+                    var(--ar-color-neutral-80, #cdcfd8) 25%,
                     transparent 25%
                 );
                 background-size: 2px 8px;
@@ -110,9 +110,9 @@ export default css`
         -webkit-transform: translateY(1px);
         transform: translateY(1px);
         -webkit-box-shadow: 0 0 0 1px
-            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-20, #b0bff0)) inset;
+            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
         box-shadow: 0 0 0 1px
-            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-20, #b0bff0)) inset;
+            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
         background-color: transparent;
     }
 
@@ -207,10 +207,10 @@ export default css`
             linear,
             left top,
             left bottom,
-            color-stop(25%, var(--ar-color-neutral-20, #cdcfd8)),
+            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
             color-stop(25%, transparent)
         );
-        background-image: linear-gradient(var(--ar-color-neutral-20, #cdcfd8) 25%, transparent 0);
+        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 3px;
         background-repeat: repeat-y;
@@ -261,10 +261,10 @@ export default css`
             linear,
             left top,
             left bottom,
-            color-stop(25%, var(--ar-color-neutral-20, #cdcfd8)),
+            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
             color-stop(25%, transparent)
         );
-        background-image: linear-gradient(var(--ar-color-neutral-20, #cdcfd8) 25%, transparent 0);
+        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;

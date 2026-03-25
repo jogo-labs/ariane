@@ -28,20 +28,21 @@
         --ar-color-primary-90: #eaecfb /* oklch(94.60% 0.020 279.87) */;
         --ar-color-primary-95: #f4f5ff /* oklch(97.50% 0.012 280.00) */;
 
-        /* Neutral — 05=clair → 95=sombre (échelle inversée) */
-        --ar-color-neutral-0: #ffffff /* oklch(100% 0 0) */;
-        --ar-color-neutral-05: #f5f5f8 /* oklch(97.10% 0.004 285.86) */;
-        --ar-color-neutral-10: #e6e7ec /* oklch(92.86% 0.007 277.00) */;
-        --ar-color-neutral-20: #cdcfd8 /* oklch(85.56% 0.013 276.00) */;
-        --ar-color-neutral-30: #b5b8c3 /* oklch(78.34% 0.016 276.04) */;
-        --ar-color-neutral-40: #9ea1ae /* oklch(71.11% 0.018 276.08) */;
+        /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
+        --ar-color-white: #ffffff /* oklch(100% 0 0) */;
+
+        /* Neutral — 05=sombre → 95=clair (même convention que les autres hues) */
+        --ar-color-neutral-05: #0d0d0c /* oklch(15.79% 0.000 259.52) */;
+        --ar-color-neutral-10: #171717 /* oklch(20.46% 0.000 263.28) */;
+        --ar-color-neutral-20: #2c2d30 /* oklch(29.82% 0.005 270.80) */;
+        --ar-color-neutral-30: #44454b /* oklch(39.17% 0.010 278.32) */;
+        --ar-color-neutral-40: #5b5d65 /* oklch(47.94% 0.013 274.65) */;
         --ar-color-neutral-50: #888b99 /* oklch(63.89% 0.021 276.13) */;
-        --ar-color-neutral-60: #5b5d65 /* oklch(47.94% 0.013 274.65) */;
-        --ar-color-neutral-70: #44454b /* oklch(39.17% 0.010 278.32) */;
-        --ar-color-neutral-80: #2c2d30 /* oklch(29.82% 0.005 270.80) */;
-        --ar-color-neutral-90: #171717 /* oklch(20.46% 0.000 263.28) */;
-        --ar-color-neutral-95: #0d0d0c /* oklch(15.79% 0.000 259.52) */;
-        --ar-color-neutral-100: #000000 /* oklch(0% 0 0) */;
+        --ar-color-neutral-60: #9ea1ae /* oklch(71.11% 0.018 276.08) */;
+        --ar-color-neutral-70: #b5b8c3 /* oklch(78.34% 0.016 276.04) */;
+        --ar-color-neutral-80: #cdcfd8 /* oklch(85.56% 0.013 276.00) */;
+        --ar-color-neutral-90: #e6e7ec /* oklch(92.86% 0.007 277.00) */;
+        --ar-color-neutral-95: #f5f5f8 /* oklch(97.10% 0.004 285.86) */;
 
         /* Green — utilisé pour success (Webawesome bright) */
         --ar-color-green-05: #00160d /* oklch(17.74% 0.037 165.47) */;
@@ -233,15 +234,15 @@
 
         /* Texte */
         --ar-color-text: #2e2e31;
-        --ar-color-text-muted: var(--ar-color-neutral-60);
-        --ar-color-text-inverse: var(--ar-color-neutral-0);
+        --ar-color-text-muted: var(--ar-color-neutral-40);
+        --ar-color-text-inverse: var(--ar-color-white);
 
         /* Surface */
-        --ar-color-bg: var(--ar-color-neutral-0);
-        --ar-color-bg-subtle: var(--ar-color-neutral-05);
+        --ar-color-bg: var(--ar-color-white);
+        --ar-color-bg-subtle: var(--ar-color-neutral-95);
 
         /* Bordure */
-        --ar-color-border: var(--ar-color-neutral-10);
+        --ar-color-border: var(--ar-color-neutral-90);
 
         /* Focus */
         --ar-focus-ring-color: var(--ar-color-interactive);
@@ -296,11 +297,11 @@
         --ar-button-border-color: var(--ar-color-interactive);
         --ar-button-danger-bg: var(--ar-color-danger-50);
         --ar-button-danger-color: var(--ar-color-text-inverse);
-        --ar-button-secondary-bg: var(--ar-color-neutral-0);
-        --ar-button-secondary-bg-hover: var(--ar-color-neutral-60);
-        --ar-button-disabled-bg: var(--ar-color-neutral-10);
-        --ar-button-disabled-border: var(--ar-color-neutral-20);
-        --ar-button-table-bg-hover: var(--ar-color-neutral-10);
+        --ar-button-secondary-bg: var(--ar-color-white);
+        --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
+        --ar-button-disabled-bg: var(--ar-color-neutral-90);
+        --ar-button-disabled-border: var(--ar-color-neutral-80);
+        --ar-button-table-bg-hover: var(--ar-color-neutral-90);
         --ar-button-help-bg: var(--ar-color-blue-50);
         --ar-button-tertiary-bg: rgba(26, 26, 26, 0.05);
         --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
@@ -321,8 +322,8 @@
         --ar-button-ratio-square-lg-width: 3rem;
 
         /* breadcrumb */
-        --ar-breadcrumb-separator-color: var(--ar-color-neutral-20);
-        --ar-breadcrumb-bullet-color: var(--ar-color-neutral-20);
+        --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
+        --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
 
         /* stepper */
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
@@ -344,12 +345,12 @@
 
     :root[data-theme='dark'] {
         /* Surface */
-        --ar-color-text: var(--ar-color-neutral-05);
-        --ar-color-text-muted: var(--ar-color-neutral-20);
-        --ar-color-text-inverse: var(--ar-color-neutral-90);
-        --ar-color-bg: var(--ar-color-neutral-90);
-        --ar-color-bg-subtle: var(--ar-color-neutral-70);
-        --ar-color-border: var(--ar-color-neutral-60);
+        --ar-color-text: var(--ar-color-neutral-95);
+        --ar-color-text-muted: var(--ar-color-neutral-80);
+        --ar-color-text-inverse: var(--ar-color-neutral-10);
+        --ar-color-bg: var(--ar-color-neutral-10);
+        --ar-color-bg-subtle: var(--ar-color-neutral-30);
+        --ar-color-border: var(--ar-color-neutral-40);
 
         /* Interaction — teinte claire pour contraste sur fond sombre */
         --ar-color-interactive: var(--ar-color-primary-70);
@@ -368,11 +369,11 @@
         --ar-color-info-text: var(--ar-color-info-70);
 
         /* Button — surfaces adaptées au fond sombre */
-        --ar-button-secondary-bg: var(--ar-color-neutral-70);
-        --ar-button-secondary-bg-hover: var(--ar-color-neutral-60);
-        --ar-button-disabled-bg: var(--ar-color-neutral-70);
-        --ar-button-disabled-border: var(--ar-color-neutral-60);
-        --ar-button-table-bg-hover: var(--ar-color-neutral-70);
+        --ar-button-secondary-bg: var(--ar-color-neutral-30);
+        --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
+        --ar-button-disabled-bg: var(--ar-color-neutral-30);
+        --ar-button-disabled-border: var(--ar-color-neutral-40);
+        --ar-button-table-bg-hover: var(--ar-color-neutral-30);
         --ar-button-help-bg: var(--ar-color-blue-40);
         --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
         --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
@@ -383,12 +384,12 @@
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
             /* Surface */
-            --ar-color-text: var(--ar-color-neutral-05);
-            --ar-color-text-muted: var(--ar-color-neutral-20);
-            --ar-color-text-inverse: var(--ar-color-neutral-90);
-            --ar-color-bg: var(--ar-color-neutral-90);
-            --ar-color-bg-subtle: var(--ar-color-neutral-70);
-            --ar-color-border: var(--ar-color-neutral-60);
+            --ar-color-text: var(--ar-color-neutral-95);
+            --ar-color-text-muted: var(--ar-color-neutral-80);
+            --ar-color-text-inverse: var(--ar-color-neutral-10);
+            --ar-color-bg: var(--ar-color-neutral-10);
+            --ar-color-bg-subtle: var(--ar-color-neutral-30);
+            --ar-color-border: var(--ar-color-neutral-40);
 
             /* Interaction — teinte claire pour contraste sur fond sombre */
             --ar-color-interactive: var(--ar-color-primary-70);
@@ -407,11 +408,11 @@
             --ar-color-info-text: var(--ar-color-info-70);
 
             /* Button — surfaces adaptées au fond sombre */
-            --ar-button-secondary-bg: var(--ar-color-neutral-70);
-            --ar-button-secondary-bg-hover: var(--ar-color-neutral-60);
-            --ar-button-disabled-bg: var(--ar-color-neutral-70);
-            --ar-button-disabled-border: var(--ar-color-neutral-60);
-            --ar-button-table-bg-hover: var(--ar-color-neutral-70);
+            --ar-button-secondary-bg: var(--ar-color-neutral-30);
+            --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
+            --ar-button-disabled-bg: var(--ar-color-neutral-30);
+            --ar-button-disabled-border: var(--ar-color-neutral-40);
+            --ar-button-table-bg-hover: var(--ar-color-neutral-30);
             --ar-button-help-bg: var(--ar-color-blue-40);
             --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
             --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
