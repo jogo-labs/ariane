@@ -9,6 +9,7 @@
 export interface Token {
     name: string;
     value: string; // toujours nettoyé (sans commentaire oklch)
+    resolvedColor?: string; // valeur de couleur résolue (suit les var() jusqu'à une couleur concrète)
 }
 
 export interface TokenCategory {
@@ -86,8 +87,35 @@ export function isColor(value: string): boolean {
     return /^#[0-9a-fA-F]{3,8}$/.test(value) || /^rgba?\(/.test(value) || /^oklch\(/.test(value);
 }
 
+/**
+ * Résout une valeur CSS en suivant les références var(--ar-*) jusqu'à une couleur concrète.
+ * Retourne la valeur concrète si c'est une couleur, undefined sinon.
+ * Limite à 10 niveaux de résolution pour éviter les boucles infinies.
+ */
+function resolveColor(value: string, tokenMap: Map<string, string>, depth = 0): string | undefined {
+    if (depth > 10) return undefined;
+    if (isColor(value)) return value;
+
+    const varMatch = /^var\((--ar[\w-]+)/.exec(value);
+    if (!varMatch) return undefined;
+
+    const ref = tokenMap.get(varMatch[1]);
+    if (!ref) return undefined;
+
+    return resolveColor(ref, tokenMap, depth + 1);
+}
+
 /** Parse tous les tokens et les retourne groupés par catégorie sémantique. */
 export function parseTokens(css: string): TokenCategory[] {
+    // Passe 1 : construire la map complète name → valeur nettoyée (pour résolution var())
+    const tokenMap = new Map<string, string>();
+    const mapRegex = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
+    let m: RegExpExecArray | null;
+    while ((m = mapRegex.exec(css)) !== null) {
+        tokenMap.set(m[1].trim(), cleanValue(m[2]));
+    }
+
+    // Passe 2 : catégoriser et résoudre les couleurs
     const categories = new Map<string, Token[]>();
     const regex = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
     let match: RegExpExecArray | null;
@@ -99,10 +127,11 @@ export function parseTokens(css: string): TokenCategory[] {
         if (ALIAS_FILTER.test(name)) continue;
 
         const value = cleanValue(match[2]);
+        const resolvedColor = resolveColor(value, tokenMap) ?? (isColor(value) ? value : undefined);
         const cat = categorize(name);
 
         if (!categories.has(cat)) categories.set(cat, []);
-        (categories.get(cat) as Token[]).push({ name, value });
+        (categories.get(cat) as Token[]).push({ name, value, resolvedColor });
     }
 
     return DISPLAY_ORDER.filter((label) => categories.has(label)).map((label) => {

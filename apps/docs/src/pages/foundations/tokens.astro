@@ -8,7 +8,7 @@
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import PaletteGrid from '../../components/PaletteGrid.astro';
-import { parseTokens, parsePalette, isColor } from '../../utils/parse-tokens.ts';
+import { parseTokens, parsePalette } from '../../utils/parse-tokens.ts';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -88,11 +88,11 @@ const tocEntries = [
                                         <tr>
                                             <td><code>{token.name}</code></td>
                                             <td>
-                                                {isColor(token.value) && (
+                                                {token.resolvedColor && (
                                                     <span
                                                         class="swatch"
-                                                        style={`background: ${token.value}`}
-                                                        title={token.value}
+                                                        style={`background: ${token.resolvedColor}`}
+                                                        title={token.resolvedColor}
                                                     />
                                                 )}
                                                 <code class="value">{token.value}</code>
