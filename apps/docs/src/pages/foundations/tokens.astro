@@ -88,14 +88,15 @@ const tocEntries = [
                                         <tr>
                                             <td><code>{token.name}</code></td>
                                             <td>
-                                                {token.resolvedColor && (
+                                                {token.resolvedColor ? (
                                                     <span
                                                         class="swatch"
-                                                        style={`background: ${token.resolvedColor}`}
-                                                        title={token.resolvedColor}
+                                                        style={`background: var(${token.name})`}
+                                                        aria-hidden="true"
                                                     />
+                                                ) : (
+                                                    <code class="value">{token.value}</code>
                                                 )}
-                                                <code class="value">{token.value}</code>
                                             </td>
                                         </tr>
                                     ))}
@@ -117,16 +118,6 @@ const tocEntries = [
         font-size: 0.875rem;
         color: var(--doc-text-muted, #6b7280);
         margin: -0.5rem 0 1rem;
-    }
-
-    .swatch {
-        display: inline-block;
-        width: 1.75rem;
-        height: 1.75rem;
-        border-radius: 4px;
-        vertical-align: middle;
-        margin-right: 0.5rem;
-        border: 1px solid transparent;
     }
 
     .value {

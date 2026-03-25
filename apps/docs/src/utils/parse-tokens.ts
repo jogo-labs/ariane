@@ -87,12 +87,27 @@ export function isColor(value: string): boolean {
     return /^#[0-9a-fA-F]{3,8}$/.test(value) || /^rgba?\(/.test(value) || /^oklch\(/.test(value);
 }
 
+/** Construit la map complète name → valeur nettoyée depuis un CSS string. */
+export function buildTokenMap(css: string): Map<string, string> {
+    const tokenMap = new Map<string, string>();
+    const regex = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
+    let m: RegExpExecArray | null;
+    while ((m = regex.exec(css)) !== null) {
+        tokenMap.set(m[1].trim(), cleanValue(m[2]));
+    }
+    return tokenMap;
+}
+
 /**
  * Résout une valeur CSS en suivant les références var(--ar-*) jusqu'à une couleur concrète.
  * Retourne la valeur concrète si c'est une couleur, undefined sinon.
  * Limite à 10 niveaux de résolution pour éviter les boucles infinies.
  */
-function resolveColor(value: string, tokenMap: Map<string, string>, depth = 0): string | undefined {
+export function resolveColor(
+    value: string,
+    tokenMap: Map<string, string>,
+    depth = 0,
+): string | undefined {
     if (depth > 10) return undefined;
     if (isColor(value)) return value;
 
@@ -108,12 +123,7 @@ function resolveColor(value: string, tokenMap: Map<string, string>, depth = 0): 
 /** Parse tous les tokens et les retourne groupés par catégorie sémantique. */
 export function parseTokens(css: string): TokenCategory[] {
     // Passe 1 : construire la map complète name → valeur nettoyée (pour résolution var())
-    const tokenMap = new Map<string, string>();
-    const mapRegex = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
-    let m: RegExpExecArray | null;
-    while ((m = mapRegex.exec(css)) !== null) {
-        tokenMap.set(m[1].trim(), cleanValue(m[2]));
-    }
+    const tokenMap = buildTokenMap(css);
 
     // Passe 2 : catégoriser et résoudre les couleurs
     const categories = new Map<string, Token[]>();
