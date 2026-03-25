@@ -176,11 +176,11 @@ const componentItems: NavItem[] = allComponents
         height:          100%;
         overflow-y:      auto;
         scrollbar-width: thin;
-        scrollbar-color: #d1d5db transparent;
+        scrollbar-color: var(--doc-border, #d1d5db) transparent;
     }
 
     nav::-webkit-scrollbar       { width: 4px; }
-    nav::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    nav::-webkit-scrollbar-thumb { background: var(--doc-border, #d1d5db); border-radius: 4px; }
 
     /* ── Marque (masquée sur desktop, le header a déjà le logo) ── */
 
@@ -195,7 +195,7 @@ const componentItems: NavItem[] = allComponents
     }
 
     .brand-accent {
-        color: var(--mr-color-primary-500, #2563eb);
+        color: var(--ar-color-interactive, #2563eb);
     }
 
     /* ── Sections ────────────────────────────────────────────── */
@@ -247,12 +247,12 @@ const componentItems: NavItem[] = allComponents
     }
 
     .nav-list a[aria-current="page"] {
-        background:                color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 10%, transparent);
-        color:                     var(--mr-color-primary-500, #2563eb);
+        background:                color-mix(in srgb, var(--ar-color-interactive, #2563eb) 10%, transparent);
+        color:                     var(--ar-color-interactive, #2563eb);
         border-top-left-radius:    0;
         border-bottom-left-radius: 0;
         font-weight:               600;
-        border-left-color:         var(--mr-color-primary-500, #2563eb);
+        border-left-color:         var(--ar-color-interactive, #2563eb);
     }
 
     /* ── Enfants (sous-composants) ───────────────────────────── */

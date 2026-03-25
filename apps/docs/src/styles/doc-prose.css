@@ -93,7 +93,7 @@ ul {
 }
 
 a {
-    color: var(--mr-color-primary-500, #2563eb);
+    color: var(--ar-color-interactive, #2563eb);
     text-decoration: none;
 }
 
@@ -113,7 +113,7 @@ pre code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.82rem;
     line-height: 1.6;
-    color: #e6edf3;
+    color: #cdd6f4;
     background: transparent;
     padding: 0;
 }
@@ -123,8 +123,8 @@ pre code {
     font-weight: 600;
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
-    background: color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 12%, transparent);
-    color: var(--mr-color-primary-500, #2563eb);
+    background: color-mix(in srgb, var(--ar-color-interactive, #2563eb) 12%, transparent);
+    color: var(--ar-color-interactive, #2563eb);
     letter-spacing: 0.02em;
 }
 
