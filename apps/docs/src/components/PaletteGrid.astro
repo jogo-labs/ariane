@@ -8,7 +8,6 @@ interface Props {
 
 const { hues, allStops } = Astro.props;
 
-// Construit un index value rapide par hue+stop
 function getStopValue(hue: PaletteHue, stop: string): string | undefined {
     return hue.stops.find((s) => s.stop === stop)?.value;
 }
@@ -75,7 +74,7 @@ function needsBorder(value: string): boolean {
 
     .stop-header {
         font-size: 0.65rem;
-        color: var(--doc-text-muted, #9ca3af);
+        color: var(--doc-text-muted, #6b7280);
         font-weight: 400;
         text-align: center;
         padding: 0 2px 0.4rem;
@@ -128,7 +127,7 @@ function needsBorder(value: string): boolean {
     .stop-value {
         font-size: 0.6rem;
         font-family: monospace;
-        color: var(--doc-text-muted, #9ca3af);
+        color: var(--doc-text-muted, #6b7280);
         text-align: center;
         max-width: 3.5rem;
         overflow: hidden;
