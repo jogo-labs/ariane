@@ -45,11 +45,11 @@ const PALETTE_TOKEN_RE =
 const ALIAS_FILTER = /^--ar-color-(success|warning|danger|info)-\d+$/;
 
 const CATEGORY_RULES: { pattern: RegExp; label: string }[] = [
-    // Palette brute — stops numériques (incl. neutral-0 et neutral-100)
+    // Palette brute — stops numériques
     { pattern: PALETTE_TOKEN_RE, label: 'Palette brute' },
     // Tokens sémantiques de couleur — ordre critique (premier match gagne)
     { pattern: /^--ar-color-interactive/, label: 'Interaction' },
-    { pattern: /^--ar-color-(text|bg|border)/, label: 'Texte & Surface' },
+    { pattern: /^--ar-color-(white|text|bg|border)/, label: 'Texte & Surface' },
     { pattern: /^--ar-color-(success|warning|danger|info)-(bg|text)$/, label: 'États' },
     { pattern: /^--ar-focus-/, label: 'Focus' },
     // Autres tokens globaux

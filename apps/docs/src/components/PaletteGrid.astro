@@ -8,6 +8,9 @@ interface Props {
 
 const { hues, allStops } = Astro.props;
 
+// Affichage du plus clair (95) vers le plus foncé (05)
+const displayStops = [...allStops].reverse();
+
 function getStopValue(hue: PaletteHue, stop: string): string | undefined {
     return hue.stops.find((s) => s.stop === stop)?.value;
 }
@@ -27,7 +30,7 @@ function needsBorder(value: string): boolean {
         <thead>
             <tr>
                 <th class="hue-label"></th>
-                {allStops.map((stop) => (
+                {displayStops.map((stop) => (
                     <th class="stop-header">{stop}</th>
                 ))}
             </tr>
@@ -36,7 +39,7 @@ function needsBorder(value: string): boolean {
             {hues.map((hue) => (
                 <tr>
                     <td class="hue-label">{hue.name}</td>
-                    {allStops.map((stop) => {
+                    {displayStops.map((stop) => {
                         const value = getStopValue(hue, stop);
                         return (
                             <td class="stop-cell">

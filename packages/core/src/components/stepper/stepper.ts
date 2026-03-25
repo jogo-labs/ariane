@@ -45,7 +45,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-gap                                                 - Espacement entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]    - Fond de la puce de l'étape active.
  * @cssprop [--ar-stepper-bullet-bg=#b0bff0]                               - Fond des puces des étapes visitables.
- * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-20)] - Bordure des puces des étapes suivantes.
+ * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)] - Bordure des puces des étapes suivantes.
  * @cssprop [--ar-stepper-bullet-hover-color=var(--ar-color-text-muted)]   - Couleur au survol des liens d'étapes.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
