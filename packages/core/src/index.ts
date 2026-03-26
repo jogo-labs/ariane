@@ -2,9 +2,8 @@
  * Point d'entrée principal du package.
  * Ce fichier est généré/mis à jour par scripts/create-component.js.
  * Pour importer un seul composant (tree-shaking) :
- *   import '@ariane-ui/core/components/button/button.js';
+ *   import '@ariane-ui/core/components/alert/alert.js';
  */
-export { ArButton } from './components/button/button.js';
 export { ArAlert } from './components/alert/alert.js';
 export { ArBreadcrumb } from './components/breadcrumb/breadcrumb.js';
 export { ArBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';

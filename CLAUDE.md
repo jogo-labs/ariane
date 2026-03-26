@@ -278,7 +278,7 @@ Un overlay avec `opacity: 0` bloque quand même les clics. Toujours ajouter `poi
 `TableOfContents.astro` est monté deux fois (desktop sticky + mobile inline). Utiliser un guard `window.__tocObserverInit` — seule la première instance crée l'observer. Les deux partagent les mêmes classes CSS `.toc-link`, un seul observer suffit.
 
 **Sous-composants : `@parent` JSDoc seul suffit**
-`index.astro` et `SiteNav.astro` lisent tous les deux `c['x-parent']` depuis le CEM. Le champ MDX `parent` a été supprimé du schéma Zod. L'annotation `@parent mr-<tag>` dans le composant Lit est la seule source de vérité — ne pas ajouter de champ MDX.
+`index.astro` et `SiteNav.astro` lisent tous les deux `c['x-parent']` depuis le CEM. Le champ MDX `parent` a été supprimé du schéma Zod. L'annotation `@parent ar-<tag>` dans le composant Lit est la seule source de vérité — ne pas ajouter de champ MDX.
 
 **Types CEM : ne pas dupliquer, utiliser `cem-types.ts`**
 Toutes les interfaces CEM et helpers (`getCustomElements`, `buildControls`) sont dans `src/utils/cem-types.ts`. Avant d'écrire une interface CEM dans un fichier Astro, vérifier si elle existe déjà.
