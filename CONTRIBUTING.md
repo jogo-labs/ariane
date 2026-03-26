@@ -1,13 +1,13 @@
-# Contributing to mARIAnne
+# Contributing to Ariane
 
-Ce guide couvre le workflow de contribution pour le **package core** (`@marianne/core`).
+Ce guide couvre le workflow de contribution pour le **package core** (`@ariane-ui/core`).
 Pour modifier le site de documentation, voir [apps/docs/CONTRIBUTING.md](apps/docs/CONTRIBUTING.md).
 
 ---
 
 ## Prérequis
 
-- Node ≥ 20, npm ≥ 10
+- Node ≥ 24 (LTS), npm ≥ 11
 - Lire [README.md](README.md) pour comprendre la structure du monorepo
 
 ---
@@ -15,13 +15,14 @@ Pour modifier le site de documentation, voir [apps/docs/CONTRIBUTING.md](apps/do
 ## Workflow général
 
 ```bash
-git clone https://github.com/jonTravens/mARIAnne
-cd mARIAnne
+git clone https://github.com/jogo-labs/ariane
+cd ariane
+nvm use          # active automatiquement Node 24 via .nvmrc
 npm install
 npm run dev          # watch core + docs en parallèle
 ```
 
-Toutes les contributions passent par une **Pull Request** sur `main`.
+Toutes les contributions passent par une **Pull Request** sur `dev`.
 
 ---
 
@@ -236,7 +237,7 @@ Pour les activer dans votre projet consommateur, référencez-les dans `.vscode/
 
 ```json
 {
-    "html.customData": ["./node_modules/@marianne/core/dist/vscode.html-custom-data.json"],
-    "css.customData": ["./node_modules/@marianne/core/dist/vscode.css-custom-data.json"]
+    "html.customData": ["./node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
+    "css.customData": ["./node_modules/@ariane-ui/core/dist/vscode.css-custom-data.json"]
 }
 ```
