@@ -20,7 +20,11 @@ const codeWhenDefined = `await customElements.whenDefined('ar-alert');
 const alert = document.querySelector('ar-alert');
 alert.setAttribute('version', 'success');`;
 
-const codeWhenAllDefined = `const tags = [...new Set(
+const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
+await whenAllDefined();
+// Tous les composants ar-* sont prêts`;
+
+const codeWhenAllDefinedCdn = `const tags = [...new Set(
     [...document.querySelectorAll('*')]
         .map(el => el.localName)
         .filter(name => name.startsWith('ar-'))
@@ -82,11 +86,10 @@ const codeTokens = `:root {
 
             <section class="subsection">
                 <h4 class="subsection-title">Tous les composants Ariane présents dans la page</h4>
-                <pre><code class="language-js" set:text={codeWhenAllDefined} /></pre>
-                <p class="hint">
-                    À venir : un helper <code>whenAllDefined()</code> sera exporté depuis
-                    <code>@ariane-ui/core</code> dans une prochaine version.
-                </p>
+                <p>Via npm :</p>
+                <pre><code class="language-js" set:text={codeWhenAllDefinedNpm} /></pre>
+                <p>Via CDN (sans import) :</p>
+                <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
             </section>
         </section>
 
