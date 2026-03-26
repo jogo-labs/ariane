@@ -34,15 +34,33 @@ jobs:
         run: npm run test
 
       # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
-      # Le tag npm est déduit automatiquement depuis la version (alpha/beta/latest)
+      # Logique du tag npm :
+      #   - version stable (sans pré-release suffix) → "latest"
+      #   - "-alpha.*" → "alpha", sauf si aucune version stable n'existe → aussi "latest"
+      #   - "-beta.*"  → "beta",  sauf si aucune version stable n'existe → aussi "latest"
+      # Cela permet à `npm install @ariane-ui/core` de fonctionner pendant la phase alpha/beta.
       - name: Publish to npm
         run: |
           VERSION=$(node -p "require('./packages/core/package.json').version")
+          # Vérifie si une version stable existe déjà sur npm
+          STABLE=$(npm view @ariane-ui/core versions --json 2>/dev/null | \
+            node -e "const v=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); \
+                     console.log(v.filter(x=>!x.includes('-')).length > 0 ? 'yes' : 'no')" \
+            || echo "no")
           if [[ "$VERSION" == *"-alpha"* ]]; then TAG="alpha"
           elif [[ "$VERSION" == *"-beta"* ]]; then TAG="beta"
           else TAG="latest"
           fi
-          npm publish --workspace packages/core --access public --tag $TAG
+          # Pas de version stable → publier aussi sous latest pour que
+          # `npm install @ariane-ui/core` fonctionne sans tag explicite
+          if [[ "$STABLE" == "no" && "$TAG" != "latest" ]]; then
+            npm publish --workspace packages/core --access public --tag latest
+            npm dist-tag add @ariane-ui/core@$VERSION $TAG
+            echo "Published $VERSION with tags: latest + $TAG (no stable version exists)"
+          else
+            npm publish --workspace packages/core --access public --tag $TAG
+            echo "Published $VERSION with tag: $TAG"
+          fi
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
