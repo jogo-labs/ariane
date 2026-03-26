@@ -8,7 +8,7 @@ modifier une page ou comprendre l'architecture du site.
 
 ## Vue d'ensemble
 
-Le site est un **Astro 5 statique** sans framework UI côté client.
+Le site est un **Astro 6 statique** sans framework UI côté client.
 Chaque page de composant est générée automatiquement depuis deux sources :
 
 | Source                                   | Rôle                                                 |
@@ -106,7 +106,7 @@ Deux modes d'affichage sont disponibles, configurés via la JSDoc du composant L
  * @display docs
  */
 @customElement('ar-stepper-item')
-export class MrStepperItem extends LitElement { … }
+export class ArStepperItem extends LitElement { … }
 ```
 
 ### Sous-composants (relation parent / enfant)
@@ -120,7 +120,7 @@ et utilisée par la nav et la page d'accueil pour masquer automatiquement le sou
  * @parent ar-stepper
  */
 @customElement('ar-stepper-item')
-export class MrStepperItem extends LitElement { … }
+export class ArStepperItem extends LitElement { … }
 ```
 
 Après avoir ajouté l'annotation, regénérez le CEM :

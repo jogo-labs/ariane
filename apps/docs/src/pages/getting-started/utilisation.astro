@@ -3,16 +3,11 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'import',           label: 'Import des composants', level: 1 as const },
-    { id: 'personnalisation', label: 'Personnalisation CSS',  level: 1 as const },
-    { id: 'tokens',           label: 'Design Tokens',         level: 1 as const },
+    { id: 'composants',       label: 'Utiliser les composants', level: 1 as const },
+    { id: 'chargement',       label: 'Attendre le chargement',  level: 1 as const },
+    { id: 'personnalisation', label: 'Personnalisation CSS',    level: 1 as const },
+    { id: 'tokens',           label: 'Design Tokens',           level: 1 as const },
 ];
-
-const codeImportGlobal = `import '@ariane-ui/core';
-import '@ariane-ui/core/themes/default.css';`;
-
-const codeImportIndividuel = `import '@ariane-ui/core/dist/components/alert/alert.js';
-import '@ariane-ui/core/themes/default.css';`;
 
 const codeHtml = `<ar-alert version="success">
   <span slot="title">Succès</span>
@@ -21,20 +16,29 @@ const codeHtml = `<ar-alert version="success">
 
 <ar-spinner></ar-spinner>`;
 
-const codeCustomProps = `/* Personnaliser ar-alert */
-ar-alert {
+const codeWhenDefined = `await customElements.whenDefined('ar-alert');
+const alert = document.querySelector('ar-alert');
+alert.setAttribute('version', 'success');`;
+
+const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
+await whenAllDefined();
+// Tous les composants ar-* sont prêts`;
+
+const codeWhenAllDefinedCdn = `const tags = [...new Set(
+    [...document.querySelectorAll('*')]
+        .map(el => el.localName)
+        .filter(name => name.startsWith('ar-'))
+)];
+await Promise.all(tags.map(tag => customElements.whenDefined(tag)));
+// Tous les composants ar-* sont prêts`;
+
+const codeCustomProps = `ar-alert {
     --ar-alert-info-bg:   #f5f0ff;
     --ar-alert-info-icon: #7c3aed;
-}
-
-/* Cibler une variante spécifique */
-ar-alert[version="success"] {
-    --ar-alert-success-bg:   #f0fff4;
-    --ar-alert-success-icon: #16a34a;
 }`;
 
 const codeTokens = `:root {
-    --ar-color-interactive: #7c3aed; /* remplace le bleu primaire par du violet */
+    --ar-color-interactive: #7c3aed;
     --ar-border-radius-md:  0.75rem;
 }`;
 ---
@@ -45,51 +49,78 @@ const codeTokens = `:root {
     showToc={true}
 >
     <div class="page-container">
-        <h2 class="page-title">Utilisation</h2>
-        <section id="import" class="main-section">
+        <div class="page-header">
+            <h2 class="page-title">Utilisation</h2>
+            <p class="page-summary">
+                Ces exemples supposent que vous avez suivi le
+                <a href="/getting-started/quickstart">Démarrage rapide</a>.
+                Ils s'appliquent quel que soit le mode d'intégration (CDN ou npm).
+            </p>
+        </div>
+
+        <section id="composants" class="main-section">
             <div>
-                <h3 class="section-title">Import des composants</h3>
-                <p class="summary">
-                    Une fois <a href="/getting-started/installation">installée</a>, la bibliothèque s'utilise
-                    directement en HTML. Les composants sont des Custom Elements natifs — aucun framework requis.
+                <h3 class="section-title">Utiliser les composants</h3>
+                <p>
+                    Les composants sont des Custom Elements natifs — ils s'utilisent directement
+                    en HTML, aucun framework requis.
                 </p>
             </div>
+            <pre><code class="language-html" set:text={codeHtml} /></pre>
+        </section>
+
+        <section id="chargement" class="main-section">
+            <div>
+                <h3 class="section-title">Attendre le chargement</h3>
+                <p>
+                    Les Custom Elements s'enregistrent de manière asynchrone. Si votre code
+                    JavaScript interagit avec un composant au chargement de la page, attendez
+                    qu'il soit défini avant d'agir dessus.
+                </p>
+            </div>
+
             <section class="subsection">
-                <h4 class="subsection-title">Import global (tous les composants)</h4>
-                <pre><code class="language-typescript" set:text={codeImportGlobal} /></pre>
+                <h4 class="subsection-title">Un composant individuel</h4>
+                <pre><code class="language-js" set:text={codeWhenDefined} /></pre>
             </section>
+
             <section class="subsection">
-                <h4 class="subsection-title">Import individuel <span class="badge-subtle">Tree-shaking</span></h4>
-                <p>Pour inclure uniquement les composants effectivement utilisés :</p>
-                <pre><code class="language-typescript" set:text={codeImportIndividuel} /></pre>
-            </section>
-            <section class="subsection">
-                <h4 class="subsection-title">Dans votre HTML</h4>
-                <pre><code class="language-html" set:text={codeHtml} /></pre>
+                <h4 class="subsection-title">Tous les composants Ariane présents dans la page</h4>
+                <p>Via npm :</p>
+                <pre><code class="language-js" set:text={codeWhenAllDefinedNpm} /></pre>
+                <p>Via CDN (sans import) :</p>
+                <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
             </section>
         </section>
-        <section id="personnalisation">
-            <h3 class="section-title">Personnalisation CSS</h3>
-            <p>
-                Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
-                l'apparence sans surcharger les styles internes.
-            </p>
+
+        <section id="personnalisation" class="main-section">
+            <div>
+                <h3 class="section-title">Personnalisation CSS</h3>
+                <p>
+                    Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
+                    l'apparence sans surcharger les styles internes.
+                </p>
+            </div>
             <pre><code class="language-css" set:text={codeCustomProps} /></pre>
             <p>
                 Les propriétés disponibles par composant sont listées dans la section
                 <strong>Référence API</strong> de chaque page de composant.
             </p>
         </section>
-        <section id="tokens">
-            <h3 class="section-title">Design Tokens</h3>
-            <p>
-                Les valeurs par défaut (couleurs, espacements, typographie…) viennent du fichier de thème
-                <code>themes/default.css</code>. Vous pouvez les surcharger globalement :
-            </p>
+
+        <section id="tokens" class="main-section">
+            <div>
+                <h3 class="section-title">Design Tokens</h3>
+                <p>
+                    Les valeurs globales (couleurs, espacements, typographie) viennent du fichier
+                    de thème <code>themes/default.css</code>. Surchargez-les via <code>:root</code>
+                    pour modifier l'ensemble de la librairie :
+                </p>
+            </div>
             <pre><code class="language-css" set:text={codeTokens} /></pre>
             <p>
-                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste complète
-                des variables disponibles.
+                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste
+                complète des variables disponibles.
             </p>
         </section>
     </div>
@@ -99,4 +130,15 @@ const codeTokens = `:root {
 
 <style>
     @import '../../styles/doc-prose.css';
+
+    .page-summary {
+        margin-top: 0.5rem;
+        color: var(--doc-text-muted);
+    }
+
+    .hint {
+        font-size: 0.875rem;
+        color: var(--doc-text-muted);
+        margin-top: -0.5rem;
+    }
 </style>

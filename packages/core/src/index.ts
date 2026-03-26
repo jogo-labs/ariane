@@ -4,6 +4,7 @@
  * Pour importer un seul composant (tree-shaking) :
  *   import '@ariane-ui/core/components/alert/alert.js';
  */
+export { whenAllDefined } from './utils/when-all-defined.js';
 export { ArAlert } from './components/alert/alert.js';
 export { ArBreadcrumb } from './components/breadcrumb/breadcrumb.js';
 export { ArBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';

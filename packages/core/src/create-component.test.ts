@@ -160,8 +160,12 @@ describe('create-component.js', () => {
             expect(content).toContain('export class ArMyComponent');
         });
 
-        it('supporte un prefix custom via --prefix', () => {
-            runScript(tmpDir, ['tooltip', '--prefix', 'ft']);
+        it('lit le prefix depuis config.componentPrefix dans package.json', () => {
+            writeFileSync(
+                join(tmpDir, 'package.json'),
+                JSON.stringify({ name: '@test/core', config: { componentPrefix: 'ft' } }),
+            );
+            runScript(tmpDir, ['tooltip']);
 
             const content = readFileSync(
                 join(tmpDir, 'src/components/tooltip/tooltip.ts'),
@@ -238,6 +242,12 @@ describe('create-component.js', () => {
             runScript(tmpDir, ['tooltip']);
             const output = runScriptExpectError(tmpDir, ['tooltip']);
             expect(output).toContain('existe déjà');
+        });
+
+        it('échoue si config.componentPrefix est absent de package.json', () => {
+            writeFileSync(join(tmpDir, 'package.json'), JSON.stringify({ name: '@test/core' }));
+            const output = runScriptExpectError(tmpDir, ['tooltip']);
+            expect(output).toContain('config.componentPrefix');
         });
     });
 });

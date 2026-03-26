@@ -1,6 +1,6 @@
 {
   "name": "@ariane-ui/core",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "type": "module",
   "description": "Accessible web components library",
   "exports": {

@@ -9,12 +9,10 @@
  *   - ../../apps/docs/src/content/components/<tagname>.mdx
  *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_MAP)
  *
- * Usage :
- *   npm run create -- button              → ar-button  (prefix par défaut)
- *   npm run create -- my-component        → ar-my-component
- *   npm run create -- ar-button           → ar-button  (prefix déjà présent, pas doublé)
- *   npm run create -- button --prefix ft  → ft-button
- *   npm run create -- button --prefix ""  → erreur, prefix requis
+ * Usage (avec config.componentPrefix = "ar" dans package.json) :
+ *   npm run create -- button          → ar-button
+ *   npm run create -- my-component    → ar-my-component
+ *   npm run create -- ar-button       → ar-button  (prefix déjà présent, pas doublé)
  */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
@@ -25,8 +23,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DOCS_ROOT = join(__dirname, '../../../apps/docs');
 
-// ─── Lecture du prefix dans package.json (permet de centraliser la config) ────
-// Priorité : --prefix <val> en CLI > config.componentPrefix dans package.json > "ar"
+// ─── Lecture du prefix dans package.json ─────────────────────────────────────
+// Source de vérité unique : config.componentPrefix dans package.json.
+// Si absent, le script s'arrête — mieux vaut une erreur explicite qu'un fallback silencieux.
 
 function readPackagePrefix() {
     try {
@@ -40,36 +39,26 @@ function readPackagePrefix() {
 // ─── Parsing des arguments ────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-
-// Extraire --prefix <val> si présent
-let cliPrefix = null;
-const prefixFlagIndex = args.indexOf('--prefix');
-if (prefixFlagIndex !== -1) {
-    cliPrefix = args[prefixFlagIndex + 1];
-    args.splice(prefixFlagIndex, 2);
-}
-
 const input = args[0];
-const PREFIX = cliPrefix ?? readPackagePrefix() ?? 'ar';
+const PREFIX = readPackagePrefix();
+
+if (!PREFIX) {
+    console.error('\n❌ config.componentPrefix manquant dans packages/core/package.json');
+    console.error('   Ajoutez : "config": { "componentPrefix": "ar" }\n');
+    process.exit(1);
+}
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
 if (!input) {
     console.error('\n❌ Fournir un nom : npm run create -- button');
-    console.error('                   npm run create -- my-component');
-    console.error('                   npm run create -- button --prefix ft\n');
+    console.error('                   npm run create -- my-component\n');
     process.exit(1);
 }
 
 if (!/^[a-z][a-z0-9-]*$/.test(input)) {
     console.error(`\n❌ Nom invalide : "${input}"`);
     console.error('   Minuscules et tirets uniquement. Exemple : my-component\n');
-    process.exit(1);
-}
-
-if (!/^[a-z][a-z0-9]*$/.test(PREFIX)) {
-    console.error(`\n❌ Prefix invalide : "${PREFIX}"`);
-    console.error('   Minuscules sans tiret uniquement. Exemple : mr\n');
     process.exit(1);
 }
 

@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, Test & Build
+    name: Lint, Test & Build (core)
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       # Restaure le cache Turborepo entre les runs
@@ -44,4 +44,44 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm run test
+        run: npm run test:coverage --workspace=packages/core
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: coverage-report
+          path: packages/core/coverage/
+          retention-days: 7
+
+  docs:
+    name: Lint, Test & Build (docs)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --frozen-lockfile
+
+      - name: Lint docs
+        run: npm run lint --workspace=apps/docs
+
+      - name: Build core (required by docs)
+        run: npm run build --workspace=packages/core
+
+      - name: Test docs (unit)
+        run: npm run test --workspace=apps/docs
+
+      - name: Build docs
+        run: npm run build --workspace=apps/docs
+
+      - name: Check build output
+        run: npm run test:build --workspace=apps/docs

@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'prerequis',  label: 'Prérequis',         level: 1 as const },
+    { id: 'cdn',        label: 'Via CDN',            level: 1 as const },
+    { id: 'autoloader', label: 'Autoloader',         level: 2 as const },
+    { id: 'bundle',     label: 'Bundle complet',     level: 2 as const },
+    { id: 'npm',        label: 'Setup avancé (npm)', level: 1 as const },
+];
+
+const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
+
+const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></scr` + `ipt>
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
+
+const codeUsage = `<ar-alert version="success">
+  <span slot="title">Succès</span>
+  <span slot="content">Opération réussie.</span>
+</ar-alert>`;
+
+const codeNpmInstall = `npm install @ariane-ui/core`;
+
+const codeNpmGlobal = `import '@ariane-ui/core';
+import '@ariane-ui/core/themes/default.css';`;
+
+const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/alert.js';
+import '@ariane-ui/core/themes/default.css';`;
+---
+
+<Layout
+    title="Démarrage rapide"
+    currentPath="/getting-started/quickstart"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Démarrage rapide</h2>
+        </div>
+
+        <section id="prerequis">
+            <h3 class="section-title">Prérequis</h3>
+            <ul>
+                <li>
+                    Un navigateur moderne supportant les
+                    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components"
+                       target="_blank" rel="noopener">Web Components</a>
+                    (Chrome, Firefox, Safari, Edge)
+                </li>
+                <li>Aucune dépendance framework — fonctionne avec Vue, React, Svelte, ou HTML pur</li>
+                <li><em>Si intégration npm uniquement :</em> Node ≥ 24, npm ≥ 11</li>
+            </ul>
+        </section>
+
+        <section id="cdn" class="main-section">
+            <div>
+                <h3 class="section-title">Via CDN <span class="badge">Recommandé</span></h3>
+                <p>
+                    La méthode la plus rapide — aucun outil requis. Ajoutez les deux balises dans
+                    votre <code>&lt;head&gt;</code> et utilisez les composants directement en HTML.
+                </p>
+            </div>
+
+            <section id="autoloader" class="subsection">
+                <h4 class="subsection-title">Autoloader <span class="badge badge-subtle">À privilégier</span></h4>
+                <p>
+                    Ne charge chaque composant que lorsqu'il est utilisé dans la page.
+                    Idéal pour la plupart des projets CDN.
+                </p>
+                <pre><code class="language-html" set:text={codeAutoloader} /></pre>
+                <p class="hint">
+                    Les deux balises sont requises : le script enregistre les composants,
+                    le CSS fournit le thème.
+                </p>
+                <p>Les composants sont ensuite utilisables directement :</p>
+                <pre><code class="language-html" set:text={codeUsage} /></pre>
+            </section>
+
+            <section id="bundle" class="subsection">
+                <h4 class="subsection-title">Bundle complet</h4>
+                <p>
+                    Charge tous les composants en une seule requête. Adapté si vous utilisez
+                    beaucoup de composants ou souhaitez éviter les imports dynamiques.
+                </p>
+                <pre><code class="language-html" set:text={codeBundle} /></pre>
+            </section>
+        </section>
+
+        <section id="npm" class="main-section">
+            <div>
+                <h3 class="section-title">Setup avancé <span class="badge">Avec bundler</span></h3>
+                <p>
+                    Pour les projets utilisant Vite, Webpack, Rollup ou tout autre bundler.
+                </p>
+                <pre><code class="language-bash" set:text={codeNpmInstall} /></pre>
+            </div>
+
+            <section class="subsection">
+                <h4 class="subsection-title">Import global</h4>
+                <p>Enregistre tous les composants en une seule ligne :</p>
+                <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
+            </section>
+
+            <section class="subsection">
+                <h4 class="subsection-title">
+                    Import individuel <span class="badge badge-subtle">Tree-shaking</span>
+                </h4>
+                <p>Pour inclure uniquement les composants effectivement utilisés :</p>
+                <pre><code class="language-typescript" set:text={codeNpmIndividuel} /></pre>
+            </section>
+        </section>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+
+    .hint {
+        font-size: 0.875rem;
+        color: var(--doc-text-muted);
+        margin-top: -0.5rem;
+    }
+</style>

@@ -27,7 +27,7 @@ Ariane/
 ├── packages/
 │   └── core/          # @ariane-ui/core — la bibliothèque de composants
 └── apps/
-    └── docs/          # Site de documentation (Astro 5)
+    └── docs/          # Site de documentation (Astro 6)
 ```
 
 Le monorepo est géré par **npm workspaces** et orchestré par **Turborepo**.
@@ -38,14 +38,15 @@ Le monorepo est géré par **npm workspaces** et orchestré par **Turborepo**.
 
 ### Prérequis
 
-- Node ≥ 20
-- npm ≥ 10
+- Node ≥ 24 (LTS)
+- npm ≥ 11
 
 ### Installation
 
 ```bash
-git clone https://github.com/jonTravens/Ariane
+git clone https://github.com/jogo-labs/ariane
 cd Ariane
+nvm use   # active automatiquement Node 24 via .nvmrc
 npm install
 ```
 
@@ -105,6 +106,10 @@ import '@ariane-ui/core/themes/default.css'; // thème par défaut
 
 // ou import individuel (tree-shaking)
 import '@ariane-ui/core/dist/components/button/button.js';
+
+// attendre que des composants spécifiques soient prêts
+import { whenAllDefined } from '@ariane-ui/core';
+await whenAllDefined('ar-button', 'ar-stepper');
 ```
 
 ### Autoloader CDN
@@ -142,7 +147,7 @@ Consultez la page **Design Tokens** du site de documentation pour la liste compl
 | [esbuild](https://esbuild.github.io/)                                                 | Build rapide — bundles npm et CDN            |
 | [@custom-elements-manifest/analyzer](https://custom-elements-manifest.open-wc.org/)   | Génération du manifest CEM depuis la JSDoc   |
 | [Vitest](https://vitest.dev/) + [happy-dom](https://github.com/capricorn86/happy-dom) | Tests unitaires                              |
-| [Astro 5](https://astro.build/)                                                       | Site de documentation statique               |
+| [Astro 6](https://astro.build/)                                                       | Site de documentation statique               |
 | npm workspaces + [Turborepo](https://turbo.build/)                                    | Monorepo                                     |
 
 ---
