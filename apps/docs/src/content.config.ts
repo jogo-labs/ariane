@@ -1,4 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'zod';
 
 /**
  * Schéma d'une variante de composant.
@@ -20,7 +22,7 @@ const variantSchema = z.object({
  * Le frontmatter définit les métadonnées et les variantes pré-configurées.
  */
 const components = defineCollection({
-    type: 'content',
+    loader: glob({ pattern: '**/*.mdx', base: './src/content/components' }),
     schema: z.object({
         /** Tag name du composant (ex: ar-button) */
         tagName: z.string(),
