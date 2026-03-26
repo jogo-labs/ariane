@@ -7,18 +7,24 @@ export default defineConfig({
         // n'ajoute pas 300MB de browsers Playwright en CI.
         environment: 'happy-dom',
 
-        include:  ['src/**/*.test.ts'],
+        include: ['src/**/*.test.ts'],
 
         // Rapport de couverture granulaire par fichier
         coverage: {
-            provider:  'v8',
-            reporter:  ['text', 'json', 'html'],
-            include:   ['src/**/*.ts'],
-            exclude:   ['src/**/*.test.ts', 'src/**/*.styles.ts'],
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            include: ['src/**/*.ts'],
+            exclude: [
+                'src/**/*.test.ts',
+                'src/**/*.styles.ts',
+                // ScrollFollowController utilise IntersectionObserver — non supporté dans happy-dom.
+                // À tester avec Playwright (issue #2).
+                'src/controllers/scroll-follow.controller.ts',
+            ],
             thresholds: {
-                lines:      80,
-                functions:  80,
-                branches:   70,
+                lines: 80,
+                functions: 80,
+                branches: 70,
                 statements: 80,
             },
         },
