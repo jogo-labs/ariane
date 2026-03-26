@@ -78,7 +78,7 @@ npm run build      # Build tous les packages et le site de doc
 | `npm run test`            | Lance tous les tests                                 |
 | `npm run lint`            | ESLint sur tous les packages                         |
 | `npm run format`          | Prettier sur tous les fichiers                       |
-| `npm run create mr-<nom>` | Scaffold un nouveau composant                        |
+| `npm run create ar-<nom>` | Scaffold un nouveau composant                        |
 
 ---
 

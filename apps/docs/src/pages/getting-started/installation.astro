@@ -15,16 +15,17 @@ const codeCdn = `<!-- Composants (autoloader : ne charge que ce qui est utilisé
 <!-- Thème par défaut -->
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
 
-const codeCdnUsage = `<ar-button variant="filled">Valider</ar-button>
-<ar-alert variant="success">Opération réussie</ar-alert>`;
+const codeCdnUsage = `<ar-alert version="success">
+  <span slot="title">Succès</span>
+  <span slot="content">Opération réussie.</span>
+</ar-alert>`;
 
 const codeNpmInstall = `npm install @ariane-ui/core`;
 
 const codeNpmGlobal = `import '@ariane-ui/core';
 import '@ariane-ui/core/themes/default.css';`;
 
-const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/button/button.js';
-import '@ariane-ui/core/dist/components/alert/alert.js';
+const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/alert.js';
 import '@ariane-ui/core/themes/default.css';`;
 
 const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>`;

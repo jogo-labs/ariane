@@ -49,7 +49,7 @@ Types autorisés : `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `
 ### Via le scaffolder
 
 ```bash
-npm run create mr-mon-composant
+npm run create ar-mon-composant
 ```
 
 Le script génère automatiquement la structure dans `packages/core/src/components/mon-composant/` :
@@ -75,12 +75,12 @@ mon-composant/
  *
  * @csspart base     - L'élément racine du composant.
  *
- * @cssprop --mr-mon-composant-bg - Couleur de fond.
+ * @cssprop --ar-mon-composant-bg - Couleur de fond.
  *
- * @event {CustomEvent} mr-change - Émis lors d'un changement.
+ * @event {CustomEvent} ar-change - Émis lors d'un changement.
  */
-@customElement('mr-mon-composant')
-export class MrMonComposant extends LitElement { … }
+@customElement('ar-mon-composant')
+export class ArMonComposant extends LitElement { … }
 ```
 
 **Annotations JSDoc spéciales :**
@@ -89,7 +89,7 @@ export class MrMonComposant extends LitElement { … }
 | ------------------ | ----------------------------------------------- |
 | `@display demo`    | Page doc : exemples + playground + API (défaut) |
 | `@display docs`    | Page doc : API uniquement, pas de playground    |
-| `@parent mr-<tag>` | Marque comme sous-composant de `<tag>`          |
+| `@parent ar-<tag>` | Marque comme sous-composant de `<tag>`          |
 | `@ignore`          | Exclut un membre des contrôles du playground    |
 
 **Propriétés :**
@@ -108,7 +108,7 @@ disabled = false;
 
 ```typescript
 // Toujours bubbles: true + composed: true pour traverser le Shadow DOM
-this.dispatchEvent(new CustomEvent('mr-change', { bubbles: true, composed: true }));
+this.dispatchEvent(new CustomEvent('ar-change', { bubbles: true, composed: true }));
 ```
 
 **Global type declaration** (à la fin de chaque fichier) :
@@ -116,7 +116,7 @@ this.dispatchEvent(new CustomEvent('mr-change', { bubbles: true, composed: true 
 ```typescript
 declare global {
     interface HTMLElementTagNameMap {
-        'mr-mon-composant': MrMonComposant;
+        'ar-mon-composant': ArMonComposant;
     }
 }
 ```
@@ -127,11 +127,11 @@ Utilisez `@parent` dans la JSDoc du composant enfant — c'est la seule déclara
 
 ```typescript
 /**
- * @parent mr-stepper
+ * @parent ar-stepper
  * @display docs
  */
-@customElement('mr-stepper-item')
-export class MrStepperItem extends LitElement { … }
+@customElement('ar-stepper-item')
+export class ArStepperItem extends LitElement { … }
 ```
 
 Cela suffit pour que le sous-composant soit :
@@ -154,25 +154,25 @@ npm run test:coverage  # rapport de couverture
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MrButton } from './button.js';
+import { ArAlert } from './alert.js';
 
-async function fixture(html: string): Promise<MrButton> {
+async function fixture(html: string): Promise<ArAlert> {
     const template = document.createElement('template');
     template.innerHTML = html.trim();
-    const el = template.content.firstElementChild as MrButton;
+    const el = template.content.firstElementChild as ArAlert;
     document.body.appendChild(el);
     await (el as any).updateComplete;
     return el;
 }
 
-describe('MrButton', () => {
+describe('ArAlert', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
     });
 
-    it("est disabled quand l'attribut disabled est présent", async () => {
-        const el = await fixture('<mr-button disabled>Label</mr-button>');
-        expect(el.disabled).toBe(true);
+    it("est dismissible quand l'attribut next-focus est présent", async () => {
+        const el = await fixture('<ar-alert next-focus="btn">Alerte</ar-alert>');
+        expect(el.getAttribute('next-focus')).toBe('btn');
     });
 });
 ```
