@@ -1,9 +1,4 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-    "paths": {
-      "@cem": ["../../packages/core/dist/custom-elements.json"]
-    }
-  },
   "include": [".astro/types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "src/**/*.mdx"]
 }
