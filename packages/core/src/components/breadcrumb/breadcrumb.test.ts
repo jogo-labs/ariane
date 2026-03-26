@@ -290,46 +290,6 @@ describe('ArBreadcrumb', () => {
         });
     });
 
-    // ── Prop dark ─────────────────────────────────────────────────────────────
-
-    describe('prop dark', () => {
-        beforeEach(() => {
-            ArBreadcrumb.mobileQuery = mockMediaQuery(false);
-        });
-
-        it('dark vaut false par défaut', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            expect(el.dark).toBe(false);
-        });
-
-        it('dark=true reflète l\'attribut "dark" sur le host', async () => {
-            el = await fixture(`
-                <ar-breadcrumb dark>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            expect(el.hasAttribute('dark')).toBe(true);
-        });
-
-        it("dark=false retire l'attribut du host", async () => {
-            el = await fixture(`
-                <ar-breadcrumb dark>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            el.dark = false;
-            await waitForUpdate(el);
-            expect(el.hasAttribute('dark')).toBe(false);
-        });
-    });
-
     // ── Mise à jour réactive ──────────────────────────────────────────────────
 
     describe('mise à jour réactive', () => {

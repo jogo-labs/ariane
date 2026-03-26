@@ -18,20 +18,20 @@ export default css`
         padding: 0.5rem 0.75rem;
         margin-left: -1px;
         line-height: 1.25;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
+        background-color: var(--ar-color-bg, #fff);
+        border: 1px solid var(--ar-color-border, #dee2e6);
     }
 
     .page-link,
     .page-link:hover {
-        color: #2458e5;
+        color: var(--ar-color-interactive, #283276);
         text-decoration: none;
     }
 
     .page-link:hover {
         z-index: 2;
-        background-color: #e9ecef;
-        border-color: #dee2e6;
+        background-color: var(--ar-color-bg-subtle, #e9ecef);
+        border-color: var(--ar-color-border, #dee2e6);
     }
 
     .page-link:focus {
@@ -54,17 +54,17 @@ export default css`
 
     .page-item.active .page-link {
         z-index: 3;
-        color: #fff;
-        background-color: #283276;
-        border-color: #283276;
+        color: var(--ar-color-text-inverse, #fff);
+        background-color: var(--ar-color-interactive, #283276);
+        border-color: var(--ar-color-interactive, #283276);
     }
 
     .page-item.disabled .page-link {
-        color: #6c757d;
+        color: var(--ar-color-text-muted, #6c757d);
         pointer-events: none;
         cursor: auto;
-        background-color: #fff;
-        border-color: #dee2e6;
+        background-color: var(--ar-color-bg, #fff);
+        border-color: var(--ar-color-border, #dee2e6);
     }
 
     .pagination-lg .page-link {
@@ -135,8 +135,8 @@ export default css`
 
     .pagination-item.active .btn-tertiary {
         z-index: 3;
-        color: #ffffff;
-        background-color: rgba(18, 20, 55, 0.8);
+        color: var(--ar-color-text-inverse, #fff);
+        background-color: var(--ar-color-interactive, #283276);
         font-weight: 700;
     }
     .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']) {
@@ -146,13 +146,6 @@ export default css`
         cursor: default !important;
         border-color: transparent !important;
     }
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).light {
-        color: #2e2e31 !important;
-    }
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).dark {
-        color: #ffffff !important;
-    }
-
     .pagination,
     .pagination .btn-tertiary {
         display: -webkit-box;
@@ -183,9 +176,9 @@ export default css`
 
     .pagination-item.active .btn-tertiary {
         z-index: 3;
-        color: var(--ar--color-primary);
-        background-color: #fff;
-        border: 1px solid var(--ar--color-primary);
+        color: var(--ar-pagination-active-color, var(--ar-color-interactive, #283276));
+        background-color: var(--ar-color-bg, #fff);
+        border: 1px solid var(--ar-pagination-active-color, var(--ar-color-interactive, #283276));
         font-weight: 700;
     }
 
@@ -197,11 +190,7 @@ export default css`
         border-color: transparent !important;
     }
 
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).light {
-        color: #2e2e31 !important;
-    }
-
-    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']).dark {
-        color: #fff !important;
+    .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']) {
+        color: var(--ar-color-text) !important;
     }
 `;

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, next]
+    branches: [main, dev, next]
   pull_request:
-    branches: [main, next]
+    branches: [main, dev, next]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -45,12 +45,3 @@ jobs:
 
       - name: Test
         run: npm run test
-
-      # Upload la couverture de code pour le reporting
-      - name: Upload coverage
-        uses: actions/upload-artifact@v5
-        if: always()
-        with:
-          name: coverage-report
-          path: packages/core/coverage/
-          retention-days: 7

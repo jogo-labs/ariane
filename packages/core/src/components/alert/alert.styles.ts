@@ -6,7 +6,7 @@ export default css`
         box-sizing: border-box;
         opacity: 1;
         transform: scale(1);
-        color: var(--ar--color-text-color, #000, #2e2e31);
+        color: var(--ar-color-text, #2e2e31);
     }
 
     :host([hiding]) {
@@ -43,7 +43,7 @@ export default css`
     }
 
     .alert .close {
-        color: #2e2e31;
+        color: var(--ar-color-text, #2e2e31);
     }
 
     .alert .close .icon {
@@ -53,7 +53,7 @@ export default css`
 
     .alert .close:focus,
     .alert .close:hover {
-        color: #171717;
+        color: var(--ar-color-text, #2e2e31);
     }
 
     .alert .icon {
@@ -116,7 +116,7 @@ export default css`
 
     .alert-title {
         font-family: system-ui, sans-serif;
-        font-size: var(--ar--font-size-text);
+        font-size: var(--ar-font-size-md, 1rem);
         line-height: 1.5;
         font-weight: 700;
     }
@@ -155,42 +155,42 @@ export default css`
     }
 
     .alert-info {
-        background-color: var(--ar--bg-info, #dfe9ff);
-        border-color: var(--ar--border-info);
+        background-color: var(--ar-alert-info-bg, var(--ar-color-info-bg));
+        border-color: var(--ar-alert-info-border, var(--ar-color-info-bg));
     }
 
     .alert-info .close:focus {
-        background: var(--ar--border-info, #dfe9ff);
+        background: var(--ar-alert-info-border, var(--ar-color-info-bg));
     }
 
     .alert-info .alert-icon-container {
-        color: var(--ar--icon-info, #2c74ff);
+        color: var(--ar-alert-info-icon, var(--ar-color-info-text));
     }
 
     .alert-error {
-        background-color: var(--ar--bg-error, #ffeceb);
-        border-color: var(--ar--border-error, #ffeceb);
+        background-color: var(--ar-alert-error-bg, var(--ar-color-danger-bg));
+        border-color: var(--ar-alert-error-border, var(--ar-color-danger-bg));
     }
 
     .alert-error .alert-icon-container {
-        color: var(--ar--icon-error, #f04438);
+        color: var(--ar-alert-error-icon, var(--ar-color-danger-text));
     }
 
     .alert-warning {
-        background-color: var(--ar--bg-warning, #fffaeb);
-        border-color: var(--ar--border-warning, #fffaeb);
+        background-color: var(--ar-alert-warning-bg, var(--ar-color-warning-bg));
+        border-color: var(--ar-alert-warning-border, var(--ar-color-warning-bg));
     }
 
     .alert-warning .alert-icon-container {
-        color: var(--ar--icon-warning, #f79009);
+        color: var(--ar-alert-warning-icon, var(--ar-color-warning-text));
     }
 
     .alert-success {
-        background-color: var(--ar--bg-success, #d9f6e8);
-        border-color: var(--ar--border-success, #d9f6e8);
+        background-color: var(--ar-alert-success-bg, var(--ar-color-success-bg));
+        border-color: var(--ar-alert-success-border, var(--ar-color-success-bg));
     }
 
     .alert-success .alert-icon-container {
-        color: var(--ar--icon-success, #09aa5f);
+        color: var(--ar-alert-success-icon, var(--ar-color-success-text));
     }
 `;

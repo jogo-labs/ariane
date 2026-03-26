@@ -15,11 +15,10 @@ import ComponentApi from './ComponentApi.astro';
 import { type CemDeclaration, type CemControl } from '../utils/cem-types.ts';
 
 interface Variant {
-    name:          string;
-    label?:        string;
-    description?:  string;
-    html:          string;
-    previewTheme?: 'light' | 'dark';
+    name:         string;
+    label?:       string;
+    description?: string;
+    html:         string;
 }
 
 interface Props {
@@ -58,11 +57,7 @@ const showPlayground = displayMode === 'demo';
                     )}
                     <div>
                         <div class="preview-wrap">
-                            <button class="preview-theme-toggle" data-preview-toggle aria-label="Basculer le thème de la preview">
-                                <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                                <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                            </button>
-                            <div class="preview" data-theme={variant.previewTheme ?? 'light'}>
+                            <div class="preview">
                                 <Fragment set:html={variant.html} />
                             </div>
                         </div>
@@ -82,7 +77,7 @@ const showPlayground = displayMode === 'demo';
     <div class="parent-notice">
         {/* <span class="parent-notice-icon">&#8593;</span> */}
         Ce composant est un sous-composant de
-        <a href={`/components/${parentTag.replace(/^mr-/, '')}`}>
+        <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>
             <code>&lt;{parentTag}&gt;</code>
         </a>
     </div>
@@ -93,11 +88,7 @@ const showPlayground = displayMode === 'demo';
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
         <h4 class="subsection-title">Playground</h4>
         <div class="preview-wrap">
-            <button class="preview-theme-toggle" data-preview-toggle aria-label="Basculer le thème de la preview">
-                <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
-            <div class="preview" data-playground-preview data-theme="light">
+            <div class="preview" data-playground-preview>
                 <Fragment set:html={playgroundHtml} />
             </div>
         </div>
@@ -232,30 +223,8 @@ const showPlayground = displayMode === 'demo';
         border-radius: 0.5rem 0.5rem 0 0;
     }
 
-    .preview[data-theme="light"] {
-        background:             #ffffff;
-        --mr-color-primary-50:  #eff6ff;
-        --mr-color-primary-100: #dbeafe;
-        --mr-color-primary-500: #2563eb;
-        --mr-color-primary-600: #1d4ed8;
-        --mr-color-neutral-50:  #f9fafb;
-        --mr-color-neutral-100: #f3f4f6;
-        --mr-color-neutral-200: #e5e7eb;
-        --mr-color-neutral-700: #374151;
-        --mr-color-neutral-900: #111827;
-    }
-
-    .preview[data-theme="dark"] {
-        background:             #0f1117;
-        --mr-color-primary-50:  #1e2a40;
-        --mr-color-primary-100: #1e3a5f;
-        --mr-color-primary-500: #3b82f6;
-        --mr-color-primary-600: #2563eb;
-        --mr-color-neutral-50:  #161b22;
-        --mr-color-neutral-100: #21262d;
-        --mr-color-neutral-200: #30363d;
-        --mr-color-neutral-700: #8b949e;
-        --mr-color-neutral-900: #e6edf3;
+    .preview {
+        background: var(--doc-bg);
     }
 
     /* ── Code block ─────────────────────────────────── */
@@ -285,7 +254,7 @@ const showPlayground = displayMode === 'demo';
     }
 
     .copy-btn:hover  { background: var(--doc-nav-bg, #374151); }
-    .copy-btn.copied { background: #059669; color: #fff; }
+    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: var(--ar-color-white, #fff); }
 
     /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
     :global(.code-block pre),
@@ -305,6 +274,7 @@ const showPlayground = displayMode === 'demo';
         font-size:   inherit;
         padding:     0;
         background:  transparent;
+        color:       #cdd6f4;
     }
 
     :global(.code-block pre) {
@@ -371,8 +341,8 @@ const showPlayground = displayMode === 'demo';
         align-items:   center;
         gap:           0.5rem;
         padding:       0.75rem 1rem;
-        background:    color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 8%, transparent);
-        border:        1px solid color-mix(in srgb, var(--mr-color-primary-500, #2563eb) 20%, transparent);
+        background:    color-mix(in srgb, var(--ar-color-interactive, #2563eb) 8%, transparent);
+        border:        1px solid color-mix(in srgb, var(--ar-color-interactive, #2563eb) 20%, transparent);
         border-radius: 0.5rem;
         font-size:     0.875rem;
         color:         var(--doc-text, #374151);
@@ -382,11 +352,11 @@ const showPlayground = displayMode === 'demo';
     .parent-notice-icon {
         font-size:   1.1rem;
         font-weight: 700;
-        color:       var(--mr-color-primary-500, #2563eb);
+        color:       var(--ar-color-interactive, #2563eb);
     }
 
     .parent-notice a {
-        color:           var(--mr-color-primary-500, #2563eb);
+        color:           var(--ar-color-interactive, #2563eb);
         text-decoration: none;
         font-weight:     600;
     }

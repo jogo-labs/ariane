@@ -11,33 +11,31 @@ const tocEntries = [
 const codeImportGlobal = `import '@ariane-ui/core';
 import '@ariane-ui/core/themes/default.css';`;
 
-const codeImportIndividuel = `import '@ariane-ui/core/dist/components/button/button.js';
-import '@ariane-ui/core/dist/components/alert/alert.js';
+const codeImportIndividuel = `import '@ariane-ui/core/dist/components/alert/alert.js';
 import '@ariane-ui/core/themes/default.css';`;
 
-const codeHtml = `<ar-button variant="filled">Valider</ar-button>
-
-<ar-alert variant="success">
-    Votre message a bien été envoyé.
+const codeHtml = `<ar-alert version="success">
+  <span slot="title">Succès</span>
+  <span slot="content">Votre message a bien été envoyé.</span>
 </ar-alert>
 
 <ar-spinner></ar-spinner>`;
 
-const codeCustomProps = `/* Personnaliser ar-button */
-ar-button {
-    --ar-button-bg:            #7c3aed;
-    --ar-button-border-radius: 2rem;
+const codeCustomProps = `/* Personnaliser ar-alert */
+ar-alert {
+    --ar-alert-info-bg:   #f5f0ff;
+    --ar-alert-info-icon: #7c3aed;
 }
 
 /* Cibler une variante spécifique */
-ar-button[variant="outlined"] {
-    --ar-button-border-color: #7c3aed;
-    --ar-button-color:        #7c3aed;
+ar-alert[version="success"] {
+    --ar-alert-success-bg:   #f0fff4;
+    --ar-alert-success-icon: #16a34a;
 }`;
 
 const codeTokens = `:root {
-    --mr-color-primary-500: #7c3aed; /* remplace le bleu par du violet */
-    --mr-border-radius-md:  0.75rem;
+    --ar-color-interactive: #7c3aed; /* remplace le bleu primaire par du violet */
+    --ar-border-radius-md:  0.75rem;
 }`;
 ---
 

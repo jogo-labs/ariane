@@ -90,11 +90,10 @@ export interface CemControl {
 // ─── Helpers manifest ────────────────────────────────────────────────────────
 
 /** Extrait toutes les déclarations de custom elements depuis un manifest CEM. */
-export function getCustomElements(manifest: {
-    modules?: { declarations?: CemDeclaration[] }[];
-}): CemDeclaration[] {
-    return (manifest.modules ?? [])
-        .flatMap((m) => m.declarations ?? [])
+export function getCustomElements(manifest: unknown): CemDeclaration[] {
+    const m = manifest as { modules?: { declarations?: CemDeclaration[] }[] };
+    return (m.modules ?? [])
+        .flatMap((mod) => mod.declarations ?? [])
         .filter((d) => d.kind === 'class' && d.customElement === true);
 }
 

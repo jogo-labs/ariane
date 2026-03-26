@@ -8,7 +8,7 @@
  *   import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
  *
  * Les fonctions sont génériques : TypeScript infère le type retourné depuis
- * le cast fourni à l'appel (ex: `fixture<ArButton>(...)`).
+ * le cast fourni à l'appel (ex: `fixture<ArAlert>(...)`).
  */
 
 /** Alias pour contourner le protected de `updateComplete` dans LitElement. */

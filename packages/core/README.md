@@ -131,7 +131,7 @@ variant: 'filled' | 'outlined' = 'filled';
 **Événements custom** — toujours `bubbles` + `composed` pour traverser le Shadow DOM :
 
 ```typescript
-this.dispatchEvent(new CustomEvent('mr-change', { bubbles: true, composed: true }));
+this.dispatchEvent(new CustomEvent('ar-change', { bubbles: true, composed: true }));
 ```
 
 **Composition parent-enfant** — via `@lit/context` :
@@ -186,9 +186,9 @@ Le fichier `custom-elements.json` est généré automatiquement par
  *
  * @csspart base              ← CSS part exposé
  *
- * @cssprop --mr-btn-bg       ← CSS custom property
+ * @cssprop --ar-alert-info-bg  ← CSS custom property
  *
- * @event {CustomEvent} mr-click ← événement émis
+ * @event {CustomEvent} ar-alert-close ← événement émis
  */
 ```
 

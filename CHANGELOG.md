@@ -10,6 +10,38 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.3] — 2026-03-26
+
+### Supprimé
+
+- **`ar-button`** — retiré de la librairie (réplique un natif `<button>` sans apport a11y)
+
+### Modifié
+
+- **Tokens CSS** — refonte complète du système de design tokens :
+    - Palette brute unifiée sur des stops `05→95` en oklch (`--ar-color-primary-*`, `--ar-color-neutral-*`, etc.)
+    - Ajout des palettes orange, cyan, indigo, purple, pink
+    - Tokens sémantiques d'état (`--ar-color-info-bg`, `--ar-color-success-text`…)
+    - Migration de tous les composants vers les tokens sémantiques (plus de couleurs hardcodées)
+    - Attribut `dark` supprimé de `ar-breadcrumb` — les composants suivent désormais le mode système
+
+### Ajouté (documentation)
+
+- Landing page avec hero, motif de fond et deux CTA
+- Section "Bien démarrer" : pages Installation et Utilisation
+- Page Design Tokens : grille palette complète + sous-sections sémantiques avec swatches
+- Swatches couleur dans la référence API des composants et la page Design Tokens
+- Migration Astro 6 + Node 22
+
+### Corrigé
+
+- Playground interactif non fonctionnel (script exécuté avant le DOM)
+- Liens vers composant parent (`ar-stepper-item` → `ar-stepper`) cassés dans la doc
+- Dark mode : couleurs hardcodées remplacées par des variables `--doc-*`
+- Spinner : hérite de `currentColor` par défaut
+
+---
+
 ## [0.1.0-alpha.1] — 2026-03-17
 
 Première pré-version publique de Ariane. Les composants sont fonctionnels

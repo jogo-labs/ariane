@@ -26,7 +26,7 @@ const ROOT = join(__dirname, '..');
 const DOCS_ROOT = join(__dirname, '../../../apps/docs');
 
 // ─── Lecture du prefix dans package.json (permet de centraliser la config) ────
-// Priorité : --prefix <val> en CLI > scripts.createPrefix dans package.json > "mr"
+// Priorité : --prefix <val> en CLI > config.componentPrefix dans package.json > "ar"
 
 function readPackagePrefix() {
     try {
@@ -76,13 +76,13 @@ if (!/^[a-z][a-z0-9]*$/.test(PREFIX)) {
 // ─── Dérivation des noms ──────────────────────────────────────────────────────
 
 // Si l'input commence déjà par le prefix, on ne le redouble pas
-// ex: "mr-button" avec prefix "mr" → "mr-button" (pas "mr-mr-button")
+// ex: "ar-button" avec prefix "ar" → "ar-button" (pas "ar-ar-button")
 const tagName = input.startsWith(`${PREFIX}-`) ? input : `${PREFIX}-${input}`;
 
 const parts = tagName.split('-');
 const className = parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
 
-// Répertoire = parties après le prefix, sans tirets : mr-my-button → mybutton
+// Répertoire = parties après le prefix, sans tirets : ar-my-button → mybutton
 const dirName = parts.slice(1).join('');
 
 const componentDir = join(ROOT, 'src', 'components', dirName);

@@ -12,10 +12,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-const mockButtonImport = vi.fn().mockResolvedValue({});
+const mockAlertImport = vi.fn().mockResolvedValue({});
 
-vi.mock('./components/button/button.js', () => {
-    mockButtonImport();
+vi.mock('./components/alert/alert.js', () => {
+    mockAlertImport();
     return {};
 });
 
@@ -37,30 +37,30 @@ const tick = () => new Promise((r) => setTimeout(r, 50));
 
 describe('autoloader', () => {
     afterEach(() => {
-        document.body.querySelectorAll('ar-button, ar-unknown').forEach((el) => el.remove());
-        mockButtonImport.mockClear();
+        document.body.querySelectorAll('ar-alert, ar-unknown').forEach((el) => el.remove());
+        mockAlertImport.mockClear();
     });
 
     it('charge le module quand un composant connu est ajouté au DOM', async () => {
-        appendElement('ar-button');
+        appendElement('ar-alert');
         await tick();
 
-        expect(mockButtonImport).toHaveBeenCalledTimes(1);
+        expect(mockAlertImport).toHaveBeenCalledTimes(1);
     });
 
-    it('ne recharge pas le module si ar-button est ajouté une seconde fois (loaded Set)', async () => {
-        // ar-button est dans loaded depuis le test précédent (module partagé)
-        appendElement('ar-button');
+    it('ne recharge pas le module si ar-alert est ajouté une seconde fois (loaded Set)', async () => {
+        // ar-alert est dans loaded depuis le test précédent (module partagé)
+        appendElement('ar-alert');
         await tick();
 
-        expect(mockButtonImport).not.toHaveBeenCalled();
+        expect(mockAlertImport).not.toHaveBeenCalled();
     });
 
     it('ne charge pas de module pour un tag inconnu de COMPONENT_MAP', async () => {
         appendElement('ar-unknown');
         await tick();
 
-        expect(mockButtonImport).not.toHaveBeenCalled();
+        expect(mockAlertImport).not.toHaveBeenCalled();
     });
 
     it('ne charge pas de module pour un élément HTML natif sans tiret', async () => {
@@ -69,7 +69,7 @@ describe('autoloader', () => {
         await tick();
         el.remove();
 
-        expect(mockButtonImport).not.toHaveBeenCalled();
+        expect(mockAlertImport).not.toHaveBeenCalled();
     });
 
     it("ne charge pas de module pour un élément natif avec attribut (ex: <input type='text'>)", async () => {
@@ -79,6 +79,6 @@ describe('autoloader', () => {
         await tick();
         el.remove();
 
-        expect(mockButtonImport).not.toHaveBeenCalled();
+        expect(mockAlertImport).not.toHaveBeenCalled();
     });
 });

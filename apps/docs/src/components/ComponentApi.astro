@@ -6,7 +6,10 @@
  * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { type CemDeclaration } from '../utils/cem-types.ts';
+import { buildTokenMap, resolveColor } from '../utils/parse-tokens.ts';
 
 interface Props {
     component: CemDeclaration;
@@ -14,9 +17,12 @@ interface Props {
 
 const { component } = Astro.props;
 
-function isColorValue(value: string | undefined): boolean {
-    if (!value) return false;
-    return /^#[0-9a-fA-F]{3,8}$/.test(value) || /^rgba?\(/.test(value);
+const themePath = resolve(process.cwd(), '../../packages/core/src/styles/themes/default.css');
+const tokenMap = buildTokenMap(readFileSync(themePath, 'utf-8'));
+
+function swatchColor(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    return resolveColor(value, tokenMap);
 }
 ---
 
@@ -120,22 +126,26 @@ function isColorValue(value: string | undefined): boolean {
                         </tr>
                     </thead>
                     <tbody>
-                        {component.cssProperties.map((prop) => (
-                            <tr>
-                                <td><code>{prop.name}</code></td>
-                                <td>
-                                    {isColorValue(prop.default) && (
-                                        <span
-                                            class="swatch"
-                                            style={`background: ${prop.default}`}
-                                            title={prop.default}
-                                        />
-                                    )}
-                                    <code>{prop.default ?? '—'}</code>
-                                </td>
-                                <td>{prop.description ?? ''}</td>
-                            </tr>
-                        ))}
+                        {component.cssProperties.map((prop) => {
+                            const color = swatchColor(prop.default);
+                            return (
+                                <tr>
+                                    <td><code>{prop.name}</code></td>
+                                    <td>
+                                        {color ? (
+                                            <span
+                                                class="swatch"
+                                                style={`background: var(${prop.name})`}
+                                                aria-hidden="true"
+                                            />
+                                        ) : (
+                                            <code>{prop.default ?? '—'}</code>
+                                        )}
+                                    </td>
+                                    <td>{prop.description ?? ''}</td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

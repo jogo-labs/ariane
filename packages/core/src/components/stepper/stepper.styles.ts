@@ -13,10 +13,13 @@ export default css`
                     linear,
                     left top,
                     left bottom,
-                    color-stop(25%, #cdcfd8),
+                    color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
                     color-stop(25%, transparent)
                 );
-                background-image: linear-gradient(#cdcfd8 25%, transparent 25%);
+                background-image: linear-gradient(
+                    var(--ar-color-neutral-80, #cdcfd8) 25%,
+                    transparent 25%
+                );
                 background-size: 2px 8px;
                 background-position: center 3px;
                 background-repeat: repeat-y;
@@ -87,7 +90,7 @@ export default css`
         -webkit-box-align: center;
         -ms-flex-align: center;
         align-items: center;
-        color: var(--ar--color-background-neutral-default-strong);
+        color: var(--ar-color-text-muted, #5b5d65);
     }
 
     .stepper-item-bullet {
@@ -106,8 +109,10 @@ export default css`
         margin-right: 0.5rem;
         -webkit-transform: translateY(1px);
         transform: translateY(1px);
-        -webkit-box-shadow: 0 0 0 1px var(--ar--stepper-next-bullet-border) inset;
-        box-shadow: 0 0 0 1px var(--ar--stepper-next-bullet-border) inset;
+        -webkit-box-shadow: 0 0 0 1px
+            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
+        box-shadow: 0 0 0 1px
+            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
         background-color: transparent;
     }
 
@@ -139,42 +144,42 @@ export default css`
 
     .stepper-item .stepper-link:focus,
     .stepper-item .stepper-link:hover {
-        color: var(--ar--stepper-bullet-hover);
+        color: var(--ar-stepper-bullet-hover-color, var(--ar-color-text-muted, #5b5d65));
     }
 
     .stepper-item .stepper-link:focus:before,
     .stepper-item .stepper-link:hover:before {
-        background-color: var(--ar--color-primary);
+        background-color: var(--ar-color-interactive, #283276);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-label,
     .stepper-item .stepper-link:hover .stepper-item-label {
         text-decoration: none;
-        color: var(--ar--color-text-color);
+        color: var(--ar-color-text, #2e2e31);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-bullet,
     .stepper-item .stepper-link:hover .stepper-item-bullet {
-        color: #fff;
-        background-color: var(--ar--stepper-bullet-hover);
+        color: var(--ar-color-text-inverse, #fff);
+        background-color: var(--ar-stepper-bullet-hover-color, var(--ar-color-text-muted, #5b5d65));
         -webkit-box-shadow: none;
         box-shadow: none;
     }
 
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
-        outline-color: var(--ar--color-primary);
+        outline-color: var(--ar-color-interactive, #283276);
         border-radius: 0.125rem;
     }
 
     .stepper-item.active > .stepper-item-inner {
-        color: var(--ar--color-primary);
+        color: var(--ar-color-interactive, #283276);
         font-weight: 700;
     }
 
     .stepper-item.active > .stepper-item-inner .stepper-item-bullet {
-        color: #fff;
-        background-color: #406bde;
+        color: var(--ar-color-text-inverse, #fff);
+        background-color: var(--ar-stepper-active-bullet-bg, var(--ar-color-interactive, #283276));
         -webkit-box-shadow: none;
         box-shadow: none;
     }
@@ -185,8 +190,8 @@ export default css`
     }
 
     .stepper-link .stepper-item-bullet {
-        color: #283276;
-        background-color: var(--ar--stepper-bullet-background);
+        color: var(--ar-color-interactive, #283276);
+        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
     }
 
     .stepper-list.stepper-desktop,
@@ -202,10 +207,10 @@ export default css`
             linear,
             left top,
             left bottom,
-            color-stop(25%, #cdcfd8),
+            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
             color-stop(25%, transparent)
         );
-        background-image: linear-gradient(#cdcfd8 25%, transparent 0);
+        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 3px;
         background-repeat: repeat-y;
@@ -256,10 +261,10 @@ export default css`
             linear,
             left top,
             left bottom,
-            color-stop(25%, #cdcfd8),
+            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
             color-stop(25%, transparent)
         );
-        background-image: linear-gradient(#cdcfd8 25%, transparent 0);
+        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
@@ -305,7 +310,7 @@ export default css`
     }
 
     .stepper-edition .stepper-item-bullet {
-        color: #283276;
-        background-color: var(--ar--stepper-bullet-background);
+        color: var(--ar-color-interactive, #283276);
+        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
     }
 `;

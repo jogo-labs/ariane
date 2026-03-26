@@ -2,7 +2,7 @@
 
 /**
  * Extrait le prefix d'un tag name custom element.
- * "ar-button"       → "mr"
+ * "ar-alert"       → "ar"
  * "ft-stepper-item" → "ft"
  */
 export function getPrefix(tagName: string): string {
@@ -11,7 +11,7 @@ export function getPrefix(tagName: string): string {
 
 /**
  * Extrait le slug (tag sans prefix) pour construire les URLs.
- * "ar-button"       → "button"
+ * "ar-alert"       → "alert"
  * "ar-stepper-item" → "stepper-item"
  */
 export function getSlug(tagName: string): string {
@@ -20,8 +20,8 @@ export function getSlug(tagName: string): string {
 
 /**
  * Regroupe les composants par prefix.
- * Utile si la lib expose plusieurs familles (mr-*, ft-*...).
- * { "mr": [...], "ft": [...] }
+ * Utile si la lib expose plusieurs familles (ar-*, ft-*...).
+ * { "ar": [...], "ft": [...] }
  */
 export function groupByPrefix<T extends { tagName?: string }>(
     components: T[],
