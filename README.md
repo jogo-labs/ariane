@@ -38,14 +38,15 @@ Le monorepo est géré par **npm workspaces** et orchestré par **Turborepo**.
 
 ### Prérequis
 
-- Node ≥ 20
-- npm ≥ 10
+- Node ≥ 24 (LTS)
+- npm ≥ 11
 
 ### Installation
 
 ```bash
 git clone https://github.com/jonTravens/Ariane
 cd Ariane
+nvm use   # active automatiquement Node 24 via .nvmrc
 npm install
 ```
 
