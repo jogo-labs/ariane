@@ -44,4 +44,12 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm run test
+        run: npm run test:coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: packages/core/coverage/
+          retention-days: 7
