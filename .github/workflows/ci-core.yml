@@ -1,14 +1,22 @@
-name: CI
+name: CI (core)
 
 on:
   push:
     branches: [main, dev, next]
   pull_request:
     branches: [main, dev, next]
+    paths:
+      - 'packages/core/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'turbo.json'
+      - 'tsconfig.base.json'
+      - '*.config.{js,ts,mjs}'
+      - '.github/workflows/ci-core.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true # Annule le run précédent si un nouveau push arrive sur la même branche
+  cancel-in-progress: true
 
 jobs:
   ci:
@@ -38,7 +46,7 @@ jobs:
         run: npm ci --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint --workspace=packages/core
 
       - name: Build
         run: npm run build
@@ -47,7 +55,7 @@ jobs:
         run: npm run test:coverage --workspace=packages/core
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
@@ -79,35 +87,3 @@ jobs:
 
       - name: Browser tests
         run: npm run test:browser --workspace=packages/core
-
-  docs:
-    name: Lint, Test & Build (docs)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --frozen-lockfile
-
-      - name: Lint docs
-        run: npm run lint --workspace=apps/docs
-
-      - name: Build core (required by docs)
-        run: npm run build --workspace=packages/core
-
-      - name: Test docs (unit)
-        run: npm run test --workspace=apps/docs
-
-      - name: Build docs
-        run: npm run build --workspace=apps/docs
-
-      - name: Check build output
-        run: npm run test:build --workspace=apps/docs
