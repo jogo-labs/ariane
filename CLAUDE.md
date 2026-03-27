@@ -4,161 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Ariane** is an accessible web components library (`@ariane-ui/core`) built with **Lit 3** and **TypeScript**. It's an npm workspaces monorepo orchestrated by Turborepo with a dual distribution strategy (NPM + CDN).
+**Ariane** is an accessible web components library (`@ariane-ui/core`) built with **Lit 3** and **TypeScript**. npm workspaces monorepo orchestrated by Turborepo. Dual distribution: NPM (tree-shakeable ESM) + CDN (self-contained bundle with autoloader).
 
-## Philosophie de la librairie
+Ariane is a **foundation** for building design systems — not a design system itself. It handles patterns where correct accessible implementation is a real obstacle. It does not rewrite native elements that already work well.
 
-### Mission
+## Références
 
-Ariane est une librairie de composants web **accessibles par défaut**, **agnostiques de framework**, **thémables** et **open source**. Elle ne réécrit pas les éléments natifs qui fonctionnent bien — elle prend en charge les patterns dont la complexité d'implémentation correcte est un obstacle à l'accessibilité dans les projets réels.
+- **Philosophie, positionnement et critères d'inclusion** → [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Setup, commandes, architecture, patterns de code** → [DEVELOPMENT.md](DEVELOPMENT.md)
+- **Décisions techniques détaillées** → [`docs/decisions/`](docs/decisions/) — indexées par context-mode, utiliser `ctx_search` pour les retrouver
 
-Ariane est pensée comme un **ensemble de briques logicielles prêtes à l'emploi servant de base stable pour construire un design system**. À ce titre, elle doit être parfaitement conforme aux normes attendues en termes de fonctionnement et de capacité de personnalisation via des design tokens bien réfléchis. L'objectif n'est pas d'être un design system en soi, mais d'être la fondation sur laquelle un design system peut être bâti — avec le moins de friction possible.
+## Règles actives
 
-### Critères d'inclusion d'un composant
+### Naming
 
-Un composant intègre Ariane si au moins l'une de ces conditions est vraie :
+- Tag: `ar-<name>` · Class: `Ar<Name>` · Events: `ar-<event>`
+- CSS custom properties: `--ar-<component>-<property>` (e.g. `--ar-button-bg`)
+- CSS parts: `part="base"`, `part="label"`, `part="prefix"`, `part="suffix"`
 
-1. **Complexité a11y non triviale** — implémenter correctement le comportement accessible est difficile et souvent mal fait (stepper, datepicker, dialog, tabs, dropdown).
-2. **Absent des projets non par manque de besoin, mais par difficulté d'implémentation** — si un composant est rare alors qu'il améliorerait l'UX, c'est un signal positif d'inclusion (datepicker en est l'exemple typique).
-3. **Extension d'un natif insuffisant** — quand un élément natif existe mais ne couvre pas les usages réels (`<dialog>` → `<ar-dialog>` qui l'étend).
+### Properties — always `reflect: true`
 
-Un composant est **exclu** si :
+Without `reflect: true`, the HTML attribute won't sync with the JS property — the playground's `outerHTML` will show missing attributes.
 
-- Il réplique un natif qui fait déjà bien le job (`<button>`, `<input>`, `<select>` de base).
-- Sa valeur ajoutée est purement graphique sans apport a11y ou comportemental.
+### Custom events — always `{ bubbles: true, composed: true }`
 
-### Ergonomie de l'API
+Without `composed: true`, events don't cross Shadow DOM boundary. Without `bubbles: true`, they don't bubble up through the light DOM either.
 
-L'API des composants doit être **intuitive par rapport aux natifs** : un breadcrumb se compose comme un `<ul>/<li>`, pas comme un JSON stringifié. Utiliser des éléments enfants slottés plutôt que des props de données complexes.
+### Global type declaration
 
-### Thémabilité encadrée par l'accessibilité
-
-- Les aspects visuels personnalisables sont exposés via CSS custom properties (`--ar-*`).
-- Les aspects qui garantissent l'accessibilité (présence du bouton de fermeture d'une modale, focus management, etc.) sont **non négociables** — ils ne peuvent pas être désactivés, seulement restyled.
-- Le thème par défaut (`default.css`) doit satisfaire les ratios de contraste **WCAG 2.2 AA sans configuration supplémentaire** — c'est la promesse "out of the box".
-
-### Gestion du contexte d'affichage (`variant`)
-
-Deux dimensions orthogonales coexistent :
-
-1. **Mode système** (`light`/`dark`) — géré via `prefers-color-scheme` et `data-theme`, les tokens sémantiques suivent automatiquement.
-2. **Contexte de fond** — certains composants s'affichent sur des fonds de couleur contrôlée par l'intégrateur (header coloré, overlay sombre). Ces composants exposent un attribut `variant="on-light"` / `variant="on-dark"` pour garantir la lisibilité.
-
-Règle : **si `variant` est défini explicitement, il prime sur le mode système** — le fond du conteneur ne change pas quand l'utilisateur bascule en dark mode. Si `variant` n'est pas défini, le composant suit le mode système via les tokens sémantiques.
-
-### Architecture des composants
-
-Trois catégories :
-
-| Catégorie                           | Description                                                                    | Exemple                               |
-| ----------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------- |
-| **Custom elements avec Shadow DOM** | Composants visuels complets, hermétiques                                       | `ar-alert`, `ar-stepper`, `ar-dialog` |
-| **Custom elements sans Shadow DOM** | Conteneurs de données / comportement pur, `createRenderRoot() { return this }` | `ar-stepper-item`, `ar-collapse`      |
-| **Extension de natif**              | Wraps un élément natif pour l'enrichir                                         | `ar-dialog` wraps `<dialog>`          |
-
-Le CEM (`custom-elements.json`) est la source de vérité pour toute l'API publique — préférer les custom elements aux directives/attributs custom pour bénéficier de la documentation automatique.
-
-### Relation entre tokens de la librairie et styles de la doc
-
-Les variables `--doc-*` (dans `apps/docs/`) peuvent référencer des tokens `--ar-*` **qui existent déjà pour les besoins des composants**. Elles ne doivent jamais forcer l'ajout d'un token dans `packages/core` pour un besoin purement documentaire.
-
-Règle : **un token n'entre dans `packages/core` que si un composant en a besoin**. La doc bénéficie des tokens existants, elle ne les pilote pas.
-
-En pratique :
-
-- Couleurs sémantiques (`--ar-color-bg`, `--ar-color-text`, `--ar-color-border`, `--ar-color-interactive`) → référencées directement dans les `--doc-*`
-- Besoins propres à la doc (fond des blocs de code, largeur sidebar, etc.) → valeurs fixes dans les `--doc-*`, pas de token `--ar-*` créé pour ça
-
-Cette approche évoluera naturellement quand le token system sera plus mature (cf. Web Awesome qui n'a plus besoin de couche intermédiaire).
-
-### Distribution
-
-- **CDN recommandé** pour l'intégration simple (bundle autoportant avec autoloader).
-- **npm** disponible pour les projets qui veulent contrôler l'hébergement ou intégrer dans un bundler.
-- Les composants sont **hermétiques** (Shadow DOM) et cohabitent avec d'autres systèmes de design sans pollution CSS mutuelle.
-
-### Accessibilité
-
-- Cible : **WCAG 2.2 niveau AA**.
-- Compatibilité maximale avec tous les lecteurs d'écran (pas de dépendance à NVDA/JAWS/VoiceOver spécifiquement).
-- Compatibilité navigateurs : **navigateurs modernes avec support des Custom Elements** uniquement.
-
-## Commands
-
-### Monorepo (root)
-
-```bash
-npm run build             # Build all packages/apps
-npm run dev               # Parallel dev mode (watch)
-npm run test              # Run all Vitest tests (core + docs)
-npm run test:all          # Run all tests including browser (Vitest + WTR/Chromium)
-npm run lint              # Lint all packages
-npm run format            # Prettier (TS, JS, JSON, CSS, Astro, MD)
-npm run create ar-<name>  # Scaffold a new component
-```
-
-### Core package (`packages/core/`)
-
-```bash
-npm run build:manifest  # Generate custom-elements.json (CEM)
-npm run build:bundles   # esbuild → dist/ (NPM) + cdn/
-npm run build:css       # Process CSS themes
-npm run build:types     # tsc --emitDeclarationOnly
-npm run test            # vitest run (single pass)
-npm run test:watch      # vitest (interactive)
-npm run test:coverage   # vitest --coverage
-npm run lint            # eslint src
-```
-
-### Docs app (`apps/docs/`)
-
-```bash
-npm run dev    # Astro dev server (requires custom-elements.json to exist first)
-npm run build  # Astro static build
-```
-
-## Architecture
-
-### Structure
-
-```
-packages/core/src/
-  components/   # One directory per component (e.g., button/, stepper/)
-  controllers/  # Reusable Lit ReactiveControllers
-  context/      # @lit/context providers for parent-child communication
-  state/        # Pure state computation engines
-  styles/       # Shared CSS (reset, utilities, animations, themes/)
-  types/        # TypeScript interfaces
-  index.ts      # Barrel export
-apps/docs/      # Astro 5 + MDX documentation site
-```
-
-### Component file conventions
-
-Each component lives in `components/<name>/` with:
-
-- `<name>.ts` — LitElement class, decorated with `@customElement('ar-<name>')`
-- `<name>.styles.ts` — Lit `css` tagged template styles
-- `<name>.test.ts` — Vitest tests
-
-Complex components add:
-
-- `<name>.renderer.ts` — Separate render helpers (e.g., `renderDesktop` / `renderMobile`)
-- `<name>.utils.ts` — Helper functions
-
-### Naming conventions
-
-- **Tag names**: `ar-<name>` (prefix defined in `packages/core/package.json` → `config.componentPrefix`)
-- **Class names**: `Ar<Name>` (PascalCase)
-- **Custom events**: prefixed `ar-` (e.g., `ar-alert-close`, `ar-stepper-step-changed`)
-- **CSS custom properties**: `--ar-<component>-<property>` (e.g., `--ar-button-bg`)
-- **CSS parts**: `part="base"`, `part="label"`, `part="prefix"`, `part="suffix"`
-
-### Key patterns
-
-**Properties**: Always use `reflect: true` for attributes that should sync to HTML.
-
-**Global type declaration**: Every component file ends with:
+Every component file ends with:
 
 ```typescript
 declare global {
@@ -168,57 +42,19 @@ declare global {
 }
 ```
 
-**Custom events**: Always `{ bubbles: true, composed: true }` to traverse Shadow DOM.
+### Tokens: doc vs. library
 
-**Parent-child composition**: Use `@lit/context` — parent exposes a `ContextProvider`, child subscribes via `ContextConsumer`. See `stepper/` for reference.
+`--doc-*` variables (in `apps/docs/`) may reference existing `--ar-*` tokens but must never force adding a token to `packages/core` for a documentation-only need. **A token only enters `packages/core` if a component needs it.**
 
-**No Shadow DOM components**: Data-container components (e.g., `ar-stepper-item`) override `createRenderRoot()` to return `this`.
+### Component variant
 
-### Build outputs
+If `variant` is set explicitly on a component, it overrides the system theme. If unset, the component follows the system theme via semantic tokens.
 
-- `dist/` — Tree-shakeable ESM, Lit as external peer dep
-- `cdn/` — Self-contained bundle (Lit bundled in), includes an autoloader
-- `custom-elements.json` — Source of truth for all component metadata; consumed by the docs app
+---
 
-### Testing pattern
+## Docs site architecture (`apps/docs/`)
 
-```typescript
-async function fixture(html: string): Promise<MrComponent> {
-    const template = document.createElement('template');
-    template.innerHTML = html.trim();
-    const el = template.content.firstElementChild as MrComponent;
-    document.body.appendChild(el);
-    await (el as any).updateComplete;
-    return el;
-}
-```
-
-### Docs generation
-
-`packages/core/cem.config.js` configures `@custom-elements-manifest/analyzer` to generate:
-
-- `custom-elements.json` — component API (props, events, slots, CSS parts/props)
-- `vscode.html-custom-data.json` / `vscode.css-custom-data.json` — IDE completions
-
-JSDoc tags used in component files:
-
-| Tag                | Effect                                                |
-| ------------------ | ----------------------------------------------------- |
-| `@display demo`    | Page shows variants + playground + API ref (default)  |
-| `@display docs`    | Page shows only API ref (no playground)               |
-| `@parent ar-<tag>` | Marks as sub-component; adds back-link to parent page |
-| `@ignore`          | Hides a member from the playground controls           |
-
-### Docs site architecture (`apps/docs/`)
-
-The docs site is a custom Astro 5 + MDX static site. **No Starlight, no api-viewer.**
-
-**Page structure per component** (`/components/[slug]`):
-
-1. **Exemples** — variants stacked vertically, all server-side rendered via `<Fragment set:html>`
-2. **Playground** — server-side initial render + live controls generated from CEM members
-3. **Référence API** — static tables (attributes, events, slots, CSS parts/props)
-4. **Sticky TOC** — right column, `IntersectionObserver`-driven active highlighting
+Custom Astro + MDX static site. No Starlight, no api-viewer.
 
 **Key files:**
 
@@ -252,10 +88,9 @@ variants:
       html: '<ar-button>Label</ar-button>'
 ```
 
-> **Sub-components**: use only `@parent ar-<tag>` JSDoc in the Lit class. No MDX field needed —
-> the CEM `x-parent` field is read directly by the nav and home page to filter and nest the component.
+> **Sub-components**: use only `@parent ar-<tag>` JSDoc in the Lit class. No MDX field needed — the CEM `x-parent` field is read directly by the nav and home page.
 
-**Playground control type detection** (in `src/utils/cem-types.ts` → `buildControls()`):
+**Playground control type detection** (`src/utils/cem-types.ts` → `buildControls()`):
 
 | CEM type                         | Control                                              |
 | -------------------------------- | ---------------------------------------------------- |
@@ -265,61 +100,29 @@ variants:
 | `number` / `number \| undefined` | `<input type="number">`                              |
 | anything else                    | `<input type="text">`                                |
 
+---
+
 ## Tooling Notes
 
 - **Commits**: Conventional Commits enforced by commitlint + Husky
 - **Pre-commit**: lint-staged runs ESLint + Prettier on staged files
 - **TypeScript**: strict mode; use inline type imports (`import type`)
 - **Prettier config**: 100 char width, 4 spaces, single quotes
-- **Node requirement**: >=20, npm >=10
+- **Node requirement**: >=24, npm >=11
+
+---
 
 ## Méthode de travail
 
 **Remettre en cause la demande après 3 essais infructueux**
-Si un correctif échoue 3 fois de suite, ne pas insister. S'arrêter et questionner la logique de la demande elle-même : est-ce rationnel ? Est-ce que ça va à l'encontre des conventions du domaine ? Est-ce que le problème vient du _quoi_ plutôt que du _comment_ ? Exposer le doute clairement à l'utilisateur et proposer une alternative avant de continuer. Exemple : tenter de simuler un layout mobile dans une preview desktop via CSS/JS alors que les DevTools sont l'outil fait pour ça.
+Si un correctif échoue 3 fois de suite, ne pas insister. S'arrêter et questionner la logique de la demande elle-même : est-ce rationnel ? Est-ce que ça va à l'encontre des conventions du domaine ? Est-ce que le problème vient du _quoi_ plutôt que du _comment_ ? Exposer le doute clairement à l'utilisateur et proposer une alternative avant de continuer.
 
 ---
 
-## Lessons — décisions techniques et erreurs à ne pas reproduire
-
-### Docs site
-
-**Highlight.js plutôt que Shiki pour la coloration syntaxique**
-Shiki est 100% serveur — impossible de re-coloriser côté client après que le playground ait réécrit le DOM. Utiliser uniquement highlight.js (CDN cdnjs, thème `github-dark`) : `hljs.highlightAll()` au chargement, `hljs.highlightElement(el)` après chaque mise à jour (après avoir réinitialisé l'attribut `data-highlighted`). Ne pas mélanger les deux outils — leurs palettes divergent même avec le même thème.
-
-**Overlay nav mobile — `pointer-events`**
-Un overlay avec `opacity: 0` bloque quand même les clics. Toujours ajouter `pointer-events: none` par défaut sur `.nav-overlay`, et `pointer-events: auto` uniquement avec la classe `.open`.
-
-**IntersectionObserver double-init (TableOfContents)**
-`TableOfContents.astro` est monté deux fois (desktop sticky + mobile inline). Utiliser un guard `window.__tocObserverInit` — seule la première instance crée l'observer. Les deux partagent les mêmes classes CSS `.toc-link`, un seul observer suffit.
-
-**Sous-composants : `@parent` JSDoc seul suffit**
-`index.astro` et `SiteNav.astro` lisent tous les deux `c['x-parent']` depuis le CEM. Le champ MDX `parent` a été supprimé du schéma Zod. L'annotation `@parent ar-<tag>` dans le composant Lit est la seule source de vérité — ne pas ajouter de champ MDX.
-
-**Types CEM : ne pas dupliquer, utiliser `cem-types.ts`**
-Toutes les interfaces CEM et helpers (`getCustomElements`, `buildControls`) sont dans `src/utils/cem-types.ts`. Avant d'écrire une interface CEM dans un fichier Astro, vérifier si elle existe déjà.
-
-**Astro scoped styles et imports CSS partagés**
-Pour partager du CSS entre composants, utiliser `@import` au début d'un bloc `<style>`. Astro résout les imports relatifs et applique quand même le scoping.
-
-**`<script is:inline src="...">` plutôt que `defer`**
-`defer` charge le script après le DOM, ce qui posait un problème pour `hljs.highlightAll()`. Utiliser `is:inline` explicitement pour un chargement synchrone — highlight.js est assez petit pour ça.
-
-**Scripts `is:inline src="..."` dans `<head>` — envelopper dans `DOMContentLoaded`**
-Un script `is:inline src="..."` dans `<head>` s'exécute avant le parsing du `<body>`. Tout `document.querySelectorAll(...)` retourne zéro éléments. Envelopper le code dans `document.addEventListener('DOMContentLoaded', function() { ... })`. C'était la cause du dysfonctionnement complet du playground interactif (contrôles sans effet).
-
-**Preview de composants indépendante du thème global**
-Les éléments `.preview` ont leur propre attribut `data-theme="light|dark"` et redéfinissent les tokens `--ar-color-*` pour un contexte CSS isolé. Un bouton toggle local permet de basculer indépendamment du thème global.
-
-**Variables CSS `--doc-*` pour les couleurs de la doc**
-Ne jamais mettre de couleurs hex hardcodées dans `apps/docs/`. Le site supporte les thèmes light/dark via les variables `--doc-*` (ex : `--doc-text`, `--doc-border`, `--doc-text-muted`). Toujours vérifier si une variable existe avant d'écrire une valeur fixe.
-
-### Package core
+## Lessons — package core
 
 **Convention de dépréciation**
-Utiliser `warnDeprecated(tag, member, message)` depuis `src/utils/deprecated.ts` pour signaler une propriété ou un attribut obsolète. Le warning ne s'affiche qu'une fois par session (garde en `Set`). Toujours annoter avec `@deprecated` en JSDoc pour que l'IDE le signale. Annoncer la suppression cible dans le message (ex: `Sera supprimé en v1.0.0.`).
-
-Exemple d'usage dans un composant :
+Utiliser `warnDeprecated(tag, member, message)` depuis `src/utils/deprecated.ts`. Le warning ne s'affiche qu'une fois par session (garde en `Set`). Toujours annoter avec `@deprecated` en JSDoc. Annoncer la suppression cible dans le message.
 
 ```typescript
 import { warnDeprecated } from '../../utils/deprecated.js';
@@ -334,23 +137,17 @@ if (this.links !== undefined) {
 }
 ```
 
-**`reflect: true` obligatoire**
-Sans `reflect: true`, l'attribut n'est pas synchronisé dans le DOM — le `outerHTML` du playground affichera des attributs absents même si la propriété a changé côté JS.
-
-**`{ bubbles: true, composed: true }` sur tous les événements custom**
-Sans `composed: true`, les événements ne traversent pas la frontière Shadow DOM. Sans `bubbles: true`, ils ne remontent pas non plus dans le DOM shadow.
-
 **Tests : `textContent` des Text nodes Lit interpolés dans happy-dom**
-happy-dom ne sérialise pas correctement les Text nodes dynamiques générés par Lit (`${this.prop}` dans un template html`...`). `element.textContent` retourne `''` même si le rendu est correct visuellement. Pour tester le contenu textuel, vérifier la propriété JS directement (`el.myProp`) plutôt que `element.textContent`. Les attributs, `hasAttribute`, `getAttribute` et la structure DOM (présence d'éléments, `hidden`) fonctionnent correctement.
+`element.textContent` retourne `''` même si le rendu est correct. Tester la propriété JS directement (`el.myProp`). Les attributs, `hasAttribute`, `getAttribute` et la structure DOM fonctionnent correctement.
 
-**Tests : helpers `fixture()`, `waitForUpdate()`, `getPart()` pour les composants Lit**
-Extraire ces trois helpers dans chaque fichier de test pour éviter les non-null assertions (`!`) bloquées par `lint-staged --max-warnings=0`. `getPart(el, 'name')` cible les éléments par `part="…"` — l'API publique stable du composant.
+**Tests : helpers `fixture()`, `waitForUpdate()`, `getPart()`**
+Extraire ces trois helpers dans chaque fichier de test pour éviter les non-null assertions (`!`) bloquées par `lint-staged --max-warnings=0`. `getPart(el, 'name')` cible les éléments par `part="…"`.
 
 **Tests : `.ariaCurrent` (et autres propriétés ARIA Lit) ne reflètent pas en attribut dans happy-dom**
-Quand Lit assigne une propriété ARIA via `.ariaCurrent`, `.ariaExpanded`, etc. (liaison de propriété DOM), `getAttribute('aria-current')` retourne `null` dans happy-dom. Tester la propriété JS directement : `(el as unknown as { ariaCurrent: string }).ariaCurrent`.
+Tester la propriété JS directement : `(el as unknown as { ariaCurrent: string }).ariaCurrent`.
 
-**Tests : `MrBreadcrumb.mobileQuery` — mock minimal avec `addEventListener`/`removeEventListener`**
-Remplacer `MrBreadcrumb.mobileQuery` par `{ matches: true/false, addEventListener: vi.fn(), removeEventListener: vi.fn() } as unknown as MediaQueryList`. Un objet sans ces méthodes plante dans `connectedCallback`/`disconnectedCallback`. Créer un helper `mockMediaQuery(matches)` en tête de fichier.
+**Tests : `MediaQueryList` mock**
+Toujours inclure `addEventListener` et `removeEventListener` : `{ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() } as unknown as MediaQueryList`.
 
-**Tests : composants avec `queueMicrotask` (ex: `_scheduleRebuild`) nécessitent deux `updateComplete`**
-Quand le rendu est déclenché depuis un `queueMicrotask` (pattern de debounce), `await updateComplete` une seule fois ne suffit pas. Dans `fixture()` et `waitForUpdate()`, `await updateComplete` deux fois de suite pour absorber le cycle initial + le cycle déclenché par le microtask.
+**Tests : `queueMicrotask` — double `updateComplete`**
+Quand le rendu est déclenché depuis un `queueMicrotask`, `await updateComplete` deux fois de suite pour absorber le cycle initial + le cycle du microtask.
