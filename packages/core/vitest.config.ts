@@ -7,9 +7,9 @@ export default defineConfig({
         // n'ajoute pas 300MB de browsers Playwright en CI.
         environment: 'happy-dom',
 
-        // *.browser.test.ts sont gérés par @web/test-runner, pas Vitest
+        // *.browser.test.ts et *.a11y.test.ts sont gérés par @web/test-runner, pas Vitest
         include: ['src/**/*.test.ts'],
-        exclude: ['src/**/*.browser.test.ts'],
+        exclude: ['src/**/*.browser.test.ts', 'src/**/*.a11y.test.ts'],
 
         // Rapport de couverture granulaire par fichier
         coverage: {
@@ -19,6 +19,7 @@ export default defineConfig({
             exclude: [
                 'src/**/*.test.ts',
                 'src/**/*.browser.test.ts',
+                'src/**/*.a11y.test.ts',
                 'src/**/*.styles.ts',
                 // ScrollFollowController désormais couvert par les browser tests (issue #30)
                 'src/controllers/scroll-follow.controller.ts',

@@ -49,7 +49,7 @@ export class ArProgressbar extends LitElement {
         const percentValue = Math.max(0, Math.min(100, this.percent));
 
         return html` <div part="container" class="progressbar-container">
-            <p part="label" class="progress-label">
+            <p part="label" id="progressbar-label" class="progress-label">
                 <span part="label-text" class="content-label">
                     <slot></slot>
                 </span>
@@ -61,6 +61,7 @@ export class ArProgressbar extends LitElement {
                     class="progress-bar"
                     style=${styleMap({ width: percentValue + '%' })}
                     role="progressbar"
+                    aria-labelledby="progressbar-label"
                     aria-valuenow="${percentValue}"
                     aria-valuemin="0"
                     aria-valuemax="100"

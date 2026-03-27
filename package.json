@@ -17,6 +17,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
+    "test:all": "turbo run test test:browser",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,css,astro,md}\" --ignore-path .gitignore",
     "create": "node packages/core/scripts/create-component.js",

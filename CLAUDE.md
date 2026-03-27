@@ -90,7 +90,8 @@ Cette approche évoluera naturellement quand le token system sera plus mature (c
 ```bash
 npm run build             # Build all packages/apps
 npm run dev               # Parallel dev mode (watch)
-npm run test              # Run all tests
+npm run test              # Run all Vitest tests (core + docs)
+npm run test:all          # Run all tests including browser (Vitest + WTR/Chromium)
 npm run lint              # Lint all packages
 npm run format            # Prettier (TS, JS, JSON, CSS, Astro, MD)
 npm run create ar-<name>  # Scaffold a new component
