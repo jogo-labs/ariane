@@ -58,6 +58,19 @@ Trois catégories :
 
 Le CEM (`custom-elements.json`) est la source de vérité pour toute l'API publique — préférer les custom elements aux directives/attributs custom pour bénéficier de la documentation automatique.
 
+### Relation entre tokens de la librairie et styles de la doc
+
+Les variables `--doc-*` (dans `apps/docs/`) peuvent référencer des tokens `--ar-*` **qui existent déjà pour les besoins des composants**. Elles ne doivent jamais forcer l'ajout d'un token dans `packages/core` pour un besoin purement documentaire.
+
+Règle : **un token n'entre dans `packages/core` que si un composant en a besoin**. La doc bénéficie des tokens existants, elle ne les pilote pas.
+
+En pratique :
+
+- Couleurs sémantiques (`--ar-color-bg`, `--ar-color-text`, `--ar-color-border`, `--ar-color-interactive`) → référencées directement dans les `--doc-*`
+- Besoins propres à la doc (fond des blocs de code, largeur sidebar, etc.) → valeurs fixes dans les `--doc-*`, pas de token `--ar-*` créé pour ça
+
+Cette approche évoluera naturellement quand le token system sera plus mature (cf. Web Awesome qui n'a plus besoin de couche intermédiaire).
+
 ### Distribution
 
 - **CDN recommandé** pour l'intégration simple (bundle autoportant avec autoloader).
