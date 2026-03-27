@@ -1,0 +1,50 @@
+name: CI (docs)
+
+on:
+  push:
+    branches: [main, dev, next]
+  pull_request:
+    branches: [main, dev, next]
+    paths:
+      - 'apps/docs/**'
+      - 'packages/core/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ci-docs.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: Lint, Test & Build (docs)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --frozen-lockfile
+
+      - name: Lint docs
+        run: npm run lint --workspace=apps/docs
+
+      - name: Build core (required by docs)
+        run: npm run build --workspace=packages/core
+
+      - name: Test docs (unit)
+        run: npm run test --workspace=apps/docs
+
+      - name: Build docs
+        run: npm run build --workspace=apps/docs
+
+      - name: Check build output
+        run: npm run test:build --workspace=apps/docs
