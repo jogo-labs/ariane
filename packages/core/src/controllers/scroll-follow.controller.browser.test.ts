@@ -1,3 +1,4 @@
+/// <reference types="mocha" />
 import { expect } from '@open-wc/testing';
 import { ScrollFollowController } from './scroll-follow.controller.js';
 
