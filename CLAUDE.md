@@ -12,6 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ariane est une librairie de composants web **accessibles par défaut**, **agnostiques de framework**, **thémables** et **open source**. Elle ne réécrit pas les éléments natifs qui fonctionnent bien — elle prend en charge les patterns dont la complexité d'implémentation correcte est un obstacle à l'accessibilité dans les projets réels.
 
+Ariane est pensée comme un **ensemble de briques logicielles prêtes à l'emploi servant de base stable pour construire un design system**. À ce titre, elle doit être parfaitement conforme aux normes attendues en termes de fonctionnement et de capacité de personnalisation via des design tokens bien réfléchis. L'objectif n'est pas d'être un design system en soi, mais d'être la fondation sur laquelle un design system peut être bâti — avec le moins de friction possible.
+
 ### Critères d'inclusion d'un composant
 
 Un composant intègre Ariane si au moins l'une de ces conditions est vraie :
