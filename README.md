@@ -20,67 +20,7 @@ Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-paginatio
 
 ---
 
-## Structure du monorepo
-
-```text
-Ariane/
-├── packages/
-│   └── core/          # @ariane-ui/core — la bibliothèque de composants
-└── apps/
-    └── docs/          # Site de documentation (Astro 6)
-```
-
-Le monorepo est géré par **npm workspaces** et orchestré par **Turborepo**.
-
----
-
-## Démarrage rapide
-
-### Prérequis
-
-- Node ≥ 24 (LTS)
-- npm ≥ 11
-
-### Installation
-
-```bash
-git clone https://github.com/jogo-labs/ariane
-cd Ariane
-nvm use   # active automatiquement Node 24 via .nvmrc
-npm install
-```
-
-### Développement
-
-```bash
-npm run dev        # Lance le watch du package core + le serveur Astro en parallèle
-```
-
-Le site de documentation est disponible sur `http://localhost:4321`.
-
-### Build complet
-
-```bash
-npm run build      # Build tous les packages et le site de doc
-```
-
----
-
-## Commandes racine
-
-| Commande                  | Description                                          |
-| ------------------------- | ---------------------------------------------------- |
-| `npm run dev`             | Mode développement parallèle (core watch + docs dev) |
-| `npm run build`           | Build complet (core + docs)                          |
-| `npm run test`            | Tests unitaires (Vitest)                             |
-| `npm run test:all`        | Tests unitaires + tests browser (Vitest + WTR)       |
-| `npm run lint`            | ESLint sur tous les packages                         |
-| `npm run format`          | Prettier sur tous les fichiers                       |
-| `npm run create ar-<nom>` | Scaffold un nouveau composant                        |
-
----
-
-## Utilisation
+## Installation
 
 ### Via CDN (sans bundler)
 
@@ -91,15 +31,15 @@ npm run build      # Build tous les packages et le site de doc
 <ar-button>Cliquez-moi</ar-button>
 ```
 
-### Via npm (avec bundler)
+### Via npm
 
 ```bash
 npm install @ariane-ui/core
 ```
 
 ```typescript
-import '@ariane-ui/core'; // enregistre tous les composants
-import '@ariane-ui/core/themes/default.css'; // thème par défaut
+import '@ariane-ui/core';
+import '@ariane-ui/core/themes/default.css';
 
 // ou import individuel (tree-shaking)
 import '@ariane-ui/core/dist/components/button/button.js';
@@ -110,8 +50,6 @@ await whenAllDefined('ar-button', 'ar-stepper');
 ```
 
 ### Autoloader CDN
-
-Le bundle CDN inclut un autoloader qui ne charge chaque composant que quand il est utilisé :
 
 ```html
 <script type="module" src="/cdn/autoloader.js"></script>
@@ -152,8 +90,8 @@ Consultez la page **Design Tokens** du site de documentation pour la liste compl
 
 ## Contribution
 
-Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les conventions et le workflow.
-Pour modifier le site de documentation, voir [apps/docs/CONTRIBUTING.md](apps/docs/CONTRIBUTING.md).
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour la philosophie et le workflow de contribution.
+Pour le setup et les commandes de développement, voir [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ---
 
