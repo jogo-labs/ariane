@@ -11,9 +11,38 @@ concurrency:
   cancel-in-progress: true # Annule le run précédent si un nouveau push arrive sur la même branche
 
 jobs:
+  # Détecte les fichiers modifiés pour conditionner les jobs suivants (PR uniquement)
+  filter:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      core: ${{ steps.filter.outputs.core }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            core:
+              - 'packages/core/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'turbo.json'
+              - '.github/workflows/ci.yml'
+            docs:
+              - 'apps/docs/**'
+              - 'packages/core/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+
   ci:
     name: Lint, Test & Build (core)
     runs-on: ubuntu-latest
+    needs: filter
+    # Toujours sur push direct ; sur PR uniquement si packages/core a changé
+    if: github.event_name == 'push' || needs.filter.outputs.core == 'true'
 
     steps:
       - name: Checkout
@@ -38,7 +67,7 @@ jobs:
         run: npm ci --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint --workspace=packages/core
 
       - name: Build
         run: npm run build
@@ -57,6 +86,8 @@ jobs:
   browser:
     name: Browser Tests (core)
     runs-on: ubuntu-latest
+    needs: filter
+    if: github.event_name == 'push' || needs.filter.outputs.core == 'true'
 
     steps:
       - name: Checkout
@@ -83,6 +114,8 @@ jobs:
   docs:
     name: Lint, Test & Build (docs)
     runs-on: ubuntu-latest
+    needs: filter
+    if: github.event_name == 'push' || needs.filter.outputs.docs == 'true'
 
     steps:
       - name: Checkout
@@ -91,7 +124,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
