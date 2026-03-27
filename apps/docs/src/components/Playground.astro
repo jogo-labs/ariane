@@ -87,65 +87,66 @@ const showPlayground = displayMode === 'demo';
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
         <h4 class="subsection-title">Playground</h4>
-        <div class="preview-wrap">
-            <div class="preview" data-playground-preview>
-                <Fragment set:html={playgroundHtml} />
+        <div class="playground-card">
+            <div class="preview-wrap">
+                <div class="preview" data-playground-preview>
+                    <Fragment set:html={playgroundHtml} />
+                </div>
             </div>
-        </div>
-        <div class="playground-code-block">
-            <button class="copy-btn" data-copy-playground aria-label="Copier le code">Copier</button>
-            {/* Le <pre><code> est mis à jour par playground.js après chaque changement de contrôle */}
-            <pre data-playground-pre><code class="language-html" data-playground-code>{playgroundHtml.trim()}</code></pre>
-        </div>
-
-        {controls.length > 0 && (
-            <div class="controls-panel">
-                {controls.map((ctrl) => (
-                    <label class="control-row">
-                        <span class="control-label">{ctrl.attribute}</span>
-                        {ctrl.controlType === 'select' && (
-                            <select
-                                data-attr={ctrl.attribute}
-                                data-playground-ctrl
-                                data-default={ctrl.default ?? ''}
-                            >
-                                {ctrl.addDefault && (
-                                    <option value="">Par défaut</option>
-                                )}
-                                {ctrl.options.map((opt) => (
-                                    <option value={opt}>{opt}</option>
-                                ))}
-                            </select>
-                        )}
-                        {ctrl.controlType === 'checkbox' && (
-                            <input
-                                type="checkbox"
-                                data-attr={ctrl.attribute}
-                                data-playground-ctrl
-                            />
-                        )}
-                        {ctrl.controlType === 'text' && (
-                            <input
-                                type="text"
-                                data-attr={ctrl.attribute}
-                                data-playground-ctrl
-                                data-default={ctrl.default ?? ''}
-                                placeholder={ctrl.default ?? ''}
-                            />
-                        )}
-                        {ctrl.controlType === 'number' && (
-                            <input
-                                type="number"
-                                data-attr={ctrl.attribute}
-                                data-playground-ctrl
-                                data-default={ctrl.default ?? ''}
-                                placeholder={ctrl.default ?? ''}
-                            />
-                        )}
-                    </label>
-                ))}
+            <div class="playground-code-block">
+                <button class="copy-btn" data-copy-playground aria-label="Copier le code">Copier</button>
+                {/* Le <pre><code> est mis à jour par playground.js après chaque changement de contrôle */}
+                <pre data-playground-pre><code class="language-html" data-playground-code>{playgroundHtml.trim()}</code></pre>
             </div>
-        )}
+            {controls.length > 0 && (
+                <div class="controls-panel">
+                    {controls.map((ctrl) => (
+                        <label class="control-row">
+                            <span class="control-label">{ctrl.attribute}</span>
+                            {ctrl.controlType === 'select' && (
+                                <select
+                                    data-attr={ctrl.attribute}
+                                    data-playground-ctrl
+                                    data-default={ctrl.default ?? ''}
+                                >
+                                    {ctrl.addDefault && (
+                                        <option value="">Par défaut</option>
+                                    )}
+                                    {ctrl.options.map((opt) => (
+                                        <option value={opt}>{opt}</option>
+                                    ))}
+                                </select>
+                            )}
+                            {ctrl.controlType === 'checkbox' && (
+                                <input
+                                    type="checkbox"
+                                    data-attr={ctrl.attribute}
+                                    data-playground-ctrl
+                                />
+                            )}
+                            {ctrl.controlType === 'text' && (
+                                <input
+                                    type="text"
+                                    data-attr={ctrl.attribute}
+                                    data-playground-ctrl
+                                    data-default={ctrl.default ?? ''}
+                                    placeholder={ctrl.default ?? ''}
+                                />
+                            )}
+                            {ctrl.controlType === 'number' && (
+                                <input
+                                    type="number"
+                                    data-attr={ctrl.attribute}
+                                    data-playground-ctrl
+                                    data-default={ctrl.default ?? ''}
+                                    placeholder={ctrl.default ?? ''}
+                                />
+                            )}
+                        </label>
+                    ))}
+                </div>
+            )}
+        </div>
     </section>
 )}
 
@@ -171,6 +172,11 @@ const showPlayground = displayMode === 'demo';
         display:        flex;
         flex-direction: column;
         gap:            1rem;
+    }
+
+    .playground-card {
+        display:        flex;
+        flex-direction: column;
     }
 
     h5 {
@@ -231,12 +237,14 @@ const showPlayground = displayMode === 'demo';
 
     .code-block,
     .playground-code-block {
-        position:      relative;
-        border:        1px solid var(--doc-border, #e5e7eb);
-        border-top:    none;
-        border-radius: 0 0 0.5rem 0.5rem;
-        overflow:      hidden;
+        position:   relative;
+        border:     1px solid var(--doc-border, #e5e7eb);
+        border-top: none;
+        overflow:   hidden;
     }
+
+    .code-block          { border-radius: 0 0 0.5rem 0.5rem; }
+    .playground-code-block { border-radius: 0; }
 
     .copy-btn {
         position:      absolute;
