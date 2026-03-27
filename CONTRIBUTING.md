@@ -144,12 +144,32 @@ Cela suffit pour que le sous-composant soit :
 
 ## Tests
 
+### Tests unitaires (Vitest + happy-dom)
+
 ```bash
 cd packages/core
 npm run test           # passe unique
 npm run test:watch     # mode interactif
 npm run test:coverage  # rapport de couverture
 ```
+
+### Tests browser (web-test-runner + Playwright + axe-core)
+
+Les tests browser vérifient le comportement réel dans Chromium et l'accessibilité via axe-core.
+Ils sont séparés des tests unitaires car ils nécessitent un vrai navigateur.
+
+```bash
+cd packages/core
+npm run test:browser   # lance WTR + Chromium (Playwright)
+```
+
+Pour lancer l'ensemble des tests depuis la racine :
+
+```bash
+npm run test:all       # tests unitaires + tests browser
+```
+
+Les fichiers de tests browser sont nommés `*.browser.test.ts` ou `*.a11y.test.ts`.
 
 ### Pattern de test
 

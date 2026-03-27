@@ -11,9 +11,9 @@ Bibliothèque de composants web accessibles, construite avec **Lit 3** et **Type
 
 ## Ce que c'est
 
-Ariane est un **Design System** : un ensemble de composants UI réutilisables, autonomes et accessibles.
-Les composants sont des **Custom Elements** natifs — ils fonctionnent dans n'importe quel framework
-(React, Vue, Angular, Svelte) ou sans framework du tout.
+Ariane est une **librairie de composants web accessibles** — une fondation sur laquelle construire un design system,
+pas un design system en soi. Les composants sont des **Custom Elements** natifs : ils fonctionnent dans n'importe
+quel framework (React, Vue, Angular, Svelte) ou sans framework du tout.
 
 Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-pagination`,
 `ar-progressbar`, `ar-spinner`, `ar-stepper` / `ar-stepper-item`.
@@ -22,7 +22,7 @@ Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-paginatio
 
 ## Structure du monorepo
 
-```
+```text
 Ariane/
 ├── packages/
 │   └── core/          # @ariane-ui/core — la bibliothèque de composants
@@ -58,10 +58,6 @@ npm run dev        # Lance le watch du package core + le serveur Astro en parall
 
 Le site de documentation est disponible sur `http://localhost:4321`.
 
-> Au premier lancement, le CEM (`custom-elements.json`) doit exister.
-> Il est généré automatiquement par `npm run dev`. Si vous partez de zéro,
-> lancez d'abord : `cd packages/core && npm run build:manifest`
-
 ### Build complet
 
 ```bash
@@ -76,7 +72,8 @@ npm run build      # Build tous les packages et le site de doc
 | ------------------------- | ---------------------------------------------------- |
 | `npm run dev`             | Mode développement parallèle (core watch + docs dev) |
 | `npm run build`           | Build complet (core + docs)                          |
-| `npm run test`            | Lance tous les tests                                 |
+| `npm run test`            | Tests unitaires (Vitest)                             |
+| `npm run test:all`        | Tests unitaires + tests browser (Vitest + WTR)       |
 | `npm run lint`            | ESLint sur tous les packages                         |
 | `npm run format`          | Prettier sur tous les fichiers                       |
 | `npm run create ar-<nom>` | Scaffold un nouveau composant                        |
@@ -140,15 +137,16 @@ Consultez la page **Design Tokens** du site de documentation pour la liste compl
 
 ## Stack technique
 
-| Outil                                                                                 | Rôle                                         |
-| ------------------------------------------------------------------------------------- | -------------------------------------------- |
-| [Lit 3](https://lit.dev/)                                                             | Base des composants (Shadow DOM, réactivité) |
-| [TypeScript 5](https://www.typescriptlang.org/)                                       | Typage strict                                |
-| [esbuild](https://esbuild.github.io/)                                                 | Build rapide — bundles npm et CDN            |
-| [@custom-elements-manifest/analyzer](https://custom-elements-manifest.open-wc.org/)   | Génération du manifest CEM depuis la JSDoc   |
-| [Vitest](https://vitest.dev/) + [happy-dom](https://github.com/capricorn86/happy-dom) | Tests unitaires                              |
-| [Astro 6](https://astro.build/)                                                       | Site de documentation statique               |
-| npm workspaces + [Turborepo](https://turbo.build/)                                    | Monorepo                                     |
+| Outil                                                                                                                                                             | Rôle                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| [Lit 3](https://lit.dev/)                                                                                                                                         | Base des composants (Shadow DOM, réactivité) |
+| [TypeScript 6](https://www.typescriptlang.org/)                                                                                                                   | Typage strict                                |
+| [esbuild](https://esbuild.github.io/)                                                                                                                             | Build rapide — bundles npm et CDN            |
+| [@custom-elements-manifest/analyzer](https://custom-elements-manifest.open-wc.org/)                                                                               | Génération du manifest CEM depuis la JSDoc   |
+| [Vitest](https://vitest.dev/) + [happy-dom](https://github.com/capricorn86/happy-dom)                                                                             | Tests unitaires                              |
+| [@web/test-runner](https://modern-web.dev/docs/test-runner/overview/) + [Playwright](https://playwright.dev/) + [axe-core](https://github.com/dequelabs/axe-core) | Tests browser et a11y                        |
+| [Astro 6](https://astro.build/)                                                                                                                                   | Site de documentation statique               |
+| npm workspaces + [Turborepo](https://turbo.build/)                                                                                                                | Monorepo                                     |
 
 ---
 
