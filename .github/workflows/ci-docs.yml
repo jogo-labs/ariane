@@ -10,6 +10,9 @@ on:
       - 'packages/core/**'
       - 'package.json'
       - 'package-lock.json'
+      - 'turbo.json'
+      - 'tsconfig.base.json'
+      - '*.config.{js,ts,mjs}'
       - '.github/workflows/ci-docs.yml'
 
 concurrency:
