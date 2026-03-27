@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run build:manifest && turbo run dev --parallel",
     "test": "turbo run test",
     "test:all": "turbo run test test:browser",
     "lint": "turbo run lint",
