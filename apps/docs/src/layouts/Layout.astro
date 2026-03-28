@@ -1,6 +1,7 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
 import rootPkg from '../../../../package.json';
+import { version } from '../../../../packages/core/package.json';
 
 interface Props {
     title: string;
@@ -217,23 +218,58 @@ const {
                 color:      var(--doc-text);
             }
 
-            /* ── Sélecteur thème dropdown ────────────────── */
-
-            #theme-select {
-                padding:       0.3rem 0.5rem;
-                background:    var(--doc-header-bg);
-                color:         var(--doc-text-muted);
-                border:        1px solid var(--doc-border);
-                border-radius: 0.4rem;
-                font-size:     0.8rem;
-                cursor:        pointer;
-                height:        2.25rem;
-                transition:    background 0.15s, color 0.15s;
+            .brand-dot {
+                display:        inline-block;
+                font-size:      0.55rem;
+                color:          var(--doc-accent, #7c3aed);
+                margin-left:    3px;
+                vertical-align: middle;
+                position:       relative;
+                top:            -2px;
             }
 
-            #theme-select:hover {
-                background: var(--doc-nav-bg);
-                color:      var(--doc-text);
+            .header-version {
+                font-size:     0.7rem;
+                font-weight:   500;
+                color:         var(--doc-text-muted, #6b7280);
+                background:    var(--doc-accent-bg, #f3efff);
+                border:        1px solid var(--doc-accent-border, #e0d0ff);
+                padding:       1px 8px;
+                border-radius: 20px;
+            }
+
+            .theme-toggle {
+                display:       flex;
+                gap:           1px;
+                border:        1px solid var(--doc-border, #e8e6e0);
+                border-radius: 7px;
+                background:    var(--doc-nav-bg, #fafaf8);
+                padding:       2px;
+            }
+
+            .theme-btn {
+                width:           26px;
+                height:          26px;
+                border-radius:   5px;
+                border:          none;
+                background:      transparent;
+                display:         flex;
+                align-items:     center;
+                justify-content: center;
+                cursor:          pointer;
+                font-size:       0.72rem;
+                color:           var(--doc-text-muted, #6b7280);
+                transition:      background 0.12s, color 0.12s;
+            }
+
+            .theme-btn.active {
+                background: #fff;
+                color:      var(--doc-accent, #7c3aed);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            }
+
+            [data-theme="dark"] .theme-btn.active {
+                background: #21262d;
             }
 
             /* ── Overlay drawer ─────────────────────────── */
@@ -379,17 +415,12 @@ const {
                 </button>
                 <h1>
                     <a href="/" class="header-brand">
-                        {rootPkg.config.displayName}
+                        {rootPkg.config.displayName}<span class="brand-dot">●</span>
                     </a>
                 </h1>
+                <span class="header-version">v{version}</span>
             </div>
             <div class="header-actions">
-                <!-- Sélecteur thème dropdown -->
-                <select id="theme-select" aria-label="Thème d'affichage">
-                    <option value="light">☀ Clair</option>
-                    <option value="system">⬛ Auto</option>
-                    <option value="dark">☾ Sombre</option>
-                </select>
                 <!-- Lien GitHub -->
                 <a
                     href="https://github.com/jogo-labs/ariane"
@@ -400,6 +431,12 @@ const {
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/></svg>
                 </a>
+                <!-- Toggle thème groupé -->
+                <div class="theme-toggle" role="group" aria-label="Thème d'affichage">
+                    <button class="theme-btn" data-theme-mode="light" aria-label="Thème clair">☀</button>
+                    <button class="theme-btn" data-theme-mode="system" aria-label="Thème automatique">⬤</button>
+                    <button class="theme-btn" data-theme-mode="dark" aria-label="Thème sombre">☾</button>
+                </div>
             </div>
         </header>
 
@@ -437,24 +474,23 @@ const {
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.dataset.themeMode = mode;
 
-                // Mettre à jour la valeur du select
-                const select = document.getElementById('theme-select') as HTMLSelectElement | null;
-                if (select) select.value = mode;
+                // Mettre à jour le bouton actif dans le toggle groupé
+                document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
+                    btn.classList.toggle('active', btn.dataset.themeMode === mode);
+                });
             }
 
-            // Lire le mode sauvegardé (défaut : 'system')
             const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
-            // Écouter les changements du select
-            const themeSelect = document.getElementById('theme-select') as HTMLSelectElement | null;
-            themeSelect?.addEventListener('change', () => {
-                const mode = themeSelect.value || 'system';
-                localStorage.setItem('ariane-theme', mode);
-                applyMode(mode);
+            document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.themeMode || 'system';
+                    localStorage.setItem('ariane-theme', mode);
+                    applyMode(mode);
+                });
             });
 
-            // Réagir aux changements de préférence système quand le mode est 'system'
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
                     applyMode('system');
