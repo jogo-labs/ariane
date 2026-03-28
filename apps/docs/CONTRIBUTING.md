@@ -11,10 +11,10 @@ modifier une page ou comprendre l'architecture du site.
 Le site est un **Astro 6 statique** sans framework UI côté client.
 Chaque page de composant est générée automatiquement depuis deux sources :
 
-| Source                                   | Rôle                                                 |
-| ---------------------------------------- | ---------------------------------------------------- |
-| `packages/core/custom-elements.json`     | API du composant (props, events, slots, CSS…)        |
-| `apps/docs/src/content/components/*.mdx` | Titre, description, variantes HTML, contenu narratif |
+| Source                                    | Rôle                                                 |
+| ----------------------------------------- | ---------------------------------------------------- |
+| `packages/core/dist/custom-elements.json` | API du composant (props, events, slots, CSS…)        |
+| `apps/docs/src/content/components/*.mdx`  | Titre, description, variantes HTML, contenu narratif |
 
 Il n'y a **rien à dupliquer** : ajouter un composant dans le package core le fait apparaître
 dans la nav et générer sa page. Le fichier MDX complète uniquement ce que le CEM ne peut pas
@@ -171,7 +171,7 @@ apps/docs/
 │   ├── pages/
 │   │   ├── index.astro             ← Page d'accueil (liste des composants)
 │   │   ├── components/[slug].astro ← Route dynamique — une page par composant
-│   │   ├── getting-started/        ← Pages Installation et Utilisation
+│   │   ├── getting-started/        ← Pages Démarrage rapide (quickstart) et Utilisation
 │   │   └── foundations/tokens.astro ← Page Design Tokens (auto-extraite du CSS)
 │   ├── styles/
 │   │   ├── doc-prose.css           ← Typographie partagée (h2→h4, p, pre, badge…)
@@ -231,7 +231,7 @@ Les variables CSS `--doc-*` contrôlent les couleurs de l'interface de documenta
 | `--doc-header-h`   | Hauteur du header (défaut : `3.25rem`)   |
 
 Le switch Light / Auto / Dark en haut à droite enregistre le choix dans
-`localStorage('marianne-theme')` et applique `data-theme="light|dark"` sur `<html>`.
+`localStorage('ariane-theme')` et applique `data-theme="light|dark"` sur `<html>`.
 
 ---
 
