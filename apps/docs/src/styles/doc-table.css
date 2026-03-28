@@ -38,8 +38,8 @@ td {
 code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.8rem;
-    background: var(--doc-code-bg, #f3f4f6);
-    color: var(--doc-text, #111827);
+    background: var(--doc-accent-bg, #f3efff);
+    color: var(--doc-accent, #7c3aed);
     padding: 0.1em 0.35em;
     border-radius: 0.25em;
 }
