@@ -52,10 +52,11 @@ jobs:
           else TAG="latest"
           fi
           # Pas de version stable → publier aussi sous latest pour que
-          # `npm install @ariane-ui/core` fonctionne sans tag explicite
+          # `npm install @ariane-ui/core` fonctionne sans tag explicite.
+          # On publie deux fois car dist-tag add n'est pas compatible OIDC.
           if [[ "$STABLE" == "no" && "$TAG" != "latest" ]]; then
             npm publish --workspace packages/core --access public --provenance --tag latest
-            npm dist-tag add @ariane-ui/core@$VERSION $TAG
+            npm publish --workspace packages/core --access public --provenance --tag $TAG
             echo "Published $VERSION with tags: latest + $TAG (no stable version exists)"
           else
             npm publish --workspace packages/core --access public --provenance --tag $TAG
