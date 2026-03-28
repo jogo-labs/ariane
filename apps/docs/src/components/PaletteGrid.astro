@@ -73,6 +73,8 @@ function needsBorder(value: string): boolean {
     .palette-table {
         border-collapse: collapse;
         white-space: nowrap;
+        width: 100%;
+        table-layout: fixed;
     }
 
     .stop-header {
@@ -81,24 +83,18 @@ function needsBorder(value: string): boolean {
         font-weight: 400;
         text-align: center;
         padding: 0 2px 0.4rem;
-        width: 3.5rem;
-        min-width: 3.5rem;
     }
 
     .hue-label {
-        font-size: .9rem;
+        font-size: .75rem;
         font-family: monospace;
         color: var(--doc-text-muted, #6b7280);
-        padding-right: 0.75rem;
+        padding-right: 0.5rem;
         padding-bottom: 2.5rem;
         vertical-align: middle;
         white-space: nowrap;
         text-align: left;
-    }
-
-    thead .hue-label {
-        /* cellule vide du coin supérieur gauche */
-        min-width: 4.5rem;
+        width: 4.5rem;
     }
 
     .stop-cell {
@@ -114,7 +110,8 @@ function needsBorder(value: string): boolean {
     }
 
     .swatch {
-        width: 3.6rem;
+        width: 100%;
+        min-width: 2.5rem;
         height: 2.5rem;
         border-radius: 4px;
     }
@@ -124,16 +121,16 @@ function needsBorder(value: string): boolean {
     }
 
     .swatch-empty {
-        width: 3.5rem;
+        width: 100%;
         height: 2rem;
     }
 
     .stop-value {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-family: monospace;
         color: var(--doc-text-muted, #6b7280);
         text-align: center;
-        max-width: 3.5rem;
+        width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
     }

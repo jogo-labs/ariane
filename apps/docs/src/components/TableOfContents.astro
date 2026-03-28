@@ -107,11 +107,11 @@ const { entries, mobileOnly = false } = Astro.props;
     .toc-mobile { display: none; }
 
     .toc-title {
-        font-size:      0.7rem;
-        font-weight:    700;
+        font-size:      0.65rem;
+        font-weight:    600;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color:          var(--doc-text-muted, #9ca3af);
+        color:          #6b7280;
         margin:         0 0 0.5rem;
     }
 
@@ -122,18 +122,19 @@ const { entries, mobileOnly = false } = Astro.props;
     }
 
     .toc-item        { margin: 0; }
-    .toc-item.level-2 { padding-left: 0.75rem; }
+    .toc-item.level-2 { padding-left: 1rem; }
 
     .toc-link,
     .toc-link-m {
         display:         block;
         padding:         0.25rem 0.5rem;
         padding-left:    0.75rem;
-        color:           var(--doc-text-muted, #6b7280);
+        color:           var(--doc-text-subtle, #4b5563);
         text-decoration: none;
         border-left:     2px solid transparent;
         line-height:     1.4;
-        transition:      color 0.1s, background 0.1s, border-color 0.1s;
+        font-size:       0.78rem;
+        transition:      color 0.1s, border-color 0.1s;
     }
 
     .toc-link:hover,
@@ -143,9 +144,8 @@ const { entries, mobileOnly = false } = Astro.props;
     }
 
     .toc-link.active {
-        color:        var(--ar-color-interactive, #2563eb);
-        font-weight:  600;
-        border-color: var(--ar-color-interactive, #2563eb);
+        color:        var(--doc-accent, #7c3aed);
+        border-color: var(--doc-accent, #7c3aed);
     }
 
     /* ── Mobile ─────────────────────────────────────────────── */

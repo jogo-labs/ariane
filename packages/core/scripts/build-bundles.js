@@ -16,7 +16,15 @@
  */
 
 import esbuild from 'esbuild';
-import { readdirSync, mkdirSync, copyFileSync, rmSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import {
+    readdirSync,
+    mkdirSync,
+    copyFileSync,
+    rmSync,
+    existsSync,
+    readFileSync,
+    writeFileSync,
+} from 'fs';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -43,10 +51,7 @@ function findTsFiles(dir, excludePatterns = []) {
         const fullPath = join(dir, entry.name);
         if (entry.isDirectory()) {
             results.push(...findTsFiles(fullPath, excludePatterns));
-        } else if (
-            entry.name.endsWith('.ts') &&
-            !excludePatterns.some((p) => p.test(fullPath))
-        ) {
+        } else if (entry.name.endsWith('.ts') && !excludePatterns.some((p) => p.test(fullPath))) {
             results.push(fullPath);
         }
     }
@@ -57,10 +62,7 @@ function findTsFiles(dir, excludePatterns = []) {
 
 // Barrel principal + chaque composant comme entry point individuel
 // → permet d'importer un composant seul sans charger toute la lib
-const componentFiles = findTsFiles(join(SRC, 'components'), [
-    /\.test\.ts$/,
-    /\.styles\.ts$/,
-]);
+const componentFiles = findTsFiles(join(SRC, 'components'), [/\.test\.ts$/, /\.styles\.ts$/]);
 
 /**
  * Transforme un chemin absolu de fichier source en clé d'entrée esbuild.
@@ -91,7 +93,7 @@ const commonOptions = {
 // ─── Clean ────────────────────────────────────────────────────────────────────
 
 // Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
-// besoin pendant que ce build tourne (race condition Turbo en mode dev --parallel).
+// besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
 // Le manifest est regénéré juste après par build:manifest, pas par ce script.
 const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
 let preservedManifest = null;

@@ -86,7 +86,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Playground interactif ── */}
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
-        <h4 class="subsection-title">Playground</h4>
+        <div class="playground-label" aria-hidden="true"><span class="playground-dot">●</span> PLAYGROUND</div>
         <div class="playground-card">
             <div class="preview-wrap">
                 <div class="preview" data-playground-preview>
@@ -167,7 +167,6 @@ const showPlayground = displayMode === 'demo';
         gap:            2.5rem;
     }
 
-    .variant,
     .playground-section {
         display:        flex;
         flex-direction: column;
@@ -177,6 +176,26 @@ const showPlayground = displayMode === 'demo';
     .playground-card {
         display:        flex;
         flex-direction: column;
+        border:         1px solid #d4bbff;
+        border-radius:  10px;
+        overflow:       hidden;
+        box-shadow:     0 0 0 3px rgba(124,58,237,0.06);
+    }
+
+    .playground-label {
+        font-size:      0.8rem;
+        font-weight:    600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color:          var(--doc-accent, #7c3aed);
+        margin-bottom:  0.5rem;
+        display:        flex;
+        align-items:    center;
+        gap:            0.35rem;
+    }
+
+    .playground-dot {
+        font-size: 0.5rem;
     }
 
     h5 {
@@ -187,7 +206,8 @@ const showPlayground = displayMode === 'demo';
     }
 
     .variant-description {
-        margin: .75rem 0;
+        margin: .75rem 0 1rem;
+        font-size: .9rem;
     }
 
     /* ── Preview ─────────────────────────────────────── */
@@ -226,10 +246,8 @@ const showPlayground = displayMode === 'demo';
         align-items:   center;
         padding:       2rem;
         border:        1px solid var(--doc-border, #e5e7eb);
+        border-bottom: 0;
         border-radius: 0.5rem 0.5rem 0 0;
-    }
-
-    .preview {
         background: var(--doc-bg);
     }
 
@@ -251,18 +269,18 @@ const showPlayground = displayMode === 'demo';
         top:           0.5rem;
         right:         0.5rem;
         padding:       0.25rem 0.6rem;
-        background:    color-mix(in srgb, var(--doc-nav-bg, #1f2937) 85%, transparent);
-        color:         var(--doc-text-muted, #d1d5db);
-        border:        none;
+        background:    rgba(255,255,255,0.08);
+        color:         #adb5bd;
+        border:        1px solid rgba(255,255,255,0.15);
         border-radius: 0.25rem;
         font-size:     0.75rem;
         cursor:        pointer;
-        transition:    background 0.15s;
+        transition:    background 0.15s, color 0.15s;
         z-index:       1;
     }
 
-    .copy-btn:hover  { background: var(--doc-nav-bg, #374151); }
-    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: var(--ar-color-white, #fff); }
+    .copy-btn:hover  { background: rgba(255,255,255,0.15); color: #e6edf3; }
+    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: #fff; border-color: transparent; }
 
     /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
     :global(.code-block pre),
@@ -289,12 +307,29 @@ const showPlayground = displayMode === 'demo';
         border-radius: 0 0 0.5rem 0.5rem;
     }
 
+    :global(.playground-code-block pre) {
+        border-radius: 0;
+    }
+
     /* ── Playground contrôles ────────────────────────── */
 
     .playground-section .preview-wrap { margin-bottom: 0; }
     .playground-section .preview {
-        border-radius: 0.5rem 0.5rem 0 0;
-        border-bottom: none;
+        border:        none;
+        border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 0;
+        border-radius: 0;
+    }
+
+    .playground-section .playground-code-block {
+        border:        none;
+        border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 0;
+    }
+
+    .playground-section .controls-panel {
+        border:     none;
+        border-top: none;
     }
 
     .controls-panel {
@@ -327,7 +362,7 @@ const showPlayground = displayMode === 'demo';
     .control-row input[type="text"],
     .control-row input[type="number"] {
         padding:       0.3rem 0.5rem;
-        border:        1px solid var(--doc-border, #d1d5db);
+        border:        1px solid var(--doc-accent-border, #e0d0ff);
         border-radius: 0.25rem;
         font-size:     0.875rem;
         background:    var(--doc-bg, #fff);

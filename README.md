@@ -4,7 +4,10 @@ Bibliothèque de composants web accessibles, construite avec **Lit 3** et **Type
 
 ```html
 <ar-button variant="filled">Valider</ar-button>
-<ar-alert variant="success">Opération réussie</ar-alert>
+<ar-alert version="success">
+    <span slot="title">Succès</span>
+    <span slot="content">Opération réussie.</span>
+</ar-alert>
 ```
 
 ---
@@ -22,16 +25,25 @@ Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-paginatio
 
 ## Installation
 
-### Via CDN (sans bundler)
+### Via CDN — Autoloader _(recommandé)_
+
+Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil requis.
+
+```html
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
+```
+
+### Via CDN — Bundle complet
+
+Charge tous les composants en une seule requête.
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
-
-<ar-button>Cliquez-moi</ar-button>
 ```
 
-### Via npm
+### Via npm _(avec bundler)_
 
 ```bash
 npm install @ariane-ui/core
@@ -43,16 +55,6 @@ import '@ariane-ui/core/themes/default.css';
 
 // ou import individuel (tree-shaking)
 import '@ariane-ui/core/dist/components/button/button.js';
-
-// attendre que des composants spécifiques soient prêts
-import { whenAllDefined } from '@ariane-ui/core';
-await whenAllDefined('ar-button', 'ar-stepper');
-```
-
-### Autoloader CDN
-
-```html
-<script type="module" src="/cdn/autoloader.js"></script>
 ```
 
 ---

@@ -1,6 +1,7 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
 import rootPkg from '../../../../package.json';
+import { version } from '../../../../packages/core/package.json';
 
 interface Props {
     title: string;
@@ -26,6 +27,11 @@ const {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
+
+        <!-- Inter — haute probabilité de cache navigateur -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
@@ -74,28 +80,44 @@ const {
             }
 
             :root {
-                /* Couleurs câblées sur les tokens sémantiques --ar-* (suivent le dark mode automatiquement) */
-                --doc-bg:         var(--ar-color-bg);
-                --doc-text:       var(--ar-color-text);
-                --doc-text-muted: var(--ar-color-text-muted);
-                --doc-border:     var(--ar-color-border);
-                --doc-header-bg:  color-mix(in srgb, var(--ar-color-interactive) 6%, var(--ar-color-bg));
-
-                /* Valeurs fixes propres à la doc — distinction subtile nav/fond non modélisée dans les tokens */
-                --doc-nav-bg:         #f8f9fb;
-                --doc-nav-border:     #e2e4e9;
+                /* Palette light — crème/violet */
+                --doc-bg:             #fafaf8;
+                --doc-nav-bg:         #fafaf8;
+                --doc-text:           #1a1a1a;
+                --doc-text-muted:     #6b7280;
+                --doc-text-subtle:    #4b5563;
+                --doc-border:         #e8e6e0;
+                --doc-nav-border:     #e8e6e0;
+                --doc-accent:         #7c3aed;
+                --doc-accent-bg:      #f3efff;
+                --doc-accent-border:  #e0d0ff;
+                --doc-code-bg:        #f3f4f6;
+                --doc-code-block-bg:  #0d1219;
+                --doc-header-bg:      rgba(250,250,248,0.92);
                 --doc-header-h:       3.25rem;
                 --doc-alpha-banner-h: 2rem;
-                --doc-code-bg:        #f3f4f6;
-                --doc-code-block-bg:  #1e1e2e;
                 --doc-swatch-outline: 1px solid rgba(0, 0, 0, 0.25);
+                --doc-nav-bg-hover: #f3efff;
             }
 
             [data-theme="dark"] {
+                --doc-bg:             #161b22;
                 --doc-nav-bg:         #161b22;
-                --doc-nav-border:     #21262d;
+                --doc-text:           #e6edf3;
+                --doc-text-muted:     #8b949e;
+                --doc-text-subtle:    #cdd6f4;
+                --doc-border:         #30363d;
+                --doc-nav-border:     #30363d;
+                --doc-header-bg:      rgba(22,27,34,0.92);
+                --doc-accent:         #a78bfa;
+                --doc-accent-bg:      #2d2040;
+                --doc-accent-border:  #4c3280;
+                --doc-cta-bg:         #2d2040;
+                --doc-cta-border:     #30215a;
                 --doc-code-bg:        #1e1e2e;
+                --doc-code-block-bg:  #0d1219;
                 --doc-swatch-outline: 1px solid rgba(255, 255, 255, 0.25);
+                --doc-nav-bg-hover: #21262d;
             }
 
             html {
@@ -108,31 +130,8 @@ const {
                 margin:     0;
                 min-height: 100vh;
                 color:      var(--doc-text);
-                font-family: system-ui, -apple-system, sans-serif;
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
                 transition: color 0.2s;
-            }
-
-            body {
-                background-image: radial-gradient(circle,var(--ar-color-interactive, #2563eb) 1px,transparent 2px);
-                background-size:  28px 28px;
-                background-color: transparent;
-            }
-
-            /* Fond opaque entre le motif (body bg-image) et le contenu */
-            body::before {
-                content:        '';
-                position:       fixed;
-                inset:          0;
-                background:     var(--doc-bg);
-                opacity:        0.92;
-                pointer-events: none;
-                z-index:        0;
-            }
-
-            /* Tout le contenu au-dessus du voile */
-            .site-header, .nav-overlay, .layout-body {
-                position: relative;
-                z-index:  1;
             }
 
             /* ── Header (toujours visible) ──────────────── */
@@ -144,6 +143,7 @@ const {
                 z-index:         100;
                 height:          var(--doc-header-h);
                 background:      var(--doc-header-bg);
+                backdrop-filter: blur(8px);
                 border-bottom:   1px solid var(--doc-nav-border);
                 padding:         0 1rem;
                 align-items:     center;
@@ -183,8 +183,8 @@ const {
                 display:         flex;
                 align-items:     center;
                 justify-content: center;
-                width:           2.25rem;
-                height:          2.25rem;
+                width:           2rem;
+                height:          2rem;
                 background:      transparent;
                 border:          1px solid var(--doc-border);
                 border-radius:   0.4rem;
@@ -199,23 +199,59 @@ const {
                 color:      var(--doc-text);
             }
 
-            /* ── Sélecteur thème dropdown ────────────────── */
-
-            #theme-select {
-                padding:       0.3rem 0.5rem;
-                background:    var(--doc-header-bg);
-                color:         var(--doc-text-muted);
-                border:        1px solid var(--doc-border);
-                border-radius: 0.4rem;
-                font-size:     0.8rem;
-                cursor:        pointer;
-                height:        2.25rem;
-                transition:    background 0.15s, color 0.15s;
+            .brand-dot {
+                display:        inline-block;
+                font-size:      0.55rem;
+                color:          var(--doc-accent, #7c3aed);
+                margin-left:    3px;
+                vertical-align: middle;
+                position:       relative;
+                top:            -2px;
             }
 
-            #theme-select:hover {
-                background: var(--doc-nav-bg);
-                color:      var(--doc-text);
+            .header-version {
+                font-size:     0.7rem;
+                font-weight:   500;
+                color:         var(--doc-text-muted, #6b7280);
+                background:    var(--doc-accent-bg, #f3efff);
+                border:        1px solid var(--doc-accent-border, #e0d0ff);
+                padding:       1px 8px;
+                border-radius: 20px;
+            }
+
+            .theme-toggle {
+                display:       flex;
+                gap:           1px;
+                border:        1px solid var(--doc-border, #e8e6e0);
+                border-radius: 7px;
+                background:    var(--doc-nav-bg, #fafaf8);
+                padding:       2px;
+            }
+
+            .theme-btn {
+                width:           26px;
+                height:          26px;
+                border-radius:   5px;
+                border:          none;
+                background:      transparent;
+                display:         flex;
+                align-items:     center;
+                justify-content: center;
+                cursor:          pointer;
+                font-size:       0.72rem;
+                color:           var(--doc-text-muted, #6b7280);
+                transition:      background 0.12s, color 0.12s;
+            }
+
+            .theme-btn.active {
+                background: #fff;
+                color:      var(--doc-accent, #7c3aed);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            }
+
+            [data-theme="dark"] .theme-btn.active {
+                background: var(--doc-accent-bg, #2d2040);
+                color:      var(--doc-accent, #a78bfa);
             }
 
             /* ── Overlay drawer ─────────────────────────── */
@@ -243,7 +279,13 @@ const {
 
             .layout-body.with-nav {
                 display:               grid;
-                grid-template-columns: 260px 1fr;
+                grid-template-columns: 270px 1fr;
+                max-width:             1640px;
+                margin:                0 auto;
+            }
+
+            .layout-body.with-nav.with-toc {
+                grid-template-columns: 270px 1fr 180px;
             }
 
             .nav-column {
@@ -267,11 +309,6 @@ const {
                 margin:    0 auto;
             }
 
-            /* Avec TOC fixe à droite : on réserve de la place côté droit */
-            .layout-body.with-toc .main-inner {
-                padding-right: 260px;
-            }
-
             .layout-body:not(.with-nav) main {
                 width: 100%;
             }
@@ -281,15 +318,10 @@ const {
                 padding:   0;
             }
 
-            /* Aside TOC — position fixe à droite, indépendante du flux */
             .toc-column {
-                position:   fixed;
-                top:        var(--doc-header-h);
-                right:      0;
-                width:      220px;
-                height:     calc(100vh - var(--doc-header-h));
-                padding:    3rem 1rem 3rem 0;
+                height:     100%;
                 overflow-y: auto;
+                padding:    3rem 0.5rem 3rem 0;
             }
 
             /* ── Responsive ─────────────────────────────── */
@@ -351,37 +383,41 @@ const {
         <!-- Header permanent (desktop + mobile) -->
         <header class="site-header">
             <div class="header-left">
-                <!-- Burger : visible uniquement en mobile via CSS -->
-                <button class="icon-btn" id="burger-btn" aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="site-nav-column">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <line x1="3" y1="12" x2="21" y2="12"/>
-                        <line x1="3" y1="18" x2="21" y2="18"/>
-                    </svg>
-                </button>
+                <!-- Burger : visible uniquement en mobile, et seulement si nav présente -->
+                {showNav && (
+                    <button class="icon-btn" id="burger-btn" aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="site-nav-column">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
+                    </button>
+                )}
                 <h1>
                     <a href="/" class="header-brand">
-                        {rootPkg.config.displayName}
+                        {rootPkg.config.displayName}<span class="brand-dot">●</span>
                     </a>
                 </h1>
+                <span class="header-version">v{version}</span>
             </div>
             <div class="header-actions">
-                <!-- Sélecteur thème dropdown -->
-                <select id="theme-select" aria-label="Thème d'affichage">
-                    <option value="light">☀ Clair</option>
-                    <option value="system">⬛ Auto</option>
-                    <option value="dark">☾ Sombre</option>
-                </select>
                 <!-- Lien GitHub -->
                 <a
                     href="https://github.com/jogo-labs/ariane"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="icon-btn header-github"
-                    aria-label="Code source sur GitHub"
+                    aria-label="Code source sur GitHub (nouvel onglet)"
+                    title="Code source sur GitHub (nouvel onglet)"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/></svg>
                 </a>
+                <!-- Toggle thème groupé -->
+                <div class="theme-toggle" role="group" aria-label="Thème d'affichage">
+                    <button class="theme-btn" data-theme-mode="light" aria-label="Thème clair" title="Thème clair" aria-pressed="false">☀</button>
+                    <button class="theme-btn" data-theme-mode="system" aria-label="Thème automatique" title="Thème automatique" aria-pressed="false">⬤</button>
+                    <button class="theme-btn" data-theme-mode="dark" aria-label="Thème sombre" title="Thème sombre" aria-pressed="false">☾</button>
+                </div>
             </div>
         </header>
 
@@ -419,24 +455,25 @@ const {
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.dataset.themeMode = mode;
 
-                // Mettre à jour la valeur du select
-                const select = document.getElementById('theme-select') as HTMLSelectElement | null;
-                if (select) select.value = mode;
+                // Mettre à jour le bouton actif dans le toggle groupé
+                document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
+                    const isActive = btn.dataset.themeMode === mode;
+                    btn.classList.toggle('active', isActive);
+                    btn.setAttribute('aria-pressed', String(isActive));
+                });
             }
 
-            // Lire le mode sauvegardé (défaut : 'system')
             const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
-            // Écouter les changements du select
-            const themeSelect = document.getElementById('theme-select') as HTMLSelectElement | null;
-            themeSelect?.addEventListener('change', () => {
-                const mode = themeSelect.value || 'system';
-                localStorage.setItem('ariane-theme', mode);
-                applyMode(mode);
+            document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.themeMode || 'system';
+                    localStorage.setItem('ariane-theme', mode);
+                    applyMode(mode);
+                });
             });
 
-            // Réagir aux changements de préférence système quand le mode est 'system'
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
                     applyMode('system');

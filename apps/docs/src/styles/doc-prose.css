@@ -8,7 +8,7 @@
 .page-container {
     display: flex;
     flex-direction: column;
-    row-gap: 2rem;
+    row-gap: 4rem;
 }
 
 .page-header {
@@ -18,14 +18,15 @@
         margin-top: 1rem;
     }
 
-    .summary {
+    .summary,
+    .callout {
         margin-top: 1.5rem;
     }
 }
 
 .page-title {
     color: var(--doc-text, #111827);
-    font-size: 3em;
+    font-size: 2rem;
     margin: 0;
 }
 
@@ -40,11 +41,11 @@
 }
 
 .main-section {
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .subsection {
-    gap: 0.5rem;
+    gap: 1rem;
 
     p {
         margin: 0;
@@ -52,11 +53,11 @@
 }
 
 .section-title {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
     border-bottom: 2px solid var(--doc-border, #e5e7eb);
-    padding-bottom: 0.5rem;
-    margin: 0 0 1rem;
+    padding-bottom: 1rem;
+    margin: 0 0 2rem;
     color: var(--doc-text, #111827);
     display: flex;
     align-items: center;
@@ -64,9 +65,9 @@
 }
 
 .subsection-title {
-    font-size: 1.5rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    color: var(--doc-text, #111827);
+    color: var(--doc-text-subtle, #374151);
     margin: 0;
     display: flex;
     align-items: center;
@@ -93,7 +94,7 @@ ul {
 }
 
 a {
-    color: var(--ar-color-interactive, #2563eb);
+    color: var(--doc-accent, #7c3aed);
     text-decoration: none;
 }
 
@@ -123,9 +124,34 @@ pre code {
     font-weight: 600;
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
-    background: color-mix(in srgb, var(--ar-color-interactive, #2563eb) 12%, transparent);
-    color: var(--ar-color-interactive, #2563eb);
+    background: var(--doc-accent-bg, #f3efff);
+    color: var(--doc-accent, #7c3aed);
+    border: 1px solid var(--doc-accent-border, #e0d0ff);
     letter-spacing: 0.02em;
+}
+
+.callout {
+    padding: 1rem 1.25rem;
+    background: var(--doc-accent-bg, rgba(243, 239, 255, 0.5));
+    border: 1px solid var(--doc-accent-border, #e0d0ff);
+    border-radius: 0.5rem;
+}
+
+.callout-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--doc-accent, #7c3aed);
+    margin: 0 0 0.6rem;
+}
+
+.callout ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--doc-text, #374151);
 }
 
 .badge-subtle {
