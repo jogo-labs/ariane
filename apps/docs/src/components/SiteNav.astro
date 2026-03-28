@@ -212,10 +212,10 @@ const componentItems: NavItem[] = allComponents
 
     .nav-section h2 {
         font-size:      0.65rem;
-        font-weight:    700;
+        font-weight:    600;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color:          var(--doc-text-muted, #8b8fa7);
+        color:          #6b7280;
         padding:        0 0.75rem;
         margin:         0 0 0.4rem;
     }
@@ -232,7 +232,7 @@ const componentItems: NavItem[] = allComponents
     .nav-list a {
         display:         block;
         padding:         0.4rem 0.75rem;
-        color:           var(--doc-text-muted, #4a4e5a);
+        color:           var(--doc-text-subtle, #4b5563);
         text-decoration: none;
         border-radius:   0.375rem;
         font-size:       0.85rem;
@@ -242,17 +242,22 @@ const componentItems: NavItem[] = allComponents
     }
 
     .nav-list a:hover {
-        background: color-mix(in srgb, var(--doc-nav-border, #e2e4e9) 60%, transparent);
-        color:      var(--doc-text, #1a1d26);
+        background: #f0ede6;
+        color:      #111;
+    }
+
+    [data-theme="dark"] .nav-list a:hover {
+        background: var(--doc-accent-bg, #21262d);
+        color:      var(--doc-text, #e6edf3);
     }
 
     .nav-list a[aria-current="page"] {
-        background:                color-mix(in srgb, var(--ar-color-interactive, #2563eb) 10%, transparent);
-        color:                     var(--ar-color-interactive, #2563eb);
+        background:                var(--doc-accent-bg, #f3efff);
+        color:                     var(--doc-accent, #7c3aed);
         border-top-left-radius:    0;
         border-bottom-left-radius: 0;
         font-weight:               600;
-        border-left-color:         var(--ar-color-interactive, #2563eb);
+        border-left-color:         var(--doc-accent, #7c3aed);
     }
 
     /* ── Enfants (sous-composants) ───────────────────────────── */
@@ -264,8 +269,9 @@ const componentItems: NavItem[] = allComponents
     }
 
     .nav-children a {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         padding:   0.3rem 0.6rem;
+        color:     var(--doc-text-subtle, #4b5563);
     }
 
     /* ── Footer nav (theme toggle dans le drawer mobile uniquement) ── */
