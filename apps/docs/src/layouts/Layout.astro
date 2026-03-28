@@ -27,6 +27,11 @@ const {
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
 
+        <!-- Inter — haute probabilité de cache navigateur -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
             (function () {
@@ -74,27 +79,38 @@ const {
             }
 
             :root {
-                /* Couleurs câblées sur les tokens sémantiques --ar-* (suivent le dark mode automatiquement) */
-                --doc-bg:         var(--ar-color-bg);
-                --doc-text:       var(--ar-color-text);
-                --doc-text-muted: var(--ar-color-text-muted);
-                --doc-border:     var(--ar-color-border);
-                --doc-header-bg:  color-mix(in srgb, var(--ar-color-interactive) 6%, var(--ar-color-bg));
-
-                /* Valeurs fixes propres à la doc — distinction subtile nav/fond non modélisée dans les tokens */
-                --doc-nav-bg:         #f8f9fb;
-                --doc-nav-border:     #e2e4e9;
+                /* Palette light — crème/violet */
+                --doc-bg:             #fafaf8;
+                --doc-nav-bg:         #fafaf8;
+                --doc-text:           #1a1a1a;
+                --doc-text-muted:     #6b7280;
+                --doc-text-subtle:    #4b5563;
+                --doc-border:         #e8e6e0;
+                --doc-nav-border:     #e8e6e0;
+                --doc-accent:         #7c3aed;
+                --doc-accent-bg:      #f3efff;
+                --doc-accent-border:  #e0d0ff;
+                --doc-code-bg:        #f3f4f6;
+                --doc-code-block-bg:  #161b22;
+                --doc-header-bg:      rgba(250,250,248,0.92);
                 --doc-header-h:       3.25rem;
                 --doc-alpha-banner-h: 2rem;
-                --doc-code-bg:        #f3f4f6;
-                --doc-code-block-bg:  #1e1e2e;
                 --doc-swatch-outline: 1px solid rgba(0, 0, 0, 0.25);
             }
 
             [data-theme="dark"] {
+                --doc-bg:             #161b22;
                 --doc-nav-bg:         #161b22;
+                --doc-text:           #e6edf3;
+                --doc-text-muted:     #8b949e;
+                --doc-text-subtle:    #8b949e;
+                --doc-border:         #21262d;
                 --doc-nav-border:     #21262d;
+                --doc-accent:         #7c3aed;
+                --doc-accent-bg:      #21262d;
+                --doc-accent-border:  #30215a;
                 --doc-code-bg:        #1e1e2e;
+                --doc-code-block-bg:  #161b22;
                 --doc-swatch-outline: 1px solid rgba(255, 255, 255, 0.25);
             }
 
@@ -108,7 +124,7 @@ const {
                 margin:     0;
                 min-height: 100vh;
                 color:      var(--doc-text);
-                font-family: system-ui, -apple-system, sans-serif;
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
                 transition: color 0.2s;
             }
 
@@ -144,6 +160,7 @@ const {
                 z-index:         100;
                 height:          var(--doc-header-h);
                 background:      var(--doc-header-bg);
+                backdrop-filter: blur(8px);
                 border-bottom:   1px solid var(--doc-nav-border);
                 padding:         0 1rem;
                 align-items:     center;
