@@ -271,18 +271,18 @@ const showPlayground = displayMode === 'demo';
         top:           0.5rem;
         right:         0.5rem;
         padding:       0.25rem 0.6rem;
-        background:    color-mix(in srgb, var(--doc-nav-bg, #1f2937) 85%, transparent);
-        color:         var(--doc-text-muted, #d1d5db);
-        border:        none;
+        background:    rgba(255,255,255,0.08);
+        color:         #adb5bd;
+        border:        1px solid rgba(255,255,255,0.15);
         border-radius: 0.25rem;
         font-size:     0.75rem;
         cursor:        pointer;
-        transition:    background 0.15s;
+        transition:    background 0.15s, color 0.15s;
         z-index:       1;
     }
 
-    .copy-btn:hover  { background: var(--doc-nav-bg, #374151); }
-    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: var(--ar-color-white, #fff); }
+    .copy-btn:hover  { background: rgba(255,255,255,0.15); color: #e6edf3; }
+    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: #fff; border-color: transparent; }
 
     /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
     :global(.code-block pre),
@@ -318,13 +318,13 @@ const showPlayground = displayMode === 'demo';
     .playground-section .preview-wrap { margin-bottom: 0; }
     .playground-section .preview {
         border:        none;
-        border-bottom: 1px solid #d4bbff;
+        border-bottom: 1px solid var(--doc-border, #e8e6e0);
         border-radius: 0;
     }
 
     .playground-section .playground-code-block {
         border:        none;
-        border-bottom: 1px solid #d4bbff;
+        border-bottom: 1px solid var(--doc-border, #e8e6e0);
     }
 
     .playground-section .controls-panel {

@@ -104,17 +104,17 @@ const {
                 --doc-nav-bg:         #161b22;
                 --doc-text:           #e6edf3;
                 --doc-text-muted:     #8b949e;
-                --doc-text-subtle:    #8b949e;
-                --doc-border:         #21262d;
-                --doc-nav-border:     #21262d;
+                --doc-text-subtle:    #cdd6f4;
+                --doc-border:         #30363d;
+                --doc-nav-border:     #30363d;
                 --doc-header-bg:      rgba(22,27,34,0.92);
-                --doc-accent:         #7c3aed;
-                --doc-accent-bg:      #21262d;
-                --doc-accent-border:  #30215a;
+                --doc-accent:         #a78bfa;
+                --doc-accent-bg:      #2d2040;
+                --doc-accent-border:  #4c3280;
                 --doc-cta-bg:         #1a1030;
                 --doc-cta-border:     #30215a;
                 --doc-code-bg:        #1e1e2e;
-                --doc-code-block-bg:  #161b22;
+                --doc-code-block-bg:  #0d1117;
                 --doc-swatch-outline: 1px solid rgba(255, 255, 255, 0.25);
             }
 
@@ -248,7 +248,8 @@ const {
             }
 
             [data-theme="dark"] .theme-btn.active {
-                background: #21262d;
+                background: var(--doc-accent-bg, #2d2040);
+                color:      var(--doc-accent, #a78bfa);
             }
 
             /* ── Overlay drawer ─────────────────────────── */
@@ -271,14 +272,14 @@ const {
             /* ── Layout body ────────────────────────────── */
 
             .layout-body {
-                height:    calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
-                max-width: 1640px;
-                margin:    0 auto;
+                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
             }
 
             .layout-body.with-nav {
                 display:               grid;
                 grid-template-columns: 270px 1fr;
+                max-width:             1640px;
+                margin:                0 auto;
             }
 
             .layout-body.with-nav.with-toc {
