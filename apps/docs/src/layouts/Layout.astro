@@ -433,9 +433,9 @@ const {
                 </a>
                 <!-- Toggle thème groupé -->
                 <div class="theme-toggle" role="group" aria-label="Thème d'affichage">
-                    <button class="theme-btn" data-theme-mode="light" aria-label="Thème clair">☀</button>
-                    <button class="theme-btn" data-theme-mode="system" aria-label="Thème automatique">⬤</button>
-                    <button class="theme-btn" data-theme-mode="dark" aria-label="Thème sombre">☾</button>
+                    <button class="theme-btn" data-theme-mode="light" aria-label="Thème clair" aria-pressed="false">☀</button>
+                    <button class="theme-btn" data-theme-mode="system" aria-label="Thème automatique" aria-pressed="false">⬤</button>
+                    <button class="theme-btn" data-theme-mode="dark" aria-label="Thème sombre" aria-pressed="false">☾</button>
                 </div>
             </div>
         </header>
@@ -476,7 +476,9 @@ const {
 
                 // Mettre à jour le bouton actif dans le toggle groupé
                 document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
-                    btn.classList.toggle('active', btn.dataset.themeMode === mode);
+                    const isActive = btn.dataset.themeMode === mode;
+                    btn.classList.toggle('active', isActive);
+                    btn.setAttribute('aria-pressed', String(isActive));
                 });
             }
 
