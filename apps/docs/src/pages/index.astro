@@ -347,9 +347,9 @@ const firstComponentHref = rootComponents[0]?.tagName
     /* ── CTA bas de page ────────────────────────────────── */
 
     .cta-bottom {
-        background:    var(--doc-accent-bg, #f3efff);
-        border-top:    1px solid var(--doc-accent-border, #e0d0ff);
-        border-bottom: 1px solid var(--doc-accent-border, #e0d0ff);
+        background:    var(--doc-cta-bg, var(--doc-accent-bg, #f3efff));
+        border-top:    1px solid var(--doc-cta-border, var(--doc-accent-border, #e0d0ff));
+        border-bottom: 1px solid var(--doc-cta-border, var(--doc-accent-border, #e0d0ff));
         text-align:    center;
         padding:       4rem 2rem;
     }
