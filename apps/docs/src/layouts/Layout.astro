@@ -132,29 +132,6 @@ const {
                 transition: color 0.2s;
             }
 
-            body {
-                background-image: radial-gradient(circle,var(--ar-color-interactive, #2563eb) 1px,transparent 2px);
-                background-size:  28px 28px;
-                background-color: transparent;
-            }
-
-            /* Fond opaque entre le motif (body bg-image) et le contenu */
-            body::before {
-                content:        '';
-                position:       fixed;
-                inset:          0;
-                background:     var(--doc-bg);
-                opacity:        0.92;
-                pointer-events: none;
-                z-index:        0;
-            }
-
-            /* Tout le contenu au-dessus du voile */
-            .site-header, .nav-overlay, .layout-body {
-                position: relative;
-                z-index:  1;
-            }
-
             /* ── Header (toujours visible) ──────────────── */
 
             .site-header {
@@ -204,8 +181,8 @@ const {
                 display:         flex;
                 align-items:     center;
                 justify-content: center;
-                width:           2.25rem;
-                height:          2.25rem;
+                width:           2rem;
+                height:          2rem;
                 background:      transparent;
                 border:          1px solid var(--doc-border);
                 border-radius:   0.4rem;
@@ -294,12 +271,18 @@ const {
             /* ── Layout body ────────────────────────────── */
 
             .layout-body {
-                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
+                height:    calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
+                max-width: 1640px;
+                margin:    0 auto;
             }
 
             .layout-body.with-nav {
                 display:               grid;
                 grid-template-columns: 270px 1fr;
+            }
+
+            .layout-body.with-nav.with-toc {
+                grid-template-columns: 270px 1fr 180px;
             }
 
             .nav-column {
@@ -323,11 +306,6 @@ const {
                 margin:    0 auto;
             }
 
-            /* Avec TOC fixe à droite : on réserve de la place côté droit */
-            .layout-body.with-toc .main-inner {
-                padding-right: 200px;
-            }
-
             .layout-body:not(.with-nav) main {
                 width: 100%;
             }
@@ -337,15 +315,10 @@ const {
                 padding:   0;
             }
 
-            /* Aside TOC — position fixe à droite, indépendante du flux */
             .toc-column {
-                position:   fixed;
-                top:        var(--doc-header-h);
-                right:      0;
-                width:      180px;
-                height:     calc(100vh - var(--doc-header-h));
-                padding:    3rem 1rem 3rem 0;
+                height:     100%;
                 overflow-y: auto;
+                padding:    3rem 0.5rem 3rem 0;
             }
 
             /* ── Responsive ─────────────────────────────── */
