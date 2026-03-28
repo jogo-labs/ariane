@@ -14,275 +14,402 @@ const firstComponentHref = rootComponents[0]?.tagName
 ---
 
 <Layout title="Accueil" showNav={false}>
-    <div class="landing">
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-eyebrow">Web Components accessibles</div>
 
-        <div class="landing-inner">
+        <h1 class="hero-title">
+            Des composants qui<br>
+            <em>fonctionnent vraiment</em>
+        </h1>
 
-            {/* Texte + CTA — gauche */}
-            <div class="landing-content">
-                <h1 class="tagline">
-                    Des composants accessibles,<br>
-                    <span class="tagline-accent">pour tous les frameworks.</span>
-                </h1>
-                <p class="description">
-                    Ariane est une bibliothèque de Custom Elements natifs construite avec Lit 3.
-                    Accessible, framework-agnostique, personnalisable via CSS Custom Properties.
-                </p>
-                <div class="cta-group">
-                    <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
-                    <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
-                </div>
-                <div class="meta-badges">
-                    <span class="meta-badge">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                        v{version}
-                    </span>
-                    <span class="meta-badge">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                        {componentCount} composants
-                    </span>
-                    <span class="meta-badge">MIT</span>
-                </div>
+        <p class="hero-pitch">
+            Ariane est une fondation pour construire des interfaces accessibles.
+            Des Custom Elements natifs, thémables, compatibles avec tous les frameworks —
+            sans imposer un look à ta place.
+        </p>
+
+        <div class="hero-badges">
+            <span class="badge"><span class="badge-dot"></span>v{version}</span>
+            <span class="badge"><span class="badge-dot green"></span>{componentCount} composants</span>
+            <span class="badge"><span class="badge-dot gray"></span>Licence MIT</span>
+            <span class="badge"><span class="badge-dot gray"></span>Lit 3 · TypeScript</span>
+        </div>
+
+        <div class="hero-ctas">
+            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
+            <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
+        </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- Selling points -->
+    <section class="selling-section">
+        <div class="selling-header">
+            <h2>Pourquoi Ariane ?</h2>
+            <p>Une bibliothèque qui résout les vrais problèmes d'accessibilité, sans te dicter le reste.</p>
+        </div>
+
+        <div class="selling-grid">
+            <div class="selling-card">
+                <div class="selling-icon">♿</div>
+                <h3>Accessible par défaut</h3>
+                <p>ARIA, navigation clavier et rôles sémantiques intégrés dans chaque composant. Pas une option — une exigence de base.</p>
             </div>
-
-            {/* Illustration — droite */}
-            <div class="landing-visual" aria-hidden="true">
-                <svg class="illus-svg" viewBox="0 0 320 380" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-                    {/* ── Grille de briques (composants) ── */}
-                    {/* Ligne 1 */}
-                    <rect x="0"   y="0"   width="148" height="52" rx="10" class="brick brick-a"/>
-                    <rect x="160" y="0"   width="160" height="52" rx="10" class="brick brick-b"/>
-                    {/* Ligne 2 */}
-                    <rect x="0"   y="64"  width="64"  height="52" rx="10" class="brick brick-b"/>
-                    <rect x="76"  y="64"  width="244" height="52" rx="10" class="brick brick-a"/>
-                    {/* Ligne 3 */}
-                    <rect x="0"   y="128" width="200" height="52" rx="10" class="brick brick-c"/>
-                    <rect x="212" y="128" width="108" height="52" rx="10" class="brick brick-b"/>
-                    {/* Ligne 4 */}
-                    <rect x="0"   y="192" width="100" height="52" rx="10" class="brick brick-b"/>
-                    <rect x="112" y="192" width="208" height="52" rx="10" class="brick brick-a"/>
-
-                    {/* ── Icône accessibilité — cercle avec silhouette ── */}
-                    <circle cx="240" cy="316" r="60" class="a11y-ring"/>
-                    {/* tête */}
-                    <circle cx="240" cy="296" r="10" class="a11y-figure"/>
-                    {/* corps */}
-                    <line x1="240" y1="308" x2="240" y2="338" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
-                    {/* bras */}
-                    <line x1="218" y1="322" x2="262" y2="322" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
-                    {/* jambes */}
-                    <line x1="240" y1="338" x2="224" y2="360" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
-                    <line x1="240" y1="338" x2="256" y2="360" stroke-width="5" stroke-linecap="round" class="a11y-stroke"/>
-
-                    {/* ── Petite brique décorative sous le cercle ── */}
-                    <rect x="0" y="260" width="148" height="36" rx="8" class="brick brick-a"/>
-                    <rect x="160" y="260" width="60" height="36" rx="8" class="brick brick-b"/>
-                </svg>
+            <div class="selling-card">
+                <div class="selling-icon">⚡</div>
+                <h3>Indépendant du framework</h3>
+                <p>Custom Elements natifs : ça fonctionne avec React, Vue, Svelte, Angular ou du HTML pur. Une seule librairie, partout.</p>
             </div>
+            <div class="selling-card">
+                <div class="selling-icon">🏗</div>
+                <h3>Fondation pour ton Design System</h3>
+                <p>CSS Custom Properties exposés sur chaque composant. Ariane pose les fondations ; toi tu définis l'identité visuelle.</p>
+            </div>
+        </div>
 
+        <!-- Placeholder différentiation -->
+        <div class="placeholder-section">
+            <p><strong>Section à venir</strong></p>
+            <p>Comparaison avec Web Awesome, Radix UI, Headless UI — ce qu'Ariane fait différemment et pour qui.</p>
+        </div>
+    </section>
+
+    <!-- CTA bas de page -->
+    <div class="cta-bottom">
+        <h2>Prêt à commencer ?</h2>
+        <p>Parcourez la documentation et le catalogue de composants.</p>
+        <div class="cta-bottom-actions">
+            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
+            <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <p>Ariane — Licence MIT</p>
+        <p>
+            Construit avec
+            <a href="https://lit.dev" target="_blank" rel="noopener noreferrer">Lit 3</a>
+            ·
+            <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </p>
+    </footer>
 </Layout>
 
 <style>
-    .landing {
-        position:        relative;
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        min-height:      calc(100vh - var(--doc-header-h, 3.25rem));
-        width:           100%;
-        overflow:        hidden;
+    /* ── Hero ─────────────────────────────────────────────── */
+
+    .hero {
+        max-width:   760px;
+        margin:      0 auto;
+        padding:     6rem 2rem 5rem;
+        text-align:  center;
     }
 
-    /* Container deux colonnes */
-    .landing-inner {
-        position:        relative;
-        display:         flex;
-        align-items:     center;
-        justify-content: space-between;
-        gap:             4rem;
-        padding:         4rem 3rem;
-        width:           100%;
-        max-width:       1100px;
+    .hero-eyebrow {
+        display:        inline-flex;
+        align-items:    center;
+        gap:            0.4rem;
+        font-size:      0.75rem;
+        font-weight:    600;
+        color:          var(--doc-accent, #7c3aed);
+        background:     var(--doc-accent-bg, #f3efff);
+        border:         1px solid var(--doc-accent-border, #e0d0ff);
+        padding:        0.25rem 0.85rem;
+        border-radius:  20px;
+        margin-bottom:  1.75rem;
+        letter-spacing: 0.02em;
     }
 
-    /* ── Texte ──────────────────────────────────────────── */
-
-    .landing-content {
-        flex:      0 1 720px;
-        min-width: 0;
+    .hero-eyebrow::before {
+        content:       '';
+        width:         6px;
+        height:        6px;
+        background:    var(--doc-accent, #7c3aed);
+        border-radius: 50%;
+        display:       inline-block;
     }
 
-    .tagline {
-        font-size:      2.5rem;
+    .hero-title {
+        font-size:      3.25rem;
         font-weight:    800;
-        line-height:    1.18;
-        letter-spacing: -0.025em;
-        color:          var(--doc-text, #111827);
-        margin:         0 0 1.1rem;
+        letter-spacing: -0.04em;
+        line-height:    1.1;
+        color:          var(--doc-text, #0f0f0f);
+        margin-bottom:  1.25rem;
     }
 
-    .tagline-accent {
-        color: var(--ar-color-interactive, #2563eb);
+    .hero-title em {
+        font-style:              normal;
+        background:              linear-gradient(135deg, #7c3aed, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip:         text;
     }
 
-    .description {
-        font-size:   1rem;
-        line-height: 1.7;
-        color:       var(--doc-text-muted, #6b7280);
-        margin:      0 0 2rem;
-        max-width:   440px;
+    .hero-pitch {
+        font-size:    1.05rem;
+        color:        var(--doc-text-subtle, #4b5563);
+        line-height:  1.75;
+        max-width:    560px;
+        margin:       0 auto 2rem;
     }
 
-    .cta-group {
-        display:       flex;
-        gap:           0.75rem;
-        flex-wrap:     wrap;
-        margin-bottom: 1.25rem;
+    .hero-badges {
+        display:         flex;
+        justify-content: center;
+        gap:             0.5rem;
+        flex-wrap:       wrap;
+        margin-bottom:   2.25rem;
     }
+
+    .badge {
+        display:       inline-flex;
+        align-items:   center;
+        gap:           0.35rem;
+        font-size:     0.72rem;
+        font-weight:   500;
+        color:         var(--doc-text-muted, #6b7280);
+        background:    var(--doc-bg, #fff);
+        border:        1px solid var(--doc-border, #e8e6e0);
+        padding:       0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+
+    .badge-dot {
+        width:         6px;
+        height:        6px;
+        border-radius: 50%;
+        background:    var(--doc-accent, #7c3aed);
+        flex-shrink:   0;
+    }
+
+    .badge-dot.green { background: #16a34a; }
+    .badge-dot.gray  { background: #9ca3af; }
+
+    .hero-ctas {
+        display:         flex;
+        justify-content: center;
+        gap:             0.75rem;
+        flex-wrap:       wrap;
+    }
+
+    /* ── Boutons ──────────────────────────────────────────── */
 
     .btn-primary {
         display:         inline-flex;
         align-items:     center;
-        padding:         0.75rem 1.6rem;
-        background-color: var(--ar-color-primary-50, #434fa7);
-        border-color: var(--ar-color-primary-50, #434fa7);
-        color:           var(--ar-color-white, #fff);
+        gap:             0.4rem;
+        background:      var(--doc-accent, #7c3aed);
+        color:           #fff;
+        font-family:     inherit;
+        font-size:       0.9rem;
         font-weight:     600;
-        font-size:       0.95rem;
-        border-radius:   0.5rem;
+        padding:         0.65rem 1.5rem;
+        border-radius:   8px;
         text-decoration: none;
+        border:          none;
+        cursor:          pointer;
+        box-shadow:      0 1px 3px rgba(124,58,237,0.3);
         transition:      background 0.15s;
     }
 
-    .btn-primary:hover {
-        background: var(--ar-color-primary-40, #283276);
-    }
+    .btn-primary:hover { background: #6d28d9; }
 
     .btn-secondary {
         display:         inline-flex;
         align-items:     center;
-        padding:         0.75rem 1.6rem;
-        border:          1px solid var(--doc-border, #e5e7eb);
-        color:           var(--doc-text, #111827);
+        gap:             0.4rem;
+        background:      transparent;
+        color:           var(--doc-text, #374151);
+        font-family:     inherit;
+        font-size:       0.9rem;
         font-weight:     600;
-        font-size:       0.95rem;
-        border-radius:   0.5rem;
+        padding:         0.65rem 1.5rem;
+        border-radius:   8px;
         text-decoration: none;
-        transition:      border-color 0.15s, background 0.15s;
+        border:          1.5px solid var(--doc-border, #e8e6e0);
+        cursor:          pointer;
+        transition:      border-color 0.15s, color 0.15s;
     }
 
     .btn-secondary:hover {
-        border-color: var(--ar-color-interactive, #2563eb);
-        background:   color-mix(in srgb, var(--ar-color-interactive, #2563eb) 5%, transparent);
+        border-color: var(--doc-accent, #7c3aed);
+        color:        var(--doc-accent, #7c3aed);
     }
 
-    /* ── Badges méta ────────────────────────────────────── */
+    /* ── Séparateur ────────────────────────────────────────── */
 
-    .meta-badges {
-        display:     flex;
-        gap:         0.5rem;
-        flex-wrap:   wrap;
-        align-items: center;
+    .divider {
+        border:     none;
+        border-top: 1px solid var(--doc-border, #e8e6e0);
+        margin:     0;
     }
 
-    .meta-badge {
-        display:      inline-flex;
-        align-items:  center;
-        gap:          0.3rem;
-        padding:      0.25em 0.65em;
-        border:       1px solid var(--doc-border, #e5e7eb);
-        border-radius: 2rem;
-        font-size:    0.73rem;
-        font-weight:  500;
-        color:        var(--doc-text-muted, #6b7280);
-        font-family:  'Fira Code', 'Cascadia Code', monospace;
-        background:   var(--doc-nav-bg, #f8f9fb);
+    /* ── Selling points ─────────────────────────────────── */
+
+    .selling-section {
+        max-width: 1100px;
+        margin:    0 auto;
+        padding:   5rem 2.5rem;
     }
 
-    /* ── Illustration ───────────────────────────────────── */
+    .selling-header {
+        text-align:    center;
+        margin-bottom: 3.5rem;
+    }
 
-    .landing-visual {
-        flex:            0 0 420px;
+    .selling-header h2 {
+        font-size:      1.85rem;
+        font-weight:    700;
+        letter-spacing: -0.03em;
+        color:          var(--doc-text, #0f0f0f);
+        margin-bottom:  0.6rem;
+    }
+
+    .selling-header p {
+        font-size:  0.95rem;
+        color:      var(--doc-text-muted, #6b7280);
+        max-width:  480px;
+        margin:     0 auto;
+    }
+
+    .selling-grid {
+        display:               grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap:                   1.5rem;
+        margin-bottom:         3rem;
+    }
+
+    .selling-card {
+        background:    var(--doc-bg, #fff);
+        border:        1px solid var(--doc-border, #e8e6e0);
+        border-radius: 12px;
+        padding:       1.75rem;
+        transition:    border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .selling-card:hover {
+        border-color: #c4b5fd;
+        box-shadow:   0 4px 16px rgba(124,58,237,0.06);
+    }
+
+    .selling-icon {
+        width:           40px;
+        height:          40px;
+        background:      var(--doc-accent-bg, #f3efff);
+        border-radius:   10px;
         display:         flex;
         align-items:     center;
         justify-content: center;
+        font-size:       1.2rem;
+        margin-bottom:   1rem;
     }
 
-    .illus-svg {
-        width: 420px;
-        height: 380px;
+    .selling-card h3 {
+        font-size:      0.95rem;
+        font-weight:    700;
+        color:          var(--doc-text, #111);
+        letter-spacing: -0.01em;
+        margin-bottom:  0.4rem;
     }
 
-    /* Briques */
-    .brick {
-        transition: opacity 0.2s;
+    .selling-card p {
+        font-size:   0.82rem;
+        color:       var(--doc-text-muted, #6b7280);
+        line-height: 1.7;
+        margin:      0;
     }
 
-    .brick-a {
-        fill:    var(--ar-color-interactive, #2563eb);
-        opacity: 0.15;
+    /* ── Placeholder différentiation ────────────────────── */
+
+    .placeholder-section {
+        border:        2px dashed var(--doc-accent-border, #e0d0ff);
+        border-radius: 12px;
+        padding:       2rem;
+        text-align:    center;
+        background:    color-mix(in srgb, var(--doc-accent-bg, #f3efff) 30%, transparent);
+        margin-bottom: 0;
     }
 
-    .brick-b {
-        fill:    var(--ar-color-interactive, #2563eb);
-        opacity: 0.25;
+    .placeholder-section p {
+        font-size:   0.82rem;
+        color:       var(--doc-text-muted, #9d8fc2);
+        margin:      0 0 0.25rem;
     }
 
-    .brick-c {
-        fill:    var(--ar-color-interactive, #2563eb);
-        opacity: 0.08;
+    .placeholder-section strong {
+        color: var(--doc-accent, #7c3aed);
     }
 
-    /* Accessibilité */
-    .a11y-ring {
-        fill:         var(--ar-color-interactive, #2563eb);
-        opacity:      0.08;
-        stroke:       var(--ar-color-interactive, #2563eb);
-        stroke-width: 1.5;
-        stroke-opacity: 0.3;
+    /* ── CTA bas de page ────────────────────────────────── */
+
+    .cta-bottom {
+        background:    var(--doc-accent-bg, #f3efff);
+        border-top:    1px solid var(--doc-accent-border, #e0d0ff);
+        border-bottom: 1px solid var(--doc-accent-border, #e0d0ff);
+        text-align:    center;
+        padding:       4rem 2rem;
     }
 
-    .a11y-figure {
-        fill:    var(--ar-color-interactive, #2563eb);
-        opacity: 0.6;
+    .cta-bottom h2 {
+        font-size:      1.6rem;
+        font-weight:    700;
+        letter-spacing: -0.03em;
+        color:          var(--doc-text, #0f0f0f);
+        margin-bottom:  0.5rem;
     }
 
-    .a11y-stroke {
-        stroke:       var(--ar-color-interactive, #2563eb);
-        opacity:      0.6;
+    .cta-bottom p {
+        font-size:     0.9rem;
+        color:         var(--doc-text-muted, #6b7280);
+        margin-bottom: 1.75rem;
     }
+
+    .cta-bottom-actions {
+        display:         flex;
+        justify-content: center;
+        gap:             0.75rem;
+        flex-wrap:       wrap;
+    }
+
+    /* ── Footer ─────────────────────────────────────────── */
+
+    .landing-footer {
+        padding:         2rem 2.5rem;
+        border-top:      1px solid var(--doc-border, #e8e6e0);
+        display:         flex;
+        justify-content: space-between;
+        align-items:     center;
+        flex-wrap:       wrap;
+        gap:             0.5rem;
+    }
+
+    .landing-footer p {
+        font-size: 0.78rem;
+        color:     var(--doc-text-muted, #6b7280);
+        margin:    0;
+    }
+
+    .landing-footer a {
+        color:           var(--doc-accent, #7c3aed);
+        text-decoration: none;
+    }
+
+    .landing-footer a:hover { text-decoration: underline; }
 
     /* ── Responsive ─────────────────────────────────────── */
 
     @media (max-width: 860px) {
-        .landing-inner {
-            flex-direction: column-reverse;
-            align-items:    flex-start;
-            gap:            1rem;
-            padding:        2.5rem;
-        }
-
-        .landing-visual {
-            flex:      0 0 auto;
-            width:     100%;
-            max-width: 200px;
-            margin: auto
-        }
-
-        .illus-svg {
-            width:  260px;
-            height: 308px;
-        }
-
-        .tagline {
-            font-size: 1.9rem;
-        }
+        .hero { padding: 4rem 1.5rem 3rem; }
+        .hero-title { font-size: 2.25rem; }
+        .selling-section { padding: 3rem 1.5rem; }
+        .selling-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 480px) {
-        .tagline { font-size: 1.6rem; }
+        .hero-title { font-size: 1.85rem; }
     }
 </style>
