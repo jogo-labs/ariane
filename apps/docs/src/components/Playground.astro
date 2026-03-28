@@ -86,7 +86,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Playground interactif ── */}
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
-        <h4 class="subsection-title">Playground</h4>
+        <div class="playground-label" aria-hidden="true"><span class="playground-dot">●</span> PLAYGROUND</div>
         <div class="playground-card">
             <div class="preview-wrap">
                 <div class="preview" data-playground-preview>
@@ -177,6 +177,26 @@ const showPlayground = displayMode === 'demo';
     .playground-card {
         display:        flex;
         flex-direction: column;
+        border:         1px solid #d4bbff;
+        border-radius:  10px;
+        overflow:       hidden;
+        box-shadow:     0 0 0 3px rgba(124,58,237,0.06);
+    }
+
+    .playground-label {
+        font-size:      0.65rem;
+        font-weight:    600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color:          var(--doc-accent, #7c3aed);
+        margin-bottom:  0.5rem;
+        display:        flex;
+        align-items:    center;
+        gap:            0.35rem;
+    }
+
+    .playground-dot {
+        font-size: 0.5rem;
     }
 
     h5 {
@@ -293,8 +313,19 @@ const showPlayground = displayMode === 'demo';
 
     .playground-section .preview-wrap { margin-bottom: 0; }
     .playground-section .preview {
-        border-radius: 0.5rem 0.5rem 0 0;
-        border-bottom: none;
+        border:        none;
+        border-bottom: 1px solid #d4bbff;
+        border-radius: 0;
+    }
+
+    .playground-section .playground-code-block {
+        border:        none;
+        border-bottom: 1px solid #d4bbff;
+    }
+
+    .playground-section .controls-panel {
+        border:     none;
+        border-top: none;
     }
 
     .controls-panel {
@@ -327,7 +358,7 @@ const showPlayground = displayMode === 'demo';
     .control-row input[type="text"],
     .control-row input[type="number"] {
         padding:       0.3rem 0.5rem;
-        border:        1px solid var(--doc-border, #d1d5db);
+        border:        1px solid var(--doc-accent-border, #e0d0ff);
         border-radius: 0.25rem;
         font-size:     0.875rem;
         background:    var(--doc-bg, #fff);
