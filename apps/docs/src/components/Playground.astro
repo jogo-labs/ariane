@@ -167,7 +167,6 @@ const showPlayground = displayMode === 'demo';
         gap:            2.5rem;
     }
 
-    .variant,
     .playground-section {
         display:        flex;
         flex-direction: column;
@@ -184,7 +183,7 @@ const showPlayground = displayMode === 'demo';
     }
 
     .playground-label {
-        font-size:      0.65rem;
+        font-size:      0.8rem;
         font-weight:    600;
         letter-spacing: 0.1em;
         text-transform: uppercase;
@@ -207,7 +206,8 @@ const showPlayground = displayMode === 'demo';
     }
 
     .variant-description {
-        margin: .75rem 0;
+        margin: .75rem 0 1rem;
+        font-size: .9rem;
     }
 
     /* ── Preview ─────────────────────────────────────── */
@@ -246,10 +246,8 @@ const showPlayground = displayMode === 'demo';
         align-items:   center;
         padding:       2rem;
         border:        1px solid var(--doc-border, #e5e7eb);
+        border-bottom: 0;
         border-radius: 0.5rem 0.5rem 0 0;
-    }
-
-    .preview {
         background: var(--doc-bg);
     }
 
@@ -319,12 +317,14 @@ const showPlayground = displayMode === 'demo';
     .playground-section .preview {
         border:        none;
         border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 0;
         border-radius: 0;
     }
 
     .playground-section .playground-code-block {
         border:        none;
         border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 0;
     }
 
     .playground-section .controls-panel {

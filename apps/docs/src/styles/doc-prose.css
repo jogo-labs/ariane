@@ -8,7 +8,7 @@
 .page-container {
     display: flex;
     flex-direction: column;
-    row-gap: 2rem;
+    row-gap: 4rem;
 }
 
 .page-header {
@@ -18,7 +18,8 @@
         margin-top: 1rem;
     }
 
-    .summary {
+    .summary,
+    .callout {
         margin-top: 1.5rem;
     }
 }
@@ -40,11 +41,11 @@
 }
 
 .main-section {
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .subsection {
-    gap: 0.5rem;
+    gap: 1rem;
 
     p {
         margin: 0;
@@ -55,8 +56,8 @@
     font-size: 1.25rem;
     font-weight: 600;
     border-bottom: 2px solid var(--doc-border, #e5e7eb);
-    padding-bottom: 0.5rem;
-    margin: 0 0 1rem;
+    padding-bottom: 1rem;
+    margin: 0 0 2rem;
     color: var(--doc-text, #111827);
     display: flex;
     align-items: center;
