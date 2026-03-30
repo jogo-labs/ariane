@@ -133,40 +133,7 @@ export default css`
         align-self: center;
     }
 
-    .alert-body {
-        padding: 0;
-        -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-        flex-grow: 1;
-    }
-
-    .alert-content,
-    .alert-title {
-        margin: 0;
-    }
-
-    .alert-title {
-        font-family: system-ui, sans-serif;
-        font-size: var(--ar-font-size-md, 1rem);
-        line-height: 1.5;
-        font-weight: 700;
-    }
-
     .alert-title + .alert-content {
         margin-top: 0.125rem;
-    }
-
-    .alert-content dl:last-child,
-    .alert-content ol:last-child,
-    .alert-content p:last-child,
-    .alert-content ul:last-child {
-        margin-bottom: 0;
-    }
-
-    .alert-date {
-        display: block;
-        font-size: 0.875rem;
-        font-style: italic;
-        margin-top: 0.5rem;
     }
 `;

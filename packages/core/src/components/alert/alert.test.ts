@@ -26,16 +26,6 @@ describe('ArAlert', () => {
         it('contient un part="body"', () => {
             expect(getPart(el, 'body')).not.toBeNull();
         });
-
-        it('contient un slot nommé "title"', () => {
-            const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('slot[name="title"]')).not.toBeNull();
-        });
-
-        it('contient un slot nommé "content"', () => {
-            const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('slot[name="content"]')).not.toBeNull();
-        });
     });
 
     // ── Valeurs par défaut ────────────────────────────────────────────────────

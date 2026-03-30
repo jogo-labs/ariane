@@ -123,8 +123,7 @@ export class ArAlert extends LitElement {
                 ></span>
             </div>
             <div part="body" class="alert-body">
-                <p class="alert-title"><slot name="title"></slot></p>
-                <p class="alert-content"><slot name="content"></slot></p>
+                <slot></slot>
             </div>
             ${this.canBeHidden
                 ? html` <button
