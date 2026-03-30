@@ -61,7 +61,19 @@ variants:
       description: Utilisé pour les erreurs critiques.
       html: '<ar-alert variant="error">Une erreur est survenue.</ar-alert>'
 ---
+## Utilisation
+
 Texte narratif optionnel en MDX (affiché sous la référence API).
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Ce que le composant garantit techniquement (role ARIA, focus management…)
+
+### À la charge de l'auteur
+
+- Ce que l'auteur du contenu doit respecter pour garantir l'accessibilité.
 ```
 
 C'est tout. La page `/components/button` sera générée automatiquement.
@@ -297,6 +309,24 @@ Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la sect
 
 ---
 
+## Convention — Section accessibilité dans les MDX
+
+Chaque page de composant **doit** comporter une section `## Accessibilité` avec deux sous-sections :
+
+**`### Pris en charge automatiquement`** — liste factuelle de ce qu'Ariane garantit techniquement :
+rôles ARIA, attributs, focus management, tokens de contraste. Courte, rassurante.
+
+**`### À la charge de l'auteur`** — ce que l'utilisateur du composant doit fournir pour que
+l'expérience soit réellement accessible. Chaque item explique _pourquoi_, pas seulement _quoi_.
+
+Cette distinction reflète la ligne entre **accessibilité structurelle** (garantie par le composant)
+et **accessibilité éditoriale** (responsabilité de l'auteur du contenu). Ariane ne peut pas valider
+que le contenu slotté est compréhensible hors contexte visuel — la documentation est le seul levier.
+
+Voir [ar-alert.mdx](./src/content/components/ar-alert.mdx) comme référence.
+
+---
+
 ## Checklist pour ajouter un composant
 
 > **Utiliser le script de scaffolding** : `npm run create -- <nom>` génère automatiquement
@@ -307,6 +337,7 @@ Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la sect
 - [ ] Implémenter le composant avec les annotations JSDoc
 - [ ] Régénérer le CEM : `cd packages/core && npm run build:manifest`
 - [ ] Compléter les variantes dans `apps/docs/src/content/components/ar-<nom>.mdx`
+- [ ] Ajouter la section `## Accessibilité` dans le MDX (voir convention ci-dessus)
 - [ ] Lancer `npm run dev` et vérifier la page `/components/<nom>`
 - [ ] Si sous-composant : ajouter uniquement `@parent ar-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
 
