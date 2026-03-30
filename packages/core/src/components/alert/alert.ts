@@ -32,6 +32,10 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
  *
+ * @cssprop [--ar-alert-border-radius=0.75rem]                     - Arrondi des alertes.
+ * @cssprop [--ar-alert-padding=1rem]                              - Marge interne des alertes.
+ * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures
+ * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures
  * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
  * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
  * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".

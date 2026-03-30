@@ -7,12 +7,13 @@ export default css`
         column-gap: 0.75rem;
         position: relative;
         align-items: center;
-        border-style: solid;
         opacity: 1;
         transform: scale(1);
-        padding: 1rem;
-        border-radius: 0.75rem;
         color: var(--ar-color-text, #2e2e31);
+        padding: var(--ar-alert-padding, 1rem);
+        border-radius: var(--ar-alert-border-radius, 0.75rem);
+        border-width: var(--ar-alert-border-width, 1px);
+        border-style: var(--ar-alert-border-style, solid);
     }
 
     :host([variant='info']) {
