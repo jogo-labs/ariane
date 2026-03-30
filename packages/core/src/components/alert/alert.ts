@@ -24,18 +24,21 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
  * @display demo
  *
- * @slot         - Contenu de l'alerte (texte, titre, liens…).
- * @slot icon    - Icône de l'alerte. Remplace l'icône par défaut si fourni.
+ * @slot              - Contenu de l'alerte (texte, titre, liens…).
+ * @slot icon         - Icône de l'alerte. Remplace l'icône par défaut si fourni.
+ * @slot close-icon   - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
  *
  * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
- *
  * @cssprop [--ar-alert-border-radius=0.75rem]                     - Arrondi des alertes.
  * @cssprop [--ar-alert-padding=1rem]                              - Marge interne des alertes.
- * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures
- * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures
+ * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures.
+ * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures.
+ * @cssprop [--ar-alert-close-size=2rem]                           - Taille (width/height) du bouton de fermeture.
+ * @cssprop [--ar-alert-close-bg=color-mix(in srgb, currentColor 8%, transparent)]    - Fond du bouton de fermeture au repos.
+ * @cssprop [--ar-alert-close-hover-bg=color-mix(in srgb, currentColor 20%, transparent)] - Fond du bouton de fermeture au survol.
  * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
  * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
  * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".
@@ -134,6 +137,18 @@ export class ArAlert extends LitElement {
         </svg>`;
     }
 
+    protected _defaultCloseIcon(): TemplateResult {
+        return html`<svg
+            aria-hidden="true"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+        </svg>`;
+    }
+
     override render(): TemplateResult {
         return html` <div part="icon">
                 <slot name="icon"> ${this._defaultIcon()} </slot>
@@ -145,11 +160,10 @@ export class ArAlert extends LitElement {
                 ? html` <button
                       part="close"
                       @click=${this._hide}
-                      class="btn btn-sm btn-tertiary light close"
                       type="button"
                       aria-label="Fermer l'alerte"
                   >
-                      X
+                      <slot name="close-icon">${this._defaultCloseIcon()}</slot>
                   </button>`
                 : nothing}`;
     }

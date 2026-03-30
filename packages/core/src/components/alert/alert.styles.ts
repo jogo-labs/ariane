@@ -59,29 +59,44 @@ export default css`
         transition-duration: 0.33s;
     }
 
-    .close {
-        color: var(--ar-color-text, #2e2e31);
-        position: static;
-        -webkit-box-ordinal-group: 2;
-        -ms-flex-order: 1;
+    [part='close'] {
         order: 1;
-        -ms-flex-item-align: start;
         align-self: flex-start;
-        -ms-flex-negative: 0;
         flex-shrink: 0;
-        color: inherit;
-        width: 2rem;
-        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--ar-alert-close-size, 2rem);
+        height: var(--ar-alert-close-size, 2rem);
         padding: 0;
+        border: none;
+        border-radius: 7px;
+        background-color: var(
+            --ar-alert-close-bg,
+            color-mix(in srgb, currentColor 8%, transparent)
+        );
+        color: currentColor;
+        cursor: pointer;
+        opacity: 0.75;
+        transition:
+            opacity 0.15s,
+            background-color 0.15s;
+        position: relative;
+        top: -0.2rem;
+        right: -0.2rem;
 
-        .icon {
-            display: block;
-            margin: 0;
+        &:hover {
+            opacity: 1;
+            background-color: var(
+                --ar-alert-close-hover-bg,
+                color-mix(in srgb, currentColor 20%, transparent)
+            );
         }
 
-        &:focus,
-        &:hover {
-            color: var(--ar-color-text, #2e2e31);
+        &:focus-visible {
+            opacity: 1;
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
         }
     }
 
