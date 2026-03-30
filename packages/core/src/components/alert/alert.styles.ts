@@ -58,13 +58,6 @@ export default css`
         transition-duration: 0.33s;
     }
 
-    .alert-button,
-    .icon {
-        -webkit-box-flex: 0;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
-    }
-
     .close {
         color: var(--ar-color-text, #2e2e31);
         position: static;
@@ -102,16 +95,5 @@ export default css`
         display: flex;
         align-items: center;
         font-size: 1.5em;
-    }
-
-    .text-link,
-    a:not(.btn) {
-        color: currentColor;
-        text-decoration: underline;
-        font-weight: 700;
-    }
-
-    .alert-title + .alert-content {
-        margin-top: 0.125rem;
     }
 `;
