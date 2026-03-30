@@ -32,30 +32,4 @@ variants:
           </div>
 ---
 
-## Utilisation
-
-`ar-alert` est destiné aux messages qui nécessitent l'attention de l'utilisateur :
-confirmations, avertissements, erreurs. Pour les messages purement informatifs et non
-urgents, préférer `variant="info"`.
-
-## Accessibilité
-
-### Pris en charge automatiquement
-
-- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) posé sur
-  l'hôte selon le variant — `info` → `status`, tous les autres → `alert`.
-- L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
-  est portée par le `role`, pas par l'icône.
-- Le focus est reporté sur l'élément cible (`next-focus`) à la fermeture — l'utilisateur
-  clavier ne se retrouve pas désorienté.
-
-### À la charge de l'auteur
-
-- **Message compréhensible hors contexte visuel.** Le contenu est lu dès l'apparition de
-  l'alerte. Évitez les messages vagues ("Une erreur s'est produite") — préférez
-  ("Le formulaire n'a pas pu être soumis : champ email manquant").
-- **Niveau de sévérité cohérent.** `error` pour les erreurs bloquantes, `warning` pour
-  les situations qui méritent attention sans bloquer, `success` pour les confirmations,
-  `info` pour les informations neutres.
-- **`next-focus` obligatoire sur les alertes dismissibles.** Un bouton de fermeture sans
-  destination de focus laisse l'utilisateur clavier sans repère.
+Documentation narrative du composant `ar-alert`.
