@@ -90,8 +90,8 @@ export class ArAlert extends LitElement {
      * Type d'alerte. Détermine la couleur et l'icône affichées.
      * @attr variant
      */
-    @property({ reflect: true, type: String, useDefault: true })
-    variant?: 'success' | 'warning' | 'error' | 'info';
+    @property({ reflect: true, type: String })
+    variant: 'success' | 'warning' | 'error' | 'info' = 'error';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).

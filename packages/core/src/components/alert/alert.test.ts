@@ -49,10 +49,10 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert></ar-alert>');
         });
 
-        it('variant est undefined par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
+        it('variant est error par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
             // La propriété JS est undefined — DEFAULT_VARIANT est utilisé dans le template,
             // pas comme valeur initiale de la propriété.
-            expect(el.variant).toBeUndefined();
+            expect(el.variant).toBe('error');
         });
 
         it('nextFocus est undefined par défaut', () => {
