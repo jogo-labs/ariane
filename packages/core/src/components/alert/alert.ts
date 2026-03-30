@@ -20,19 +20,12 @@ export class ArAlertConfig {
 /** Valeurs possibles pour la propriété variant de ArAlert */
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
-const VARIANT_TO_CLASS: Record<ArAlertVariant, string> = {
-    success: 'check-round-full',
-    warning: 'warning-full',
-    error: 'error-full',
-    info: 'info-full',
-};
-
 /**
  * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
  * @display demo
  *
- * @slot title   - Titre de l'alerte.
- * @slot content - Corps du message de l'alerte.
+ * @slot         - Contenu de l'alerte (texte, titre, liens…).
+ * @slot icon    - Icône de l'alerte. Remplace l'icône par défaut si fourni.
  *
  * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart body      - Le conteneur du titre et du contenu.
@@ -115,12 +108,31 @@ export class ArAlert extends LitElement {
         }
     }
 
+    private static readonly _ICON_PATHS: Record<ArAlertVariant, string> = {
+        success: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+        warning:
+            'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z',
+        info: 'm11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z',
+        error: 'M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z',
+    };
+
+    protected _defaultIcon(): TemplateResult {
+        const path = ArAlert._ICON_PATHS[this.variant ?? ArAlert.DEFAULT_VARIANT];
+        return html` <svg
+            aria-hidden="true"
+            part="icon-svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d=${path}></path>
+        </svg>`;
+    }
+
     override render(): TemplateResult {
-        return html` <div part="icon" class="alert-icon-container has-icon-top">
-                <span
-                    aria-hidden="true"
-                    class="icon icon-${VARIANT_TO_CLASS[this.variant ?? ArAlert.DEFAULT_VARIANT]}"
-                ></span>
+        return html` <div part="icon">
+                <slot name="icon"> ${this._defaultIcon()} </slot>
             </div>
             <div part="body" class="alert-body">
                 <slot></slot>

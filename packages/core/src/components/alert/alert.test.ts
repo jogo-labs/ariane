@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ArAlert } from './alert.js';
-import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart, requirePart, requireShadow } from '../../test-utils.js';
 import './alert.js';
 
 describe('ArAlert', () => {
@@ -91,11 +91,52 @@ describe('ArAlert', () => {
             // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
             expect(el.hasAttribute('role')).toBe(false);
         });
+    });
 
-        it('l\'icône a aria-hidden="true"', async () => {
+    // ── Icône ─────────────────────────────────────────────────────────────────
+
+    describe('icône', () => {
+        it('contient un slot nommé "icon"', async () => {
             el = await fixture('<ar-alert></ar-alert>');
-            const icon = (el.shadowRoot as ShadowRoot).querySelector('.icon') as Element;
-            expect(icon.getAttribute('aria-hidden')).toBe('true');
+            expect(requireShadow(el).querySelector('slot[name="icon"]')).not.toBeNull();
+        });
+
+        it('rend un svg par défaut dans le slot icon', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            expect(requireShadow(el).querySelector('slot[name="icon"] svg')).not.toBeNull();
+        });
+
+        it('le svg par défaut a aria-hidden="true"', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            const svg = requireShadow(el).querySelector('slot[name="icon"] svg');
+            expect(svg?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('le path svg change quand variant change', async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            const pathSuccess = requireShadow(el)
+                .querySelector('slot[name="icon"] svg path')
+                ?.getAttribute('d');
+
+            el.variant = 'warning';
+            await waitForUpdate(el);
+            const pathWarning = requireShadow(el)
+                .querySelector('slot[name="icon"] svg path')
+                ?.getAttribute('d');
+
+            expect(pathSuccess).not.toBe(pathWarning);
+        });
+
+        it('un slot icon custom remplace le svg par défaut', async () => {
+            el = await fixture(`
+                <ar-alert>
+                    <svg slot="icon" data-custom="true" aria-hidden="true"></svg>
+                </ar-alert>
+            `);
+            const slotEl = requireShadow(el).querySelector('slot[name="icon"]') as HTMLSlotElement;
+            const assigned = slotEl.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect((assigned[0] as HTMLElement).dataset.custom).toBe('true');
         });
     });
 

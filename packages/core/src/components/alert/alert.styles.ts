@@ -19,7 +19,7 @@ export default css`
         background-color: var(--ar-alert-info-bg, var(--ar-color-info-bg));
         border-color: var(--ar-alert-info-border, var(--ar-color-info-bg));
 
-        .alert-icon-container {
+        [part='icon'] {
             color: var(--ar-alert-info-icon, var(--ar-color-info-text));
         }
     }
@@ -28,7 +28,7 @@ export default css`
         background-color: var(--ar-alert-error-bg, var(--ar-color-danger-bg));
         border-color: var(--ar-alert-error-border, var(--ar-color-danger-bg));
 
-        .alert-icon-container {
+        [part='icon'] {
             color: var(--ar-alert-error-icon, var(--ar-color-danger-text));
         }
     }
@@ -37,7 +37,7 @@ export default css`
         background-color: var(--ar-alert-warning-bg, var(--ar-color-warning-bg));
         border-color: var(--ar-alert-warning-border, var(--ar-color-warning-bg));
 
-        .alert-icon-container {
+        [part='icon'] {
             color: var(--ar-alert-warning-icon, var(--ar-color-warning-text));
         }
     }
@@ -46,7 +46,7 @@ export default css`
         background-color: var(--ar-alert-success-bg, var(--ar-color-success-bg));
         border-color: var(--ar-alert-success-border, var(--ar-color-success-bg));
 
-        .alert-icon-container {
+        [part='icon'] {
             color: var(--ar-alert-success-icon, var(--ar-color-success-text));
         }
     }
@@ -91,9 +91,17 @@ export default css`
         }
     }
 
-    .icon {
-        margin: 0;
-        line-height: 1;
+    svg {
+        height: 1.25em;
+        overflow: visible;
+        width: auto;
+    }
+
+    [part='icon'] {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        font-size: 1.5em;
     }
 
     .text-link,
@@ -101,36 +109,6 @@ export default css`
         color: currentColor;
         text-decoration: underline;
         font-weight: 700;
-    }
-
-    .alert-icon-container {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
-        justify-content: center;
-        -ms-flex-negative: 0;
-        flex-shrink: 0;
-    }
-
-    .alert-icon-container .icon {
-        font-size: 1.5rem;
-    }
-
-    .alert-icon-container.has-icon-top {
-        -ms-flex-item-align: start;
-        align-self: flex-start;
-    }
-
-    .alert-icon-container.has-icon-bottom {
-        -ms-flex-item-align: end;
-        align-self: flex-end;
-    }
-
-    .alert-icon-container.has-icon-center {
-        -ms-flex-item-align: center;
-        align-self: center;
     }
 
     .alert-title + .alert-content {
