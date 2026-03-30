@@ -33,35 +33,54 @@ jobs:
       - name: Test (gate de sécurité avant publication)
         run: npm run test
 
-      # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token)
-      # Logique du tag npm :
-      #   - version stable (sans pré-release suffix) → "latest"
-      #   - "-alpha.*" → "alpha", sauf si aucune version stable n'existe → aussi "latest"
-      #   - "-beta.*"  → "beta",  sauf si aucune version stable n'existe → aussi "latest"
-      # Cela permet à `npm install @ariane-ui/core` de fonctionner pendant la phase alpha/beta.
+      # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token).
+      #
+      # Logique de tagging :
+      #   - version stable (sans suffixe pré-release) → tag "latest"
+      #   - "-alpha.*" → tag "alpha"
+      #   - "-beta.*"  → tag "beta"
+      #
+      # Cas spécial — phase pré-v1 :
+      #   Tant qu'aucune version stable n'existe sur npm, les pré-releases sont
+      #   publiées sous le tag "latest" afin que `npm install @ariane-ui/core`
+      #   (sans @alpha / @beta) fonctionne. Dès la première stable publiée,
+      #   ce cas ne s'applique plus et les pré-releases basculent sur leur tag
+      #   propre — `npm install @ariane-ui/core` pointera alors sur la stable.
+      #
+      # Note : npm dist-tag add est incompatible avec OIDC Trusted Publishers
+      # (E401). On détermine le tag en amont et on l'injecte directement dans
+      # npm publish — un seul appel par release.
       - name: Publish to npm
         run: |
           VERSION=$(node -p "require('./packages/core/package.json').version")
-          # Vérifie si une version stable existe déjà sur npm
-          STABLE=$(npm view @ariane-ui/core versions --json 2>/dev/null | \
-            node -e "const v=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); \
-                     console.log(v.filter(x=>!x.includes('-')).length > 0 ? 'yes' : 'no')" \
-            || echo "no")
-          if [[ "$VERSION" == *"-alpha"* ]]; then TAG="alpha"
-          elif [[ "$VERSION" == *"-beta"* ]]; then TAG="beta"
-          else TAG="latest"
-          fi
-          # Pas de version stable → publier aussi sous latest pour que
-          # `npm install @ariane-ui/core` fonctionne sans tag explicite.
-          # On publie deux fois car dist-tag add n'est pas compatible OIDC.
-          if [[ "$STABLE" == "no" && "$TAG" != "latest" ]]; then
-            npm publish --workspace packages/core --access public --provenance --tag latest
-            npm publish --workspace packages/core --access public --provenance --tag $TAG
-            echo "Published $VERSION with tags: latest + $TAG (no stable version exists)"
+          PACKAGE_NAME="@ariane-ui/core"
+
+          # Vérification robuste : npm view retourne une string si une seule version,
+          # un array sinon — [].concat() normalise les deux cas.
+          STABLE_EXISTS=$(npm view $PACKAGE_NAME versions --json 2>/dev/null | \
+            node -e "
+              const input = require('fs').readFileSync(0, 'utf8');
+              if (!input) { console.log('no'); process.exit(0); }
+              const v = [].concat(JSON.parse(input));
+              console.log(v.some(x => !x.includes('-')) ? 'yes' : 'no');
+            " || echo "no")
+
+          if [[ "$VERSION" == *"-alpha"* ]]; then
+            TAG="alpha"
+          elif [[ "$VERSION" == *"-beta"* ]]; then
+            TAG="beta"
           else
-            npm publish --workspace packages/core --access public --provenance --tag $TAG
-            echo "Published $VERSION with tag: $TAG"
+            TAG="latest"
           fi
+
+          # Cas spécial pré-v1 : pas de stable → force latest pour la découvrabilité
+          if [[ "$STABLE_EXISTS" == "no" && "$TAG" != "latest" ]]; then
+            echo "No stable version found. Using 'latest' instead of '$TAG' to ensure discoverability."
+            TAG="latest"
+          fi
+
+          echo "Publishing $VERSION with tag: $TAG"
+          npm publish --workspace packages/core --access public --provenance --tag $TAG
 
       # Créer la GitHub Release avec le contenu du tag
       - name: Create GitHub Release
