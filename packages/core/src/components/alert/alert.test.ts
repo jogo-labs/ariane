@@ -49,10 +49,10 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert></ar-alert>');
         });
 
-        it('version est undefined par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
-            // La propriété JS est undefined — DEFAULT_VERSION est utilisé dans le template,
+        it('variant est undefined par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
+            // La propriété JS est undefined — DEFAULT_VARIANT est utilisé dans le template,
             // pas comme valeur initiale de la propriété.
-            expect(el.version).toBeUndefined();
+            expect(el.variant).toBeUndefined();
         });
 
         it('nextFocus est undefined par défaut', () => {
@@ -68,31 +68,31 @@ describe('ArAlert', () => {
         });
     });
 
-    // ── Propriété version ─────────────────────────────────────────────────────
+    // ── Propriété variant ─────────────────────────────────────────────────────
 
-    describe('propriété version', () => {
-        it("reflète version en attribut HTML depuis l'attribut initial", async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
-            expect(el.getAttribute('version')).toBe('success');
+    describe('propriété variant', () => {
+        it("reflète variant en attribut HTML depuis l'attribut initial", async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(el.getAttribute('variant')).toBe('success');
         });
 
-        it('version="success" applique la classe alert-success au container', async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
+        it('variant="success" applique la classe alert-success au container', async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
             expect(requirePart(el, 'container').classList.contains('alert-success')).toBe(true);
         });
 
-        it('version="warning" applique la classe alert-warning au container', async () => {
-            el = await fixture('<ar-alert version="warning"></ar-alert>');
+        it('variant="warning" applique la classe alert-warning au container', async () => {
+            el = await fixture('<ar-alert variant="warning"></ar-alert>');
             expect(requirePart(el, 'container').classList.contains('alert-warning')).toBe(true);
         });
 
-        it('version="error" applique la classe alert-error au container', async () => {
-            el = await fixture('<ar-alert version="error"></ar-alert>');
+        it('variant="error" applique la classe alert-error au container', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
             expect(requirePart(el, 'container').classList.contains('alert-error')).toBe(true);
         });
 
-        it('version="info" applique la classe alert-info au container', async () => {
-            el = await fixture('<ar-alert version="info"></ar-alert>');
+        it('variant="info" applique la classe alert-info au container', async () => {
+            el = await fixture('<ar-alert variant="info"></ar-alert>');
             expect(requirePart(el, 'container').classList.contains('alert-info')).toBe(true);
         });
     });
@@ -100,23 +100,23 @@ describe('ArAlert', () => {
     // ── Accessibilité ARIA ────────────────────────────────────────────────────
 
     describe('accessibilité ARIA', () => {
-        it('version="error" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="error"></ar-alert>');
+        it('variant="error" donne role="alert" au container', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
             expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
         });
 
-        it('version="warning" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="warning"></ar-alert>');
+        it('variant="warning" donne role="alert" au container', async () => {
+            el = await fixture('<ar-alert variant="warning"></ar-alert>');
             expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
         });
 
-        it('version="success" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
+        it('variant="success" donne role="alert" au container', async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
             expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
         });
 
-        it('version="info" donne role="status" au container', async () => {
-            el = await fixture('<ar-alert version="info"></ar-alert>');
+        it('variant="info" donne role="status" au container', async () => {
+            el = await fixture('<ar-alert variant="info"></ar-alert>');
             expect(requirePart(el, 'container').getAttribute('role')).toBe('status');
         });
 

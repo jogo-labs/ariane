@@ -11,17 +11,17 @@ export function warn(name: string, message: string, error?: Error) {
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
     /** Permet de spécifier le type d'alerte */
-    version: ArAlertVersion = ArAlert.DEFAULT_VERSION;
+    variant: ArAlertVariant = ArAlert.DEFAULT_VARIANT;
     /** Permet d'afficher la croix de fermeture. La valeur attendue est l'ID de l'élément à focus après fermeture */
     nextFocus?: string;
     /** Désactive la notification aux lecteurs d'écran lors de l'apparition de l'alerte */
     withoutNotification: boolean = ArAlert.DEFAULT_NOTIFICATION;
 }
 
-/** Valeurs possibles pour la propriété version de ArAlert */
-export type ArAlertVersion = 'success' | 'warning' | 'error' | 'info';
+/** Valeurs possibles pour la propriété variant de ArAlert */
+export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
-const VERSION_TO_CLASS: Record<ArAlertVersion, string> = {
+const VARIANT_TO_CLASS: Record<ArAlertVariant, string> = {
     success: 'check-round-full',
     warning: 'warning-full',
     error: 'error-full',
@@ -36,7 +36,7 @@ const VERSION_TO_CLASS: Record<ArAlertVersion, string> = {
  * @slot content - Corps du message de l'alerte.
  *
  * @csspart container - Le `<div>` englobant l'alerte.
- * @csspart icon      - Le conteneur de l'icône de version.
+ * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
@@ -65,7 +65,7 @@ export class ArAlert extends LitElement {
     // @ignore
     static readonly NAME = 'ArAlert';
     // @ignore
-    static readonly DEFAULT_VERSION: ArAlertVersion = 'error';
+    static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
 
@@ -88,7 +88,7 @@ export class ArAlert extends LitElement {
 
     /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
-     * @attr version
+     * @attr variant
      */
     @property({ reflect: true, type: String, useDefault: true })
     version?: 'success' | 'warning' | 'error' | 'info';
@@ -112,21 +112,21 @@ export class ArAlert extends LitElement {
             alert: true,
             'alert-dismissible': this.nextFocus !== undefined,
         };
-        containerClassMap[`alert-${this.version ?? ArAlert.DEFAULT_VERSION}`] = true;
+        containerClassMap[`alert-${this.variant ?? ArAlert.DEFAULT_VARIANT}`] = true;
 
         return html` <div
             part="container"
             class=${classMap(containerClassMap)}
             .role=${this.withoutNotification
                 ? nothing
-                : this.version === 'info'
+                : this.variant === 'info'
                   ? 'status'
                   : 'alert'}
         >
             <div part="icon" class="alert-icon-container has-icon-top">
                 <span
                     aria-hidden="true"
-                    class="icon icon-${VERSION_TO_CLASS[this.version ?? ArAlert.DEFAULT_VERSION]}"
+                    class="icon icon-${VARIANT_TO_CLASS[this.variant ?? ArAlert.DEFAULT_VARIANT]}"
                 ></span>
             </div>
             <div part="body" class="alert-body">
