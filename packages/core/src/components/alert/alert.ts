@@ -1,5 +1,4 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { type ClassInfo, classMap } from 'lit/directives/class-map.js';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 
@@ -11,36 +10,32 @@ export function warn(name: string, message: string, error?: Error) {
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
     /** Permet de spécifier le type d'alerte */
-    version: ArAlertVersion = ArAlert.DEFAULT_VERSION;
+    variant: ArAlertVariant = ArAlert.DEFAULT_VARIANT;
     /** Permet d'afficher la croix de fermeture. La valeur attendue est l'ID de l'élément à focus après fermeture */
     nextFocus?: string;
     /** Désactive la notification aux lecteurs d'écran lors de l'apparition de l'alerte */
     withoutNotification: boolean = ArAlert.DEFAULT_NOTIFICATION;
 }
 
-/** Valeurs possibles pour la propriété version de ArAlert */
-export type ArAlertVersion = 'success' | 'warning' | 'error' | 'info';
-
-const VERSION_TO_CLASS: Record<ArAlertVersion, string> = {
-    success: 'check-round-full',
-    warning: 'warning-full',
-    error: 'error-full',
-    info: 'info-full',
-};
+/** Valeurs possibles pour la propriété variant de ArAlert */
+export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
  * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
  * @display demo
  *
- * @slot title   - Titre de l'alerte.
- * @slot content - Corps du message de l'alerte.
+ * @slot         - Contenu de l'alerte (texte, titre, liens…).
+ * @slot icon    - Icône de l'alerte. Remplace l'icône par défaut si fourni.
  *
- * @csspart container - Le `<div>` englobant l'alerte.
- * @csspart icon      - Le conteneur de l'icône de version.
+ * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
  *
+ * @cssprop [--ar-alert-border-radius=0.75rem]                     - Arrondi des alertes.
+ * @cssprop [--ar-alert-padding=1rem]                              - Marge interne des alertes.
+ * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures
+ * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures
  * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
  * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
  * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".
@@ -65,7 +60,7 @@ export class ArAlert extends LitElement {
     // @ignore
     static readonly NAME = 'ArAlert';
     // @ignore
-    static readonly DEFAULT_VERSION: ArAlertVersion = 'error';
+    static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
 
@@ -88,10 +83,10 @@ export class ArAlert extends LitElement {
 
     /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
-     * @attr version
+     * @attr variant
      */
-    @property({ reflect: true, type: String, useDefault: true })
-    version?: 'success' | 'warning' | 'error' | 'info';
+    @property({ reflect: true, type: String })
+    variant: 'success' | 'warning' | 'error' | 'info' = 'error';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
@@ -107,31 +102,44 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
-    override render(): TemplateResult {
-        const containerClassMap: ClassInfo = {
-            alert: true,
-            'alert-dismissible': this.nextFocus !== undefined,
-        };
-        containerClassMap[`alert-${this.version ?? ArAlert.DEFAULT_VERSION}`] = true;
+    override updated(changed: Map<string, unknown>) {
+        if (changed.has('variant') || changed.has('withoutNotification')) {
+            if (this.withoutNotification) {
+                this.removeAttribute('role');
+                return;
+            }
+            this.role = this.variant === 'info' ? 'status' : 'alert';
+        }
+    }
 
-        return html` <div
-            part="container"
-            class=${classMap(containerClassMap)}
-            .role=${this.withoutNotification
-                ? nothing
-                : this.version === 'info'
-                  ? 'status'
-                  : 'alert'}
+    private static readonly _ICON_PATHS: Record<ArAlertVariant, string> = {
+        success: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+        warning:
+            'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z',
+        info: 'm11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z',
+        error: 'M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z',
+    };
+
+    protected _defaultIcon(): TemplateResult {
+        const path = ArAlert._ICON_PATHS[this.variant ?? ArAlert.DEFAULT_VARIANT];
+        return html` <svg
+            aria-hidden="true"
+            part="icon-svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
         >
-            <div part="icon" class="alert-icon-container has-icon-top">
-                <span
-                    aria-hidden="true"
-                    class="icon icon-${VERSION_TO_CLASS[this.version ?? ArAlert.DEFAULT_VERSION]}"
-                ></span>
+            <path stroke-linecap="round" stroke-linejoin="round" d=${path}></path>
+        </svg>`;
+    }
+
+    override render(): TemplateResult {
+        return html` <div part="icon">
+                <slot name="icon"> ${this._defaultIcon()} </slot>
             </div>
             <div part="body" class="alert-body">
-                <p class="alert-title"><slot name="title"></slot></p>
-                <p class="alert-content"><slot name="content"></slot></p>
+                <slot></slot>
             </div>
             ${this.canBeHidden
                 ? html` <button
@@ -143,8 +151,7 @@ export class ArAlert extends LitElement {
                   >
                       X
                   </button>`
-                : nothing}
-        </div>`;
+                : nothing}`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */

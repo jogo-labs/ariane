@@ -8,27 +8,27 @@ variants:
       description: Rendu par défaut du composant.
       html: |
           <ar-alert>
-            <span slot="title">Alerte par defaut</span>
-            <span slot="content">Je suis une alerte par defaut (erreur).</span>
+              <strong>Titre de l'alerte</strong><br>
+              Je suis une alerte par defaut (erreur).
           </ar-alert>
     - name: success
       label: Succès
       description: Rendu en mode succès.
       html: |
-          <ar-alert version="success">
-            <span slot="title">Alerte de succès</span>
-            <span slot="content">Je suis une alerte de succès.</span>
+          <ar-alert variant="success">
+              <strong>Succès de l'opération</strong><br>
+              Je suis une alerte de succès.
           </ar-alert>
     - name: dismissible
       label: Dismissible
       description: Rendu d'une alerte qui peut être fermée. L'ID fourni doit être un élément existant dans la page qui recevra le focus à la fermeture du composant.
       html: |
           <div>
-            <button style="margin-bottom: 10px" type="button" id="idBoutonFocused">Test focus</button>
-            <ar-alert next-focus="idBoutonFocused">
-              <span slot="title">Alerte dismissible</span>
-              <span slot="content">Je suis une alerte qui peut être fermée.</span>
-            </ar-alert>
+              <button style="margin-bottom: 10px" type="button" id="idBoutonFocused">Test focus</button>
+              <ar-alert next-focus="idBoutonFocused">
+                  <strong>Alerte supprimable</strong><br>
+                  Je suis une alerte qui peut être fermée.
+              </ar-alert>
           </div>
 ---
 

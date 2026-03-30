@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ArAlert } from './alert.js';
-import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart, requirePart, requireShadow } from '../../test-utils.js';
 import './alert.js';
 
 describe('ArAlert', () => {
@@ -19,26 +19,12 @@ describe('ArAlert', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un part="container"', () => {
-            expect(getPart(el, 'container')).not.toBeNull();
-        });
-
         it('contient un part="icon"', () => {
             expect(getPart(el, 'icon')).not.toBeNull();
         });
 
         it('contient un part="body"', () => {
             expect(getPart(el, 'body')).not.toBeNull();
-        });
-
-        it('contient un slot nommé "title"', () => {
-            const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('slot[name="title"]')).not.toBeNull();
-        });
-
-        it('contient un slot nommé "content"', () => {
-            const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('slot[name="content"]')).not.toBeNull();
         });
     });
 
@@ -49,10 +35,10 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert></ar-alert>');
         });
 
-        it('version est undefined par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
-            // La propriété JS est undefined — DEFAULT_VERSION est utilisé dans le template,
+        it('variant est error par défaut (la valeur par défaut est appliquée au rendu uniquement)', () => {
+            // La propriété JS est undefined — DEFAULT_VARIANT est utilisé dans le template,
             // pas comme valeur initiale de la propriété.
-            expect(el.version).toBeUndefined();
+            expect(el.variant).toBe('error');
         });
 
         it('nextFocus est undefined par défaut', () => {
@@ -68,68 +54,89 @@ describe('ArAlert', () => {
         });
     });
 
-    // ── Propriété version ─────────────────────────────────────────────────────
+    // ── Propriété variant ─────────────────────────────────────────────────────
 
-    describe('propriété version', () => {
-        it("reflète version en attribut HTML depuis l'attribut initial", async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
-            expect(el.getAttribute('version')).toBe('success');
-        });
-
-        it('version="success" applique la classe alert-success au container', async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-success')).toBe(true);
-        });
-
-        it('version="warning" applique la classe alert-warning au container', async () => {
-            el = await fixture('<ar-alert version="warning"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-warning')).toBe(true);
-        });
-
-        it('version="error" applique la classe alert-error au container', async () => {
-            el = await fixture('<ar-alert version="error"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-error')).toBe(true);
-        });
-
-        it('version="info" applique la classe alert-info au container', async () => {
-            el = await fixture('<ar-alert version="info"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-info')).toBe(true);
+    describe('propriété variant', () => {
+        it("reflète variant en attribut HTML depuis l'attribut initial", async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(el.getAttribute('variant')).toBe('success');
         });
     });
 
     // ── Accessibilité ARIA ────────────────────────────────────────────────────
 
     describe('accessibilité ARIA', () => {
-        it('version="error" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="error"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+        it('variant="error" donne role="alert" au host', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('version="warning" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="warning"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+        it('variant="warning" donne role="alert" au host', async () => {
+            el = await fixture('<ar-alert variant="warning"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('version="success" donne role="alert" au container', async () => {
-            el = await fixture('<ar-alert version="success"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+        it('variant="success" donne role="alert" au host', async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('version="info" donne role="status" au container', async () => {
-            el = await fixture('<ar-alert version="info"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('status');
+        it('variant="info" donne role="status" au host', async () => {
+            el = await fixture('<ar-alert variant="info"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('status');
         });
 
-        it('without-notification supprime le role du container', async () => {
+        it('without-notification supprime le role du host', async () => {
             el = await fixture('<ar-alert without-notification></ar-alert>');
             // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
-            expect(requirePart(el, 'container').hasAttribute('role')).toBe(false);
+            expect(el.hasAttribute('role')).toBe(false);
+        });
+    });
+
+    // ── Icône ─────────────────────────────────────────────────────────────────
+
+    describe('icône', () => {
+        it('contient un slot nommé "icon"', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            expect(requireShadow(el).querySelector('slot[name="icon"]')).not.toBeNull();
         });
 
-        it('l\'icône a aria-hidden="true"', async () => {
+        it('rend un svg par défaut dans le slot icon', async () => {
             el = await fixture('<ar-alert></ar-alert>');
-            const icon = (el.shadowRoot as ShadowRoot).querySelector('.icon') as Element;
-            expect(icon.getAttribute('aria-hidden')).toBe('true');
+            expect(requireShadow(el).querySelector('slot[name="icon"] svg')).not.toBeNull();
+        });
+
+        it('le svg par défaut a aria-hidden="true"', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            const svg = requireShadow(el).querySelector('slot[name="icon"] svg');
+            expect(svg?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('le path svg change quand variant change', async () => {
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            const pathSuccess = requireShadow(el)
+                .querySelector('slot[name="icon"] svg path')
+                ?.getAttribute('d');
+
+            el.variant = 'warning';
+            await waitForUpdate(el);
+            const pathWarning = requireShadow(el)
+                .querySelector('slot[name="icon"] svg path')
+                ?.getAttribute('d');
+
+            expect(pathSuccess).not.toBe(pathWarning);
+        });
+
+        it('un slot icon custom remplace le svg par défaut', async () => {
+            el = await fixture(`
+                <ar-alert>
+                    <svg slot="icon" data-custom="true" aria-hidden="true"></svg>
+                </ar-alert>
+            `);
+            const slotEl = requireShadow(el).querySelector('slot[name="icon"]') as HTMLSlotElement;
+            const assigned = slotEl.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect((assigned[0] as HTMLElement).dataset.custom).toBe('true');
         });
     });
 
