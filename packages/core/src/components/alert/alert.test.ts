@@ -19,10 +19,6 @@ describe('ArAlert', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un part="container"', () => {
-            expect(getPart(el, 'container')).not.toBeNull();
-        });
-
         it('contient un part="icon"', () => {
             expect(getPart(el, 'icon')).not.toBeNull();
         });
@@ -75,55 +71,35 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert variant="success"></ar-alert>');
             expect(el.getAttribute('variant')).toBe('success');
         });
-
-        it('variant="success" applique la classe alert-success au container', async () => {
-            el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-success')).toBe(true);
-        });
-
-        it('variant="warning" applique la classe alert-warning au container', async () => {
-            el = await fixture('<ar-alert variant="warning"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-warning')).toBe(true);
-        });
-
-        it('variant="error" applique la classe alert-error au container', async () => {
-            el = await fixture('<ar-alert variant="error"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-error')).toBe(true);
-        });
-
-        it('variant="info" applique la classe alert-info au container', async () => {
-            el = await fixture('<ar-alert variant="info"></ar-alert>');
-            expect(requirePart(el, 'container').classList.contains('alert-info')).toBe(true);
-        });
     });
 
     // ── Accessibilité ARIA ────────────────────────────────────────────────────
 
     describe('accessibilité ARIA', () => {
-        it('variant="error" donne role="alert" au container', async () => {
+        it('variant="error" donne role="alert" au host', async () => {
             el = await fixture('<ar-alert variant="error"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="warning" donne role="alert" au container', async () => {
+        it('variant="warning" donne role="alert" au host', async () => {
             el = await fixture('<ar-alert variant="warning"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="success" donne role="alert" au container', async () => {
+        it('variant="success" donne role="alert" au host', async () => {
             el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="info" donne role="status" au container', async () => {
+        it('variant="info" donne role="status" au host', async () => {
             el = await fixture('<ar-alert variant="info"></ar-alert>');
-            expect(requirePart(el, 'container').getAttribute('role')).toBe('status');
+            expect(el.getAttribute('role')).toBe('status');
         });
 
-        it('without-notification supprime le role du container', async () => {
+        it('without-notification supprime le role du host', async () => {
             el = await fixture('<ar-alert without-notification></ar-alert>');
             // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
-            expect(requirePart(el, 'container').hasAttribute('role')).toBe(false);
+            expect(el.hasAttribute('role')).toBe(false);
         });
 
         it('l\'icône a aria-hidden="true"', async () => {

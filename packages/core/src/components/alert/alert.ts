@@ -1,5 +1,4 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { type ClassInfo, classMap } from 'lit/directives/class-map.js';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 
@@ -35,7 +34,6 @@ const VARIANT_TO_CLASS: Record<ArAlertVariant, string> = {
  * @slot title   - Titre de l'alerte.
  * @slot content - Corps du message de l'alerte.
  *
- * @csspart container - Le `<div>` englobant l'alerte.
  * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
@@ -107,23 +105,18 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
-    override render(): TemplateResult {
-        const containerClassMap: ClassInfo = {
-            alert: true,
-            'alert-dismissible': this.nextFocus !== undefined,
-        };
-        containerClassMap[`alert-${this.variant ?? ArAlert.DEFAULT_VARIANT}`] = true;
+    override updated(changed: Map<string, unknown>) {
+        if (changed.has('variant') || changed.has('withoutNotification')) {
+            if (this.withoutNotification) {
+                this.removeAttribute('role');
+                return;
+            }
+            this.role = this.variant === 'info' ? 'status' : 'alert';
+        }
+    }
 
-        return html` <div
-            part="container"
-            class=${classMap(containerClassMap)}
-            .role=${this.withoutNotification
-                ? nothing
-                : this.variant === 'info'
-                  ? 'status'
-                  : 'alert'}
-        >
-            <div part="icon" class="alert-icon-container has-icon-top">
+    override render(): TemplateResult {
+        return html` <div part="icon" class="alert-icon-container has-icon-top">
                 <span
                     aria-hidden="true"
                     class="icon icon-${VARIANT_TO_CLASS[this.variant ?? ArAlert.DEFAULT_VARIANT]}"
@@ -143,8 +136,7 @@ export class ArAlert extends LitElement {
                   >
                       X
                   </button>`
-                : nothing}
-        </div>`;
+                : nothing}`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */
