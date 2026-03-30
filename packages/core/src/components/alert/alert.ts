@@ -91,7 +91,7 @@ export class ArAlert extends LitElement {
      * @attr variant
      */
     @property({ reflect: true, type: String, useDefault: true })
-    version?: 'success' | 'warning' | 'error' | 'info';
+    variant?: 'success' | 'warning' | 'error' | 'info';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
