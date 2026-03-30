@@ -16,9 +16,10 @@ import { join, dirname, relative, extname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT      = join(__dirname, '..');
-const CSS_SRC   = join(ROOT, 'src', 'styles');
-const CSS_OUT   = join(ROOT, 'dist', 'styles');
+const ROOT = join(__dirname, '..');
+const CSS_SRC = join(ROOT, 'src', 'styles');
+const CSS_OUT = join(ROOT, 'dist', 'styles');
+const WATCH = process.argv.includes('--watch');
 
 /**
  * Scan récursif pour trouver tous les fichiers CSS.
@@ -56,18 +57,19 @@ const entryPoints = Object.fromEntries(
 
 mkdirSync(CSS_OUT, { recursive: true });
 
-await esbuild
-    .build({
-        entryPoints,
-        outdir:   CSS_OUT,
-        bundle:   false, // pas de résolution d'imports @import ici
-        minify:   true,
-        logLevel: 'info',
-    })
-    .then(() => {
-        console.log(`✓ CSS: ${cssFiles.length} file(s) → dist/styles/`);
-    })
-    .catch((err) => {
-        console.error('CSS build failed:', err);
-        process.exit(1);
-    });
+const ctx = await esbuild.context({
+    entryPoints,
+    outdir: CSS_OUT,
+    bundle: false, // pas de résolution d'imports @import ici
+    minify: true,
+    logLevel: 'info',
+});
+
+if (WATCH) {
+    await ctx.watch();
+    console.log('[css] watching...');
+} else {
+    await ctx.rebuild();
+    await ctx.dispose();
+    console.log(`✓ CSS: ${cssFiles.length} file(s) → dist/styles/`);
+}

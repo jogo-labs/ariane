@@ -26,7 +26,7 @@
     "build:bundles": "node scripts/build-bundles.js",
     "build:css": "node scripts/build-css.js",
     "build:types": "tsc --emitDeclarationOnly --declarationMap",
-    "dev": "npm run build:manifest && node scripts/build-bundles.js --watch",
+    "dev": "npm run build:manifest && node scripts/build-bundles.js --watch & node scripts/build-css.js --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
