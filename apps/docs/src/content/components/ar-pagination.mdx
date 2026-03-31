@@ -41,3 +41,10 @@ variants:
   management) pour que l'utilisateur clavier sache que la page a changé.
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
+
+## Comportement responsive
+
+En dessous de **640px**, le composant réduit automatiquement le nombre de pages affichées :
+
+- Seules les pages **précédente**, **active**, **suivante** et les deux voisines directes restent visibles.
+- Les autres pages sont masquées — aucune configuration nécessaire.

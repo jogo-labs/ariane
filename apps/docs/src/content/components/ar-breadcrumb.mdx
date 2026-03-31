@@ -1,7 +1,7 @@
 ---
 tagName: ar-breadcrumb
 title: Breadcrumb
-description: Fil d'ariane accessible avec affichage adaptatif mobile/desktop. En dessous de 768px de largeur de viewport, les liens intermédiaires sont masqués derrière un dropdown. Le premier lien reste visible sous forme d'un bouton "Retour". Pour voir ce comportement, utiliser les DevTools du navigateur (mode responsive).
+description: Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
 variants:
     - name: default
       label: Par défaut
@@ -40,3 +40,13 @@ variants:
 - **Labels descriptifs sur chaque item.** Le `label` est le seul texte vocalisé — évitez les
   labels génériques ("Page 1", "Étape") au profit de libellés qui situent l'utilisateur
   ("Mon espace personnel", "Résultats de recherche").
+
+## Comportement responsive
+
+En dessous de **768px**, le composant bascule automatiquement vers un affichage condensé :
+
+- Les liens intermédiaires sont masqués derrière un **dropdown**.
+- Seul le **premier lien** reste visible, rendu sous forme de bouton "Retour".
+- Le dropdown expose son état via `aria-expanded` — le comportement clavier et vocal est géré automatiquement.
+
+Pour observer ce rendu, utiliser les DevTools du navigateur en mode responsive.
