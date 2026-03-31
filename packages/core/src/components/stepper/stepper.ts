@@ -12,7 +12,7 @@ import { stepperContext, type StepperRegistry } from '../../context/stepper.cont
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { DropdownController } from '../../controllers/dropdown.controller.js';
-import { renderDesktop, renderMobile } from './stepper.renderer.js';
+import { renderDesktop } from './stepper.renderer.js';
 import { type ArStepperItem } from '../stepper-item/stepper-item.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
@@ -22,15 +22,16 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Stepper de navigation accessible, adaptatif desktop/mobile.
+ * @summary Stepper de navigation accessible avec téléportation DOM adaptive.
  * @display demo
  *
  * Les étapes sont déclarées via des éléments `<ar-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
  * l'arbre de navigation. Un item peut avoir des sous-étapes (enfants imbriqués).
  *
- * En mode `mobile`, les étapes sont affichées dans un dropdown.
- * En mode `desktop`, elles sont affichées dans une liste verticale.
+ * Fournir `desktop-target` (ID d'un élément) pour activer la téléportation automatique :
+ * en dessous de `desktop-from` px le composant affiche le rendu dropdown à sa position
+ * d'origine ; au-dessus il se déplace dans l'élément cible et affiche la liste verticale.
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
@@ -39,8 +40,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
- * @csspart dropdown     - Le conteneur dropdown (mobile uniquement).
- * @csspart dropdown-btn - Le bouton d'ouverture du dropdown mobile.
+ * @csspart dropdown     - Le conteneur dropdown.
+ * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
  *
  * @cssprop --ar-stepper-gap                                                 - Espacement entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]    - Fond de la puce de l'étape active.
@@ -75,14 +76,6 @@ export class ArStepper extends LitElement {
      */
     @property({ type: String, attribute: 'mode', useDefault: true })
     mode: 'create' | 'edit' = 'create';
-
-    /**
-     * Version d'affichage. Passer `mobile` pour activer le rendu dropdown.
-     * En pratique, gérer ce changement via un `ResizeObserver` ou une media query externe.
-     * @attr version
-     */
-    @property({ type: String })
-    version: 'desktop' | 'mobile' = 'desktop';
 
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
@@ -174,21 +167,7 @@ export class ArStepper extends LitElement {
             return html`<slot></slot>`;
         }
 
-        const content =
-            this.version === 'mobile'
-                ? renderMobile(
-                      steps,
-                      {
-                          isOpen: this.dropdown.isOpen,
-                          currentStepIndex: this._currentStepIndex,
-                          currentStepLabel: this.getCurrentStepLabel(),
-                          currentSubStepLabel: this.getCurrentSubStepLabel(),
-                          onToggle: this._onDropdownToggle,
-                      },
-                      this.mode,
-                      this.onClickLink,
-                  )
-                : renderDesktop(steps, this.mode, this.onClickLink);
+        const content = renderDesktop(steps, this.mode, this.onClickLink);
 
         return html` <nav
             part="nav"

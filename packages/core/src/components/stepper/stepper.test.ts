@@ -68,113 +68,23 @@ describe('ArStepper', () => {
             expect(el.mode).toBe('create');
         });
 
-        it('version par défaut vaut "desktop"', async () => {
-            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
-            expect(el.version).toBe('desktop');
-        });
-
         it('followScroll par défaut vaut false', async () => {
             const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
             expect(el.followScroll).toBe(false);
         });
 
+        it("version n'est plus une propriété du composant", async () => {
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect('version' in el).toBe(false);
+        });
+
         it('lit les attributs depuis le HTML', async () => {
             const el = await fixture<ArStepper>(
-                '<ar-stepper current-path="/b" mode="edit" version="mobile" follow-scroll></ar-stepper>',
+                '<ar-stepper current-path="/b" mode="edit" follow-scroll></ar-stepper>',
             );
             expect(el.currentPath).toBe('/b');
             expect(el.mode).toBe('edit');
-            expect(el.version).toBe('mobile');
             expect(el.followScroll).toBe(true);
-        });
-    });
-
-    // ── Rendu desktop ─────────────────────────────────────────────────────────
-
-    describe('rendu desktop', () => {
-        it('affiche les étapes dans une liste ol.stepper-desktop', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="desktop">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const list = shadow(el).querySelector('ol.stepper-desktop');
-            expect(list).not.toBeNull();
-            expect(list?.querySelectorAll('li').length).toBe(2);
-        });
-
-        it("l'étape courante a la classe active", async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const items = shadow(el).querySelectorAll('li.stepper-item');
-            expect(items[0]?.classList.contains('active')).toBe(false);
-            expect(items[1]?.classList.contains('active')).toBe(true);
-        });
-
-        it('en mode edit les étapes complétées sont des liens', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b" mode="edit">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const links = shadow(el).querySelectorAll('a.stepper-link');
-            expect(links.length).toBeGreaterThan(0);
-        });
-    });
-
-    // ── Rendu mobile ──────────────────────────────────────────────────────────
-
-    describe('rendu mobile', () => {
-        it('affiche un bouton dropdown en mode mobile', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const btn = shadow(el).querySelector('button.dropdown-toggle');
-            expect(btn).not.toBeNull();
-        });
-
-        it('le dropdown est fermé par défaut', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const dropdown = shadow(el).querySelector('.dropdown');
-            expect(dropdown?.classList.contains('show')).toBe(false);
-        });
-
-        it('cliquer sur le bouton toggle ouvre le dropdown', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const btn = shadow(el).querySelector<HTMLButtonElement>('button.dropdown-toggle');
-            btn?.click();
-            await waitForUpdate(el);
-            const dropdown = shadow(el).querySelector('.dropdown');
-            expect(dropdown?.classList.contains('show')).toBe(true);
-        });
-
-        it("affiche le label de l'étape courante dans le bouton", async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            expect(el.currentPath).toBe('/b');
         });
     });
 
