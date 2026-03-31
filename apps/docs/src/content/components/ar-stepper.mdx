@@ -69,4 +69,22 @@ variants:
           </ar-stepper>
 ---
 
-Documentation narrative du composant `ar-stepper`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
+  et identifiable par les lecteurs d'écran.
+- L'état courant (`current-path`) est reflété visuellement et structurellement — les items
+  actifs, complétés et désactivés sont distingués.
+
+### À la charge de l'auteur
+
+- **Labels descriptifs sur chaque `ar-stepper-item`.** Le `label` est le seul texte vocalisé
+  pour chaque étape — évitez les labels génériques ("Étape 1") au profit de libellés métier
+  ("Mes informations", "Récapitulatif").
+- **`current-path` doit correspondre au `path` d'un item existant.** Une valeur incorrecte
+  n'active aucun item — aucun feedback visuel ni vocal ne signale l'étape courante.
+- **Les items sans `href` ne sont pas des liens.** Un item sans destination est rendu comme
+  un élément non interactif — ne pas en faire la cible de `current-path` si l'utilisateur
+  doit pouvoir y naviguer.
