@@ -1,0 +1,29 @@
+---
+/**
+ * NarrativeHeading.astro
+ *
+ * Composant MDX custom pour les titres h2 du contenu narratif des pages composant.
+ *
+ * Rôle : générer un `id` slugifié depuis le texte du titre, afin que chaque h2
+ * du MDX soit accessible comme ancre et apparaisse correctement dans la TOC.
+ *
+ * L'algorithme de slugification utilise `github-slugger` — le même qu'Astro/remark
+ * utilise pour construire le tableau `headings` retourné par `render()`.
+ * Cette cohérence garantit que l'id posé ici correspond toujours à l'entrée TOC
+ * construite dans [slug].astro, sans aucune synchronisation manuelle.
+ *
+ * Usage : injecté via <Content components={{ h2: NarrativeHeading }} /> dans [slug].astro.
+ * Ne pas utiliser directement dans les templates Astro.
+ */
+import GithubSlugger from 'github-slugger';
+
+interface Props {
+    id?: string;
+}
+
+const { id, ...rest } = Astro.props as Props & Record<string, unknown>;
+const text = await Astro.slots.render('default');
+const plainText = text.replace(/<[^>]+>/g, '').trim();
+const slug = id ?? new GithubSlugger().slug(plainText);
+---
+<h2 id={slug} {...rest}><slot /></h2>
