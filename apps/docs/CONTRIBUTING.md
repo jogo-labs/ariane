@@ -377,6 +377,24 @@ Voir [ar-alert.mdx](./src/content/components/ar-alert.mdx) comme référence.
 
 ---
 
+## Convention — Section comportement responsive dans les MDX
+
+Ajouter une section `## Comportement responsive` **uniquement si le composant a un comportement
+automatique distinct selon le viewport** (CSS media queries ou JS détectant le viewport).
+
+La section décrit :
+
+- Le seuil de breakpoint (`768px`, `640px`…)
+- Ce qui change visuellement à ce seuil
+- Ce qui est géré automatiquement (pas de configuration requise côté auteur)
+
+Elle est placée **après `## Accessibilité`**. Elle suit le même style : liste de faits courts,
+pas d'exemples de code.
+
+Voir [ar-breadcrumb.mdx](./src/content/components/ar-breadcrumb.mdx) comme référence.
+
+---
+
 ## Checklist pour ajouter un composant
 
 > **Utiliser le script de scaffolding** : `npm run create -- <nom>` génère automatiquement
@@ -388,6 +406,7 @@ Voir [ar-alert.mdx](./src/content/components/ar-alert.mdx) comme référence.
 - [ ] Régénérer le CEM : `cd packages/core && npm run build:manifest`
 - [ ] Compléter les variantes dans `apps/docs/src/content/components/ar-<nom>.mdx`
 - [ ] Ajouter la section `## Accessibilité` dans le MDX (voir convention ci-dessus)
+- [ ] Si le composant a un comportement adaptatif automatique : ajouter `## Comportement responsive` après `## Accessibilité` (voir convention ci-dessus)
 - [ ] Lancer `npm run dev` et vérifier la page `/components/<nom>`
 - [ ] Si sous-composant : ajouter uniquement `@parent ar-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
 
