@@ -24,7 +24,7 @@ const variantSchema = z.object({
 const components = defineCollection({
     loader: glob({ pattern: '**/*.mdx', base: './src/content/components' }),
     schema: z.object({
-        /** Tag name du composant (ex: ar-button) */
+        /** Tag name du composant (ex: ar-alert) */
         tagName: z.string(),
         /** Titre affiché en haut de la page */
         title: z.string(),

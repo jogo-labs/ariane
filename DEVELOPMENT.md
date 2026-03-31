@@ -79,13 +79,13 @@ Composants complexes ajoutent :
 
 ## Conventions de nommage
 
-| Élément               | Convention                | Exemple          |
-| --------------------- | ------------------------- | ---------------- |
-| Tag HTML              | `ar-<name>`               | `ar-button`      |
-| Classe                | `Ar<Name>`                | `ArButton`       |
-| Événements custom     | `ar-<event>`              | `ar-alert-close` |
-| CSS custom properties | `--ar-<component>-<prop>` | `--ar-button-bg` |
-| CSS parts             | `part="base"`             | `part="label"`   |
+| Élément               | Convention                | Exemple              |
+| --------------------- | ------------------------- | -------------------- |
+| Tag HTML              | `ar-<name>`               | `ar-alert`           |
+| Classe                | `Ar<Name>`                | `ArAlert`            |
+| Événements custom     | `ar-<event>`              | `ar-alert-close`     |
+| CSS custom properties | `--ar-<component>-<prop>` | `--ar-alert-padding` |
+| CSS parts             | `part="base"`             | `part="label"`       |
 
 ---
 

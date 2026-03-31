@@ -19,7 +19,7 @@ Ariane is a **foundation** for building design systems — not a design system i
 ### Naming
 
 - Tag: `ar-<name>` · Class: `Ar<Name>` · Events: `ar-<event>`
-- CSS custom properties: `--ar-<component>-<property>` (e.g. `--ar-button-bg`)
+- CSS custom properties: `--ar-<component>-<property>` (e.g. `--ar-alert-padding`)
 - CSS parts: `part="base"`, `part="label"`, `part="prefix"`, `part="suffix"`
 
 ### Properties — always `reflect: true`
@@ -77,15 +77,15 @@ Custom Astro + MDX static site. No Starlight, no api-viewer.
 **MDX frontmatter schema** (per component content file):
 
 ```yaml
-tagName: ar-button # required
-title: Bouton # required
+tagName: ar-alert # required
+title: Alerte # required
 description: … # optional, shown under title
 playgroundTemplate: default # optional, name of variant used to init playground (defaults to first)
 variants:
     - name: default
       label: Par défaut
       description: …
-      html: '<ar-button>Label</ar-button>'
+      html: '<ar-alert variant="info">Message informatif.</ar-alert>'
 ```
 
 > **Sub-components**: use only `@parent ar-<tag>` JSDoc in the Lit class. No MDX field needed — the CEM `x-parent` field is read directly by the nav and home page.

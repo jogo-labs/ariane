@@ -10,9 +10,9 @@
  *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_MAP)
  *
  * Usage (avec config.componentPrefix = "ar" dans package.json) :
- *   npm run create -- button          → ar-button
+ *   npm run create -- spinner         → ar-spinner
  *   npm run create -- my-component    → ar-my-component
- *   npm run create -- ar-button       → ar-button  (prefix déjà présent, pas doublé)
+ *   npm run create -- ar-spinner      → ar-spinner  (prefix déjà présent, pas doublé)
  */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
@@ -65,7 +65,7 @@ if (!/^[a-z][a-z0-9-]*$/.test(input)) {
 // ─── Dérivation des noms ──────────────────────────────────────────────────────
 
 // Si l'input commence déjà par le prefix, on ne le redouble pas
-// ex: "ar-button" avec prefix "ar" → "ar-button" (pas "ar-ar-button")
+// ex: "ar-spinner" avec prefix "ar" → "ar-spinner" (pas "ar-ar-spinner")
 const tagName = input.startsWith(`${PREFIX}-`) ? input : `${PREFIX}-${input}`;
 
 const parts = tagName.split('-');

@@ -74,7 +74,7 @@ variants:
       label:
           fr: Par défaut
           en: Default
-      html: '<ar-button>Label</ar-button>'
+      html: '<ar-alert variant="info">Message informatif.</ar-alert>'
 ```
 
 Un helper de lecture sélectionne la valeur selon la langue active, avec fallback
@@ -189,7 +189,7 @@ et décision sur le JSDoc.
 
 - [ ] JSDoc bilingue ou anglais uniquement pour les tables API ?
 - [ ] Langue par défaut du routing racine (`/` → `/fr/` ou `/en/`) ?
-- [ ] Faut-il conserver les URLs sans préfixe de langue comme alias (`/components/ar-button` → `/fr/components/ar-button`) pour ne pas casser les liens existants ?
+- [ ] Faut-il conserver les URLs sans préfixe de langue comme alias (`/components/ar-alert` → `/fr/components/ar-alert`) pour ne pas casser les liens existants ?
 
 ---
 

@@ -19,7 +19,7 @@ au build. Cette piste a été écartée après analyse — voir section "Piste �
 ## Piste écartée — Préfixes configurables au build
 
 **Idée :** permettre à une équipe de générer une version d'Ariane avec ses propres
-préfixes (`acme-button` au lieu de `ar-button`) via une config de build.
+préfixes (`acme-alert` au lieu de `ar-alert`) via une config de build.
 
 **Pourquoi c'est écarté :**
 

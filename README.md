@@ -3,11 +3,8 @@
 Bibliothèque de composants web accessibles, construite avec **Lit 3** et **TypeScript**.
 
 ```html
-<ar-button variant="filled">Valider</ar-button>
-<ar-alert version="success">
-    <span slot="title">Succès</span>
-    <span slot="content">Opération réussie.</span>
-</ar-alert>
+<ar-alert variant="success">Opération réussie.</ar-alert>
+<ar-spinner label="Chargement en cours…"></ar-spinner>
 ```
 
 ---
@@ -18,7 +15,7 @@ Ariane est une **librairie de composants web accessibles** — une fondation sur
 pas un design system en soi. Les composants sont des **Custom Elements** natifs : ils fonctionnent dans n'importe
 quel framework (React, Vue, Angular, Svelte) ou sans framework du tout.
 
-Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-button`, `ar-pagination`,
+Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-pagination`,
 `ar-progressbar`, `ar-spinner`, `ar-stepper` / `ar-stepper-item`.
 
 ---
@@ -64,9 +61,9 @@ import '@ariane-ui/core/dist/components/button/button.js';
 Les composants exposent des **CSS Custom Properties** pour la personnalisation :
 
 ```css
-ar-button {
-    --ar-button-bg: #7c3aed;
-    --ar-button-border-radius: 2rem;
+ar-alert {
+    --ar-alert-border-radius: 0.5rem;
+    --ar-alert-padding: 0.75rem;
 }
 ```
 

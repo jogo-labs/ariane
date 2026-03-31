@@ -19,7 +19,7 @@ npm install @ariane-ui/core
 <script type="module" src="node_modules/@ariane-ui/core/cdn/index.js"></script>
 <link rel="stylesheet" href="node_modules/@ariane-ui/core/themes/default.css" />
 
-<ar-button variant="filled">Valider</ar-button>
+<ar-alert variant="success">Opération réussie.</ar-alert>
 ```
 
 ```typescript
@@ -36,7 +36,6 @@ import '@ariane-ui/core/themes/default.css';
 | ------------ | ------------------- | ---------------------------------------------------- |
 | Alert        | `<ar-alert>`        | Message contextuel (info, success, warning, error)   |
 | Breadcrumb   | `<ar-breadcrumb>`   | Fil d'ariane de navigation                           |
-| Button       | `<ar-button>`       | Bouton accessible, plusieurs variantes et tailles    |
 | Pagination   | `<ar-pagination>`   | Navigation entre pages                               |
 | Progress Bar | `<ar-progressbar>`  | Barre de progression                                 |
 | Spinner      | `<ar-spinner>`      | Indicateur de chargement                             |
@@ -52,7 +51,7 @@ import '@ariane-ui/core/themes/default.css';
 import '@ariane-ui/core';
 
 // Import individuel (tree-shaking)
-import '@ariane-ui/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/alert/alert.js';
 
 // Thème CSS
 import '@ariane-ui/core/themes/default.css';
@@ -74,11 +73,10 @@ import manifest from '@ariane-ui/core/custom-elements.json';
 Chaque composant expose des **CSS Custom Properties** pour la personnalisation sans modifier les sources :
 
 ```css
-/* Exemple : personnaliser ar-button */
-ar-button {
-    --ar-button-bg: #7c3aed;
-    --ar-button-border-radius: 2rem;
-    --ar-button-font-weight: 700;
+/* Exemple : personnaliser ar-alert */
+ar-alert {
+    --ar-alert-border-radius: 0.5rem;
+    --ar-alert-padding: 0.75rem;
 }
 ```
 
@@ -90,11 +88,11 @@ Créez votre propre thème en surchargeant ces variables dans votre CSS global.
 Les éléments internes sont exposés via `::part()` pour un ciblage CSS précis :
 
 ```css
-ar-button::part(base) {
-    /* l'élément <button> natif */
+ar-alert::part(icon) {
+    /* le conteneur de l'icône */
 }
-ar-button::part(label) {
-    /* le conteneur du label */
+ar-alert::part(body) {
+    /* le conteneur du contenu */
 }
 ```
 
@@ -105,10 +103,10 @@ ar-button::part(label) {
 ```
 src/
 ├── components/          # Un répertoire par composant
-│   └── button/
-│       ├── button.ts          ← LitElement + JSDoc CEM
-│       ├── button.styles.ts   ← Styles Lit CSS
-│       └── button.test.ts     ← Tests Vitest
+│   └── alert/
+│       ├── alert.ts          ← LitElement + JSDoc CEM
+│       ├── alert.styles.ts   ← Styles Lit CSS
+│       └── alert.test.ts     ← Tests Vitest
 ├── controllers/         # ReactiveControllers réutilisables
 ├── context/             # Providers @lit/context (communication parent-enfant)
 ├── state/               # Moteurs de calcul d'état purs
@@ -216,10 +214,10 @@ npm run test:coverage  # rapport de couverture
 Environnement : **Vitest** + **happy-dom** (DOM léger sans navigateur).
 
 ```typescript
-async function fixture(html: string): Promise<MrButton> {
+async function fixture<T extends HTMLElement>(html: string): Promise<T> {
     const template = document.createElement('template');
     template.innerHTML = html.trim();
-    const el = template.content.firstElementChild as MrButton;
+    const el = template.content.firstElementChild as T;
     document.body.appendChild(el);
     await (el as any).updateComplete;
     return el;
