@@ -1,7 +1,9 @@
 ---
 tagName: ar-alert
 title: Alert
-description: Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+description: >
+    Destiné aux messages qui nécessitent l'attention de l'utilisateur : confirmations,
+    avertissements, erreurs. Pour les messages informatifs non urgents, préférer `variant="info"`.
 variants:
     - name: default
       label: Défaut
@@ -32,4 +34,28 @@ variants:
           </div>
 ---
 
-Documentation narrative du composant `ar-alert`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) posé sur
+  l'hôte selon le variant — `info` → `status`, tous les autres → `alert`.
+- L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
+  est portée par le `role`, pas par l'icône.
+- Une icône par défaut est fournie pour chaque variant. Elle peut être remplacée via le
+  slot `icon`, mais il est déconseillé de la supprimer : elle constitue un repère visuel
+  non colorimétrique, important pour les utilisateurs daltoniens ou en environnement à
+  faible contraste.
+- Le focus est reporté sur l'élément cible (`next-focus`) à la fermeture — l'utilisateur
+  clavier ne se retrouve pas désorienté.
+
+### À la charge de l'auteur
+
+- **Message compréhensible hors contexte visuel.** Le contenu est lu dès l'apparition de
+  l'alerte. Évitez les messages vagues ("Une erreur s'est produite") — préférez
+  ("Le formulaire n'a pas pu être soumis : champ email manquant").
+- **Niveau de sévérité cohérent.** `error` pour les erreurs bloquantes, `warning` pour
+  les situations qui méritent attention sans bloquer, `success` pour les confirmations,
+  `info` pour les informations neutres.
+- **`next-focus` obligatoire sur les alertes dismissibles.** Un bouton de fermeture sans
+  destination de focus laisse l'utilisateur clavier sans repère.

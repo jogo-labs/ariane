@@ -33,4 +33,21 @@ variants:
           <ar-spinner size="lg"></ar-spinner>
 ---
 
-Documentation narrative du composant `ar-spinner`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- L'animation SVG est masquée aux lecteurs d'écran (`aria-hidden`). Un `<div role="alert">`
+  invisible annonce les changements d'état — le passage "en cours → terminé" est vocalisé
+  sans intervention supplémentaire.
+- Les labels "en cours" (`loading-label`) et "terminé" (`done-label`) ont des valeurs par
+  défaut raisonnables utilisées si non fournis.
+
+### À la charge de l'auteur
+
+- **Adapter `loading-label` et `done-label` au contexte.** Les valeurs par défaut sont
+  génériques — préférez des labels qui décrivent l'opération en cours ("Envoi du formulaire…",
+  "Fichier chargé.") pour que l'annonce soit utile et non redondante.
+- **Ne pas afficher plusieurs spinners simultanément sans les différencier.** Chaque
+  `role="alert"` visible déclenche une annonce — des labels identiques sur plusieurs spinners
+  actifs simultanément créent une confusion pour les utilisateurs de lecteurs d'écran.
