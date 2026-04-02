@@ -25,11 +25,17 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
-    - name: mobile
-      label: Version mobile
-      description: Rendu par défaut du composant.
+    - name: responsive
+      label: Responsive
+      description: Exemple configuré avec un conteneur desktop cible pour démontrer la téléportation responsive.
       html: |
-          <ar-stepper class="align-left" current-path="etape-1-2" version="mobile">
+          <aside id="stepper-sidebar"></aside>
+          <ar-stepper
+            class="align-left"
+            current-path="etape-1-2"
+            desktop-target="stepper-sidebar"
+            desktop-from="992"
+          >
             <!-- Étape 1 -->
             <ar-stepper-item path="etape-1" label="Mes informations" href="#">
                 <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
@@ -88,3 +94,14 @@ variants:
 - **Les items sans `href` ne sont pas des liens.** Un item sans destination est rendu comme
   un élément non interactif — ne pas en faire la cible de `current-path` si l'utilisateur
   doit pouvoir y naviguer.
+
+## Comportement responsive
+
+Quand `desktop-target` est renseigné, le composant adapte automatiquement son rendu selon la
+largeur de l'écran :
+
+- En dessous de `desktop-from`, il reste à sa position d'origine et utilise le rendu dropdown.
+- À partir de `desktop-from`, il se téléporte dans l'élément ciblé par `desktop-target` et
+  affiche la liste desktop.
+
+Pour observer ce comportement, utiliser les DevTools du navigateur en mode responsive.

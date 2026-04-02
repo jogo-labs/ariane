@@ -4,7 +4,7 @@ export default css`
     :host(.loading) {
         display: none !important;
     }
-    :host(:not(.align-left, [version='mobile'])) {
+    :host(:not(.align-left)) {
         .stepper-list {
             .stepper-item::after {
                 width: 2.25rem;
@@ -53,10 +53,6 @@ export default css`
             }
         }
     }
-
-    /* .stepper-desktop {
-        display: none;
-    } */
 
     .stepper-dropdown {
         display: -webkit-box;
@@ -289,10 +285,6 @@ export default css`
     }
 
     @media (min-width: 992px) {
-        /* .stepper-dropdown {
-            display:none!important
-        } */
-
         .stepper-desktop {
             display: -webkit-box !important;
             display: -ms-flexbox !important;
