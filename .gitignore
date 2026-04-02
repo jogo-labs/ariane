@@ -31,3 +31,7 @@ Thumbs.db
 .claude
 .superpowers/
 .github/hooks/
+.codeium/windsurf/skills/speakeasy-context
+.cursor/skills/speakeasy-context
+.github/copilot/skills/speakeasy-context
+.agents/skills/speakeasy-context/SKILL.md
