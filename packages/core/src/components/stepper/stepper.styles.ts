@@ -4,7 +4,7 @@ export default css`
     :host(.loading) {
         display: none !important;
     }
-    :host(:not(.align-left, [version='mobile'])) {
+    :host(:not(.align-left)) {
         .stepper-list {
             .stepper-item::after {
                 width: 2.25rem;
@@ -54,10 +54,6 @@ export default css`
         }
     }
 
-    /* .stepper-desktop {
-        display: none;
-    } */
-
     .stepper-dropdown {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -72,6 +68,8 @@ export default css`
     .stepper-dropdown-menu {
         padding: 0.75rem;
         width: 100%;
+        background-color: var(--ar-color-bg, #fff);
+        color: var(--ar-color-text, #2e2e31);
     }
 
     .stepper-list {
@@ -289,10 +287,6 @@ export default css`
     }
 
     @media (min-width: 992px) {
-        /* .stepper-dropdown {
-            display:none!important
-        } */
-
         .stepper-desktop {
             display: -webkit-box !important;
             display: -ms-flexbox !important;

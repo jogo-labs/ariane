@@ -1,5 +1,5 @@
 import { LitElement, html, type TemplateResult, type CSSResultGroup } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -22,15 +22,16 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Stepper de navigation accessible, adaptatif desktop/mobile.
+ * @summary Stepper de navigation accessible avec téléportation DOM adaptive.
  * @display demo
  *
  * Les étapes sont déclarées via des éléments `<ar-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
  * l'arbre de navigation. Un item peut avoir des sous-étapes (enfants imbriqués).
  *
- * En mode `mobile`, les étapes sont affichées dans un dropdown.
- * En mode `desktop`, elles sont affichées dans une liste verticale.
+ * Fournir `desktop-target` (ID d'un élément) pour activer la téléportation automatique :
+ * en dessous de `desktop-from` px le composant affiche le rendu dropdown à sa position
+ * d'origine ; au-dessus il se déplace dans l'élément cible et affiche la liste verticale.
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
@@ -39,8 +40,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
- * @csspart dropdown     - Le conteneur dropdown (mobile uniquement).
- * @csspart dropdown-btn - Le bouton d'ouverture du dropdown mobile.
+ * @csspart dropdown     - Le conteneur dropdown.
+ * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
  *
  * @cssprop --ar-stepper-gap                                                 - Espacement entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]    - Fond de la puce de l'étape active.
@@ -77,14 +78,6 @@ export class ArStepper extends LitElement {
     mode: 'create' | 'edit' = 'create';
 
     /**
-     * Version d'affichage. Passer `mobile` pour activer le rendu dropdown.
-     * En pratique, gérer ce changement via un `ResizeObserver` ou une media query externe.
-     * @attr version
-     */
-    @property({ type: String })
-    version: 'desktop' | 'mobile' = 'desktop';
-
-    /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
      * automatiquement quand l'utilisateur scrolle vers une section de la page.
      * @attr follow-scroll
@@ -92,7 +85,33 @@ export class ArStepper extends LitElement {
     @property({ type: Boolean, attribute: 'follow-scroll' })
     followScroll = false;
 
+    /**
+     * ID de l'élément cible qui accueille le stepper en mode desktop.
+     * @attr desktop-target
+     */
+    @property({ type: String, attribute: 'desktop-target', reflect: true })
+    desktopTarget?: string;
+
+    /**
+     * Breakpoint desktop à partir duquel la téléportation est activée.
+     * @attr desktop-from
+     */
+    @property({ type: Number, attribute: 'desktop-from', reflect: true })
+    desktopFrom = 992;
+
+    @state()
     private _currentStepIndex = 0;
+
+    @state()
+    private _isDesktop = false;
+
+    private _originalParent: ParentNode | null = null;
+    private _originalNextSibling: ChildNode | null = null;
+    private _mediaQueryList: MediaQueryList | undefined;
+    private _responsiveQuery: string | undefined;
+    private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
+        this.applyResponsiveMode(event.matches);
+    };
 
     // ── Controllers ──────────────────────────────────────────────────────────
 
@@ -134,7 +153,13 @@ export class ArStepper extends LitElement {
     override connectedCallback() {
         super.connectedCallback();
 
+        if (!this._originalParent && this.parentNode) {
+            this._originalParent = this.parentNode;
+            this._originalNextSibling = this.nextSibling;
+        }
+
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
+        this.setupResponsiveMode();
 
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
         customElements.whenDefined('ar-stepper-item').then(() => {
@@ -145,6 +170,7 @@ export class ArStepper extends LitElement {
 
     override disconnectedCallback() {
         this.removeEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
+        this.teardownResponsiveMode();
         super.disconnectedCallback();
     }
 
@@ -162,6 +188,9 @@ export class ArStepper extends LitElement {
         if (changed.has('followScroll')) {
             this.scrollFollow.setEnabled(this.followScroll);
         }
+        if (changed.has('desktopTarget') || changed.has('desktopFrom')) {
+            this.setupResponsiveMode();
+        }
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -174,21 +203,20 @@ export class ArStepper extends LitElement {
             return html`<slot></slot>`;
         }
 
-        const content =
-            this.version === 'mobile'
-                ? renderMobile(
-                      steps,
-                      {
-                          isOpen: this.dropdown.isOpen,
-                          currentStepIndex: this._currentStepIndex,
-                          currentStepLabel: this.getCurrentStepLabel(),
-                          currentSubStepLabel: this.getCurrentSubStepLabel(),
-                          onToggle: this._onDropdownToggle,
-                      },
-                      this.mode,
-                      this.onClickLink,
-                  )
-                : renderDesktop(steps, this.mode, this.onClickLink);
+        const content = this._isDesktop
+            ? renderDesktop(steps, this.mode, this.onClickLink)
+            : renderMobile(
+                  steps,
+                  {
+                      isOpen: this.dropdown.isOpen,
+                      currentStepIndex: this._currentStepIndex,
+                      currentStepLabel: this.getCurrentStepLabel(),
+                      currentSubStepLabel: this.getCurrentSubStepLabel(),
+                      onToggle: this._onDropdownToggle,
+                  },
+                  this.mode,
+                  this.onClickLink,
+              );
 
         return html` <nav
             part="nav"
@@ -227,6 +255,76 @@ export class ArStepper extends LitElement {
         this.querySelectorAll<ArStepperItem>('ar-stepper-item').forEach((item) =>
             item.setRegistry(this._registry),
         );
+    }
+
+    private setupResponsiveMode(): void {
+        if (!this.isConnected) {
+            this.teardownResponsiveMode();
+            return;
+        }
+
+        // Si desktopTarget a été retiré, on restaure la position d'origine
+        if (!this.desktopTarget) {
+            this._restoreToOriginalContainer();
+        }
+
+        const query = `(min-width: ${this.desktopFrom}px)`;
+        if (this._mediaQueryList && this._responsiveQuery === query) {
+            this.applyResponsiveMode(this._mediaQueryList.matches);
+            return;
+        }
+
+        this.teardownResponsiveMode();
+
+        this._responsiveQuery = query;
+        this._mediaQueryList = window.matchMedia(query);
+        this._mediaQueryList.addEventListener('change', this._onMediaQueryChange);
+        this.applyResponsiveMode(this._mediaQueryList.matches);
+    }
+
+    private teardownResponsiveMode(): void {
+        this._mediaQueryList?.removeEventListener('change', this._onMediaQueryChange);
+        this._mediaQueryList = undefined;
+        this._responsiveQuery = undefined;
+    }
+
+    private applyResponsiveMode(matches: boolean): void {
+        // Le mode de rendu suit le breakpoint, indépendamment de la téléportation
+        this._isDesktop = matches;
+
+        if (this.desktopTarget) {
+            if (matches) {
+                this._teleportToTarget();
+            } else {
+                this._restoreToOriginalContainer();
+            }
+        }
+    }
+
+    private _teleportToTarget(): void {
+        if (!this.desktopTarget) return;
+        const target = document.getElementById(this.desktopTarget);
+        if (!target) {
+            console.warn(`[ar-stepper] desktop target "${this.desktopTarget}" not found`);
+            return;
+        }
+        if (this.parentNode !== target) {
+            target.appendChild(this);
+        }
+    }
+
+    private _restoreToOriginalContainer(): void {
+        if (!this._originalParent || this.parentNode === this._originalParent) return;
+
+        if (
+            this._originalNextSibling &&
+            this._originalNextSibling.parentNode === this._originalParent
+        ) {
+            this._originalParent.insertBefore(this, this._originalNextSibling);
+            return;
+        }
+
+        this._originalParent.appendChild(this);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

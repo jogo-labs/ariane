@@ -12,6 +12,12 @@ function shadow(el: Element): ShadowRoot {
     return el.shadowRoot;
 }
 
+function requireQuery<T extends Element>(root: ParentNode, selector: string): T {
+    const el = root.querySelector<T>(selector);
+    if (!el) throw new Error(`Missing element for selector: ${selector}`);
+    return el;
+}
+
 /** Monte un stepper avec des items. Attend deux updateComplete pour absorber queueMicrotask. */
 async function fixtureWithItems(html: string): Promise<ArStepper> {
     const el = await fixture<ArStepper>(html);
@@ -68,113 +74,23 @@ describe('ArStepper', () => {
             expect(el.mode).toBe('create');
         });
 
-        it('version par défaut vaut "desktop"', async () => {
-            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
-            expect(el.version).toBe('desktop');
-        });
-
         it('followScroll par défaut vaut false', async () => {
             const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
             expect(el.followScroll).toBe(false);
         });
 
+        it("version n'est plus une propriété du composant", async () => {
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect('version' in el).toBe(false);
+        });
+
         it('lit les attributs depuis le HTML', async () => {
             const el = await fixture<ArStepper>(
-                '<ar-stepper current-path="/b" mode="edit" version="mobile" follow-scroll></ar-stepper>',
+                '<ar-stepper current-path="/b" mode="edit" follow-scroll></ar-stepper>',
             );
             expect(el.currentPath).toBe('/b');
             expect(el.mode).toBe('edit');
-            expect(el.version).toBe('mobile');
             expect(el.followScroll).toBe(true);
-        });
-    });
-
-    // ── Rendu desktop ─────────────────────────────────────────────────────────
-
-    describe('rendu desktop', () => {
-        it('affiche les étapes dans une liste ol.stepper-desktop', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="desktop">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const list = shadow(el).querySelector('ol.stepper-desktop');
-            expect(list).not.toBeNull();
-            expect(list?.querySelectorAll('li').length).toBe(2);
-        });
-
-        it("l'étape courante a la classe active", async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const items = shadow(el).querySelectorAll('li.stepper-item');
-            expect(items[0]?.classList.contains('active')).toBe(false);
-            expect(items[1]?.classList.contains('active')).toBe(true);
-        });
-
-        it('en mode edit les étapes complétées sont des liens', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b" mode="edit">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const links = shadow(el).querySelectorAll('a.stepper-link');
-            expect(links.length).toBeGreaterThan(0);
-        });
-    });
-
-    // ── Rendu mobile ──────────────────────────────────────────────────────────
-
-    describe('rendu mobile', () => {
-        it('affiche un bouton dropdown en mode mobile', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const btn = shadow(el).querySelector('button.dropdown-toggle');
-            expect(btn).not.toBeNull();
-        });
-
-        it('le dropdown est fermé par défaut', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const dropdown = shadow(el).querySelector('.dropdown');
-            expect(dropdown?.classList.contains('show')).toBe(false);
-        });
-
-        it('cliquer sur le bouton toggle ouvre le dropdown', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const btn = shadow(el).querySelector<HTMLButtonElement>('button.dropdown-toggle');
-            btn?.click();
-            await waitForUpdate(el);
-            const dropdown = shadow(el).querySelector('.dropdown');
-            expect(dropdown?.classList.contains('show')).toBe(true);
-        });
-
-        it("affiche le label de l'étape courante dans le bouton", async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b" version="mobile">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            expect(el.currentPath).toBe('/b');
         });
     });
 
@@ -271,6 +187,267 @@ describe('ArStepper', () => {
             const items = shadow(el).querySelectorAll('li.stepper-item');
             expect(items[0]?.classList.contains('active')).toBe(false);
             expect(items[1]?.classList.contains('active')).toBe(true);
+        });
+    });
+
+    // ── Téléportation ─────────────────────────────────────────────────────────
+
+    describe('téléportation', () => {
+        function mockMatchMedia(matches: boolean) {
+            return vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+        }
+
+        it('desktopTarget vaut undefined par défaut', async () => {
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect(el.desktopTarget).toBeUndefined();
+        });
+
+        it('desktopFrom vaut 992 par défaut', async () => {
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect(el.desktopFrom).toBe(992);
+        });
+
+        it('sans desktop-target : écoute le breakpoint mais ne déplace pas le composant', async () => {
+            const spy = mockMatchMedia(false);
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect(spy).toHaveBeenCalled();
+            expect(el.parentElement).toBe(document.body);
+        });
+
+        it('avec desktop-target valide + viewport desktop : téléporte dans la cible', async () => {
+            mockMatchMedia(true);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar';
+            document.body.appendChild(target);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper desktop-target="sidebar" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(el.parentElement).toBe(target);
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(true);
+        });
+
+        it('avec desktop-target valide + viewport mobile : reste à sa position', async () => {
+            mockMatchMedia(false);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar2';
+            document.body.appendChild(target);
+
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+            container.innerHTML = `
+                <ar-stepper desktop-target="sidebar2" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `;
+            const el = requireQuery<ArStepper>(container, 'ar-stepper');
+            await waitForUpdate(el as ArStepper);
+
+            expect(el.parentElement).toBe(container);
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(false);
+        });
+
+        it('desktop-target avec ID inexistant : console.warn, composant non déplacé, rendu desktop', async () => {
+            mockMatchMedia(true);
+            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+            container.innerHTML = `
+                <ar-stepper desktop-target="inexistant" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `;
+            const el = requireQuery<ArStepper>(container, 'ar-stepper');
+            await waitForUpdate(el as ArStepper);
+
+            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('inexistant'));
+            expect(el.parentElement).toBe(container);
+            // La téléportation échoue mais le rendu suit quand même le viewport
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(true);
+        });
+
+        it('suppression de desktop-target après téléportation : restaure la position originale', async () => {
+            mockMatchMedia(true);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar-restore';
+            document.body.appendChild(target);
+
+            // fixture() appende dans document.body → _originalParent = document.body
+            const el = await fixtureWithItems(`
+                <ar-stepper desktop-target="sidebar-restore" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(el.parentElement).toBe(target);
+
+            el.removeAttribute('desktop-target');
+            await waitForUpdate(el);
+
+            expect(el.parentElement).toBe(document.body);
+            // Le viewport est toujours desktop → _isDesktop reste true, seule la téléportation est annulée
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(true);
+        });
+
+        it('disconnectedCallback débranche le listener matchMedia', async () => {
+            const removeListenerSpy = vi.fn();
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: removeListenerSpy,
+            } as unknown as MediaQueryList);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar3';
+            document.body.appendChild(target);
+
+            const el = await fixture<ArStepper>(
+                '<ar-stepper desktop-target="sidebar3"></ar-stepper>',
+            );
+            el.remove();
+
+            expect(removeListenerSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('rendu responsive', () => {
+        it('sans desktop-target + viewport mobile : rendu dropdown', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
+            expect(shadow(el).querySelector('.stepper-desktop')).toBeNull();
+        });
+
+        it('sans desktop-target + viewport desktop : rendu liste desktop sans téléportation', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(shadow(el).querySelector('.stepper-desktop')).not.toBeNull();
+            expect(shadow(el).querySelector('.stepper-dropdown')).toBeNull();
+            // Pas de téléportation : reste dans document.body (où fixture() l'a inséré)
+            expect(el.parentElement).toBe(document.body);
+        });
+
+        it('avec desktop-target + viewport mobile : rend le dropdown mobile', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar-mobile';
+            document.body.appendChild(target);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper desktop-target="sidebar-mobile" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
+            expect(shadow(el).querySelector('.stepper-desktop')).toBeNull();
+        });
+
+        it('avec desktop-target + viewport desktop : rend la liste desktop', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar-desktop';
+            document.body.appendChild(target);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper desktop-target="sidebar-desktop" current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(shadow(el).querySelector('.stepper-desktop')).not.toBeNull();
+            expect(shadow(el).querySelector('.stepper-dropdown')).toBeNull();
+        });
+
+        it('réinsère le composant à sa position d’origine quand le viewport repasse en mobile', async () => {
+            let matches = true;
+            let listener: ((event: MediaQueryListEvent) => void) | undefined;
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                get matches() {
+                    return matches;
+                },
+                addEventListener: vi.fn((_type, cb) => {
+                    listener = cb as (event: MediaQueryListEvent) => void;
+                }),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const target = document.createElement('div');
+            target.id = 'sidebar-roundtrip';
+            document.body.appendChild(target);
+
+            const marker = document.createElement('div');
+            marker.id = 'marker';
+
+            const container = document.createElement('div');
+            document.body.append(container);
+            container.append(marker);
+            container.insertAdjacentHTML(
+                'beforeend',
+                `
+                    <ar-stepper desktop-target="sidebar-roundtrip" current-path="/a">
+                        <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                    </ar-stepper>
+                `,
+            );
+
+            const el = document.querySelector('ar-stepper') as ArStepper;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            matches = false;
+            listener?.({ matches: false } as MediaQueryListEvent);
+            await waitForUpdate(el);
+
+            expect(el.parentElement).toBe(container);
+            expect(marker.nextElementSibling).toBe(el);
+            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
         });
     });
 });
