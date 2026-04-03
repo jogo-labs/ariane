@@ -209,7 +209,7 @@ export default css`
     }
 
     .show > .btn.dropdown-toggle {
-        background-color: var(--ar-color-text, #2e2e31);
+        background-color: var(--ar-color-neutral-30, #44454b);
         color: var(--ar-color-white, #fff);
     }
 

@@ -68,6 +68,8 @@ export default css`
     .stepper-dropdown-menu {
         padding: 0.75rem;
         width: 100%;
+        background-color: var(--ar-color-bg, #fff);
+        color: var(--ar-color-text, #2e2e31);
     }
 
     .stepper-list {
