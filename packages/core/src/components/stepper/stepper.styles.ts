@@ -23,6 +23,8 @@ export default css`
 
     .stepper-list {
         counter-reset: step;
+        display: flex;
+        flex-direction: column;
         gap: var(--ar-stepper-gap);
     }
 
@@ -118,7 +120,7 @@ export default css`
 
     .stepper-link .stepper-item-bullet {
         color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
-        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
+        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
     }
 
     .stepper-list.stepper-desktop,
@@ -183,7 +185,7 @@ export default css`
 
     .stepper-edition .stepper-item-bullet {
         color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
-        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
+        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
     }
 
     :host([align='right']) .stepper-list .stepper-item {
