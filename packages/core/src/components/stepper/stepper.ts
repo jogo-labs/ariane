@@ -258,11 +258,14 @@ export class ArStepper extends LitElement {
     }
 
     private setupResponsiveMode(): void {
-        if (!this.isConnected || !this.desktopTarget) {
+        if (!this.isConnected) {
             this.teardownResponsiveMode();
-            this._isDesktop = false;
-            this._restoreToOriginalContainer();
             return;
+        }
+
+        // Si desktopTarget a été retiré, on restaure la position d'origine
+        if (!this.desktopTarget) {
+            this._restoreToOriginalContainer();
         }
 
         const query = `(min-width: ${this.desktopFrom}px)`;
@@ -286,35 +289,28 @@ export class ArStepper extends LitElement {
     }
 
     private applyResponsiveMode(matches: boolean): void {
-        if (!matches) {
-            this._isDesktop = false;
-            this.moveToResponsiveContainer();
-            return;
-        }
-        this._isDesktop = true;
-        if (!this.moveToResponsiveContainer()) {
-            this._isDesktop = false;
+        // Le mode de rendu suit le breakpoint, indépendamment de la téléportation
+        this._isDesktop = matches;
+
+        if (this.desktopTarget) {
+            if (matches) {
+                this._teleportToTarget();
+            } else {
+                this._restoreToOriginalContainer();
+            }
         }
     }
 
-    private moveToResponsiveContainer(): boolean {
-        if (!this.desktopTarget) return false;
-
-        if (this._isDesktop) {
-            const target = document.getElementById(this.desktopTarget);
-            if (!target) {
-                console.warn(`[ar-stepper] desktop target "${this.desktopTarget}" not found`);
-                return false;
-            }
-
-            if (this.parentNode !== target) {
-                target.appendChild(this);
-            }
-            return true;
+    private _teleportToTarget(): void {
+        if (!this.desktopTarget) return;
+        const target = document.getElementById(this.desktopTarget);
+        if (!target) {
+            console.warn(`[ar-stepper] desktop target "${this.desktopTarget}" not found`);
+            return;
         }
-
-        this._restoreToOriginalContainer();
-        return true;
+        if (this.parentNode !== target) {
+            target.appendChild(this);
+        }
     }
 
     private _restoreToOriginalContainer(): void {

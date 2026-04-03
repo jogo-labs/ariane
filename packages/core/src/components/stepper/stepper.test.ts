@@ -211,10 +211,11 @@ describe('ArStepper', () => {
             expect(el.desktopFrom).toBe(992);
         });
 
-        it('sans desktop-target : pas de matchMedia, composant reste en place', async () => {
-            const spy = vi.spyOn(window, 'matchMedia');
-            await fixture<ArStepper>('<ar-stepper></ar-stepper>');
-            expect(spy).not.toHaveBeenCalled();
+        it('sans desktop-target : écoute le breakpoint mais ne déplace pas le composant', async () => {
+            const spy = mockMatchMedia(false);
+            const el = await fixture<ArStepper>('<ar-stepper></ar-stepper>');
+            expect(spy).toHaveBeenCalled();
+            expect(el.parentElement).toBe(document.body);
         });
 
         it('avec desktop-target valide + viewport desktop : téléporte dans la cible', async () => {
@@ -255,7 +256,7 @@ describe('ArStepper', () => {
             expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(false);
         });
 
-        it('desktop-target avec ID inexistant : console.warn, composant non déplacé', async () => {
+        it('desktop-target avec ID inexistant : console.warn, composant non déplacé, rendu desktop', async () => {
             mockMatchMedia(true);
             const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -271,25 +272,8 @@ describe('ArStepper', () => {
 
             expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('inexistant'));
             expect(el.parentElement).toBe(container);
-            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(false);
-        });
-
-        it('desktop-target absent au connect : _isDesktop reste false (pas de rendu desktop)', async () => {
-            mockMatchMedia(true);
-            vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-            const container = document.createElement('div');
-            document.body.appendChild(container);
-            container.innerHTML = `
-                <ar-stepper desktop-target="target-absent" current-path="/a">
-                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
-                </ar-stepper>
-            `;
-            const el = requireQuery<ArStepper>(container, 'ar-stepper');
-            await waitForUpdate(el as ArStepper);
-
-            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(false);
-            expect(el.parentElement).toBe(container);
+            // La téléportation échoue mais le rendu suit quand même le viewport
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(true);
         });
 
         it('suppression de desktop-target après téléportation : restaure la position originale', async () => {
@@ -312,7 +296,8 @@ describe('ArStepper', () => {
             await waitForUpdate(el);
 
             expect(el.parentElement).toBe(document.body);
-            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(false);
+            // Le viewport est toujours desktop → _isDesktop reste true, seule la téléportation est annulée
+            expect((el as unknown as { _isDesktop: boolean })._isDesktop).toBe(true);
         });
 
         it('disconnectedCallback débranche le listener matchMedia', async () => {
@@ -337,7 +322,13 @@ describe('ArStepper', () => {
     });
 
     describe('rendu responsive', () => {
-        it('sans desktop-target : rendu mobile par défaut (dropdown)', async () => {
+        it('sans desktop-target + viewport mobile : rendu dropdown', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="A"></ar-stepper-item>
@@ -347,6 +338,26 @@ describe('ArStepper', () => {
 
             expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
             expect(shadow(el).querySelector('.stepper-desktop')).toBeNull();
+        });
+
+        it('sans desktop-target + viewport desktop : rendu liste desktop sans téléportation', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(shadow(el).querySelector('.stepper-desktop')).not.toBeNull();
+            expect(shadow(el).querySelector('.stepper-dropdown')).toBeNull();
+            // Pas de téléportation : reste dans document.body (où fixture() l'a inséré)
+            expect(el.parentElement).toBe(document.body);
         });
 
         it('avec desktop-target + viewport mobile : rend le dropdown mobile', async () => {
