@@ -4,59 +4,8 @@ export default css`
     :host(.loading) {
         display: none !important;
     }
-    :host(:not(.align-left)) {
-        .stepper-list {
-            .stepper-item::after {
-                width: 2.25rem;
-                height: 1.5rem;
-                background-image: -webkit-gradient(
-                    linear,
-                    left top,
-                    left bottom,
-                    color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
-                    color-stop(25%, transparent)
-                );
-                background-image: linear-gradient(
-                    var(--ar-color-neutral-80, #cdcfd8) 25%,
-                    transparent 25%
-                );
-                background-size: 2px 8px;
-                background-position: center 3px;
-                background-repeat: repeat-y;
-            }
-            .stepper-item {
-                -webkit-box-align: end;
-                -ms-flex-align: end;
-                align-items: flex-end;
-                text-align: right;
-            }
-            .stepper-item::after {
-                margin-left: auto;
-            }
-            .stepper-item-inner {
-                -webkit-box-pack: end;
-                -ms-flex-pack: end;
-                justify-content: flex-end;
-                margin-left: auto;
-                text-align: right;
-            }
-            .stepper-item-bullet {
-                -webkit-box-ordinal-group: 3;
-                -ms-flex-order: 2;
-                order: 2;
-                margin-right: 0;
-                margin-left: 0.5rem;
-            }
-            .stepper-list .stepper-item-bullet {
-                margin-left: 1.25rem;
-                margin-right: 0.75rem;
-            }
-        }
-    }
 
     .stepper-dropdown {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
     }
 
@@ -77,38 +26,26 @@ export default css`
     }
 
     .stepper-item-inner {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
         display: inline-flex;
         counter-increment: step;
     }
 
     .stepper-item-bullet,
     .stepper-item-inner {
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
-        color: var(--ar-color-text-muted, #5b5d65);
+        color: var(--ar-stepper-label-color, var(--ar-color-text-muted, #5b5d65));
     }
 
     .stepper-item-bullet {
         width: 2.25rem;
         height: 2.25rem;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -ms-flex-negative: 0;
         flex-shrink: 0;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
         justify-content: center;
-        border-radius: 0.75rem;
+        border-radius: var(--ar-stepper-bullet-radius, 0.75rem);
         padding-bottom: 0.125rem;
         margin-right: 0.5rem;
-        -webkit-transform: translateY(1px);
         transform: translateY(1px);
-        -webkit-box-shadow: 0 0 0 1px
-            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
         box-shadow: 0 0 0 1px
             var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
         background-color: transparent;
@@ -120,15 +57,8 @@ export default css`
 
     .stepper-item {
         position: relative;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
         flex-direction: column;
-        -webkit-box-align: start;
-        -ms-flex-align: start;
         align-items: flex-start;
     }
 
@@ -142,7 +72,7 @@ export default css`
 
     .stepper-item .stepper-link:focus,
     .stepper-item .stepper-link:hover {
-        color: var(--ar-stepper-bullet-hover-color, var(--ar-color-text-muted, #5b5d65));
+        color: var(--ar-stepper-bullet-hover-bg, var(--ar-color-text-muted, #5b5d65));
     }
 
     .stepper-item .stepper-link:focus:before,
@@ -159,8 +89,7 @@ export default css`
     .stepper-item .stepper-link:focus .stepper-item-bullet,
     .stepper-item .stepper-link:hover .stepper-item-bullet {
         color: var(--ar-color-text-inverse, #fff);
-        background-color: var(--ar-stepper-bullet-hover-color, var(--ar-color-text-muted, #5b5d65));
-        -webkit-box-shadow: none;
+        background-color: var(--ar-stepper-bullet-hover-bg, var(--ar-color-text-muted, #5b5d65));
         box-shadow: none;
     }
 
@@ -171,14 +100,13 @@ export default css`
     }
 
     .stepper-item.active > .stepper-item-inner {
-        color: var(--ar-color-interactive, #283276);
+        color: var(--ar-stepper-active-label-color, var(--ar-color-interactive, #283276));
         font-weight: 700;
     }
 
     .stepper-item.active > .stepper-item-inner .stepper-item-bullet {
-        color: var(--ar-color-text-inverse, #fff);
+        color: var(--ar-stepper-active-bullet-color, var(--ar-color-text-inverse, #fff));
         background-color: var(--ar-stepper-active-bullet-bg, var(--ar-color-interactive, #283276));
-        -webkit-box-shadow: none;
         box-shadow: none;
     }
 
@@ -188,8 +116,8 @@ export default css`
     }
 
     .stepper-link .stepper-item-bullet {
-        color: var(--ar-color-interactive, #283276);
-        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
+        color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
+        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
     }
 
     .stepper-list.stepper-desktop,
@@ -197,53 +125,16 @@ export default css`
         margin-bottom: 0;
     }
 
-    .stepper-list.stepper-right .stepper-item:after,
     .stepper-list:not(.stepper-horizontal) .stepper-item:after {
         width: 2.25rem;
-        height: 1.5rem;
-        background-image: -webkit-gradient(
-            linear,
-            left top,
-            left bottom,
-            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
-            color-stop(25%, transparent)
+        height: var(--ar-stepper-gap, 1.5rem);
+        background-image: linear-gradient(
+            var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
+            transparent 0
         );
-        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 3px;
         background-repeat: repeat-y;
-    }
-
-    .stepper-list.stepper-right .stepper-item {
-        -webkit-box-align: end;
-        -ms-flex-align: end;
-        align-items: flex-end;
-        text-align: right;
-    }
-
-    .stepper-list.stepper-right .stepper-item:after {
-        margin-left: auto;
-    }
-
-    .stepper-list.stepper-right .stepper-item-inner {
-        -webkit-box-pack: end;
-        -ms-flex-pack: end;
-        justify-content: flex-end;
-        margin-left: auto;
-        text-align: right;
-    }
-
-    .stepper-list.stepper-right .stepper-item-bullet {
-        -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-        order: 2;
-        margin-right: 0;
-        margin-left: 0.5rem;
-    }
-
-    .stepper-list.stepper-right .stepper-list .stepper-item-bullet {
-        margin-left: 1.25rem;
-        margin-right: 0.75rem;
     }
 
     .stepper-list .stepper-list .stepper-item:after {
@@ -254,15 +145,11 @@ export default css`
         content: '';
         display: block;
         width: 2.25rem;
-        height: 1rem;
-        background-image: -webkit-gradient(
-            linear,
-            left top,
-            left bottom,
-            color-stop(25%, var(--ar-color-neutral-80, #cdcfd8)),
-            color-stop(25%, transparent)
+        height: var(--ar-stepper-substep-gap, 1rem);
+        background-image: linear-gradient(
+            var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
+            transparent 0
         );
-        background-image: linear-gradient(var(--ar-color-neutral-80, #cdcfd8) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
@@ -281,19 +168,9 @@ export default css`
         content: '';
     }
 
-    .stepper-right .stepper-list .stepper-item:before {
-        margin-left: auto;
-        margin-left: 0;
-    }
-
     @media (min-width: 992px) {
         .stepper-desktop {
-            display: -webkit-box !important;
-            display: -ms-flexbox !important;
             display: flex !important;
-            -webkit-box-orient: vertical !important;
-            -webkit-box-direction: normal !important;
-            -ms-flex-flow: column !important;
             flex-flow: column !important;
         }
     }
@@ -304,7 +181,33 @@ export default css`
     }
 
     .stepper-edition .stepper-item-bullet {
-        color: var(--ar-color-interactive, #283276);
-        background-color: var(--ar-stepper-bullet-bg, #b0bff0);
+        color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
+        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
+    }
+
+    :host([align='right']) .stepper-desktop .stepper-item {
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    :host([align='right']) .stepper-desktop .stepper-item::after {
+        margin-left: auto;
+    }
+
+    :host([align='right']) .stepper-desktop .stepper-item-inner {
+        justify-content: flex-end;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    :host([align='right']) .stepper-desktop .stepper-item-bullet {
+        order: 2;
+        margin-right: 0;
+        margin-left: 0.5rem;
+    }
+
+    :host([align='right']) .stepper-desktop .stepper-list .stepper-item-bullet {
+        margin-left: 1.25rem;
+        margin-right: 0.75rem;
     }
 `;

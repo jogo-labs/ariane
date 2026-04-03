@@ -321,6 +321,21 @@ describe('ArStepper', () => {
         });
     });
 
+    // ── Alignement ────────────────────────────────────────────────────────────
+
+    describe('align', () => {
+        it('vaut "left" par défaut', async () => {
+            const el = await fixture<ArStepper>(`<ar-stepper></ar-stepper>`);
+            expect(el.align).toBe('left');
+        });
+
+        it('est réfléchi comme attribut HTML', async () => {
+            const el = await fixture<ArStepper>(`<ar-stepper align="right"></ar-stepper>`);
+            expect(el.getAttribute('align')).toBe('right');
+            expect(el.align).toBe('right');
+        });
+    });
+
     describe('rendu responsive', () => {
         it('sans desktop-target + viewport mobile : rendu dropdown', async () => {
             vi.spyOn(window, 'matchMedia').mockReturnValue({

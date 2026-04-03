@@ -1,14 +1,14 @@
 ---
 tagName: ar-stepper
 title: Stepper
-description: Description du composant ar-stepper.
+description: Composant de navigation par étapes avec support de sous-étapes, responsive et accessible.
 playgroundTemplate: default
 variants:
     - name: default
       label: Par défaut
       description: Rendu par défaut du composant.
       html: |
-          <ar-stepper class="align-left" current-path="etape-1-2">
+          <ar-stepper current-path="etape-1-2">
             <!-- Étape 1 -->
             <ar-stepper-item path="etape-1" label="Mes informations" href="#">
                 <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
@@ -29,7 +29,7 @@ variants:
       label: Mode édition
       description: Rendu par défaut du composant.
       html: |
-          <ar-stepper class="align-left" current-path="etape-1-2" mode="edit">
+          <ar-stepper current-path="etape-1-2" mode="edit">
             <!-- Étape 1 -->
             <ar-stepper-item path="etape-1" label="Mes informations" href="#">
                 <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
@@ -43,6 +43,25 @@ variants:
                 <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
             </ar-stepper-item>
 
+            <!-- Étape 3 -->
+            <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
+          </ar-stepper>
+    - name: align-right
+      label: Alignement droite
+      description: Le stepper peut être aligné à droite en mode desktop via l'attribut align.
+      html: |
+          <ar-stepper current-path="etape-1-2" align="right">
+            <!-- Étape 1 -->
+            <ar-stepper-item path="etape-1" label="Mes informations" href="#">
+                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#"></ar-stepper-item>
+            </ar-stepper-item>
+            <!-- Étape 2 -->
+            <ar-stepper-item path="etape-2" label="Mes préférences" href="#">
+                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="#etape-2-1"></ar-stepper-item>
+                <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
+            </ar-stepper-item>
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
