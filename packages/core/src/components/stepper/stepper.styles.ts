@@ -23,9 +23,6 @@ export default css`
 
     .stepper-list {
         counter-reset: step;
-        display: flex;
-        flex-direction: column;
-        gap: var(--ar-stepper-gap);
     }
 
     .stepper-item-inner {
@@ -130,7 +127,7 @@ export default css`
 
     .stepper-list:not(.stepper-horizontal) .stepper-item:after {
         width: 2.25rem;
-        height: 1.5rem;
+        height: var(--ar-stepper-gap, 1.5rem);
         background-image: linear-gradient(
             var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
             transparent 0
@@ -148,7 +145,7 @@ export default css`
         content: '';
         display: block;
         width: 2.25rem;
-        height: 1rem;
+        height: var(--ar-stepper-substep-gap, 1rem);
         background-image: linear-gradient(
             var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
             transparent 0

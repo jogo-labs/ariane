@@ -43,7 +43,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart dropdown     - Le conteneur dropdown.
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
  *
- * @cssprop --ar-stepper-gap                                                                   - Espacement entre les étapes (gap de la liste flex).
+ * @cssprop [--ar-stepper-gap=1.5rem]                                                          - Hauteur du connecteur entre les étapes principales.
+ * @cssprop [--ar-stepper-substep-gap=1rem]                                                    - Hauteur du connecteur entre les sous-étapes.
  * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
  * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.
