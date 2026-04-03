@@ -43,11 +43,17 @@ export interface ArStepperStepChangeDetail {
  * @csspart dropdown     - Le conteneur dropdown.
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
  *
- * @cssprop --ar-stepper-gap                                                 - Espacement entre les étapes.
- * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]    - Fond de la puce de l'étape active.
- * @cssprop [--ar-stepper-bullet-bg=var(--ar-color-primary-80)]            - Fond des puces des étapes visitables.
- * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)] - Bordure des puces des étapes suivantes.
- * @cssprop [--ar-stepper-bullet-hover-color=var(--ar-color-text-muted)]   - Couleur au survol des liens d'étapes.
+ * @cssprop --ar-stepper-gap                                                                   - Espacement entre les étapes (gap de la liste flex).
+ * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
+ * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
+ * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.
+ * @cssprop [--ar-stepper-bullet-bg=var(--ar-color-primary-80)]                               - Fond des puces des étapes visitables.
+ * @cssprop [--ar-stepper-bullet-color=var(--ar-color-interactive)]                           - Couleur du numéro dans les puces visitables.
+ * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)]                     - Bordure des puces des étapes suivantes.
+ * @cssprop [--ar-stepper-bullet-hover-bg=var(--ar-color-text-muted)]                         - Fond de la puce au survol.
+ * @cssprop [--ar-stepper-bullet-radius=0.75rem]                                              - Border-radius de la puce.
+ * @cssprop [--ar-stepper-label-color=var(--ar-color-text-muted)]                             - Couleur des labels des étapes inactives.
+ * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
@@ -98,6 +104,13 @@ export class ArStepper extends LitElement {
      */
     @property({ type: Number, attribute: 'desktop-from', reflect: true })
     desktopFrom = 992;
+
+    /**
+     * Alignement de la liste d'étapes : `left` (défaut) ou `right`.
+     * @attr align
+     */
+    @property({ type: String, attribute: 'align', reflect: true })
+    align: 'left' | 'right' = 'left';
 
     @state()
     private _currentStepIndex = 0;
