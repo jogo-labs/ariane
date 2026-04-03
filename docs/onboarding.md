@@ -46,7 +46,6 @@ npm workspaces + Turborepo : les commandes racine (`npm run dev`, `npm run build
 | ------------ | ------------------------------------------ | ------------------------------------------------------ |
 | Alert        | `<ar-alert>`                               | Messages informatifs / succès / erreur / avertissement |
 | Breadcrumb   | `<ar-breadcrumb>` + `<ar-breadcrumb-item>` | Fil d'Ariane                                           |
-| Button       | `<ar-button>`                              | Bouton avec variantes et états                         |
 | Pagination   | `<ar-pagination>`                          | Navigation paginée                                     |
 | Progress bar | `<ar-progressbar>`                         | Barre de progression                                   |
 | Spinner      | `<ar-spinner>`                             | Indicateur de chargement                               |
@@ -85,8 +84,8 @@ Le site de doc est accessible sur `http://localhost:4321`.
 **`npm run create`** génère automatiquement les 4 fichiers du composant (`.ts`, `.styles.ts`, `.test.ts`, `.mdx`), met à jour le barrel (`index.ts`) et l'autoloader. C'est le point d'entrée recommandé pour tout nouveau composant.
 
 ```bash
-npm run create -- button       # génère ar-button
-npm run create -- ar-button    # identique (prefix non doublé)
+npm run create -- spinner      # génère ar-spinner
+npm run create -- ar-spinner   # identique (prefix non doublé)
 ```
 
 ---
@@ -112,24 +111,24 @@ Les trois fichiers de test correspondent à des besoins différents et ne sont p
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-// @customElement remplace customElements.define('ar-button', ArButton)
-@customElement('ar-button')
-export class ArButton extends LitElement {
+// @customElement remplace customElements.define('ar-spinner', ArSpinner)
+@customElement('ar-spinner')
+export class ArSpinner extends LitElement {
     // @property déclare une propriété réactive + son attribut HTML
     // reflect: true synchronise la propriété JS → l'attribut HTML (OBLIGATOIRE chez nous)
     @property({ reflect: true })
-    variant: 'filled' | 'outlined' = 'filled';
+    label: string = 'Chargement…';
 
     override render() {
         // part="base" expose cet élément via ::part(base) pour le styling externe
-        return html`<button part="base"><slot></slot></button>`;
+        return html`<span part="base" role="status" aria-label=${this.label}></span>`;
     }
 }
 
 // Typage VS Code + TypeScript — obligatoire en fin de fichier
 declare global {
     interface HTMLElementTagNameMap {
-        'ar-button': ArButton;
+        'ar-spinner': ArSpinner;
     }
 }
 ```
@@ -160,21 +159,22 @@ this.dispatchEvent(
 
 ### Nommage — cohérence stricte
 
-| Élément          | Convention                | Exemple          |
-| ---------------- | ------------------------- | ---------------- |
-| Tag HTML         | `ar-<name>`               | `ar-button`      |
-| Classe           | `Ar<Name>`                | `ArButton`       |
-| Événements       | `ar-<event>`              | `ar-alert-close` |
-| CSS custom props | `--ar-<composant>-<prop>` | `--ar-button-bg` |
-| CSS parts        | `part="base"`             | `part="label"`   |
+| Élément          | Convention                | Exemple              |
+| ---------------- | ------------------------- | -------------------- |
+| Tag HTML         | `ar-<name>`               | `ar-alert`           |
+| Classe           | `Ar<Name>`                | `ArAlert`            |
+| Événements       | `ar-<event>`              | `ar-alert-close`     |
+| CSS custom props | `--ar-<composant>-<prop>` | `--ar-alert-padding` |
+| CSS parts        | `part="base"`             | `part="label"`       |
 
 ### Thémabilité
 
 Les aspects visuels sont exposés via CSS custom properties. Les utilisateurs personnalisent via :
 
 ```css
-ar-button {
-    --ar-button-bg: #7c3aed;
+ar-alert {
+    --ar-alert-border-radius: 0.5rem;
+    --ar-alert-padding: 0.75rem;
 }
 ```
 

@@ -67,6 +67,15 @@ export function getPart(el: Element, part: string): Element | null {
  * appels dessus (`.getAttribute`, `.classList`, `.click()`, etc.)
  * sans avoir à gérer le cas `null` dans chaque assertion.
  */
+/**
+ * Retourne le shadowRoot d'un élément.
+ * Lance une erreur de test si le shadowRoot est absent.
+ */
+export function requireShadow(el: Element): ShadowRoot {
+    if (!el.shadowRoot) throw new Error(`shadowRoot absent sur <${el.tagName.toLowerCase()}>`);
+    return el.shadowRoot;
+}
+
 export function requirePart(el: Element, part: string): Element {
     const found = el.shadowRoot?.querySelector(`[part="${part}"]`);
     if (!found)

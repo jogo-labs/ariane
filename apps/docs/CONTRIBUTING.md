@@ -46,22 +46,34 @@ Créez `apps/docs/src/content/components/ar-<nom>.mdx` :
 
 ```yaml
 ---
-tagName: ar-button # doit correspondre exactement au tag name Lit
-title: Bouton # titre affiché en haut de la page et dans la nav
+tagName: ar-alert # doit correspondre exactement au tag name Lit
+title: Alerte # titre affiché en haut de la page et dans la nav
 description: > # optionnel — phrase courte sous le titre
-    Déclenche une action au clic.
+    Message contextuel accessible.
 playgroundTemplate: default # optionnel — nom de la variante utilisée dans le playground
 variants:
     - name: default
       label: Par défaut
-      html: '<ar-button>Valider</ar-button>'
+      html: '<ar-alert variant="info">Message informatif.</ar-alert>'
 
-    - name: danger
-      label: Danger
-      description: Utilisé pour les actions destructives.
-      html: '<ar-button variant="danger">Supprimer</ar-button>'
+    - name: error
+      label: Erreur
+      description: Utilisé pour les erreurs critiques.
+      html: '<ar-alert variant="error">Une erreur est survenue.</ar-alert>'
 ---
+## Utilisation
+
 Texte narratif optionnel en MDX (affiché sous la référence API).
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Ce que le composant garantit techniquement (role ARIA, focus management…)
+
+### À la charge de l'auteur
+
+- Ce que l'auteur du contenu doit respecter pour garantir l'accessibilité.
 ```
 
 C'est tout. La page `/components/button` sera générée automatiquement.
@@ -70,7 +82,7 @@ C'est tout. La page `/components/button` sera générée automatiquement.
 
 | Champ                | Requis | Description                                                                                                |
 | -------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| `tagName`            | ✅     | Tag name du composant (`ar-button`). Doit exister dans le CEM.                                             |
+| `tagName`            | ✅     | Tag name du composant (`ar-alert`). Doit exister dans le CEM.                                              |
 | `title`              | ✅     | Titre de la page et libellé dans la nav.                                                                   |
 | `description`        | —      | Phrase courte affichée sous le titre.                                                                      |
 | `playgroundTemplate` | —      | `name` de la variante dont le HTML initialise le playground. Si absent, la première variante est utilisée. |
@@ -84,7 +96,7 @@ variants:
       label: Par défaut # libellé affiché comme sous-titre
       description: … # optionnel — texte explicatif en italique
       html: | # HTML brut injecté en preview et dans le bloc code
-          <ar-button variant="primary">Valider</ar-button>
+          <ar-alert variant="info">Message informatif.</ar-alert>
 ```
 
 Le HTML est rendu **côté serveur** via `<Fragment set:html>`. Les custom elements
@@ -160,6 +172,8 @@ apps/docs/
 ├── src/
 │   ├── components/
 │   │   ├── ComponentApi.astro      ← Tables de référence API (attributs, events, slots…)
+│   │   ├── NarrativeHeading.astro  ← Composant MDX custom : h2 avec id slugifié (ancres TOC)
+│   │   ├── NarrativeList.astro     ← Composant MDX custom : ul avec classe .narrative-list
 │   │   ├── Playground.astro        ← Variantes + playground + controls
 │   │   ├── SiteNav.astro           ← Navigation gauche (auto-générée depuis CEM + MDX)
 │   │   └── TableOfContents.astro   ← TOC sticky droite + collapse mobile
@@ -190,16 +204,20 @@ apps/docs/
 
 ```
 [slug].astro
-  ├── manifest (@cem)        → CemDeclaration (API, membres, events…)
+  ├── manifest (@cem)             → CemDeclaration (API, membres, events…)
   │     └── getCustomElements()  → liste de tous les custom elements
   ├── getCollection('components') → données MDX (titre, variantes, description)
-  ├── buildControls()        → contrôles playground depuis les membres CEM
-  └── tocEntries[]           → entrées TOC (Exemples > variantes, Playground, API)
+  ├── render(mdx)                 → { Content, headings[] }
+  │     └── headings (depth=2)   → narrativeTocEntries (ancres depuis les h2 MDX)
+  ├── buildControls()             → contrôles playground depuis les membres CEM
+  └── tocEntries[]                → narrativeTocEntries + Exemples + Playground + API
         ↓
   Layout.astro (3 colonnes)
-    ├── SiteNav.astro        ← nav gauche
-    ├── Playground.astro     ← variantes + playground + ComponentApi
-    └── TableOfContents      ← TOC droite (slot="toc")
+    ├── SiteNav.astro             ← nav gauche
+    ├── <section class="narrative">
+    │     └── <Content components={{ h2: NarrativeHeading, ul: NarrativeList }} />
+    ├── Playground.astro          ← variantes + playground + ComponentApi
+    └── TableOfContents           ← TOC droite (slot="toc")
 ```
 
 ---
@@ -297,6 +315,86 @@ Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la sect
 
 ---
 
+## Contenu narratif MDX
+
+Le corps d'un fichier MDX (sous le frontmatter) est affiché dans une `<section class="narrative">`
+entre le header de la page et les exemples. C'est l'endroit pour documenter l'usage et l'accessibilité.
+
+### Composants MDX custom
+
+Certains éléments HTML générés par le MDX sont remplacés par des composants Astro afin de contrôler
+précisément le rendu. Le mapping est déclaré dans `[slug].astro` via la prop `components` de `<Content>` :
+
+| Élément MDX | Composant Astro          | Rôle                                                       |
+| ----------- | ------------------------ | ---------------------------------------------------------- |
+| `ul`        | `NarrativeList.astro`    | Ajoute la classe `.narrative-list` pour le ciblage CSS     |
+| `h2`        | `NarrativeHeading.astro` | Génère un `id` slugifié automatiquement (ancre TOC + lien) |
+
+**Ajouter un nouveau composant custom :** créer `src/components/Narrative<Nom>.astro`, l'importer
+dans `[slug].astro` et l'ajouter dans le spread `components={{ … }}`.
+
+### TOC automatique depuis les `h2`
+
+Les titres `## Titre` du MDX sont **automatiquement ajoutés à la TOC** — il n'y a rien à déclarer
+dans le frontmatter. Le mécanisme fonctionne ainsi :
+
+1. `render(mdx)` retourne un tableau `headings` (fourni par Astro/remark)
+2. `[slug].astro` filtre les `depth === 2` et les injecte dans `tocEntries` avant les exemples
+3. `NarrativeHeading.astro` pose le même `id` sur le `h2` rendu, via `github-slugger` — le même
+   algorithme qu'Astro, ce qui garantit que l'ancre et l'entrée TOC sont toujours synchronisées
+
+**Conséquence :** renommer un `h2` dans le MDX met à jour l'ancre et la TOC simultanément, sans
+aucune intervention manuelle.
+
+### Flux de données narratif
+
+```text
+ar-alert.mdx (corps)
+  → render(mdx) → { Content, headings[] }
+  → headings filtrés depth=2 → narrativeTocEntries → tocEntries[]
+  → <Content components={{ ul: NarrativeList, h2: NarrativeHeading }} />
+      → h2 "Accessibilité" → <NarrativeHeading> → <h2 id="accessibilité">
+      → ul → <NarrativeList> → <ul class="narrative-list">
+```
+
+---
+
+## Convention — Section accessibilité dans les MDX
+
+Chaque page de composant **doit** comporter une section `## Accessibilité` avec deux sous-sections :
+
+**`### Pris en charge automatiquement`** — liste factuelle de ce qu'Ariane garantit techniquement :
+rôles ARIA, attributs, focus management, tokens de contraste. Courte, rassurante.
+
+**`### À la charge de l'auteur`** — ce que l'utilisateur du composant doit fournir pour que
+l'expérience soit réellement accessible. Chaque item explique _pourquoi_, pas seulement _quoi_.
+
+Cette distinction reflète la ligne entre **accessibilité structurelle** (garantie par le composant)
+et **accessibilité éditoriale** (responsabilité de l'auteur du contenu). Ariane ne peut pas valider
+que le contenu slotté est compréhensible hors contexte visuel — la documentation est le seul levier.
+
+Voir [ar-alert.mdx](./src/content/components/ar-alert.mdx) comme référence.
+
+---
+
+## Convention — Section comportement responsive dans les MDX
+
+Ajouter une section `## Comportement responsive` **uniquement si le composant a un comportement
+automatique distinct selon le viewport** (CSS media queries ou JS détectant le viewport).
+
+La section décrit :
+
+- Le seuil de breakpoint (`768px`, `640px`…)
+- Ce qui change visuellement à ce seuil
+- Ce qui est géré automatiquement (pas de configuration requise côté auteur)
+
+Elle est placée **après `## Accessibilité`**. Elle suit le même style : liste de faits courts,
+pas d'exemples de code.
+
+Voir [ar-breadcrumb.mdx](./src/content/components/ar-breadcrumb.mdx) comme référence.
+
+---
+
 ## Checklist pour ajouter un composant
 
 > **Utiliser le script de scaffolding** : `npm run create -- <nom>` génère automatiquement
@@ -307,6 +405,8 @@ Lors d'une PR qui modifie l'un des éléments ci-dessous, mettre à jour la sect
 - [ ] Implémenter le composant avec les annotations JSDoc
 - [ ] Régénérer le CEM : `cd packages/core && npm run build:manifest`
 - [ ] Compléter les variantes dans `apps/docs/src/content/components/ar-<nom>.mdx`
+- [ ] Ajouter la section `## Accessibilité` dans le MDX (voir convention ci-dessus)
+- [ ] Si le composant a un comportement adaptatif automatique : ajouter `## Comportement responsive` après `## Accessibilité` (voir convention ci-dessus)
 - [ ] Lancer `npm run dev` et vérifier la page `/components/<nom>`
 - [ ] Si sous-composant : ajouter uniquement `@parent ar-<parent>` dans la JSDoc (aucun champ MDX supplémentaire)
 

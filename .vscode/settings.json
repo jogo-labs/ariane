@@ -11,5 +11,8 @@
   "eslint.useFlatConfig": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "lit-plugin.rules.no-unknown-tag-name": "warning"
+  "lit-plugin.rules.no-unknown-tag-name": "warning",
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

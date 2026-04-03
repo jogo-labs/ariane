@@ -50,6 +50,21 @@ pas comme un JSON stringifié. Préférer des éléments enfants slottés aux pr
 - Les aspects qui garantissent l'accessibilité (focus management, bouton de fermeture) sont non négociables.
 - Le thème par défaut satisfait les ratios de contraste **WCAG 2.2 AA** sans configuration supplémentaire.
 
+### Périmètre de l'accessibilité
+
+Ariane distingue deux niveaux de responsabilité :
+
+**Accessibilité structurelle** — ce que le composant peut garantir techniquement : rôles ARIA corrects,
+attributs, gestion du focus, icônes masquées aux AT. C'est non négociable et documenté dans la section
+"Pris en charge automatiquement" de chaque page de composant.
+
+**Accessibilité éditoriale** — ce que l'auteur du contenu doit fournir : messages compréhensibles hors
+contexte visuel, niveau de sévérité cohérent, labels significatifs. Ariane ne peut pas valider cela
+techniquement — elle le documente dans la section "À la charge de l'auteur" de chaque page de composant.
+
+Les équipes qui souhaitent imposer des contraintes éditoriales (titre obligatoire, validation de contenu)
+peuvent étendre les classes Ariane dans leur propre design system — voir le pattern de réexportation.
+
 ---
 
 ## Proposer un nouveau composant

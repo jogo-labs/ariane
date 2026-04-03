@@ -1,0 +1,15 @@
+---
+/**
+ * NarrativeList.astro
+ *
+ * Composant MDX custom pour les listes `ul` du contenu narratif des pages composant.
+ *
+ * Rôle : ajouter la classe `.narrative-list` sur le `ul` généré par le MDX,
+ * afin de pouvoir le cibler en CSS avec un sélecteur de classe plutôt qu'un
+ * sélecteur de tag (`ul`), conformément à la convention du projet.
+ *
+ * Usage : injecté via <Content components={{ ul: NarrativeList }} /> dans [slug].astro.
+ * Ne pas utiliser directement dans les templates Astro.
+ */
+---
+<ul class="narrative-list"><slot /></ul>

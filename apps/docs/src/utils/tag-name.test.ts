@@ -25,7 +25,7 @@ describe('groupByPrefix', () => {
     it('regroupe des composants par prefix', () => {
         const components = [
             { tagName: 'ar-alert' },
-            { tagName: 'ar-button' },
+            { tagName: 'ar-spinner' },
             { tagName: 'ft-card' },
         ];
         const result = groupByPrefix(components);

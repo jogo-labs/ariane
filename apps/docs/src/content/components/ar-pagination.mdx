@@ -25,4 +25,26 @@ variants:
           <ar-pagination current="18" total="20"></ar-pagination>
 ---
 
-Documentation narrative du composant `ar-pagination`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
+  par les lecteurs d'écran comme zone de navigation.
+- Les boutons "précédent" et "suivant" ont `aria-disabled` synchronisé avec leur état désactivé.
+- Les séparateurs et points de suspension sont masqués aux lecteurs d'écran (`aria-hidden`).
+
+### À la charge de l'auteur
+
+- **Annoncer le changement de page.** La pagination ne gère pas le rechargement de contenu —
+  c'est à l'intégrateur d'annoncer le nouveau contenu chargé (via une live region ou un focus
+  management) pour que l'utilisateur clavier sache que la page a changé.
+- **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
+  produit un état visuellement incohérent non corrigé par le composant.
+
+## Comportement responsive
+
+En dessous de **640px**, le composant réduit automatiquement le nombre de pages affichées :
+
+- Seules les pages **précédente**, **active**, **suivante** et les deux voisines directes restent visibles.
+- Les autres pages sont masquées — aucune configuration nécessaire.

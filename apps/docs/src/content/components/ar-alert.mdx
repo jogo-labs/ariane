@@ -1,35 +1,61 @@
 ---
 tagName: ar-alert
 title: Alert
-description: Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+description: >
+    Destiné aux messages qui nécessitent l'attention de l'utilisateur : confirmations,
+    avertissements, erreurs. Pour les messages informatifs non urgents, préférer `variant="info"`.
 variants:
     - name: default
       label: Défaut
       description: Rendu par défaut du composant.
       html: |
           <ar-alert>
-            <span slot="title">Alerte par defaut</span>
-            <span slot="content">Je suis une alerte par defaut (erreur).</span>
+              <strong>Titre de l'alerte</strong><br>
+              Je suis une alerte par defaut (erreur).
           </ar-alert>
     - name: success
       label: Succès
       description: Rendu en mode succès.
       html: |
-          <ar-alert version="success">
-            <span slot="title">Alerte de succès</span>
-            <span slot="content">Je suis une alerte de succès.</span>
+          <ar-alert variant="success">
+              <strong>Succès de l'opération</strong><br>
+              Je suis une alerte de succès.
           </ar-alert>
     - name: dismissible
       label: Dismissible
       description: Rendu d'une alerte qui peut être fermée. L'ID fourni doit être un élément existant dans la page qui recevra le focus à la fermeture du composant.
       html: |
           <div>
-            <button style="margin-bottom: 10px" type="button" id="idBoutonFocused">Test focus</button>
-            <ar-alert next-focus="idBoutonFocused">
-              <span slot="title">Alerte dismissible</span>
-              <span slot="content">Je suis une alerte qui peut être fermée.</span>
-            </ar-alert>
+              <button style="margin-bottom: 10px" type="button" id="idBoutonFocused">Test focus</button>
+              <ar-alert next-focus="idBoutonFocused">
+                  <strong>Alerte supprimable</strong><br>
+                  Je suis une alerte qui peut être fermée.
+              </ar-alert>
           </div>
 ---
 
-Documentation narrative du composant `ar-alert`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) posé sur
+  l'hôte selon le variant — `info` → `status`, tous les autres → `alert`.
+- L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
+  est portée par le `role`, pas par l'icône.
+- Une icône par défaut est fournie pour chaque variant. Elle peut être remplacée via le
+  slot `icon`, mais il est déconseillé de la supprimer : elle constitue un repère visuel
+  non colorimétrique, important pour les utilisateurs daltoniens ou en environnement à
+  faible contraste.
+- Le focus est reporté sur l'élément cible (`next-focus`) à la fermeture — l'utilisateur
+  clavier ne se retrouve pas désorienté.
+
+### À la charge de l'auteur
+
+- **Message compréhensible hors contexte visuel.** Le contenu est lu dès l'apparition de
+  l'alerte. Évitez les messages vagues ("Une erreur s'est produite") — préférez
+  ("Le formulaire n'a pas pu être soumis : champ email manquant").
+- **Niveau de sévérité cohérent.** `error` pour les erreurs bloquantes, `warning` pour
+  les situations qui méritent attention sans bloquer, `success` pour les confirmations,
+  `info` pour les informations neutres.
+- **`next-focus` obligatoire sur les alertes dismissibles.** Un bouton de fermeture sans
+  destination de focus laisse l'utilisateur clavier sans repère.

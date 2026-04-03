@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Playground from '../../components/Playground.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeList from '../../components/NarrativeList.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
 import manifest from '@cem';
 import { getSlug } from '../../utils/tag-name.ts';
 import { type CemDeclaration, getCustomElements, buildControls } from '../../utils/cem-types.ts';
@@ -30,7 +32,7 @@ const { component, mdx } = Astro.props as {
     mdx: MdxEntry | null;
 };
 
-const { Content } = mdx ? await render(mdx) : { Content: null };
+const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
 
 const variants    = mdx?.data.variants ?? [];
 const pageTitle   = mdx?.data.title ?? component.name;
@@ -51,8 +53,22 @@ const playgroundHtml = playgroundVariant?.html ?? '';
 const controls = buildControls(component.members ?? []);
 
 // ─── TOC ──────────────────────────────────────────────────────────────────────
+//
+// Les h2 du MDX sont automatiquement injectés en tête de TOC.
+// `headings` est fourni par render() — Astro/remark les extrait à la compilation.
+// L'id utilisé ici doit correspondre exactement à celui posé par NarrativeHeading.astro,
+// qui utilise le même algorithme (github-slugger) pour garantir la synchronisation.
+
+const narrativeTocEntries = headings
+    .filter((h: { depth: number }) => h.depth === 2)
+    .map((h: { slug: string; text: string }) => ({
+        id:    h.slug,
+        label: h.text,
+        level: 1 as const,
+    }));
 
 const tocEntries = [
+    ...narrativeTocEntries,
     ...(variants.length > 0
         ? [
             { id: 'exemples', label: 'Exemples', level: 1 as const },
@@ -89,13 +105,21 @@ const tocEntries = [
             </div>
 
             {pageDesc && <p class="summary">{pageDesc}</p>}
+        </div>
 
-            {Content && (
+        {/*
+          * Contenu narratif du MDX (usage, accessibilité…).
+          * Les composants custom remplacent les éléments HTML natifs générés par le MDX :
+          *   - h2 → NarrativeHeading : pose un id slugifié pour les ancres TOC
+          *   - ul → NarrativeList    : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
+          * Voir apps/docs/CONTRIBUTING.md § "Contenu narratif MDX" pour la documentation complète.
+          */}
+        {Content && (
             <section class="narrative">
-                <Content />
+                <Content components={{ ul: NarrativeList, h2: NarrativeHeading }} />
             </section>
         )}
-        </div>
+
         <Playground
             variants={variants}
             tagName={component.tagName!}
@@ -119,19 +143,36 @@ const tocEntries = [
         .toc-mobile-inline { display: block; }
     }
 
-    /* .narrative {
-        margin:      1.5rem 0;
-        color:       var(--doc-text, #374151);
-        line-height: 1.7;
-    } */
+    .narrative :global(h2) {
+        font-size: 1.25rem;
+        font-weight: 600;
+        border-bottom: 2px solid var(--doc-border, #e5e7eb);
+        padding-bottom: 1rem;
+        margin: 2rem 0 1rem;
+        color: var(--doc-text, #111827);
+    }
 
-    .narrative :global(p)    { margin-bottom: 0rem; }
+    .narrative :global(h2:first-child) { margin-top: 0; }
 
-    /* .narrative :global(code) {
-        font-size:     0.85em;
-        background:    var(--doc-code-bg, #f3f4f6);
-        color:         var(--doc-text, #111827);
-        padding:       0.1em 0.35em;
-        border-radius: 0.25em;
-    } */
+    .narrative :global(h3) {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--doc-text-subtle, #374151);
+        margin: 1.25rem 0 0.5rem;
+    }
+
+    .narrative :global(p) {
+        font-size: 0.9rem;
+        line-height: 1.75;
+        color: var(--doc-text, #374151);
+        margin: 0;
+    }
+
+    .narrative :global(.narrative-list) {
+        font-size: 0.9rem;
+        line-height: 1.75;
+        color: var(--doc-text, #374151);
+        margin: 0;
+        padding-left: 1.25rem;
+    }
 </style>

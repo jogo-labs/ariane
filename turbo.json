@@ -17,17 +17,26 @@
     },
     "build:types": {
       "dependsOn": ["build:manifest"],
-      "inputs": ["src/**/*.ts", "tsconfig.json"],
+      "inputs": ["src/**/*.ts", "tsconfig.json", "../../tsconfig.base.json"],
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
     "build": {
       "dependsOn": ["build:manifest", "build:bundles", "build:css", "build:types", "^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/styles/**/*.css",
+        "scripts/build-bundles.js",
+        "scripts/build-css.js",
+        "cem.config.js",
+        "tsconfig.json",
+        "../../tsconfig.base.json"
+      ],
       "outputs": ["dist/**", "cdn/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "build:manifest"]
     },
     "test": {
       "dependsOn": ["^build:bundles"],
