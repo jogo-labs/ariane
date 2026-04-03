@@ -25,33 +25,6 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
-    - name: responsive
-      label: Responsive
-      description: Exemple configuré avec un conteneur desktop cible pour démontrer la téléportation responsive.
-      html: |
-          <aside id="stepper-sidebar"></aside>
-          <ar-stepper
-            class="align-left"
-            current-path="etape-1-2"
-            desktop-target="stepper-sidebar"
-            desktop-from="992"
-          >
-            <!-- Étape 1 -->
-            <ar-stepper-item path="etape-1" label="Mes informations" href="#">
-                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#"></ar-stepper-item>
-            </ar-stepper-item>
-
-            <!-- Étape 2 -->
-            <ar-stepper-item path="etape-2" label="Mes préférences" href="#">
-                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="#etape-2-1"></ar-stepper-item>
-                <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
-            </ar-stepper-item>
-
-            <!-- Étape 3 -->
-            <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
-          </ar-stepper>
     - name: edit
       label: Mode édition
       description: Rendu par défaut du composant.
@@ -97,11 +70,16 @@ variants:
 
 ## Comportement responsive
 
-Quand `desktop-target` est renseigné, le composant adapte automatiquement son rendu selon la
-largeur de l'écran :
+Le composant adapte son rendu selon la largeur de l'écran, au niveau du breakpoint `desktop-from`
+(992 px par défaut) :
 
-- En dessous de `desktop-from`, il reste à sa position d'origine et utilise le rendu dropdown.
-- À partir de `desktop-from`, il se téléporte dans l'élément ciblé par `desktop-target` et
-  affiche la liste desktop.
+- En dessous de `desktop-from` : rendu dropdown (mobile).
+- À partir de `desktop-from` : liste verticale (desktop).
 
-Pour observer ce comportement, utiliser les DevTools du navigateur en mode responsive.
+Quand `desktop-target` est renseigné, la téléportation DOM est également activée : le composant
+se déplace dans l'élément ciblé sur desktop, et revient à sa position d'origine sur mobile.
+
+```html
+<aside id="stepper-sidebar"></aside>
+<ar-stepper desktop-target="stepper-sidebar" desktop-from="992"> ... </ar-stepper>
+```
