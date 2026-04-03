@@ -28,14 +28,13 @@ npm run build:manifest     # Regénère custom-elements.json
 ## Git Workflow
 
 - Branches : `feat/<desc>`, `fix/<desc>`, `chore/<desc>` créées depuis `dev`
-- PRs vers `dev` — jamais de push direct sur `main`, et sur `dev` demander l'autorisation
+- PRs vers `dev` — jamais de push direct sur `main`
+- commit et push depuis `dev` de manière exceptionnelle > demander confirmation
 - `main` ← PR depuis `dev` uniquement, pour les releases
 - Release : tag `vX.Y.Z` → CI publie sur npm + crée la GitHub Release automatiquement
 - Tag npm : `-alpha.*` → `alpha`, `-beta.*` → `beta`, stable → `latest`
 
 ## Notes
-
-Toujours vérifier la branche active avant de commiter — ne jamais commiter sur `main`, et si `dev` est active, demander confirmation à l'utilsateur.
 
 Dépréciation : `warnDeprecated(tag, member, msg)` depuis `src/utils/deprecated.ts` + `@deprecated` JSDoc — pas nécessaire en alpha.
 Si un correctif échoue 3 fois de suite, remettre en cause la demande avant de continuer.
