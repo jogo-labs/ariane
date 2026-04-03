@@ -107,6 +107,8 @@ export class ArStepper extends LitElement {
 
     /**
      * Alignement de la liste d'étapes : `left` (défaut) ou `right`.
+     * **Note** — l'alignement `right` ne s'applique qu'en mode desktop (rendu liste verticale).
+     * En mode mobile (dropdown), les items restent alignés à gauche.
      * @attr align
      */
     @property({ type: String, attribute: 'align', reflect: true })

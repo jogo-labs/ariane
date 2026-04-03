@@ -188,28 +188,28 @@ export default css`
         background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
     }
 
-    :host([align='right']) .stepper-list .stepper-item {
+    :host([align='right']) .stepper-desktop .stepper-item {
         align-items: flex-end;
         text-align: right;
     }
 
-    :host([align='right']) .stepper-list .stepper-item::after {
+    :host([align='right']) .stepper-desktop .stepper-item::after {
         margin-left: auto;
     }
 
-    :host([align='right']) .stepper-list .stepper-item-inner {
+    :host([align='right']) .stepper-desktop .stepper-item-inner {
         justify-content: flex-end;
         margin-left: auto;
         text-align: right;
     }
 
-    :host([align='right']) .stepper-list .stepper-item-bullet {
+    :host([align='right']) .stepper-desktop .stepper-item-bullet {
         order: 2;
         margin-right: 0;
         margin-left: 0.5rem;
     }
 
-    :host([align='right']) .stepper-list .stepper-list .stepper-item-bullet {
+    :host([align='right']) .stepper-desktop .stepper-list .stepper-item-bullet {
         margin-left: 1.25rem;
         margin-right: 0.75rem;
     }
