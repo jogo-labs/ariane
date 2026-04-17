@@ -45,6 +45,7 @@
   },
   "packageManager": "npm@11.9.0",
   "overrides": {
-    "lit": "^3.0.0"
+    "lit": "^3.0.0",
+    "execa": "^8.0.1"
   }
 }
