@@ -152,7 +152,7 @@ export class ArDialog extends LitElement {
         super.disconnectedCallback();
         this._footerObserver?.disconnect();
         this._removeOpenListeners();
-        if (this.open) this._unfreezeScroll();
+        if (this.open || this._isClosing) this._unfreezeScroll();
     }
 
     override firstUpdated(): void {
@@ -264,9 +264,15 @@ export class ArDialog extends LitElement {
     // ── Interaction handlers ───────────────────────────────────────────────────
 
     private _handleDialogClick = (event: MouseEvent) => {
-        const target = event.target as HTMLElement;
-        const dismissed = target.closest('[data-ar-dismiss]');
-        const accepted = target.closest('[data-ar-accept]');
+        const path = event.composedPath() as Element[];
+        const stopAt = path.indexOf(this.dialog);
+        const inner = stopAt >= 0 ? path.slice(0, stopAt) : path;
+        const dismissed = inner.find(
+            (n): n is HTMLElement => n instanceof HTMLElement && n.hasAttribute('data-ar-dismiss'),
+        );
+        const accepted = inner.find(
+            (n): n is HTMLElement => n instanceof HTMLElement && n.hasAttribute('data-ar-accept'),
+        );
 
         if (dismissed || accepted) {
             const e = this._emit(dismissed ? 'ar-dialog-dismissed' : 'ar-dialog-accepted');
