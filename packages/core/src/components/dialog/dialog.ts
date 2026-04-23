@@ -10,7 +10,7 @@ import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
 
-/** Evènements envoyés par le webcomposant FTModalSide */
+/** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
     | 'ar-dialog-show'
     | 'ar-dialog-shown'
@@ -22,7 +22,8 @@ export type ArDialogEvents =
     | 'ar-dialog-accepted'
     | 'ar-dialog-accepted-prevented';
 
-const arDialogLocks = new Set();
+const arDialogLocks = new Set<ArDialog>();
+let _savedBodyOverflow: string | null = null;
 
 /**
  * @summary Version améliorée du composant natif <dialog> avec affichage centré ou panel.
@@ -35,7 +36,15 @@ const arDialogLocks = new Set();
  * @csspart base - L'élément racine du composant.
  * @cssprop [--ar-dialog-size=auto] - Taille du composant.
  *
- * @event {CustomEvent} ar-dialog-change - Émis lors d'un changement.
+ * @event {CustomEvent} ar-dialog-show - Émis lorsque que le composant va s'afficher.
+ * @event {CustomEvent} ar-dialog-shown - Émis lorsque que le composant est affiché
+ * @event {CustomEvent} ar-dialog-hide - Émis lorsque que le composant va être masqué
+ * @event {CustomEvent} ar-dialog-hide-prevented - Émis lorsque que le masquage du composant a été interrompu
+ * @event {CustomEvent} ar-dialog-hidden - Émis lorsque que le composant est masqué
+ * @event {CustomEvent} ar-dialog-dismissed - Émis lorsque que le composant a été fermé
+ * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis lorsque la fermeture du composant a été interrompue
+ * @event {CustomEvent} ar-dialog-accepted - Émis lorsque que le composant est fermé avec un bouton indiquant une acceptation
+ * @event {CustomEvent} ar-dialog-accepted-prevented - Émis lorsque que la fermeture via un bouton de confirmation a été interrompue
  */
 @customElement('ar-dialog')
 export class ArDialog extends LitElement {
@@ -46,7 +55,7 @@ export class ArDialog extends LitElement {
     // Références HTML
     /** Elément HTML contenant la dialog */
     @query('dialog', true)
-    dialog?: HTMLDialogElement;
+    dialog!: HTMLDialogElement;
 
     /**
      * Visibilité du composant.
@@ -61,7 +70,7 @@ export class ArDialog extends LitElement {
      * Si vrai, le composant ne se ferme pas quand l'utilisateur clique sur le fond grisé
      *
      * @attr staticBackdrop
-     * @default staticBackdrop
+     * @default false
      */
     @property({ reflect: true, type: Boolean, attribute: 'static-backdrop' })
     staticBackdrop: boolean = false;
@@ -69,6 +78,9 @@ export class ArDialog extends LitElement {
     /**
      * Le label du composant dialog affiché dans le header.
      * Pour utiliser du HTML, utiliser le slot `label`.
+     *
+     * @attr label
+     * @default ''
      */
     @property({ reflect: true }) label = '';
 
@@ -85,8 +97,8 @@ export class ArDialog extends LitElement {
      * Position du composant.
      * Utilisé uniquement pour le mode 'panel'
      *
-     * @attr mode
-     * @default dialog
+     * @attr placement
+     * @default 'right'
      */
     @property({ reflect: true, type: String })
     placement: 'left' | 'right' = 'right';
@@ -94,14 +106,11 @@ export class ArDialog extends LitElement {
     /**
      * Largeur du composant.
      *
-     * @attr mode
-     * @default size
+     * @attr size
+     * @default 'md'
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
-
-    /** Valeur de la propriété de style overflow sur l'élément body à l'ouverture de la modale */
-    private _overflowOnClose: string | null = null;
 
     private _pointerDownTarget: EventTarget | null = null;
 
@@ -113,7 +122,7 @@ export class ArDialog extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        this.removeOpenListeners();
+        this._removeOpenListeners();
         if (this.open) {
             this._unfreezeScroll();
         }
@@ -160,7 +169,7 @@ export class ArDialog extends LitElement {
                                     <slot name="label">${this.label}</slot>
                                 </h1>
                                 <button
-                                    id="ftdialog-close"
+                                    id="ar-dialog-close"
                                     type="button"
                                     class="btn btn-tertiary light close btn-ratio-square"
                                     data-dismiss="dialog"
@@ -185,13 +194,10 @@ export class ArDialog extends LitElement {
 
     /** Empêche le scroll sur le corps de page quand la modale est ouverte */
     private _freezeScroll() {
-        arDialogLocks.add(this);
-
-        // On ajoute overflow hidden
-        if (arDialogLocks.size === 1 && document.body.style.overflow) {
-            // On fait un backup de l'overflow actuel
-            this._overflowOnClose = document.body.style.overflow;
+        if (arDialogLocks.size === 0) {
+            _savedBodyOverflow = document.body.style.overflow || null;
         }
+        arDialogLocks.add(this);
         document.body.style.overflow = 'hidden';
     }
 
@@ -200,15 +206,12 @@ export class ArDialog extends LitElement {
         arDialogLocks.delete(this);
         if (arDialogLocks.size > 0) return;
 
-        // On rétabli la valeur précédente si nécessaire
-        if (this._overflowOnClose) {
-            document.body.style.overflow = this._overflowOnClose;
-            this._overflowOnClose = null;
-        }
-        // Sinon on retire la clé
-        else {
+        if (_savedBodyOverflow) {
+            document.body.style.overflow = _savedBodyOverflow;
+        } else {
             document.body.style.removeProperty('overflow');
         }
+        _savedBodyOverflow = null;
     }
 
     /**
@@ -221,17 +224,17 @@ export class ArDialog extends LitElement {
             bubbles: true,
             composed: true,
             cancelable: true,
-            detail: { id: this.id },
+            detail: { id: this.id || undefined },
         });
         this.dispatchEvent(e);
         return e;
     }
 
-    private addOpenListeners() {
+    private _addOpenListeners() {
         document.addEventListener('keydown', this._handleDocumentKeyDown);
     }
 
-    private removeOpenListeners() {
+    private _removeOpenListeners() {
         document.removeEventListener('keydown', this._handleDocumentKeyDown);
     }
 
@@ -248,6 +251,7 @@ export class ArDialog extends LitElement {
         if (dismissed || accepted) {
             const e = this._emit(dismissed ? 'ar-dialog-dismissed' : 'ar-dialog-accepted');
             if (e.defaultPrevented) {
+                event.stopPropagation();
                 const prevented = dismissed
                     ? 'ar-dialog-dismissed-prevented'
                     : 'ar-dialog-accepted-prevented';
@@ -265,7 +269,7 @@ export class ArDialog extends LitElement {
      * @param {KeyboardEvent} event
      */
     private _handleDocumentKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && this.open) {
+        if (event.key === 'Escape' && this.open && !this._isClosing) {
             event.preventDefault();
             event.stopPropagation();
             this._close();
@@ -308,21 +312,20 @@ export class ArDialog extends LitElement {
             return;
         }
 
-        this.addOpenListeners();
+        this._addOpenListeners();
         this.dialog?.showModal();
-        this.open = true;
         this._freezeScroll();
 
-        this._emit('ar-dialog-shown');
+        this.updateComplete.then(() => this._emit('ar-dialog-shown'));
     }
 
     /** Cache la modale avec une animation, réactive le scroll et supprime l'écoute du click */
     private _close(): void {
         if (this._isClosing) return;
-        const ftModalHideEvent = this._emit('ar-dialog-hide');
+        const hideEvent = this._emit('ar-dialog-hide');
 
         // Si la fermeture est annulée
-        if (ftModalHideEvent.defaultPrevented) {
+        if (hideEvent.defaultPrevented) {
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
             return;
@@ -333,17 +336,18 @@ export class ArDialog extends LitElement {
         const prefersReducedMotion =
             typeof window.matchMedia === 'function' &&
             window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const animationTiming = prefersReducedMotion ? 0 : 400;
+        const duration = parseFloat(getComputedStyle(this.dialog).animationDuration) * 1000 || 0;
+        const animationTiming = prefersReducedMotion ? 0 : duration;
         this.dialog?.classList.add('closing');
 
         setTimeout(() => {
             this.dialog?.classList.remove('closing');
             this.dialog?.close();
             this._unfreezeScroll();
-            this.removeOpenListeners();
+            this._removeOpenListeners();
             this._isClosing = false;
             this.open = false;
-            this._emit('ar-dialog-hidden');
+            this.updateComplete.then(() => this._emit('ar-dialog-hidden'));
         }, animationTiming);
     }
 }
