@@ -24,6 +24,7 @@ const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
     'ar-spinner': () => import('./components/spinner/spinner.js'),
     'ar-stepper': () => import('./components/stepper/stepper.js'),
     'ar-stepper-item': () => import('./components/stepper-item/stepper-item.js'),
+    'ar-dialog': () => import('./components/dialog/dialog.js'),
     // ⚠ Mis à jour automatiquement par le script create-component.js
 };
 

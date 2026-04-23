@@ -13,3 +13,4 @@ export { ArSpinner } from './components/spinner/spinner.js';
 export { ArPagination } from './components/pagination/pagination.js';
 export { ArStepper } from './components/stepper/stepper.js';
 export { ArStepperItem } from './components/stepper-item/stepper-item.js';
+export { ArDialog } from './components/dialog/dialog.js';
