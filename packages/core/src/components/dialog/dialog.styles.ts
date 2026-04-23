@@ -70,13 +70,16 @@ export default css`
     }
 
     @media (prefers-reduced-motion: reduce) {
-        dialog {
+        dialog,
+        dialog:not(.closing)[open],
+        dialog[open].closing {
             transition: none;
             animation: none;
         }
 
         dialog::backdrop,
-        dialog[open]::backdrop {
+        dialog[open]::backdrop,
+        dialog:where(:not(.closing))[open]::backdrop {
             transition: none;
             animation: none;
         }
