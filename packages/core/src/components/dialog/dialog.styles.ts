@@ -86,22 +86,22 @@ export default css`
         margin: 0 !important;
     }
 
-    .modal-header {
+    .dialog-header {
         -moz-column-gap: 0.75rem;
         column-gap: 0.75rem;
     }
 
-    .modal-header .close {
+    .dialog-header .close {
         ms-flex-item-align: start;
         align-self: flex-start;
         min-height: 2.5rem; /* @EvolutionDesign: On force la taille temporairement tant qu'on a pas migré sur la nouvelle charte pour s'assurer d'un bouton en 40x40 */
     }
 
-    .modal-content {
+    .dialog-content {
         max-height: calc(100vh - 3.5rem);
     }
 
-    .modal-body {
+    .dialog-body {
         overflow-y: auto;
     }
 `;
