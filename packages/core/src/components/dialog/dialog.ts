@@ -196,7 +196,6 @@ export class ArDialog extends LitElement {
                                 type="button"
                                 class="btn btn-tertiary light close btn-ratio-square"
                                 data-ar-dismiss
-                                aria-describedby="dialog-heading"
                             >
                                 <span aria-hidden="true" class="icon icon-close"></span>
                                 <span class="btn-content sr-only">Fermer la modale</span>

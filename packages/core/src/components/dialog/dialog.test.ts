@@ -55,6 +55,13 @@ describe('ArDialog', () => {
         it('contient un bouton close avec data-ar-dismiss', () => {
             expect(requireShadow(el).querySelector('[data-ar-dismiss]')).not.toBeNull();
         });
+
+        it("le bouton close n'a pas d'aria-describedby", async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            const closeBtn = requireShadow(el).querySelector('[data-ar-dismiss]');
+            expect(closeBtn).not.toBeNull();
+            expect((closeBtn as HTMLElement).hasAttribute('aria-describedby')).toBe(false);
+        });
     });
 
     // ── Valeurs par défaut ────────────────────────────────────────────────────
