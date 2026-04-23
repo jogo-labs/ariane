@@ -57,6 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
             var el = preview.querySelector(tagName);
             if (!el || !codeEl) return;
             var html = el.outerHTML;
+            // Le DOM sérialise les attributs booléens en attr="" — on corrige en attr seul
+            controls.forEach(function (c) {
+                if (c.type === 'checkbox' && c.dataset.attr) {
+                    html = html.replace(' ' + c.dataset.attr + '=""', ' ' + c.dataset.attr);
+                }
+            });
             codeEl.textContent = html; // textContent = texte brut, pas d'injection HTML
             codeEl.removeAttribute('data-highlighted'); // permet à hljs de re-coloriser
             if (window.hljs) window.hljs.highlightElement(codeEl);
