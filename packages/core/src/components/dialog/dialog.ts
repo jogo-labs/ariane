@@ -26,17 +26,19 @@ export type ArDialogEvents =
 const arDialogLocks = new Set<ArDialog>();
 let _savedBodyOverflow: string | null = null;
 
-document.addEventListener(
-    'click',
-    (e: MouseEvent) => {
-        const trigger = (e.target as Element).closest('[data-ar-dialog-open]');
-        if (!trigger) return;
-        const id = trigger.getAttribute('data-ar-dialog-open');
-        const target = id ? (document.getElementById(id) as ArDialog | null) : null;
-        if (target?.tagName === 'AR-DIALOG') target.open = true;
-    },
-    { capture: true },
-);
+if (typeof document !== 'undefined') {
+    document.addEventListener(
+        'click',
+        (e: MouseEvent) => {
+            const trigger = (e.target as Element).closest('[data-ar-dialog-open]');
+            if (!trigger) return;
+            const id = trigger.getAttribute('data-ar-dialog-open');
+            const target = id ? (document.getElementById(id) as ArDialog | null) : null;
+            if (target?.tagName === 'AR-DIALOG') target.open = true;
+        },
+        { capture: true },
+    );
+}
 
 /**
  * @summary Version améliorée du composant natif <dialog> avec affichage centré ou panel.

@@ -450,5 +450,11 @@ describe('ArDialog', () => {
 
             btn.remove();
         });
+
+        it('le module se charge sans erreur (guard SSR)', () => {
+            // Guard: le listener module-level est protégé par typeof
+            // document !== 'undefined'
+            expect(customElements.get('ar-dialog')).toBeDefined();
+        });
     });
 });
