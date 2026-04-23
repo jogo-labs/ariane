@@ -1,14 +1,95 @@
 ---
 tagName: ar-dialog
 title: Dialog
-description: Description du composant ar-dialog.
+description: Boîte de dialogue modale ou panneau latéral, accessible et animée.
+playgroundTemplate: default
 variants:
-    - name: Par défaut
-      description: Rendu par défaut du composant.
+    - name: default
+      label: Modal
+      description: Dialog centré avec backdrop. Cliquer sur le bouton pour l'ouvrir.
       html: |
-          <ar-dialog label="Titre de ma modale">
-            Contenu de ma modale
+          <button data-ar-dialog-open="demo-modal">Ouvrir la modale</button>
+          <ar-dialog id="demo-modal" label="Informations importantes">
+              <p>Votre session expirera dans 5 minutes. Enregistrez votre travail pour ne pas perdre vos modifications.</p>
+          </ar-dialog>
+    - name: panel
+      label: Panel droit
+      description: Panneau latéral glissant depuis la droite.
+      html: |
+          <button data-ar-dialog-open="demo-panel">Ouvrir le panel</button>
+          <ar-dialog id="demo-panel" label="Filtres de recherche" mode="panel">
+              <p>Contenu du panel latéral.</p>
+          </ar-dialog>
+    - name: panel-left
+      label: Panel gauche
+      description: Panneau latéral glissant depuis la gauche.
+      html: |
+          <button data-ar-dialog-open="demo-panel-left">Ouvrir le panel gauche</button>
+          <ar-dialog id="demo-panel-left" label="Menu de navigation" mode="panel" placement="left">
+              <p>Contenu du panel latéral gauche.</p>
+          </ar-dialog>
+    - name: static-backdrop
+      label: Backdrop statique
+      description: Un clic sur le fond ne ferme pas le dialog — l'utilisateur doit agir explicitement.
+      html: |
+          <button data-ar-dialog-open="demo-static">Ouvrir (backdrop statique)</button>
+          <ar-dialog id="demo-static" label="Action requise" static-backdrop>
+              <p>Ce dialog ne se ferme pas en cliquant sur le fond.</p>
+          </ar-dialog>
+    - name: with-footer
+      label: Avec footer
+      description: Zone d'actions en pied de page via slot="footer".
+      html: |
+          <button data-ar-dialog-open="demo-footer">Ouvrir avec footer</button>
+          <ar-dialog id="demo-footer" label="Confirmer la suppression">
+              <p>Cette action supprimera définitivement l'élément sélectionné.</p>
+              <button slot="footer" data-ar-dismiss>Annuler</button>
+              <button slot="footer" data-ar-accept>Supprimer</button>
           </ar-dialog>
 ---
 
-Documentation narrative du composant `ar-dialog`.
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby` et `aria-modal` — la région est correctement annoncée par les lecteurs d'écran.
+- Le focus est déplacé sur le premier élément focalisable du contenu à l'ouverture, ou sur le bouton de fermeture si aucun n'est présent.
+- Le focus est restauré sur l'élément déclencheur à la fermeture.
+- Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture. Les dialogs empilés sont correctement gérés.
+- La touche Escape est interceptée et traitée via `ar-dialog-hide` (annulable) — la fermeture native du `<dialog>` est désactivée.
+- Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
+
+### À la charge de l'auteur
+
+- **Fournir un `label` descriptif.** C'est le texte vocalisé comme titre de la région — éviter les libellés génériques ("Modale", "Fenêtre").
+- **Toujours proposer un moyen de fermer.** Bouton de fermeture visible, action "Annuler" dans le footer, ou `data-ar-dismiss` sur un élément accessible au clavier.
+- **Ne pas désactiver le backdrop sans alternative.** Si `static-backdrop` est utilisé, un bouton d'annulation explicite est indispensable pour les utilisateurs ne pouvant pas utiliser Escape.
+
+## Déclenchement
+
+Un dialog peut être ouvert de deux manières :
+
+**Via `data-ar-dialog-open`** — posé sur n'importe quel élément cliquable, sans JavaScript :
+
+```html
+<button data-ar-dialog-open="mon-dialog">Ouvrir</button>
+<ar-dialog id="mon-dialog" label="Mon titre">…</ar-dialog>
+```
+
+**Via la propriété `open`** — pour un contrôle programmatique :
+
+```js
+document.querySelector('#mon-dialog').open = true;
+```
+
+## Fermeture
+
+Plusieurs mécanismes ferment le dialog :
+
+- **Clic sur le backdrop** (sauf si `static-backdrop` est présent)
+- **Touche Escape** — passe par `ar-dialog-hide`, annulable
+- **`data-ar-dismiss`** sur tout élément du dialog — déclenche `ar-dialog-dismissed`
+- **`data-ar-accept`** sur tout élément du dialog — déclenche `ar-dialog-accepted`
+- **`open = false`** en JavaScript
+
+Les événements `ar-dialog-dismissed` et `ar-dialog-accepted` sont annulables via `event.preventDefault()` — utile pour bloquer la fermeture et afficher une confirmation.
