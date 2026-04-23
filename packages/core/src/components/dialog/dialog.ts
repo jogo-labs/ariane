@@ -137,6 +137,9 @@ export class ArDialog extends LitElement {
 
     private _footerObserver?: MutationObserver;
 
+    /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
+    private _triggerElement: Element | null = null;
+
     private _checkFooter(): void {
         this._hasFooter = !!this.querySelector(':scope > [slot="footer"]');
     }
@@ -319,8 +322,10 @@ export class ArDialog extends LitElement {
 
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
+        this._triggerElement = document.activeElement;
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
+            this._triggerElement = null;
             return;
         }
 
@@ -328,7 +333,19 @@ export class ArDialog extends LitElement {
         this.dialog?.showModal();
         this._freezeScroll();
 
-        this.updateComplete.then(() => this._emit('ar-dialog-shown'));
+        this.updateComplete.then(() => {
+            const firstFocusable = this.querySelector<HTMLElement>(
+                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
+            if (firstFocusable) {
+                firstFocusable.focus();
+            } else {
+                (
+                    this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this.dialog
+                )?.focus();
+            }
+            this._emit('ar-dialog-shown');
+        });
     }
 
     /** Déclenche l'animation de fermeture et attend animationend avant de clore. */
@@ -375,6 +392,9 @@ export class ArDialog extends LitElement {
         this._removeOpenListeners();
         this._isClosing = false;
         this.open = false;
+        const trigger = this._triggerElement;
+        this._triggerElement = null;
+        (trigger as HTMLElement | null)?.focus?.();
         this.updateComplete.then(() => this._emit('ar-dialog-hidden'));
     }
 }

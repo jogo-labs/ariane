@@ -435,6 +435,54 @@ describe('ArDialog', () => {
         });
     });
 
+    // ── Gestion du focus ──────────────────────────────────────────────────────
+
+    describe('gestion du focus', () => {
+        it("retourne le focus à l'élément déclencheur à la fermeture", async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            const trigger = document.createElement('button');
+            document.body.appendChild(trigger);
+            trigger.focus();
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            el.open = false;
+            await waitForUpdate(el);
+            fireAnimationEnd(el);
+            await waitForUpdate(el);
+
+            expect(document.activeElement).toBe(trigger);
+            trigger.remove();
+        });
+
+        it("déplace le focus sur le premier élément focalisable du contenu à l'ouverture", async () => {
+            el = await fixture(`
+                <ar-dialog>
+                    <button id="first-btn">Premier</button>
+                </ar-dialog>
+            `);
+            const firstBtn = el.querySelector<HTMLButtonElement>('#first-btn');
+            if (!firstBtn) throw new Error('button#first-btn introuvable');
+            const focusSpy = vi.spyOn(firstBtn, 'focus');
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it('déplace le focus sur le bouton fermer si aucun élément focalisable dans le slot', async () => {
+            el = await fixture('<ar-dialog><p>Texte</p></ar-dialog>');
+            const closeBtn = requireShadow(el).querySelector<HTMLElement>('[data-ar-dismiss]');
+            if (!closeBtn) throw new Error('[data-ar-dismiss] introuvable');
+            const focusSpy = vi.spyOn(closeBtn, 'focus');
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+    });
+
     // ── Trigger externe ───────────────────────────────────────────────────────
 
     describe('trigger externe data-ar-dialog-open', () => {
