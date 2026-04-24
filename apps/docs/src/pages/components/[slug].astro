@@ -46,7 +46,13 @@ const playgroundVariantName = mdx?.data.playgroundTemplate;
 const playgroundVariant = playgroundVariantName
     ? variants.find((v: { name: string }) => v.name === playgroundVariantName)
     : variants[0];
-const playgroundHtml = playgroundVariant?.html ?? '';
+
+// Préfixe les id= et les data-*-open="id" du playground pour éviter les collisions
+// avec les aperçus de variantes qui utilisent le même HTML (même IDs).
+const rawPlaygroundHtml = playgroundVariant?.html ?? '';
+const playgroundHtml = rawPlaygroundHtml
+    .replace(/\bid="([\w-]+)"/g, 'id="pg-$1"')
+    .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"');
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────
 
