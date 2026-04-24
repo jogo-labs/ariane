@@ -72,7 +72,7 @@ describe('ArDialog', () => {
         });
 
         it('open est false', () => expect(el.open).toBe(false));
-        it('staticBackdrop est false', () => expect(el.staticBackdrop).toBe(false));
+        it('closeOnBackdrop est false', () => expect(el.closeOnBackdrop).toBe(false));
         it('label est vide', () => expect(el.label).toBe(''));
         it('mode est modal', () => expect(el.mode).toBe('modal'));
         it('placement est right', () => expect(el.placement).toBe('right'));
@@ -88,8 +88,8 @@ describe('ArDialog', () => {
         });
 
         it('mode reflète en attribut', async () => {
-            el = await fixture('<ar-dialog mode="panel"></ar-dialog>');
-            expect(el.getAttribute('mode')).toBe('panel');
+            el = await fixture('<ar-dialog mode="drawer"></ar-dialog>');
+            expect(el.getAttribute('mode')).toBe('drawer');
         });
 
         it('size reflète en attribut', async () => {
@@ -102,10 +102,10 @@ describe('ArDialog', () => {
             expect(el.getAttribute('placement')).toBe('left');
         });
 
-        it('static-backdrop reflète en attribut', async () => {
-            el = await fixture('<ar-dialog static-backdrop></ar-dialog>');
-            expect(el.hasAttribute('static-backdrop')).toBe(true);
-            expect(el.staticBackdrop).toBe(true);
+        it('close-on-backdrop reflète en attribut', async () => {
+            el = await fixture('<ar-dialog close-on-backdrop></ar-dialog>');
+            expect(el.hasAttribute('close-on-backdrop')).toBe(true);
+            expect(el.closeOnBackdrop).toBe(true);
         });
     });
 
@@ -363,29 +363,30 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog open></ar-dialog>');
         });
 
-        it('pointerdown + pointerup sur le dialog (backdrop) ferme', async () => {
+        it('backdrop ne ferme pas par défaut', async () => {
             const dialogEl = getDialogEl(el);
             dialogEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
-            dialogEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
-            await waitForUpdate(el);
-            // _isClosing est true (fermeture démarrée)
-            expect((el as unknown as { _isClosing: boolean })._isClosing).toBe(true);
-        });
-
-        it('pointerdown sur enfant + pointerup sur dialog (drag) ne ferme pas', async () => {
-            const dialogEl = getDialogEl(el);
-            const body = requireShadow(el).querySelector('.dialog-body') as Element;
-            body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             dialogEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
             await waitForUpdate(el);
             expect((el as unknown as { _isClosing: boolean })._isClosing).toBe(false);
         });
 
-        it('static-backdrop : backdrop click ne ferme pas', async () => {
-            el.staticBackdrop = true;
+        it('close-on-backdrop : backdrop click ferme', async () => {
+            el.closeOnBackdrop = true;
             await waitForUpdate(el);
             const dialogEl = getDialogEl(el);
             dialogEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            dialogEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+            await waitForUpdate(el);
+            expect((el as unknown as { _isClosing: boolean })._isClosing).toBe(true);
+        });
+
+        it('pointerdown sur enfant + pointerup sur dialog (drag) ne ferme pas', async () => {
+            el.closeOnBackdrop = true;
+            await waitForUpdate(el);
+            const dialogEl = getDialogEl(el);
+            const body = requireShadow(el).querySelector('.dialog-body') as Element;
+            body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             dialogEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
             await waitForUpdate(el);
             expect((el as unknown as { _isClosing: boolean })._isClosing).toBe(false);
