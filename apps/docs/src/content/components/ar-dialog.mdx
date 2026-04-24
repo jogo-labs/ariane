@@ -83,8 +83,8 @@ variants:
 
 ### Pris en charge automatiquement
 
-- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby` et `aria-modal`.
-- Le focus est déplacé sur le premier élément focalisable du contenu à l'ouverture, ou sur le bouton de fermeture si aucun n'est présent.
+- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
+- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent.
 - Le focus est restauré sur l'élément déclencheur à la fermeture.
 - Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture, y compris avec plusieurs dialogs empilés.
 - La touche Escape passe par `ar-dialog-hide` : la fermeture peut donc être interceptée avec `event.preventDefault()`.
@@ -96,3 +96,5 @@ variants:
 - **Fournir un `label` descriptif.** Un fallback `Dialogue` existe, mais il doit rester un filet de sécurité, pas le libellé final du composant. Un avertissement est émis dans la console si ni `label` ni `slot="label"` ne sont fournis.
 - **Toujours proposer une issue claire.** Le backdrop est statique par défaut : prévoir un bouton de fermeture visible ou une action `data-ar-dismiss`.
 - **Si vous bloquez la fermeture, renseigner `prevented-message`.** Le message doit expliquer quoi faire pour continuer ou confirmer l'action.
+- **Piloter le focus initial si nécessaire.** Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — utile par exemple pour un champ de saisie dans un drawer.
+- **Adapter `close-label` à la langue de l'interface.** Par défaut `"Fermer"` — à remplacer si l'interface n'est pas en français (`close-label="Close"`, `close-label="Schließen"`, etc.).
