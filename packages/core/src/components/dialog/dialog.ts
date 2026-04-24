@@ -12,6 +12,7 @@ import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
+import { prefersReducedMotion } from '../../utils/media.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
@@ -29,9 +30,6 @@ const arDialogLocks = new Set<ArDialog>();
 // Partagé entre instances pour restaurer fidèlement le overflow d'origine lors d'un empilement de dialogs.
 let _savedBodyOverflow: string | null = null;
 
-const prefersReducedMotion = (): boolean =>
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const DEFAULT_DIALOG_LABEL = 'Dialogue';
 
 if (typeof document !== 'undefined') {

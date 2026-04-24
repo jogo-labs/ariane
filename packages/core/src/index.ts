@@ -5,6 +5,7 @@
  *   import '@ariane-ui/core/components/alert/alert.js';
  */
 export { whenAllDefined } from './utils/when-all-defined.js';
+export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';
 export { announceA11y } from './a11y/announce-a11y.js';
 export { ArAlert } from './components/alert/alert.js';
