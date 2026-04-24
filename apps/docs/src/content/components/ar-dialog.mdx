@@ -8,44 +8,84 @@ variants:
       label: Modal
       description: Dialog centré avec backdrop. Cliquer sur le bouton pour l'ouvrir.
       html: |
-          <button data-ar-dialog-open="demo-modal">Ouvrir la modale</button>
+          <button class="btn btn-primary" data-ar-dialog-open="demo-modal">Ouvrir la modale</button>
           <ar-dialog id="demo-modal" label="Informations importantes">
               <p>Votre session expirera dans 5 minutes. Enregistrez votre travail pour ne pas perdre vos modifications.</p>
           </ar-dialog>
-    - name: panel
-      label: Panel droit
+    - name: drawer
+      label: Drawer droit
       description: Panneau latéral glissant depuis la droite.
       html: |
-          <button data-ar-dialog-open="demo-panel">Ouvrir le panel</button>
-          <ar-dialog id="demo-panel" label="Filtres de recherche" mode="panel">
-              <p>Contenu du panel latéral.</p>
+          <button class="btn btn-primary" data-ar-dialog-open="demo-drawer">Ouvrir le drawer</button>
+          <ar-dialog id="demo-drawer" label="Filtres de recherche" mode="drawer">
+              <p>Contenu du panneau latéral.</p>
           </ar-dialog>
-    - name: panel-left
-      label: Panel gauche
+    - name: drawer-left
+      label: Drawer gauche
       description: Panneau latéral glissant depuis la gauche.
       html: |
-          <button data-ar-dialog-open="demo-panel-left">Ouvrir le panel gauche</button>
-          <ar-dialog id="demo-panel-left" label="Menu de navigation" mode="panel" placement="left">
-              <p>Contenu du panel latéral gauche.</p>
+          <button class="btn btn-primary" data-ar-dialog-open="demo-drawer-left">Ouvrir le drawer gauche</button>
+          <ar-dialog id="demo-drawer-left" label="Menu de navigation" mode="drawer" placement="left">
+              <p>Contenu du panneau latéral gauche.</p>
           </ar-dialog>
-    - name: static-backdrop
-      label: Backdrop statique
-      description: Un clic sur le fond ne ferme pas le dialog — l'utilisateur doit agir explicitement.
+    - name: close-on-backdrop
+      label: Fermeture au clic backdrop
+      description: Par défaut, le backdrop est statique. Avec close-on-backdrop, un clic sur le fond ferme le dialog.
       html: |
-          <button data-ar-dialog-open="demo-static">Ouvrir (backdrop statique)</button>
-          <ar-dialog id="demo-static" label="Action requise" static-backdrop>
-              <p>Ce dialog ne se ferme pas en cliquant sur le fond.</p>
+          <button class="btn btn-primary" data-ar-dialog-open="demo-backdrop">Ouvrir (close-on-backdrop)</button>
+          <ar-dialog id="demo-backdrop" label="Informations" close-on-backdrop>
+              <p>Cliquez en dehors du dialog pour le fermer.</p>
           </ar-dialog>
     - name: with-footer
       label: Avec footer
       description: Zone d'actions en pied de page via slot="footer".
       html: |
-          <button data-ar-dialog-open="demo-footer">Ouvrir avec footer</button>
+          <button class="btn btn-primary" data-ar-dialog-open="demo-footer">Ouvrir avec footer</button>
           <ar-dialog id="demo-footer" label="Confirmer la suppression">
               <p>Cette action supprimera définitivement l'élément sélectionné.</p>
-              <button slot="footer" data-ar-dismiss>Annuler</button>
-              <button slot="footer" data-ar-accept>Supprimer</button>
+              <button class="btn btn-secondary" slot="footer" data-ar-dismiss>Annuler</button>
+              <button class="btn btn-danger" slot="footer" data-ar-accept>Supprimer</button>
           </ar-dialog>
+    - name: stacked
+      label: Dialogs empilés
+      description: Ouverture d'un second dialog depuis le premier — scroll lock et focus sont coordonnés. Escape ne ferme que le dialog au sommet.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-stacked-1">Ouvrir le dialog</button>
+          <ar-dialog id="demo-stacked-1" label="Dialog principal">
+              <p>Ce dialog peut en ouvrir un second par-dessus.</p>
+              <button class="btn btn-secondary" data-ar-dialog-open="demo-stacked-2">Ouvrir un second dialog</button>
+          </ar-dialog>
+          <ar-dialog id="demo-stacked-2" label="Dialog secondaire">
+              <p>Dialog empilé. Escape ne ferme que ce dialog, pas le précédent.</p>
+          </ar-dialog>
+    - name: persistent
+      label: Fermeture bloquée
+      description: "ar-dialog-hide est annulable : le composant secoue le dialog et un lecteur d'écran annonce le blocage. Seul le bouton Confirmer ferme."
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-persistent">Ouvrir le dialog persistant</button>
+          <ar-dialog id="demo-persistent" label="Action requise">
+              <p>Ce dialog ne peut être fermé que via le bouton <strong>Confirmer</strong>. Escape et le bouton de fermeture sont interceptés.</p>
+              <p id="demo-persistent-status" aria-live="assertive" style="position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap"></p>
+              <button class="btn btn-primary" slot="footer" data-ar-accept>Confirmer</button>
+          </ar-dialog>
+          <script>
+              (function () {
+                  var dialog = document.getElementById('demo-persistent');
+                  if (!dialog) return;
+                  var confirming = false;
+                  function announce() {
+                      var s = document.getElementById('demo-persistent-status');
+                      if (!s) return;
+                      s.textContent = '';
+                      requestAnimationFrame(function () { s.textContent = 'Fermeture bloquée — utilisez le bouton Confirmer.'; });
+                  }
+                  dialog.addEventListener('ar-dialog-accepted', function () { confirming = true; });
+                  dialog.addEventListener('ar-dialog-hide', function (e) { if (!confirming) e.preventDefault(); confirming = false; });
+                  dialog.addEventListener('ar-dialog-dismissed', function (e) { e.preventDefault(); });
+                  dialog.addEventListener('ar-dialog-hide-prevented', announce);
+                  dialog.addEventListener('ar-dialog-dismissed-prevented', announce);
+              })();
+          </script>
 ---
 
 ## Accessibilité
@@ -63,7 +103,7 @@ variants:
 
 - **Fournir un `label` descriptif.** C'est le texte vocalisé comme titre de la région — éviter les libellés génériques ("Modale", "Fenêtre").
 - **Toujours proposer un moyen de fermer.** Bouton de fermeture visible, action "Annuler" dans le footer, ou `data-ar-dismiss` sur un élément accessible au clavier.
-- **Ne pas désactiver le backdrop sans alternative.** Si `static-backdrop` est utilisé, un bouton d'annulation explicite est indispensable pour les utilisateurs ne pouvant pas utiliser Escape.
+- **Ne pas omettre de moyen de fermeture au clavier.** Par défaut le backdrop ne ferme pas le dialog — Escape et `data-ar-dismiss` restent les seules issues, veillez à ce qu'elles soient toujours accessibles.
 
 ## Déclenchement
 
@@ -86,7 +126,7 @@ document.querySelector('#mon-dialog').open = true;
 
 Plusieurs mécanismes ferment le dialog :
 
-- **Clic sur le backdrop** (sauf si `static-backdrop` est présent)
+- **Clic sur le backdrop** (uniquement si `close-on-backdrop` est présent — le backdrop est statique par défaut)
 - **Touche Escape** — passe par `ar-dialog-hide`, annulable
 - **`data-ar-dismiss`** sur tout élément du dialog — déclenche `ar-dialog-dismissed`
 - **`data-ar-accept`** sur tout élément du dialog — déclenche `ar-dialog-accepted`
