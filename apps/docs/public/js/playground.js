@@ -54,13 +54,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Met à jour le bloc code et re-colore avec hljs
         function updateCode() {
-            var el = preview.querySelector(tagName);
-            if (!el || !codeEl) return;
-            var html = el.outerHTML;
+            if (!codeEl) return;
+            // Capture le HTML complet de la preview (bouton déclencheur + composant)
+            var html = preview.innerHTML.trim();
             // Le DOM sérialise les attributs booléens en attr="" — on corrige en attr seul
             controls.forEach(function (c) {
                 if (c.type === 'checkbox' && c.dataset.attr) {
-                    html = html.replace(' ' + c.dataset.attr + '=""', ' ' + c.dataset.attr);
+                    html = html.replace(
+                        new RegExp(' ' + c.dataset.attr + '=""', 'g'),
+                        ' ' + c.dataset.attr,
+                    );
                 }
             });
             codeEl.textContent = html; // textContent = texte brut, pas d'injection HTML
@@ -68,34 +71,45 @@ document.addEventListener('DOMContentLoaded', function () {
             if (window.hljs) window.hljs.highlightElement(codeEl);
         }
 
-        // Synchroniser l'état initial des contrôles avec les attributs du composant rendu
-        controls.forEach(function (ctrl) {
-            var attr = ctrl.dataset.attr;
-            if (!attr) return;
-            var el = preview.querySelector(tagName);
-            if (!el) return;
-            if (ctrl.type === 'checkbox') {
-                ctrl.checked = el.hasAttribute(attr);
-            } else {
-                var current = el.getAttribute(attr);
-                if (current !== null) ctrl.value = current;
-            }
-        });
+        // Synchroniser les contrôles depuis les attributs du composant (init + changements)
+        var compEl = preview.querySelector(tagName);
+
+        function syncControlsFromComponent() {
+            if (!compEl) return;
+            controls.forEach(function (ctrl) {
+                var attr = ctrl.dataset.attr;
+                if (!attr) return;
+                if (ctrl.type === 'checkbox') {
+                    ctrl.checked = compEl.hasAttribute(attr);
+                } else {
+                    var val = compEl.getAttribute(attr);
+                    if (val !== null) ctrl.value = val;
+                }
+            });
+        }
+
+        syncControlsFromComponent();
+
+        // Observer les changements d'attributs du composant pour maintenir la sync
+        if (compEl) {
+            new MutationObserver(function () {
+                syncControlsFromComponent();
+                updateCode();
+            }).observe(compEl, { attributes: true });
+        }
 
         // Écouter les changements sur les contrôles
         controls.forEach(function (ctrl) {
             var eventName = ctrl.type === 'checkbox' ? 'change' : 'input';
             ctrl.addEventListener(eventName, function () {
                 var attr = ctrl.dataset.attr;
-                if (!attr) return;
-                var el = preview.querySelector(tagName);
-                if (!el) return;
+                if (!attr || !compEl) return;
                 if (ctrl.type === 'checkbox') {
-                    el.toggleAttribute(attr, ctrl.checked);
+                    compEl.toggleAttribute(attr, ctrl.checked);
                 } else if (ctrl.value === '') {
-                    el.removeAttribute(attr);
+                    compEl.removeAttribute(attr);
                 } else {
-                    el.setAttribute(attr, ctrl.value);
+                    compEl.setAttribute(attr, ctrl.value);
                 }
                 updateCode();
             });
