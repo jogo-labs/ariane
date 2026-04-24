@@ -23,4 +23,14 @@ export default css`
             stroke-dashoffset: -124px;
         }
     }
+
+    @keyframes spinnerPulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.35;
+        }
+    }
 `;
