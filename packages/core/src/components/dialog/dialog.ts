@@ -282,9 +282,10 @@ export class ArDialog extends LitElement {
     private _announce(): void {
         const el = this.shadowRoot?.getElementById('dialog-status');
         if (!el) return;
+        const message = this.preventedMessage.trim() || 'Fermeture bloquée.';
         el.textContent = '';
         requestAnimationFrame(() => {
-            el.textContent = this.preventedMessage;
+            el.textContent = message;
         });
     }
 

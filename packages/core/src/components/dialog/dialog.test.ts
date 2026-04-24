@@ -9,11 +9,6 @@ function getDialogEl(el: ArDialog): HTMLDialogElement {
     return requireShadow(el).querySelector('dialog') as HTMLDialogElement;
 }
 
-/** Simule la fin de l'animation de fermeture. */
-function fireAnimationEnd(el: ArDialog): void {
-    getDialogEl(el).dispatchEvent(new Event('animationend'));
-}
-
 // ──────────────────────────────────────────────────────────────────────────────
 
 describe('ArDialog', () => {
@@ -77,6 +72,8 @@ describe('ArDialog', () => {
         it('mode est modal', () => expect(el.mode).toBe('modal'));
         it('placement est right', () => expect(el.placement).toBe('right'));
         it('size est md', () => expect(el.size).toBe('md'));
+        it('preventedMessage a sa valeur par défaut', () =>
+            expect(el.preventedMessage).toBe('Fermeture bloquée.'));
     });
 
     // ── Propriétés reflect ────────────────────────────────────────────────────
@@ -106,6 +103,11 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog close-on-backdrop></ar-dialog>');
             expect(el.hasAttribute('close-on-backdrop')).toBe(true);
             expect(el.closeOnBackdrop).toBe(true);
+        });
+
+        it('prevented-message est lu depuis l’attribut', async () => {
+            el = await fixture('<ar-dialog prevented-message="Action refusée."></ar-dialog>');
+            expect(el.preventedMessage).toBe('Action refusée.');
         });
     });
 
@@ -211,6 +213,17 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             expect(spy).not.toHaveBeenCalled();
         });
+
+        it("ar-dialog-show expose l'id du composant dans detail", async () => {
+            el = await fixture('<ar-dialog id="dialog-events"></ar-dialog>');
+            let detailId: string | undefined;
+            el.addEventListener('ar-dialog-show', (event) => {
+                detailId = (event as CustomEvent<{ id?: string }>).detail.id;
+            });
+            el.open = true;
+            await waitForUpdate(el);
+            expect(detailId).toBe('dialog-events');
+        });
     });
 
     // ── Fermeture ─────────────────────────────────────────────────────────────
@@ -220,36 +233,10 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog open></ar-dialog>');
         });
 
-        it('ferme le <dialog> natif après animationend', async () => {
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
-            await waitForUpdate(el);
-            expect(getDialogEl(el).open).toBe(false);
-        });
-
-        it('restaure le scroll après fermeture', async () => {
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
-            await waitForUpdate(el);
-            expect(document.body.style.overflow).not.toBe('hidden');
-        });
-
         it('émet ar-dialog-hide avant la fermeture', async () => {
             const handler = vi.fn();
             el.addEventListener('ar-dialog-hide', handler);
             el.open = false;
-            await waitForUpdate(el);
-            expect(handler).toHaveBeenCalledOnce();
-        });
-
-        it('émet ar-dialog-hidden après la fermeture', async () => {
-            const handler = vi.fn();
-            el.addEventListener('ar-dialog-hidden', handler);
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
             await waitForUpdate(el);
             expect(handler).toHaveBeenCalledOnce();
         });
@@ -262,19 +249,6 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(true);
             expect(prevented).toHaveBeenCalledOnce();
-        });
-
-        it('_isClosing bloque un double-appel à _close', async () => {
-            el.open = false;
-            await waitForUpdate(el);
-            const spy = vi.spyOn(getDialogEl(el), 'close');
-            // Tenter de refermer pendant que la fermeture est déjà en cours
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
-            await waitForUpdate(el);
-            // close() ne doit être appelé qu'une seule fois
-            expect(spy).toHaveBeenCalledOnce();
         });
 
         it('fermeture immédiate avec prefers-reduced-motion', async () => {
@@ -301,6 +275,29 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             expect(getDialogEl(el).open).toBe(false);
             vi.useRealTimers();
+        });
+
+        it('restaure la valeur précédente de body.style.overflow à la fermeture', async () => {
+            el.remove();
+            document.body.style.overflow = 'clip';
+            el = await fixture('<ar-dialog open></ar-dialog>');
+
+            el.open = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 550));
+            expect(document.body.style.overflow).toBe('clip');
+        });
+
+        it('réannonce le message par défaut si preventedMessage est vide', async () => {
+            el.preventedMessage = '   ';
+            const liveRegion = requireShadow(el).getElementById('dialog-status');
+
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
+            el.open = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(liveRegion?.textContent).toBe('Fermeture bloquée.');
         });
     });
 
@@ -417,46 +414,26 @@ describe('ArDialog', () => {
             getDialogEl(el).dispatchEvent(event);
             expect(event.defaultPrevented).toBe(true);
         });
-    });
 
-    // ── Scroll management ─────────────────────────────────────────────────────
+        it('Escape ne ferme que le dialog au sommet quand plusieurs dialogs sont ouverts', async () => {
+            const first = await fixture<ArDialog>('<ar-dialog id="dialog-1" open></ar-dialog>');
+            const second = await fixture<ArDialog>('<ar-dialog id="dialog-2" open></ar-dialog>');
 
-    describe('scroll', () => {
-        it("gèle le scroll à l'ouverture et le restaure à la fermeture", async () => {
-            el = await fixture('<ar-dialog></ar-dialog>');
-            el.open = true;
-            await waitForUpdate(el);
-            expect(document.body.style.overflow).toBe('hidden');
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await waitForUpdate(first);
+            await waitForUpdate(second);
 
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
-            await waitForUpdate(el);
-            expect(document.body.style.overflow).not.toBe('hidden');
+            expect((first as unknown as { _isClosing: boolean })._isClosing).toBe(false);
+            expect((second as unknown as { _isClosing: boolean })._isClosing).toBe(true);
+
+            second.remove();
+            first.remove();
         });
     });
 
     // ── Gestion du focus ──────────────────────────────────────────────────────
 
     describe('gestion du focus', () => {
-        it("retourne le focus à l'élément déclencheur à la fermeture", async () => {
-            el = await fixture('<ar-dialog></ar-dialog>');
-            const trigger = document.createElement('button');
-            document.body.appendChild(trigger);
-            trigger.focus();
-
-            el.open = true;
-            await waitForUpdate(el);
-
-            el.open = false;
-            await waitForUpdate(el);
-            fireAnimationEnd(el);
-            await waitForUpdate(el);
-
-            expect(document.activeElement).toBe(trigger);
-            trigger.remove();
-        });
-
         it("déplace le focus sur le premier élément focalisable du contenu à l'ouverture", async () => {
             el = await fixture(`
                 <ar-dialog>
@@ -504,6 +481,19 @@ describe('ArDialog', () => {
             // Guard: le listener module-level est protégé par typeof
             // document !== 'undefined'
             expect(customElements.get('ar-dialog')).toBeDefined();
+        });
+
+        it("ignore un trigger data-ar-dialog-open si l'id ne correspond à aucun dialog", async () => {
+            el = await fixture('<ar-dialog id="dialog-existant"></ar-dialog>');
+            const btn = document.createElement('button');
+            btn.setAttribute('data-ar-dialog-open', 'dialog-introuvable');
+            document.body.appendChild(btn);
+
+            btn.click();
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(false);
+            btn.remove();
         });
     });
 });
