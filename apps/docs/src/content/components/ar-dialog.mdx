@@ -60,12 +60,11 @@ variants:
           </ar-dialog>
     - name: persistent
       label: Fermeture bloquée
-      description: "ar-dialog-hide est annulable : le composant secoue le dialog et un lecteur d'écran annonce le blocage. Seul le bouton Confirmer ferme."
+      description: "ar-dialog-hide est annulable : le composant secoue le dialog et annonce automatiquement le blocage aux lecteurs d'écran. Seul le bouton Confirmer ferme."
       html: |
           <button class="btn btn-primary" data-ar-dialog-open="demo-persistent">Ouvrir le dialog persistant</button>
-          <ar-dialog id="demo-persistent" label="Action requise">
+          <ar-dialog id="demo-persistent" label="Action requise" prevented-message="Fermeture bloquée — utilisez le bouton Confirmer.">
               <p>Ce dialog ne peut être fermé que via le bouton <strong>Confirmer</strong>. Escape et le bouton de fermeture sont interceptés.</p>
-              <p id="demo-persistent-status" aria-live="assertive" style="position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap"></p>
               <button class="btn btn-primary" slot="footer" data-ar-accept>Confirmer</button>
           </ar-dialog>
           <script>
@@ -73,17 +72,9 @@ variants:
                   var dialog = document.getElementById('demo-persistent');
                   if (!dialog) return;
                   var confirming = false;
-                  function announce() {
-                      var s = document.getElementById('demo-persistent-status');
-                      if (!s) return;
-                      s.textContent = '';
-                      requestAnimationFrame(function () { s.textContent = 'Fermeture bloquée — utilisez le bouton Confirmer.'; });
-                  }
                   dialog.addEventListener('ar-dialog-accepted', function () { confirming = true; });
                   dialog.addEventListener('ar-dialog-hide', function (e) { if (!confirming) e.preventDefault(); confirming = false; });
                   dialog.addEventListener('ar-dialog-dismissed', function (e) { e.preventDefault(); });
-                  dialog.addEventListener('ar-dialog-hide-prevented', announce);
-                  dialog.addEventListener('ar-dialog-dismissed-prevented', announce);
               })();
           </script>
 ---
@@ -97,6 +88,7 @@ variants:
 - Le focus est restauré sur l'élément déclencheur à la fermeture.
 - Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture. Les dialogs empilés sont correctement gérés.
 - La touche Escape est interceptée et traitée via `ar-dialog-hide` (annulable) — la fermeture native du `<dialog>` est désactivée.
+- Quand une fermeture est bloquée (`ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`), le composant secoue visuellement le dialog et annonce automatiquement `prevented-message` via une région `aria-live="assertive"` dans son shadow DOM.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
 
 ### À la charge de l'auteur

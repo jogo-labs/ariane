@@ -147,7 +147,7 @@ export default css`
         max-height: min(90vh, calc(100dvh - 2rem));
     }
 
-    :host(:not([mode='drawer'])) dialog:not(.closing)[open] {
+    :host(:not([mode='drawer'])) dialog.opening {
         animation: showModal 0.25s ease-out;
     }
 
@@ -175,7 +175,7 @@ export default css`
         margin-inline-end: auto;
     }
 
-    :host([mode='drawer']:not([placement='left'])) dialog:not(.closing)[open] {
+    :host([mode='drawer']:not([placement='left'])) dialog.opening {
         animation: showDrawerRight 0.3s ease-out;
     }
 
@@ -183,7 +183,7 @@ export default css`
         animation: hideDrawerRight 0.25s ease-in forwards;
     }
 
-    :host([mode='drawer'][placement='left']) dialog:not(.closing)[open] {
+    :host([mode='drawer'][placement='left']) dialog.opening {
         animation: showDrawerLeft 0.3s ease-out;
     }
 
@@ -269,6 +269,14 @@ export default css`
 
     dialog.shake {
         animation: dialogShake 0.4s ease-out;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        dialog.shake {
+            animation: none;
+            outline: 3px solid var(--ar-color-danger, #d04442);
+            outline-offset: 2px;
+        }
     }
 
     /* ── prefers-reduced-motion ───────────────────────────────────────────── */

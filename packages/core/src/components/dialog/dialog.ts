@@ -59,7 +59,7 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
  * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. Annulable.
- * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé.
+ * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
  * @event {CustomEvent} ar-dialog-hidden - Émis après la fermeture (après animation).
  * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. Annulable.
  * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
@@ -124,6 +124,15 @@ export class ArDialog extends LitElement {
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
+
+    /**
+     * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
+     * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
+     *
+     * @attr prevented-message
+     * @default 'Fermeture bloquée.'
+     */
+    @property({ attribute: 'prevented-message' }) preventedMessage = 'Fermeture bloquée.';
 
     // ── Private state ──────────────────────────────────────────────────────────
 
@@ -229,6 +238,7 @@ export class ArDialog extends LitElement {
                       </footer>`
                     : nothing}
             </dialog>
+            <div aria-live="assertive" aria-atomic="true" class="sr-only" id="dialog-status"></div>
         `;
     }
 
@@ -269,6 +279,15 @@ export class ArDialog extends LitElement {
         return e;
     }
 
+    private _announce(): void {
+        const el = this.shadowRoot?.getElementById('dialog-status');
+        if (!el) return;
+        el.textContent = '';
+        requestAnimationFrame(() => {
+            el.textContent = this.preventedMessage;
+        });
+    }
+
     private _addOpenListeners() {
         document.addEventListener('keydown', this._handleDocumentKeyDown);
     }
@@ -299,6 +318,7 @@ export class ArDialog extends LitElement {
                     : 'ar-dialog-accepted-prevented';
                 this._emit(prevented);
                 this._shake();
+                this._announce();
                 return;
             }
 
@@ -349,6 +369,20 @@ export class ArDialog extends LitElement {
         this.dialog?.showModal();
         this._freezeScroll();
 
+        const prefersReducedMotion =
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!prefersReducedMotion) {
+            this.dialog.classList.add('opening');
+            const onOpenEnd = (e: AnimationEvent) => {
+                if (e.animationName && !e.animationName.startsWith('show')) return;
+                this.dialog.classList.remove('opening');
+                this.dialog.removeEventListener('animationend', onOpenEnd);
+            };
+            this.dialog.addEventListener('animationend', onOpenEnd);
+        }
+
         this.updateComplete.then(() => {
             const firstFocusable = this.querySelector<HTMLElement>(
                 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
@@ -372,6 +406,7 @@ export class ArDialog extends LitElement {
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
             this._shake();
+            this._announce();
             return;
         }
 
@@ -380,6 +415,7 @@ export class ArDialog extends LitElement {
             window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         this._isClosing = true;
+        this.dialog.classList.remove('opening', 'shake');
         this.dialog.classList.add('closing');
 
         if (prefersReducedMotion) {
@@ -401,16 +437,32 @@ export class ArDialog extends LitElement {
         this.dialog.addEventListener('animationend', onEnd);
     }
 
-    /** Animation de rejet — déclenche un shake sur le <dialog> natif pour signaler que la fermeture est bloquée. */
+    /** Animation de rejet — déclenche un shake (ou outline si prefers-reduced-motion) pour signaler que la fermeture est bloquée. */
     private _shake(): void {
-        this.dialog.classList.remove('shake');
-        void this.dialog.offsetWidth; // force reflow pour redémarrer l'animation si déjà en cours
-        this.dialog.classList.add('shake');
+        const dialog = this.dialog;
+        dialog.classList.remove('shake');
+        void dialog.offsetWidth; // force reflow pour redémarrer l'animation si déjà en cours
+        dialog.classList.add('shake');
+
+        const prefersReducedMotion =
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion) {
+            setTimeout(() => dialog.classList.remove('shake'), 700);
+        } else {
+            const onShakeEnd = (e: AnimationEvent) => {
+                if (e.animationName && e.animationName !== 'dialogShake') return;
+                dialog.classList.remove('shake');
+                dialog.removeEventListener('animationend', onShakeEnd);
+            };
+            dialog.addEventListener('animationend', onShakeEnd);
+        }
     }
 
     /** Finalise la fermeture : ferme le dialog natif, restaure l'état et émet ar-dialog-hidden. */
     private _finishClose(): void {
-        this.dialog.classList.remove('closing');
+        this.dialog.classList.remove('closing', 'opening', 'shake');
         this.dialog.close();
         this._unfreezeScroll();
         this._removeOpenListeners();
