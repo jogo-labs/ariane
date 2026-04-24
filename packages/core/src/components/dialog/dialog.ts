@@ -41,7 +41,7 @@ if (typeof document !== 'undefined') {
 }
 
 /**
- * @summary Version améliorée du composant natif <dialog> avec affichage centré ou panel.
+ * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
  *
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire.
  * @slot - Contenu principal du dialog.
@@ -52,6 +52,9 @@ if (typeof document !== 'undefined') {
  * @csspart title - Le titre du dialog.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
+ *
+ * @cssprop [--width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
+ * @cssprop [--spacing=1.5rem] - Padding interne de la zone de contenu. Défaut : 1.5rem.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
@@ -71,20 +74,20 @@ export class ArDialog extends LitElement {
 
     /**
      * Visibilité du composant.
-     * Quand l'attribut est présent le composant est visible.
      * @attr open
      * @default false
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     /**
-     * Si vrai, un clic sur le backdrop ne ferme pas le dialog.
+     * Si présent, un clic sur le backdrop ferme le dialog.
+     * Par défaut, le backdrop est statique et ne déclenche pas la fermeture.
      *
-     * @attr static-backdrop
+     * @attr close-on-backdrop
      * @default false
      */
-    @property({ reflect: true, type: Boolean, attribute: 'static-backdrop' })
-    staticBackdrop: boolean = false;
+    @property({ reflect: true, type: Boolean, attribute: 'close-on-backdrop' })
+    closeOnBackdrop: boolean = false;
 
     /**
      * Titre affiché dans le header. Pour du HTML, utiliser `slot="label"`.
@@ -95,16 +98,16 @@ export class ArDialog extends LitElement {
     @property({ reflect: true }) label = '';
 
     /**
-     * Mode d'affichage : `modal` (centré avec backdrop) ou `panel` (latéral).
+     * Mode d'affichage : `modal` (centré avec backdrop) ou `drawer` (panneau latéral).
      *
      * @attr mode
      * @default 'modal'
      */
     @property({ reflect: true, type: String })
-    mode: 'modal' | 'panel' = 'modal';
+    mode: 'modal' | 'drawer' = 'modal';
 
     /**
-     * Côté d'affichage du panel. Sans effet en mode `modal`.
+     * Côté d'affichage du drawer. Sans effet en mode `modal`.
      *
      * @attr placement
      * @default 'right'
@@ -113,7 +116,8 @@ export class ArDialog extends LitElement {
     placement: 'left' | 'right' = 'right';
 
     /**
-     * Largeur du dialog. Les valeurs correspondent à des tailles CSS prédéfinies.
+     * Taille du dialog. Les valeurs correspondent à des largeurs CSS prédéfinies.
+     * Utilisez `--width` pour une valeur personnalisée.
      *
      * @attr size
      * @default 'md'
@@ -182,40 +186,48 @@ export class ArDialog extends LitElement {
         return html`
             <dialog
                 part="dialog"
+                role="dialog"
                 aria-labelledby="dialog-heading"
                 aria-modal="true"
-                role="dialog"
                 ?inert=${!this.open || this._isClosing}
                 @cancel=${this._handleDialogCancel}
                 @click=${this._handleDialogClick}
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                <div class="modal-dialog" role="document">
-                    <div class="dialog-content">
-                        <header part="header" class="dialog-header">
-                            <h1 part="title" class="dialog-title" id="dialog-heading">
-                                <slot name="label">${this.label}</slot>
-                            </h1>
-                            <button
-                                type="button"
-                                class="btn btn-tertiary light close btn-ratio-square"
-                                data-ar-dismiss
-                            >
-                                <span aria-hidden="true" class="icon icon-close"></span>
-                                <span class="btn-content sr-only">Fermer la modale</span>
-                            </button>
-                        </header>
-                        <div part="body" class="dialog-body">
-                            <slot></slot>
-                        </div>
-                        ${this._hasFooter
-                            ? html`<footer part="footer" class="dialog-footer">
-                                  <slot name="footer"></slot>
-                              </footer>`
-                            : nothing}
-                    </div>
+                <header part="header" class="dialog-header">
+                    <h1 part="title" class="dialog-title" id="dialog-heading">
+                        <slot name="label">${this.label}</slot>
+                    </h1>
+                    <button
+                        type="button"
+                        class="btn btn-tertiary light btn-ratio-square"
+                        data-ar-dismiss
+                    >
+                        <svg
+                            aria-hidden="true"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18 18 6M6 6l12 12"
+                            ></path>
+                        </svg>
+                        <span class="btn-content sr-only">Fermer</span>
+                    </button>
+                </header>
+                <div part="body" class="dialog-body" role="document">
+                    <slot></slot>
                 </div>
+                ${this._hasFooter
+                    ? html`<footer part="footer" class="dialog-footer">
+                          <slot name="footer"></slot>
+                      </footer>`
+                    : nothing}
             </dialog>
         `;
     }
@@ -286,6 +298,7 @@ export class ArDialog extends LitElement {
                     ? 'ar-dialog-dismissed-prevented'
                     : 'ar-dialog-accepted-prevented';
                 this._emit(prevented);
+                this._shake();
                 return;
             }
 
@@ -296,6 +309,9 @@ export class ArDialog extends LitElement {
 
     private _handleDocumentKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape' && this.open && !this._isClosing) {
+            // N'intercepte Escape que si ce dialog est au sommet de la pile (dialogs empilés)
+            const locks = [...arDialogLocks];
+            if (locks[locks.length - 1] !== this) return;
             event.preventDefault();
             event.stopPropagation();
             this._close();
@@ -311,7 +327,7 @@ export class ArDialog extends LitElement {
     };
 
     private _handleDialogPointerUp = (event: PointerEvent) => {
-        if (this.staticBackdrop) return;
+        if (!this.closeOnBackdrop) return;
         if (this._pointerDownTarget === this.dialog && event.target === this.dialog) {
             this._close();
         }
@@ -355,6 +371,7 @@ export class ArDialog extends LitElement {
         if (hideEvent.defaultPrevented) {
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
+            this._shake();
             return;
         }
 
@@ -382,6 +399,13 @@ export class ArDialog extends LitElement {
             this._finishClose();
         };
         this.dialog.addEventListener('animationend', onEnd);
+    }
+
+    /** Animation de rejet — déclenche un shake sur le <dialog> natif pour signaler que la fermeture est bloquée. */
+    private _shake(): void {
+        this.dialog.classList.remove('shake');
+        void this.dialog.offsetWidth; // force reflow pour redémarrer l'animation si déjà en cours
+        this.dialog.classList.add('shake');
     }
 
     /** Finalise la fermeture : ferme le dialog natif, restaure l'état et émet ar-dialog-hidden. */
