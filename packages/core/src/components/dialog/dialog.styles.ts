@@ -87,6 +87,8 @@ export default [
             border-radius: 0.5rem;
             /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
             width: min(var(--width), calc(100vw - 2rem));
+            /* height + max-height : requis pour que flex:1 sur le body soit contraint en Safari */
+            height: min(90vh, calc(100dvh - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
         }
 

@@ -143,6 +143,14 @@ export class ArDialog extends LitElement {
     @property({ reflect: true, attribute: 'prevented-message' }) preventedMessage =
         'Fermeture bloquée.';
 
+    /**
+     * Label accessible du bouton de fermeture. À adapter pour la langue de l'interface.
+     *
+     * @attr close-label
+     * @default 'Fermer'
+     */
+    @property({ reflect: true, attribute: 'close-label' }) closeLabel = 'Fermer';
+
     // ── Private state ──────────────────────────────────────────────────────────
 
     @query('dialog', true)
@@ -210,6 +218,7 @@ export class ArDialog extends LitElement {
                 part="dialog"
                 role="dialog"
                 aria-labelledby="dialog-heading"
+                aria-describedby="dialog-body"
                 aria-modal="true"
                 ?inert=${!this.open || this._isClosing}
                 @cancel=${this._handleDialogCancel}
@@ -241,10 +250,10 @@ export class ArDialog extends LitElement {
                                 d="M6 18 18 6M6 6l12 12"
                             ></path>
                         </svg>
-                        <span class="btn-content sr-only">Fermer</span>
+                        <span class="btn-content sr-only">${this.closeLabel}</span>
                     </button>
                 </header>
-                <div part="body">
+                <div part="body" id="dialog-body">
                     <slot></slot>
                 </div>
                 ${this._slotController.test('footer')
@@ -309,6 +318,13 @@ export class ArDialog extends LitElement {
     // ── Interaction handlers ───────────────────────────────────────────────────
 
     private _handleDialogClick = (event: MouseEvent) => {
+        // Fallback backdrop close for Safari iOS (WebKit #267688 — pointerdown absent sur backdrop).
+        // Sur desktop, _handleDialogPointerUp déjà traité ; _close() est idempotent via _isClosing.
+        if (this.closeOnBackdrop && event.target === this.dialog) {
+            this._close();
+            return;
+        }
+
         const path = event.composedPath() as Element[];
         const stopAt = path.indexOf(this.dialog);
         const inner = stopAt >= 0 ? path.slice(0, stopAt) : path;
@@ -393,9 +409,12 @@ export class ArDialog extends LitElement {
         }
 
         this.updateComplete.then(() => {
-            const firstFocusable = this.querySelector<HTMLElement>(
-                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-            );
+            const autoFocused = this.querySelector<HTMLElement>('[autofocus]');
+            const firstFocusable =
+                autoFocused ??
+                this.querySelector<HTMLElement>(
+                    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+                );
             if (firstFocusable) {
                 firstFocusable.focus();
             } else {

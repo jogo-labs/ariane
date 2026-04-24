@@ -73,6 +73,16 @@ describe('ar-dialog — accessibilité', () => {
         expect(title.textContent?.trim()).to.equal('Dialogue');
     });
 
+    it('aria-describedby pointe vers le corps du dialog', () => {
+        const dialogEl = requireDialog(el);
+        const descId = dialogEl.getAttribute('aria-describedby');
+        expect(descId).not.to.equal(null);
+        if (!descId) throw new Error('aria-describedby absent');
+        const body = requireShadow(el).getElementById(descId);
+        expect(body).not.to.equal(null);
+        expect(body?.getAttribute('part')).to.equal('body');
+    });
+
     it('le drawer conserve les attributs ARIA du dialog', async () => {
         el.remove();
         el = await fixture(html`<ar-dialog label="Filtres" mode="drawer"></ar-dialog>`);
