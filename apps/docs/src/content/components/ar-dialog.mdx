@@ -46,6 +46,14 @@ variants:
               <button class="btn btn-secondary" slot="footer" data-ar-dismiss>Annuler</button>
               <button class="btn btn-danger" slot="footer" data-ar-accept>Supprimer</button>
           </ar-dialog>
+    - name: autofocus
+      label: Focus initial
+      description: Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — ici un champ de recherche dans un drawer.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-autofocus">Ouvrir le drawer</button>
+          <ar-dialog id="demo-autofocus" label="Rechercher" mode="drawer">
+              <input autofocus type="search" placeholder="Rechercher…" style="width:100%;padding:.5rem .75rem;border:1px solid var(--ar-color-border,#ccc);border-radius:.375rem;font-size:1rem;" />
+          </ar-dialog>
     - name: stacked
       label: Dialogs empilés
       description: Ouverture d'un second dialog depuis le premier — scroll lock et focus sont coordonnés. Escape ne ferme que le dialog au sommet.

@@ -87,8 +87,6 @@ export default [
             border-radius: 0.5rem;
             /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
             width: min(var(--width), calc(100vw - 2rem));
-            /* height + max-height : requis pour que flex:1 sur le body soit contraint en Safari */
-            height: min(90vh, calc(100dvh - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
         }
 
@@ -106,6 +104,8 @@ export default [
             /* Sur petit écran, le drawer peut occuper 100% de la largeur */
             width: min(var(--width), 100vw);
             height: 100dvh;
+            /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
+            max-height: 100dvh;
             margin: 0;
         }
 
@@ -170,8 +170,8 @@ export default [
         /* ── Body ─────────────────────────────────────────────────────────────── */
 
         [part='body'] {
-            flex: 1;
-            min-height: 0; /* autorise le shrink flex pour activer le scroll */
+            flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
             padding-block: var(--spacing-block, var(--spacing, 1.25rem));
             padding-inline: var(--spacing-inline, var(--spacing, 1.25rem));
