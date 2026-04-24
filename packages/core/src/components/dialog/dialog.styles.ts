@@ -171,7 +171,8 @@ export default [
             flex: 1;
             min-height: 0; /* autorise le shrink flex pour activer le scroll */
             overflow-y: auto;
-            padding: var(--spacing, 1.25rem);
+            padding-block: var(--spacing-block, var(--spacing, 1.25rem));
+            padding-inline: var(--spacing-inline, var(--spacing, 1.25rem));
         }
 
         /* ── Footer ───────────────────────────────────────────────────────────── */

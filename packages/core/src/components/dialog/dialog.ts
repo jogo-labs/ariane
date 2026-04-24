@@ -57,7 +57,9 @@ if (typeof document !== 'undefined') {
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
  * @cssprop [--width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
- * @cssprop [--spacing=1.5rem] - Padding interne de la zone de contenu. Défaut : 1.5rem.
+ * @cssprop [--spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
+ * @cssprop [--spacing-block] - Padding haut/bas. Prend le pas sur `--spacing` si défini.
+ * @cssprop [--spacing-inline] - Padding gauche/droite. Prend le pas sur `--spacing` si défini.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
