@@ -10,6 +10,8 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
+import { HasSlotController } from '../../controllers/has-slot.controller.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
@@ -25,6 +27,7 @@ export type ArDialogEvents =
 
 const arDialogLocks = new Set<ArDialog>();
 let _savedBodyOverflow: string | null = null;
+const DEFAULT_DIALOG_LABEL = 'Dialogue';
 
 if (typeof document !== 'undefined') {
     document.addEventListener(
@@ -145,30 +148,31 @@ export class ArDialog extends LitElement {
     /** Vrai pendant l'animation de fermeture — bloque les interactions et les double-appels. */
     @state() private _isClosing = false;
 
-    /** Vrai si au moins un enfant direct avec slot="footer" est présent. */
-    @state() private _hasFooter = false;
-
-    private _footerObserver?: MutationObserver;
-
     /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
     private _triggerElement: Element | null = null;
 
-    private _checkFooter(): void {
-        this._hasFooter = !!this.querySelector(':scope > [slot="footer"]');
+    private readonly _slotController = new HasSlotController(this, 'footer', 'label');
+    private _hasWarnedMissingLabel = false;
+
+    private _getHeadingLabel(): string {
+        return (this.label ?? '').trim() || DEFAULT_DIALOG_LABEL;
+    }
+
+    private _warnIfMissingLabel(): void {
+        if (this._hasWarnedMissingLabel) return;
+        if ((this.label ?? '').trim() || this._slotController.test('label')) return;
+
+        this._hasWarnedMissingLabel = true;
+        console.warn(
+            `[ar-dialog] Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".`,
+            this,
+        );
     }
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._checkFooter();
-        this._footerObserver = new MutationObserver(() => this._checkFooter());
-        this._footerObserver.observe(this, { childList: true });
-    }
-
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        this._footerObserver?.disconnect();
         this._removeOpenListeners();
         if (this.open || this._isClosing) this._unfreezeScroll();
     }
@@ -180,6 +184,7 @@ export class ArDialog extends LitElement {
     }
 
     override updated(changedProperties: PropertyValues<this>): void {
+        this._warnIfMissingLabel();
         if (changedProperties.has('open')) {
             if (this.open && !this.dialog?.open) {
                 this._show();
@@ -192,6 +197,8 @@ export class ArDialog extends LitElement {
     // ── Render ─────────────────────────────────────────────────────────────────
 
     override render(): TemplateResult {
+        const headingLabel = this._getHeadingLabel();
+
         return html`
             <dialog
                 part="dialog"
@@ -204,9 +211,11 @@ export class ArDialog extends LitElement {
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                <header part="header" class="dialog-header">
-                    <h1 part="title" class="dialog-title" id="dialog-heading">
-                        <slot name="label">${this.label}</slot>
+                <header part="header">
+                    <h1 part="title" id="dialog-heading">
+                        ${this._slotController.test('label')
+                            ? html`<slot name="label"></slot>`
+                            : headingLabel}
                     </h1>
                     <button
                         type="button"
@@ -229,16 +238,15 @@ export class ArDialog extends LitElement {
                         <span class="btn-content sr-only">Fermer</span>
                     </button>
                 </header>
-                <div part="body" class="dialog-body" role="document">
+                <main part="body">
                     <slot></slot>
-                </div>
-                ${this._hasFooter
-                    ? html`<footer part="footer" class="dialog-footer">
+                </main>
+                ${this._slotController.test('footer')
+                    ? html`<footer part="footer">
                           <slot name="footer"></slot>
                       </footer>`
                     : nothing}
             </dialog>
-            <div aria-live="assertive" aria-atomic="true" class="sr-only" id="dialog-status"></div>
         `;
     }
 
@@ -280,13 +288,8 @@ export class ArDialog extends LitElement {
     }
 
     private _announce(): void {
-        const el = this.shadowRoot?.getElementById('dialog-status');
-        if (!el) return;
         const message = this.preventedMessage.trim() || 'Fermeture bloquée.';
-        el.textContent = '';
-        requestAnimationFrame(() => {
-            el.textContent = message;
-        });
+        announceA11y(message, 'assertive');
     }
 
     private _addOpenListeners() {
@@ -363,6 +366,7 @@ export class ArDialog extends LitElement {
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
             this._triggerElement = null;
+            this.open = false;
             return;
         }
 

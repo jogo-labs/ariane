@@ -3,8 +3,8 @@
  * dialog.a11y.test.ts
  *
  * Tests d'accessibilité structurels pour ar-dialog, via @web/test-runner.
- * Les comportements dynamiques dépendants de showModal() sont couverts dans
- * dialog.browser.test.ts pour éviter les blocages du runner.
+ * Les comportements dynamiques dépendants de showModal() ou des annonces
+ * document-level sont couverts ailleurs pour éviter les blocages du runner.
  */
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArDialog } from './dialog.js';
@@ -62,12 +62,15 @@ describe('ar-dialog — accessibilité', () => {
         expect(label.textContent?.trim()).to.equal('Fermer');
     });
 
-    it('une région aria-live="assertive" est présente dans le shadow DOM', () => {
-        const liveRegion = requireShadow(el).getElementById('dialog-status');
-        expect(liveRegion).not.to.equal(null);
-        if (!liveRegion) throw new Error('#dialog-status introuvable');
-        expect(liveRegion.getAttribute('aria-live')).to.equal('assertive');
-        expect(liveRegion.getAttribute('aria-atomic')).to.equal('true');
+    it('le fallback de titre fournit un nom accessible par défaut', async () => {
+        el.remove();
+        el = await fixture(html`<ar-dialog></ar-dialog>`);
+        const dialogEl = requireDialog(el);
+        const labelId = dialogEl.getAttribute('aria-labelledby');
+        if (!labelId) throw new Error('aria-labelledby absent');
+        const title = requireShadow(el).getElementById(labelId);
+        if (!title) throw new Error('titre référencé introuvable');
+        expect(title.textContent?.trim()).to.equal('Dialogue');
     });
 
     it('le drawer conserve les attributs ARIA du dialog', async () => {

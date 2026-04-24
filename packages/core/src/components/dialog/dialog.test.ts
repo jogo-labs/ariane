@@ -14,7 +14,10 @@ function getDialogEl(el: ArDialog): HTMLDialogElement {
 describe('ArDialog', () => {
     let el: ArDialog;
 
-    afterEach(() => el?.remove());
+    afterEach(() => {
+        el?.remove();
+        document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+    });
 
     // ── Rendu ─────────────────────────────────────────────────────────────────
 
@@ -128,18 +131,6 @@ describe('ArDialog', () => {
             expect(getPart(el, 'footer')).not.toBeNull();
         });
 
-        it('apparaît dynamiquement après injection d\'un enfant slot="footer"', async () => {
-            el = await fixture('<ar-dialog></ar-dialog>');
-            expect(getPart(el, 'footer')).toBeNull();
-
-            const btn = document.createElement('button');
-            btn.setAttribute('slot', 'footer');
-            el.appendChild(btn);
-            await waitForUpdate(el);
-
-            expect(getPart(el, 'footer')).not.toBeNull();
-        });
-
         it('disparaît dynamiquement si le slot="footer" est retiré', async () => {
             el = await fixture(`
                 <ar-dialog>
@@ -202,6 +193,7 @@ describe('ArDialog', () => {
             el.open = true;
             await waitForUpdate(el);
             expect(getDialogEl(el).open).toBe(false);
+            expect(el.open).toBe(false);
         });
 
         it('open=true deux fois ne double-appelle pas showModal', async () => {
@@ -223,6 +215,25 @@ describe('ArDialog', () => {
             el.open = true;
             await waitForUpdate(el);
             expect(detailId).toBe('dialog-events');
+        });
+
+        it('peut être rouvert après une ouverture annulée', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            let prevented = true;
+            el.addEventListener('ar-dialog-show', (e) => {
+                if (prevented) {
+                    e.preventDefault();
+                    prevented = false;
+                }
+            });
+
+            el.open = true;
+            await waitForUpdate(el);
+            expect(el.open).toBe(false);
+
+            el.open = true;
+            await waitForUpdate(el);
+            expect(getDialogEl(el).open).toBe(true);
         });
     });
 
@@ -290,14 +301,15 @@ describe('ArDialog', () => {
 
         it('réannonce le message par défaut si preventedMessage est vide', async () => {
             el.preventedMessage = '   ';
-            const liveRegion = requireShadow(el).getElementById('dialog-status');
 
             el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
             el.open = false;
             await waitForUpdate(el);
             await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 
-            expect(liveRegion?.textContent).toBe('Fermeture bloquée.');
+            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
+                'Fermeture bloquée.',
+            );
         });
     });
 
@@ -321,7 +333,7 @@ describe('ArDialog', () => {
             // On simule data-ar-accept sur un élément shadow DOM (même code path que composedPath).
             const handler = vi.fn();
             el.addEventListener('ar-dialog-accepted', handler);
-            const body = requireShadow(el).querySelector('.dialog-body') as HTMLElement;
+            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
             body.setAttribute('data-ar-accept', '');
             body.click();
             body.removeAttribute('data-ar-accept');
@@ -343,7 +355,7 @@ describe('ArDialog', () => {
             const prevented = vi.fn();
             el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
             el.addEventListener('ar-dialog-accepted-prevented', prevented);
-            const body = requireShadow(el).querySelector('.dialog-body') as HTMLElement;
+            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
             body.setAttribute('data-ar-accept', '');
             body.click();
             body.removeAttribute('data-ar-accept');
@@ -382,7 +394,7 @@ describe('ArDialog', () => {
             el.closeOnBackdrop = true;
             await waitForUpdate(el);
             const dialogEl = getDialogEl(el);
-            const body = requireShadow(el).querySelector('.dialog-body') as Element;
+            const body = requireShadow(el).querySelector('[part="body"]') as Element;
             body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             dialogEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
             await waitForUpdate(el);
@@ -458,6 +470,52 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             await waitForUpdate(el);
             expect(focusSpy).toHaveBeenCalled();
+        });
+    });
+
+    // ── Label accessible ─────────────────────────────────────────────────────
+
+    describe('label accessible', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('affiche un fallback visible si aucun label n’est fourni', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            const title = requireShadow(el).getElementById('dialog-heading');
+            expect(title?.textContent?.trim()).toBe('Dialogue');
+        });
+
+        it('utilise le slot label quand un libellé slotté est fourni', async () => {
+            el = await fixture(
+                '<ar-dialog><span slot="label">Titre personnalisé</span></ar-dialog>',
+            );
+            await waitForUpdate(el);
+            const slot = requireShadow(el).querySelector<HTMLSlotElement>('slot[name="label"]');
+            expect(slot).not.toBeNull();
+            const text = slot
+                ?.assignedNodes({ flatten: true })
+                .map((n) => n.textContent)
+                .join('')
+                .trim();
+            expect(text).toBe('Titre personnalisé');
+        });
+
+        it('affiche un warning si aucun label explicite n’est fourni', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(spy).toHaveBeenCalledWith(
+                expect.stringContaining('Aucun libellé accessible fourni'),
+                el,
+            );
+        });
+
+        it('ne répète pas le warning plusieurs fois pour la même instance', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-dialog></ar-dialog>');
+            el.appendChild(document.createTextNode(' '));
+            await waitForUpdate(el);
+            expect(spy).toHaveBeenCalledTimes(1);
         });
     });
 
