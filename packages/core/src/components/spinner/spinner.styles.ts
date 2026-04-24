@@ -17,30 +17,29 @@ export default css`
     .spinner {
         width: 56px;
         height: 56px;
-        -webkit-animation: spinnerRotate 2s linear infinite;
         animation: spinnerRotate 2s linear infinite;
-        -webkit-transform-origin: center center;
+        transform-box: fill-box;
         transform-origin: center center;
     }
 
     .spinner-path {
         stroke-width: 4;
+        stroke-dasharray: 1, 200;
         stroke-dashoffset: 0;
         stroke-linecap: round;
         stroke: var(--ar-spinner-stroke-color, currentColor);
-        -webkit-animation: spinnerDash 1.5s ease-in-out infinite;
         animation: spinnerDash 1.5s ease-in-out infinite;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-        .spinner-path {
-            stroke-dasharray: 1, 200;
-        }
-    }
-
     @media (prefers-reduced-motion: reduce) {
+        .spinner {
+            animation: spinnerPulse 1.5s ease-in-out infinite;
+        }
+
         .spinner-path {
+            animation: none;
             stroke-dasharray: 89, 200;
+            stroke-dashoffset: -35px;
         }
     }
 
