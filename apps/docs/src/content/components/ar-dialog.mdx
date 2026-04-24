@@ -88,11 +88,11 @@ variants:
 - Le focus est restauré sur l'élément déclencheur à la fermeture.
 - Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture, y compris avec plusieurs dialogs empilés.
 - La touche Escape passe par `ar-dialog-hide` : la fermeture peut donc être interceptée avec `event.preventDefault()`.
-- Quand une fermeture est bloquée, le composant secoue visuellement le dialog et annonce automatiquement `prevented-message` via une région `aria-live="assertive"`.
+- Quand une fermeture est bloquée, le composant secoue visuellement le dialog et annonce automatiquement `prevented-message` via la zone d'annonce globale de la librairie.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
 
 ### À la charge de l'auteur
 
-- **Fournir un `label` descriptif.** C'est le titre annoncé aux technologies d'assistance.
+- **Fournir un `label` descriptif.** Un fallback `Dialogue` existe, mais il doit rester un filet de sécurité, pas le libellé final du composant. Un avertissement est émis dans la console si ni `label` ni `slot="label"` ne sont fournis.
 - **Toujours proposer une issue claire.** Le backdrop est statique par défaut : prévoir un bouton de fermeture visible ou une action `data-ar-dismiss`.
 - **Si vous bloquez la fermeture, renseigner `prevented-message`.** Le message doit expliquer quoi faire pour continuer ou confirmer l'action.
