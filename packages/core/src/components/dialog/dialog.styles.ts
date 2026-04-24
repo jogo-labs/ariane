@@ -167,7 +167,7 @@ export default [
 
         /* ── Body ─────────────────────────────────────────────────────────────── */
 
-        main {
+        [part='body'] {
             flex: 1;
             min-height: 0; /* autorise le shrink flex pour activer le scroll */
             overflow-y: auto;

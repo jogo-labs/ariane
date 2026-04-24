@@ -26,7 +26,12 @@ export type ArDialogEvents =
     | 'ar-dialog-accepted-prevented';
 
 const arDialogLocks = new Set<ArDialog>();
+// Partagé entre instances pour restaurer fidèlement le overflow d'origine lors d'un empilement de dialogs.
 let _savedBodyOverflow: string | null = null;
+
+const prefersReducedMotion = (): boolean =>
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const DEFAULT_DIALOG_LABEL = 'Dialogue';
 
 if (typeof document !== 'undefined') {
@@ -137,7 +142,8 @@ export class ArDialog extends LitElement {
      * @attr prevented-message
      * @default 'Fermeture bloquée.'
      */
-    @property({ attribute: 'prevented-message' }) preventedMessage = 'Fermeture bloquée.';
+    @property({ reflect: true, attribute: 'prevented-message' }) preventedMessage =
+        'Fermeture bloquée.';
 
     // ── Private state ──────────────────────────────────────────────────────────
 
@@ -240,9 +246,9 @@ export class ArDialog extends LitElement {
                         <span class="btn-content sr-only">Fermer</span>
                     </button>
                 </header>
-                <main part="body">
+                <div part="body">
                     <slot></slot>
-                </main>
+                </div>
                 ${this._slotController.test('footer')
                     ? html`<footer part="footer">
                           <slot name="footer"></slot>
@@ -345,7 +351,9 @@ export class ArDialog extends LitElement {
     };
 
     private _handleDialogCancel = (event: Event) => {
-        event.preventDefault(); // Empêche la fermeture automatique du <dialog> natif sur Escape
+        // Toujours annulé : la gestion Escape est déléguée à _handleDocumentKeyDown pour
+        // respecter la pile de dialogs (arDialogLocks) et les animations de fermeture.
+        event.preventDefault();
     };
 
     private _handleDialogPointerDown = (event: PointerEvent) => {
@@ -376,14 +384,10 @@ export class ArDialog extends LitElement {
         this.dialog?.showModal();
         this._freezeScroll();
 
-        const prefersReducedMotion =
-            typeof window.matchMedia === 'function' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (!prefersReducedMotion) {
+        if (!prefersReducedMotion()) {
             this.dialog.classList.add('opening');
             const onOpenEnd = (e: AnimationEvent) => {
-                if (e.animationName && !e.animationName.startsWith('show')) return;
+                if (e.target !== this.dialog) return;
                 this.dialog.classList.remove('opening');
                 this.dialog.removeEventListener('animationend', onOpenEnd);
             };
@@ -417,15 +421,11 @@ export class ArDialog extends LitElement {
             return;
         }
 
-        const prefersReducedMotion =
-            typeof window.matchMedia === 'function' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
         this._isClosing = true;
         this.dialog.classList.remove('opening', 'shake');
         this.dialog.classList.add('closing');
 
-        if (prefersReducedMotion) {
+        if (prefersReducedMotion()) {
             this._finishClose();
             return;
         }
@@ -451,11 +451,7 @@ export class ArDialog extends LitElement {
         void dialog.offsetWidth; // force reflow pour redémarrer l'animation si déjà en cours
         dialog.classList.add('shake');
 
-        const prefersReducedMotion =
-            typeof window.matchMedia === 'function' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (prefersReducedMotion) {
+        if (prefersReducedMotion()) {
             setTimeout(() => dialog.classList.remove('shake'), 700);
         } else {
             const onShakeEnd = (e: AnimationEvent) => {

@@ -108,9 +108,16 @@ describe('ArDialog', () => {
             expect(el.closeOnBackdrop).toBe(true);
         });
 
-        it('prevented-message est lu depuis l’attribut', async () => {
+        it("prevented-message est lu depuis l'attribut", async () => {
             el = await fixture('<ar-dialog prevented-message="Action refusée."></ar-dialog>');
             expect(el.preventedMessage).toBe('Action refusée.');
+        });
+
+        it('preventedMessage reflète en attribut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            el.preventedMessage = 'Bloqué.';
+            await waitForUpdate(el);
+            expect(el.getAttribute('prevented-message')).toBe('Bloqué.');
         });
     });
 
@@ -480,7 +487,7 @@ describe('ArDialog', () => {
             vi.restoreAllMocks();
         });
 
-        it('affiche un fallback visible si aucun label n’est fourni', async () => {
+        it("affiche un fallback visible si aucun label n'est fourni", async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             const title = requireShadow(el).getElementById('dialog-heading');
             expect(title?.textContent?.trim()).toBe('Dialogue');
@@ -501,7 +508,7 @@ describe('ArDialog', () => {
             expect(text).toBe('Titre personnalisé');
         });
 
-        it('affiche un warning si aucun label explicite n’est fourni', async () => {
+        it("affiche un warning si aucun label explicite n'est fourni", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-dialog></ar-dialog>');
             expect(spy).toHaveBeenCalledWith(
