@@ -55,8 +55,16 @@ export default css`
     :host([hiding]) {
         opacity: 0;
         transform: scale(0.75);
-        transition: opacity, transform;
-        transition-duration: 0.33s;
+        transition:
+            opacity 0.33s,
+            transform 0.33s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :host([hiding]),
+        [part='close'] {
+            transition: none;
+        }
     }
 
     [part='close'] {
