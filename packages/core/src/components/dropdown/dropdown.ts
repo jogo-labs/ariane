@@ -78,6 +78,7 @@ export class ArDropdown extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        this._panel?.removeEventListener('keydown', this._handlePanelKeyDown);
         this._removeMenuListeners();
     }
 
@@ -134,6 +135,7 @@ export class ArDropdown extends LitElement {
         }
         this._detectMenuMode();
         this._popover.show();
+        this._panel?.addEventListener('keydown', this._handlePanelKeyDown);
         if (this._menuMode) this._activateMenuListeners();
         void this.updateComplete.then(() => {
             if (this._menuMode) this._focusMenuItem(0);
@@ -147,6 +149,7 @@ export class ArDropdown extends LitElement {
             this.open = true;
             return;
         }
+        this._panel?.removeEventListener('keydown', this._handlePanelKeyDown);
         this._removeMenuListeners();
         this._activeIndex = -1;
         this._popover.hide();
@@ -168,6 +171,10 @@ export class ArDropdown extends LitElement {
         this._panel?.removeEventListener('keydown', this._handleMenuKeyDown);
     }
 
+    private _handlePanelKeyDown = (e: KeyboardEvent): void => {
+        if (e.key === 'Escape' || e.key === 'Tab') this.open = false;
+    };
+
     private _handleMenuKeyDown = (e: KeyboardEvent): void => {
         const items = this._focusableMenuItems();
         if (!items.length) return;
@@ -187,12 +194,6 @@ export class ArDropdown extends LitElement {
             case 'End':
                 e.preventDefault();
                 this._focusMenuItem(items.length - 1);
-                break;
-            case 'Escape':
-                this.open = false;
-                break;
-            case 'Tab':
-                this.open = false;
                 break;
         }
     };

@@ -77,10 +77,12 @@ describe('ar-dropdown — browser', () => {
                 </ar-dropdown>
             `);
             await openDropdown(el);
+            const panel = getPanel(el);
 
-            // Clic sur le body hors du panel
-            document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
-            document.body.click();
+            // Les événements synthétiques (isTrusted: false) ne déclenchent pas le light-dismiss
+            // natif du popover. On simule via hidePopover() qui émet le vrai toggle event,
+            // ce qui teste le chemin _onPanelToggle → onExternalClose → el.open = false.
+            (panel as HTMLElement & { hidePopover(): void }).hidePopover();
             await aTimeout(50);
 
             expect(el.open).to.equal(false);
