@@ -4,11 +4,11 @@ import { customElement } from 'lit/decorators.js';
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 /**
- * @summary Élément d'un menu dropdown. Sentinel qui active le mode menu sur
- * ar-dropdown.
- * @display none
+ * @summary Élément enfant de ar-dropdown. Active le mode menu et pose les attributs ARIA sur son enfant focusable.
+ * @parent ar-dropdown
+ * @display docs
  *
- * @slot - Contenu de l'item (bouton ou lien).
+ * @slot - Un bouton ou un lien — reçoit automatiquement role="menuitem" et tabIndex=-1.
  */
 @customElement('ar-dropdown-item')
 export class ArDropdownItem extends LitElement {

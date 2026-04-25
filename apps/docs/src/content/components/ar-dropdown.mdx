@@ -1,0 +1,59 @@
+---
+tagName: ar-dropdown
+title: Dropdown
+description: Mécanisme de disclosure accessible basé sur l'API Popover native, avec positionnement via Floating UI.
+playgroundTemplate: menu
+variants:
+    - name: menu
+      label: Mode menu
+      description: Avec des ar-dropdown-item, le panel reçoit automatiquement role="menu" et la navigation clavier est activée (↑↓ Home End Escape Tab).
+      html: |
+          <ar-dropdown>
+              <button class="btn btn-secondary" slot="trigger">Actions ▾</button>
+              <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+          </ar-dropdown>
+    - name: free-content
+      label: Contenu libre
+      description: Sans ar-dropdown-item, le panel est un conteneur libre — aucun role ni navigation clavier n'est ajouté.
+      html: |
+          <ar-dropdown>
+              <button class="btn btn-secondary" slot="trigger">Options ▾</button>
+              <p style="padding: .5rem .75rem; margin: 0;">Contenu libre — formulaire, liste, texte…</p>
+          </ar-dropdown>
+    - name: placement-top
+      label: Placement top-end
+      description: Le panel s'ouvre au-dessus du trigger, aligné à droite.
+      html: |
+          <ar-dropdown placement="top-end">
+              <button class="btn btn-secondary" slot="trigger">Placement ▾</button>
+              <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
+          </ar-dropdown>
+    - name: disabled
+      label: Désactivé
+      description: Le trigger ne répond plus aux clics.
+      html: |
+          <ar-dropdown disabled>
+              <button class="btn btn-secondary" slot="trigger" disabled>Désactivé ▾</button>
+              <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
+          </ar-dropdown>
+---
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Le trigger reçoit `aria-haspopup="true"`, `aria-controls` (pointant vers le panel) et `aria-expanded` synchronisé à l'état ouvert/fermé.
+- En mode menu (présence d'`ar-dropdown-item`), le panel reçoit `role="menu"` et chaque enfant focusable reçoit `role="menuitem"`.
+- Navigation clavier complète : `↑` `↓` `Home` `End` pour déplacer le focus, `Escape` et `Tab` pour fermer.
+- Retour du focus sur le trigger à la fermeture.
+- Light-dismiss natif (`popover="auto"`) : un clic hors du panel ferme automatiquement.
+- Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
+
+### À la charge de l'auteur
+
+- **Le bouton du trigger doit être accessible.** Fournir un libellé textuel clair ou un `aria-label` si le trigger ne contient que de l'iconographie.
+- **En mode menu, envelopper chaque action dans `ar-dropdown-item`.** Les éléments sans `ar-dropdown-item` dans un panel menu ne reçoivent pas `role="menuitem"` et sortent de la navigation clavier.
+- **Ne pas désactiver le bouton trigger sans désactiver aussi `ar-dropdown[disabled]`.** L'attribut `disabled` sur le composant bloque la logique d'ouverture côté JS — le désactiver uniquement sur le bouton ne suffit pas.
