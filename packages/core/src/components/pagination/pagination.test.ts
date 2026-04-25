@@ -279,4 +279,47 @@ describe('ArPagination', () => {
             expect(captured).not.toBeNull();
         });
     });
+
+    // ── Annonces a11y ─────────────────────────────────────────────────────────
+
+    describe('annonces a11y', () => {
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        it('un clic sur prev annonce "Page N-1 sur M"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            (requirePart(el, 'prev') as HTMLElement).click();
+            await waitForUpdate(el);
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Page 2 sur 5',
+            );
+        });
+
+        it('un clic sur next annonce "Page N+1 sur M"', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Page 3 sur 5',
+            );
+        });
+
+        it('un clic direct sur un numéro de page annonce "Page N sur M"', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="4"]') as HTMLElement;
+            pageLink.click();
+            await waitForUpdate(el);
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Page 4 sur 5',
+            );
+        });
+    });
 });

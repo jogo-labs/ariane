@@ -465,4 +465,61 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
         });
     });
+
+    // ── Annonces a11y ─────────────────────────────────────────────────────────
+
+    describe('annonces a11y', () => {
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        it('un clic sur une étape de premier niveau annonce son label', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
+            if (!link) throw new Error('Lien vers /a introuvable');
+            link.click();
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe('Étape A');
+        });
+
+        it('un clic sur une sous-étape annonce son label (branche flatMap)', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A">
+                        <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                        <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                    </ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
+            if (!link) throw new Error('Lien vers /a/2 introuvable');
+            link.click();
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Sous-étape 2',
+            );
+        });
+    });
 });
