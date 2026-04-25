@@ -1,11 +1,22 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import type { Placement } from '@floating-ui/dom';
 import { PopoverController } from '../../controllers/popover.controller.js';
 import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import styles from './dropdown.styles.js';
 
-export type ArDropdownPlacement = Placement;
+export type ArDropdownPlacement =
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end';
 
 /**
  * @summary Mécanisme de disclosure accessible basé sur l'API popover native.
@@ -37,7 +48,7 @@ export class ArDropdown extends LitElement {
     @property({ reflect: true, type: Boolean }) open = false;
 
     /** Placement du panel par rapport au trigger (Floating UI). */
-    @property({ reflect: true }) placement: Placement = 'bottom-start';
+    @property({ reflect: true }) placement: ArDropdownPlacement = 'bottom-start';
 
     /** Désactive le composant — le trigger ne répond plus aux clics. */
     @property({ reflect: true, type: Boolean }) disabled = false;
