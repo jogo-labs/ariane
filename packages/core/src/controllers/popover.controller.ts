@@ -71,8 +71,6 @@ export class PopoverController implements ReactiveController {
         if (!this._isOpen || !this._panel) return;
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
-        this._triggerObserver?.disconnect();
-        this._triggerObserver = null;
         this._panel.hidePopover();
         this._isOpen = false;
         this._syncTriggerAria();
