@@ -17,3 +17,5 @@ export { ArPagination } from './components/pagination/pagination.js';
 export { ArStepper } from './components/stepper/stepper.js';
 export { ArStepperItem } from './components/stepper-item/stepper-item.js';
 export { ArDialog } from './components/dialog/dialog.js';
+export { ArDropdown } from './components/dropdown/dropdown.js';
+export { ArDropdownItem } from './components/dropdownitem/dropdownitem.js';
