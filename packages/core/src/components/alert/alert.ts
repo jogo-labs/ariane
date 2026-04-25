@@ -1,6 +1,7 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
+import { prefersReducedMotion } from '../../utils/media.js';
 
 export function warn(name: string, message: string, error?: Error) {
     if (error) console.warn(`${name} - ${message}`, error);
@@ -174,7 +175,11 @@ export class ArAlert extends LitElement {
     }
 
     private _hide = (): void => {
-        this.hiding = this.canBeHidden;
+        if (!this.canBeHidden) return;
+        this.hiding = true;
+        if (prefersReducedMotion()) {
+            this._finishHide();
+        }
     };
 
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
