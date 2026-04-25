@@ -5,6 +5,7 @@ import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
 import { mrPaginationUtils } from './pagination.utils.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
 export class ArPaginationConfig {
@@ -183,6 +184,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = this.current - 1;
         this._emit({ from, to: this.current });
+        this._announcePageChange();
     }
 
     private _onNextPage(): void {
@@ -190,6 +192,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = this.current + 1;
         this._emit({ from, to: this.current });
+        this._announcePageChange();
     }
 
     private _onPageChange(event: MouseEvent): void {
@@ -199,6 +202,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = parseInt(page);
         this._emit({ from, to: this.current });
+        this._announcePageChange();
     }
 
     private _emit(detail: ArPaginationPageChangeDetail): void {
@@ -210,6 +214,10 @@ export class ArPagination extends LitElement {
                 detail,
             }),
         );
+    }
+
+    private _announcePageChange(): void {
+        announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
     }
 }
 

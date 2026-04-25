@@ -9,6 +9,7 @@ import dropdownStyles from '../../styles/components/dropdown.styles.js';
 import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { DropdownController } from '../../controllers/dropdown.controller.js';
@@ -384,6 +385,11 @@ export class ArStepper extends LitElement {
         this.dispatchEvent(
             new CustomEvent('ar-stepper-step-changed', { bubbles: true, composed: true, detail }),
         );
+
+        const stepLabel =
+            this.navigation.tree.flatMap((s) => [s, ...s.children]).find((s) => s.path === path)
+                ?.label ?? path;
+        announceA11y(stepLabel, 'polite');
     };
 
     private handleScrollChange = (event: CustomEvent<string>): void => {
