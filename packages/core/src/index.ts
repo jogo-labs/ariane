@@ -18,4 +18,5 @@ export { ArStepper } from './components/stepper/stepper.js';
 export { ArStepperItem } from './components/stepper-item/stepper-item.js';
 export { ArDialog } from './components/dialog/dialog.js';
 export { ArDropdown } from './components/dropdown/dropdown.js';
-export { ArDropdownItem } from './components/dropdownitem/dropdownitem.js';
+export { ArDropdownItem } from './components/dropdown-item/dropdown-item.js';
+export { PopoverController } from './controllers/popover.controller.js';

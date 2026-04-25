@@ -2,7 +2,7 @@ import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js';
 import type { Placement } from '@floating-ui/dom';
 import { PopoverController } from '../../controllers/popover.controller.js';
-import type { ArDropdownItem } from '../dropdownitem/dropdownitem.js';
+import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import styles from './dropdown.styles.js';
 
 export type ArDropdownPlacement = Placement;

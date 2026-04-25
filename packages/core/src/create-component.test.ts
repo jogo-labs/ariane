@@ -149,11 +149,11 @@ describe('create-component.js', () => {
         it('gère les noms composés (my-component → ar-my-component)', () => {
             runScript(tmpDir, ['my-component']);
 
-            expect(existsSync(join(tmpDir, 'src/components/mycomponent/mycomponent.ts'))).toBe(
+            expect(existsSync(join(tmpDir, 'src/components/my-component/my-component.ts'))).toBe(
                 true,
             );
             const content = readFileSync(
-                join(tmpDir, 'src/components/mycomponent/mycomponent.ts'),
+                join(tmpDir, 'src/components/my-component/my-component.ts'),
                 'utf-8',
             );
             expect(content).toContain("@customElement('ar-my-component')");
