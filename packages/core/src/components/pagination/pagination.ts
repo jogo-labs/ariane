@@ -184,7 +184,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = this.current - 1;
         this._emit({ from, to: this.current });
-        this._announce();
+        this._announcePageChange();
     }
 
     private _onNextPage(): void {
@@ -192,7 +192,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = this.current + 1;
         this._emit({ from, to: this.current });
-        this._announce();
+        this._announcePageChange();
     }
 
     private _onPageChange(event: MouseEvent): void {
@@ -202,7 +202,7 @@ export class ArPagination extends LitElement {
         const from = this.current;
         this.current = parseInt(page);
         this._emit({ from, to: this.current });
-        this._announce();
+        this._announcePageChange();
     }
 
     private _emit(detail: ArPaginationPageChangeDetail): void {
@@ -216,7 +216,7 @@ export class ArPagination extends LitElement {
         );
     }
 
-    private _announce(): void {
+    private _announcePageChange(): void {
         announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
     }
 }

@@ -370,10 +370,6 @@ export class ArStepper extends LitElement {
         return this.navigation.tree.flatMap((step) => step.children.map((sub) => sub.path));
     }
 
-    private _announce(label: string): void {
-        announceA11y(label, 'polite');
-    }
-
     // ── Events ───────────────────────────────────────────────────────────────
 
     private onClickLink = (event: MouseEvent): void => {
@@ -393,7 +389,7 @@ export class ArStepper extends LitElement {
         const stepLabel =
             this.navigation.tree.flatMap((s) => [s, ...s.children]).find((s) => s.path === path)
                 ?.label ?? path;
-        this._announce(stepLabel);
+        announceA11y(stepLabel, 'polite');
     };
 
     private handleScrollChange = (event: CustomEvent<string>): void => {

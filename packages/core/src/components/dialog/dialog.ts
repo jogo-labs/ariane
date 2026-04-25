@@ -302,7 +302,7 @@ export class ArDialog extends LitElement {
         return e;
     }
 
-    private _announce(): void {
+    private _announcePrevented(): void {
         const message = this.preventedMessage.trim() || 'Fermeture bloquée.';
         announceA11y(message, 'assertive');
     }
@@ -344,7 +344,7 @@ export class ArDialog extends LitElement {
                     : 'ar-dialog-accepted-prevented';
                 this._emit(prevented);
                 this._shake();
-                this._announce();
+                this._announcePrevented();
                 return;
             }
 
@@ -434,7 +434,7 @@ export class ArDialog extends LitElement {
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
             this._shake();
-            this._announce();
+            this._announcePrevented();
             return;
         }
 
