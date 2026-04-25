@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
-import { computePosition, flip, offset, shift } from '@floating-ui/dom';
+import { computePosition, flip, hide, offset, shift, autoUpdate } from '@floating-ui/dom';
 import type { Placement } from '@floating-ui/dom';
 
 type PopoverPanel = HTMLElement & { showPopover(): void; hidePopover(): void };
@@ -15,6 +15,7 @@ export class PopoverController implements ReactiveController {
     private _trigger: HTMLElement | null = null;
     private _panel: PopoverPanel | null = null;
     private _isOpen = false;
+    private _cleanupAutoUpdate: (() => void) | null = null;
     private _options: Required<Omit<PopoverControllerOptions, 'onExternalClose'>> & {
         onExternalClose?: () => void;
     };
@@ -54,16 +55,24 @@ export class PopoverController implements ReactiveController {
     }
 
     show(): void {
-        if (this._isOpen || !this._panel) return;
+        if (this._isOpen || !this._panel || !this._trigger) return;
         this._panel.showPopover();
         this._isOpen = true;
         this._syncTriggerAria();
-        void this._position();
+        this._cleanupAutoUpdate = autoUpdate(
+            this._trigger,
+            this._panel,
+            () => void this._position(),
+        );
         this.host.requestUpdate();
     }
 
     hide(): void {
         if (!this._isOpen || !this._panel) return;
+        this._cleanupAutoUpdate?.();
+        this._cleanupAutoUpdate = null;
+        this._triggerObserver?.disconnect();
+        this._triggerObserver = null;
         this._panel.hidePopover();
         this._isOpen = false;
         this._syncTriggerAria();
@@ -78,6 +87,8 @@ export class PopoverController implements ReactiveController {
     hostConnected(): void {}
 
     hostDisconnected(): void {
+        this._cleanupAutoUpdate?.();
+        this._cleanupAutoUpdate = null;
         this._panel?.removeEventListener('toggle', this._onPanelToggle);
     }
 
@@ -93,10 +104,14 @@ export class PopoverController implements ReactiveController {
 
     private async _position(): Promise<void> {
         if (!this._trigger || !this._panel) return;
-        const { x, y } = await computePosition(this._trigger, this._panel, {
+        const { x, y, middlewareData } = await computePosition(this._trigger, this._panel, {
             placement: this._options.placement,
-            middleware: [offset(this._options.offsetPx), flip(), shift({ padding: 8 })],
+            middleware: [offset(this._options.offsetPx), flip(), shift({ padding: 8 }), hide()],
         });
+        if (middlewareData.hide?.referenceHidden) {
+            this._options.onExternalClose?.();
+            return;
+        }
         this._panel.style.position = 'fixed';
         this._panel.style.top = `${y}px`;
         this._panel.style.left = `${x}px`;
