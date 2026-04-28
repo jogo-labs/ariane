@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         syncControlsFromComponent();
+        updateCode();
 
         // Observer les changements d'attributs du composant pour maintenir la sync.
         // updateCode() n'est déclenché que si un attribut contrôlé change (pas open/aria-*).

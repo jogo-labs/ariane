@@ -110,10 +110,10 @@ const showPlayground = displayMode === 'demo';
                                     data-default={ctrl.default ?? ''}
                                 >
                                     {ctrl.addDefault && (
-                                        <option value="">Par défaut</option>
+                                        <option value="" selected={!ctrl.default}>Par défaut</option>
                                     )}
                                     {ctrl.options.map((opt) => (
-                                        <option value={opt}>{opt}</option>
+                                        <option value={opt} selected={opt === ctrl.default}>{opt}</option>
                                     ))}
                                 </select>
                             )}
@@ -122,6 +122,7 @@ const showPlayground = displayMode === 'demo';
                                     type="checkbox"
                                     data-attr={ctrl.attribute}
                                     data-playground-ctrl
+                                    checked={ctrl.default === 'true'}
                                 />
                             )}
                             {ctrl.controlType === 'text' && (
@@ -131,6 +132,7 @@ const showPlayground = displayMode === 'demo';
                                     data-playground-ctrl
                                     data-default={ctrl.default ?? ''}
                                     placeholder={ctrl.default ?? ''}
+                                    value={ctrl.default ?? ''}
                                 />
                             )}
                             {ctrl.controlType === 'number' && (
@@ -140,6 +142,7 @@ const showPlayground = displayMode === 'demo';
                                     data-playground-ctrl
                                     data-default={ctrl.default ?? ''}
                                     placeholder={ctrl.default ?? ''}
+                                    value={ctrl.default ?? ''}
                                 />
                             )}
                         </label>
@@ -480,5 +483,11 @@ const showPlayground = displayMode === 'demo';
     .preview :global(ar-dropdown-item button:hover),
     .preview :global(ar-dropdown-item a:hover) {
         background: var(--ar-color-bg-subtle, #f5f5f8);
+    }
+
+    .preview :global(ar-dropdown hr) {
+        border:     none;
+        border-top: 1px solid var(--ar-color-border, #e5e7eb);
+        margin:     0.25rem 0;
     }
 </style>
