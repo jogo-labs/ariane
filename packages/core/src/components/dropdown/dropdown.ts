@@ -22,7 +22,7 @@ export type ArDropdownPlacement =
  * @summary Mécanisme de disclosure accessible basé sur l'API popover native.
  * @display demo
  *
- * @slot trigger  - Le bouton déclencheur.
+ * @slot trigger  - Le bouton déclencheur (ignoré si `trigger` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
  * @csspart panel - Le conteneur du panel.
@@ -53,6 +53,25 @@ export class ArDropdown extends LitElement {
     /** Désactive le composant — le trigger ne répond plus aux clics. */
     @property({ reflect: true, type: Boolean }) disabled = false;
 
+    /**
+     * Désactive le verrouillage du scroll des conteneurs ancêtres à l'ouverture.
+     * Par défaut, le scroll est bloqué comme le fait le `<select>` natif.
+     * À activer uniquement si le jitter de positionnement est acceptable.
+     */
+    @property({ attribute: 'no-scroll-lock', reflect: true, type: Boolean }) noScrollLock = false;
+
+    /** Espacement en pixels entre le trigger et le panel (axe principal). */
+    @property({ reflect: true, type: Number }) distance = 4;
+
+    /** Décalage latéral en pixels du panel par rapport au trigger (axe transversal). */
+    @property({ reflect: true, type: Number }) offset = 0;
+
+    /**
+     * ID d'un élément déclencheur externe (light DOM). Quand défini, le slot
+     * `trigger` est ignoré.
+     */
+    @property({ reflect: true }) trigger = '';
+
     @query('[part="panel"]') private _panel!: HTMLElement;
 
     private readonly _popover = new PopoverController(this, {
@@ -64,15 +83,23 @@ export class ArDropdown extends LitElement {
     private _menuItems: ArDropdownItem[] = [];
     private _menuMode = false;
     private _activeIndex = -1;
+    private _externalTrigger: HTMLElement | null = null;
     private readonly _uniqueId = Math.random().toString(36).slice(2, 9);
 
     override firstUpdated(): void {
         const trigger = this._resolvedTrigger;
+        if (this.trigger && !trigger) {
+            console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
+        }
         if (trigger && this._panel) {
             this._popover.attach(
                 trigger,
                 this._panel as HTMLElement & { showPopover(): void; hidePopover(): void },
             );
+            if (this.trigger) {
+                trigger.addEventListener('click', this._handleTriggerClick);
+                this._externalTrigger = trigger;
+            }
         }
         if (this.open) this._show();
     }
@@ -80,6 +107,33 @@ export class ArDropdown extends LitElement {
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('placement')) {
             this._popover.setPlacement(this.placement);
+        }
+        if (changed.has('noScrollLock')) {
+            this._popover.setLockScroll(!this.noScrollLock);
+        }
+        if (changed.has('distance')) {
+            this._popover.setDistance(this.distance);
+        }
+        if (changed.has('offset')) {
+            this._popover.setOffset(this.offset);
+        }
+        if (changed.has('trigger')) {
+            this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);
+            this._externalTrigger = null;
+            const newTrigger = this._resolvedTrigger;
+            if (this.trigger && !newTrigger) {
+                console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
+            }
+            if (newTrigger && this._panel) {
+                this._popover.attach(
+                    newTrigger,
+                    this._panel as HTMLElement & { showPopover(): void; hidePopover(): void },
+                );
+                if (this.trigger) {
+                    newTrigger.addEventListener('click', this._handleTriggerClick);
+                    this._externalTrigger = newTrigger;
+                }
+            }
         }
         if (changed.has('open')) {
             if (this.open) this._show();
@@ -89,6 +143,7 @@ export class ArDropdown extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);
         this._panel?.removeEventListener('keydown', this._handlePanelKeyDown);
         this._removeMenuListeners();
     }
@@ -103,11 +158,15 @@ export class ArDropdown extends LitElement {
     }
 
     private get _resolvedTrigger(): HTMLElement | null {
+        if (this.trigger) {
+            return document.getElementById(this.trigger);
+        }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
     }
 
     private _handleTriggerSlotChange(): void {
+        if (this.trigger) return;
         const trigger = this._resolvedTrigger;
         if (!trigger || !this._panel) return;
         this._popover.attach(
@@ -127,6 +186,7 @@ export class ArDropdown extends LitElement {
         if (this._panel) {
             if (this._menuMode) {
                 this._panel.setAttribute('role', 'menu');
+                this.querySelectorAll('hr').forEach((hr) => hr.setAttribute('role', 'separator'));
             } else {
                 this._panel.removeAttribute('role');
             }
@@ -226,7 +286,7 @@ export class ArDropdown extends LitElement {
             el.tabIndex = i === clamped ? 0 : -1;
         });
         this._activeIndex = clamped;
-        items[clamped].focus();
+        items[clamped].focus({ preventScroll: true });
     }
 }
 

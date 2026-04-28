@@ -6,8 +6,8 @@ export default css`
     }
 
     [part='panel'] {
-        position: fixed;
-        inset: unset;
+        position: absolute;
+        inset: 0 auto auto 0;
         box-sizing: border-box;
         min-width: var(--ar-dropdown-min-width, 10rem);
         max-width: var(--ar-dropdown-max-width, none);
@@ -29,7 +29,7 @@ export default css`
     }
 
     [part='panel']:popover-open {
-        animation: arDropdownShow 0.12s ease-out;
+        animation: arDropdownShow 0.2s ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -41,13 +41,9 @@ export default css`
     @keyframes arDropdownShow {
         from {
             opacity: 0;
-            transform: scaleY(0.95) translateY(-4px);
-            transform-origin: top;
         }
         to {
             opacity: 1;
-            transform: scaleY(1) translateY(0);
-            transform-origin: top;
         }
     }
 `;

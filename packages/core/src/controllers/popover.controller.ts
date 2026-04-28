@@ -6,8 +6,18 @@ type PopoverPanel = HTMLElement & { showPopover(): void; hidePopover(): void };
 
 export interface PopoverControllerOptions {
     placement?: Placement;
-    offsetPx?: number;
+    /** Espacement perpendiculaire entre le trigger et le panel (mainAxis). Défaut : 4. */
+    distance?: number;
+    /** Décalage latéral du panel par rapport au trigger (crossAxis). Défaut : 0. */
+    offset?: number;
+    lockScroll?: boolean;
     onExternalClose?: () => void;
+}
+
+interface _ScrollLock {
+    el: HTMLElement;
+    overflowY: string;
+    overflowX: string;
 }
 
 export class PopoverController implements ReactiveController {
@@ -16,6 +26,7 @@ export class PopoverController implements ReactiveController {
     private _panel: PopoverPanel | null = null;
     private _isOpen = false;
     private _cleanupAutoUpdate: (() => void) | null = null;
+    private _scrollLocks: _ScrollLock[] = [];
     private _options: Required<Omit<PopoverControllerOptions, 'onExternalClose'>> & {
         onExternalClose?: () => void;
     };
@@ -27,7 +38,9 @@ export class PopoverController implements ReactiveController {
         (this.host = host).addController(this);
         this._options = {
             placement: options.placement ?? 'bottom-start',
-            offsetPx: options.offsetPx ?? 4,
+            distance: options.distance ?? 4,
+            offset: options.offset ?? 0,
+            lockScroll: options.lockScroll ?? true,
             ...(options.onExternalClose !== undefined && {
                 onExternalClose: options.onExternalClose,
             }),
@@ -40,6 +53,18 @@ export class PopoverController implements ReactiveController {
 
     setPlacement(placement: Placement): void {
         this._options.placement = placement;
+    }
+
+    setLockScroll(value: boolean): void {
+        this._options.lockScroll = value;
+    }
+
+    setDistance(value: number): void {
+        this._options.distance = value;
+    }
+
+    setOffset(value: number): void {
+        this._options.offset = value;
     }
 
     /** Called from host firstUpdated() once DOM refs are available. */
@@ -56,14 +81,16 @@ export class PopoverController implements ReactiveController {
 
     show(): void {
         if (this._isOpen || !this._panel || !this._trigger) return;
-        this._panel.showPopover();
-        this._isOpen = true;
-        this._syncTriggerAria();
         this._cleanupAutoUpdate = autoUpdate(
             this._trigger,
             this._panel,
-            () => void this._position(),
+            async () => await this._position(),
         );
+        if (this._options.lockScroll) this._lockScrollContainers();
+        this._panel.style.visibility = 'hidden';
+        this._panel.showPopover();
+        this._isOpen = true;
+        this._syncTriggerAria();
         this.host.requestUpdate();
     }
 
@@ -71,6 +98,7 @@ export class PopoverController implements ReactiveController {
         if (!this._isOpen || !this._panel) return;
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
+        this._unlockScrollContainers();
         this._panel.hidePopover();
         this._isOpen = false;
         this._syncTriggerAria();
@@ -87,12 +115,16 @@ export class PopoverController implements ReactiveController {
     hostDisconnected(): void {
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
+        this._unlockScrollContainers();
         this._panel?.removeEventListener('toggle', this._onPanelToggle);
     }
 
     private _onPanelToggle = (e: Event): void => {
         const newState = (e as ToggleEvent).newState;
         if (newState === 'closed' && this._isOpen) {
+            this._cleanupAutoUpdate?.();
+            this._cleanupAutoUpdate = null;
+            this._unlockScrollContainers();
             this._isOpen = false;
             this._syncTriggerAria();
             this._options.onExternalClose?.();
@@ -100,19 +132,51 @@ export class PopoverController implements ReactiveController {
         }
     };
 
+    private _lockScrollContainers(): void {
+        let el: HTMLElement | null = this._trigger?.parentElement ?? null;
+        while (el && el !== document.documentElement) {
+            const { overflowY, overflowX } = getComputedStyle(el);
+            if (['auto', 'scroll'].includes(overflowY) || ['auto', 'scroll'].includes(overflowX)) {
+                this._scrollLocks.push({
+                    el,
+                    overflowY: el.style.overflowY,
+                    overflowX: el.style.overflowX,
+                });
+                el.style.overflowY = 'hidden';
+                el.style.overflowX = 'hidden';
+            }
+            el = el.parentElement;
+        }
+    }
+
+    private _unlockScrollContainers(): void {
+        for (const { el, overflowY, overflowX } of this._scrollLocks) {
+            el.style.overflowY = overflowY;
+            el.style.overflowX = overflowX;
+        }
+        this._scrollLocks = [];
+    }
+
     private async _position(): Promise<void> {
         if (!this._trigger || !this._panel) return;
         const { x, y, middlewareData } = await computePosition(this._trigger, this._panel, {
             placement: this._options.placement,
-            middleware: [offset(this._options.offsetPx), flip(), shift({ padding: 8 }), hide()],
+            strategy: 'absolute',
+            middleware: [
+                offset({ mainAxis: this._options.distance, crossAxis: this._options.offset }),
+                flip(),
+                shift({ padding: 4 }),
+                hide(),
+            ],
         });
-        if (middlewareData.hide?.referenceHidden) {
-            this._options.onExternalClose?.();
-            return;
-        }
-        this._panel.style.position = 'fixed';
-        this._panel.style.top = `${y}px`;
-        this._panel.style.left = `${x}px`;
+        this._panel.style.visibility = middlewareData.hide?.referenceHidden ? 'hidden' : '';
+        if (middlewareData.hide?.referenceHidden) return;
+        this._panel.style.transform = `translate(${this._roundByDPR(x)}px, ${this._roundByDPR(y)}px)`;
+    }
+
+    private _roundByDPR(value: number): number {
+        const dpr = window.devicePixelRatio || 1;
+        return Math.round(value * dpr) / dpr;
     }
 
     private _syncTriggerAria(): void {
