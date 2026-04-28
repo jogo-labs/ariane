@@ -14,6 +14,19 @@ variants:
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
               <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
           </ar-dropdown>
+    - name: divider
+      label: Séparateur
+      description: >
+          Un `<hr>` placé entre des `ar-dropdown-item` reçoit automatiquement `role="separator"`.
+          Stylez-le avec votre propre CSS — ici via une variable CSS du token de bordure.
+      html: |
+          <ar-dropdown>
+              <button class="btn btn-secondary" slot="trigger">Actions ▾</button>
+              <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+              <hr style="border:none;border-top:1px solid var(--ar-color-border,#e5e7eb);margin:.25rem 0;">
+              <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+          </ar-dropdown>
     - name: free-content
       label: Contenu libre
       description: Sans ar-dropdown-item, le panel est un conteneur libre — aucun role ni navigation clavier n'est ajouté.
@@ -31,14 +44,57 @@ variants:
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
           </ar-dropdown>
+    - name: distance
+      label: Distance personnalisée
+      description: Espacement en pixels entre le trigger et le panel (axe principal). La valeur par défaut est 4px.
+      html: |
+          <ar-dropdown distance="16">
+              <button class="btn btn-secondary" slot="trigger">Distance 16px ▾</button>
+              <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Item 3</button></ar-dropdown-item>
+          </ar-dropdown>
+    - name: offset
+      label: Offset latéral
+      description: Décalage latéral en pixels du panel par rapport au trigger (axe transversal). La valeur par défaut est 0.
+      html: |
+          <ar-dropdown offset="32">
+              <button class="btn btn-secondary" slot="trigger">Offset 32px ▾</button>
+              <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Item 3</button></ar-dropdown-item>
+          </ar-dropdown>
+    - name: external-trigger
+      label: Trigger externe
+      description: "L'attribut `trigger` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
+      html: |
+          <button class="btn btn-secondary" id="ar-doc-ext-trigger">Trigger externe ▾</button>
+          <ar-dropdown trigger="ar-doc-ext-trigger">
+              <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+              <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+          </ar-dropdown>
     - name: disabled
       label: Désactivé
-      description: Le trigger ne répond plus aux clics.
+      description: |
+          Posez `disabled` sur `ar-dropdown` pour bloquer la logique JS, et `aria-disabled="true"`
+          (pas l'attribut natif `disabled`) sur le trigger pour qu'il reste focusable — les technologies
+          d'assistance annoncent l'état et peuvent lire la raison via `aria-describedby`.
+          WCAG exempte les composants désactivés des exigences de contraste : `opacity: .5` est donc conforme.
       html: |
           <ar-dropdown disabled>
-              <button class="btn btn-secondary" slot="trigger" disabled>Désactivé ▾</button>
+              <button
+                  class="btn btn-secondary"
+                  slot="trigger"
+                  aria-disabled="true"
+                  aria-describedby="disabled-reason"
+                  style="opacity:.5;cursor:not-allowed;"
+              >Actions ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
           </ar-dropdown>
+          <p id="disabled-reason" style="margin-top:.5rem;font-size:.875rem;color:var(--ar-color-text-muted,#6b7280);">
+              Droits insuffisants pour effectuer cette action.
+          </p>
 ---
 
 ## Accessibilité
@@ -56,4 +112,4 @@ variants:
 
 - **Le bouton du trigger doit être accessible.** Fournir un libellé textuel clair ou un `aria-label` si le trigger ne contient que de l'iconographie.
 - **En mode menu, envelopper chaque action dans `ar-dropdown-item`.** Les éléments sans `ar-dropdown-item` dans un panel menu ne reçoivent pas `role="menuitem"` et sortent de la navigation clavier.
-- **Ne pas désactiver le bouton trigger sans désactiver aussi `ar-dropdown[disabled]`.** L'attribut `disabled` sur le composant bloque la logique d'ouverture côté JS — le désactiver uniquement sur le bouton ne suffit pas.
+- **Pour l'état désactivé, coupler `ar-dropdown[disabled]` et `aria-disabled="true"` sur le trigger.** L'attribut `disabled` du composant bloque la logique JS ; `aria-disabled="true"` (à la place du `disabled` natif) maintient le bouton dans l'ordre de tabulation pour que les technologies d'assistance puissent annoncer l'état et lire une éventuelle raison via `aria-describedby`.
