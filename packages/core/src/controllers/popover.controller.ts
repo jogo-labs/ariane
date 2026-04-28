@@ -79,19 +79,23 @@ export class PopoverController implements ReactiveController {
         panel.addEventListener('toggle', this._onPanelToggle);
     }
 
-    show(): void {
-        if (this._isOpen || !this._panel || !this._trigger) return;
-        this._cleanupAutoUpdate = autoUpdate(
-            this._trigger,
-            this._panel,
-            async () => await this._position(),
-        );
+    show(): Promise<void> {
+        if (this._isOpen || !this._panel || !this._trigger) return Promise.resolve();
         if (this._options.lockScroll) this._lockScrollContainers();
         this._panel.style.visibility = 'hidden';
         this._panel.showPopover();
         this._isOpen = true;
         this._syncTriggerAria();
+        this._cleanupAutoUpdate = autoUpdate(
+            this._trigger,
+            this._panel,
+            async () => await this._position(),
+        );
         this.host.requestUpdate();
+        // Return a promise that resolves once the panel is positioned and visible.
+        // autoUpdate also calls _position() immediately (idempotent), but we need
+        // our own promise so callers know when it's safe to move focus.
+        return this._position();
     }
 
     hide(): void {
@@ -107,7 +111,7 @@ export class PopoverController implements ReactiveController {
 
     toggle(): void {
         if (this._isOpen) this.hide();
-        else this.show();
+        else void this.show();
     }
 
     hostConnected(): void {}

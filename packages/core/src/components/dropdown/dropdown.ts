@@ -205,10 +205,9 @@ export class ArDropdown extends LitElement {
             return;
         }
         this._detectMenuMode();
-        this._popover.show();
         this._panel?.addEventListener('keydown', this._handlePanelKeyDown);
         if (this._menuMode) this._activateMenuListeners();
-        void this.updateComplete.then(() => {
+        void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
             this._emit('ar-dropdown-shown');
         });
