@@ -131,6 +131,8 @@ export class Popover {
                 hide(),
             ],
         });
+        // Guard: panel may have been destroyed during the async computePosition call.
+        if (!this._panel) return;
         const hidden = middlewareData.hide?.referenceHidden ?? false;
         this._panel.style.visibility = hidden ? 'hidden' : '';
         this._panel.style.transform = `translate(${this._roundByDPR(x)}px, ${this._roundByDPR(y)}px)`;

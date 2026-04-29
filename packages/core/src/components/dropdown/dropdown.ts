@@ -1,6 +1,6 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { PopoverController } from '../../controllers/popover.controller.js';
+import { AnchoredController } from '../../controllers/anchored.controller.js';
 import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import styles from './dropdown.styles.js';
 
@@ -74,7 +74,7 @@ export class ArDropdown extends LitElement {
 
     @query('[part="panel"]') private _panel!: HTMLElement;
 
-    private readonly _popover = new PopoverController(this, {
+    private readonly _popover = new AnchoredController(this, {
         onExternalClose: () => {
             this.open = false;
         },
@@ -92,10 +92,7 @@ export class ArDropdown extends LitElement {
             console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
         }
         if (trigger && this._panel) {
-            this._popover.attach(
-                trigger,
-                this._panel as HTMLElement & { showPopover(): void; hidePopover(): void },
-            );
+            this._popover.attach(trigger, this._panel);
             if (this.trigger) {
                 trigger.addEventListener('click', this._handleTriggerClick);
                 this._externalTrigger = trigger;
@@ -125,10 +122,7 @@ export class ArDropdown extends LitElement {
                 console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
             }
             if (newTrigger && this._panel) {
-                this._popover.attach(
-                    newTrigger,
-                    this._panel as HTMLElement & { showPopover(): void; hidePopover(): void },
-                );
+                this._popover.attach(newTrigger, this._panel);
                 if (this.trigger) {
                     newTrigger.addEventListener('click', this._handleTriggerClick);
                     this._externalTrigger = newTrigger;
@@ -169,10 +163,7 @@ export class ArDropdown extends LitElement {
         if (this.trigger) return;
         const trigger = this._resolvedTrigger;
         if (!trigger || !this._panel) return;
-        this._popover.attach(
-            trigger,
-            this._panel as HTMLElement & { showPopover(): void; hidePopover(): void },
-        );
+        this._popover.attach(trigger, this._panel);
         trigger.addEventListener('click', this._handleTriggerClick);
     }
 
