@@ -106,7 +106,7 @@ export class ArBreadcrumb extends LitElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        if (changed.has('isMobile') && this.isMobile) {
+        if ((changed as Map<PropertyKey, unknown>).has('isMobile') && this.isMobile) {
             void this.updateComplete.then(() => {
                 if (this.isConnected) this._attachDropdown();
             });

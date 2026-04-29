@@ -20,3 +20,4 @@ export { ArDialog } from './components/dialog/dialog.js';
 export { ArDropdown } from './components/dropdown/dropdown.js';
 export { ArDropdownItem } from './components/dropdown-item/dropdown-item.js';
 export { AnchoredController } from './controllers/anchored.controller.js';
+export { TooltipController } from './controllers/tooltip.controller.js';
