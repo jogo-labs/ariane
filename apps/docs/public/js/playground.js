@@ -52,11 +52,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!preview || !tagName) return;
 
-        // Met à jour le bloc code et re-colore avec hljs
+        // Template de référence — capturé une seule fois, avant tout attribut runtime
+        var originalHtml = codeEl ? codeEl.textContent.trim() : '';
+
+        // Met à jour le bloc code depuis le template original, sans attributs runtime
         function updateCode() {
             if (!codeEl) return;
-            // Capture le HTML complet de la preview (bouton déclencheur + composant)
-            var html = preview.innerHTML.trim();
+            var parser = new DOMParser();
+            var doc = parser.parseFromString('<body>' + originalHtml + '</body>', 'text/html');
+            var templateEl = doc.body.querySelector(tagName);
+            if (templateEl) {
+                controls.forEach(function (c) {
+                    var attr = c.dataset.attr;
+                    if (!attr) return;
+                    if (c.type === 'checkbox') {
+                        if (c.checked) templateEl.setAttribute(attr, '');
+                        else templateEl.removeAttribute(attr);
+                    } else if (c.value !== '') {
+                        templateEl.setAttribute(attr, c.value);
+                    } else {
+                        templateEl.removeAttribute(attr);
+                    }
+                });
+            }
+            var html = doc.body.innerHTML.trim();
             // Le DOM sérialise les attributs booléens en attr="" — on corrige en attr seul
             controls.forEach(function (c) {
                 if (c.type === 'checkbox' && c.dataset.attr) {
@@ -66,13 +85,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     );
                 }
             });
-            codeEl.textContent = html; // textContent = texte brut, pas d'injection HTML
-            codeEl.removeAttribute('data-highlighted'); // permet à hljs de re-coloriser
+            codeEl.textContent = html;
+            codeEl.removeAttribute('data-highlighted');
             if (window.hljs) window.hljs.highlightElement(codeEl);
         }
 
         // Synchroniser les contrôles depuis les attributs du composant (init + changements)
         var compEl = preview.querySelector(tagName);
+        var controlledAttrs = Array.from(controls).map(function (c) {
+            return c.dataset.attr;
+        });
 
         function syncControlsFromComponent() {
             if (!compEl) return;
@@ -89,12 +111,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         syncControlsFromComponent();
+        updateCode();
 
-        // Observer les changements d'attributs du composant pour maintenir la sync
+        // Observer les changements d'attributs du composant pour maintenir la sync.
+        // updateCode() n'est déclenché que si un attribut contrôlé change (pas open/aria-*).
         if (compEl) {
-            new MutationObserver(function () {
+            new MutationObserver(function (mutations) {
+                var controlledChanged = mutations.some(function (m) {
+                    return controlledAttrs.indexOf(m.attributeName) !== -1;
+                });
                 syncControlsFromComponent();
-                updateCode();
+                if (controlledChanged) updateCode();
             }).observe(compEl, { attributes: true });
         }
 

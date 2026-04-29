@@ -71,8 +71,8 @@ const tagName = input.startsWith(`${PREFIX}-`) ? input : `${PREFIX}-${input}`;
 const parts = tagName.split('-');
 const className = parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
 
-// Répertoire = parties après le prefix, sans tirets : ar-my-button → mybutton
-const dirName = parts.slice(1).join('');
+// Répertoire = parties après le prefix, avec tirets conservés : ar-my-button → my-button
+const dirName = parts.slice(1).join('-');
 
 const componentDir = join(ROOT, 'src', 'components', dirName);
 const fileName = dirName;

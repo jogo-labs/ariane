@@ -9,6 +9,8 @@
  * @type {import('@custom-elements-manifest/analyzer').UserConfig}
  */
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
 
 export default {
@@ -90,6 +92,44 @@ export default {
                 });
             },
             packageLinkPhase({ customElementsManifest }) {
+                // Résolution des type aliases de string union depuis les sources.
+                // Le CEM sort le nom de l'alias (ex: "ArDropdownPlacement") au lieu de la
+                // valeur réelle — on lit les fichiers pour construire une map de résolution.
+                const typeAliasMap = new Map();
+                for (const mod of customElementsManifest.modules) {
+                    try {
+                        const src = readFileSync(resolve(process.cwd(), mod.path), 'utf-8');
+                        // Capture multiline type aliases (with or without leading |)
+                        for (const match of src.matchAll(/export\s+type\s+(\w+)\s*=([^;]+);/gms)) {
+                            const name = match[1];
+                            const raw = match[2]
+                                .replace(/\s+/g, ' ')
+                                .replace(/^\s*\|\s*/, '')
+                                .trim();
+                            const parts = raw.split(/\s*\|\s*/);
+                            const isStringUnion =
+                                parts.length > 1 && parts.every((p) => /^['"][^'"]+['"]$/.test(p));
+                            if (isStringUnion) typeAliasMap.set(name, raw);
+                        }
+                    } catch {
+                        // fichier inaccessible — on ignore
+                    }
+                }
+
+                // Résoudre les aliases aussi dans la section attributes (tableau API).
+                for (const mod of customElementsManifest.modules) {
+                    for (const decl of mod.declarations ?? []) {
+                        if (!decl.attributes) continue;
+                        decl.attributes = decl.attributes.map((attr) => {
+                            const t = attr.type?.text ?? '';
+                            if (typeAliasMap.has(t)) {
+                                return { ...attr, type: { text: typeAliasMap.get(t) } };
+                            }
+                            return attr;
+                        });
+                    }
+                }
+
                 // Masquer les champs statiques des knobs api-demo (pas d'attribut HTML)
                 // et extraire les options d'enum pour les knobs de type <select>.
                 for (const mod of customElementsManifest.modules) {
@@ -101,9 +141,15 @@ export default {
                                 return { ...member, privacy: 'private' };
                             }
 
+                            // Résoudre les aliases de type avant le check isStringUnion
+                            let typeText = member.type?.text ?? '';
+                            if (typeAliasMap.has(typeText)) {
+                                member = { ...member, type: { text: typeAliasMap.get(typeText) } };
+                                typeText = member.type.text;
+                            }
+
                             // Union de string literals → extraire les options pour knob select
                             // Ex: "'success' | 'warning' | 'error' | 'info'" → x-knob-options: ['success','warning',...]
-                            const typeText = member.type?.text ?? '';
                             const cleanType = typeText
                                 .replace(/\s*\|\s*(undefined|null)/g, '')
                                 .trim();

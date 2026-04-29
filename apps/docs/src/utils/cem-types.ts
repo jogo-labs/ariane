@@ -119,6 +119,12 @@ export function hasUndefined(typeText: string): boolean {
     return /\bundefined\b/.test(typeText);
 }
 
+/** Supprime les guillemets encadrant les string literals TypeScript (`'foo'` → `foo`). */
+function stripQuotes(val: string | undefined): string | undefined {
+    if (!val) return val;
+    return val.replace(/^(['"`])(.*)\1$/, '$2');
+}
+
 /**
  * Construit le tableau de contrôles playground depuis les membres CEM d'un composant.
  * Filtre les membres privés, protected, readonly et ceux sans attribut HTML.
@@ -139,7 +145,7 @@ export function buildControls(members: CemMember[]): CemControl[] {
             return {
                 attribute: m.attribute as string,
                 description: m.description,
-                default: m.default,
+                default: stripQuotes(m.default),
                 controlType: stringUnion
                     ? ('select' as const)
                     : typeText === 'boolean'
