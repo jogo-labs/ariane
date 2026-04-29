@@ -172,7 +172,6 @@ export function renderMobile(
             <button
                 type="button"
                 class="btn btn-secondary dropdown-toggle btn-block btn-stepper-mobile"
-                aria-expanded=${ctx.isOpen}
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
