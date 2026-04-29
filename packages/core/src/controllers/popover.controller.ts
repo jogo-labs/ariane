@@ -14,11 +14,14 @@ export interface PopoverControllerOptions {
     onExternalClose?: () => void;
 }
 
-interface _ScrollLock {
-    el: HTMLElement;
+// Partagé entre instances : ref-count par élément pour gérer les dropdowns empilés.
+// Même pattern que arDialogLocks dans ar-dialog.
+interface _ScrollLockEntry {
+    count: number;
     overflowY: string;
     overflowX: string;
 }
+const _scrollLockRegistry = new Map<HTMLElement, _ScrollLockEntry>();
 
 export class PopoverController implements ReactiveController {
     private host: ReactiveControllerHost & HTMLElement;
@@ -26,7 +29,7 @@ export class PopoverController implements ReactiveController {
     private _panel: PopoverPanel | null = null;
     private _isOpen = false;
     private _cleanupAutoUpdate: (() => void) | null = null;
-    private _scrollLocks: _ScrollLock[] = [];
+    private _scrollLocks: HTMLElement[] = [];
     private _options: Required<Omit<PopoverControllerOptions, 'onExternalClose'>> & {
         onExternalClose?: () => void;
     };
@@ -140,23 +143,42 @@ export class PopoverController implements ReactiveController {
         let el: HTMLElement | null = this._trigger?.parentElement ?? null;
         while (el && el !== document.documentElement) {
             const { overflowY, overflowX } = getComputedStyle(el);
-            if (['auto', 'scroll'].includes(overflowY) || ['auto', 'scroll'].includes(overflowX)) {
-                this._scrollLocks.push({
-                    el,
-                    overflowY: el.style.overflowY,
-                    overflowX: el.style.overflowX,
-                });
-                el.style.overflowY = 'hidden';
-                el.style.overflowX = 'hidden';
+            // Include containers already locked by another controller: their computed
+            // overflow is 'hidden' so the 'auto'/'scroll' check alone would miss them.
+            const alreadyLocked = _scrollLockRegistry.has(el);
+            if (
+                alreadyLocked ||
+                ['auto', 'scroll'].includes(overflowY) ||
+                ['auto', 'scroll'].includes(overflowX)
+            ) {
+                const entry = _scrollLockRegistry.get(el);
+                if (!entry) {
+                    _scrollLockRegistry.set(el, {
+                        count: 1,
+                        overflowY: el.style.overflowY,
+                        overflowX: el.style.overflowX,
+                    });
+                    el.style.overflowY = 'hidden';
+                    el.style.overflowX = 'hidden';
+                } else {
+                    entry.count++;
+                }
+                this._scrollLocks.push(el);
             }
             el = el.parentElement;
         }
     }
 
     private _unlockScrollContainers(): void {
-        for (const { el, overflowY, overflowX } of this._scrollLocks) {
-            el.style.overflowY = overflowY;
-            el.style.overflowX = overflowX;
+        for (const el of this._scrollLocks) {
+            const entry = _scrollLockRegistry.get(el);
+            if (!entry) continue;
+            entry.count--;
+            if (entry.count === 0) {
+                el.style.overflowY = entry.overflowY;
+                el.style.overflowX = entry.overflowX;
+                _scrollLockRegistry.delete(el);
+            }
         }
         this._scrollLocks = [];
     }
