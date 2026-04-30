@@ -149,6 +149,13 @@ export default css`
         background-image: linear-gradient(var(--ar-color-neutral-70, #b5b8c3) 25%, transparent 0);
     }
 
+    /* ── Wrapper dropdown mobile ────────────────────────────── */
+
+    .breadcrumb-dropdown {
+        display: inline-flex;
+        position: relative;
+    }
+
     /* ── Panel flottant mobile ───────────────────────────────── */
 
     [part='panel'] {

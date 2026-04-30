@@ -252,7 +252,6 @@ export class ArStepper extends LitElement {
             : renderMobile(
                   steps,
                   {
-                      isOpen: this.dropdown.isOpen,
                       currentStepIndex: this._currentStepIndex,
                       currentStepLabel: this.getCurrentStepLabel(),
                       currentSubStepLabel: this.getCurrentSubStepLabel(),

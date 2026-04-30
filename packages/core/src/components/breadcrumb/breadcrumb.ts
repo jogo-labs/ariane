@@ -143,10 +143,7 @@ export class ArBreadcrumb extends LitElement {
             >
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
-                    ? html`<div
-                          part="dropdown"
-                          class="dropdown breadcrumb-dropdown${this.dropdownOpen ? ' show' : ''}"
-                      >
+                    ? html`<div part="dropdown" class="breadcrumb-dropdown">
                           <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
                               <span class="btn-content">${items[0]?.label}</span>
