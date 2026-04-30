@@ -45,9 +45,10 @@ export interface ArStepperStepChangeDetail {
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
  * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-stepper-gap=1.5rem]                                                          - Hauteur du connecteur entre les étapes principales.
- * @cssprop [--ar-stepper-substep-gap=1rem]                                                    - Hauteur du connecteur entre les sous-étapes.
+ * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width,18rem)]                    - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)]                    - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @cssprop [--ar-stepper-gap=1.5rem]                                                         - Hauteur du connecteur entre les étapes principales.
+ * @cssprop [--ar-stepper-substep-gap=1rem]                                                   - Hauteur du connecteur entre les sous-étapes.
  * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
  * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.

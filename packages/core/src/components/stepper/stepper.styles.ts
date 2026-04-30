@@ -17,6 +17,7 @@ export default css`
 
     [part='panel'] {
         padding: 0.75rem;
+        min-width: var(--ar-stepper-panel-min-width, var(--ar-panel-min-width, 18rem));
         max-width: var(--ar-stepper-panel-max-width, var(--ar-panel-max-width, 18rem));
     }
 
