@@ -173,7 +173,7 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             el.open = true;
             await waitForUpdate(el);
-            expect(document.body.style.overflow).toBe('hidden');
+            expect(document.body.style.overflowY).toBe('hidden');
         });
 
         it("émet ar-dialog-show avant l'ouverture", async () => {

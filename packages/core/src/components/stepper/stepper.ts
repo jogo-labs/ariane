@@ -1,5 +1,5 @@
 import { LitElement, html, type TemplateResult, type CSSResultGroup } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -12,7 +12,7 @@ import { stepperContext, type StepperRegistry } from '../../context/stepper.cont
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
-import { DropdownController } from '../../controllers/dropdown.controller.js';
+import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { type ArStepperItem } from '../stepper-item/stepper-item.js';
 
@@ -122,10 +122,14 @@ export class ArStepper extends LitElement {
     @state()
     private _isDesktop = false;
 
+    @query('.btn-stepper-mobile') private _dropdownTrigger?: HTMLElement;
+    @query('#stepper-dropdown-menu') private _dropdownPanel?: HTMLElement;
+
     private _originalParent: ParentNode | null = null;
     private _originalNextSibling: ChildNode | null = null;
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
+    private _dropdownAttached = false;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -134,7 +138,10 @@ export class ArStepper extends LitElement {
 
     private readonly navigation = new NavigationTreeController(this);
     private readonly scrollFollow = new ScrollFollowController(this, () => this.getScrollTargets());
-    private readonly dropdown = new DropdownController(this);
+    private readonly dropdown = new AnchoredController(this, {
+        lockScroll: false,
+        popupMode: 'menu',
+    });
     private readonly _onDropdownToggle = () => this.dropdown.toggle();
 
     // ── Registry / Context ───────────────────────────────────────────────────
@@ -189,6 +196,24 @@ export class ArStepper extends LitElement {
         this.removeEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
         this.teardownResponsiveMode();
         super.disconnectedCallback();
+    }
+
+    override updated(_changed: Map<PropertyKey, unknown>): void {
+        if (!this._isDesktop && !this._dropdownAttached) {
+            void this.updateComplete.then(() => {
+                this._dropdownAttached = this._attachDropdown();
+            });
+        }
+    }
+
+    private _attachDropdown(): boolean {
+        if (!this.isConnected) return false;
+        if (this._dropdownTrigger && this._dropdownPanel) {
+            this.dropdown.hide(); // flush stale scroll-lock refs before re-attach
+            this.dropdown.attach(this._dropdownTrigger, this._dropdownPanel);
+            return true;
+        }
+        return false;
     }
 
     // ── Reactivity ───────────────────────────────────────────────────────────
@@ -306,6 +331,7 @@ export class ArStepper extends LitElement {
     }
 
     private applyResponsiveMode(matches: boolean): void {
+        const wasDesktop = this._isDesktop;
         // Le mode de rendu suit le breakpoint, indépendamment de la téléportation
         this._isDesktop = matches;
 
@@ -315,6 +341,10 @@ export class ArStepper extends LitElement {
             } else {
                 this._restoreToOriginalContainer();
             }
+        }
+        // Retour en mode mobile : updated() re-attachera dès que les éléments sont dans le DOM
+        if (wasDesktop && !matches) {
+            this._dropdownAttached = false;
         }
     }
 

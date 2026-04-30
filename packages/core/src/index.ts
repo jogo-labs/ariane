@@ -19,4 +19,5 @@ export { ArStepperItem } from './components/stepper-item/stepper-item.js';
 export { ArDialog } from './components/dialog/dialog.js';
 export { ArDropdown } from './components/dropdown/dropdown.js';
 export { ArDropdownItem } from './components/dropdown-item/dropdown-item.js';
-export { PopoverController } from './controllers/popover.controller.js';
+export { AnchoredController } from './controllers/anchored.controller.js';
+export { TooltipController } from './controllers/tooltip.controller.js';

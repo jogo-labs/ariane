@@ -13,6 +13,7 @@ import styles from './dialog.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
+import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
@@ -26,9 +27,7 @@ export type ArDialogEvents =
     | 'ar-dialog-accepted'
     | 'ar-dialog-accepted-prevented';
 
-const arDialogLocks = new Set<ArDialog>();
-// Partagé entre instances pour restaurer fidèlement le overflow d'origine lors d'un empilement de dialogs.
-let _savedBodyOverflow: string | null = null;
+const _dialogStack: ArDialog[] = [];
 
 const DEFAULT_DIALOG_LABEL = 'Dialogue';
 
@@ -267,26 +266,20 @@ export class ArDialog extends LitElement {
 
     // ── Scroll management ──────────────────────────────────────────────────────
 
-    /** Bloque le scroll du body. Le backup est partagé entre instances pour gérer les dialogs empilés. */
+    /** Bloque le scroll du body. */
     private _freezeScroll() {
-        if (arDialogLocks.size === 0) {
-            _savedBodyOverflow = document.body.style.overflow || null;
+        if (!_dialogStack.includes(this)) {
+            _dialogStack.push(this);
+            acquireScrollLock(document.body);
         }
-        arDialogLocks.add(this);
-        document.body.style.overflow = 'hidden';
     }
 
     /** Restaure le scroll du body, seulement quand aucun autre dialog n'est ouvert. */
     private _unfreezeScroll() {
-        arDialogLocks.delete(this);
-        if (arDialogLocks.size > 0) return;
-
-        if (_savedBodyOverflow) {
-            document.body.style.overflow = _savedBodyOverflow;
-        } else {
-            document.body.style.removeProperty('overflow');
-        }
-        _savedBodyOverflow = null;
+        const idx = _dialogStack.indexOf(this);
+        if (idx === -1) return;
+        _dialogStack.splice(idx, 1);
+        releaseScrollLock(document.body);
     }
 
     // ── Events ─────────────────────────────────────────────────────────────────
@@ -356,8 +349,7 @@ export class ArDialog extends LitElement {
     private _handleDocumentKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape' && this.open && !this._isClosing) {
             // N'intercepte Escape que si ce dialog est au sommet de la pile (dialogs empilés)
-            const locks = [...arDialogLocks];
-            if (locks[locks.length - 1] !== this) return;
+            if (_dialogStack[_dialogStack.length - 1] !== this) return;
             event.preventDefault();
             event.stopPropagation();
             this._close();
@@ -366,7 +358,7 @@ export class ArDialog extends LitElement {
 
     private _handleDialogCancel = (event: Event) => {
         // Toujours annulé : la gestion Escape est déléguée à _handleDocumentKeyDown pour
-        // respecter la pile de dialogs (arDialogLocks) et les animations de fermeture.
+        // respecter la pile de dialogs (_dialogStack) et les animations de fermeture.
         event.preventDefault();
     };
 

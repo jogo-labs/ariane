@@ -1,5 +1,12 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import {
+    LitElement,
+    type TemplateResult,
+    html,
+    type CSSResultGroup,
+    nothing,
+    type PropertyValues,
+} from 'lit';
+import { customElement, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import dropdownStyles from '../../styles/components/dropdown.styles.js';
@@ -8,6 +15,7 @@ import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
+import { AnchoredController } from '../../controllers/anchored.controller.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
@@ -44,6 +52,9 @@ export class ArBreadcrumb extends LitElement {
     @state() private isMobile: boolean = ArBreadcrumb.mobileQuery.matches;
     @state() private dropdownOpen: boolean = false;
 
+    @query('#breadcrumb-dropdown') private _dropdownTrigger?: HTMLButtonElement;
+    @query('.breadcrumb-dropdown-panel') private _dropdownPanel?: HTMLElement;
+
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
 
@@ -64,6 +75,17 @@ export class ArBreadcrumb extends LitElement {
         },
     });
 
+    private readonly _anchoredCtrl = new AnchoredController(this, {
+        lockScroll: false,
+        popupMode: 'menu',
+        onExternalClose: () => {
+            this.dropdownOpen = false;
+            this.dispatchEvent(
+                new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
+            );
+        },
+    });
+
     // ---------------------------------------------------------------------------
     // Lifecycle
     // ---------------------------------------------------------------------------
@@ -77,6 +99,18 @@ export class ArBreadcrumb extends LitElement {
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
+    }
+
+    override firstUpdated(): void {
+        if (this.isMobile) this._attachDropdown();
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        if ((changed as Map<PropertyKey, unknown>).has('isMobile') && this.isMobile) {
+            void this.updateComplete.then(() => {
+                if (this.isConnected) this._attachDropdown();
+            });
+        }
     }
 
     // ---------------------------------------------------------------------------
@@ -122,7 +156,6 @@ export class ArBreadcrumb extends LitElement {
                           </a>
                           <button
                               @click=${this.dropdownOpen ? this._hide : this._show}
-                              .ariaExpanded=${this.dropdownOpen}
                               type="button"
                               class="btn btn-tertiary btn-ratio-square"
                               id="breadcrumb-dropdown"
@@ -131,9 +164,11 @@ export class ArBreadcrumb extends LitElement {
                               <span class="btn-content sr-only">Afficher le fil d'ariane</span>
                           </button>
                           <div
-                              class="dropdown-menu dropdown-menu-left${this.dropdownOpen
+                              class="dropdown-menu dropdown-menu-left breadcrumb-dropdown-panel${this
+                                  .dropdownOpen
                                   ? ' show'
                                   : ''}"
+                              popover="auto"
                               tabindex="-1"
                           >
                               <ol class="breadcrumb breadcrumb-mobile">
@@ -173,9 +208,15 @@ export class ArBreadcrumb extends LitElement {
         });
     }
 
+    private _attachDropdown(): void {
+        if (this._dropdownTrigger && this._dropdownPanel) {
+            this._anchoredCtrl.attach(this._dropdownTrigger, this._dropdownPanel);
+        }
+    }
+
     private _show(): void {
         this.dropdownOpen = true;
-        this.addEventListener('blur', this._hide);
+        void this._anchoredCtrl.show();
         this.dispatchEvent(
             new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
         );
@@ -183,7 +224,7 @@ export class ArBreadcrumb extends LitElement {
 
     private _hide(): void {
         this.dropdownOpen = false;
-        this.removeEventListener('blur', this._hide);
+        this._anchoredCtrl.hide();
         this.dispatchEvent(
             new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
         );
