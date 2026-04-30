@@ -159,6 +159,7 @@ export default css`
     /* ── Panel flottant mobile ───────────────────────────────── */
 
     [part='panel'] {
+        min-width: var(--ar-breadcrumb-panel-min-width, var(--ar-panel-min-width, 18rem));
         max-width: var(--ar-breadcrumb-panel-max-width, var(--ar-panel-max-width, 18rem));
     }
 `;

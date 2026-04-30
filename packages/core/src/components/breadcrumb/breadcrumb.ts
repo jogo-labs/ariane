@@ -35,6 +35,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  *
  * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
  * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
+ * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width,18rem)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
  * @cssprop [--ar-breadcrumb-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  *
  * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
