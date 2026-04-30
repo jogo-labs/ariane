@@ -76,6 +76,7 @@ export class ArBreadcrumb extends LitElement {
     private readonly _anchoredCtrl = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
+        placement: 'bottom-end',
         onExternalClose: () => {
             this.dropdownOpen = false;
             this.dispatchEvent(
