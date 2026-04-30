@@ -11,8 +11,8 @@ function getBtn(el: ArBreadcrumb): HTMLButtonElement {
 }
 
 function getPanel(el: ArBreadcrumb): HTMLElement {
-    const panel = el.shadowRoot?.querySelector<HTMLElement>('.breadcrumb-dropdown-panel');
-    if (!panel) throw new Error('.breadcrumb-dropdown-panel introuvable');
+    const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+    if (!panel) throw new Error('[part="panel"] introuvable');
     return panel;
 }
 
@@ -65,6 +65,14 @@ describe('ar-breadcrumb — browser', () => {
             getBtn(el).click();
             await aTimeout(50);
             expect(getBtn(el).getAttribute('aria-expanded')).to.equal('false');
+        });
+    });
+
+    describe('structure', () => {
+        it('le panel a part="panel"', async () => {
+            el = await mobileBreadcrumb();
+            const panel = el.shadowRoot?.querySelector('[part="panel"]');
+            expect(panel).to.not.equal(null);
         });
     });
 

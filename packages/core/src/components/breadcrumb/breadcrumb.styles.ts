@@ -148,4 +148,10 @@ export default css`
     .high-contrast .breadcrumb-mobile:before {
         background-image: linear-gradient(var(--ar-color-neutral-70, #b5b8c3) 25%, transparent 0);
     }
+
+    /* ── Panel flottant mobile ───────────────────────────────── */
+
+    [part='panel'] {
+        max-width: var(--ar-breadcrumb-panel-max-width, var(--ar-panel-max-width, 18rem));
+    }
 `;
