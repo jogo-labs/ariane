@@ -54,7 +54,7 @@ export class ArBreadcrumb extends LitElement {
      * Sans effet en mode desktop.
      * @attr open
      */
-    @property({ reflect: true, type: Boolean }) open = false;
+    @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     @query('[part="trigger"]') private _dropdownTrigger?: HTMLButtonElement;
     @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
@@ -79,7 +79,7 @@ export class ArBreadcrumb extends LitElement {
         },
     });
 
-    private readonly _anchoredCtrl = new AnchoredController(this, {
+    private readonly _popover = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
         placement: 'bottom-end',
@@ -115,6 +115,19 @@ export class ArBreadcrumb extends LitElement {
             void this.updateComplete.then(() => {
                 if (this.isConnected) this._attachDropdown();
             });
+        }
+        if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
+            if (this.open) {
+                void this._popover.show();
+                this.dispatchEvent(
+                    new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
+                );
+            } else {
+                this._popover.hide();
+                this.dispatchEvent(
+                    new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
+                );
+            }
         }
     }
 
@@ -206,24 +219,16 @@ export class ArBreadcrumb extends LitElement {
 
     private _attachDropdown(): void {
         if (this._dropdownTrigger && this._dropdownPanel) {
-            this._anchoredCtrl.attach(this._dropdownTrigger, this._dropdownPanel);
+            this._popover.attach(this._dropdownTrigger, this._dropdownPanel);
         }
     }
 
     private _show(): void {
         this.open = true;
-        void this._anchoredCtrl.show();
-        this.dispatchEvent(
-            new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
-        );
     }
 
     private _hide(): void {
         this.open = false;
-        this._anchoredCtrl.hide();
-        this.dispatchEvent(
-            new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-        );
     }
 
     private _handleMediaChange = (): void => {

@@ -1,4 +1,10 @@
-import { LitElement, html, type TemplateResult, type CSSResultGroup } from 'lit';
+import {
+    LitElement,
+    html,
+    type TemplateResult,
+    type CSSResultGroup,
+    type PropertyValues,
+} from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
@@ -42,7 +48,7 @@ export interface ArStepperStepChangeDetail {
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
  * @csspart dropdown     - Le conteneur dropdown.
- * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
+ * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
  * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width,18rem)]                    - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
@@ -111,6 +117,14 @@ export class ArStepper extends LitElement {
     desktopFrom = 992;
 
     /**
+     * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
+     * Sans effet en mode desktop.
+     * @attr open
+     * @default false
+     */
+    @property({ reflect: true, type: Boolean }) open: boolean = false;
+
+    /**
      * Alignement de la liste d'étapes : `left` (défaut) ou `right`.
      * **Note** — l'alignement `right` ne s'applique qu'en mode desktop (rendu liste verticale).
      * En mode mobile (dropdown), les items restent alignés à gauche.
@@ -141,11 +155,16 @@ export class ArStepper extends LitElement {
 
     private readonly navigation = new NavigationTreeController(this);
     private readonly scrollFollow = new ScrollFollowController(this, () => this.getScrollTargets());
-    private readonly dropdown = new AnchoredController(this, {
+    private readonly _popover = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
+        onExternalClose: () => {
+            this.open = false;
+        },
     });
-    private readonly _onDropdownToggle = () => this.dropdown.toggle();
+    private readonly _onDropdownToggle = () => {
+        this.open = !this.open;
+    };
 
     // ── Registry / Context ───────────────────────────────────────────────────
 
@@ -201,19 +220,27 @@ export class ArStepper extends LitElement {
         super.disconnectedCallback();
     }
 
-    override updated(_changed: Map<PropertyKey, unknown>): void {
+    override updated(changed: PropertyValues<this>): void {
         if (!this._isDesktop && !this._dropdownAttached) {
             void this.updateComplete.then(() => {
                 this._dropdownAttached = this._attachDropdown();
             });
+        }
+        if (changed.has('open') && !this._isDesktop && this._dropdownAttached) {
+            if (this.open) {
+                void this._popover.show();
+            } else {
+                this._popover.hide();
+            }
         }
     }
 
     private _attachDropdown(): boolean {
         if (!this.isConnected) return false;
         if (this._dropdownTrigger && this._dropdownPanel) {
-            this.dropdown.hide(); // flush stale scroll-lock refs before re-attach
-            this.dropdown.attach(this._dropdownTrigger, this._dropdownPanel);
+            this._popover.hide(); // flush stale scroll-lock refs before re-attach
+            this._popover.attach(this._dropdownTrigger, this._dropdownPanel);
+            if (this.open) void this._popover.show();
             return true;
         }
         return false;
@@ -223,7 +250,7 @@ export class ArStepper extends LitElement {
 
     // willUpdate() s'exécute AVANT le rendu : les requestUpdate() déclenchés ici
     // (via setCurrentPath, setEnabled) sont mergés dans le cycle courant → 0 update parasite.
-    protected override willUpdate(changed: Map<PropertyKey, unknown>) {
+    protected override willUpdate(changed: PropertyValues<this>) {
         if (changed.has('currentPath') || this.navigation.tree.length) {
             this._currentStepIndex = this.computeCurrentStepIndex();
         }
