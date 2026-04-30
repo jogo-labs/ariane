@@ -129,6 +129,7 @@ export class ArStepper extends LitElement {
     private _originalNextSibling: ChildNode | null = null;
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
+    private _dropdownAttached = false;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -192,22 +193,27 @@ export class ArStepper extends LitElement {
     }
 
     override disconnectedCallback() {
-        this.dropdown.hide(); // stop autoUpdate and release scroll locks before destroy
         this.removeEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
         this.teardownResponsiveMode();
         super.disconnectedCallback();
     }
 
-    override firstUpdated(): void {
-        if (!this._isDesktop) this._attachDropdown();
+    override updated(_changed: Map<PropertyKey, unknown>): void {
+        if (!this._isDesktop && !this._dropdownAttached) {
+            void this.updateComplete.then(() => {
+                this._dropdownAttached = this._attachDropdown();
+            });
+        }
     }
 
-    private _attachDropdown(): void {
-        if (!this.isConnected) return;
+    private _attachDropdown(): boolean {
+        if (!this.isConnected) return false;
         if (this._dropdownTrigger && this._dropdownPanel) {
             this.dropdown.hide(); // flush stale scroll-lock refs before re-attach
             this.dropdown.attach(this._dropdownTrigger, this._dropdownPanel);
+            return true;
         }
+        return false;
     }
 
     // ── Reactivity ───────────────────────────────────────────────────────────
@@ -336,9 +342,9 @@ export class ArStepper extends LitElement {
                 this._restoreToOriginalContainer();
             }
         }
-        // Premier passage en mode mobile : attacher le controller après le prochain rendu
+        // Retour en mode mobile : updated() re-attachera dès que les éléments sont dans le DOM
         if (wasDesktop && !matches) {
-            void this.updateComplete.then(() => this._attachDropdown());
+            this._dropdownAttached = false;
         }
     }
 
