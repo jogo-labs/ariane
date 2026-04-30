@@ -466,6 +466,55 @@ describe('ArStepper', () => {
         });
     });
 
+    // ── Attribut open ─────────────────────────────────────────────────────────
+
+    describe('attribut open', () => {
+        it('vaut false par défaut', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(el.open).toBe(false);
+            expect(el.hasAttribute('open')).toBe(false);
+        });
+
+        it('est reflété comme attribut HTML quand posé programmatiquement', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(el.hasAttribute('open')).toBe(true);
+        });
+
+        it("open=true n'a pas d'effet en mode desktop", async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(shadow(el).querySelector('[part="trigger"]')).toBeNull();
+        });
+    });
+
     // ── Annonces a11y ─────────────────────────────────────────────────────────
 
     describe('annonces a11y', () => {

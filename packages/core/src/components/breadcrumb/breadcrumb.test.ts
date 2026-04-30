@@ -296,6 +296,91 @@ describe('ArBreadcrumb', () => {
 
             expect(fired).toBe(true);
         });
+
+        it('open vaut false par défaut', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(el.open).toBe(false);
+            expect(el.hasAttribute('open')).toBe(false);
+        });
+
+        it('open est reflété comme attribut HTML après clic', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(el.hasAttribute('open')).toBe(true);
+        });
+
+        it('open=true programmatique émet ar-breadcrumb-open', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-open', handler);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('open=false programmatique émet ar-breadcrumb-close', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-close', handler);
+            el.open = false;
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+    });
+
+    // ── Attribut open (desktop) ───────────────────────────────────────────────
+
+    describe('attribut open — mode desktop', () => {
+        beforeEach(() => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(false);
+        });
+
+        it("open=true n'émet pas d'événement en mode desktop", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-open', handler);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(handler).not.toHaveBeenCalled();
+        });
     });
 
     // ── Mise à jour réactive ──────────────────────────────────────────────────
