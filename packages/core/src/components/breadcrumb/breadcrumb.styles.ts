@@ -148,4 +148,18 @@ export default css`
     .high-contrast .breadcrumb-mobile:before {
         background-image: linear-gradient(var(--ar-color-neutral-70, #b5b8c3) 25%, transparent 0);
     }
+
+    /* ── Wrapper dropdown mobile ────────────────────────────── */
+
+    .breadcrumb-dropdown {
+        display: inline-flex;
+        position: relative;
+    }
+
+    /* ── Panel flottant mobile ───────────────────────────────── */
+
+    [part='panel'] {
+        min-width: var(--ar-breadcrumb-panel-min-width, var(--ar-panel-min-width, 18rem));
+        max-width: var(--ar-breadcrumb-panel-max-width, var(--ar-panel-max-width, 18rem));
+    }
 `;

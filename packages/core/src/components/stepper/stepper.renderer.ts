@@ -9,7 +9,6 @@ import { type NavigationNode, type NavigationMode } from '../../types/navigation
 // Contexte nécessaire au rendu mobile, fourni par ft-stepper.
 // Séparé des params communs pour que renderDesktop reste minimal.
 export interface MobileRenderContext {
-    isOpen: boolean;
     currentStepIndex: number;
     currentStepLabel: string | undefined;
     currentSubStepLabel: string | undefined;
@@ -168,10 +167,10 @@ export function renderMobile(
     const subLabel = ctx.currentSubStepLabel ? ` | ${ctx.currentSubStepLabel}` : '';
 
     return html`
-        <div class="dropdown stepper-dropdown${ctx.isOpen ? ' show' : ''}">
+        <div class="stepper-dropdown">
             <button
                 type="button"
-                class="btn btn-secondary dropdown-toggle btn-block btn-stepper-mobile"
+                class="btn btn-secondary btn-block btn-stepper-mobile"
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
@@ -181,10 +180,7 @@ export function renderMobile(
                 </span>
             </button>
 
-            <div
-                id="stepper-dropdown-menu"
-                class="stepper-dropdown-menu dropdown-menu${ctx.isOpen ? ' show' : ''}"
-            >
+            <div id="stepper-dropdown-menu" part="panel" class="stepper-dropdown-panel">
                 ${renderStepList(steps, 'stepper-mobile', mode, onClickLink)}
             </div>
         </div>

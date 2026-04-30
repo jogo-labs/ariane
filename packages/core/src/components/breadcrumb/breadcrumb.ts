@@ -9,7 +9,7 @@ import {
 import { customElement, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import dropdownStyles from '../../styles/components/dropdown.styles.js';
+import panelStyles from '../../styles/shared/panel.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
@@ -31,21 +31,19 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @csspart link       - Les `<a>` de navigation.
  * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
  * @csspart dropdown   - Le conteneur du dropdown mobile.
+ * @csspart panel      - Le panel mobile flottant.
  *
  * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
  * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
+ * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width,18rem)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop [--ar-breadcrumb-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  *
  * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
  * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
  */
 @customElement('ar-breadcrumb')
 export class ArBreadcrumb extends LitElement {
-    static override styles: CSSResultGroup = [
-        utilitiesStyles,
-        dropdownStyles,
-        buttonStyles,
-        styles,
-    ];
+    static override styles: CSSResultGroup = [utilitiesStyles, panelStyles, buttonStyles, styles];
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
@@ -53,7 +51,7 @@ export class ArBreadcrumb extends LitElement {
     @state() private dropdownOpen: boolean = false;
 
     @query('#breadcrumb-dropdown') private _dropdownTrigger?: HTMLButtonElement;
-    @query('.breadcrumb-dropdown-panel') private _dropdownPanel?: HTMLElement;
+    @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
@@ -78,6 +76,7 @@ export class ArBreadcrumb extends LitElement {
     private readonly _anchoredCtrl = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
+        placement: 'bottom-end',
         onExternalClose: () => {
             this.dropdownOpen = false;
             this.dispatchEvent(
@@ -146,10 +145,7 @@ export class ArBreadcrumb extends LitElement {
             >
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
-                    ? html`<div
-                          part="dropdown"
-                          class="dropdown breadcrumb-dropdown${this.dropdownOpen ? ' show' : ''}"
-                      >
+                    ? html`<div part="dropdown" class="breadcrumb-dropdown">
                           <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
                               <span class="btn-content">${items[0]?.label}</span>
@@ -163,14 +159,7 @@ export class ArBreadcrumb extends LitElement {
                               <span aria-hidden="true" class="icon icon-more">v</span>
                               <span class="btn-content sr-only">Afficher le fil d'ariane</span>
                           </button>
-                          <div
-                              class="dropdown-menu dropdown-menu-left breadcrumb-dropdown-panel${this
-                                  .dropdownOpen
-                                  ? ' show'
-                                  : ''}"
-                              popover="auto"
-                              tabindex="-1"
-                          >
+                          <div part="panel" popover="auto" tabindex="-1">
                               <ol class="breadcrumb breadcrumb-mobile">
                                   ${listTemplates.slice(1)}
                               </ol>

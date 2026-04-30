@@ -2,6 +2,7 @@ import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
+import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
 
 export type ArDropdownPlacement =
@@ -25,15 +26,15 @@ export type ArDropdownPlacement =
  * @slot trigger  - Le bouton déclencheur (ignoré si `trigger` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
- * @csspart panel - Le conteneur du panel.
+ * @csspart panel - Le panel flottant.
  *
- * @cssprop [--ar-dropdown-min-width=10rem]          - Largeur minimale du panel.
- * @cssprop [--ar-dropdown-max-width=none]           - Largeur maximale du panel.
- * @cssprop [--ar-dropdown-padding=0.25rem]          - Marge interne du panel.
- * @cssprop [--ar-dropdown-bg=var(--ar-color-bg)]    - Fond du panel.
- * @cssprop [--ar-dropdown-border-color=var(--ar-color-border)] - Bordure du panel.
- * @cssprop [--ar-dropdown-border-radius=0.375rem]   - Arrondi du panel.
- * @cssprop [--ar-dropdown-shadow=…]                 - Ombre du panel.
+ * @cssprop [--ar-dropdown-min-width=10rem] - Largeur minimale du panel.
+ * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width,18rem)] - Largeur maximale (cascade vers --ar-panel-max-width).
+ * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding,0.25rem)] - Marge interne (cascade vers --ar-panel-padding).
+ * @cssprop [--ar-dropdown-bg=var(--ar-panel-bg)] - Fond du panel (cascade vers --ar-panel-bg).
+ * @cssprop [--ar-dropdown-border-color=var(--ar-panel-border-color)] - Bordure (cascade vers --ar-panel-border-color).
+ * @cssprop [--ar-dropdown-border-radius=var(--ar-panel-radius)] - Arrondi (cascade vers --ar-panel-radius).
+ * @cssprop [--ar-dropdown-shadow=var(--ar-panel-shadow)] - Ombre (cascade vers --ar-panel-shadow).
  *
  * @event {CustomEvent} ar-dropdown-show    - Émis avant l'ouverture (annulable).
  * @event {CustomEvent} ar-dropdown-shown   - Émis après l'ouverture.
@@ -42,7 +43,7 @@ export type ArDropdownPlacement =
  */
 @customElement('ar-dropdown')
 export class ArDropdown extends LitElement {
-    static override styles = [styles];
+    static override styles = [panelStyles, styles];
 
     /** Ouvre ou ferme le panel. */
     @property({ reflect: true, type: Boolean }) open = false;
