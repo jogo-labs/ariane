@@ -33,4 +33,13 @@ export default css`
             opacity: 0.35;
         }
     }
+
+    @keyframes arPanelShow {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 `;
