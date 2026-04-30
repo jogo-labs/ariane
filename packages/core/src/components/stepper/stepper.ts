@@ -125,7 +125,7 @@ export class ArStepper extends LitElement {
     @state()
     private _isDesktop = false;
 
-    @query('.btn-stepper-mobile') private _dropdownTrigger?: HTMLElement;
+    @query('[part="trigger"]') private _dropdownTrigger?: HTMLElement;
     @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
     private _originalParent: ParentNode | null = null;
