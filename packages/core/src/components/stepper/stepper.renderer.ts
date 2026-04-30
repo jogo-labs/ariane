@@ -171,7 +171,7 @@ export function renderMobile(
         <div class="dropdown stepper-dropdown${ctx.isOpen ? ' show' : ''}">
             <button
                 type="button"
-                class="btn btn-secondary dropdown-toggle btn-block btn-stepper-mobile"
+                class="btn btn-secondary btn-block btn-stepper-mobile"
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
@@ -181,10 +181,7 @@ export function renderMobile(
                 </span>
             </button>
 
-            <div
-                id="stepper-dropdown-menu"
-                class="stepper-dropdown-menu dropdown-menu${ctx.isOpen ? ' show' : ''}"
-            >
+            <div id="stepper-dropdown-menu" part="panel" class="stepper-dropdown-panel">
                 ${renderStepList(steps, 'stepper-mobile', mode, onClickLink)}
             </div>
         </div>

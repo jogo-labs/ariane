@@ -5,7 +5,7 @@ import { ContextProvider } from '@lit/context';
 import resetStyles from '../../styles/components/reset.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
-import dropdownStyles from '../../styles/components/dropdown.styles.js';
+import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
@@ -43,7 +43,9 @@ export interface ArStepperStepChangeDetail {
  * @csspart step-link    - Le lien d'une étape.
  * @csspart dropdown     - Le conteneur dropdown.
  * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
+ * @csspart panel        - Le panel mobile flottant.
  *
+ * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  * @cssprop [--ar-stepper-gap=1.5rem]                                                          - Hauteur du connecteur entre les étapes principales.
  * @cssprop [--ar-stepper-substep-gap=1rem]                                                    - Hauteur du connecteur entre les sous-étapes.
  * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
@@ -65,7 +67,7 @@ export class ArStepper extends LitElement {
         resetStyles,
         utilitiesStyles,
         buttonStyles,
-        dropdownStyles,
+        panelStyles,
         styles,
     ];
 
@@ -123,7 +125,7 @@ export class ArStepper extends LitElement {
     private _isDesktop = false;
 
     @query('.btn-stepper-mobile') private _dropdownTrigger?: HTMLElement;
-    @query('#stepper-dropdown-menu') private _dropdownPanel?: HTMLElement;
+    @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
     private _originalParent: ParentNode | null = null;
     private _originalNextSibling: ChildNode | null = null;

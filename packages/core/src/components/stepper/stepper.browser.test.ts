@@ -73,5 +73,11 @@ describe('ar-stepper — browser', () => {
             await aTimeout(50);
             expect(getPanel(el).matches(':popover-open')).to.equal(false);
         });
+
+        it('le panel a part="panel"', async () => {
+            el = await mobileStepper();
+            const panel = el.shadowRoot?.querySelector('[part="panel"]');
+            expect(panel).to.not.equal(null);
+        });
     });
 });
