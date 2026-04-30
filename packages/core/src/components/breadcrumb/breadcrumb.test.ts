@@ -88,7 +88,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'dropdown')).toBeNull();
+            expect(getPart(el, 'trigger')).toBeNull();
         });
 
         it("affiche le bon nombre d'items", async () => {
@@ -171,14 +171,14 @@ describe('ArBreadcrumb', () => {
             ArBreadcrumb.mobileQuery = mockMediaQuery(true);
         });
 
-        it('affiche un part="dropdown" en mode mobile', async () => {
+        it('affiche un part="trigger" en mode mobile', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'dropdown')).not.toBeNull();
+            expect(getPart(el, 'trigger')).not.toBeNull();
         });
 
         it('ne rend pas de ol.breadcrumb-desktop en mode mobile', async () => {
