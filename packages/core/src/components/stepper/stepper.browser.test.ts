@@ -20,8 +20,8 @@ function getPanel(el: ArStepper): HTMLElement {
 }
 
 function getTrigger(el: ArStepper): HTMLElement {
-    const btn = el.shadowRoot?.querySelector<HTMLElement>('.btn-stepper-mobile');
-    if (!btn) throw new Error('.btn-stepper-mobile introuvable');
+    const btn = el.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]');
+    if (!btn) throw new Error('[part="trigger"] introuvable');
     return btn;
 }
 

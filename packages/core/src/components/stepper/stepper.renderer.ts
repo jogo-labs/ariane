@@ -170,7 +170,8 @@ export function renderMobile(
         <div class="stepper-dropdown">
             <button
                 type="button"
-                class="btn btn-secondary btn-block btn-stepper-mobile"
+                part="trigger"
+                class="btn btn-secondary btn-block"
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >

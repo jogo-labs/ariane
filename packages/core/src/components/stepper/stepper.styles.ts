@@ -15,6 +15,14 @@ export default css`
         gap: 0.25rem;
     }
 
+    [part='trigger'] {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+        justify-content: space-between;
+        line-height: normal;
+        text-align: left;
+    }
+
     [part='panel'] {
         padding: 0.75rem;
         min-width: var(--ar-stepper-panel-min-width, var(--ar-panel-min-width, 18rem));
