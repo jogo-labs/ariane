@@ -6,6 +6,7 @@ import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
 import { mrPaginationUtils } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
+import { warn } from '../../utils/warn.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
 export class ArPaginationConfig {
@@ -75,6 +76,22 @@ export class ArPagination extends LitElement {
      */
     @property({ reflect: true, type: String, useDefault: true })
     variant: 'light' | 'dark' = ArPagination.DEFAULT_VARIANT;
+
+    override updated(changed: Map<string, unknown>): void {
+        if (changed.has('total') && this.total < 1) {
+            warn('ar-pagination', `total doit être ≥ 1. Valeur reçue : ${this.total}.`);
+        }
+        if (changed.has('current') || changed.has('total')) {
+            if (this.current < 1) {
+                warn('ar-pagination', `current doit être ≥ 1. Valeur reçue : ${this.current}.`);
+            } else if (this.current > this.total) {
+                warn(
+                    'ar-pagination',
+                    `current (${this.current}) est supérieur à total (${this.total}).`,
+                );
+            }
+        }
+    }
 
     override render(): TemplateResult {
         const isNextDisabled = this.current >= this.total;
