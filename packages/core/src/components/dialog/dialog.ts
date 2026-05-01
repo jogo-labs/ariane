@@ -159,6 +159,9 @@ export class ArDialog extends LitElement {
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
 
+    /** Évite de lancer la fermeture pendant le cycle `updated()` de Lit. */
+    private _closePending = false;
+
     /** Vrai pendant l'animation de fermeture — bloque les interactions et les double-appels. */
     @state() private _isClosing = false;
 
@@ -210,7 +213,7 @@ export class ArDialog extends LitElement {
             if (this.open && !this.dialog?.open) {
                 this._show();
             } else if (!this.open && this.dialog?.open) {
-                this._close();
+                this._scheduleClose();
             }
         }
     }
@@ -308,6 +311,18 @@ export class ArDialog extends LitElement {
         announceA11y(message, 'assertive');
     }
 
+    private _scheduleClose(): void {
+        if (this._closePending) return;
+        this._closePending = true;
+
+        void this.updateComplete.then(() => {
+            this._closePending = false;
+            if (this.isConnected && !this.open && this.dialog?.open) {
+                this._close();
+            }
+        });
+    }
+
     private _addOpenListeners() {
         document.addEventListener('keydown', this._handleDocumentKeyDown);
     }
@@ -390,7 +405,11 @@ export class ArDialog extends LitElement {
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
             this._triggerElement = null;
-            this.open = false;
+            void this.updateComplete.then(() => {
+                if (this.isConnected && this.open && !this.dialog?.open) {
+                    this.open = false;
+                }
+            });
             return;
         }
 
