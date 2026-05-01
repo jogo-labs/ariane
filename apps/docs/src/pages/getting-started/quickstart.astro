@@ -10,10 +10,13 @@ const tocEntries = [
     { id: 'npm',        label: 'Setup avancé (npm)', level: 1 as const },
 ];
 
-const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>
+const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
 
-const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></scr` + `ipt>
+const codeAutoloaderDev = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
+
+const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></scr` + `ipt>
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />`;
 
 const codeUsage = `<ar-alert version="success">
@@ -73,6 +76,10 @@ import '@ariane-ui/core/themes/default.css';`;
                 <p class="hint">
                     Les deux balises sont requises : le script enregistre les composants,
                     le CSS fournit le thème.
+                </p>
+                <p class="hint">
+                    En développement local, remplacez <code>autoloader.prod.js</code> par
+                    <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
                 </p>
                 <p>Les composants sont ensuite utilisables directement :</p>
                 <pre><code class="language-html" set:text={codeUsage} /></pre>
