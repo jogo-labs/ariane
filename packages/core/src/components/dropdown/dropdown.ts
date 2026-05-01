@@ -2,6 +2,7 @@ import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
+import { warn } from '../../utils/warn.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
 
@@ -89,9 +90,6 @@ export class ArDropdown extends LitElement {
 
     override firstUpdated(): void {
         const trigger = this._resolvedTrigger;
-        if (this.trigger && !trigger) {
-            console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
-        }
         if (trigger && this._panel) {
             this._popover.attach(trigger, this._panel);
             if (this.trigger) {
@@ -120,7 +118,7 @@ export class ArDropdown extends LitElement {
             this._externalTrigger = null;
             const newTrigger = this._resolvedTrigger;
             if (this.trigger && !newTrigger) {
-                console.warn(`[ar-dropdown] Aucun élément trouvé avec l'id "${this.trigger}".`);
+                warn('ar-dropdown', `Aucun élément trouvé avec l'id "${this.trigger}".`);
             }
             if (newTrigger && this._panel) {
                 this._popover.attach(newTrigger, this._panel);
