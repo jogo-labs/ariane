@@ -9,7 +9,9 @@
       "default": "./dist/index.js"
     },
     "./cdn": "./cdn/index.js",
+    "./cdn.prod": "./cdn/index.prod.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
+    "./cdn/autoloader.prod": "./cdn/autoloader.prod.js",
     "./themes/*": "./dist/styles/themes/*.css",
     "./custom-elements.json": "./dist/custom-elements.json",
     "./dist/*": "./dist/*"
@@ -24,6 +26,8 @@
     "build": "npm run build:manifest && npm run build:bundles && npm run build:css && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
+    "build:bundles:dev": "node scripts/build-bundles.js --dev",
+    "build:bundles:prod": "node scripts/build-bundles.js --prod",
     "build:css": "node scripts/build-css.js",
     "build:types": "tsc --emitDeclarationOnly --declarationMap",
     "dev": "node scripts/build-bundles.js --watch & node scripts/build-css.js --watch",
