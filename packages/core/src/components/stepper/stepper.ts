@@ -21,6 +21,7 @@ import { ScrollFollowController } from '../../controllers/scroll-follow.controll
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { type ArStepperItem } from '../stepper-item/stepper-item.js';
+import { warn } from '../../utils/warn.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
 export interface ArStepperStepChangeDetail {
@@ -381,7 +382,7 @@ export class ArStepper extends LitElement {
         if (!this.desktopTarget) return;
         const target = document.getElementById(this.desktopTarget);
         if (!target) {
-            console.warn(`[ar-stepper] desktop target "${this.desktopTarget}" not found`);
+            warn('ar-stepper', `desktop-target "${this.desktopTarget}" introuvable.`);
             return;
         }
         if (this.parentNode !== target) {

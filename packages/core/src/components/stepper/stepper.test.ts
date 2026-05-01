@@ -571,4 +571,23 @@ describe('ArStepper', () => {
             );
         });
     });
+
+    describe('warn() — desktop-target introuvable', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si desktop-target pointe vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const el = await fixture<ArStepper>(
+                '<ar-stepper desktop-target="conteneur-inexistant"></ar-stepper>',
+            );
+            (el as unknown as Record<string, () => void>)['_teleportToTarget']?.();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-stepper]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('conteneur-inexistant'));
+        });
+    });
 });
