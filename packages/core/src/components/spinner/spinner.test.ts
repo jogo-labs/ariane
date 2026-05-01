@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArSpinner } from './spinner.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './spinner.js';
@@ -163,6 +163,40 @@ describe('ArSpinner', () => {
         it('le SVG a focusable="false"', async () => {
             el = await fixture('<ar-spinner></ar-spinner>');
             expect(requirePart(el, 'spinner').getAttribute('focusable')).toBe('false');
+        });
+    });
+
+    describe('warn() — labels ARIA vides', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si loading-label est vidé', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-spinner loading-label=""></ar-spinner>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-spinner]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('loading-label'));
+        });
+
+        it('émet un warn si done-label est vidé', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-spinner done-label=""></ar-spinner>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-spinner]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('done-label'));
+        });
+
+        it("n'émet pas de warn avec les labels par défaut", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-spinner></ar-spinner>');
+
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 });

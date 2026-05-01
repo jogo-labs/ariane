@@ -322,4 +322,45 @@ describe('ArPagination', () => {
             );
         });
     });
+
+    describe('warn() — bornes numériques', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si total < 1', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-pagination total="0"></ar-pagination>');
+
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-pagination]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('total'));
+        });
+
+        it('émet un warn si current < 1', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-pagination current="0" total="5"></ar-pagination>');
+
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-pagination]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('current'));
+        });
+
+        it('émet un warn si current > total', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-pagination current="10" total="5"></ar-pagination>');
+
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-pagination]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('current'));
+        });
+
+        it("n'émet pas de warn pour des valeurs valides", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-pagination current="3" total="10"></ar-pagination>');
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
 });

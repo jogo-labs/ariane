@@ -316,4 +316,32 @@ describe('ArDropdown', () => {
             expect(hr.getAttribute('role')).toBe('separator');
         });
     });
+
+    describe('warn() — trigger introuvable', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si trigger pointe vers un ID inexistant (firstUpdated)', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dropdown trigger="id-qui-nexiste-pas"></ar-dropdown>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('id-qui-nexiste-pas'));
+        });
+
+        it('émet un warn si trigger est mis à jour vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture<ArDropdown>('<ar-dropdown></ar-dropdown>');
+
+            el.trigger = 'id-inconnu';
+            await waitForUpdate(el);
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('id-inconnu'));
+        });
+    });
 });

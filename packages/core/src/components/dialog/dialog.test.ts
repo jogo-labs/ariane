@@ -512,8 +512,7 @@ describe('ArDialog', () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-dialog></ar-dialog>');
             expect(spy).toHaveBeenCalledWith(
-                expect.stringContaining('Aucun libellé accessible fourni'),
-                el,
+                expect.stringContaining('[ar-dialog] Aucun libellé accessible fourni'),
             );
         });
 
@@ -559,6 +558,49 @@ describe('ArDialog', () => {
 
             expect(el.open).toBe(false);
             btn.remove();
+        });
+    });
+
+    describe('warn() — label manquant et placement/modal', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it("émet un warn si aucun label ni slot label n'est fourni", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog open></ar-dialog>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dialog]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('label'));
+        });
+
+        it("n'émet pas de warn si label est fourni", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog open label="Titre du dialog"></ar-dialog>');
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('émet un warn si placement est défini hors mode drawer', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog label="Test" placement="left" mode="modal"></ar-dialog>');
+
+            const placementWarns = spy.mock.calls.filter((c) => String(c[0]).includes('placement'));
+            expect(placementWarns.length).toBeGreaterThan(0);
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dialog]'));
+        });
+
+        it("n'émet pas de warn placement si mode est drawer", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog label="Test" placement="left" mode="drawer"></ar-dialog>');
+
+            const placementWarns = spy.mock.calls.filter((c) => String(c[0]).includes('placement'));
+            expect(placementWarns).toHaveLength(0);
         });
     });
 });

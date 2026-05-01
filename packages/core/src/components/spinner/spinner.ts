@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import animationsStyles from '../../styles/animations.styles.js';
 import styles from './spinner.styles.js';
+import { warn } from '../../utils/warn.js';
 
 /**
  * @summary Indicateur de chargement accessible avec états "en cours" et "terminé".
@@ -52,6 +53,21 @@ export class ArSpinner extends LitElement {
 
     @property({ reflect: true, type: String, useDefault: true })
     size: 'xs' | 'sm' | 'lg' | undefined = undefined;
+
+    override updated(changed: Map<string, unknown>): void {
+        if (changed.has('loadingLabel') && !this.loadingLabel.trim()) {
+            warn(
+                'ar-spinner',
+                "loading-label est vide — le spinner ne sera pas annoncé aux lecteurs d'écran.",
+            );
+        }
+        if (changed.has('doneLabel') && !this.doneLabel.trim()) {
+            warn(
+                'ar-spinner',
+                "done-label est vide — l'état terminé ne sera pas annoncé aux lecteurs d'écran.",
+            );
+        }
+    }
 
     override render(): TemplateResult {
         return html` <svg

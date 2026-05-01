@@ -3,11 +3,6 @@ import { customElement, property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 
-export function warn(name: string, message: string, error?: Error) {
-    if (error) console.warn(`${name} - ${message}`, error);
-    else console.warn(`${name} - ${message}`);
-}
-
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
     /** Permet de spécifier le type d'alerte */

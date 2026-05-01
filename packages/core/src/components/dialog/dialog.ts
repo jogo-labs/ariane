@@ -14,6 +14,7 @@ import { announceA11y } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
+import { warn } from '../../utils/warn.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
@@ -176,9 +177,9 @@ export class ArDialog extends LitElement {
         if ((this.label ?? '').trim() || this._slotController.test('label')) return;
 
         this._hasWarnedMissingLabel = true;
-        console.warn(
-            `[ar-dialog] Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".`,
-            this,
+        warn(
+            'ar-dialog',
+            'Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".',
         );
     }
 
@@ -198,6 +199,13 @@ export class ArDialog extends LitElement {
 
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
+        if (
+            (changedProperties.has('placement') || changedProperties.has('mode')) &&
+            this.mode === 'modal' &&
+            this.placement !== 'right'
+        ) {
+            warn('ar-dialog', 'placement n\'a aucun effet en mode "modal".');
+        }
         if (changedProperties.has('open')) {
             if (this.open && !this.dialog?.open) {
                 this._show();

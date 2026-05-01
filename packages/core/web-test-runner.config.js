@@ -15,7 +15,9 @@ export default {
     // experimentalDecorators + useDefineForClassFields, requis par les décorateurs Lit.
     // Le plugin ne résout pas "extends" quand il lit tsconfigRaw, donc tsconfig.json
     // (qui étend tsconfig.base.json) ne suffit pas.
-    plugins: [esbuildPlugin({ ts: true, tsconfig: './tsconfig.wtr.json' })],
+    plugins: [
+        esbuildPlugin({ ts: true, tsconfig: './tsconfig.wtr.json', define: { __DEV__: 'true' } }),
+    ],
 
     nodeResolve: true,
 };
