@@ -5,7 +5,10 @@
  * Produit trois bundles distincts :
  *
  *  dist/          → bundle NPM : lit est "external", tree-shakeable, destiné aux bundlers
- *                   (Vite, webpack). __DEV__ évalué à runtime via process.env.NODE_ENV.
+ *                   (Vite, webpack). __DEV__ injecté via banner esbuild :
+ *                   `const __DEV__ = process.env.NODE_ENV !== "production";`
+ *                   Les bundlers consommateurs (Vite, webpack) remplacent process.env.NODE_ENV
+ *                   → dead-code elimination en prod, warnings actifs en dev.
  *
  *  cdn/           → bundle CDN dev : tout inclus (lit bundlé), non minifié, __DEV__ = true.
  *                   Destiné au développement local via <script type="module">.
@@ -126,8 +129,7 @@ async function buildNpm() {
         external: EXTERNALS_NPM,
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
-        // esbuild define only accepts literals — __DEV__ is left to downstream bundlers.
-        // Vite / webpack will replace process.env.NODE_ENV at their own build step.
+        banner: { js: 'const __DEV__ = process.env.NODE_ENV !== "production";' },
     };
 
     if (WATCH) {
