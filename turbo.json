@@ -11,6 +11,16 @@
       "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
       "outputs": ["dist/**", "cdn/**"]
     },
+    "build:bundles:dev": {
+      "dependsOn": ["build:manifest"],
+      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "outputs": ["dist/**", "cdn/**"]
+    },
+    "build:bundles:prod": {
+      "dependsOn": ["build:manifest"],
+      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "outputs": ["dist/**", "cdn/**"]
+    },
     "build:css": {
       "inputs": ["src/styles/**/*.css"],
       "outputs": ["dist/styles/**"]

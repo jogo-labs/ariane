@@ -36,17 +36,19 @@ npm install
 
 ### `packages/core`
 
-| Commande                 | Description                       |
-| ------------------------ | --------------------------------- |
-| `npm run build:manifest` | Génère `custom-elements.json`     |
-| `npm run build:bundles`  | esbuild → `dist/` (npm) + `cdn/`  |
-| `npm run build:css`      | Thèmes CSS                        |
-| `npm run build:types`    | Déclarations TypeScript           |
-| `npm run test`           | Vitest, passe unique              |
-| `npm run test:watch`     | Vitest interactif                 |
-| `npm run test:coverage`  | Vitest avec rapport de couverture |
-| `npm run test:browser`   | @web/test-runner + Chromium       |
-| `npm run lint`           | ESLint                            |
+| Commande                     | Description                                      |
+| ---------------------------- | ------------------------------------------------ |
+| `npm run build:manifest`     | Génère `custom-elements.json`                    |
+| `npm run build:bundles`      | esbuild → `dist/` + `cdn/` dev + `cdn/*.prod.js` |
+| `npm run build:bundles:dev`  | npm + CDN dev uniquement (plus rapide en local)  |
+| `npm run build:bundles:prod` | npm + CDN prod uniquement                        |
+| `npm run build:css`          | Thèmes CSS                                       |
+| `npm run build:types`        | Déclarations TypeScript                          |
+| `npm run test`               | Vitest, passe unique                             |
+| `npm run test:watch`         | Vitest interactif                                |
+| `npm run test:coverage`      | Vitest avec rapport de couverture                |
+| `npm run test:browser`       | @web/test-runner + Chromium                      |
+| `npm run lint`               | ESLint                                           |
 
 ---
 
@@ -243,12 +245,23 @@ describe('ArAlert a11y', () => {
 
 ## Build outputs
 
-| Répertoire                  | Usage                                        |
-| --------------------------- | -------------------------------------------- |
-| `dist/`                     | Bundle npm — Lit en peer dep, tree-shakeable |
-| `cdn/`                      | Bundle CDN — Lit bundlé, avec autoloader     |
-| `dist/custom-elements.json` | Manifest CEM — consommé par la doc           |
-| `dist/styles/themes/`       | Fichiers CSS de thème                        |
+| Répertoire                  | Usage                                                           |
+| --------------------------- | --------------------------------------------------------------- |
+| `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking |
+| `cdn/index.js`              | Bundle CDN dev — non minifié, avertissements actifs             |
+| `cdn/autoloader.js`         | Autoloader CDN dev                                              |
+| `cdn/index.prod.js`         | Bundle CDN prod — minifié, avertissements supprimés             |
+| `cdn/autoloader.prod.js`    | Autoloader CDN prod                                             |
+| `dist/custom-elements.json` | Manifest CEM — consommé par la doc                              |
+| `dist/styles/themes/`       | Fichiers CSS de thème                                           |
+
+### Constante `__DEV__`
+
+Les avertissements dans les composants sont conditionnels à `__DEV__` :
+
+- **CDN dev** : `__DEV__ = true` (injecté par esbuild) — avertissements visibles
+- **CDN prod** : `__DEV__ = false` — le code mort est supprimé par esbuild, aucun impact à l'exécution
+- **Bundle npm** : `__DEV__` est remplacé par `process.env.NODE_ENV !== "production"` via un banner — Vite et Webpack suppriment automatiquement le code mort lors du build de production du projet consommateur
 
 ---
 
