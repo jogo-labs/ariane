@@ -2,29 +2,26 @@
 /**
  * build-bundles.js
  *
- * Produit deux bundles distincts :
+ * Produit trois bundles distincts :
  *
- *  dist/   → bundle NPM : lit est "external", tree-shakeable, destiné aux bundlers (Vite, webpack).
- *            Les utilisateurs importent les composants individuellement ou via le barrel.
+ *  dist/          → bundle NPM : lit est "external", tree-shakeable, destiné aux bundlers
+ *                   (Vite, webpack). __DEV__ évalué à runtime via process.env.NODE_ENV.
  *
- *  cdn/    → bundle CDN : tout inclus (lit bundlé dedans), un seul fichier auto-contenu.
- *            Destiné à être chargé via <script type="module"> depuis un CDN.
+ *  cdn/           → bundle CDN dev : tout inclus (lit bundlé), non minifié, __DEV__ = true.
+ *                   Destiné au développement local via <script type="module">.
  *
- * Pourquoi deux cibles séparées ?
- * Le bundle npm suppose qu'un bundler en aval dédupliquera lit (et d'autres deps partagées).
- * Le bundle CDN ne peut pas faire cette supposition → tout est bundlé.
+ *  cdn/*.prod.js  → bundle CDN prod : tout inclus, minifié, __DEV__ = false (dead-code
+ *                   éliminé). Destiné à la production via un CDN.
+ *
+ * CLI flags :
+ *   --dev   → npm + CDN dev seulement
+ *   --prod  → npm + CDN prod seulement
+ *   --watch → npm + CDN dev en watch (prod inutile en watch)
+ *   (aucun) → npm + CDN dev + CDN prod (mode CI)
  */
 
 import esbuild from 'esbuild';
-import {
-    readdirSync,
-    mkdirSync,
-    copyFileSync,
-    rmSync,
-    existsSync,
-    readFileSync,
-    writeFileSync,
-} from 'fs';
+import { readdirSync, mkdirSync, rmSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -32,6 +29,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const SRC = join(ROOT, 'src');
 const WATCH = process.argv.includes('--watch');
+const DEV_ONLY = process.argv.includes('--dev') || WATCH;
+const PROD_ONLY = process.argv.includes('--prod');
 
 // ─── Utilitaire : scan récursif de fichiers ───────────────────────────────────
 
@@ -77,6 +76,11 @@ const entryPoints = {
     ...Object.fromEntries(componentFiles.map((f) => [toEntryKey(f), f])),
 };
 
+const cdnEntryPoints = {
+    index: join(SRC, 'index.ts'),
+    autoloader: join(SRC, 'autoloader.ts'),
+};
+
 // ─── Options communes ─────────────────────────────────────────────────────────
 
 /** Dépendances runtime à externaliser dans le bundle npm (résolues par le bundler consommateur) */
@@ -94,7 +98,6 @@ const commonOptions = {
 
 // Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
 // besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
-// Le manifest est regénéré juste après par build:manifest, pas par ce script.
 const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
 let preservedManifest = null;
 if (existsSync(manifestPath)) {
@@ -109,7 +112,6 @@ for (const dir of ['dist', 'cdn']) {
     mkdirSync(target, { recursive: true });
 }
 
-// Restaure immédiatement le manifest pour que la doc ne tombe pas pendant le build
 if (preservedManifest !== null) {
     writeFileSync(manifestPath, preservedManifest, 'utf-8');
 }
@@ -121,11 +123,11 @@ async function buildNpm() {
         ...commonOptions,
         entryPoints,
         outdir: join(ROOT, 'dist'),
-        // lit reste external → dédupliqué par Vite/webpack côté consommateur
         external: EXTERNALS_NPM,
-        // Splitting permet de partager le code commun entre composants sans le dupliquer
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
+        // esbuild define only accepts literals — __DEV__ is left to downstream bundlers.
+        // Vite / webpack will replace process.env.NODE_ENV at their own build step.
     };
 
     if (WATCH) {
@@ -138,21 +140,17 @@ async function buildNpm() {
     return esbuild.build(options);
 }
 
-// ─── Build CDN ────────────────────────────────────────────────────────────────
+// ─── Build CDN dev ────────────────────────────────────────────────────────────
 
-async function buildCdn() {
+async function buildCdnDev() {
     const options = {
         ...commonOptions,
-        entryPoints: {
-            index: join(SRC, 'index.ts'),
-            autoloader: join(SRC, 'autoloader.ts'),
-        },
+        entryPoints: cdnEntryPoints,
         outdir: join(ROOT, 'cdn'),
-        // Ici on ne met RIEN en external : tout est bundlé dans le fichier final
-        minify: !WATCH,
+        minify: false,
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
-        metafile: true, // utile pour analyser le bundle (esbuild --analyze)
+        define: { __DEV__: 'true' },
     };
 
     if (WATCH) {
@@ -162,13 +160,32 @@ async function buildCdn() {
         return ctx;
     }
 
+    return esbuild.build(options);
+}
+
+// ─── Build CDN prod ───────────────────────────────────────────────────────────
+
+async function buildCdnProd() {
+    const options = {
+        ...commonOptions,
+        entryPoints: cdnEntryPoints,
+        outdir: join(ROOT, 'cdn'),
+        outExtension: { '.js': '.prod.js' },
+        minify: true,
+        splitting: true,
+        chunkNames: 'chunks/[name]-[hash]',
+        define: { __DEV__: 'false' },
+        metafile: true,
+    };
+
     const result = await esbuild.build(options);
 
-    // Afficher la taille du bundle CDN principal pour surveiller la régression
     if (result.metafile) {
-        const bytes = result.metafile.outputs['cdn/index.js']?.bytes ?? 0;
+        const outputs = result.metafile.outputs;
+        const key = Object.keys(outputs).find((k) => k.endsWith('index.prod.js'));
+        const bytes = key ? outputs[key].bytes : 0;
         const kb = (bytes / 1024).toFixed(1);
-        console.log(`\n✓ CDN bundle: ${kb} kB (minified)\n`);
+        console.log(`\n✓ CDN prod bundle: ${kb} kB (minified)\n`);
     }
 
     return result;
@@ -178,8 +195,6 @@ async function buildCdn() {
 
 function copyCemManifest() {
     const src = join(ROOT, 'dist', 'custom-elements.json');
-    // Le manifest est déjà dans dist/ grâce à cem analyze --outdir dist
-    // Cette étape existe au cas où le manifest serait ailleurs
     if (existsSync(src)) {
         console.log('✓ custom-elements.json already in dist/');
     }
@@ -190,7 +205,13 @@ function copyCemManifest() {
 async function main() {
     try {
         console.log('Building bundles...\n');
-        await Promise.all([buildNpm(), buildCdn()]);
+
+        const cdnBuilds = [];
+        if (!PROD_ONLY) cdnBuilds.push(buildCdnDev());
+        if (!DEV_ONLY) cdnBuilds.push(buildCdnProd());
+
+        await Promise.all([buildNpm(), ...cdnBuilds]);
+
         copyCemManifest();
         if (!WATCH) {
             console.log('✓ Build complete');
