@@ -17,7 +17,7 @@
     "build": "turbo run build",
     "build:bundles:dev": "turbo run build:bundles:dev",
     "build:bundles:prod": "turbo run build:bundles:prod",
-    "dev": "turbo run build:manifest && turbo run dev",
+    "dev": "rm -rf packages/core/dist packages/core/cdn && turbo run build:dev --filter=@ariane-ui/core && turbo run dev",
     "test": "turbo run test",
     "test:all": "turbo run test test:browser",
     "lint": "turbo run lint",

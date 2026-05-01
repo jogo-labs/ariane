@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "build": "npm run build:manifest && npm run build:bundles && npm run build:css && npm run build:types",
+    "build:dev": "npm run build:manifest && npm run build:bundles:dev && npm run build:css && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
     "build:bundles:dev": "node scripts/build-bundles.js --dev",

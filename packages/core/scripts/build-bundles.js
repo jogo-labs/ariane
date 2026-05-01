@@ -99,24 +99,29 @@ const commonOptions = {
 
 // ─── Clean ────────────────────────────────────────────────────────────────────
 
-// Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
-// besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
-const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
-let preservedManifest = null;
-if (existsSync(manifestPath)) {
-    preservedManifest = readFileSync(manifestPath, 'utf-8');
-}
-
-for (const dir of ['dist', 'cdn']) {
-    const target = join(ROOT, dir);
-    if (existsSync(target)) {
-        rmSync(target, { recursive: true });
+// En watch mode, dist/ est déjà populé par le pre-build (turbo run build) et
+// build-css.js --watch tourne en parallèle — un rmSync ici créerait une race
+// condition (dist/styles/ wipeé pendant que build-css.js y écrit).
+if (!WATCH) {
+    // Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
+    // besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
+    const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
+    let preservedManifest = null;
+    if (existsSync(manifestPath)) {
+        preservedManifest = readFileSync(manifestPath, 'utf-8');
     }
-    mkdirSync(target, { recursive: true });
-}
 
-if (preservedManifest !== null) {
-    writeFileSync(manifestPath, preservedManifest, 'utf-8');
+    for (const dir of ['dist', 'cdn']) {
+        const target = join(ROOT, dir);
+        if (existsSync(target)) {
+            rmSync(target, { recursive: true });
+        }
+        mkdirSync(target, { recursive: true });
+    }
+
+    if (preservedManifest !== null) {
+        writeFileSync(manifestPath, preservedManifest, 'utf-8');
+    }
 }
 
 // ─── Build NPM ────────────────────────────────────────────────────────────────
