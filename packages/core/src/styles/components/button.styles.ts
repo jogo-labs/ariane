@@ -714,16 +714,6 @@ export default css`
         display: flex;
     }
 
-    .btn-stepper-mobile {
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.75rem;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-        justify-content: space-between;
-        line-height: normal;
-        text-align: left;
-    }
-
     .btn-help,
     a.btn-help {
         margin-left: 0.25rem;

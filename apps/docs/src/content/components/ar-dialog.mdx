@@ -1,0 +1,108 @@
+---
+tagName: ar-dialog
+title: Dialog
+description: Boîte de dialogue modale ou panneau latéral, accessible et animée.
+playgroundTemplate: default
+variants:
+    - name: default
+      label: Modal
+      description: Dialog centré avec backdrop. Cliquer sur le bouton pour l'ouvrir.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-modal">Ouvrir la modale</button>
+          <ar-dialog id="demo-modal" label="Informations importantes">
+              <p>Votre session expirera dans 5 minutes. Enregistrez votre travail pour ne pas perdre vos modifications.</p>
+          </ar-dialog>
+    - name: drawer
+      label: Drawer droit
+      description: Panneau latéral glissant depuis la droite.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-drawer">Ouvrir le drawer</button>
+          <ar-dialog id="demo-drawer" label="Filtres de recherche" mode="drawer">
+              <p>Contenu du panneau latéral.</p>
+          </ar-dialog>
+    - name: drawer-left
+      label: Drawer gauche
+      description: Panneau latéral glissant depuis la gauche.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-drawer-left">Ouvrir le drawer gauche</button>
+          <ar-dialog id="demo-drawer-left" label="Menu de navigation" mode="drawer" placement="left">
+              <p>Contenu du panneau latéral gauche.</p>
+          </ar-dialog>
+    - name: close-on-backdrop
+      label: Fermeture au clic backdrop
+      description: Par défaut, le backdrop est statique. Avec close-on-backdrop, un clic sur le fond ferme le dialog.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-backdrop">Ouvrir (close-on-backdrop)</button>
+          <ar-dialog id="demo-backdrop" label="Informations" close-on-backdrop>
+              <p>Cliquez en dehors du dialog pour le fermer.</p>
+          </ar-dialog>
+    - name: with-footer
+      label: Avec footer
+      description: Zone d'actions en pied de page via slot="footer".
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-footer">Ouvrir avec footer</button>
+          <ar-dialog id="demo-footer" label="Confirmer la suppression">
+              <p>Cette action supprimera définitivement l'élément sélectionné.</p>
+              <button class="btn btn-secondary" slot="footer" data-ar-dismiss>Annuler</button>
+              <button class="btn btn-danger" slot="footer" data-ar-accept>Supprimer</button>
+          </ar-dialog>
+    - name: autofocus
+      label: Focus initial
+      description: Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — ici un champ de recherche dans un drawer.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-autofocus">Ouvrir le drawer</button>
+          <ar-dialog id="demo-autofocus" label="Rechercher" mode="drawer">
+              <input autofocus type="search" placeholder="Rechercher…" style="width:100%;padding:.5rem .75rem;border:1px solid var(--ar-color-border,#ccc);border-radius:.375rem;font-size:1rem;" />
+          </ar-dialog>
+    - name: stacked
+      label: Dialogs empilés
+      description: Ouverture d'un second dialog depuis le premier — scroll lock et focus sont coordonnés. Escape ne ferme que le dialog au sommet.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-stacked-1">Ouvrir le dialog</button>
+          <ar-dialog id="demo-stacked-1" label="Dialog principal">
+              <p>Ce dialog peut en ouvrir un second par-dessus.</p>
+              <button class="btn btn-secondary" data-ar-dialog-open="demo-stacked-2">Ouvrir un second dialog</button>
+          </ar-dialog>
+          <ar-dialog id="demo-stacked-2" label="Dialog secondaire">
+              <p>Dialog empilé. Escape ne ferme que ce dialog, pas le précédent.</p>
+          </ar-dialog>
+    - name: persistent
+      label: Fermeture bloquée
+      description: "ar-dialog-hide est annulable : le composant secoue le dialog et annonce automatiquement le blocage aux lecteurs d'écran. Seul le bouton Confirmer ferme."
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-persistent">Ouvrir le dialog persistant</button>
+          <ar-dialog id="demo-persistent" label="Action requise" prevented-message="Fermeture bloquée — utilisez le bouton Confirmer.">
+              <p>Ce dialog ne peut être fermé que via le bouton <strong>Confirmer</strong>. Escape et le bouton de fermeture sont interceptés.</p>
+              <button class="btn btn-primary" slot="footer" data-ar-accept>Confirmer</button>
+          </ar-dialog>
+          <script>
+              (function () {
+                  var dialog = document.getElementById('demo-persistent');
+                  if (!dialog) return;
+                  var confirming = false;
+                  dialog.addEventListener('ar-dialog-accepted', function () { confirming = true; });
+                  dialog.addEventListener('ar-dialog-hide', function (e) { if (!confirming) e.preventDefault(); confirming = false; });
+                  dialog.addEventListener('ar-dialog-dismissed', function (e) { e.preventDefault(); });
+              })();
+          </script>
+---
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
+- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent.
+- Le focus est restauré sur l'élément déclencheur à la fermeture.
+- Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture, y compris avec plusieurs dialogs empilés.
+- La touche Escape passe par `ar-dialog-hide` : la fermeture peut donc être interceptée avec `event.preventDefault()`.
+- Quand une fermeture est bloquée, le composant secoue visuellement le dialog et annonce automatiquement `prevented-message` via la zone d'annonce globale de la librairie.
+- Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
+
+### À la charge de l'auteur
+
+- **Fournir un `label` descriptif.** Un fallback `Dialogue` existe, mais il doit rester un filet de sécurité, pas le libellé final du composant. Un avertissement est émis dans la console si ni `label` ni `slot="label"` ne sont fournis.
+- **Toujours proposer une issue claire.** Le backdrop est statique par défaut : prévoir un bouton de fermeture visible ou une action `data-ar-dismiss`.
+- **Si vous bloquez la fermeture, renseigner `prevented-message`.** Le message doit expliquer quoi faire pour continuer ou confirmer l'action.
+- **Piloter le focus initial si nécessaire.** Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — utile par exemple pour un champ de saisie dans un drawer.
+- **Adapter `close-label` à la langue de l'interface.** Par défaut `"Fermer"` — à remplacer si l'interface n'est pas en français (`close-label="Close"`, `close-label="Schließen"`, etc.).

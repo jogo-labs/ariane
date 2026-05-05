@@ -71,11 +71,11 @@ describe('NavigationTreeController', () => {
         expect(ctrl.tree.map((n) => n.path)).toEqual(['/a', '/b', '/c']);
     });
 
-    it('buildFromItems() appelle requestUpdate', () => {
+    it('buildFromItems() ne déclenche pas requestUpdate (responsabilité du caller)', () => {
         const host = makeHost();
         const ctrl = new NavigationTreeController(host);
         ctrl.buildFromItems([makeItem('/a')]);
-        expect(host.requestUpdate).toHaveBeenCalledTimes(1);
+        expect(host.requestUpdate).not.toHaveBeenCalled();
     });
 
     it('setCurrentPath() met à jour le chemin courant et appelle requestUpdate', () => {
@@ -86,7 +86,7 @@ describe('NavigationTreeController', () => {
         ctrl.setCurrentPath('/b');
 
         expect(ctrl.currentNode?.path).toBe('/b');
-        expect(host.requestUpdate).toHaveBeenCalledTimes(2); // buildFromItems + setCurrentPath
+        expect(host.requestUpdate).toHaveBeenCalledTimes(1); // setCurrentPath seulement
     });
 
     it('setCurrentPath() ne fait rien si le path est identique', () => {

@@ -15,7 +15,9 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run build:manifest && turbo run dev",
+    "build:bundles:dev": "turbo run build:bundles:dev",
+    "build:bundles:prod": "turbo run build:bundles:prod",
+    "dev": "rm -rf packages/core/dist packages/core/cdn && turbo run build:dev --filter=@ariane-ui/core && turbo run dev",
     "test": "turbo run test",
     "test:all": "turbo run test test:browser",
     "lint": "turbo run lint",
@@ -45,6 +47,7 @@
   },
   "packageManager": "npm@11.9.0",
   "overrides": {
-    "lit": "^3.0.0"
+    "lit": "^3.0.0",
+    "execa": "^8.0.1"
   }
 }

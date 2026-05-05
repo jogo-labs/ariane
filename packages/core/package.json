@@ -1,6 +1,6 @@
 {
   "name": "@ariane-ui/core",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "type": "module",
   "description": "Accessible web components library",
   "exports": {
@@ -9,7 +9,9 @@
       "default": "./dist/index.js"
     },
     "./cdn": "./cdn/index.js",
+    "./cdn.prod": "./cdn/index.prod.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
+    "./cdn/autoloader.prod": "./cdn/autoloader.prod.js",
     "./themes/*": "./dist/styles/themes/*.css",
     "./custom-elements.json": "./dist/custom-elements.json",
     "./dist/*": "./dist/*"
@@ -22,8 +24,11 @@
   ],
   "scripts": {
     "build": "npm run build:manifest && npm run build:bundles && npm run build:css && npm run build:types",
+    "build:dev": "npm run build:manifest && npm run build:bundles:dev && npm run build:css && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
+    "build:bundles:dev": "node scripts/build-bundles.js --dev",
+    "build:bundles:prod": "node scripts/build-bundles.js --prod",
     "build:css": "node scripts/build-css.js",
     "build:types": "tsc --emitDeclarationOnly --declarationMap",
     "dev": "node scripts/build-bundles.js --watch & node scripts/build-css.js --watch",
@@ -36,6 +41,7 @@
     "create": "node scripts/create-component.js"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.6.0",
     "@lit/context": "^1.1.6",
     "lit": "^3.2.1",
     "typescript": "^6.0.2"
@@ -50,7 +56,7 @@
     "@web/test-runner": "^0.20.2",
     "@web/test-runner-playwright": "^0.11.1",
     "custom-element-vs-code-integration": "^1.5.0",
-    "esbuild": "^0.27.4",
+    "esbuild": "^0.28.0",
     "happy-dom": "^20.8.9",
     "sinon": "^21.0.3",
     "vitest": "^4.1.2"

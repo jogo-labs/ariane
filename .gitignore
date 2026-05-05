@@ -10,6 +10,7 @@ dist-astro/
 .turbo/
 .astro/
 *.tsbuildinfo
+node-compile-cache/
 
 # ── Tests ─────────────────────────────────────────────────────
 coverage/

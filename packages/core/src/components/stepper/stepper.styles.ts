@@ -6,19 +6,27 @@ export default css`
     }
 
     .stepper-dropdown {
+        position: relative;
         display: flex;
     }
 
-    .stepper-dropdown .dropdown-toggle .btn-content {
+    .stepper-dropdown .btn-content {
         margin-right: 1rem;
         gap: 0.25rem;
     }
 
-    .stepper-dropdown-menu {
+    [part='trigger'] {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+        justify-content: space-between;
+        line-height: normal;
+        text-align: left;
+    }
+
+    [part='panel'] {
         padding: 0.75rem;
-        width: 100%;
-        background-color: var(--ar-color-bg, #fff);
-        color: var(--ar-color-text, #2e2e31);
+        min-width: var(--ar-stepper-panel-min-width, var(--ar-panel-min-width, 18rem));
+        max-width: var(--ar-stepper-panel-max-width, var(--ar-panel-max-width, 18rem));
     }
 
     .stepper-list {

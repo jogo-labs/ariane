@@ -465,4 +465,183 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
         });
     });
+
+    // ── Attribut open ─────────────────────────────────────────────────────────
+
+    describe('attribut open', () => {
+        it('vaut false par défaut', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(el.open).toBe(false);
+            expect(el.hasAttribute('open')).toBe(false);
+        });
+
+        it('est reflété comme attribut HTML quand posé programmatiquement', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(el.hasAttribute('open')).toBe(true);
+        });
+
+        it("open=true n'a pas d'effet en mode desktop", async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(shadow(el).querySelector('[part="trigger"]')).toBeNull();
+        });
+    });
+
+    // ── Annonces a11y ─────────────────────────────────────────────────────────
+
+    describe('annonces a11y', () => {
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        it('un clic sur une étape de premier niveau annonce son label', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
+            if (!link) throw new Error('Lien vers /a introuvable');
+            link.click();
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe('Étape A');
+        });
+
+        it('un clic sur une sous-étape annonce son label (branche flatMap)', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A">
+                        <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                        <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                    </ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
+            if (!link) throw new Error('Lien vers /a/2 introuvable');
+            link.click();
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Sous-étape 2',
+            );
+        });
+    });
+
+    describe('warn() — desktop-target introuvable', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si desktop-target pointe vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const el = await fixture<ArStepper>(
+                '<ar-stepper desktop-target="conteneur-inexistant"></ar-stepper>',
+            );
+            (el as unknown as Record<string, () => void>)['_teleportToTarget']?.();
+
+            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-stepper]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('conteneur-inexistant'));
+        });
+    });
+
+    describe('régressions change-in-update', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it("ne déclenche pas de warning Lit 'change-in-update' lors de l'enregistrement des items", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                    <ar-stepper-item path="/c" label="C"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((v) => typeof v === 'string')
+                    .some((v) => v.includes('scheduled an update')),
+            ).toBe(false);
+        });
+
+        it("ne déclenche pas de warning Lit 'change-in-update' lors du toggle open en mode mobile", async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            el.open = true;
+            await waitForUpdate(el);
+            el.open = false;
+            await waitForUpdate(el);
+
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((v) => typeof v === 'string')
+                    .some((v) => v.includes('scheduled an update')),
+            ).toBe(false);
+        });
+    });
 });

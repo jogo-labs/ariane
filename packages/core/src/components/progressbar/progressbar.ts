@@ -2,6 +2,7 @@ import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit'
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import { warn } from '../../utils/warn.js';
 import styles from './progressbar.styles.js';
 
 /** Objet de configuration d'un webcomposant ArProgressbar */
@@ -43,6 +44,19 @@ export class ArProgressbar extends LitElement {
      */
     @property({ reflect: true, useDefault: true, type: Number })
     percent = 0;
+
+    override updated(changed: Map<string, unknown>): void {
+        if (changed.has('percent')) {
+            if (isNaN(this.percent)) {
+                warn('ar-progressbar', `percent est NaN — vérifiez l'attribut HTML fourni.`);
+            } else if (this.percent < 0 || this.percent > 100) {
+                warn(
+                    'ar-progressbar',
+                    `percent doit être compris entre 0 et 100. Valeur reçue : ${this.percent}. Elle sera bornée automatiquement.`,
+                );
+            }
+        }
+    }
 
     override render(): TemplateResult {
         // Clamp défensif : même si la propriété est bornée, une valeur HTML arbitraire peut passer

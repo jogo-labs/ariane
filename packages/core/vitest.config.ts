@@ -1,6 +1,9 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+    define: {
+        __DEV__: 'true',
+    },
     test: {
         // happy-dom : supporte Shadow DOM, Custom Elements Registry, adoptedStyleSheets.
         // Plus léger et ~3x plus rapide que jsdom, contrairement à @web/test-runner

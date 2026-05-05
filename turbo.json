@@ -11,6 +11,16 @@
       "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
       "outputs": ["dist/**", "cdn/**"]
     },
+    "build:bundles:dev": {
+      "dependsOn": ["build:manifest"],
+      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "outputs": ["dist/**", "cdn/**"]
+    },
+    "build:bundles:prod": {
+      "dependsOn": ["build:manifest"],
+      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "outputs": ["dist/**", "cdn/**"]
+    },
     "build:css": {
       "inputs": ["src/styles/**/*.css"],
       "outputs": ["dist/styles/**"]
@@ -33,10 +43,22 @@
       ],
       "outputs": ["dist/**", "cdn/**"]
     },
+    "build:dev": {
+      "dependsOn": ["build:manifest", "build:bundles:dev", "build:css", "build:types", "^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/styles/**/*.css",
+        "scripts/build-bundles.js",
+        "scripts/build-css.js",
+        "cem.config.js",
+        "tsconfig.json",
+        "../../tsconfig.base.json"
+      ],
+      "outputs": ["dist/**", "cdn/**"]
+    },
     "dev": {
       "cache": false,
-      "persistent": true,
-      "dependsOn": ["^build", "build:manifest"]
+      "persistent": true
     },
     "test": {
       "dependsOn": ["^build:bundles"],

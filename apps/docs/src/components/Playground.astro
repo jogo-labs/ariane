@@ -110,10 +110,10 @@ const showPlayground = displayMode === 'demo';
                                     data-default={ctrl.default ?? ''}
                                 >
                                     {ctrl.addDefault && (
-                                        <option value="">Par défaut</option>
+                                        <option value="" selected={!ctrl.default}>Par défaut</option>
                                     )}
                                     {ctrl.options.map((opt) => (
-                                        <option value={opt}>{opt}</option>
+                                        <option value={opt} selected={opt === ctrl.default}>{opt}</option>
                                     ))}
                                 </select>
                             )}
@@ -122,6 +122,7 @@ const showPlayground = displayMode === 'demo';
                                     type="checkbox"
                                     data-attr={ctrl.attribute}
                                     data-playground-ctrl
+                                    checked={ctrl.default === 'true'}
                                 />
                             )}
                             {ctrl.controlType === 'text' && (
@@ -131,6 +132,7 @@ const showPlayground = displayMode === 'demo';
                                     data-playground-ctrl
                                     data-default={ctrl.default ?? ''}
                                     placeholder={ctrl.default ?? ''}
+                                    value={ctrl.default ?? ''}
                                 />
                             )}
                             {ctrl.controlType === 'number' && (
@@ -140,6 +142,7 @@ const showPlayground = displayMode === 'demo';
                                     data-playground-ctrl
                                     data-default={ctrl.default ?? ''}
                                     placeholder={ctrl.default ?? ''}
+                                    value={ctrl.default ?? ''}
                                 />
                             )}
                         </label>
@@ -405,4 +408,86 @@ const showPlayground = displayMode === 'demo';
     }
 
     .parent-notice a:hover { text-decoration: underline; }
+
+    /* ── Boutons dans la preview (trigger + slotted)
+     * :global() nécessaire : les boutons sont injectés via set:html et n'ont pas
+     * l'attribut de portée Astro — la règle .preview.astro-xxx .btn.astro-xxx ne les atteint pas.
+     * ─────────────────────────────────────────────────────────────────────── */
+
+    .preview :global(.btn) {
+        display:         inline-flex;
+        align-items:     center;
+        justify-content: center;
+        padding:         0 var(--ar-button-padding-x, 1rem);
+        min-height:      var(--ar-button-height, 2.5rem);
+        border-radius:   var(--ar-button-border-radius, 0.375rem);
+        border:          1px solid transparent;
+        font-size:       var(--ar-font-size-md, 1rem);
+        font-weight:     var(--ar-button-font-weight, 500);
+        line-height:     1;
+        cursor:          pointer;
+        text-decoration: none;
+        font-family:     inherit;
+    }
+
+    .preview :global(.btn-primary) {
+        background:   var(--ar-button-bg, var(--ar-color-interactive, #283276));
+        color:        var(--ar-button-color, #fff);
+        border-color: var(--ar-button-border-color, var(--ar-color-interactive, #283276));
+    }
+    .preview :global(.btn-primary:hover) {
+        background:   var(--ar-button-bg-hover, var(--ar-color-interactive-hover, #1b2256));
+        border-color: var(--ar-button-bg-hover, var(--ar-color-interactive-hover, #1b2256));
+    }
+
+    .preview :global(.btn-secondary) {
+        background:   var(--ar-button-secondary-bg, #fff);
+        color:        var(--ar-color-text, #2e2e31);
+        border-color: var(--ar-color-border, #e5e7eb);
+    }
+    .preview :global(.btn-secondary:hover) {
+        background: var(--ar-color-bg-subtle, #f5f5f8);
+    }
+
+    .preview :global(.btn-danger) {
+        background: var(--ar-button-danger-bg, #d04442);
+        color: #fff;
+    }
+    .preview :global(.btn-danger:hover) {
+        background: var(--ar-color-danger-40, #a52c2b);
+        color: #fff;
+    }
+
+    /* ── Styles consumer pour les items de menu dans les démos dropdown
+     * Ces styles vivent ici (couche docs) car ar-dropdown-item est intentionnellement
+     * unstyled — c'est le consumer qui apporte le CSS de ses boutons/liens.
+     * Le sélecteur évite d'ajouter une classe dans le snippet de code.
+     * ─────────────────────────────────────────────────────────────────────────────── */
+
+    .preview :global(ar-dropdown-item button),
+    .preview :global(ar-dropdown-item a) {
+        display:       block;
+        width:         100%;
+        padding:       0.4rem 0.75rem;
+        background:    transparent;
+        border:        none;
+        border-radius: 0.25rem;
+        text-align:    left;
+        font-size:     0.875rem;
+        font-family:   inherit;
+        color:         var(--ar-color-text, #2e2e31);
+        cursor:        pointer;
+        white-space:   nowrap;
+    }
+
+    .preview :global(ar-dropdown-item button:hover),
+    .preview :global(ar-dropdown-item a:hover) {
+        background: var(--ar-color-bg-subtle, #f5f5f8);
+    }
+
+    .preview :global(ar-dropdown hr) {
+        border:     none;
+        border-top: 1px solid var(--ar-color-border, #e5e7eb);
+        margin:     0.25rem 0;
+    }
 </style>

@@ -88,7 +88,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'dropdown')).toBeNull();
+            expect(getPart(el, 'trigger')).toBeNull();
         });
 
         it("affiche le bon nombre d'items", async () => {
@@ -171,14 +171,14 @@ describe('ArBreadcrumb', () => {
             ArBreadcrumb.mobileQuery = mockMediaQuery(true);
         });
 
-        it('affiche un part="dropdown" en mode mobile', async () => {
+        it('affiche un part="trigger" en mode mobile', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'dropdown')).not.toBeNull();
+            expect(getPart(el, 'trigger')).not.toBeNull();
         });
 
         it('ne rend pas de ol.breadcrumb-desktop en mode mobile', async () => {
@@ -259,21 +259,56 @@ describe('ArBreadcrumb', () => {
             expect(closeHandler).toHaveBeenCalledOnce();
         });
 
-        it('ajoute la classe "show" au dropdown après ouverture', async () => {
+        it('émet ar-breadcrumb-open au premier clic sur le bouton', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            let fired = false;
+            el.addEventListener('ar-breadcrumb-open', () => {
+                fired = true;
+            });
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
-            expect(getPart(el, 'dropdown')?.classList.contains('show')).toBe(true);
+            expect(fired).toBe(true);
         });
 
-        it('retire la classe "show" du dropdown après fermeture', async () => {
+        it('émet ar-breadcrumb-close au deuxième clic sur le bouton', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            let fired = false;
+            el.addEventListener('ar-breadcrumb-close', () => {
+                fired = true;
+            });
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+            btn.click();
+            await waitForUpdate(el);
+
+            expect(fired).toBe(true);
+        });
+
+        it('open vaut false par défaut', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(el.open).toBe(false);
+            expect(el.hasAttribute('open')).toBe(false);
+        });
+
+        it('open est reflété comme attribut HTML après clic', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
@@ -283,10 +318,68 @@ describe('ArBreadcrumb', () => {
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(el.hasAttribute('open')).toBe(true);
+        });
+
+        it('open=true programmatique émet ar-breadcrumb-open', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-open', handler);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('open=false programmatique émet ar-breadcrumb-close', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
-            expect(getPart(el, 'dropdown')?.classList.contains('show')).toBe(false);
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-close', handler);
+            el.open = false;
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+    });
+
+    // ── Attribut open (desktop) ───────────────────────────────────────────────
+
+    describe('attribut open — mode desktop', () => {
+        beforeEach(() => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(false);
+        });
+
+        it("open=true n'émet pas d'événement en mode desktop", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-breadcrumb-open', handler);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            expect(handler).not.toHaveBeenCalled();
         });
     });
 

@@ -1,13 +1,21 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import {
+    LitElement,
+    type TemplateResult,
+    html,
+    type CSSResultGroup,
+    nothing,
+    type PropertyValues,
+} from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import dropdownStyles from '../../styles/components/dropdown.styles.js';
+import panelStyles from '../../styles/shared/panel.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
+import { AnchoredController } from '../../controllers/anchored.controller.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
@@ -22,27 +30,34 @@ import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
  * @csspart item       - Chaque `<li>` de la liste.
  * @csspart link       - Les `<a>` de navigation.
  * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
- * @csspart dropdown   - Le conteneur du dropdown mobile.
+ * @csspart trigger    - Le bouton d'ouverture du panel mobile.
+ * @csspart panel      - Le panel mobile flottant.
  *
  * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
  * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
+ * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width,18rem)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop [--ar-breadcrumb-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  *
  * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
  * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
  */
 @customElement('ar-breadcrumb')
 export class ArBreadcrumb extends LitElement {
-    static override styles: CSSResultGroup = [
-        utilitiesStyles,
-        dropdownStyles,
-        buttonStyles,
-        styles,
-    ];
+    static override styles: CSSResultGroup = [utilitiesStyles, panelStyles, buttonStyles, styles];
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
     @state() private isMobile: boolean = ArBreadcrumb.mobileQuery.matches;
-    @state() private dropdownOpen: boolean = false;
+
+    /**
+     * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
+     * Sans effet en mode desktop.
+     * @attr open
+     */
+    @property({ reflect: true, type: Boolean }) open: boolean = false;
+
+    @query('[part="trigger"]') private _dropdownTrigger?: HTMLButtonElement;
+    @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
@@ -64,6 +79,18 @@ export class ArBreadcrumb extends LitElement {
         },
     });
 
+    private readonly _popover = new AnchoredController(this, {
+        lockScroll: false,
+        popupMode: 'menu',
+        placement: 'bottom-end',
+        onExternalClose: () => {
+            this.open = false;
+            this.dispatchEvent(
+                new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
+            );
+        },
+    });
+
     // ---------------------------------------------------------------------------
     // Lifecycle
     // ---------------------------------------------------------------------------
@@ -77,6 +104,31 @@ export class ArBreadcrumb extends LitElement {
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
+    }
+
+    override firstUpdated(): void {
+        if (this.isMobile) this._attachDropdown();
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        if ((changed as Map<PropertyKey, unknown>).has('isMobile') && this.isMobile) {
+            void this.updateComplete.then(() => {
+                if (this.isConnected) this._attachDropdown();
+            });
+        }
+        if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
+            if (this.open) {
+                void this._popover.show();
+                this.dispatchEvent(
+                    new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
+                );
+            } else {
+                this._popover.hide();
+                this.dispatchEvent(
+                    new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
+                );
+            }
+        }
     }
 
     // ---------------------------------------------------------------------------
@@ -112,30 +164,22 @@ export class ArBreadcrumb extends LitElement {
             >
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
-                    ? html`<div
-                          part="dropdown"
-                          class="dropdown breadcrumb-dropdown${this.dropdownOpen ? ' show' : ''}"
-                      >
+                    ? html`<div class="breadcrumb-dropdown">
                           <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
                               <span class="btn-content">${items[0]?.label}</span>
                           </a>
                           <button
-                              @click=${this.dropdownOpen ? this._hide : this._show}
-                              .ariaExpanded=${this.dropdownOpen}
+                              @click=${this.open ? this._hide : this._show}
                               type="button"
+                              part="trigger"
                               class="btn btn-tertiary btn-ratio-square"
                               id="breadcrumb-dropdown"
                           >
                               <span aria-hidden="true" class="icon icon-more">v</span>
                               <span class="btn-content sr-only">Afficher le fil d'ariane</span>
                           </button>
-                          <div
-                              class="dropdown-menu dropdown-menu-left${this.dropdownOpen
-                                  ? ' show'
-                                  : ''}"
-                              tabindex="-1"
-                          >
+                          <div part="panel" popover="auto" tabindex="-1">
                               <ol class="breadcrumb breadcrumb-mobile">
                                   ${listTemplates.slice(1)}
                               </ol>
@@ -173,20 +217,18 @@ export class ArBreadcrumb extends LitElement {
         });
     }
 
+    private _attachDropdown(): void {
+        if (this._dropdownTrigger && this._dropdownPanel) {
+            this._popover.attach(this._dropdownTrigger, this._dropdownPanel);
+        }
+    }
+
     private _show(): void {
-        this.dropdownOpen = true;
-        this.addEventListener('blur', this._hide);
-        this.dispatchEvent(
-            new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
-        );
+        this.open = true;
     }
 
     private _hide(): void {
-        this.dropdownOpen = false;
-        this.removeEventListener('blur', this._hide);
-        this.dispatchEvent(
-            new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-        );
+        this.open = false;
     }
 
     private _handleMediaChange = (): void => {

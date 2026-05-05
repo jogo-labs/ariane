@@ -1,19 +1,27 @@
-import { LitElement, html, type TemplateResult, type CSSResultGroup } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import {
+    LitElement,
+    html,
+    type TemplateResult,
+    type CSSResultGroup,
+    type PropertyValues,
+} from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
-import dropdownStyles from '../../styles/components/dropdown.styles.js';
+import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
-import { DropdownController } from '../../controllers/dropdown.controller.js';
+import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { type ArStepperItem } from '../stepper-item/stepper-item.js';
+import { warn } from '../../utils/warn.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
 export interface ArStepperStepChangeDetail {
@@ -41,10 +49,13 @@ export interface ArStepperStepChangeDetail {
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
  * @csspart dropdown     - Le conteneur dropdown.
- * @csspart dropdown-btn - Le bouton d'ouverture du dropdown.
+ * @csspart trigger      - Le bouton d'ouverture du panel mobile.
+ * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop [--ar-stepper-gap=1.5rem]                                                          - Hauteur du connecteur entre les étapes principales.
- * @cssprop [--ar-stepper-substep-gap=1rem]                                                    - Hauteur du connecteur entre les sous-étapes.
+ * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width,18rem)]                    - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)]                    - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @cssprop [--ar-stepper-gap=1.5rem]                                                         - Hauteur du connecteur entre les étapes principales.
+ * @cssprop [--ar-stepper-substep-gap=1rem]                                                   - Hauteur du connecteur entre les sous-étapes.
  * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
  * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
  * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.
@@ -64,7 +75,7 @@ export class ArStepper extends LitElement {
         resetStyles,
         utilitiesStyles,
         buttonStyles,
-        dropdownStyles,
+        panelStyles,
         styles,
     ];
 
@@ -107,6 +118,14 @@ export class ArStepper extends LitElement {
     desktopFrom = 992;
 
     /**
+     * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
+     * Sans effet en mode desktop.
+     * @attr open
+     * @default false
+     */
+    @property({ reflect: true, type: Boolean }) open: boolean = false;
+
+    /**
      * Alignement de la liste d'étapes : `left` (défaut) ou `right`.
      * **Note** — l'alignement `right` ne s'applique qu'en mode desktop (rendu liste verticale).
      * En mode mobile (dropdown), les items restent alignés à gauche.
@@ -121,10 +140,14 @@ export class ArStepper extends LitElement {
     @state()
     private _isDesktop = false;
 
+    @query('[part="trigger"]') private _dropdownTrigger?: HTMLElement;
+    @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
+
     private _originalParent: ParentNode | null = null;
     private _originalNextSibling: ChildNode | null = null;
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
+    private _dropdownAttached = false;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -133,8 +156,16 @@ export class ArStepper extends LitElement {
 
     private readonly navigation = new NavigationTreeController(this);
     private readonly scrollFollow = new ScrollFollowController(this, () => this.getScrollTargets());
-    private readonly dropdown = new DropdownController(this);
-    private readonly _onDropdownToggle = () => this.dropdown.toggle();
+    private readonly _popover = new AnchoredController(this, {
+        lockScroll: false,
+        popupMode: 'menu',
+        onExternalClose: () => {
+            this.open = false;
+        },
+    });
+    private readonly _onDropdownToggle = () => {
+        this.open = !this.open;
+    };
 
     // ── Registry / Context ───────────────────────────────────────────────────
 
@@ -190,11 +221,42 @@ export class ArStepper extends LitElement {
         super.disconnectedCallback();
     }
 
+    override updated(changed: PropertyValues<this>): void {
+        if (!this._isDesktop && !this._dropdownAttached) {
+            void this.updateComplete.then(() => {
+                this._dropdownAttached = this._attachDropdown();
+            });
+        }
+        if (changed.has('open') && !this._isDesktop && this._dropdownAttached) {
+            // Différer évite que Popover.requestUpdate() déclenche le warning Lit "change-in-update".
+            if (this.open) {
+                void this.updateComplete.then(() => {
+                    if (this.isConnected) void this._popover.show();
+                });
+            } else {
+                void this.updateComplete.then(() => {
+                    if (this.isConnected) this._popover.hide();
+                });
+            }
+        }
+    }
+
+    private _attachDropdown(): boolean {
+        if (!this.isConnected) return false;
+        if (this._dropdownTrigger && this._dropdownPanel) {
+            this._popover.hide(); // flush stale scroll-lock refs before re-attach
+            this._popover.attach(this._dropdownTrigger, this._dropdownPanel);
+            if (this.open) void this._popover.show();
+            return true;
+        }
+        return false;
+    }
+
     // ── Reactivity ───────────────────────────────────────────────────────────
 
     // willUpdate() s'exécute AVANT le rendu : les requestUpdate() déclenchés ici
     // (via setCurrentPath, setEnabled) sont mergés dans le cycle courant → 0 update parasite.
-    protected override willUpdate(changed: Map<PropertyKey, unknown>) {
+    protected override willUpdate(changed: PropertyValues<this>) {
         if (changed.has('currentPath') || this.navigation.tree.length) {
             this._currentStepIndex = this.computeCurrentStepIndex();
         }
@@ -224,7 +286,6 @@ export class ArStepper extends LitElement {
             : renderMobile(
                   steps,
                   {
-                      isOpen: this.dropdown.isOpen,
                       currentStepIndex: this._currentStepIndex,
                       currentStepLabel: this.getCurrentStepLabel(),
                       currentSubStepLabel: this.getCurrentSubStepLabel(),
@@ -251,18 +312,19 @@ export class ArStepper extends LitElement {
     private _rebuildPending = false;
 
     /**
-     * Déclenche une reconstruction de l'arbre au prochain microtask.
-     * Le debounce via `_rebuildPending` évite N rebuilds pour N items qui s'enregistrent
-     * en même temps au premier rendu.
+     * Déclenche une reconstruction de l'arbre après le cycle de rendu courant.
+     * Le debounce via `_rebuildPending` évite N rebuilds pour N items simultanés.
+     * `updateComplete.then` garantit que le rebuild est hors du cycle Lit actif.
      */
     private rebuildTree(): void {
         if (this._rebuildPending) return;
         this._rebuildPending = true;
 
-        queueMicrotask(() => {
+        void this.updateComplete.then(() => {
             this._rebuildPending = false;
             this.navigation.buildFromItems(Array.from(this.items));
             this.scrollFollow.refresh();
+            this.requestUpdate();
         });
     }
 
@@ -305,6 +367,7 @@ export class ArStepper extends LitElement {
     }
 
     private applyResponsiveMode(matches: boolean): void {
+        const wasDesktop = this._isDesktop;
         // Le mode de rendu suit le breakpoint, indépendamment de la téléportation
         this._isDesktop = matches;
 
@@ -315,13 +378,17 @@ export class ArStepper extends LitElement {
                 this._restoreToOriginalContainer();
             }
         }
+        // Retour en mode mobile : updated() re-attachera dès que les éléments sont dans le DOM
+        if (wasDesktop && !matches) {
+            this._dropdownAttached = false;
+        }
     }
 
     private _teleportToTarget(): void {
         if (!this.desktopTarget) return;
         const target = document.getElementById(this.desktopTarget);
         if (!target) {
-            console.warn(`[ar-stepper] desktop target "${this.desktopTarget}" not found`);
+            warn('ar-stepper', `desktop-target "${this.desktopTarget}" introuvable.`);
             return;
         }
         if (this.parentNode !== target) {
@@ -384,6 +451,11 @@ export class ArStepper extends LitElement {
         this.dispatchEvent(
             new CustomEvent('ar-stepper-step-changed', { bubbles: true, composed: true, detail }),
         );
+
+        const stepLabel =
+            this.navigation.tree.flatMap((s) => [s, ...s.children]).find((s) => s.path === path)
+                ?.label ?? path;
+        announceA11y(stepLabel, 'polite');
     };
 
     private handleScrollChange = (event: CustomEvent<string>): void => {

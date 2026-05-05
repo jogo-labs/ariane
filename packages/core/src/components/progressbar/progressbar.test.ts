@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArProgressbar } from './progressbar.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './progressbar.js';
@@ -135,6 +135,40 @@ describe('ArProgressbar', () => {
         it('aria-valuenow est clampé à 100 si percent > 100', async () => {
             el = await fixture('<ar-progressbar percent="999"></ar-progressbar>');
             expect(requirePart(el, 'bar').getAttribute('aria-valuenow')).toBe('100');
+        });
+    });
+
+    describe('warn() — percent hors bornes', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si percent > 100', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-progressbar percent="150"></ar-progressbar>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-progressbar]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('150'));
+        });
+
+        it('émet un warn si percent < 0', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-progressbar percent="-10"></ar-progressbar>');
+
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-progressbar]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('-10'));
+        });
+
+        it("n'émet pas de warn pour une valeur valide", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-progressbar percent="50"></ar-progressbar>');
+
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 });
