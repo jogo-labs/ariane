@@ -590,4 +590,58 @@ describe('ArStepper', () => {
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('conteneur-inexistant'));
         });
     });
+
+    describe('régressions change-in-update', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it("ne déclenche pas de warning Lit 'change-in-update' lors de l'enregistrement des items", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                    <ar-stepper-item path="/c" label="C"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((v) => typeof v === 'string')
+                    .some((v) => v.includes('scheduled an update')),
+            ).toBe(false);
+        });
+
+        it("ne déclenche pas de warning Lit 'change-in-update' lors du toggle open en mode mobile", async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            el.open = true;
+            await waitForUpdate(el);
+            el.open = false;
+            await waitForUpdate(el);
+
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((v) => typeof v === 'string')
+                    .some((v) => v.includes('scheduled an update')),
+            ).toBe(false);
+        });
+    });
 });
