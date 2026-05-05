@@ -86,8 +86,6 @@ export class NavigationTreeController implements ReactiveController {
         this.buildOrdered();
 
         computeNavigationStates(this.ordered, this.currentPath);
-
-        this.host.requestUpdate();
     }
 
     setCurrentPath(path: string) {

@@ -228,10 +228,15 @@ export class ArStepper extends LitElement {
             });
         }
         if (changed.has('open') && !this._isDesktop && this._dropdownAttached) {
+            // Différer évite que Popover.requestUpdate() déclenche le warning Lit "change-in-update".
             if (this.open) {
-                void this._popover.show();
+                void this.updateComplete.then(() => {
+                    if (this.isConnected) void this._popover.show();
+                });
             } else {
-                this._popover.hide();
+                void this.updateComplete.then(() => {
+                    if (this.isConnected) this._popover.hide();
+                });
             }
         }
     }
@@ -307,18 +312,19 @@ export class ArStepper extends LitElement {
     private _rebuildPending = false;
 
     /**
-     * Déclenche une reconstruction de l'arbre au prochain microtask.
-     * Le debounce via `_rebuildPending` évite N rebuilds pour N items qui s'enregistrent
-     * en même temps au premier rendu.
+     * Déclenche une reconstruction de l'arbre après le cycle de rendu courant.
+     * Le debounce via `_rebuildPending` évite N rebuilds pour N items simultanés.
+     * `updateComplete.then` garantit que le rebuild est hors du cycle Lit actif.
      */
     private rebuildTree(): void {
         if (this._rebuildPending) return;
         this._rebuildPending = true;
 
-        queueMicrotask(() => {
+        void this.updateComplete.then(() => {
             this._rebuildPending = false;
             this.navigation.buildFromItems(Array.from(this.items));
             this.scrollFollow.refresh();
+            this.requestUpdate();
         });
     }
 

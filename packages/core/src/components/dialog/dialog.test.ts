@@ -194,6 +194,47 @@ describe('ArDialog', () => {
             expect(handler).toHaveBeenCalledOnce();
         });
 
+        it("ne déclenche pas de warning Lit 'change-in-update' lors d'un cycle open/close", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog label="Titre" open></ar-dialog>');
+            await waitForUpdate(el);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 550));
+
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((value) => typeof value === 'string')
+                    .some((value) => value.includes('scheduled an update')),
+            ).toBe(false);
+
+            spy.mockRestore();
+        });
+
+        it("ne déclenche pas de warning Lit 'change-in-update' quand l'ouverture est annulée", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
+            el.addEventListener('ar-dialog-show', (e) => e.preventDefault());
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(getDialogEl(el).open).toBe(false);
+            expect(el.open).toBe(false);
+            expect(
+                spy.mock.calls
+                    .flat()
+                    .filter((value) => typeof value === 'string')
+                    .some((value) => value.includes('scheduled an update')),
+            ).toBe(false);
+
+            spy.mockRestore();
+        });
+
         it("ar-dialog-show annulable empêche l'ouverture", async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             el.addEventListener('ar-dialog-show', (e) => e.preventDefault());
