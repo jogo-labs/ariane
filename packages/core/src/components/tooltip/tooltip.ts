@@ -1,11 +1,22 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
-import type { Placement } from '@floating-ui/dom';
 import { warn } from '../../utils/warn.js';
 import styles from './tooltip.styles.js';
 
-export type ArTooltipPlacement = Placement;
+export type ArTooltipPlacement =
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end';
 
 /**
  * @summary Bulle d'information non-interactive déclenchée sur hover et focus.

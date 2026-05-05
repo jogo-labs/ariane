@@ -17,6 +17,9 @@ const tooltipStyles = css`
         padding: var(--ar-tooltip-padding, 0.375rem 0.625rem);
         max-width: var(--ar-tooltip-max-width, 18rem);
 
+        /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
+        overflow: visible;
+
         /* Visual */
         background-color: var(--ar-tooltip-bg, #1a1a1a);
         color: var(--ar-tooltip-color, #fff);
