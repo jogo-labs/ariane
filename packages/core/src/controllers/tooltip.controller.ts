@@ -11,12 +11,14 @@ export interface TooltipControllerOptions {
 }
 
 export class TooltipController implements ReactiveController {
+    private readonly _host: ReactiveControllerHost & HTMLElement;
     private readonly _popover: Popover;
 
     constructor(
         host: ReactiveControllerHost & HTMLElement,
         options: TooltipControllerOptions = {},
     ) {
+        this._host = host;
         this._popover = new Popover(host, {
             placement: options.placement ?? 'top',
             distance: options.distance ?? 6,
@@ -33,7 +35,8 @@ export class TooltipController implements ReactiveController {
     attach(trigger: HTMLElement, panel: HTMLElement): void {
         this._popover.attach(trigger, panel);
         panel.setAttribute('role', 'tooltip');
-        trigger.setAttribute('aria-describedby', panel.id);
+        if (!this._host.id) this._host.id = `ar-tooltip-${crypto.randomUUID().slice(0, 8)}`;
+        trigger.setAttribute('aria-describedby', this._host.id);
     }
 
     show(): Promise<void> {
