@@ -1,5 +1,4 @@
 ---
-title: ar-tooltip — Design spec
 date: 2026-05-04
 status: approved
 ---
@@ -100,7 +99,7 @@ Aucun événement public — le tooltip est purement informatif.
 1. `firstUpdated` → `document.getElementById(for)` → `controller.attach(trigger, bubble)` + enregistrement des listeners hover/focus.
 2. `updated` sur changement de `for` → détachement des anciens listeners, résolution du nouveau trigger, nouvel attach.
 3. `disconnectedCallback` → retrait des listeners + `controller.hostDisconnected()`.
-4. `for` ne résout rien → `warn('ar-tooltip', `Aucun élément trouvé avec l'id "${this.for}".`)`.
+4. `for` ne résout rien → `warn('ar-tooltip', ...)` avec l'id manquant.
 
 ### Déclencheurs
 
@@ -108,7 +107,7 @@ Aucun événement public — le tooltip est purement informatif.
 
 ### Cycle show / hide
 
-```
+```text
 mouseenter / focus  →  clearTimeout(hideTimer)
                     →  showTimer après show-delay ms
                     →  controller.show()
