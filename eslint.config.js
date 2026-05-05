@@ -38,4 +38,13 @@ export default defineConfig(
             '@typescript-eslint/ban-types': 'off',
         },
     },
+
+    // Assouplissements pour les fichiers de test
+    {
+        files: ['**/*.test.ts', '**/*.spec.ts'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-non-null-assertion': 'off',
+        },
+    },
 );

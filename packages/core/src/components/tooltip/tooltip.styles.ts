@@ -1,0 +1,55 @@
+import { css, type CSSResultGroup } from 'lit';
+import animationsStyles from '../../styles/animations.styles.js';
+
+const tooltipStyles = css`
+    :host {
+        display: contents;
+    }
+
+    [part='bubble'] {
+        /* Popover positioning reset */
+        position: absolute;
+        inset: 0 auto auto 0;
+        margin: 0;
+
+        /* Box model */
+        box-sizing: border-box;
+        padding: var(--ar-tooltip-padding, 0.375rem 0.625rem);
+        max-width: var(--ar-tooltip-max-width, 18rem);
+
+        /* Visual */
+        background-color: var(--ar-tooltip-bg, #1a1a1a);
+        color: var(--ar-tooltip-color, #fff);
+        border: none;
+        border-radius: var(--ar-tooltip-border-radius, 0.25rem);
+        font-size: var(--ar-tooltip-font-size, 0.8125rem);
+        line-height: 1.4;
+        word-break: break-word;
+    }
+
+    [part='bubble']:not(:popover-open) {
+        display: none;
+    }
+
+    [part='bubble']:popover-open {
+        animation: arPanelShow 0.15s ease-out;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [part='bubble']:popover-open {
+            animation: none;
+        }
+    }
+
+    [part='arrow'] {
+        position: absolute;
+        width: var(--ar-tooltip-arrow-size, 6px);
+        height: var(--ar-tooltip-arrow-size, 6px);
+        background-color: var(--ar-tooltip-bg, #1a1a1a);
+        transform: rotate(45deg);
+        pointer-events: none;
+    }
+`;
+
+const styles: CSSResultGroup = [animationsStyles, tooltipStyles];
+export default styles;
