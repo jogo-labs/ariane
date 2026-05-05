@@ -56,6 +56,10 @@ export class TooltipController implements ReactiveController {
         this._popover.setOffset(v);
     }
 
+    setArrow(el: HTMLElement | null): void {
+        this._popover.setArrow(el);
+    }
+
     hostConnected(): void {}
 
     hostDisconnected(): void {
