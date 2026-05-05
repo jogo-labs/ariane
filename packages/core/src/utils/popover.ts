@@ -1,4 +1,4 @@
-import { computePosition, flip, hide, offset, shift, autoUpdate } from '@floating-ui/dom';
+import { arrow, computePosition, flip, hide, offset, shift, autoUpdate } from '@floating-ui/dom';
 import type { Placement } from '@floating-ui/dom';
 import type { ReactiveControllerHost } from 'lit';
 
@@ -13,6 +13,8 @@ export interface PopoverOptions {
     popoverType?: 'auto' | 'manual';
     /** Appelé lors du light-dismiss natif (popoverType 'auto' uniquement). */
     onExternalClose?: () => void;
+    /** Élément caret positionné par Floating UI arrow(). Optionnel. */
+    arrowEl?: HTMLElement;
 }
 
 export class Popover {
@@ -21,8 +23,9 @@ export class Popover {
     private _panel: HTMLElement | null = null;
     private _isOpen = false;
     private _cleanupAutoUpdate: (() => void) | null = null;
-    private _opts: Required<Omit<PopoverOptions, 'onExternalClose'>> & {
+    private _opts: Required<Omit<PopoverOptions, 'onExternalClose' | 'arrowEl'>> & {
         onExternalClose?: () => void;
+        arrowEl?: HTMLElement;
     };
 
     constructor(host: ReactiveControllerHost & HTMLElement, options: PopoverOptions = {}) {
@@ -35,6 +38,7 @@ export class Popover {
             ...(options.onExternalClose !== undefined && {
                 onExternalClose: options.onExternalClose,
             }),
+            ...(options.arrowEl !== undefined && { arrowEl: options.arrowEl }),
         };
     }
 
@@ -52,6 +56,14 @@ export class Popover {
 
     setOffset(v: number): void {
         this._opts.offset = v;
+    }
+
+    setArrow(el: HTMLElement | null): void {
+        if (el) {
+            this._opts.arrowEl = el;
+        } else {
+            delete this._opts.arrowEl;
+        }
     }
 
     attach(trigger: HTMLElement, panel: HTMLElement): void {
@@ -121,21 +133,44 @@ export class Popover {
 
     private async _position(): Promise<void> {
         if (!this._isOpen || !this._trigger || !this._panel) return;
-        const { x, y, middlewareData } = await computePosition(this._trigger, this._panel, {
-            placement: this._opts.placement,
-            strategy: 'absolute',
-            middleware: [
-                offset({ mainAxis: this._opts.distance, crossAxis: this._opts.offset }),
-                flip(),
-                shift({ padding: 4 }),
-                hide(),
-            ],
-        });
+        const arrowEl = this._opts.arrowEl ?? null;
+        const { x, y, middlewareData, placement } = await computePosition(
+            this._trigger,
+            this._panel,
+            {
+                placement: this._opts.placement,
+                strategy: 'absolute',
+                middleware: [
+                    offset({ mainAxis: this._opts.distance, crossAxis: this._opts.offset }),
+                    flip(),
+                    ...(arrowEl ? [arrow({ element: arrowEl })] : []),
+                    shift({ padding: 4 }),
+                    hide(),
+                ],
+            },
+        );
         // Guard: panel may have been destroyed during the async computePosition call.
         if (!this._panel) return;
         const hidden = middlewareData.hide?.referenceHidden ?? false;
         this._panel.style.visibility = hidden ? 'hidden' : '';
         this._panel.style.transform = `translate(${this._roundByDPR(x)}px, ${this._roundByDPR(y)}px)`;
+
+        if (arrowEl && middlewareData.arrow) {
+            const { x: ax, y: ay } = middlewareData.arrow;
+            const side = placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right';
+            const staticSide = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' }[side];
+            const halfSize =
+                side === 'left' || side === 'right'
+                    ? arrowEl.offsetHeight / 2
+                    : arrowEl.offsetWidth / 2;
+            Object.assign(arrowEl.style, {
+                left: ax != null ? `${this._roundByDPR(ax)}px` : '',
+                top: ay != null ? `${this._roundByDPR(ay)}px` : '',
+                right: '',
+                bottom: '',
+                [staticSide]: `-${halfSize}px`,
+            });
+        }
     }
 
     private _roundByDPR(value: number): number {
