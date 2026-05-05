@@ -57,10 +57,26 @@ export class ArTooltip extends LitElement {
     @property({ reflect: true, type: Number }) offset = 0;
 
     /** Délai avant affichage en ms (WCAG 1.4.13). */
-    @property({ attribute: 'show-delay', reflect: true, type: Number }) showDelay = 300;
+    @property({
+        attribute: 'show-delay',
+        reflect: true,
+        converter: {
+            fromAttribute: (v) => (v === null || v === '' ? 300 : Number(v)),
+            toAttribute: String,
+        },
+    })
+    showDelay = 300;
 
     /** Délai avant masquage en ms (WCAG 1.4.13). */
-    @property({ attribute: 'hide-delay', reflect: true, type: Number }) hideDelay = 150;
+    @property({
+        attribute: 'hide-delay',
+        reflect: true,
+        converter: {
+            fromAttribute: (v) => (v === null || v === '' ? 150 : Number(v)),
+            toAttribute: String,
+        },
+    })
+    hideDelay = 150;
 
     /** Supprime le caret. */
     @property({ attribute: 'without-arrow', reflect: true, type: Boolean }) withoutArrow = false;
