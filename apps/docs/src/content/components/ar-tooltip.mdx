@@ -70,7 +70,7 @@ variants:
 
 ### Pris en charge automatiquement
 
-- Le trigger reçoit `aria-describedby` pointant vers l'id interne de la bulle, même quand elle est fermée — les lecteurs d'écran peuvent lire la description au focus sans que la bulle soit visuellement ouverte.
+- Le trigger reçoit `aria-describedby` pointant vers l'élément `<ar-tooltip>` lui-même (light DOM). Les IDREF ne franchissent pas la frontière shadow DOM — référencer la bulle interne rendrait la description invisible aux lecteurs d'écran. L'hôte étant toujours présent dans le DOM, la description est disponible dès le focus, même quand la bulle est visuellement fermée.
 - La bulle porte `role="tooltip"` et `popover="manual"`.
 - **WCAG 1.4.13 — Content on Hover or Focus :** déplacer le pointeur du trigger vers la bulle annule le timer de fermeture ; la bulle reste ouverte tant que le pointeur y séjourne.
 - La touche `Escape` ferme immédiatement le tooltip sans déplacer le focus.
