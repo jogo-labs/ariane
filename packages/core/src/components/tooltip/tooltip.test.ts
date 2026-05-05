@@ -65,14 +65,13 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
         });
 
-        it("pose aria-describedby sur le trigger pointant vers l'id de la bulle", () => {
+        it("pose aria-describedby sur le trigger pointant vers l'id de l'hôte", () => {
             const trigger = document.getElementById('btn')!;
-            const bubble = getPart(el, 'bubble')!;
-            expect(trigger.getAttribute('aria-describedby')).toBe(bubble.id);
+            expect(trigger.getAttribute('aria-describedby')).toBe(el.id);
         });
 
-        it("l'id de la bulle est non vide", () => {
-            expect((getPart(el, 'bubble') as HTMLElement).id).not.toBe('');
+        it("l'id de l'hôte est non vide", () => {
+            expect(el.id).not.toBe('');
         });
     });
 
@@ -115,8 +114,7 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>('<ar-tooltip for="a">Aide</ar-tooltip>');
             el.for = 'b';
             await waitForUpdate(el);
-            const bubble = getPart(el, 'bubble') as HTMLElement;
-            expect(document.getElementById('b')!.getAttribute('aria-describedby')).toBe(bubble.id);
+            expect(document.getElementById('b')!.getAttribute('aria-describedby')).toBe(el.id);
         });
     });
 

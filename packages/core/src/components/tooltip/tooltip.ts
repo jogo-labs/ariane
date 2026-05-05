@@ -134,6 +134,10 @@ export class ArTooltip extends LitElement {
         }
         this._trigger = trigger;
         this._tooltip.attach(trigger, this._bubble);
+        // aria-describedby doit pointer vers l'hôte (light DOM) — les IDREF ne franchissent pas
+        // la frontière shadow DOM, donc référencer la bulle (shadow DOM) ne fonctionnerait pas.
+        if (!this.id) this.id = `ar-tooltip-${crypto.randomUUID().slice(0, 8)}`;
+        trigger.setAttribute('aria-describedby', this.id);
         trigger.addEventListener('mouseenter', this._handleMouseEnter);
         trigger.addEventListener('mouseleave', this._handleMouseLeave);
         trigger.addEventListener('focus', this._handleFocus);

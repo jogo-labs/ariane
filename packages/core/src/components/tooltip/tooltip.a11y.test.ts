@@ -19,7 +19,7 @@ describe('ar-tooltip — accessibilité', () => {
     // ── ARIA trigger ────────────────────────────────────────────────────────
 
     describe('ARIA trigger', () => {
-        it('le trigger a aria-describedby pointant vers la bulle', async () => {
+        it("le trigger a aria-describedby pointant vers l'hôte (light DOM)", async () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="help">?</button>
@@ -28,8 +28,9 @@ describe('ar-tooltip — accessibilité', () => {
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
             const trigger = wrapper.querySelector<HTMLElement>('#help')!;
-            const bubble = getBubble(el);
-            expect(trigger.getAttribute('aria-describedby')).to.equal(bubble.id);
+            // aria-describedby doit pointer vers l'hôte (light DOM), pas la bulle (shadow DOM)
+            // — les IDREF ne franchissent pas la frontière shadow DOM.
+            expect(trigger.getAttribute('aria-describedby')).to.equal(el.id);
         });
 
         it('aria-describedby est retiré du trigger quand `for` change', async () => {
@@ -73,7 +74,7 @@ describe('ar-tooltip — accessibilité', () => {
             expect(getBubble(el).matches(':popover-open')).to.equal(false);
         });
 
-        it('aria-describedby reste valide quand la bulle est fermée (AT lit le contenu au focus)', async () => {
+        it("aria-describedby pointe vers l'hôte même quand la bulle est fermée", async () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn3">x</button>
@@ -82,10 +83,9 @@ describe('ar-tooltip — accessibilité', () => {
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
             const trigger = wrapper.querySelector<HTMLElement>('#btn3')!;
-            const bubble = getBubble(el);
-            // Bulle fermée — aria-describedby doit déjà pointer vers la bulle
-            expect(trigger.getAttribute('aria-describedby')).to.equal(bubble.id);
-            // Le texte est présent dans la bulle même fermée (dans le slot)
+            // L'hôte (light DOM) est toujours présent — les AT peuvent lire sa description au focus
+            // même quand la bulle est fermée (display:none dans le shadow DOM).
+            expect(trigger.getAttribute('aria-describedby')).to.equal(el.id);
             expect(el.textContent?.trim()).to.equal('Description accessible');
         });
     });
