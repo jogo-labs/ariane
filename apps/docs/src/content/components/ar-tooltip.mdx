@@ -1,0 +1,84 @@
+---
+tagName: ar-tooltip
+title: Tooltip
+description: Bulle d'aide non-interactive déclenchée sur hover et focus, conforme WCAG 1.4.13.
+playgroundTemplate: default
+variants:
+    - name: default
+      label: Par défaut
+      description: Passez l'ID du trigger via `for`. La bulle s'affiche après `show-delay` ms (300 par défaut) et se masque après `hide-delay` ms (150 par défaut).
+      html: |
+          <button id="tt-default" class="btn btn-secondary">Survolez-moi</button>
+          <ar-tooltip for="tt-default">Texte d'aide contextuelle</ar-tooltip>
+    - name: placement
+      label: Placement
+      description: Toutes les valeurs Floating UI sont supportées — `top`, `bottom`, `left`, `right` et leurs variantes `-start`/`-end`. Le composant bascule automatiquement si l'espace est insuffisant.
+      html: |
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;padding:2rem 0;">
+              <button id="tt-top" class="btn btn-secondary">top</button>
+              <ar-tooltip for="tt-top" placement="top">Placement top</ar-tooltip>
+
+              <button id="tt-bottom" class="btn btn-secondary">bottom</button>
+              <ar-tooltip for="tt-bottom" placement="bottom">Placement bottom</ar-tooltip>
+
+              <button id="tt-left" class="btn btn-secondary">left</button>
+              <ar-tooltip for="tt-left" placement="left">Placement left</ar-tooltip>
+
+              <button id="tt-right" class="btn btn-secondary">right</button>
+              <ar-tooltip for="tt-right" placement="right">Placement right</ar-tooltip>
+          </div>
+    - name: without-arrow
+      label: Sans caret
+      description: Ajoutez `without-arrow` pour supprimer le caret directionnel — utile quand le tooltip est suffisamment proche du trigger ou dans un contexte visuel dense.
+      html: |
+          <button id="tt-no-arrow" class="btn btn-secondary">Sans caret</button>
+          <ar-tooltip for="tt-no-arrow" without-arrow>Tooltip sans caret</ar-tooltip>
+    - name: abbr
+      label: Sur une abréviation
+      description: Cas d'usage classique — `<abbr>` n'est pas interactif nativement, donc `tabindex="0"` est nécessaire pour que le tooltip soit accessible au clavier.
+      html: |
+          <p style="font-size:1rem;">
+              Le composant suit
+              <abbr id="tt-wcag" tabindex="0" style="cursor:help;text-decoration:underline dotted;">WCAG 1.4.13</abbr>
+              pour garantir la persistance au survol.
+          </p>
+          <ar-tooltip for="tt-wcag">Web Content Accessibility Guidelines — critère 1.4.13 : Content on Hover or Focus</ar-tooltip>
+    - name: icon-button
+      label: Bouton icône
+      description: Complète un bouton sans libellé textuel — le tooltip joue le rôle de description visible. Attention, il ne remplace pas un `aria-label` sur le bouton lui-même.
+      html: |
+          <button id="tt-icon" class="btn btn-secondary" aria-label="Paramètres" style="width:2.5rem;height:2.5rem;padding:0;font-size:1.1rem;">⚙</button>
+          <ar-tooltip for="tt-icon">Paramètres du compte</ar-tooltip>
+    - name: delays
+      label: Délais personnalisés
+      description: |
+          `show-delay` et `hide-delay` contrôlent les temporisations en ms.
+          Valeurs par défaut : 300 ms / 150 ms (conformes WCAG 1.4.13).
+          Ici `show-delay="0"` pour une réponse immédiate.
+      html: |
+          <button id="tt-fast" class="btn btn-secondary">Réponse immédiate</button>
+          <ar-tooltip for="tt-fast" show-delay="0" hide-delay="0">Apparaît sans délai</ar-tooltip>
+    - name: disabled
+      label: Désactivé
+      description: L'attribut `disabled` bloque tout déclenchement sans modifier le DOM du trigger. Utile pour désactiver dynamiquement le tooltip selon le contexte.
+      html: |
+          <button id="tt-disabled" class="btn btn-secondary">Hover (tooltip désactivé)</button>
+          <ar-tooltip for="tt-disabled" disabled>Ce texte ne s'affichera pas</ar-tooltip>
+---
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Le trigger reçoit `aria-describedby` pointant vers l'élément `<ar-tooltip>` lui-même (light DOM). Les IDREF ne franchissent pas la frontière shadow DOM — référencer la bulle interne rendrait la description invisible aux lecteurs d'écran. L'hôte étant toujours présent dans le DOM, la description est disponible dès le focus, même quand la bulle est visuellement fermée.
+- La bulle porte `role="tooltip"` et `popover="manual"`.
+- **WCAG 1.4.13 — Content on Hover or Focus :** déplacer le pointeur du trigger vers la bulle annule le timer de fermeture ; la bulle reste ouverte tant que le pointeur y séjourne.
+- La touche `Escape` ferme immédiatement le tooltip sans déplacer le focus.
+- Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
+
+### À la charge de l'auteur
+
+- **Le trigger doit rester accessible sans le tooltip.** Le tooltip est une description supplémentaire, pas le seul libellé. Un bouton icône doit toujours porter un `aria-label`.
+- **Les éléments non-interactifs doivent être focusables.** Si le trigger est un `<abbr>`, une `<span>` ou tout élément sans focus natif, ajoutez `tabindex="0"` pour que le tooltip soit atteignable au clavier.
+- **Le contenu de la bulle doit rester non-interactif.** Pour un contenu riche (liens, boutons), utilisez `ar-dropdown` à la place.
+- **Adapter les délais à vos besoins.** Les valeurs par défaut (300 ms / 150 ms) sont un bon équilibre WCAG. Évitez `show-delay="0"` sur des déclencheurs très proches les uns des autres — des tooltips qui surgissent à chaque micro-survol dégradent l'expérience.
