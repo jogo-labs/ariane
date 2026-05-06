@@ -89,6 +89,15 @@ export class ArDropdown extends LitElement {
     private readonly _uniqueId = Math.random().toString(36).slice(2, 9);
 
     override firstUpdated(): void {
+        if (this.for) {
+            const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+            if (slot?.assignedElements({ flatten: true }).length) {
+                warn(
+                    'ar-dropdown',
+                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                );
+            }
+        }
         const trigger = this._resolvedTrigger;
         if (trigger && this._panel) {
             this._popover.attach(trigger, this._panel);
@@ -159,7 +168,16 @@ export class ArDropdown extends LitElement {
     }
 
     private _handleTriggerSlotChange(): void {
-        if (this.for) return;
+        if (this.for) {
+            const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+            if (slot?.assignedElements({ flatten: true }).length) {
+                warn(
+                    'ar-dropdown',
+                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                );
+            }
+            return;
+        }
         const trigger = this._resolvedTrigger;
         if (!trigger || !this._panel) return;
         this._popover.attach(trigger, this._panel);

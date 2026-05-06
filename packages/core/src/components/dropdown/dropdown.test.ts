@@ -343,5 +343,25 @@ describe('ArDropdown', () => {
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('id-inconnu'));
         });
+
+        it('émet un warn si for et slot="trigger" sont tous les deux définis', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const conflictBtn = document.createElement('button');
+            conflictBtn.id = 'conflict-warn-btn';
+            document.body.appendChild(conflictBtn);
+
+            el = await fixture(`
+                <ar-dropdown for="conflict-warn-btn">
+                    <button slot="trigger">Slot trigger</button>
+                </ar-dropdown>
+            `);
+
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('for'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('priorité'));
+
+            conflictBtn.remove();
+            spy.mockRestore();
+        });
     });
 });
