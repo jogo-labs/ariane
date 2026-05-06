@@ -23,14 +23,21 @@ variants:
           </ar-breadcrumb>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est identifiable
-  par les lecteurs d'écran sans configuration supplémentaire.
+  par les lecteurs d'écran sans configuration supplémentaire
+  (<WcagRef criterion="1.3.1" summary="Info and Relationships : les relations et structures visuelles doivent être déterminables par programmation ou disponibles en texte." />).
 - Le dernier item est automatiquement rendu comme texte (pas de lien), quel que soit son
-  attribut `href`. `aria-current="page"` lui est appliqué automatiquement.
+  attribut `href`. `aria-current="page"` lui est appliqué automatiquement — conforme
+    <WcagRef
+        criterion="2.4.8"
+        summary="Location : l'utilisateur doit pouvoir situer sa position dans un ensemble de pages."
+    />
 - Les icônes de séparation sont masquées aux lecteurs d'écran (`aria-hidden`).
 - En mobile, le bouton "dropdown" expose son état via `aria-expanded`. Son label est vocalisé
   via une classe `.sr-only` — accessible sans être visible.

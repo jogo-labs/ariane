@@ -87,15 +87,25 @@ variants:
           </script>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
-- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent.
+- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent — conforme
+    <WcagRef
+        criterion="2.1.2"
+        summary="No Keyboard Trap : le focus clavier peut toujours quitter un composant via les touches standard (Escape, Tab)."
+    />
 - Le focus est restauré sur l'élément déclencheur à la fermeture.
 - Le scroll du `<body>` est bloqué à l'ouverture et restauré à la fermeture, y compris avec plusieurs dialogs empilés.
-- La touche Escape passe par `ar-dialog-hide` : la fermeture peut donc être interceptée avec `event.preventDefault()`.
+- La touche Escape passe par `ar-dialog-hide` : la fermeture peut donc être interceptée avec `event.preventDefault()` — comportement prévisible conforme
+    <WcagRef
+        criterion="3.2.2"
+        summary="On Input : modifier un composant UI ne doit pas provoquer de changement de contexte inattendu sans en avertir l'utilisateur au préalable."
+    />
 - Quand une fermeture est bloquée, le composant secoue visuellement le dialog et annonce automatiquement `prevented-message` via la zone d'annonce globale de la librairie.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
 

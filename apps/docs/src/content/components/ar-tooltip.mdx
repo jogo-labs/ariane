@@ -66,13 +66,20 @@ variants:
           <ar-tooltip for="tt-disabled" disabled>Ce texte ne s'affichera pas</ar-tooltip>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - Le trigger reçoit `aria-describedby` pointant vers l'élément `<ar-tooltip>` lui-même (light DOM). Les IDREF ne franchissent pas la frontière shadow DOM — référencer la bulle interne rendrait la description invisible aux lecteurs d'écran. L'hôte étant toujours présent dans le DOM, la description est disponible dès le focus, même quand la bulle est visuellement fermée.
 - La bulle porte `role="tooltip"` et `popover="manual"`.
-- **WCAG 1.4.13 — Content on Hover or Focus :** déplacer le pointeur du trigger vers la bulle annule le timer de fermeture ; la bulle reste ouverte tant que le pointeur y séjourne.
+- <WcagRef
+      criterion="1.4.13"
+      summary="Content on Hover or Focus : le contenu affiché au survol ou au focus doit être persistant, escamotable et consultable au pointeur."
+  />
+  : déplacer le pointeur du trigger vers la bulle annule le timer de fermeture ; la bulle reste
+  ouverte tant que le pointeur y séjourne.
 - La touche `Escape` ferme immédiatement le tooltip sans déplacer le focus.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
 
