@@ -48,7 +48,7 @@ describe('ArDropdown', () => {
         it('noScrollLock=false', () => expect(el.noScrollLock).toBe(false));
         it('distance=4', () => expect(el.distance).toBe(4));
         it('offset=0', () => expect(el.offset).toBe(0));
-        it('trigger=""', () => expect(el.trigger).toBe(''));
+        it('for=""', () => expect(el.for).toBe(''));
     });
 
     // ── Attributs reflect ─────────────────────────────────────────────────────
@@ -95,10 +95,10 @@ describe('ArDropdown', () => {
             expect(el.getAttribute('offset')).toBe('8');
         });
 
-        it('trigger reflète en attribut', async () => {
-            el.trigger = 'mon-btn';
+        it('for reflète en attribut', async () => {
+            el.for = 'mon-btn';
             await waitForUpdate(el);
-            expect(el.getAttribute('trigger')).toBe('mon-btn');
+            expect(el.getAttribute('for')).toBe('mon-btn');
         });
     });
 
@@ -217,7 +217,7 @@ describe('ArDropdown', () => {
 
     // ── Trigger externe ───────────────────────────────────────────────────────
 
-    describe('trigger externe', () => {
+    describe('for — trigger externe', () => {
         let externalBtn: HTMLButtonElement;
 
         beforeEach(() => {
@@ -229,13 +229,13 @@ describe('ArDropdown', () => {
         afterEach(() => externalBtn.remove());
 
         it('pose aria-haspopup et aria-expanded sur le trigger externe', async () => {
-            el = await fixture('<ar-dropdown trigger="test-ext-trigger"></ar-dropdown>');
+            el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
             expect(externalBtn.getAttribute('aria-haspopup')).toBe('true');
             expect(externalBtn.getAttribute('aria-expanded')).toBe('false');
         });
 
         it('le clic sur le trigger externe ouvre le dropdown', async () => {
-            el = await fixture('<ar-dropdown trigger="test-ext-trigger"></ar-dropdown>');
+            el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
             mockPanelPopover(el);
 
             externalBtn.click();
@@ -244,9 +244,9 @@ describe('ArDropdown', () => {
             expect(el.open).toBe(true);
         });
 
-        it('le slot trigger est ignoré quand trigger est défini', async () => {
+        it('le slot trigger est ignoré quand for est défini', async () => {
             el = await fixture(`
-                <ar-dropdown trigger="test-ext-trigger">
+                <ar-dropdown for="test-ext-trigger">
                     <button slot="trigger" id="slot-btn">Slot</button>
                 </ar-dropdown>
             `);
@@ -256,7 +256,7 @@ describe('ArDropdown', () => {
 
         it("affiche un warn si l'ID est introuvable", async () => {
             const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            el = await fixture('<ar-dropdown trigger="id-qui-nexiste-pas"></ar-dropdown>');
+            el = await fixture('<ar-dropdown for="id-qui-nexiste-pas"></ar-dropdown>');
             expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('id-qui-nexiste-pas'));
             warnSpy.mockRestore();
         });
@@ -317,26 +317,26 @@ describe('ArDropdown', () => {
         });
     });
 
-    describe('warn() — trigger introuvable', () => {
+    describe('warn() — for introuvable', () => {
         afterEach(() => {
             vi.restoreAllMocks();
         });
 
-        it('émet un warn si trigger pointe vers un ID inexistant (firstUpdated)', async () => {
+        it('émet un warn si for pointe vers un ID inexistant (firstUpdated)', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            el = await fixture('<ar-dropdown trigger="id-qui-nexiste-pas"></ar-dropdown>');
+            el = await fixture('<ar-dropdown for="id-qui-nexiste-pas"></ar-dropdown>');
 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('id-qui-nexiste-pas'));
         });
 
-        it('émet un warn si trigger est mis à jour vers un ID inexistant', async () => {
+        it('émet un warn si for est mis à jour vers un ID inexistant', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture<ArDropdown>('<ar-dropdown></ar-dropdown>');
 
-            el.trigger = 'id-inconnu';
+            el.for = 'id-inconnu';
             await waitForUpdate(el);
 
             expect(spy).toHaveBeenCalledOnce();
