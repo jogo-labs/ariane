@@ -66,10 +66,10 @@ variants:
           </ar-dropdown>
     - name: external-trigger
       label: Trigger externe
-      description: "L'attribut `trigger` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
+      description: "L'attribut `for` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
       html: |
           <button class="btn btn-secondary" id="ar-doc-ext-trigger">Trigger externe ▾</button>
-          <ar-dropdown trigger="ar-doc-ext-trigger">
+          <ar-dropdown for="ar-doc-ext-trigger">
               <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
               <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
@@ -101,7 +101,7 @@ variants:
 
 ### Pris en charge automatiquement
 
-- Le trigger reçoit `aria-haspopup="true"`, `aria-controls` (pointant vers le panel) et `aria-expanded` synchronisé à l'état ouvert/fermé.
+- Le trigger reçoit `aria-haspopup="true"` et `aria-expanded` synchronisé à l'état ouvert/fermé.
 - En mode menu (présence d'`ar-dropdown-item`), le panel reçoit `role="menu"` et chaque enfant focusable reçoit `role="menuitem"`.
 - Navigation clavier complète : `↑` `↓` `Home` `End` pour déplacer le focus, `Escape` et `Tab` pour fermer.
 - Retour du focus sur le trigger à la fermeture.
