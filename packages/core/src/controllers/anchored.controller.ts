@@ -62,7 +62,6 @@ export class AnchoredController implements ReactiveController {
         this._popover.attach(trigger, panel);
         const haspopup = this._opts.popupMode === 'dialog' ? 'dialog' : 'true';
         trigger.setAttribute('aria-haspopup', haspopup);
-        trigger.setAttribute('aria-controls', panel.id);
         trigger.setAttribute('aria-expanded', 'false');
     }
 
