@@ -25,13 +25,19 @@ variants:
           <ar-pagination current="18" total="20"></ar-pagination>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
   par les lecteurs d'écran comme zone de navigation.
-- Les boutons "précédent" et "suivant" ont `aria-disabled` synchronisé avec leur état désactivé.
+- Les boutons "précédent" et "suivant" ont `aria-disabled` synchronisé avec leur état désactivé —
+    <WcagRef
+        criterion="4.1.2"
+        summary="Name, Role, Value : tout composant UI doit exposer son nom, rôle et valeur (états inclus) aux technologies d'assistance."
+    />
 - Les séparateurs et points de suspension sont masqués aux lecteurs d'écran (`aria-hidden`).
 
 ### À la charge de l'auteur
