@@ -39,9 +39,9 @@ describe('AnchoredController', () => {
             expect(trigger.getAttribute('aria-haspopup')).to.equal('true');
         });
 
-        it("attach() pose aria-controls avec l'id du panel", async () => {
-            const { trigger, panel } = await setupAnchored({ popupMode: 'menu' });
-            expect(trigger.getAttribute('aria-controls')).to.equal(panel.id);
+        it('attach() ne pose pas aria-controls (non supporté cross-shadow-DOM)', async () => {
+            const { trigger } = await setupAnchored({ popupMode: 'menu' });
+            expect(trigger.hasAttribute('aria-controls')).to.equal(false);
         });
 
         it('attach() pose aria-expanded="false"', async () => {
