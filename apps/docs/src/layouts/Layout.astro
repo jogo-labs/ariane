@@ -56,9 +56,7 @@ const {
         <script type="module" src="/cdn/index.js"></script>
         <script src="/js/playground.js" is:inline></script>
 
-        <style>
-            *, *::before, *::after { box-sizing: border-box; }
-
+        <style is:global>
             .sr-only {
                 position: absolute;
                 width: 1px;
@@ -70,6 +68,9 @@ const {
                 white-space: nowrap;
                 border-width: 0;
             }
+        </style>
+        <style>
+            *, *::before, *::after { box-sizing: border-box; }
 
             .alpha-banner {
                 position:        relative;
