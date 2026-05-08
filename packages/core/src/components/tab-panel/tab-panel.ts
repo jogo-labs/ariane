@@ -20,7 +20,7 @@ export class ArTabPanel extends LitElement {
     /** Nom correspondant à l'attribut `panel` du ar-tab associé. Requis. */
     @property({ reflect: true }) name = '';
 
-    private _registry?: TabGroupRegistry;
+    private _registry?: TabGroupRegistry | undefined;
 
     protected readonly _consumer = new ContextConsumer(this, {
         context: tabGroupContext,

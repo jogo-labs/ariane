@@ -23,7 +23,7 @@ export class ArTab extends LitElement {
     /** Désactive l'onglet — non sélectionnable, ignoré au clavier. */
     @property({ reflect: true, type: Boolean }) disabled = false;
 
-    _registry?: TabGroupRegistry;
+    _registry?: TabGroupRegistry | undefined;
 
     protected readonly _consumer = new ContextConsumer(this, {
         context: tabGroupContext,
