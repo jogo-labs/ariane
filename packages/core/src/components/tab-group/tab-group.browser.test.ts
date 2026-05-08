@@ -17,12 +17,6 @@ function getTab(el: ArTabGroup, panel: string): HTMLElement {
     return tab;
 }
 
-function getNav(el: ArTabGroup): HTMLElement {
-    const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
-    if (!nav) throw new Error('[part="nav"] introuvable');
-    return nav;
-}
-
 describe('ar-tab-group — browser', () => {
     // ── Activation par clic ────────────────────────────────────────────────
 
@@ -197,8 +191,7 @@ describe('ar-tab-group — browser', () => {
             `);
             const el = wrapper.querySelector<ArTabGroup>('ar-tab-group')!;
             await aTimeout(50);
-            const nav = getNav(el);
-            expect(nav.classList.contains('has-overflow-end')).to.equal(true);
+            expect(el.classList.contains('has-overflow-end')).to.equal(true);
         });
 
         it("n'ajoute pas has-overflow-start si scroll à 0", async () => {
@@ -216,8 +209,7 @@ describe('ar-tab-group — browser', () => {
             `);
             const el = wrapper.querySelector<ArTabGroup>('ar-tab-group')!;
             await aTimeout(50);
-            const nav = getNav(el);
-            expect(nav.classList.contains('has-overflow-start')).to.equal(false);
+            expect(el.classList.contains('has-overflow-start')).to.equal(false);
         });
     });
 });

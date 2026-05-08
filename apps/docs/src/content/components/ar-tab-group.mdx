@@ -54,19 +54,23 @@ variants:
           </ar-tab-group>
     - name: scroll-hints
       label: Scroll hints
-      description: L'attribut `scroll-hints` ajoute les classes `has-overflow-start` et `has-overflow-end` sur `part="nav"` quand du contenu est masqué de chaque côté. La demo ci-dessous utilise un `mask-image` CSS pour signaler l'overflow.
+      description: L'attribut `scroll-hints` ajoute les classes `has-overflow-start` et `has-overflow-end` sur l'hôte quand du contenu est masqué de chaque côté. La démo ci-dessous branche un `mask-image` CSS sur ces classes pour signaler l'overflow en temps réel.
       html: |
           <style>
-              .demo-scroll ar-tab-group::part(nav) {
-                  --mask-start: linear-gradient(to right, transparent 0, black 3rem);
-                  --mask-end: linear-gradient(to left, transparent 0, black 3rem);
-                  mask-image: var(--mask-start-active, none), var(--mask-end-active, none);
+              .demo-scroll ar-tab-group.has-overflow-start:not(.has-overflow-end)::part(nav) {
+                  mask-image: linear-gradient(to right, transparent, black 3rem);
               }
-              .demo-scroll ar-tab-group::part(nav).has-overflow-start {
-                  --mask-start-active: var(--mask-start);
+              .demo-scroll ar-tab-group.has-overflow-end:not(.has-overflow-start)::part(nav) {
+                  mask-image: linear-gradient(to left, transparent, black 3rem);
               }
-              .demo-scroll ar-tab-group::part(nav).has-overflow-end {
-                  --mask-end-active: var(--mask-end);
+              .demo-scroll ar-tab-group.has-overflow-start.has-overflow-end::part(nav) {
+                  mask-image: linear-gradient(
+                      to right,
+                      transparent,
+                      black 3rem,
+                      black calc(100% - 3rem),
+                      transparent
+                  );
               }
           </style>
           <div class="demo-scroll" style="max-width: 300px;">
@@ -111,7 +115,7 @@ Le tablist utilise un scroll horizontal natif (`overflow-x: auto`). Les onglets 
 
 **Recommandations pour votre design system :**
 
-- Utilisez `scroll-hints` et branchez un `mask-image` CSS sur `.has-overflow-end` / `.has-overflow-start` pour signaler visuellement l'overflow aux utilisateurs souris (voir la variante _Scroll hints_).
+- Utilisez `scroll-hints` et branchez un `mask-image` CSS sur les classes `has-overflow-start` / `has-overflow-end` de l'hôte pour signaler visuellement l'overflow aux utilisateurs souris (voir la variante _Scroll hints_).
 - Si une scrollbar visible est souhaitée, stylez `ar-tab-group::part(nav)::-webkit-scrollbar` et `scrollbar-width`.
 
 ### À la charge de l'auteur

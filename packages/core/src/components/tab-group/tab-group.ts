@@ -233,10 +233,10 @@ export class ArTabGroup extends LitElement {
         if (!nav || !this.scrollHints) return;
 
         const update = () => {
-            nav.classList.toggle('has-overflow-start', nav.scrollLeft > 0);
-            nav.classList.toggle(
+            this.classList.toggle('has-overflow-start', nav.scrollLeft > 0);
+            this.classList.toggle(
                 'has-overflow-end',
-                nav.scrollLeft + nav.clientWidth < nav.scrollWidth,
+                Math.ceil(nav.scrollLeft + nav.clientWidth) < nav.scrollWidth,
             );
         };
 
