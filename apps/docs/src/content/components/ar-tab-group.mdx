@@ -1,0 +1,120 @@
+---
+tagName: ar-tab-group
+title: Tab Group
+description: Groupe d'onglets accessibles — pattern WAI-ARIA Tabs complet avec roving tabindex et gestion du scroll horizontal.
+playgroundTemplate: default
+variants:
+    - name: default
+      label: Par défaut
+      description: Déclarer les onglets avec `<ar-tab panel="nom">` et les panneaux avec `<ar-tab-panel name="nom">`. L'association se fait par correspondance du nom.
+      html: |
+          <ar-tab-group>
+              <ar-tab panel="intro">Introduction</ar-tab>
+              <ar-tab panel="usage">Utilisation</ar-tab>
+              <ar-tab panel="api">API</ar-tab>
+              <ar-tab-panel name="intro">Contenu de l'onglet Introduction.</ar-tab-panel>
+              <ar-tab-panel name="usage">Contenu de l'onglet Utilisation.</ar-tab-panel>
+              <ar-tab-panel name="api">Contenu de l'onglet API.</ar-tab-panel>
+          </ar-tab-group>
+    - name: active
+      label: Onglet initial
+      description: Utilisez l'attribut `active` pour définir l'onglet ouvert par défaut.
+      html: |
+          <ar-tab-group active="usage">
+              <ar-tab panel="intro">Introduction</ar-tab>
+              <ar-tab panel="usage">Utilisation</ar-tab>
+              <ar-tab panel="api">API</ar-tab>
+              <ar-tab-panel name="intro">Introduction.</ar-tab-panel>
+              <ar-tab-panel name="usage">Cet onglet est actif par défaut.</ar-tab-panel>
+              <ar-tab-panel name="api">API.</ar-tab-panel>
+          </ar-tab-group>
+    - name: disabled
+      label: Onglet désactivé
+      description: L'attribut `disabled` sur un `<ar-tab>` rend l'onglet non sélectionnable et l'exclut de la navigation clavier.
+      html: |
+          <ar-tab-group>
+              <ar-tab panel="a">Actif</ar-tab>
+              <ar-tab panel="b" disabled>Désactivé</ar-tab>
+              <ar-tab panel="c">Actif aussi</ar-tab>
+              <ar-tab-panel name="a">Panel A.</ar-tab-panel>
+              <ar-tab-panel name="b">Panel B (inaccessible).</ar-tab-panel>
+              <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+          </ar-tab-group>
+    - name: manual-activation
+      label: Activation manuelle
+      description: Avec `manual-activation`, les flèches déplacent le focus sans changer l'onglet actif — il faut appuyer sur Entrée ou Espace pour confirmer. Utile quand le contenu du panel est coûteux à charger.
+      html: |
+          <ar-tab-group manual-activation>
+              <ar-tab panel="a">Tab A</ar-tab>
+              <ar-tab panel="b">Tab B</ar-tab>
+              <ar-tab panel="c">Tab C</ar-tab>
+              <ar-tab-panel name="a">Panel A.</ar-tab-panel>
+              <ar-tab-panel name="b">Panel B.</ar-tab-panel>
+              <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+          </ar-tab-group>
+    - name: scroll-hints
+      label: Scroll hints
+      description: L'attribut `scroll-hints` ajoute les classes `has-overflow-start` et `has-overflow-end` sur `part="nav"` quand du contenu est masqué de chaque côté. La demo ci-dessous utilise un `mask-image` CSS pour signaler l'overflow.
+      html: |
+          <style>
+              .demo-scroll ar-tab-group::part(nav) {
+                  --mask-start: linear-gradient(to right, transparent 0, black 3rem);
+                  --mask-end: linear-gradient(to left, transparent 0, black 3rem);
+                  mask-image: var(--mask-start-active, none), var(--mask-end-active, none);
+              }
+              .demo-scroll ar-tab-group::part(nav).has-overflow-start {
+                  --mask-start-active: var(--mask-start);
+              }
+              .demo-scroll ar-tab-group::part(nav).has-overflow-end {
+                  --mask-end-active: var(--mask-end);
+              }
+          </style>
+          <div class="demo-scroll" style="max-width: 300px;">
+              <ar-tab-group scroll-hints>
+                  <ar-tab panel="a">Premier onglet</ar-tab>
+                  <ar-tab panel="b">Deuxième onglet</ar-tab>
+                  <ar-tab panel="c">Troisième onglet</ar-tab>
+                  <ar-tab panel="d">Quatrième onglet</ar-tab>
+                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
+                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
+                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+                  <ar-tab-panel name="d">Panel D.</ar-tab-panel>
+              </ar-tab-group>
+          </div>
+---
+
+import WcagRef from '../../components/WcagRef.astro';
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- Le tablist reçoit `role="tablist"`, chaque onglet `role="tab"` et chaque panneau `role="tabpanel"`.
+- Les associations `aria-controls` (onglet → panneau) et `aria-labelledby` (panneau → onglet) sont calculées et posées automatiquement sur les hôtes en light DOM — les IDREF restent dans le même arbre et sont lisibles par les technologies d'assistance.
+- <WcagRef
+      criterion="2.1.1"
+      summary="Keyboard : toutes les fonctionnalités doivent être accessibles au clavier."
+  />
+  : navigation ←/→ entre les onglets, `Home`/`End` pour le premier/dernier, `Tab` pour atteindre le
+  panneau actif.
+- L'onglet actif a `tabindex="0"`, les inactifs `tabindex="-1"` (roving tabindex).
+- Les panneaux inactifs ont l'attribut `hidden` natif — exclus du flux de tabulation et invisibles aux lecteurs d'écran.
+
+### Scroll horizontal et overflow
+
+<WcagRef
+    criterion="1.4.10"
+    summary="Reflow : le contenu doit être accessible à 320px de large sans scroll horizontal."
+/>
+
+Le tablist utilise un scroll horizontal natif (`overflow-x: auto`). Les onglets restent toujours accessibles au clavier via les flèches (l'onglet actif est automatiquement ramené dans le viewport). Cette approche s'appuie sur l'exception WCAG 1.4.10 pour les éléments de navigation à mise en page bidimensionnelle.
+
+**Recommandations pour votre design system :**
+
+- Utilisez `scroll-hints` et branchez un `mask-image` CSS sur `.has-overflow-end` / `.has-overflow-start` pour signaler visuellement l'overflow aux utilisateurs souris (voir la variante _Scroll hints_).
+- Si une scrollbar visible est souhaitée, stylez `ar-tab-group::part(nav)::-webkit-scrollbar` et `scrollbar-width`.
+
+### À la charge de l'auteur
+
+- **Nommer le tablist** : si la page contient plusieurs `ar-tab-group`, ajoutez l'attribut `label` sur chacun — il devient l'`aria-label` du tablist, permettant aux lecteurs d'écran de les distinguer.
+- **Libellés des onglets** : le texte visible de l'onglet est son nom accessible. Évitez les onglets avec des icônes seules sans texte alternatif (`aria-label` sur `ar-tab`).
