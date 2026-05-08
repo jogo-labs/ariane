@@ -1,27 +1,49 @@
 import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
+import { ContextConsumer } from '@lit/context';
+import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import styles from './tab-panel.styles.js';
 
 /**
- * @summary Résumé du composant ar-tab-panel.
+ * @summary Panneau de contenu pour ar-tab-group.
+ * @parent ar-tab-group
+ * @display docs
  *
- * @slot         - Contenu principal.
+ * @slot - Contenu du panel.
  *
- * @csspart base - L'élément racine du composant.
- * @cssprop [--ar-tab-panel-size=auto] - Taille du composant.
- *
- * @event {CustomEvent} ar-tab-panel-change - Émis lors d'un changement.
+ * @csspart base - Wrapper du slot.
  */
 @customElement('ar-tab-panel')
 export class ArTabPanel extends LitElement {
     static override styles = [styles];
 
+    /** Nom correspondant à l'attribut `panel` du ar-tab associé. Requis. */
+    @property({ reflect: true }) name = '';
+
+    private _registry?: TabGroupRegistry;
+
+    protected readonly _consumer = new ContextConsumer(this, {
+        context: tabGroupContext,
+        subscribe: true,
+        callback: (registry) => this._setRegistry(registry),
+    });
+
+    private _setRegistry(registry: TabGroupRegistry): void {
+        if (this._registry) {
+            this._registry.unregisterPanel(this);
+        }
+        this._registry = registry;
+        registry.registerPanel(this);
+    }
+
+    override disconnectedCallback(): void {
+        this._registry?.unregisterPanel(this);
+        this._registry = undefined;
+        super.disconnectedCallback();
+    }
+
     override render() {
-        return html`
-            <div part="base">
-                <slot></slot>
-            </div>
-        `;
+        return html`<div part="base"><slot></slot></div>`;
     }
 }
 
