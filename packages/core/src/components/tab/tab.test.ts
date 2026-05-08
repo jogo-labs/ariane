@@ -1,66 +1,70 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { fixture, waitForUpdate } from '../../test-utils.js';
 import type { ArTab } from './tab.js';
-import { fixture, getPart } from '../../test-utils.js';
 import './tab.js';
-
-// ─── Aide-mémoire tests Lit ────────────────────────────────────────────────────
-//
-// fixture(html)          — monte un élément dans le DOM et attend le premier rendu
-// waitForUpdate(el)      — attend le prochain cycle de rendu après une mutation
-// getPart(el, 'name')    — retourne un part="name" du Shadow DOM (| null)
-//                          → utiliser pour les assertions .toBeNull() / .not.toBeNull()
-// requirePart(el, 'name')— idem, mais lance une erreur si absent
-//                          → utiliser quand on enchaîne .getAttribute, .classList, etc.
-//
-// ⚠ happy-dom ne sérialise pas les Text nodes dynamiques Lit en textContent.
-//   Tester le contenu textuel via la propriété JS (el.myProp) plutôt que textContent.
-//
-// ⚠ Les propriétés ARIA assignées via .ariaCurrent, .ariaExpanded, etc. (liaisons
-//   Lit) ne reflètent pas en attribut HTML dans happy-dom. Tester la propriété
-//   JS : (el as unknown as { ariaCurrent: string }).ariaCurrent.
-//
-// ─── Éléments à tester selon le type de composant ─────────────────────────────
-//
-// Composant standard (avec Shadow DOM) :
-//   - Rendu : shadowRoot non null, parts présents (getPart)
-//   - Valeurs par défaut : vérifier chaque propriété à l'état initial
-//   - Attributs reflect : el.prop = x → await waitForUpdate → el.getAttribute(...)
-//   - Comportement : interactions (clic, événements custom)
-//   - Accessibilité : role, aria-*, labels sr-only
-//
-// Sous-composant (sans Shadow DOM, createRenderRoot → this) :
-//   - shadowRoot est null
-//   - setRegistry() appelle registerItem / unregisterItem
-//   - disconnectedCallback() appelle unregisterItem
-//   - updated() appelle notifyItemChanged après le premier rendu seulement
-// ──────────────────────────────────────────────────────────────────────────────
 
 describe('ArTab', () => {
     let el: ArTab;
-
     afterEach(() => el?.remove());
 
-    // ── Rendu ─────────────────────────────────────────────────────────────────
-
     describe('rendu', () => {
-        beforeEach(async () => {
-            el = await fixture('<ar-tab></ar-tab>');
-        });
-
-        it('monte un shadow DOM', () => {
+        it('monte un shadow DOM avec un slot', async () => {
+            el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
             expect(el.shadowRoot).not.toBeNull();
-        });
-
-        it('contient un élément racine avec part="base"', () => {
-            expect(getPart(el, 'base')).not.toBeNull();
+            expect(el.shadowRoot?.querySelector('slot')).not.toBeNull();
         });
     });
 
-    // ── Valeurs par défaut ────────────────────────────────────────────────────
+    describe('valeurs par défaut', () => {
+        it('panel vaut chaîne vide', async () => {
+            el = await fixture('<ar-tab>Tab</ar-tab>');
+            expect(el.panel).toBe('');
+        });
 
-    // describe('valeurs par défaut', () => { ... });
+        it('disabled vaut false', async () => {
+            el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
+            expect(el.disabled).toBe(false);
+        });
+    });
 
-    // ── Propriétés ────────────────────────────────────────────────────────────
+    describe('attribut panel', () => {
+        it("lit panel depuis l'attribut HTML", async () => {
+            el = await fixture('<ar-tab panel="intro">Tab</ar-tab>');
+            expect(el.panel).toBe('intro');
+        });
 
-    // describe('propriétés', () => { ... });
+        it('reflète panel en attribut', async () => {
+            el = await fixture('<ar-tab panel="intro">Tab</ar-tab>');
+            el.panel = 'usage';
+            await waitForUpdate(el);
+            expect(el.getAttribute('panel')).toBe('usage');
+        });
+    });
+
+    describe('disabled', () => {
+        it('reflète disabled en attribut', async () => {
+            el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
+            el.disabled = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('disabled')).toBe(true);
+        });
+
+        it('ne déclenche pas activate si disabled', async () => {
+            el = await fixture('<ar-tab panel="a" disabled>Tab</ar-tab>');
+            const spy = vi.fn();
+            (el as any)._registry = { activate: spy, registerTab: vi.fn(), unregisterTab: vi.fn() };
+            el.click();
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('click', () => {
+        it('appelle registry.activate(panel) au clic', async () => {
+            el = await fixture('<ar-tab panel="test">Tab</ar-tab>');
+            const activate = vi.fn();
+            (el as any)._registry = { activate, registerTab: vi.fn(), unregisterTab: vi.fn() };
+            el.click();
+            expect(activate).toHaveBeenCalledWith('test');
+        });
+    });
 });
