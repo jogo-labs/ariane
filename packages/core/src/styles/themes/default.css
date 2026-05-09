@@ -365,7 +365,7 @@
         --ar-tab-font-weight: var(--ar-font-weight-normal);
 
         --ar-tab-hover-color: var(--ar-color-text);
-        --ar-tab-hover-bg: transparent;
+        --ar-tab-hover-bg: var(--ar-color-bg-subtle);
 
         --ar-tab-active-color: var(--ar-color-interactive);
         --ar-tab-active-bg: transparent;
@@ -375,6 +375,7 @@
             var(--ar-tab-indicator-color);
 
         --ar-tab-disabled-opacity: 0.5;
+        --ar-tab-focus-ring-offset: -2px;
 
         --ar-tab-group-border-color: var(--ar-color-border);
         --ar-tab-group-border-width: 0;
