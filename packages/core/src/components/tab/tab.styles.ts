@@ -35,7 +35,7 @@ export default css`
         opacity: var(--ar-tab-disabled-opacity, 0.5);
     }
 
-    :host([aria-selected='true']) {
+    :host([aria-selected='true']:not([disabled])) {
         cursor: default;
     }
 
