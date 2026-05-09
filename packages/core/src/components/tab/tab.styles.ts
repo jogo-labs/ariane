@@ -19,7 +19,7 @@ export default css`
         border-radius: inherit;
     }
 
-    :host(:hover:not([disabled])) [part='base'] {
+    :host(:hover:not([disabled]):not([aria-selected='true'])) [part='base'] {
         color: var(--ar-tab-hover-color, inherit);
         background: var(--ar-tab-hover-bg, transparent);
     }
@@ -35,8 +35,12 @@ export default css`
         opacity: var(--ar-tab-disabled-opacity, 0.5);
     }
 
+    :host([aria-selected='true']) {
+        cursor: default;
+    }
+
     :host(:focus-visible) {
         outline: 2px solid var(--ar-focus-ring-color, currentColor);
-        outline-offset: var(--ar-focus-ring-offset, 2px);
+        outline-offset: var(--ar-tab-focus-ring-offset, -2px);
     }
 `;
