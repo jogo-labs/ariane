@@ -355,6 +355,29 @@
 
         /* table */
         --ar-table-padding-x: 1rem;
+
+        /* tab */
+        --ar-tab-color: var(--ar-color-text-muted);
+        --ar-tab-bg: transparent;
+        --ar-tab-padding-x: 1rem;
+        --ar-tab-padding-y: 0.5rem;
+        --ar-tab-border-radius: 0;
+        --ar-tab-font-weight: var(--ar-font-weight-normal);
+
+        --ar-tab-hover-color: var(--ar-color-text);
+        --ar-tab-hover-bg: transparent;
+
+        --ar-tab-active-color: var(--ar-color-interactive);
+        --ar-tab-active-bg: transparent;
+        --ar-tab-indicator-color: var(--ar-color-interactive);
+        --ar-tab-indicator-width: 2px;
+        --ar-tab-active-shadow: inset 0 calc(-1 * var(--ar-tab-indicator-width)) 0
+            var(--ar-tab-indicator-color);
+
+        --ar-tab-disabled-opacity: 0.5;
+
+        --ar-tab-group-border-color: var(--ar-color-border);
+        --ar-tab-group-border-width: 0;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
