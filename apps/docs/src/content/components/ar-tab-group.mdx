@@ -85,6 +85,42 @@ variants:
                   <ar-tab-panel name="d">Panel D.</ar-tab-panel>
               </ar-tab-group>
           </div>
+    - name: styled
+      label: Avec thème personnalisé
+      description: Les tokens `--ar-tab-*` permettent de changer le style de l'indicateur actif sans modifier le composant. Exemple — indicateur en haut (top border) et style pill.
+      html: |
+          <style>
+              .demo-top ar-tab {
+                  --ar-tab-active-shadow: inset 0 3px 0 var(--ar-tab-indicator-color);
+              }
+              .demo-pill ar-tab {
+                  --ar-tab-active-shadow: none;
+                  --ar-tab-active-bg: var(--ar-color-interactive-subtle, #eaecfb);
+                  --ar-tab-border-radius: 9999px;
+              }
+          </style>
+          <p style="margin-bottom: 0.5rem; font-weight: 500;">Top border</p>
+          <div class="demo-top" style="margin-bottom: 1.5rem;">
+              <ar-tab-group>
+                  <ar-tab panel="a">Premier</ar-tab>
+                  <ar-tab panel="b">Deuxième</ar-tab>
+                  <ar-tab panel="c">Troisième</ar-tab>
+                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
+                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
+                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+              </ar-tab-group>
+          </div>
+          <p style="margin-bottom: 0.5rem; font-weight: 500;">Pill</p>
+          <div class="demo-pill">
+              <ar-tab-group>
+                  <ar-tab panel="a">Premier</ar-tab>
+                  <ar-tab panel="b">Deuxième</ar-tab>
+                  <ar-tab panel="c">Troisième</ar-tab>
+                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
+                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
+                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+              </ar-tab-group>
+          </div>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
