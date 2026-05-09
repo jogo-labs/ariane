@@ -14,6 +14,8 @@ export default css`
     [part='nav'] {
         overflow-x: auto;
         scrollbar-width: none;
+        border-bottom: var(--ar-tab-group-border-width, 0) solid
+            var(--ar-tab-group-border-color, transparent);
     }
 
     [part='nav']::-webkit-scrollbar {
