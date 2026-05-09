@@ -359,8 +359,8 @@
         /* tab */
         --ar-tab-color: var(--ar-color-text-muted);
         --ar-tab-bg: transparent;
-        --ar-tab-padding-x: 1rem;
-        --ar-tab-padding-y: 0.5rem;
+        --ar-tab-padding-x: 1.5rem;
+        --ar-tab-padding-y: 1rem;
         --ar-tab-border-radius: 0;
         --ar-tab-font-weight: var(--ar-font-weight-normal);
 

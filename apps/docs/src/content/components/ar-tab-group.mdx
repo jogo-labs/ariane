@@ -12,9 +12,9 @@ variants:
               <ar-tab panel="intro">Introduction</ar-tab>
               <ar-tab panel="usage">Utilisation</ar-tab>
               <ar-tab panel="api">API</ar-tab>
-              <ar-tab-panel name="intro">Contenu de l'onglet Introduction.</ar-tab-panel>
-              <ar-tab-panel name="usage">Contenu de l'onglet Utilisation.</ar-tab-panel>
-              <ar-tab-panel name="api">Contenu de l'onglet API.</ar-tab-panel>
+              <ar-tab-panel name="intro" style="padding: 0.75rem 1rem">Contenu de l'onglet Introduction.</ar-tab-panel>
+              <ar-tab-panel name="usage" style="padding: 0.75rem 1rem">Contenu de l'onglet Utilisation.</ar-tab-panel>
+              <ar-tab-panel name="api" style="padding: 0.75rem 1rem">Contenu de l'onglet API.</ar-tab-panel>
           </ar-tab-group>
     - name: active
       label: Onglet initial
@@ -24,9 +24,9 @@ variants:
               <ar-tab panel="intro">Introduction</ar-tab>
               <ar-tab panel="usage">Utilisation</ar-tab>
               <ar-tab panel="api">API</ar-tab>
-              <ar-tab-panel name="intro">Introduction.</ar-tab-panel>
-              <ar-tab-panel name="usage">Cet onglet est actif par défaut.</ar-tab-panel>
-              <ar-tab-panel name="api">API.</ar-tab-panel>
+              <ar-tab-panel name="intro" style="padding: 0.75rem 1rem">Introduction.</ar-tab-panel>
+              <ar-tab-panel name="usage" style="padding: 0.75rem 1rem">Cet onglet est actif par défaut.</ar-tab-panel>
+              <ar-tab-panel name="api" style="padding: 0.75rem 1rem">API.</ar-tab-panel>
           </ar-tab-group>
     - name: disabled
       label: Onglet désactivé
@@ -36,9 +36,9 @@ variants:
               <ar-tab panel="a">Actif</ar-tab>
               <ar-tab panel="b" disabled>Désactivé</ar-tab>
               <ar-tab panel="c">Actif aussi</ar-tab>
-              <ar-tab-panel name="a">Panel A.</ar-tab-panel>
-              <ar-tab-panel name="b">Panel B (inaccessible).</ar-tab-panel>
-              <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+              <ar-tab-panel name="a" style="padding: 0.75rem 1rem">Panel A.</ar-tab-panel>
+              <ar-tab-panel name="b" style="padding: 0.75rem 1rem">Panel B (inaccessible).</ar-tab-panel>
+              <ar-tab-panel name="c" style="padding: 0.75rem 1rem">Panel C.</ar-tab-panel>
           </ar-tab-group>
     - name: manual-activation
       label: Activation manuelle
@@ -48,9 +48,9 @@ variants:
               <ar-tab panel="a">Tab A</ar-tab>
               <ar-tab panel="b">Tab B</ar-tab>
               <ar-tab panel="c">Tab C</ar-tab>
-              <ar-tab-panel name="a">Panel A.</ar-tab-panel>
-              <ar-tab-panel name="b">Panel B.</ar-tab-panel>
-              <ar-tab-panel name="c">Panel C.</ar-tab-panel>
+              <ar-tab-panel name="a" style="padding: 0.75rem 1rem">Panel A.</ar-tab-panel>
+              <ar-tab-panel name="b" style="padding: 0.75rem 1rem">Panel B.</ar-tab-panel>
+              <ar-tab-panel name="c" style="padding: 0.75rem 1rem">Panel C.</ar-tab-panel>
           </ar-tab-group>
     - name: scroll-hints
       label: Scroll hints
@@ -79,10 +79,10 @@ variants:
                   <ar-tab panel="b">Deuxième onglet</ar-tab>
                   <ar-tab panel="c">Troisième onglet</ar-tab>
                   <ar-tab panel="d">Quatrième onglet</ar-tab>
-                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
-                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
-                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
-                  <ar-tab-panel name="d">Panel D.</ar-tab-panel>
+                  <ar-tab-panel name="a" style="padding: 0.75rem 1rem">Panel A.</ar-tab-panel>
+                  <ar-tab-panel name="b" style="padding: 0.75rem 1rem">Panel B.</ar-tab-panel>
+                  <ar-tab-panel name="c" style="padding: 0.75rem 1rem">Panel C.</ar-tab-panel>
+                  <ar-tab-panel name="d" style="padding: 0.75rem 1rem">Panel D.</ar-tab-panel>
               </ar-tab-group>
           </div>
     - name: styled
@@ -99,27 +99,30 @@ variants:
                   --ar-tab-border-radius: 9999px;
               }
           </style>
-          <p style="margin-bottom: 0.5rem; font-weight: 500;">Top border</p>
-          <div class="demo-top" style="margin-bottom: 1.5rem;">
-              <ar-tab-group>
-                  <ar-tab panel="a">Premier</ar-tab>
-                  <ar-tab panel="b">Deuxième</ar-tab>
-                  <ar-tab panel="c">Troisième</ar-tab>
-                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
-                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
-                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
-              </ar-tab-group>
-          </div>
-          <p style="margin-bottom: 0.5rem; font-weight: 500;">Pill</p>
-          <div class="demo-pill">
-              <ar-tab-group>
-                  <ar-tab panel="a">Premier</ar-tab>
-                  <ar-tab panel="b">Deuxième</ar-tab>
-                  <ar-tab panel="c">Troisième</ar-tab>
-                  <ar-tab-panel name="a">Panel A.</ar-tab-panel>
-                  <ar-tab-panel name="b">Panel B.</ar-tab-panel>
-                  <ar-tab-panel name="c">Panel C.</ar-tab-panel>
-              </ar-tab-group>
+          <div style="display: flex; flex-direction: column; width: 100%;">
+              <p style="margin: 0 0 1.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--doc-text-muted, #6b7280);">Top border</p>
+              <div class="demo-top">
+                  <ar-tab-group>
+                      <ar-tab panel="a">Premier</ar-tab>
+                      <ar-tab panel="b">Deuxième</ar-tab>
+                      <ar-tab panel="c">Troisième</ar-tab>
+                      <ar-tab-panel name="a" style="padding: 0.75rem 1rem">Panel A.</ar-tab-panel>
+                      <ar-tab-panel name="b" style="padding: 0.75rem 1rem">Panel B.</ar-tab-panel>
+                      <ar-tab-panel name="c" style="padding: 0.75rem 1rem">Panel C.</ar-tab-panel>
+                  </ar-tab-group>
+              </div>
+              <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--doc-border, #e5e7eb);" />
+              <p style="margin: 0 0 1.25rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--doc-text-muted, #6b7280);">Pill</p>
+              <div class="demo-pill">
+                  <ar-tab-group>
+                      <ar-tab panel="a">Premier</ar-tab>
+                      <ar-tab panel="b">Deuxième</ar-tab>
+                      <ar-tab panel="c">Troisième</ar-tab>
+                      <ar-tab-panel name="a" style="padding: 0.75rem 1rem">Panel A.</ar-tab-panel>
+                      <ar-tab-panel name="b" style="padding: 0.75rem 1rem">Panel B.</ar-tab-panel>
+                      <ar-tab-panel name="c" style="padding: 0.75rem 1rem">Panel C.</ar-tab-panel>
+                  </ar-tab-group>
+              </div>
           </div>
 ---
 
