@@ -27,6 +27,7 @@ import styles from './tab.styles.js';
  * @cssprop [--ar-tab-indicator-color=currentColor] - Couleur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop [--ar-tab-indicator-width=2px] - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop [--ar-tab-disabled-opacity=0.5] - Opacité de l'onglet désactivé.
+ * @cssprop [--ar-tab-focus-ring-offset=-2px] - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
  */
 @customElement('ar-tab')
 export class ArTab extends LitElement {
