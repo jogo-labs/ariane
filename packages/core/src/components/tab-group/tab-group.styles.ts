@@ -8,14 +8,13 @@ export default css`
     [part='base'] {
         display: flex;
         flex-direction: column;
-        gap: var(--ar-tab-group-gap, 0);
+        gap: var(--ar-tab-group-gap);
     }
 
     [part='nav'] {
         overflow-x: auto;
         scrollbar-width: none;
-        border-bottom: var(--ar-tab-group-border-width, 0) solid
-            var(--ar-tab-group-border-color, transparent);
+        border-bottom: var(--ar-tab-group-border-width) solid var(--ar-tab-group-border-color);
     }
 
     [part='nav']::-webkit-scrollbar {

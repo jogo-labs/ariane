@@ -377,6 +377,7 @@
         --ar-tab-disabled-opacity: 0.5;
         --ar-tab-focus-ring-offset: -2px;
 
+        --ar-tab-group-gap: 0;
         --ar-tab-group-border-color: var(--ar-color-border);
         --ar-tab-group-border-width: 0;
     }
