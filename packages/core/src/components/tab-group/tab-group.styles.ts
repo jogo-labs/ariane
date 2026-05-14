@@ -14,7 +14,6 @@ export default css`
     [part='nav'] {
         overflow-x: auto;
         scrollbar-width: none;
-        border-bottom: var(--ar-tab-group-border-width) solid var(--ar-tab-group-border-color);
     }
 
     [part='nav']::-webkit-scrollbar {
@@ -24,5 +23,9 @@ export default css`
     [part='tabs'] {
         display: flex;
         flex-direction: row;
+        min-width: 100%;
+        border-top: var(--ar-tab-group-border-top-width) solid var(--ar-tab-group-border-color);
+        border-bottom: var(--ar-tab-group-border-bottom-width) solid
+            var(--ar-tab-group-border-color);
     }
 `;

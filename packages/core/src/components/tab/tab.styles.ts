@@ -17,6 +17,8 @@ export default css`
         background: var(--ar-tab-bg);
         padding: var(--ar-tab-padding-y) var(--ar-tab-padding-x);
         border-radius: inherit;
+        margin-block-start: calc(-1 * var(--ar-tab-group-border-top-width, 0px));
+        margin-block-end: calc(-1 * var(--ar-tab-group-border-bottom-width, 0px));
     }
 
     :host(:hover:not([disabled]):not([aria-selected='true'])) [part='base'] {
