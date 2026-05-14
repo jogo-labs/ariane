@@ -18,7 +18,8 @@ import styles from './tab-group.styles.js';
  * @csspart tabs - div[role="tablist"].
  *
  * @cssprop --ar-tab-group-gap - Espacement entre tablist et panels.
- * @cssprop --ar-tab-group-border-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
+ * @cssprop --ar-tab-group-border-top-width - Épaisseur du trait séparateur en haut de la la tablist. Mettre à 1px pour l'activer.
+ * @cssprop --ar-tab-group-border-bottom-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-color - Couleur du trait séparateur sous la tablist.
  *
  * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.

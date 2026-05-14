@@ -379,7 +379,8 @@
 
         --ar-tab-group-gap: 0;
         --ar-tab-group-border-color: var(--ar-color-border);
-        --ar-tab-group-border-width: 0;
+        --ar-tab-group-border-top-width: 0;
+        --ar-tab-group-border-bottom-width: 1px;
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -90,12 +90,21 @@ variants:
       description: Les tokens `--ar-tab-*` permettent de changer le style de l'indicateur actif sans modifier le composant. Exemple — indicateur en haut (top border) et style pill.
       html: |
           <style>
+              .demo-top ar-tab-group {
+                  --ar-tab-group-border-top-width: 1px;
+                  --ar-tab-group-border-bottom-width: 0;
+              }
               .demo-top ar-tab {
                   --ar-tab-active-shadow: inset 0 3px 0 var(--ar-tab-indicator-color);
               }
+
+              .demo-pill ar-tab-group {
+                --ar-tab-group-border-top-width: 0;
+                --ar-tab-group-border-bottom-width: 0;
+              }
               .demo-pill ar-tab {
                   --ar-tab-active-shadow: none;
-                  --ar-tab-active-bg: var(--ar-color-interactive-subtle, #f4f5ff);
+                  --ar-tab-active-bg: var(--ar-color-interactive-subtle);
                   --ar-tab-border-radius: 9999px;
               }
           </style>
