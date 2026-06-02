@@ -84,6 +84,8 @@ jobs:
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Browser tests
         run: npm run test:browser --workspace=packages/core
