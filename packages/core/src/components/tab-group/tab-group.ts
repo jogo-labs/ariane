@@ -44,6 +44,7 @@ export class ArTabGroup extends LitElement {
     private _tabs: ArTab[] = [];
     private _panels: ArTabPanel[] = [];
     private readonly _prefix = Math.random().toString(36).slice(2, 9);
+    private _initialized = false;
     private _resizeObserver?: ResizeObserver | undefined;
     private _scrollHintsUnlisten?: (() => void) | undefined;
 
@@ -112,6 +113,7 @@ export class ArTabGroup extends LitElement {
     }
 
     override firstUpdated(): void {
+        this._initialized = true;
         this._setupScrollHints();
     }
 
@@ -158,7 +160,9 @@ export class ArTabGroup extends LitElement {
                 tab.removeAttribute('aria-disabled');
             }
             if (tab.panel && !this._panels.find((p) => p.name === tab.panel)) {
-                warn('ar-tab-group', `Aucun ar-tab-panel avec name="${tab.panel}" trouvé.`);
+                if (this._initialized) {
+                    warn('ar-tab-group', `Aucun ar-tab-panel avec name="${tab.panel}" trouvé.`);
+                }
             }
         });
 
