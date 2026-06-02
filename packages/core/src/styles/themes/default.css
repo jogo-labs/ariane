@@ -345,6 +345,8 @@
         /* breadcrumb */
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
+        --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
+        --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
 
         /* stepper */
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
