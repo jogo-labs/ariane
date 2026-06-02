@@ -10,6 +10,13 @@
 
 // ─── Membres d'un composant (propriétés, méthodes) ───────────────────────────
 
+export interface CemParameter {
+    name: string;
+    type?: { text: string };
+    default?: string;
+    optional?: boolean;
+}
+
 export interface CemMember {
     kind: string;
     name: string;
@@ -21,6 +28,8 @@ export interface CemMember {
     type?: { text: string };
     default?: string;
     description?: string;
+    parameters?: CemParameter[];
+    return?: { type?: { text: string } };
 }
 
 // ─── Autres éléments d'API ────────────────────────────────────────────────────
