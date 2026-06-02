@@ -220,6 +220,58 @@ describe('ar-tab-group — browser', () => {
         });
     });
 
+    // ── suppression dynamique ─────────────────────────────────────────────
+
+    describe('suppression dynamique', () => {
+        it('émet ar-tab-group-change quand le tab actif est supprimé', async () => {
+            const el = await fixture<ArTabGroup>(html`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">A</ar-tab>
+                    <ar-tab panel="b">B</ar-tab>
+                    <ar-tab-panel name="a">A</ar-tab-panel>
+                    <ar-tab-panel name="b">B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-tab-group-change', (e) => events.push(e as CustomEvent));
+            getTab(el, 'a').remove();
+            await el.updateComplete;
+            expect(events).to.have.length(1);
+            expect(events[0].detail.active).to.equal('b');
+        });
+
+        it('met à jour active quand le tab actif est supprimé', async () => {
+            const el = await fixture<ArTabGroup>(html`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">A</ar-tab>
+                    <ar-tab panel="b">B</ar-tab>
+                    <ar-tab-panel name="a">A</ar-tab-panel>
+                    <ar-tab-panel name="b">B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            getTab(el, 'a').remove();
+            await el.updateComplete;
+            expect(el.active).to.equal('b');
+        });
+
+        it("n'émet pas ar-tab-group-change quand un tab inactif est supprimé", async () => {
+            const el = await fixture<ArTabGroup>(html`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">A</ar-tab>
+                    <ar-tab panel="b">B</ar-tab>
+                    <ar-tab-panel name="a">A</ar-tab-panel>
+                    <ar-tab-panel name="b">B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-tab-group-change', (e) => events.push(e as CustomEvent));
+            getTab(el, 'b').remove();
+            await el.updateComplete;
+            expect(events).to.have.length(0);
+            expect(el.active).to.equal('a');
+        });
+    });
+
     // ── overflow tracking (toujours actif) ────────────────────────────────
 
     describe('overflow tracking', () => {

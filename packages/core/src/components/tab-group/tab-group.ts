@@ -59,8 +59,14 @@ export class ArTabGroup extends LitElement {
             this._syncAll();
         },
         unregisterTab: (tab: ArTab) => {
+            const wasActive = tab.panel === this.active;
             this._tabs = this._tabs.filter((t) => t !== tab);
             this._syncAll();
+            if (wasActive) {
+                const newActive = this._effectiveActive;
+                this.active = newActive;
+                this._emit('ar-tab-group-change', { active: newActive });
+            }
         },
         registerPanel: (panel: ArTabPanel) => {
             if (!this._panels.includes(panel)) {
