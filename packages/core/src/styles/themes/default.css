@@ -353,6 +353,9 @@
         /* pagination */
         --ar-pagination-active-color: var(--ar-color-interactive);
 
+        /* spinner */
+        --ar-spinner-stroke-color: currentColor;
+
         /* table */
         --ar-table-padding-x: 1rem;
 
