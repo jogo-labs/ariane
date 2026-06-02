@@ -5,6 +5,7 @@ import TableOfContents from '../../components/TableOfContents.astro';
 const tocEntries = [
     { id: 'composants',       label: 'Utiliser les composants', level: 1 as const },
     { id: 'chargement',       label: 'Attendre le chargement',  level: 1 as const },
+    { id: 'headless',         label: 'Modèle headless',         level: 1 as const },
     { id: 'personnalisation', label: 'Personnalisation CSS',    level: 1 as const },
     { id: 'tokens',           label: 'Design Tokens',           level: 1 as const },
 ];
@@ -91,6 +92,27 @@ const codeTokens = `:root {
                 <p>Via CDN (sans import) :</p>
                 <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
             </section>
+        </section>
+
+        <section id="headless" class="main-section">
+            <div>
+                <h3 class="section-title">Modèle headless</h3>
+                <p>
+                    Ariane est une librairie <strong>headless</strong> : les composants ne portent
+                    aucun style visuel par défaut. Couleurs, espacements et typographie proviennent
+                    exclusivement du fichier de thème chargé séparément.
+                </p>
+                <p>
+                    Sans thème, les composants fonctionnent (accessibilité, interactions, slots)
+                    mais leur rendu visuel est indéfini. C'est intentionnel — Ariane est une
+                    fondation sur laquelle construire un design system, pas un kit d'UI clé en main.
+                </p>
+                <p>
+                    Les exemples de cette documentation utilisent <code>themes/default.css</code>.
+                    Vous pouvez le remplacer par votre propre thème en définissant les tokens CSS
+                    de chaque composant sur <code>:root</code>.
+                </p>
+            </div>
         </section>
 
         <section id="personnalisation" class="main-section">
