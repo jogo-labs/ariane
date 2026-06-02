@@ -8,11 +8,15 @@ export default {
     files: 'src/**/*.{browser,a11y}.test.{js,ts}',
 
     // Chromium uniquement en CI ; WebKit peut être ajouté plus tard
-    // --no-sandbox requis sur les runners Linux GitHub Actions (pas de user namespace)
+    // En CI : utilise google-chrome-stable préinstallé sur le runner (évite le téléchargement).
+    // --no-sandbox requis sur les runners Linux (pas de user namespace dans les conteneurs).
     browsers: [
         playwrightLauncher({
             product: 'chromium',
-            launchOptions: { args: ['--no-sandbox', '--disable-setuid-sandbox'] },
+            launchOptions: {
+                executablePath: process.env.CI ? '/usr/bin/google-chrome-stable' : undefined,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            },
         }),
     ],
 

@@ -82,13 +82,5 @@ jobs:
       - name: Build core
         run: npm run build --workspace=packages/core
 
-      - name: Install Playwright system deps
-        run: npx playwright install-deps chromium
-        env:
-          DEBIAN_FRONTEND: noninteractive
-
-      - name: Install Playwright Chromium
-        run: npx playwright install chromium
-
       - name: Browser tests
         run: npm run test:browser --workspace=packages/core
