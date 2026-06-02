@@ -98,18 +98,12 @@ export class ArTabGroup extends LitElement {
             this._syncAll();
             this._scrollActiveTabIntoView();
         }
-        if (changed.has('label')) {
-            const tablist = this.shadowRoot?.querySelector('[part="tabs"]');
-            if (tablist) {
-                if (this.label) tablist.setAttribute('aria-label', this.label);
-                else tablist.removeAttribute('aria-label');
-            }
-        }
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
         this.addEventListener('keydown', this._handleKeyDown);
+        if (this._initialized) this._setupScrollHints();
     }
 
     override firstUpdated(): void {
@@ -201,6 +195,8 @@ export class ArTabGroup extends LitElement {
         if (!this._tabs.some((t) => t === target)) return;
 
         const enabledTabs = this._tabs.filter((t) => !t.disabled);
+        if (enabledTabs.length === 0) return;
+
         const currentIdx = enabledTabs.findIndex((t) => t === target);
 
         switch (e.key) {
@@ -208,7 +204,12 @@ export class ArTabGroup extends LitElement {
             case 'ArrowRight': {
                 e.preventDefault();
                 const dir = e.key === 'ArrowLeft' ? -1 : 1;
-                const newIdx = (currentIdx + dir + enabledTabs.length) % enabledTabs.length;
+                const newIdx =
+                    currentIdx === -1
+                        ? dir === 1
+                            ? 0
+                            : enabledTabs.length - 1
+                        : (currentIdx + dir + enabledTabs.length) % enabledTabs.length;
                 this._moveFocusTo(enabledTabs[newIdx]);
                 if (!this.manualActivation) {
                     this._registry.activate(enabledTabs[newIdx].panel);
@@ -228,8 +229,8 @@ export class ArTabGroup extends LitElement {
                 break;
             case 'Enter':
             case ' ':
+                e.preventDefault();
                 if (this.manualActivation) {
-                    e.preventDefault();
                     const tab = this._tabs.find((t) => t === target);
                     if (tab) this._registry.activate(tab.panel);
                 }
@@ -252,10 +253,11 @@ export class ArTabGroup extends LitElement {
         if (!nav) return;
 
         const update = () => {
-            this.classList.toggle('has-overflow-start', nav.scrollLeft > 0);
+            const scrollLeft = Math.abs(nav.scrollLeft);
+            this.classList.toggle('has-overflow-start', scrollLeft > 0);
             this.classList.toggle(
                 'has-overflow-end',
-                Math.ceil(nav.scrollLeft + nav.clientWidth) < nav.scrollWidth,
+                Math.ceil(scrollLeft + nav.clientWidth) < nav.scrollWidth,
             );
         };
 
