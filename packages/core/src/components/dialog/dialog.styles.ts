@@ -76,9 +76,7 @@ export default [
             overflow: hidden;
             background: var(--ar-color-bg);
             color: var(--ar-color-text);
-            box-shadow:
-                0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 20px 50px -8px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--ar-dialog-shadow);
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */

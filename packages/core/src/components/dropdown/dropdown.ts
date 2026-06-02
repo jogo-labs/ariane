@@ -30,8 +30,8 @@ export type ArDropdownPlacement =
  * @csspart panel - Le panel flottant.
  *
  * @cssprop [--ar-dropdown-min-width=10rem] - Largeur minimale du panel.
- * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width,18rem)] - Largeur maximale (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding,0.25rem)] - Marge interne (cascade vers --ar-panel-padding).
+ * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width)] - Largeur maximale (cascade vers --ar-panel-max-width).
+ * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding)] - Marge interne (cascade vers --ar-panel-padding).
  * @cssprop [--ar-dropdown-bg=var(--ar-panel-bg)] - Fond du panel (cascade vers --ar-panel-bg).
  * @cssprop [--ar-dropdown-border-color=var(--ar-panel-border-color)] - Bordure (cascade vers --ar-panel-border-color).
  * @cssprop [--ar-dropdown-border-radius=var(--ar-panel-radius)] - Arrondi (cascade vers --ar-panel-radius).

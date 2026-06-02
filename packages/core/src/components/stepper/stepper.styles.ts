@@ -79,7 +79,7 @@ export default css`
 
     .stepper-item .stepper-link:focus,
     .stepper-item .stepper-link:hover {
-        color: var(--ar-stepper-bullet-hover-bg);
+        color: var(--ar-stepper-link-hover-color);
     }
 
     .stepper-item .stepper-link:focus:before,

@@ -355,6 +355,7 @@
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
+        --ar-stepper-link-hover-color: var(--ar-color-text-muted);
         --ar-stepper-active-label-color: var(--ar-color-interactive);
         --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
         --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
@@ -376,7 +377,7 @@
         --ar-spinner-stroke-color: currentColor;
 
         /* tooltip */
-        --ar-tooltip-bg: #1a1a1a;
+        --ar-tooltip-bg: var(--ar-color-neutral-20);
         --ar-tooltip-color: var(--ar-color-white);
         --ar-tooltip-border-radius: var(--ar-border-radius-sm);
         --ar-tooltip-font-size: 0.8125rem;
@@ -403,6 +404,9 @@
         --ar-dropdown-padding: var(--ar-panel-padding);
         --ar-dropdown-min-width: 10rem;
         --ar-dropdown-max-width: var(--ar-panel-max-width);
+
+        /* dialog */
+        --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
 
         /* table */
         --ar-table-padding-x: 1rem;
@@ -482,6 +486,10 @@
         --ar-alert-warning-border: var(--ar-color-warning-40);
         --ar-alert-error-border: var(--ar-color-danger-40);
         --ar-alert-success-border: var(--ar-color-success-40);
+
+        /* Tooltip — fond clair sur fond de page sombre */
+        --ar-tooltip-bg: var(--ar-color-neutral-80);
+        --ar-tooltip-color: var(--ar-color-neutral-10);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -527,6 +535,10 @@
             --ar-alert-warning-border: var(--ar-color-warning-40);
             --ar-alert-error-border: var(--ar-color-danger-40);
             --ar-alert-success-border: var(--ar-color-success-40);
+
+            /* Tooltip — fond clair sur fond de page sombre */
+            --ar-tooltip-bg: var(--ar-color-neutral-80);
+            --ar-tooltip-color: var(--ar-color-neutral-10);
         }
     }
 }

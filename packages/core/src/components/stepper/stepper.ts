@@ -52,8 +52,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width,18rem)]                    - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)]                    - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width)]                         - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width)]                         - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  * @cssprop [--ar-stepper-gap=1.5rem]                                                         - Hauteur du connecteur entre les étapes principales.
  * @cssprop [--ar-stepper-substep-gap=1rem]                                                   - Hauteur du connecteur entre les sous-étapes.
  * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
@@ -63,6 +63,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop [--ar-stepper-bullet-color=var(--ar-color-interactive)]                           - Couleur du numéro dans les puces visitables.
  * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)]                     - Bordure des puces des étapes suivantes.
  * @cssprop [--ar-stepper-bullet-hover-bg=var(--ar-color-text-muted)]                         - Fond de la puce au survol.
+ * @cssprop [--ar-stepper-link-hover-color=var(--ar-color-text-muted)]                       - Couleur du texte du lien au survol.
  * @cssprop [--ar-stepper-bullet-radius=0.75rem]                                              - Border-radius de la puce.
  * @cssprop [--ar-stepper-label-color=var(--ar-color-text-muted)]                             - Couleur des labels des étapes inactives.
  * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
