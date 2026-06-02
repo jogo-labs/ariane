@@ -64,7 +64,7 @@ jobs:
 
   browser:
     name: Browser Tests (core)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -82,10 +82,13 @@ jobs:
       - name: Build core
         run: npm run build --workspace=packages/core
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright system deps
+        run: npx playwright install-deps chromium
         env:
           DEBIAN_FRONTEND: noninteractive
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
 
       - name: Browser tests
         run: npm run test:browser --workspace=packages/core
