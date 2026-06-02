@@ -372,6 +372,26 @@
         --ar-tooltip-max-width: 18rem;
         --ar-tooltip-arrow-size: 6px;
 
+        /* panel (shared — dropdown, breadcrumb, stepper) */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+
+        /* dropdown */
+        --ar-dropdown-bg: var(--ar-panel-bg);
+        --ar-dropdown-color: var(--ar-panel-text);
+        --ar-dropdown-border-color: var(--ar-panel-border-color);
+        --ar-dropdown-border-radius: var(--ar-panel-radius);
+        --ar-dropdown-shadow: var(--ar-panel-shadow);
+        --ar-dropdown-padding: var(--ar-panel-padding);
+        --ar-dropdown-min-width: 10rem;
+        --ar-dropdown-max-width: var(--ar-panel-max-width);
+
         /* table */
         --ar-table-padding-x: 1rem;
 
