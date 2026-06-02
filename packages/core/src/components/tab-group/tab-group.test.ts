@@ -52,7 +52,6 @@ describe('ArTabGroup', () => {
         it('active vaut chaîne vide', () => expect(el.active).toBe(''));
         it('label vaut chaîne vide', () => expect(el.label).toBe(''));
         it('manualActivation vaut false', () => expect(el.manualActivation).toBe(false));
-        it('scrollHints vaut false', () => expect(el.scrollHints).toBe(false));
     });
 
     // ── Onglet actif par défaut ────────────────────────────────────────────

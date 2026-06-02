@@ -17,6 +17,9 @@ import styles from './tab-group.styles.js';
  * @csspart nav  - Zone scrollable (overflow-x: auto).
  * @csspart tabs - div[role="tablist"].
  *
+ * Les classes `has-overflow-start` et `has-overflow-end` sont ajoutées automatiquement sur l'hôte
+ * quand le contenu de la tablist déborde à gauche ou à droite.
+ *
  * @cssprop --ar-tab-group-gap - Espacement entre tablist et panels.
  * @cssprop --ar-tab-group-border-top-width - Épaisseur du trait séparateur en haut de la la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-bottom-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
@@ -37,10 +40,6 @@ export class ArTabGroup extends LitElement {
     /** Active le mode manuel : les flèches déplacent le focus sans activer l'onglet. */
     @property({ attribute: 'manual-activation', reflect: true, type: Boolean })
     manualActivation = false;
-
-    /** Active les classes has-overflow-start / has-overflow-end sur part="nav". */
-    @property({ attribute: 'scroll-hints', reflect: true, type: Boolean })
-    scrollHints = false;
 
     private _tabs: ArTab[] = [];
     private _panels: ArTabPanel[] = [];
@@ -99,14 +98,15 @@ export class ArTabGroup extends LitElement {
                 else tablist.removeAttribute('aria-label');
             }
         }
-        if (changed.has('scrollHints')) {
-            this._setupScrollHints();
-        }
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
         this.addEventListener('keydown', this._handleKeyDown);
+    }
+
+    override firstUpdated(): void {
+        this._setupScrollHints();
     }
 
     override disconnectedCallback(): void {
@@ -168,6 +168,12 @@ export class ArTabGroup extends LitElement {
                 panel.setAttribute('hidden', '');
             }
         });
+    }
+
+    /** Scrolle la zone de navigation d'un certain nombre de pixels vers `'start'` ou `'end'`. */
+    scrollNav(direction: 'start' | 'end', amount = 200): void {
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        nav?.scrollBy({ left: direction === 'end' ? amount : -amount, behavior: 'smooth' });
     }
 
     private _scrollActiveTabIntoView(): void {
@@ -233,7 +239,7 @@ export class ArTabGroup extends LitElement {
         this._scrollHintsUnlisten = undefined;
 
         const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
-        if (!nav || !this.scrollHints) return;
+        if (!nav) return;
 
         const update = () => {
             this.classList.toggle('has-overflow-start', nav.scrollLeft > 0);

@@ -173,13 +173,60 @@ describe('ar-tab-group — browser', () => {
         });
     });
 
-    // ── scroll-hints ───────────────────────────────────────────────────────
+    // ── scrollNav ─────────────────────────────────────────────────────────
 
-    describe('scroll-hints', () => {
+    describe('scrollNav', () => {
+        it('scrolle vers la droite quand appelé avec "end"', async () => {
+            const wrapper = await fixture<HTMLElement>(html`
+                <div style="width: 100px; overflow: hidden;">
+                    <ar-tab-group>
+                        <ar-tab panel="a" style="min-width:60px">A</ar-tab>
+                        <ar-tab panel="b" style="min-width:60px">B</ar-tab>
+                        <ar-tab panel="c" style="min-width:60px">C</ar-tab>
+                        <ar-tab-panel name="a">A</ar-tab-panel>
+                        <ar-tab-panel name="b">B</ar-tab-panel>
+                        <ar-tab-panel name="c">C</ar-tab-panel>
+                    </ar-tab-group>
+                </div>
+            `);
+            const el = wrapper.querySelector<ArTabGroup>('ar-tab-group')!;
+            el.scrollNav('end');
+            await aTimeout(150);
+            const nav = el.shadowRoot!.querySelector<HTMLElement>('[part="nav"]')!;
+            expect(nav.scrollLeft).to.be.greaterThan(0);
+        });
+
+        it('scrolle vers la gauche quand appelé avec "start"', async () => {
+            const wrapper = await fixture<HTMLElement>(html`
+                <div style="width: 100px; overflow: hidden;">
+                    <ar-tab-group>
+                        <ar-tab panel="a" style="min-width:60px">A</ar-tab>
+                        <ar-tab panel="b" style="min-width:60px">B</ar-tab>
+                        <ar-tab panel="c" style="min-width:60px">C</ar-tab>
+                        <ar-tab-panel name="a">A</ar-tab-panel>
+                        <ar-tab-panel name="b">B</ar-tab-panel>
+                        <ar-tab-panel name="c">C</ar-tab-panel>
+                    </ar-tab-group>
+                </div>
+            `);
+            const el = wrapper.querySelector<ArTabGroup>('ar-tab-group')!;
+            el.scrollNav('end', 999);
+            await aTimeout(150);
+            const nav = el.shadowRoot!.querySelector<HTMLElement>('[part="nav"]')!;
+            const scrollAfterEnd = nav.scrollLeft;
+            el.scrollNav('start');
+            await aTimeout(150);
+            expect(nav.scrollLeft).to.be.lessThan(scrollAfterEnd);
+        });
+    });
+
+    // ── overflow tracking (toujours actif) ────────────────────────────────
+
+    describe('overflow tracking', () => {
         it('ajoute has-overflow-end quand le contenu déborde', async () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div style="width: 100px; overflow: hidden;">
-                    <ar-tab-group scroll-hints>
+                    <ar-tab-group>
                         <ar-tab panel="a" style="min-width:60px">A</ar-tab>
                         <ar-tab panel="b" style="min-width:60px">B</ar-tab>
                         <ar-tab panel="c" style="min-width:60px">C</ar-tab>
@@ -197,7 +244,7 @@ describe('ar-tab-group — browser', () => {
         it("n'ajoute pas has-overflow-start si scroll à 0", async () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div style="width: 100px; overflow: hidden;">
-                    <ar-tab-group scroll-hints>
+                    <ar-tab-group>
                         <ar-tab panel="a" style="min-width:60px">A</ar-tab>
                         <ar-tab panel="b" style="min-width:60px">B</ar-tab>
                         <ar-tab panel="c" style="min-width:60px">C</ar-tab>
