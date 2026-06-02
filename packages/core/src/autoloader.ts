@@ -27,6 +27,9 @@ const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
     'ar-dialog': () => import('./components/dialog/dialog.js'),
     'ar-dropdown': () => import('./components/dropdown/dropdown.js'),
     'ar-dropdown-item': () => import('./components/dropdown-item/dropdown-item.js'),
+    'ar-tab-group': () => import('./components/tab-group/tab-group.js'),
+    'ar-tab': () => import('./components/tab/tab.js'),
+    'ar-tab-panel': () => import('./components/tab-panel/tab-panel.js'),
     // ⚠ Mis à jour automatiquement par le script create-component.js
 };
 

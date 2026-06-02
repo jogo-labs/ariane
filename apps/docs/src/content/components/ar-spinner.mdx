@@ -33,13 +33,19 @@ variants:
           <ar-spinner size="lg"></ar-spinner>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - L'animation SVG est masquée aux lecteurs d'écran (`aria-hidden`). Un `<div role="alert">`
   invisible annonce les changements d'état — le passage "en cours → terminé" est vocalisé
-  sans intervention supplémentaire.
+  sans intervention supplémentaire — conforme
+    <WcagRef
+        criterion="4.1.3"
+        summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus."
+    />
 - Les labels "en cours" (`loading-label`) et "terminé" (`done-label`) ont des valeurs par
   défaut raisonnables utilisées si non fournis.
 

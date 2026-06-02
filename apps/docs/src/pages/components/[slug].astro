@@ -52,7 +52,8 @@ const playgroundVariant = playgroundVariantName
 const rawPlaygroundHtml = playgroundVariant?.html ?? '';
 const playgroundHtml = rawPlaygroundHtml
     .replace(/\bid="([\w-]+)"/g, 'id="pg-$1"')
-    .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"');
+    .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"')
+    .replace(/\bfor="([\w-]+)"/g, 'for="pg-$1"');
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────
 

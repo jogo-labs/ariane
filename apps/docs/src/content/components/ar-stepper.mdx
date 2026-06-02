@@ -67,12 +67,15 @@ variants:
           </ar-stepper>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
-  et identifiable par les lecteurs d'écran.
+  et identifiable par les lecteurs d'écran
+  (<WcagRef criterion="1.3.1" summary="Info and Relationships : les relations et structures visuelles doivent être déterminables par programmation ou disponibles en texte." />).
 - L'état courant (`current-path`) est reflété visuellement et structurellement — les items
   actifs, complétés et désactivés sont distingués.
 

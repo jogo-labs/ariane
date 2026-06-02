@@ -21,12 +21,15 @@ variants:
           </ar-progressbar>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
 - `role="progressbar"`, `aria-valuenow`, `aria-valuemin` et `aria-valuemax` posés sur la barre —
-  la progression est vocalisée automatiquement par les lecteurs d'écran.
+  la progression est vocalisée automatiquement par les lecteurs d'écran
+  (<WcagRef criterion="4.1.2" summary="Name, Role, Value : tout composant UI doit exposer son nom, rôle et valeur (états inclus) aux technologies d'assistance." />).
 - La valeur de `aria-labelledby` pointe sur le label slotté, pas sur un texte invisible —
   le contexte de la progression est toujours visible et vocalisé simultanément.
 

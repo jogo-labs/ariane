@@ -1,0 +1,31 @@
+import { css } from 'lit';
+
+export default css`
+    :host {
+        display: block;
+    }
+
+    [part='base'] {
+        display: flex;
+        flex-direction: column;
+        gap: var(--ar-tab-group-gap);
+    }
+
+    [part='nav'] {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    [part='nav']::-webkit-scrollbar {
+        display: none;
+    }
+
+    [part='tabs'] {
+        display: flex;
+        flex-direction: row;
+        min-width: 100%;
+        border-top: var(--ar-tab-group-border-top-width) solid var(--ar-tab-group-border-color);
+        border-bottom: var(--ar-tab-group-border-bottom-width) solid
+            var(--ar-tab-group-border-color);
+    }
+`;

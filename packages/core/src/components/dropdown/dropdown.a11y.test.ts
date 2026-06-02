@@ -43,10 +43,8 @@ describe('ar-dropdown — accessibilité', () => {
             expect(getTrigger(el).getAttribute('aria-haspopup')).to.equal('true');
         });
 
-        it('le trigger a aria-controls pointant vers le panel', () => {
-            const panel = getPanel(el);
-            const controls = getTrigger(el).getAttribute('aria-controls');
-            expect(controls).to.equal(panel.id);
+        it("le trigger n'a pas aria-controls (non supporté cross-shadow-DOM)", () => {
+            expect(getTrigger(el).hasAttribute('aria-controls')).to.equal(false);
         });
 
         it('aria-expanded="false" à l\'état fermé', () => {

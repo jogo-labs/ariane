@@ -66,10 +66,10 @@ variants:
           </ar-dropdown>
     - name: external-trigger
       label: Trigger externe
-      description: "L'attribut `trigger` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
+      description: "L'attribut `for` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
       html: |
           <button class="btn btn-secondary" id="ar-doc-ext-trigger">Trigger externe ▾</button>
-          <ar-dropdown trigger="ar-doc-ext-trigger">
+          <ar-dropdown for="ar-doc-ext-trigger">
               <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
               <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
@@ -97,13 +97,23 @@ variants:
           </p>
 ---
 
+import WcagRef from '../../components/WcagRef.astro';
+
 ## Accessibilité
 
 ### Pris en charge automatiquement
 
-- Le trigger reçoit `aria-haspopup="true"`, `aria-controls` (pointant vers le panel) et `aria-expanded` synchronisé à l'état ouvert/fermé.
+- Le trigger reçoit `aria-haspopup="true"` et `aria-expanded` synchronisé à l'état ouvert/fermé —
+    <WcagRef
+        criterion="4.1.2"
+        summary="Name, Role, Value : tout composant UI doit exposer son nom, rôle et valeur (états inclus) aux technologies d'assistance."
+    />
 - En mode menu (présence d'`ar-dropdown-item`), le panel reçoit `role="menu"` et chaque enfant focusable reçoit `role="menuitem"`.
-- Navigation clavier complète : `↑` `↓` `Home` `End` pour déplacer le focus, `Escape` et `Tab` pour fermer.
+- Navigation clavier complète : `↑` `↓` `Home` `End` pour déplacer le focus, `Escape` et `Tab` pour fermer —
+    <WcagRef
+        criterion="2.1.1"
+        summary="Keyboard : toutes les fonctionnalités doivent être accessibles au clavier sans temporisation spécifique."
+    />
 - Retour du focus sur le trigger à la fermeture.
 - Light-dismiss natif (`popover="auto"`) : un clic hors du panel ferme automatiquement.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
