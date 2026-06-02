@@ -8,7 +8,13 @@ export default {
     files: 'src/**/*.{browser,a11y}.test.{js,ts}',
 
     // Chromium uniquement en CI ; WebKit peut être ajouté plus tard
-    browsers: [playwrightLauncher({ product: 'chromium' })],
+    // --no-sandbox requis sur les runners Linux GitHub Actions (pas de user namespace)
+    browsers: [
+        playwrightLauncher({
+            product: 'chromium',
+            launchOptions: { args: ['--no-sandbox', '--disable-setuid-sandbox'] },
+        }),
+    ],
 
     // Plugin esbuild pour transpiler TypeScript à la volée.
     // tsconfig.wtr.json est un fichier plat (sans "extends") qui transmet
