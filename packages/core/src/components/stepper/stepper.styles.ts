@@ -25,8 +25,8 @@ export default css`
 
     [part='panel'] {
         padding: 0.75rem;
-        min-width: var(--ar-stepper-panel-min-width, var(--ar-panel-min-width, 18rem));
-        max-width: var(--ar-stepper-panel-max-width, var(--ar-panel-max-width, 18rem));
+        min-width: var(--ar-stepper-panel-min-width);
+        max-width: var(--ar-stepper-panel-max-width);
     }
 
     .stepper-list {
@@ -41,7 +41,7 @@ export default css`
     .stepper-item-bullet,
     .stepper-item-inner {
         align-items: center;
-        color: var(--ar-stepper-label-color, var(--ar-color-text-muted, #5b5d65));
+        color: var(--ar-stepper-label-color);
     }
 
     .stepper-item-bullet {
@@ -50,12 +50,11 @@ export default css`
         display: flex;
         flex-shrink: 0;
         justify-content: center;
-        border-radius: var(--ar-stepper-bullet-radius, 0.75rem);
+        border-radius: var(--ar-stepper-bullet-radius);
         padding-bottom: 0.125rem;
         margin-right: 0.5rem;
         transform: translateY(1px);
-        box-shadow: 0 0 0 1px
-            var(--ar-stepper-bullet-border-color, var(--ar-color-neutral-80, #b0bff0)) inset;
+        box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
         background-color: transparent;
     }
 
@@ -80,41 +79,41 @@ export default css`
 
     .stepper-item .stepper-link:focus,
     .stepper-item .stepper-link:hover {
-        color: var(--ar-stepper-bullet-hover-bg, var(--ar-color-text-muted, #5b5d65));
+        color: var(--ar-stepper-bullet-hover-bg);
     }
 
     .stepper-item .stepper-link:focus:before,
     .stepper-item .stepper-link:hover:before {
-        background-color: var(--ar-color-interactive, #283276);
+        background-color: var(--ar-color-interactive);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-label,
     .stepper-item .stepper-link:hover .stepper-item-label {
         text-decoration: none;
-        color: var(--ar-color-text, #2e2e31);
+        color: var(--ar-color-text);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-bullet,
     .stepper-item .stepper-link:hover .stepper-item-bullet {
-        color: var(--ar-color-text-inverse, #fff);
-        background-color: var(--ar-stepper-bullet-hover-bg, var(--ar-color-text-muted, #5b5d65));
+        color: var(--ar-color-text-inverse);
+        background-color: var(--ar-stepper-bullet-hover-bg);
         box-shadow: none;
     }
 
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
-        outline-color: var(--ar-color-interactive, #283276);
+        outline-color: var(--ar-color-interactive);
         border-radius: 0.125rem;
     }
 
     .stepper-item.active > .stepper-item-inner {
-        color: var(--ar-stepper-active-label-color, var(--ar-color-interactive, #283276));
+        color: var(--ar-stepper-active-label-color);
         font-weight: 700;
     }
 
     .stepper-item.active > .stepper-item-inner .stepper-item-bullet {
-        color: var(--ar-stepper-active-bullet-color, var(--ar-color-text-inverse, #fff));
-        background-color: var(--ar-stepper-active-bullet-bg, var(--ar-color-interactive, #283276));
+        color: var(--ar-stepper-active-bullet-color);
+        background-color: var(--ar-stepper-active-bullet-bg);
         box-shadow: none;
     }
 
@@ -124,8 +123,8 @@ export default css`
     }
 
     .stepper-link .stepper-item-bullet {
-        color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
-        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
+        color: var(--ar-stepper-bullet-color);
+        background-color: var(--ar-stepper-bullet-bg);
     }
 
     .stepper-list.stepper-desktop,
@@ -135,11 +134,8 @@ export default css`
 
     .stepper-list:not(.stepper-horizontal) .stepper-item:after {
         width: 2.25rem;
-        height: var(--ar-stepper-gap, 1.5rem);
-        background-image: linear-gradient(
-            var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
-            transparent 0
-        );
+        height: var(--ar-stepper-gap);
+        background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 3px;
         background-repeat: repeat-y;
@@ -153,11 +149,8 @@ export default css`
         content: '';
         display: block;
         width: 2.25rem;
-        height: var(--ar-stepper-substep-gap, 1rem);
-        background-image: linear-gradient(
-            var(--ar-stepper-connector-color, var(--ar-color-neutral-80, #cdcfd8)) 25%,
-            transparent 0
-        );
+        height: var(--ar-stepper-substep-gap);
+        background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
@@ -189,8 +182,8 @@ export default css`
     }
 
     .stepper-edition .stepper-item-bullet {
-        color: var(--ar-stepper-bullet-color, var(--ar-color-interactive, #283276));
-        background-color: var(--ar-stepper-bullet-bg, var(--ar-color-primary-80, #b0bff0));
+        color: var(--ar-stepper-bullet-color);
+        background-color: var(--ar-stepper-bullet-bg);
     }
 
     :host([align='right']) .stepper-desktop .stepper-item {
