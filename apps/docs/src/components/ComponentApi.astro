@@ -84,6 +84,48 @@ function swatchColor(value: string | undefined): string | undefined {
         </section>
     )}
 
+    {/* ── Méthodes ── */}
+    {component.members && component.members.some((m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected') && (
+        <section>
+            <h4 id="api-methodes" class="subsection-title">Méthodes</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Paramètres</th>
+                            <th>Retour</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {component.members
+                            .filter((m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected')
+                            .map((m) => {
+                                const params = (m.parameters ?? [])
+                                    .map((p) => {
+                                        let s = p.name;
+                                        if (p.type?.text) s += `: ${p.type.text}`;
+                                        if (p.default !== undefined) s += ` = ${p.default}`;
+                                        return s;
+                                    })
+                                    .join(', ');
+                                const returnType = m.return?.type?.text ?? 'void';
+                                return (
+                                    <tr>
+                                        <td><code>{m.name}()</code></td>
+                                        <td>{params ? <code>{params}</code> : <span class="muted">—</span>}</td>
+                                        <td><code>{returnType}</code></td>
+                                        <td>{m.description ?? ''}</td>
+                                    </tr>
+                                );
+                            })}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
     {/* ── CSS Parts ── */}
     {component.cssParts && component.cssParts.length > 0 && (
         <section>
