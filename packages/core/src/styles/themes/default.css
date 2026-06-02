@@ -291,6 +291,13 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* alert */
+        --ar-alert-padding: 1rem;
+        --ar-alert-border-radius: 0.75rem;
+        --ar-alert-border-width: 1px;
+        --ar-alert-border-style: solid;
+        --ar-alert-close-size: 2rem;
+        --ar-alert-close-bg: color-mix(in srgb, currentColor 8%, transparent);
+        --ar-alert-close-hover-bg: color-mix(in srgb, currentColor 20%, transparent);
         --ar-alert-info-bg: var(--ar-color-info-bg);
         --ar-alert-info-border: var(--ar-color-info-bg);
         --ar-alert-info-icon: var(--ar-color-info-text);

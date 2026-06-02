@@ -9,46 +9,46 @@ export default css`
         align-items: center;
         opacity: 1;
         transform: scale(1);
-        color: var(--ar-color-text, #2e2e31);
-        padding: var(--ar-alert-padding, 1rem);
-        border-radius: var(--ar-alert-border-radius, 0.75rem);
-        border-width: var(--ar-alert-border-width, 1px);
-        border-style: var(--ar-alert-border-style, solid);
+        color: var(--ar-color-text);
+        padding: var(--ar-alert-padding);
+        border-radius: var(--ar-alert-border-radius);
+        border-width: var(--ar-alert-border-width);
+        border-style: var(--ar-alert-border-style);
     }
 
     :host([variant='info']) {
-        background-color: var(--ar-alert-info-bg, var(--ar-color-info-bg));
-        border-color: var(--ar-alert-info-border, var(--ar-color-info-bg));
+        background-color: var(--ar-alert-info-bg);
+        border-color: var(--ar-alert-info-border);
 
         [part='icon'] {
-            color: var(--ar-alert-info-icon, var(--ar-color-info-text));
+            color: var(--ar-alert-info-icon);
         }
     }
 
     :host([variant='error']) {
-        background-color: var(--ar-alert-error-bg, var(--ar-color-danger-bg));
-        border-color: var(--ar-alert-error-border, var(--ar-color-danger-bg));
+        background-color: var(--ar-alert-error-bg);
+        border-color: var(--ar-alert-error-border);
 
         [part='icon'] {
-            color: var(--ar-alert-error-icon, var(--ar-color-danger-text));
+            color: var(--ar-alert-error-icon);
         }
     }
 
     :host([variant='warning']) {
-        background-color: var(--ar-alert-warning-bg, var(--ar-color-warning-bg));
-        border-color: var(--ar-alert-warning-border, var(--ar-color-warning-bg));
+        background-color: var(--ar-alert-warning-bg);
+        border-color: var(--ar-alert-warning-border);
 
         [part='icon'] {
-            color: var(--ar-alert-warning-icon, var(--ar-color-warning-text));
+            color: var(--ar-alert-warning-icon);
         }
     }
 
     :host([variant='success']) {
-        background-color: var(--ar-alert-success-bg, var(--ar-color-success-bg));
-        border-color: var(--ar-alert-success-border, var(--ar-color-success-bg));
+        background-color: var(--ar-alert-success-bg);
+        border-color: var(--ar-alert-success-border);
 
         [part='icon'] {
-            color: var(--ar-alert-success-icon, var(--ar-color-success-text));
+            color: var(--ar-alert-success-icon);
         }
     }
 
@@ -74,15 +74,12 @@ export default css`
         display: flex;
         align-items: center;
         justify-content: center;
-        width: var(--ar-alert-close-size, 2rem);
-        height: var(--ar-alert-close-size, 2rem);
+        width: var(--ar-alert-close-size);
+        height: var(--ar-alert-close-size);
         padding: 0;
         border: none;
         border-radius: 7px;
-        background-color: var(
-            --ar-alert-close-bg,
-            color-mix(in srgb, currentColor 8%, transparent)
-        );
+        background-color: var(--ar-alert-close-bg);
         color: currentColor;
         cursor: pointer;
         opacity: 0.75;
@@ -95,10 +92,7 @@ export default css`
 
         &:hover {
             opacity: 1;
-            background-color: var(
-                --ar-alert-close-hover-bg,
-                color-mix(in srgb, currentColor 20%, transparent)
-            );
+            background-color: var(--ar-alert-close-hover-bg);
         }
 
         &:focus-visible {
