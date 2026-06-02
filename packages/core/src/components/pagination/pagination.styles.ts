@@ -18,20 +18,20 @@ export default css`
         padding: 0.5rem 0.75rem;
         margin-left: -1px;
         line-height: 1.25;
-        background-color: var(--ar-color-bg, #fff);
-        border: 1px solid var(--ar-color-border, #dee2e6);
+        background-color: var(--ar-color-bg);
+        border: 1px solid var(--ar-color-border);
     }
 
     .page-link,
     .page-link:hover {
-        color: var(--ar-color-interactive, #283276);
+        color: var(--ar-color-interactive);
         text-decoration: none;
     }
 
     .page-link:hover {
         z-index: 2;
-        background-color: var(--ar-color-bg-subtle, #e9ecef);
-        border-color: var(--ar-color-border, #dee2e6);
+        background-color: var(--ar-color-bg-subtle);
+        border-color: var(--ar-color-border);
     }
 
     .page-link:focus {
@@ -54,17 +54,17 @@ export default css`
 
     .page-item.active .page-link {
         z-index: 3;
-        color: var(--ar-color-text-inverse, #fff);
-        background-color: var(--ar-color-interactive, #283276);
-        border-color: var(--ar-color-interactive, #283276);
+        color: var(--ar-color-text-inverse);
+        background-color: var(--ar-color-interactive);
+        border-color: var(--ar-color-interactive);
     }
 
     .page-item.disabled .page-link {
-        color: var(--ar-color-text-muted, #6c757d);
+        color: var(--ar-color-text-muted);
         pointer-events: none;
         cursor: auto;
-        background-color: var(--ar-color-bg, #fff);
-        border-color: var(--ar-color-border, #dee2e6);
+        background-color: var(--ar-color-bg);
+        border-color: var(--ar-color-border);
     }
 
     .pagination-lg .page-link {
@@ -135,8 +135,8 @@ export default css`
 
     .pagination-item.active .btn-tertiary {
         z-index: 3;
-        color: var(--ar-color-text-inverse, #fff);
-        background-color: var(--ar-color-interactive, #283276);
+        color: var(--ar-color-text-inverse);
+        background-color: var(--ar-color-interactive);
         font-weight: 700;
     }
     .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']) {
@@ -176,9 +176,9 @@ export default css`
 
     .pagination-item.active .btn-tertiary {
         z-index: 3;
-        color: var(--ar-pagination-active-color, var(--ar-color-interactive, #283276));
-        background-color: var(--ar-color-bg, #fff);
-        border: 1px solid var(--ar-pagination-active-color, var(--ar-color-interactive, #283276));
+        color: var(--ar-pagination-active-color);
+        background-color: var(--ar-color-bg);
+        border: 1px solid var(--ar-pagination-active-color);
         font-weight: 700;
     }
 

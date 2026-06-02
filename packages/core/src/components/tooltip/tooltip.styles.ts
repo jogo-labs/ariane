@@ -14,18 +14,18 @@ const tooltipStyles = css`
 
         /* Box model */
         box-sizing: border-box;
-        padding: var(--ar-tooltip-padding, 0.375rem 0.625rem);
-        max-width: var(--ar-tooltip-max-width, 18rem);
+        padding: var(--ar-tooltip-padding);
+        max-width: var(--ar-tooltip-max-width);
 
         /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
         overflow: visible;
 
         /* Visual */
-        background-color: var(--ar-tooltip-bg, #1a1a1a);
-        color: var(--ar-tooltip-color, #fff);
+        background-color: var(--ar-tooltip-bg);
+        color: var(--ar-tooltip-color);
         border: none;
-        border-radius: var(--ar-tooltip-border-radius, 0.25rem);
-        font-size: var(--ar-tooltip-font-size, 0.8125rem);
+        border-radius: var(--ar-tooltip-border-radius);
+        font-size: var(--ar-tooltip-font-size);
         line-height: 1.4;
         word-break: break-word;
     }
@@ -46,9 +46,9 @@ const tooltipStyles = css`
 
     [part='arrow'] {
         position: absolute;
-        width: var(--ar-tooltip-arrow-size, 6px);
-        height: var(--ar-tooltip-arrow-size, 6px);
-        background-color: var(--ar-tooltip-bg, #1a1a1a);
+        width: var(--ar-tooltip-arrow-size);
+        height: var(--ar-tooltip-arrow-size);
+        background-color: var(--ar-tooltip-bg);
         transform: rotate(45deg);
         pointer-events: none;
     }

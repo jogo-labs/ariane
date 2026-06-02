@@ -74,11 +74,9 @@ export default [
             border: none;
             padding: 0;
             overflow: hidden;
-            background: var(--ar-color-bg, #fff);
-            color: var(--ar-color-text, #2e2e31);
-            box-shadow:
-                0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 20px 50px -8px rgba(0, 0, 0, 0.2);
+            background: var(--ar-color-bg);
+            color: var(--ar-color-text);
+            box-shadow: var(--ar-dialog-shadow);
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
@@ -206,7 +204,7 @@ export default [
 
             dialog.shake {
                 animation: none;
-                outline: 3px solid var(--ar-color-danger, #d04442);
+                outline: 3px solid var(--ar-color-danger-50);
                 outline-offset: 2px;
             }
         }

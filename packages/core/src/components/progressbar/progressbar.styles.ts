@@ -25,12 +25,12 @@ export default css`
         display: inline-flex;
         position: relative;
         height: 0.5rem;
-        background-color: var(--ar-progressbar-track-color, #e6e7ec);
+        background-color: var(--ar-progressbar-track-color);
         border-radius: 50rem;
     }
 
     .progress-bar {
-        background-color: var(--ar-progressbar-fill-color, #283276);
+        background-color: var(--ar-progressbar-fill-color);
         border-radius: 50rem;
     }
 
@@ -67,7 +67,7 @@ export default css`
     }
 
     .progress-label .progress-percent {
-        color: var(--ar-progressbar-percent-color, #5b5d65);
+        color: var(--ar-progressbar-percent-color);
         -ms-flex-negative: 0;
         flex-shrink: 0;
     }

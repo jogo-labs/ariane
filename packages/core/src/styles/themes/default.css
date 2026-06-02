@@ -291,6 +291,13 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* alert */
+        --ar-alert-padding: 1rem;
+        --ar-alert-border-radius: 0.75rem;
+        --ar-alert-border-width: 1px;
+        --ar-alert-border-style: solid;
+        --ar-alert-close-size: 2rem;
+        --ar-alert-close-bg: color-mix(in srgb, currentColor 8%, transparent);
+        --ar-alert-close-hover-bg: color-mix(in srgb, currentColor 20%, transparent);
         --ar-alert-info-bg: var(--ar-color-info-bg);
         --ar-alert-info-border: var(--ar-color-info-bg);
         --ar-alert-info-icon: var(--ar-color-info-text);
@@ -338,12 +345,25 @@
         /* breadcrumb */
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
+        --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
+        --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
 
         /* stepper */
+        --ar-stepper-label-color: var(--ar-color-text-muted);
+        --ar-stepper-bullet-radius: 0.75rem;
+        --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
-        --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
-        --ar-stepper-bullet-hover-color: var(--ar-color-text-muted);
+        --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
+        --ar-stepper-link-hover-color: var(--ar-color-text-muted);
+        --ar-stepper-active-label-color: var(--ar-color-interactive);
+        --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
+        --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
+        --ar-stepper-gap: 1.5rem;
+        --ar-stepper-substep-gap: 1rem;
+        --ar-stepper-connector-color: var(--ar-color-neutral-80);
+        --ar-stepper-panel-min-width: var(--ar-panel-min-width);
+        --ar-stepper-panel-max-width: var(--ar-panel-max-width);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -352,6 +372,41 @@
 
         /* pagination */
         --ar-pagination-active-color: var(--ar-color-interactive);
+
+        /* spinner */
+        --ar-spinner-stroke-color: currentColor;
+
+        /* tooltip */
+        --ar-tooltip-bg: var(--ar-color-neutral-20);
+        --ar-tooltip-color: var(--ar-color-white);
+        --ar-tooltip-border-radius: var(--ar-border-radius-sm);
+        --ar-tooltip-font-size: 0.8125rem;
+        --ar-tooltip-padding: 0.375rem 0.625rem;
+        --ar-tooltip-max-width: 18rem;
+        --ar-tooltip-arrow-size: 6px;
+
+        /* panel (shared — dropdown, breadcrumb, stepper) */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+
+        /* dropdown */
+        --ar-dropdown-bg: var(--ar-panel-bg);
+        --ar-dropdown-color: var(--ar-panel-text);
+        --ar-dropdown-border-color: var(--ar-panel-border-color);
+        --ar-dropdown-border-radius: var(--ar-panel-radius);
+        --ar-dropdown-shadow: var(--ar-panel-shadow);
+        --ar-dropdown-padding: var(--ar-panel-padding);
+        --ar-dropdown-min-width: 10rem;
+        --ar-dropdown-max-width: var(--ar-panel-max-width);
+
+        /* dialog */
+        --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
 
         /* table */
         --ar-table-padding-x: 1rem;
@@ -431,6 +486,10 @@
         --ar-alert-warning-border: var(--ar-color-warning-40);
         --ar-alert-error-border: var(--ar-color-danger-40);
         --ar-alert-success-border: var(--ar-color-success-40);
+
+        /* Tooltip — fond clair sur fond de page sombre */
+        --ar-tooltip-bg: var(--ar-color-neutral-80);
+        --ar-tooltip-color: var(--ar-color-neutral-10);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -476,6 +535,10 @@
             --ar-alert-warning-border: var(--ar-color-warning-40);
             --ar-alert-error-border: var(--ar-color-danger-40);
             --ar-alert-success-border: var(--ar-color-success-40);
+
+            /* Tooltip — fond clair sur fond de page sombre */
+            --ar-tooltip-bg: var(--ar-color-neutral-80);
+            --ar-tooltip-color: var(--ar-color-neutral-10);
         }
     }
 }
