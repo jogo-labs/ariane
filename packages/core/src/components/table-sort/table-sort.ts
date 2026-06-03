@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
+import utilitiesStyles from '../../styles/utilities.styles.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';
@@ -53,7 +54,7 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  */
 @customElement('ar-table-sort')
 export class ArTableSort extends LitElement {
-    static override styles = [styles];
+    static override styles = [utilitiesStyles, styles];
 
     /** Type de tri — influe sur les labels accessibles. */
     @property({ reflect: true }) type: TableSortType = 'alpha';
@@ -74,6 +75,10 @@ export class ArTableSort extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         this._syncParentTh();
+    }
+
+    override updated(changed: Map<string, unknown>): void {
+        if (changed.has('order')) this._syncParentTh();
     }
 
     /** Applique le pending order et avance le cycle. Sans effet si pending est false. */
