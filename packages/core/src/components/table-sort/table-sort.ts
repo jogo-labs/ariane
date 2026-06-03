@@ -146,6 +146,13 @@ export class ArTableSort extends LitElement {
         );
     }
 
+    private _handleKeydown(e: KeyboardEvent): void {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this._handleClick();
+        }
+    }
+
     override render() {
         const label = getActionLabel(this.type, this.order, this.pending);
         return html`
@@ -154,6 +161,7 @@ export class ArTableSort extends LitElement {
                 title=${label}
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
+                @keydown=${this._handleKeydown}
             >
                 <slot></slot>
                 <span class="sr-only">, ${label}</span>
