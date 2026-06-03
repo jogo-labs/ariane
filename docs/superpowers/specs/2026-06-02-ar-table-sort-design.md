@@ -1,24 +1,24 @@
-# Design : ar-th-sort
+# Design : ar-table-sort
 
 **Date :** 2026-06-02  
 **Statut :** Approuvé
 
 ## Résumé
 
-`ar-th-sort` est un composant placé à l'intérieur d'un `<th>` natif. Il enrichit les entêtes de tableau triables en restituant correctement l'intention de tri aux lecteurs d'écran et en fournissant des indicateurs visuels clairs. Il ne trie pas les données — il délègue au code consommateur.
+`ar-table-sort` est un composant placé à l'intérieur d'un `<th>` natif. Il enrichit les entêtes de tableau triables en restituant correctement l'intention de tri aux lecteurs d'écran et en fournissant des indicateurs visuels clairs. Il ne trie pas les données — il délègue au code consommateur.
 
 ## Usage
 
 ```html
 <th>
-    <ar-th-sort type="numeric">Prix</ar-th-sort>
+    <ar-table-sort type="numeric">Prix</ar-table-sort>
 </th>
 ```
 
 ```js
-const el = document.querySelector('ar-th-sort');
+const el = document.querySelector('ar-table-sort');
 
-el.addEventListener('ar-th-sort-change', async (e) => {
+el.addEventListener('ar-table-sort-change', async (e) => {
     const ok = await sortData(e.detail.requestedOrder);
     if (ok) el.confirm();
     else el.reject();
@@ -43,7 +43,7 @@ el.addEventListener('ar-th-sort-change', async (e) => {
 
 ### Événement
 
-**`ar-th-sort-change`** — Émis au clic ou entrée clavier. Non émis si `pending` est `true`.
+**`ar-table-sort-change`** — Émis au clic ou entrée clavier. Non émis si `pending` est `true`.
 
 ```ts
 detail: {
@@ -59,7 +59,7 @@ detail: {
 Cycle fixe : `none → asc → desc → none`
 
 ```
-[clic]                  → _pendingOrder = nextInCycle(order), pending = true, émet ar-th-sort-change
+[clic]                  → _pendingOrder = nextInCycle(order), pending = true, émet ar-table-sort-change
 [confirm()]             → order = _pendingOrder, pending = false, met à jour aria-sort
 [reject()]              → order inchangé, pending = false
 [clic pendant pending]  → ignoré
@@ -161,13 +161,13 @@ L'état neutre (↑↓) indique que la colonne est triable mais non triée. L'im
 
 ### CSS Tokens
 
-| Token                                  | Rôle                            |
-| -------------------------------------- | ------------------------------- |
-| `--ar-th-sort-gap`                     | Espacement label / indicateur   |
-| `--ar-th-sort-indicator-size`          | Taille de l'icône               |
-| `--ar-th-sort-indicator-color`         | Couleur état neutre             |
-| `--ar-th-sort-indicator-active-color`  | Couleur état actif (asc / desc) |
-| `--ar-th-sort-indicator-pending-color` | Couleur état pending            |
+| Token                                     | Rôle                            |
+| ----------------------------------------- | ------------------------------- |
+| `--ar-table-sort-gap`                     | Espacement label / indicateur   |
+| `--ar-table-sort-indicator-size`          | Taille de l'icône               |
+| `--ar-table-sort-indicator-color`         | Couleur état neutre             |
+| `--ar-table-sort-indicator-active-color`  | Couleur état actif (asc / desc) |
+| `--ar-table-sort-indicator-pending-color` | Couleur état pending            |
 
 ### CSS Parts
 
@@ -184,7 +184,7 @@ L'état neutre (↑↓) indique que la colonne est triable mais non triée. L'im
 
 ## Approche retenue vs alternatives
 
-**Approche A retenue** — `ar-th-sort` avec bouton interne + tooltip `title` natif. Autonome, zéro dépendance inter-composants.
+**Approche A retenue** — `ar-table-sort` avec bouton interne + tooltip `title` natif. Autonome, zéro dépendance inter-composants.
 
 **Approche B (évolution possible)** — Remplacer le `title` natif par `ar-tooltip` pour un tooltip stylisable. Ne casse pas l'API.
 
