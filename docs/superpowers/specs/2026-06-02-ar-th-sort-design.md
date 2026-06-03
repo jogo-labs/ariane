@@ -50,6 +50,7 @@ detail: {
     type: 'alpha' | 'numeric' | 'date';
     currentOrder: 'none' | 'asc' | 'desc';
     requestedOrder: 'asc' | 'desc' | 'none';
+    columnLabel: string; // textContent du slot — utile pour distinguer les colonnes dans un handler partagé
 }
 ```
 
@@ -66,7 +67,7 @@ Cycle fixe : `none → asc → desc → none`
 
 ## Effets de bord sur le `<th>` parent
 
-Au `connectedCallback` et à chaque `confirm()`, le composant met à jour le `<th>` parent direct :
+Au `connectedCallback` et à chaque `confirm()`, le composant met à jour le `<th>` ancêtre le plus proche via `this.closest('th')` — plus robuste que `parentElement` si un élément wrapper est intercalé.
 
 **`aria-sort`**
 
@@ -114,11 +115,15 @@ Le label affiché dans `title`, `sr-only` et `aria-live` est dérivé de `type` 
 
 **Annonce après confirm()** (aria-live) :
 
-| `order` après confirm | Message                  |
-| --------------------- | ------------------------ |
-| `asc`                 | Tri croissant appliqué   |
-| `desc`                | Tri décroissant appliqué |
-| `none`                | Tri supprimé             |
+Les régions `aria-live` sont lues en isolation — sans contexte DOM automatique. L'annonce inclut donc le nom de colonne lu depuis le slot :
+
+| `order` après confirm | Message (exemple colonne "Prix") |
+| --------------------- | -------------------------------- |
+| `asc`                 | Prix : tri croissant appliqué    |
+| `desc`                | Prix : tri décroissant appliqué  |
+| `none`                | Prix : tri supprimé              |
+
+Le nom de colonne est obtenu via `slot.assignedNodes({ flatten: true })` au moment de l'annonce.
 
 > **Note :** L'infrastructure de localisation (pour surcharger ces labels) est hors scope.
 > Voir issue GitHub à créer : "Infrastructure i18n — `setLocale()` + locales CDN".
