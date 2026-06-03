@@ -14,9 +14,21 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 }
 
 const ACTION_LABELS: Record<TableSortType, Record<'asc' | 'desc' | 'reset', string>> = {
-    alpha: { asc: 'Trier A → Z', desc: 'Trier Z → A', reset: 'Supprimer le tri' },
-    numeric: { asc: 'Trier croissant', desc: 'Trier décroissant', reset: 'Supprimer le tri' },
-    date: { asc: 'Trier du plus ancien', desc: 'Trier du plus récent', reset: 'Supprimer le tri' },
+    alpha: {
+        asc: 'Trier de A à Z',
+        desc: 'Trier de Z à A',
+        reset: 'Supprimer le tri alphabétique',
+    },
+    numeric: {
+        asc: 'Trier par ordre croissant',
+        desc: 'Trier par ordre décroissant',
+        reset: 'Supprimer le tri numérique',
+    },
+    date: {
+        asc: 'Trier du plus ancien au plus récent',
+        desc: 'Trier du plus récent au plus ancien',
+        reset: 'Supprimer le tri chronologique',
+    },
 };
 
 const APPLIED_LABELS: Record<TableSortOrder, string> = {
