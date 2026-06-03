@@ -154,6 +154,7 @@ export class ArTableSort extends LitElement {
         return html`
             <button
                 part="button"
+                type="button"
                 title=${label}
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
