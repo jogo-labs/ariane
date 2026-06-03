@@ -1,12 +1,175 @@
 ---
 tagName: ar-table-sort
-title: TableSort
-description: Description du composant ar-table-sort.
+title: Table Sort
+description: Entête de colonne triable accessible — indicateur visuel ↑↓, aria-sort automatique et annonce aria-live contextualisée.
+playgroundTemplate: alpha
 variants:
-    - name: Par défaut
-      description: Rendu par défaut du composant.
+    - name: alpha
+      label: Alphabétique
+      description: |
+          Tri alphabétique (A → Z / Z → A). Cliquer sur l'entête émet `ar-table-sort-change`.
+          Appeler `confirm()` pour valider le tri ou `reject()` pour annuler.
       html: |
-          <ar-table-sort></ar-table-sort>
+          <table style="border-collapse:collapse;font-family:inherit;">
+              <thead>
+                  <tr>
+                      <th style="padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="alpha" id="demo-alpha">Nom</ar-table-sort>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr><td style="padding:.5rem 1rem;">Alice</td></tr>
+                  <tr><td style="padding:.5rem 1rem;">Bob</td></tr>
+              </tbody>
+          </table>
+          <script type="module">
+              document.getElementById('demo-alpha').addEventListener('ar-table-sort-change', (e) => {
+                  setTimeout(() => e.target.confirm(), 300);
+              });
+          </script>
+    - name: numeric
+      label: Numérique
+      description: Tri numérique (croissant / décroissant).
+      html: |
+          <table style="border-collapse:collapse;font-family:inherit;">
+              <thead>
+                  <tr>
+                      <th style="padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="numeric" id="demo-numeric">Prix</ar-table-sort>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr><td style="padding:.5rem 1rem;">10 €</td></tr>
+                  <tr><td style="padding:.5rem 1rem;">42 €</td></tr>
+              </tbody>
+          </table>
+          <script type="module">
+              document.getElementById('demo-numeric').addEventListener('ar-table-sort-change', (e) => {
+                  setTimeout(() => e.target.confirm(), 300);
+              });
+          </script>
+    - name: date
+      label: Date
+      description: Tri chronologique (plus ancien / plus récent).
+      html: |
+          <table style="border-collapse:collapse;font-family:inherit;">
+              <thead>
+                  <tr>
+                      <th style="padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="date" id="demo-date">Date</ar-table-sort>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr><td style="padding:.5rem 1rem;">2024-01-15</td></tr>
+                  <tr><td style="padding:.5rem 1rem;">2024-06-03</td></tr>
+              </tbody>
+          </table>
+          <script type="module">
+              document.getElementById('demo-date').addEventListener('ar-table-sort-change', (e) => {
+                  setTimeout(() => e.target.confirm(), 300);
+              });
+          </script>
+    - name: multi
+      label: Multi-colonnes
+      description: |
+          Plusieurs colonnes triables — le consommateur gère la coordination.
+          Réinitialiser les autres colonnes (`order="none"`) avant de confirmer la colonne active.
+      html: |
+          <table style="border-collapse:collapse;font-family:inherit;" id="demo-multi">
+              <thead>
+                  <tr>
+                      <th style="padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="alpha">Nom</ar-table-sort>
+                      </th>
+                      <th style="padding:.5rem 1rem;text-align:right;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="numeric">Prix</ar-table-sort>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td style="padding:.5rem 1rem;">Alice</td>
+                      <td style="padding:.5rem 1rem;text-align:right;">42 €</td>
+                  </tr>
+              </tbody>
+          </table>
+          <script type="module">
+              const sorters = document.getElementById('demo-multi').querySelectorAll('ar-table-sort');
+              sorters.forEach((sorter) => {
+                  sorter.addEventListener('ar-table-sort-change', (e) => {
+                      sorters.forEach((s) => { if (s !== e.target) s.order = 'none'; });
+                      setTimeout(() => e.target.confirm(), 300);
+                  });
+              });
+          </script>
+    - name: reject
+      label: Tri en échec
+      description: |
+          Si le tri échoue, appeler `reject()` — le composant revient à son état précédent
+          sans avancer dans le cycle.
+      html: |
+          <table style="border-collapse:collapse;font-family:inherit;">
+              <thead>
+                  <tr>
+                      <th style="padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--ar-color-border,#e5e7eb);">
+                          <ar-table-sort type="alpha" id="demo-reject">Nom (échec simulé)</ar-table-sort>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr><td style="padding:.5rem 1rem;">Alice</td></tr>
+              </tbody>
+          </table>
+          <script type="module">
+              document.getElementById('demo-reject').addEventListener('ar-table-sort-change', (e) => {
+                  setTimeout(() => e.target.reject(), 500);
+              });
+          </script>
 ---
 
-Documentation narrative du composant `ar-table-sort`.
+import WcagRef from '../../components/WcagRef.astro';
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+- `aria-sort` est posé et mis à jour sur le `<th>` ancêtre à chaque changement confirmé (`none` → `"none"`, `asc` → `"ascending"`, `desc` → `"descending"`).
+- `scope="col"` est posé sur le `<th>` ancêtre s'il est absent — ne remplace jamais un `scope` existant.
+- Le bouton reçoit `aria-disabled="true"` (pas `disabled`) pendant `pending` — focusable mais bloqué.
+- Une région `aria-live="polite"` annonce le résultat après `confirm()` en incluant le nom de colonne : _"Prix : tri croissant appliqué"_, _"Nom : tri supprimé"_.
+- <WcagRef
+      criterion="1.3.1"
+      summary="Info and Relationships : aria-sort et scope encodent la sémantique du tri programmatiquement."
+  />
+- <WcagRef
+      criterion="1.3.3"
+      summary="Sensory Characteristics : la direction de tri n'est pas communiquée uniquement par la flèche visuelle."
+  />
+- <WcagRef
+      criterion="2.1.1"
+      summary="Keyboard : le bouton interne est activable au clavier (Entrée / Espace)."
+  />
+- <WcagRef
+      criterion="2.4.6"
+      summary="Headings and Labels : le nom accessible du bouton décrit l'action suivante."
+  />
+- <WcagRef criterion="2.4.7" summary="Focus Visible : :focus-visible visible sur le bouton." />
+- <WcagRef
+      criterion="4.1.2"
+      summary="Name, Role, Value : nom (slot + sr-only), rôle (button), état (aria-sort, aria-disabled)."
+  />
+- <WcagRef
+      criterion="4.1.3"
+      summary="Status Messages : la région aria-live annonce le résultat du tri sans déplacer le focus."
+  />
+
+### Multi-colonnes
+
+`ar-table-sort` ne coordonne pas les colonnes entre elles. Quand une nouvelle colonne est triée, réinitialiser les autres en posant `order="none"` avant d'appeler `confirm()`. Voir la variante **Multi-colonnes** ci-dessus.
+
+### Localisation
+
+Les labels sont en français par défaut. Une infrastructure de localisation (`setLocale()`) est prévue — voir l'issue GitHub correspondante.
