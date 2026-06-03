@@ -1,7 +1,8 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';
@@ -70,8 +71,6 @@ export class ArTableSort extends LitElement {
 
     private _pendingOrder: TableSortOrder | null = null;
 
-    @query('.live') private _liveEl?: HTMLElement;
-
     override connectedCallback(): void {
         super.connectedCallback();
         this._syncParentTh();
@@ -88,8 +87,7 @@ export class ArTableSort extends LitElement {
         this._pendingOrder = null;
         this.pending = false;
         this.order = newOrder;
-        this._syncParentTh();
-        this._announce(`${this._getColumnLabel()} : ${APPLIED_LABELS[newOrder]}`);
+        announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS[newOrder]}`);
     }
 
     /** Annule le pending order. Sans effet si pending est false. */
@@ -119,14 +117,6 @@ export class ArTableSort extends LitElement {
             .trim();
     }
 
-    private _announce(message: string): void {
-        if (!this._liveEl) return;
-        this._liveEl.textContent = message;
-        setTimeout(() => {
-            if (this._liveEl) this._liveEl.textContent = '';
-        }, 150);
-    }
-
     private _handleClick(): void {
         if (this.pending) return;
         const requestedOrder = nextOrder(this.order);
@@ -146,13 +136,6 @@ export class ArTableSort extends LitElement {
         );
     }
 
-    private _handleKeydown(e: KeyboardEvent): void {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            this._handleClick();
-        }
-    }
-
     override render() {
         const label = getActionLabel(this.type, this.order, this.pending);
         return html`
@@ -161,13 +144,11 @@ export class ArTableSort extends LitElement {
                 title=${label}
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
-                @keydown=${this._handleKeydown}
             >
                 <slot></slot>
                 <span class="sr-only">, ${label}</span>
                 <span part="indicator" aria-hidden="true"></span>
             </button>
-            <span class="sr-only live" aria-live="polite" aria-atomic="true"></span>
         `;
     }
 }

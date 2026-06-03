@@ -1,5 +1,5 @@
 /// <reference types="mocha" />
-import { fixture, html, expect, aTimeout } from '@open-wc/testing';
+import { fixture, html, expect } from '@open-wc/testing';
 import type { ArTableSort } from './table-sort.js';
 import './table-sort.js';
 
@@ -87,20 +87,10 @@ describe('ar-table-sort — browser', () => {
             await el.updateComplete;
             el.confirm();
             await el.updateComplete;
+            await new Promise(requestAnimationFrame);
 
-            const live = el.shadowRoot!.querySelector('.live')!;
+            const live = document.querySelector('[data-ar-live-region="polite"]')!;
             expect(live.textContent).to.equal('Prix : tri croissant appliqué');
-        });
-
-        it('vide la région live après 150ms', async () => {
-            const el = await fixture<ArTableSort>(html`<ar-table-sort>Prix</ar-table-sort>`);
-            btn(el).click();
-            await el.updateComplete;
-            el.confirm();
-            await el.updateComplete;
-            await aTimeout(200);
-
-            expect(el.shadowRoot!.querySelector('.live')!.textContent).to.equal('');
         });
     });
 
@@ -117,22 +107,6 @@ describe('ar-table-sort — browser', () => {
 
             expect(el.order).to.equal('none');
             expect(el.pending).to.equal(false);
-        });
-    });
-
-    // ── Clavier ───────────────────────────────────────────────────────────
-
-    describe('clavier', () => {
-        it('Enter déclenche ar-table-sort-change', async () => {
-            const el = await fixture<ArTableSort>(html`<ar-table-sort></ar-table-sort>`);
-            const events: CustomEvent[] = [];
-            el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
-
-            btn(el).focus();
-            btn(el).dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-            await el.updateComplete;
-
-            expect(el.pending).to.equal(true);
         });
     });
 

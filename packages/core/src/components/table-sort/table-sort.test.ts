@@ -50,12 +50,6 @@ describe('ArTableSort', () => {
         it('contient part="indicator"', () => {
             expect(el.shadowRoot!.querySelector('[part="indicator"]')).not.toBeNull();
         });
-
-        it('contient une région aria-live="polite"', () => {
-            const live = el.shadowRoot!.querySelector('[aria-live="polite"]');
-            expect(live).not.toBeNull();
-            expect(live!.getAttribute('aria-atomic')).toBe('true');
-        });
     });
 
     // ── Labels alpha ──────────────────────────────────────────────────────

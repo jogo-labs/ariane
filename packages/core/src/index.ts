@@ -27,3 +27,4 @@ export { ArTabGroup } from './components/tab-group/tab-group.js';
 export { ArTab } from './components/tab/tab.js';
 export { ArTabPanel } from './components/tab-panel/tab-panel.js';
 export { ArTableSort } from './components/table-sort/table-sort.js';
+export type { TableSortType, TableSortOrder } from './components/table-sort/table-sort.js';

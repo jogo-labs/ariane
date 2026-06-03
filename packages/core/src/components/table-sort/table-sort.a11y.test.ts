@@ -105,12 +105,5 @@ describe('ar-table-sort — accessibilité', () => {
                 el.shadowRoot!.querySelector('[part="button"]')!.getAttribute('aria-disabled'),
             ).to.equal('true');
         });
-
-        it('région aria-live présente et vide au repos', async () => {
-            const el = await fixture<ArTableSort>(html`<ar-table-sort>Nom</ar-table-sort>`);
-            const live = el.shadowRoot!.querySelector('[aria-live="polite"]');
-            expect(live).to.not.equal(null);
-            expect(live!.textContent).to.equal('');
-        });
     });
 });
