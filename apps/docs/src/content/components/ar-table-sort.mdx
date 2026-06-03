@@ -140,35 +140,20 @@ import WcagRef from '../../components/WcagRef.astro';
 - `scope="col"` est posé sur le `<th>` ancêtre s'il est absent — ne remplace jamais un `scope` existant.
 - Le bouton reçoit `aria-disabled="true"` (pas `disabled`) pendant `pending` — focusable mais bloqué.
 - Une région `aria-live="polite"` annonce le résultat après `confirm()` en incluant le nom de colonne : _"Prix : tri croissant appliqué"_, _"Nom : tri supprimé"_.
-- <WcagRef
-      criterion="1.3.1"
-      summary="Info and Relationships : aria-sort et scope encodent la sémantique du tri programmatiquement."
-  />
-- <WcagRef
-      criterion="1.3.3"
-      summary="Sensory Characteristics : la direction de tri n'est pas communiquée uniquement par la flèche visuelle."
-  />
-- <WcagRef
-      criterion="2.1.1"
-      summary="Keyboard : le bouton interne est activable au clavier (Entrée / Espace)."
-  />
-- <WcagRef
-      criterion="2.4.6"
-      summary="Headings and Labels : le nom accessible du bouton décrit l'action suivante."
-  />
-- <WcagRef criterion="2.4.7" summary="Focus Visible : :focus-visible visible sur le bouton." />
-- <WcagRef
-      criterion="4.1.2"
-      summary="Name, Role, Value : nom (slot + sr-only), rôle (button), état (aria-sort, aria-disabled)."
-  />
-- <WcagRef
-      criterion="4.1.3"
-      summary="Status Messages : la région aria-live annonce le résultat du tri sans déplacer le focus."
-  />
+
+Les critères WCAG suivants sont implémentés :
+
+- aria-sort et scope encodent la sémantique du tri programmatiquement (<WcagRef criterion="1.3.1" summary="Info and Relationships : aria-sort et scope encodent la sémantique du tri programmatiquement."/>).
+- la direction de tri n'est pas communiquée uniquement par la flèche visuelle (<WcagRef criterion="1.3.3" summary="Sensory Characteristics : la direction de tri n'est pas communiquée uniquement par la flèche visuelle." />)
+- le bouton interne est activable au clavier (Entrée / Espace) (<WcagRef criterion="2.1.1" summary="Keyboard : le bouton interne est activable au clavier (Entrée / Espace)." />)
+- le nom accessible du bouton décrit l'action suivante (<WcagRef criterion="2.4.6" summary="Headings and Labels : le nom accessible du bouton décrit l'action suivante." />)
+- :focus-visible visible sur le bouton (<WcagRef criterion="2.4.7" summary="Focus Visible : :focus-visible visible sur le bouton." />)
+- nom (slot + sr-only), rôle (button), état (aria-sort, aria-disabled) (<WcagRef criterion="4.1.2" summary="Name, Role, Value : nom (slot + sr-only), rôle (button), état (aria-sort, )aria-disabled)." />)
+- la région aria-live annonce le résultat du tri sans déplacer le focus (<WcagRef criterion="4.1.3" summary="Status Messages : la région aria-live annonce le résultat du tri sans déplacer le focus." />)
 
 ### Multi-colonnes
 
-`ar-table-sort` ne coordonne pas les colonnes entre elles. Quand une nouvelle colonne est triée, réinitialiser les autres en posant `order="none"` avant d'appeler `confirm()`. Voir la variante **Multi-colonnes** ci-dessus.
+`ar-table-sort` ne coordonne pas les colonnes entre elles. Quand une nouvelle colonne est triée, si on ne souhaite pas cumuler les tri, il faut réinitialiser le composant des autres colonnes en mettant leur attribut`ordrer` à `none"` avant d'appeler `confirm()`. Voir la variante **Multi-colonnes** ci-dessous.
 
 ### Localisation
 
