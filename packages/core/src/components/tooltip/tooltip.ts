@@ -32,13 +32,13 @@ export type ArTooltipPlacement =
  * @csspart bubble - Le panel flottant.
  * @csspart arrow  - Le caret directionnel.
  *
- * @cssprop [--ar-tooltip-bg=#1a1a1a]                  - Fond de la bulle.
- * @cssprop [--ar-tooltip-color=#fff]                  - Couleur du texte.
- * @cssprop [--ar-tooltip-border-radius=0.25rem]        - Arrondi.
- * @cssprop [--ar-tooltip-padding=0.375rem 0.625rem]    - Marge interne.
- * @cssprop [--ar-tooltip-font-size=0.8125rem]          - Taille de police.
- * @cssprop [--ar-tooltip-max-width=18rem]              - Largeur maximale.
- * @cssprop [--ar-tooltip-arrow-size=6px]               - Taille du caret.
+ * @cssprop --ar-tooltip-bg                  - Fond de la bulle.
+ * @cssprop --ar-tooltip-color]                  - Couleur du texte.
+ * @cssprop --ar-tooltip-border-radius        - Arrondi.
+ * @cssprop --ar-tooltip-padding    - Marge interne.
+ * @cssprop --ar-tooltip-font-size          - Taille de police.
+ * @cssprop --ar-tooltip-max-width              - Largeur maximale.
+ * @cssprop --ar-tooltip-arrow-size               - Taille du caret.
  */
 @customElement('ar-tooltip')
 export class ArTooltip extends LitElement {
