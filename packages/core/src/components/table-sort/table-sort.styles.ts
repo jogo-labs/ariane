@@ -35,7 +35,7 @@ export default css`
         display: inline-flex;
         flex-direction: column;
         align-items: center;
-        gap: 1px;
+        gap: var(--ar-table-sort-indicator-gap);
         width: var(--ar-table-sort-indicator-size);
         flex-shrink: 0;
     }

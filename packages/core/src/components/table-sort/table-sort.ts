@@ -46,7 +46,8 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  * @csspart indicator - L'icône de direction de tri.
  *
  * @cssprop --ar-table-sort-gap                     - Espacement label / indicateur.
- * @cssprop --ar-table-sort-indicator-size          - Taille de l'icône.
+ * @cssprop --ar-table-sort-indicator-gap           - Espacement entre les icônes indicateurs asc / desc.
+ * @cssprop --ar-table-sort-indicator-size          - Taille de l'icône indicateur asc / desc.
  * @cssprop --ar-table-sort-indicator-color         - Couleur état neutre.
  * @cssprop --ar-table-sort-indicator-active-color  - Couleur état actif (asc/desc).
  * @cssprop --ar-table-sort-indicator-pending-color - Couleur état pending.
