@@ -151,11 +151,8 @@ export class ArPagination extends LitElement {
         </nav>`;
     }
 
-    /**
-     * Génère le `<li>` d'une page.
-     * Rendu public pour permettre la surcharge dans les sous-classes.
-     */
-    renderPage(
+    /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
+    protected renderPage(
         page: number,
         active: boolean,
         variant: ArPaginationVariant = 'light',
@@ -166,7 +163,7 @@ export class ArPagination extends LitElement {
     }
 
     /** Génère le lien ou le span (si page active) d'une page */
-    renderPageLink(
+    protected renderPageLink(
         page: number,
         active: boolean,
         variant: ArPaginationVariant = 'light',
@@ -192,7 +189,7 @@ export class ArPagination extends LitElement {
     }
 
     /** Génère le label d'une page avec texte sr-only pour les lecteurs d'écran */
-    renderPageLabel(page: number): TemplateResult {
+    protected renderPageLabel(page: number): TemplateResult {
         return html`<span class="sr-only">Page&nbsp;</span>${page}`;
     }
 
