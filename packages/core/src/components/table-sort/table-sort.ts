@@ -105,6 +105,13 @@ export class ArTableSort extends LitElement {
         announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS[newOrder]}`);
     }
 
+    /** Remet le tri à "none" et annonce le reset aux lecteurs d'écran. Sans effet si déjà "none". */
+    reset(): void {
+        if (this.order === 'none') return;
+        this.order = 'none';
+        announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS.none}`);
+    }
+
     /**
      * Annule le pending order. Sans effet si pending est false.
      * @param reason Message annoncé aux lecteurs d'écran. Par défaut : "échec du tri".

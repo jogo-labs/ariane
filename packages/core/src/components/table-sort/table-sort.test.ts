@@ -254,6 +254,24 @@ describe('ArTableSort', () => {
         });
     });
 
+    // ── reset() ───────────────────────────────────────────────────────────
+
+    describe('reset()', () => {
+        it('remet order à "none"', async () => {
+            el = await fixture('<ar-table-sort order="asc"></ar-table-sort>');
+            el.reset();
+            await waitForUpdate(el);
+            expect(el.order).toBe('none');
+        });
+
+        it('sans effet si order est déjà "none"', async () => {
+            el = await fixture('<ar-table-sort order="none"></ar-table-sort>');
+            el.reset();
+            await waitForUpdate(el);
+            expect(el.order).toBe('none');
+        });
+    });
+
     // ── Effets de bord sur <th> ───────────────────────────────────────────
 
     describe('effets de bord sur le <th> parent', () => {
