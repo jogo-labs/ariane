@@ -353,7 +353,7 @@ describe('ArDialog', () => {
             el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
             el.open = false;
             await waitForUpdate(el);
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
                 'Fermeture bloquée.',

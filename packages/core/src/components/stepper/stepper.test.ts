@@ -539,7 +539,7 @@ describe('ArStepper', () => {
             const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
             if (!link) throw new Error('Lien vers /a introuvable');
             link.click();
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe('Étape A');
         });
@@ -564,7 +564,7 @@ describe('ArStepper', () => {
             const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
             if (!link) throw new Error('Lien vers /a/2 introuvable');
             link.click();
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
                 'Sous-étape 2',

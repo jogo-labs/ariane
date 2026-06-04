@@ -291,7 +291,7 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             (requirePart(el, 'prev') as HTMLElement).click();
             await waitForUpdate(el);
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
                 'Page 2 sur 5',
@@ -302,7 +302,7 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             (requirePart(el, 'next') as HTMLElement).click();
             await waitForUpdate(el);
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
                 'Page 3 sur 5',
@@ -315,7 +315,7 @@ describe('ArPagination', () => {
             const pageLink = shadow.querySelector('[data-ar-pagination-page="4"]') as HTMLElement;
             pageLink.click();
             await waitForUpdate(el);
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
                 'Page 4 sur 5',
