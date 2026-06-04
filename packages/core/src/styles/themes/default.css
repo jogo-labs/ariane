@@ -411,6 +411,14 @@
         /* table */
         --ar-table-padding-x: 1rem;
 
+        /* table-sort */
+        --ar-table-sort-gap: 0.375rem;
+        --ar-table-sort-indicator-gap: 3px;
+        --ar-table-sort-indicator-size: 0.65rem;
+        --ar-table-sort-indicator-color: var(--ar-color-text-muted, #9ca3af);
+        --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
+        --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted, #9ca3af);
+
         /* tab */
         --ar-tab-color: var(--ar-color-text-muted);
         --ar-tab-bg: transparent;
