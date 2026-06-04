@@ -83,6 +83,7 @@ export class ArTableSort extends LitElement {
     @property({ reflect: true, type: Boolean }) pending = false;
 
     private _pendingOrder: TableSortOrder | null = null;
+    private readonly _buttonId = `ar-ts-btn-${crypto.randomUUID().slice(0, 8)}`;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -155,14 +156,14 @@ export class ArTableSort extends LitElement {
             <button
                 part="button"
                 type="button"
-                title=${label}
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
+                id=${this._buttonId}
             >
                 <slot></slot>
-                <span class="sr-only">, ${label}</span>
                 <span part="indicator" aria-hidden="true"></span>
             </button>
+            <ar-tooltip for=${this._buttonId}>${label}</ar-tooltip>
         `;
     }
 }

@@ -24,6 +24,10 @@ function swatchColor(value: string | undefined): string | undefined {
     if (!value) return undefined;
     return resolveColor(value, tokenMap);
 }
+
+const publicMethods = (component.members ?? []).filter(
+    (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
+);
 ---
 
 <div class="component-api">
@@ -85,7 +89,7 @@ function swatchColor(value: string | undefined): string | undefined {
     )}
 
     {/* ── Méthodes ── */}
-    {component.members && component.members.some((m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected') && (
+    {publicMethods.length > 0 && (
         <section>
             <h4 id="api-methodes" class="subsection-title">Méthodes</h4>
             <div class="table-wrap">
@@ -99,8 +103,7 @@ function swatchColor(value: string | undefined): string | undefined {
                         </tr>
                     </thead>
                     <tbody>
-                        {component.members
-                            .filter((m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected')
+                        {publicMethods
                             .map((m) => {
                                 const params = (m.parameters ?? [])
                                     .map((p) => {

@@ -54,7 +54,7 @@ const playgroundHtml = rawPlaygroundHtml
     .replace(/\bid="([\w-]+)"/g, 'id="pg-$1"')
     .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"')
     .replace(/\bfor="([\w-]+)"/g, 'for="pg-$1"')
-    .replace(/\bgetElementById\('([\w-]+)'\)/g, "getElementById('pg-$1')");
+    .replace(/\bgetElementById\((['"])([\w-]+)\1\)/g, "getElementById('pg-$2')");
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────
 
