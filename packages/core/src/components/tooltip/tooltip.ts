@@ -172,9 +172,10 @@ export class ArTooltip extends LitElement {
     private _scheduleShow(): void {
         if (this.disabled) return;
         clearTimeout(this._hideTimer);
+        // Listener attaché avant le délai : Escape pendant showDelay doit aussi annuler l'affichage.
+        document.addEventListener('keydown', this._handleKeyDown);
         this._showTimer = window.setTimeout(() => {
             void this._tooltip.show();
-            document.addEventListener('keydown', this._handleKeyDown);
         }, this.showDelay);
     }
 
