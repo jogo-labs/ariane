@@ -54,82 +54,70 @@ describe('ArTableSort', () => {
 
     // ── Labels alpha ──────────────────────────────────────────────────────
 
+    function tooltipLabel(el: ArTableSort): string {
+        return el.shadowRoot!.querySelector('ar-tooltip')!.textContent!.trim();
+    }
+
     describe('labels — alpha', () => {
-        it('title = "Trier A → Z" quand order=none', async () => {
+        it('tooltip = "Trier de A à Z" quand order=none', async () => {
             el = await fixture('<ar-table-sort type="alpha" order="none"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier A → Z');
+            expect(tooltipLabel(el)).toBe('Trier de A à Z');
         });
 
-        it('title = "Trier Z → A" quand order=asc', async () => {
+        it('tooltip = "Trier de Z à A" quand order=asc', async () => {
             el = await fixture('<ar-table-sort type="alpha" order="asc"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier Z → A');
+            expect(tooltipLabel(el)).toBe('Trier de Z à A');
         });
 
-        it('title = "Supprimer le tri" quand order=desc', async () => {
+        it('tooltip = "Supprimer le tri alphabétique" quand order=desc', async () => {
             el = await fixture('<ar-table-sort type="alpha" order="desc"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Supprimer le tri');
+            expect(tooltipLabel(el)).toBe('Supprimer le tri alphabétique');
         });
     });
 
     // ── Labels numeric ────────────────────────────────────────────────────
 
     describe('labels — numeric', () => {
-        it('title = "Trier croissant" quand order=none', async () => {
+        it('tooltip = "Trier par ordre croissant" quand order=none', async () => {
             el = await fixture('<ar-table-sort type="numeric" order="none"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier croissant');
+            expect(tooltipLabel(el)).toBe('Trier par ordre croissant');
         });
 
-        it('title = "Trier décroissant" quand order=asc', async () => {
+        it('tooltip = "Trier par ordre décroissant" quand order=asc', async () => {
             el = await fixture('<ar-table-sort type="numeric" order="asc"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier décroissant');
+            expect(tooltipLabel(el)).toBe('Trier par ordre décroissant');
         });
     });
 
     // ── Labels date ───────────────────────────────────────────────────────
 
     describe('labels — date', () => {
-        it('title = "Trier du plus ancien" quand order=none', async () => {
+        it('tooltip = "Trier du plus ancien au plus récent" quand order=none', async () => {
             el = await fixture('<ar-table-sort type="date" order="none"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier du plus ancien');
+            expect(tooltipLabel(el)).toBe('Trier du plus ancien au plus récent');
         });
 
-        it('title = "Trier du plus récent" quand order=asc', async () => {
+        it('tooltip = "Trier du plus récent au plus ancien" quand order=asc', async () => {
             el = await fixture('<ar-table-sort type="date" order="asc"></ar-table-sort>');
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Trier du plus récent');
+            expect(tooltipLabel(el)).toBe('Trier du plus récent au plus ancien');
         });
     });
 
     // ── Label pendant pending ─────────────────────────────────────────────
 
     describe('label pendant pending', () => {
-        it('title = "Tri en cours…" pendant pending', async () => {
+        it('tooltip = "Tri en cours…" pendant pending', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
             el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.click();
             await waitForUpdate(el);
-            expect(
-                el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.getAttribute('title'),
-            ).toBe('Tri en cours…');
+            expect(tooltipLabel(el)).toBe('Tri en cours…');
         });
     });
 
