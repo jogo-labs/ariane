@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
+import { warn } from '../../utils/warn.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';
@@ -104,16 +105,26 @@ export class ArTableSort extends LitElement {
         announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS[newOrder]}`);
     }
 
-    /** Annule le pending order. Sans effet si pending est false. */
-    reject(): void {
+    /**
+     * Annule le pending order. Sans effet si pending est false.
+     * @param reason Message annoncé aux lecteurs d'écran. Par défaut : "échec du tri".
+     */
+    reject(reason?: string): void {
         if (!this._pendingOrder) return;
         this._pendingOrder = null;
         this.pending = false;
+        announceA11y(reason ?? `${this._getColumnLabel()} : échec du tri.`);
     }
 
     private _syncParentTh(): void {
         const th = this.closest('th');
-        if (!th) return;
+        if (!th) {
+            warn(
+                'ar-table-sort',
+                'ar-table-sort doit être placé dans un <th> — aria-sort ne sera pas posé.',
+            );
+            return;
+        }
         const ariaSort = ({ none: 'none', asc: 'ascending', desc: 'descending' } as const)[
             this.order
         ];
@@ -132,7 +143,10 @@ export class ArTableSort extends LitElement {
     }
 
     private _handleClick(): void {
-        if (this.pending) return;
+        if (this.pending) {
+            announceA11y('Tri en cours, veuillez patienter.');
+            return;
+        }
         const requestedOrder = nextOrder(this.order);
         this._pendingOrder = requestedOrder;
         this.pending = true;
