@@ -143,7 +143,9 @@ export class ArTooltip extends LitElement {
 
     private _attachTrigger(): void {
         if (!this.for) return;
-        const trigger = document.getElementById(this.for);
+        const root = this.getRootNode();
+
+        const trigger = (root as typeof document).getElementById(this.for);
         if (!trigger) {
             warn('ar-tooltip', `Aucun élément trouvé avec l'id "${this.for}".`);
             return;
