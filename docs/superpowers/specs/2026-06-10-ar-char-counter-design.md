@@ -20,7 +20,7 @@ Le composant suit le pattern `ar-tooltip` — il est indépendant du champ et s'
 
 ### Format d'affichage : décompte inversé
 
-Affiche `"{remaining} restants"` (ex : "158 restants"). Sans attribut `max`, affiche uniquement le count courant ("42") sans label.
+Affiche `"{remaining} restants"` (ex : "158 restants"). L'attribut `max` est requis — sans lui, le composant émet un `warn()` en dev et ne rend rien.
 
 ### États : 3 niveaux
 
@@ -46,7 +46,7 @@ Le seuil warning est calculé : `Math.floor(max * warnThreshold / 100)` caractè
 | Attribut         | Type     | Défaut       | Requis | Description                                                    |
 | ---------------- | -------- | ------------ | ------ | -------------------------------------------------------------- |
 | `for`            | `string` | —            | ✅     | ID du champ observé                                            |
-| `max`            | `number` | —            | ❌     | Limite de caractères                                           |
+| `max`            | `number` | —            | ✅     | Limite de caractères. Warn dev + rendu vide si absent.         |
 | `warn-threshold` | `number` | `20`         | ❌     | % restant déclenchant le warning                               |
 | `label`          | `string` | `"restants"` | ❌     | Texte affiché après le chiffre                                 |
 | `state`          | `string` | `"normal"`   | —      | **Readonly, réfléchi.** `"normal"` \| `"warning"` \| `"error"` |
@@ -69,7 +69,6 @@ Le seuil warning est calculé : `Math.floor(max * warnThreshold / 100)` caractè
     <span part="count">
         <span part="remaining">158</span>
         <span part="label"> restants</span>
-        <!-- absent si pas de max -->
     </span>
 </span>
 ```
@@ -164,16 +163,9 @@ Le composant fournit deux mécanismes pour éviter que la couleur soit le seul s
 
 La page de doc montre un exemple WCAG-compliant (couleur + icône + annonce SR).
 
----
+## Validation en dev
 
-## Comportement sans `max`
-
-Sans attribut `max` :
-
-- Affiche uniquement le count courant (`"42"`)
-- `part="label"` absent du shadow DOM
-- Pas d'état warning/error
-- `data-ar-char-state` jamais posé
+Si `max` est absent au `connectedCallback`, le composant appelle `warn('ar-char-counter', "l'attribut max est requis")` et ne rend rien. Pattern identique à `ar-progressbar` pour les attributs requis.
 
 ---
 
