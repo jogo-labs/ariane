@@ -87,7 +87,7 @@ describe('ar-table-sort — browser', () => {
             await el.updateComplete;
             el.confirm();
             await el.updateComplete;
-            await new Promise(requestAnimationFrame);
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             const live = document.querySelector('[data-ar-live-region="polite"]')!;
             expect(live.textContent).to.equal('Prix : tri croissant appliqué');
