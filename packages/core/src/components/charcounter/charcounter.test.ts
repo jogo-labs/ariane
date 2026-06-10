@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fixture, getPart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArCharcounter } from './charcounter.js';
 import './charcounter.js';
 
@@ -91,6 +91,46 @@ describe('ArCharcounter', () => {
             el = await fixture('<ar-charcounter for="inexistant" max="100"></ar-charcounter>');
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('inexistant'));
             spy.mockRestore();
+        });
+    });
+
+    // ── Observation du champ ──────────────────────────────────────────────
+
+    describe('observation du champ', () => {
+        it('lit la valeur initiale du champ', async () => {
+            document.body.innerHTML = '<textarea id="f">bonjour</textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('193');
+        });
+
+        it('met à jour le décompte à chaque event input', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'hello';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('195');
+        });
+
+        it('retire le listener input au changement de for', async () => {
+            document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b"></textarea>';
+            el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
+            el.for = 'b';
+            await waitForUpdate(el);
+            const fieldA = document.getElementById('a') as HTMLTextAreaElement;
+            fieldA.value = 'xxx';
+            fieldA.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('100');
+        });
+
+        it('observe le nouveau champ après changement de for', async () => {
+            document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b">abc</textarea>';
+            el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
+            el.for = 'b';
+            await waitForUpdate(el);
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('97');
         });
     });
 });
