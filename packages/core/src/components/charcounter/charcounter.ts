@@ -68,6 +68,9 @@ export class ArCharcounter extends LitElement {
             this._detachField();
             this._attachField();
         }
+        if (changed.has('max' as keyof this) || changed.has('warnThreshold' as keyof this)) {
+            this._computeState();
+        }
         this.setAttribute('state', this._state);
     }
 
@@ -79,7 +82,7 @@ export class ArCharcounter extends LitElement {
     private _attachField(): void {
         if (!this.for) return;
         const root = this.getRootNode();
-        const field = (root as Document).getElementById(this.for) as
+        const field = (root as Document | ShadowRoot).getElementById(this.for) as
             | HTMLInputElement
             | HTMLTextAreaElement
             | null;
