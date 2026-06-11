@@ -32,22 +32,25 @@ Contenu du trigger : SVG de l'icône du mode actif + chevron `▾`. Le SVG est s
 
 `<ar-dropdown>` avec `placement="bottom-end"` positionné immédiatement après le trigger dans le DOM.
 
-Trois `<ar-dropdown-item>` :
+Trois `<ar-dropdown-item>` avec un séparateur avant "Automatique" :
 
 ```html
 <ar-dropdown-item data-theme-mode="light">
     <!-- SVG soleil -->
     Clair
 </ar-dropdown-item>
-<ar-dropdown-item data-theme-mode="system">
-    <!-- SVG moniteur -->
-    Automatique
-</ar-dropdown-item>
 <ar-dropdown-item data-theme-mode="dark">
     <!-- SVG lune -->
     Sombre
 </ar-dropdown-item>
+<hr />
+<ar-dropdown-item data-theme-mode="system">
+    <!-- SVG moniteur -->
+    Automatique
+</ar-dropdown-item>
 ```
+
+Le `<hr>` agit comme séparateur visuel — "Automatique" est conceptuellement différent (délégation au système) et mérite d'être isolé.
 
 L'item correspondant au mode actif reçoit `aria-current="true"` (ajouté/retiré via JS, pas via attribut Lit interne).
 
