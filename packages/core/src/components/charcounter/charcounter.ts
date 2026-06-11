@@ -172,6 +172,7 @@ export class ArCharcounter extends LitElement {
 
     private _announceTransition(state: CharcounterState, remaining: number): void {
         if (state === 'warning') {
+            clearA11yRegion('assertive');
             announceA11y(`${remaining} ${this.label}`, 'polite');
         } else if (state === 'error') {
             announceA11y('Limite dépassée', 'assertive');

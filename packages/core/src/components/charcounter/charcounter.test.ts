@@ -202,6 +202,29 @@ describe('ArCharcounter', () => {
             document.querySelectorAll('[data-ar-live-region]').forEach((el) => el.remove());
         });
 
+        it('vide la région assertive lors du passage error → warning', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(el.state).toBe('error');
+
+            field.value = 'xxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+
+            expect(el.state).toBe('warning');
+            const region = document.getElementById('ar-live-region-assertive');
+            expect(region?.textContent).toBe('');
+        });
+
         it('vide la région assertive au retour à létat normal depuis error', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
