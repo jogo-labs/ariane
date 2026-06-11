@@ -67,6 +67,9 @@ export class ArCharcounter extends LitElement {
         if (this.max === undefined) {
             warn('ar-charcounter', "l'attribut max est requis.");
         }
+        if (this.warnThreshold <= 0) {
+            warn('ar-charcounter', 'warn-threshold doit être supérieur à 0.');
+        }
         // Attach to the field before the first render so that render() can read
         // the initial field value without needing a second update cycle.
         this._attachField();

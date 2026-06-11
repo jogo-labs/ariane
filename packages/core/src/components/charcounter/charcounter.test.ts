@@ -84,6 +84,30 @@ describe('ArCharcounter', () => {
         });
     });
 
+    // ── warn() si warn-threshold invalide ────────────────────────────────
+
+    describe('warn() si warn-threshold invalide', () => {
+        it('émet un warn si warn-threshold vaut 0', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="100" warn-threshold="0"></ar-charcounter>',
+            );
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('warn-threshold'));
+            spy.mockRestore();
+        });
+
+        it('émet un warn si warn-threshold est négatif', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="100" warn-threshold="-5"></ar-charcounter>',
+            );
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('warn-threshold'));
+            spy.mockRestore();
+        });
+    });
+
     // ── warn() si for absent ou invalide ─────────────────────────────────
 
     describe('warn() si for absent ou invalide', () => {
