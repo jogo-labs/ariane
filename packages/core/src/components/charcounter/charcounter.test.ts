@@ -133,4 +133,124 @@ describe('ArCharcounter', () => {
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('97');
         });
     });
+
+    // ── Transitions d'état ────────────────────────────────────────────────
+
+    describe("transitions d'état", () => {
+        async function setupWithCount(count: number, max = 200, threshold = 20) {
+            document.body.innerHTML = `<textarea id="f">${'x'.repeat(count)}</textarea>`;
+            const el = await fixture<ArCharcounter>(
+                `<ar-charcounter for="f" max="${max}" warn-threshold="${threshold}"></ar-charcounter>`,
+            );
+            return el;
+        }
+
+        it('state="normal" quand remaining > seuil', async () => {
+            el = await setupWithCount(0, 200, 20);
+            expect(el.state).toBe('normal');
+            expect(el.getAttribute('state')).toBe('normal');
+        });
+
+        it('state="warning" quand remaining ≤ seuil (20% de 200 = 40)', async () => {
+            el = await setupWithCount(160, 200, 20);
+            expect(el.state).toBe('warning');
+            expect(el.getAttribute('state')).toBe('warning');
+        });
+
+        it('state="warning" exactement au seuil (remaining = 40)', async () => {
+            el = await setupWithCount(160, 200, 20);
+            expect(el.state).toBe('warning');
+        });
+
+        it('state="normal" quand remaining = 41 (juste au dessus du seuil)', async () => {
+            el = await setupWithCount(159, 200, 20);
+            expect(el.state).toBe('normal');
+        });
+
+        it('state="error" quand remaining < 0', async () => {
+            el = await setupWithCount(201, 200, 20);
+            expect(el.state).toBe('error');
+            expect(el.getAttribute('state')).toBe('error');
+        });
+
+        it('affiche remaining négatif en état error', async () => {
+            el = await setupWithCount(205, 200, 20);
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('-5');
+        });
+
+        it('retour à normal depuis error après suppression de texte', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxxxxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(el.state).toBe('error');
+            field.value = 'hello';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(el.state).toBe('normal');
+        });
+    });
+
+    // ── data-ar-char-state sur le champ et le label ───────────────────────
+
+    describe('data-ar-char-state', () => {
+        it('pose data-ar-char-state="warning" sur le textarea', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            const el = await fixture<ArCharcounter>(
+                '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(field.getAttribute('data-ar-char-state')).toBe('warning');
+            el.remove();
+        });
+
+        it('pose data-ar-char-state="error" sur le textarea', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            const el = await fixture<ArCharcounter>(
+                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(field.getAttribute('data-ar-char-state')).toBe('error');
+            el.remove();
+        });
+
+        it('retire data-ar-char-state au retour à normal', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            const el = await fixture<ArCharcounter>(
+                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            field.value = 'hi';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(field.hasAttribute('data-ar-char-state')).toBe(false);
+            el.remove();
+        });
+
+        it('retire data-ar-char-state au disconnectedCallback', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            const el = await fixture<ArCharcounter>(
+                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            el.remove();
+            expect(field.hasAttribute('data-ar-char-state')).toBe(false);
+        });
+    });
 });
