@@ -1,4 +1,4 @@
-# Design — `ar-char-counter`
+# Design — `ar-charcounter`
 
 Date : 2026-06-10  
 Statut : validé  
@@ -8,7 +8,7 @@ Auteur : Jon + Claude
 
 ## Contexte
 
-`ar-char-counter` est un composant standalone qui observe un champ texte (`<textarea>` ou `<input>`) et affiche le nombre de caractères restants. Il fait partie de la roadmap composants v1 (issue #13).
+`ar-charcounter` est un composant standalone qui observe un champ texte (`<textarea>` ou `<input>`) et affiche le nombre de caractères restants. Il fait partie de la roadmap composants v1 (issue #13).
 
 ---
 
@@ -37,10 +37,10 @@ Le seuil warning est calculé : `Math.floor(max * warnThreshold / 100)` caractè
 ## API publique
 
 ```html
-<ar-char-counter for="field-id" max="200" warn-threshold="20" label="restants" state="normal">
+<ar-charcounter for="field-id" max="200" warn-threshold="20" label="restants" state="normal">
     <svg slot="icon-warning" aria-hidden="true">…</svg>
     <svg slot="icon-error" aria-hidden="true">…</svg>
-</ar-char-counter>
+</ar-charcounter>
 ```
 
 | Attribut         | Type     | Défaut       | Requis | Description                                                    |
@@ -133,7 +133,7 @@ Lier le counter au champ via `aria-describedby` — le SR annonce le count au fo
 ```html
 <label for="field">Commentaire</label>
 <textarea id="field" aria-describedby="field-counter"></textarea>
-<ar-char-counter id="field-counter" for="field" max="200"></ar-char-counter>
+<ar-charcounter id="field-counter" for="field" max="200"></ar-charcounter>
 ```
 
 ### Annonces SR aux transitions
@@ -165,7 +165,7 @@ La page de doc montre un exemple WCAG-compliant (couleur + icône + annonce SR).
 
 ## Validation en dev
 
-Si `max` est absent au `connectedCallback`, le composant appelle `warn('ar-char-counter', "l'attribut max est requis")` et ne rend rien. Pattern identique à `ar-progressbar` pour les attributs requis.
+Si `max` est absent au `connectedCallback`, le composant appelle `warn('ar-charcounter', "l'attribut max est requis")` et ne rend rien. Pattern identique à `ar-progressbar` pour les attributs requis.
 
 ---
 

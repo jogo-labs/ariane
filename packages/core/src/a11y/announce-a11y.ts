@@ -33,6 +33,11 @@ function getLiveRegion(politeness: AriaPoliteness): HTMLElement | null {
     return region;
 }
 
+export function clearA11yRegion(politeness: AriaPoliteness): void {
+    const region = getLiveRegion(politeness);
+    if (region) region.textContent = '';
+}
+
 export function announceA11y(message: string, politeness: AriaPoliteness = 'polite'): void {
     const normalized = message.trim();
     if (!normalized) return;
