@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { announceA11y } from './announce-a11y.js';
+import { announceA11y, clearA11yRegion } from './announce-a11y.js';
 
 describe('announceA11y', () => {
     afterEach(() => {
@@ -32,5 +32,25 @@ describe('announceA11y', () => {
         await new Promise((resolve) => setTimeout(resolve, 60));
 
         expect(document.getElementById('ar-live-region-assertive')).toBeNull();
+    });
+});
+
+describe('clearA11yRegion', () => {
+    afterEach(() => {
+        document.querySelectorAll('[data-ar-live-region]').forEach((el) => el.remove());
+    });
+
+    it('vide le contenu de la région assertive', async () => {
+        announceA11y('Limite dépassée', 'assertive');
+        await new Promise((resolve) => setTimeout(resolve, 60));
+
+        clearA11yRegion('assertive');
+
+        const region = document.getElementById('ar-live-region-assertive');
+        expect(region?.textContent).toBe('');
+    });
+
+    it('est sans effet si la région nexiste pas encore', () => {
+        expect(() => clearA11yRegion('assertive')).not.toThrow();
     });
 });

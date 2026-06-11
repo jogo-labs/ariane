@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
-import { announceA11y } from '../../a11y/announce-a11y.js';
+import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
@@ -175,6 +175,9 @@ export class ArCharcounter extends LitElement {
             announceA11y(`${remaining} ${this.label}`, 'polite');
         } else if (state === 'error') {
             announceA11y('Limite dépassée', 'assertive');
+        } else {
+            clearA11yRegion('assertive');
+            clearA11yRegion('polite');
         }
     }
 
