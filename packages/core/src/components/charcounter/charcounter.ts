@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
@@ -42,8 +42,8 @@ export class ArCharcounter extends LitElement {
     /** Texte affiché après le chiffre (défaut : "restants"). */
     @property({ reflect: true }) label = 'restants';
 
-    @state() private _count = 0;
-    @state() private _state: CharcounterState = 'normal';
+    private _count = 0;
+    private _state: CharcounterState = 'normal';
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
 
@@ -57,18 +57,19 @@ export class ArCharcounter extends LitElement {
         if (this.max === undefined) {
             warn('ar-charcounter', "l'attribut max est requis.");
         }
-    }
-
-    override firstUpdated(): void {
+        // Attach to the field before the first render so that render() can read
+        // the initial field value without needing a second update cycle.
         this._attachField();
     }
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('for')) {
             this._detachField();
-            this._attachField();
+            // Defer to next microtask so that requestUpdate() (called in _attachField)
+            // runs after _$didUpdate() finishes its change-in-update check.
+            queueMicrotask(() => this._attachField());
         }
-        if (changed.has('max' as keyof this) || changed.has('warnThreshold' as keyof this)) {
+        if (changed.has('max') || changed.has('warnThreshold')) {
             this._computeState();
         }
         this.setAttribute('state', this._state);
@@ -93,6 +94,7 @@ export class ArCharcounter extends LitElement {
         this._field = field;
         this._count = field.value.length;
         this._computeState();
+        this.requestUpdate();
         field.addEventListener('input', this._handleInput);
     }
 
@@ -107,6 +109,7 @@ export class ArCharcounter extends LitElement {
         if (!this._field) return;
         this._count = this._field.value.length;
         this._computeState();
+        this.requestUpdate();
     };
 
     private _computeState(): void {
