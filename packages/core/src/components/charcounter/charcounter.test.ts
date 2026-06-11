@@ -19,7 +19,8 @@ describe('ArCharcounter', () => {
         });
 
         it('warnThreshold vaut 20', () => expect(el.warnThreshold).toBe(20));
-        it('label vaut "restants"', () => expect(el.label).toBe('restants'));
+        it('label vaut "caractère restant|caractères restants"', () =>
+            expect(el.label).toBe('caractère restant|caractères restants'));
         it('state vaut "normal"', () => expect(el.state).toBe('normal'));
         it('state="normal" est réfléchi comme attribut', () =>
             expect(el.getAttribute('state')).toBe('normal'));
@@ -57,9 +58,9 @@ describe('ArCharcounter', () => {
         it('contient part="count"', () => expect(getPart(el, 'count')).not.toBeNull());
         it('contient part="remaining"', () => expect(getPart(el, 'remaining')).not.toBeNull());
         it('contient part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
-        it('affiche "200 restants" au départ (champ vide)', () => {
+        it('affiche "200 caractères restants" au départ (champ vide)', () => {
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('200');
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('restants');
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
         });
     });
 
@@ -131,6 +132,50 @@ describe('ArCharcounter', () => {
             el.for = 'b';
             await waitForUpdate(el);
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('97');
+        });
+    });
+
+    // ── Pluralisation du label ────────────────────────────────────────────
+
+    describe('pluralisation du label', () => {
+        it('affiche la forme singulier quand remaining = 1', async () => {
+            document.body.innerHTML = `<textarea id="f">${'x'.repeat(199)}</textarea>`;
+            el = await fixture(
+                '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractère restant');
+        });
+
+        it('affiche la forme pluriel quand remaining = 0', async () => {
+            document.body.innerHTML = `<textarea id="f">${'x'.repeat(200)}</textarea>`;
+            el = await fixture(
+                '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
+        });
+
+        it('affiche la forme pluriel quand remaining = 5', async () => {
+            document.body.innerHTML = `<textarea id="f">${'x'.repeat(195)}</textarea>`;
+            el = await fixture(
+                '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
+        });
+
+        it('affiche la forme singulier quand remaining = -1 (dépassement de 1)', async () => {
+            document.body.innerHTML = `<textarea id="f">${'x'.repeat(201)}</textarea>`;
+            el = await fixture(
+                '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractère restant');
+        });
+
+        it('utilise le label tel quel si pas de pipe (compat descendante)', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="200" label="restants"></ar-charcounter>',
+            );
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('restants');
         });
     });
 
@@ -223,6 +268,70 @@ describe('ArCharcounter', () => {
             expect(el.state).toBe('warning');
             const region = document.getElementById('ar-live-region-assertive');
             expect(region?.textContent).toBe('');
+        });
+
+        it('annonce le warning avec le label pluralisé (pluriel)', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="50" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(el.state).toBe('warning');
+            const region = document.getElementById('ar-live-region-polite');
+            expect(region?.textContent).toBe('5 caractères restants');
+        });
+
+        it('annonce le warning avec le label pluralisé (singulier)', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="50" label="caractère restant|caractères restants"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(el.state).toBe('warning');
+            const region = document.getElementById('ar-live-region-polite');
+            expect(region?.textContent).toBe('1 caractère restant');
+        });
+
+        it('annonce le dépassement avec son nombre en pluriel', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="5" warn-threshold="0"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(el.state).toBe('error');
+            const region = document.getElementById('ar-live-region-assertive');
+            expect(region?.textContent).toBe('Limite dépassée de 2 caractères');
+        });
+
+        it('annonce le dépassement au singulier quand excess = 1', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="5" warn-threshold="0"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(el.state).toBe('error');
+            const region = document.getElementById('ar-live-region-assertive');
+            expect(region?.textContent).toBe('Limite dépassée de 1 caractère');
         });
 
         it('vide la région assertive au retour à létat normal depuis error', async () => {

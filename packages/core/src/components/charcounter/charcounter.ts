@@ -6,6 +6,12 @@ import styles from './charcounter.styles.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
 
+function pluralize(count: number, label: string): string {
+    if (!label.includes('|')) return label;
+    const [singular, plural] = label.split('|');
+    return Math.abs(count) === 1 ? singular : plural;
+}
+
 /**
  * @summary Compteur de caractères restants pour un champ texte accessible.
  *
@@ -35,13 +41,13 @@ export class ArCharcounter extends LitElement {
     @property({ reflect: true }) for = '';
 
     /** Limite de caractères. Requis — warn dev et rendu vide si absent. */
-    @property({ type: Number }) max?: number | undefined;
+    @property({ type: Number }) max: number | undefined;
 
     /** Pourcentage restant déclenchant l'état warning (défaut : 20). */
     @property({ attribute: 'warn-threshold', reflect: true, type: Number }) warnThreshold = 20;
 
-    /** Texte affiché après le chiffre (défaut : "restants"). */
-    @property({ reflect: true }) label = 'restants';
+    /** Texte affiché après le chiffre. Accepte "singulier|pluriel" (défaut : "caractère restant|caractères restants"). */
+    @property({ reflect: true }) label = 'caractère restant|caractères restants';
 
     private _count = 0;
     private _state: CharcounterState = 'normal';
@@ -173,9 +179,13 @@ export class ArCharcounter extends LitElement {
     private _announceTransition(state: CharcounterState, remaining: number): void {
         if (state === 'warning') {
             clearA11yRegion('assertive');
-            announceA11y(`${remaining} ${this.label}`, 'polite');
+            announceA11y(`${remaining} ${pluralize(remaining, this.label)}`, 'polite');
         } else if (state === 'error') {
-            announceA11y('Limite dépassée', 'assertive');
+            const excess = Math.abs(remaining);
+            announceA11y(
+                `Limite dépassée de ${excess} ${pluralize(excess, 'caractère|caractères')}`,
+                'assertive',
+            );
         } else {
             clearA11yRegion('assertive');
             clearA11yRegion('polite');
@@ -207,7 +217,7 @@ export class ArCharcounter extends LitElement {
                 <slot name="icon-error"></slot>
                 <span part="count">
                     <span part="remaining">${remaining}</span>
-                    <span part="label"> ${this.label}</span>
+                    <span part="label"> ${pluralize(remaining, this.label)}</span>
                 </span>
             </span>
         `;
