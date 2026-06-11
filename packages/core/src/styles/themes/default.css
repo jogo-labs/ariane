@@ -411,6 +411,14 @@
         /* table */
         --ar-table-padding-x: 1rem;
 
+        /* charcounter */
+        --ar-charcounter-color: var(--ar-color-text-muted);
+        --ar-charcounter-font-size: 0.875rem;
+        --ar-charcounter-warning-color: var(--ar-color-warning-text);
+        --ar-charcounter-warning-weight: 600;
+        --ar-charcounter-error-color: var(--ar-color-danger-text);
+        --ar-charcounter-error-weight: 700;
+
         /* table-sort */
         --ar-table-sort-gap: 0.375rem;
         --ar-table-sort-indicator-gap: 3px;

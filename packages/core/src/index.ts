@@ -28,3 +28,5 @@ export { ArTab } from './components/tab/tab.js';
 export { ArTabPanel } from './components/tab-panel/tab-panel.js';
 export { ArTableSort } from './components/table-sort/table-sort.js';
 export type { TableSortType, TableSortOrder } from './components/table-sort/table-sort.js';
+export { ArCharcounter } from './components/charcounter/charcounter.js';
+export type { CharcounterState } from './components/charcounter/charcounter.js';
