@@ -1,11 +1,11 @@
 ---
 tagName: ar-progressbar
 title: Progressbar
-description: Description du composant ar-progressbar.
+description: Barre de progression accessible avec label slotté, affichage optionnel du pourcentage et état indéterminé.
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Barre de progression sans attribut — affiche l'état 0 % sans label.
       html: |
           <ar-progressbar></ar-progressbar>
     - name: upload
@@ -33,10 +33,10 @@ import WcagRef from '../../components/WcagRef.astro';
 - La valeur de `aria-labelledby` pointe sur le label slotté, pas sur un texte invisible —
   le contexte de la progression est toujours visible et vocalisé simultanément.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Fournir un label explicite dans le slot.** Sans slot, la barre n'a pas de contexte — le
   lecteur d'écran annoncera "75%" sans préciser quoi. Utilisez un texte descriptif
   ("Chargement du fichier", "Progression de l'inscription").
 - **Mettre à jour `percent` au fil de l'avancement.** Le composant ne suit pas l'avancement
-  automatiquement — c'est à l'intégrateur d'incrémenter la valeur au rythme réel de l'opération.
+  automatiquement — c'est à vous d'incrémenter la valeur au rythme réel de l'opération.

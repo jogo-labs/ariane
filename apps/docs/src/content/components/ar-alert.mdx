@@ -7,7 +7,7 @@ description: >
 variants:
     - name: default
       label: Défaut
-      description: Rendu par défaut du composant.
+      description: Alerte sans variant explicite (erreur par défaut), avec titre et corps.
       html: |
           <ar-alert>
               <strong>Titre de l'alerte</strong><br>
@@ -55,7 +55,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - Le focus est reporté sur l'élément cible (`next-focus`) à la fermeture — l'utilisateur
   clavier ne se retrouve pas désorienté.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Message compréhensible hors contexte visuel.** Le contenu est lu dès l'apparition de
   l'alerte. Évitez les messages vagues ("Une erreur s'est produite") — préférez

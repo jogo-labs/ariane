@@ -1,31 +1,31 @@
 ---
 tagName: ar-spinner
 title: Spinner
-description: Description du composant ar-spinner.
+description: Indicateur de chargement animé avec annonce aria-live à la résolution, disponible en 5 tailles.
 variants:
     - name: default
       label: Par défaut (moyen)
-      description: Rendu par défaut du composant.
+      description: Spinner sans attribut size (taille md par défaut).
       html: |
           <ar-spinner></ar-spinner>
     - name: xs
       label: Très petit
-      description: Rendu par défaut du composant.
+      description: Spinner avec size="xs".
       html: |
           <ar-spinner size="xs"></ar-spinner>
     - name: sm
       label: Petit
-      description: Rendu par défaut du composant.
+      description: Spinner avec size="sm".
       html: |
           <ar-spinner size="sm"></ar-spinner>
     - name: lg
       label: Grand
-      description: Rendu par défaut du composant.
+      description: Spinner avec size="lg".
       html: |
           <ar-spinner size="lg"></ar-spinner>
     - name: all
       label: Toutes les tailles
-      description: Rendu par défaut du composant.
+      description: Les 4 tailles disponibles affichées côte à côte (xs, sm, md, lg).
       html: |
           <ar-spinner size="xs"></ar-spinner>
           <ar-spinner size="sm"></ar-spinner>
@@ -49,7 +49,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - Les labels "en cours" (`loading-label`) et "terminé" (`done-label`) ont des valeurs par
   défaut raisonnables utilisées si non fournis.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Adapter `loading-label` et `done-label` au contexte.** Les valeurs par défaut sont
   génériques — préférez des labels qui décrivent l'opération en cours ("Envoi du formulaire…",

@@ -229,7 +229,7 @@ Le tablist utilise un scroll horizontal natif (`overflow-x: auto`). Les onglets 
 - Pour ajouter des boutons de navigation, appelez `scrollNav('start' | 'end', amount?)` — la méthode scrolle `[part="nav"]` sans avoir à percer le shadow DOM (voir la démo _Boutons de scroll_ ci-dessous).
 - Si une scrollbar visible est souhaitée, stylez `ar-tab-group::part(nav)::-webkit-scrollbar` et `scrollbar-width`.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Nommer le tablist** : si la page contient plusieurs `ar-tab-group`, ajoutez l'attribut `label` sur chacun — il devient l'`aria-label` du tablist, permettant aux lecteurs d'écran de les distinguer.
 - **Libellés des onglets** : le texte visible de l'onglet est son nom accessible. Évitez les onglets avec des icônes seules sans texte alternatif (`aria-label` sur `ar-tab`).

@@ -5,7 +5,7 @@ description: Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Fil d'ariane avec 3 niveaux, le dernier élément actif.
       html: |
           <ar-breadcrumb>
             <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
@@ -42,7 +42,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - En mobile, le bouton "dropdown" expose son état via `aria-expanded`. Son label est vocalisé
   via une classe `.sr-only` — accessible sans être visible.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Labels descriptifs sur chaque item.** Le `label` est le seul texte vocalisé — évitez les
   labels génériques ("Page 1", "Étape") au profit de libellés qui situent l'utilisateur

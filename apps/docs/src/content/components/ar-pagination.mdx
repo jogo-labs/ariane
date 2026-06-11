@@ -1,26 +1,26 @@
 ---
 tagName: ar-pagination
 title: Pagination
-description: Description du composant ar-pagination.
+description: Navigation entre pages avec gestion du responsive et annonce accessible du changement de page.
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Pagination sans attributs (valeurs par défaut du composant).
       html: |
           <ar-pagination></ar-pagination>
     - name: 20-pages
       label: 20 pages
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 10 active (milieu de la liste).
       html: |
           <ar-pagination current="10" total="20"></ar-pagination>
     - name: 20-pages-start
       label: 20 pages (current en début)
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 5 active (début de la liste).
       html: |
           <ar-pagination current="5" total="20"></ar-pagination>
     - name: 20-pages-end
       label: 20 pages (current en fin)
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
 ---
@@ -40,10 +40,10 @@ import WcagRef from '../../components/WcagRef.astro';
     />
 - Les séparateurs et points de suspension sont masqués aux lecteurs d'écran (`aria-hidden`).
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Annoncer le changement de page.** La pagination ne gère pas le rechargement de contenu —
-  c'est à l'intégrateur d'annoncer le nouveau contenu chargé (via une live region ou un focus
+  c'est à vous d'annoncer le nouveau contenu chargé (via une live region ou un focus
   management) pour que l'utilisateur clavier sache que la page a changé.
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
