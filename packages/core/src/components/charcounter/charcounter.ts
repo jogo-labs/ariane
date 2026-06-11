@@ -51,6 +51,7 @@ export class ArCharcounter extends LitElement {
 
     private _count = 0;
     private _state: CharcounterState = 'normal';
+    private _errorAnnounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
 
@@ -61,7 +62,7 @@ export class ArCharcounter extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        if (this.for === undefined) {
+        if (!this.for) {
             warn('ar-charcounter', "l'attribut for est requis.");
         }
         if (this.max === undefined) {
@@ -80,16 +81,22 @@ export class ArCharcounter extends LitElement {
             this._detachField();
             // Defer to next microtask so that requestUpdate() (called in _attachField)
             // runs after _$didUpdate() finishes its change-in-update check.
-            queueMicrotask(() => this._attachField());
+            queueMicrotask(() => {
+                if (!this.isConnected) return;
+                this._attachField();
+            });
         }
         if (changed.has('max') || changed.has('warnThreshold')) {
             this._computeState();
         }
-        this.setAttribute('state', this._state);
+        if (this._state !== this.getAttribute('state')) {
+            this.setAttribute('state', this._state);
+        }
     }
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        clearTimeout(this._errorAnnounceTimer);
         this._detachField();
     }
 
@@ -180,7 +187,10 @@ export class ArCharcounter extends LitElement {
                 this._setLinkedAttributes(nextState);
             }
         } else if (nextState === 'error') {
-            this._announceTransition(nextState, remaining);
+            clearTimeout(this._errorAnnounceTimer);
+            this._errorAnnounceTimer = setTimeout(() => {
+                this._announceTransition(nextState, remaining);
+            }, 300);
         }
     }
 

@@ -118,6 +118,13 @@ describe('ArCharcounter', () => {
             spy.mockRestore();
         });
 
+        it('émet un warn si for est une chaîne vide', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-charcounter for="" max="100"></ar-charcounter>');
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('for'));
+            spy.mockRestore();
+        });
+
         it("émet un warn si l'id est introuvable", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-charcounter for="inexistant" max="100"></ar-charcounter>');
@@ -365,6 +372,33 @@ describe('ArCharcounter', () => {
             expect(region?.textContent).toBe('Limite dépassée de 1 caractère');
         });
 
+        it('ne ré-annonce pas immédiatement en état error lors de frappes rapides (debounce)', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="5" warn-threshold="1"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+
+            // Transition normale→error : annonce immédiate (non debounce)
+            field.value = 'xxxxxx'; // excess=1
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((r) => setTimeout(r, 60));
+
+            const region = document.getElementById('ar-live-region-assertive');
+            expect(region?.textContent).toBe('Limite dépassée de 1 caractère');
+
+            // Frappes rapides en état error — annonce debounce, pas encore résolue
+            field.value = 'xxxxxxxxxx'; // excess=5
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((r) => setTimeout(r, 60)); // << debounce duration
+
+            // Sans debounce : '...5 caractères' → RED
+            // Avec debounce : toujours '...1 caractère' (debounce pas encore résolu)
+            expect(region?.textContent).toBe('Limite dépassée de 1 caractère');
+        });
+
         it('vide la région assertive au retour à létat normal depuis error', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
@@ -386,6 +420,48 @@ describe('ArCharcounter', () => {
             expect(el.state).toBe('normal');
             const region = document.getElementById('ar-live-region-assertive');
             expect(region?.textContent).toBe('');
+        });
+    });
+
+    // ── Cycle de vie / fuites de listener ────────────────────────────────
+
+    describe('cycle de vie', () => {
+        it("n'émet pas de warn parasite si déconnecté avant le microtask", async () => {
+            document.body.innerHTML = '<textarea id="fa"></textarea><textarea id="fb"></textarea>';
+            el = await fixture('<ar-charcounter for="fa" max="100"></ar-charcounter>');
+
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el.for = 'fb'; // planifie queueMicrotask dans updated()
+            el.remove(); // disconnectedCallback synchrone avant le microtask
+            await new Promise((r) => setTimeout(r, 0)); // vide tous les microtasks
+
+            // Sans fix : _attachField tente la requête DOM, ne trouve pas 'fb',
+            //            émet warn('Aucun élément trouvé avec l'id "fb"')
+            // Avec fix : guard isConnected → return early → pas de warn parasite
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it("ne déclenche pas de mutation de l'attribut state s'il ne change pas", async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="100"></ar-charcounter>');
+
+            const mutations: MutationRecord[] = [];
+            const observer = new MutationObserver((r) => mutations.push(...r));
+            observer.observe(el, { attributes: true, attributeFilter: ['state'] });
+
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'hello'; // reste normal (5 chars < 80 remaining)
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await Promise.resolve(); // flush MutationObserver callbacks
+
+            observer.disconnect();
+
+            // Sans fix : setAttribute appelé → mutation enregistrée
+            // Avec fix : pas d'appel si valeur identique
+            expect(mutations).toHaveLength(0);
         });
     });
 

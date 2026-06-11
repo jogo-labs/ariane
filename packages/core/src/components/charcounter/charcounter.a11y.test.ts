@@ -100,7 +100,7 @@ describe('ar-charcounter — accessibilité', () => {
             field.value = 'xxxxxxxx';
             field.dispatchEvent(new Event('input'));
             await counter.updateComplete;
-            await new Promise((r) => setTimeout(r, 80));
+            await new Promise((r) => setTimeout(r, 400)); // debounce 300ms + announceA11y 50ms + marge
 
             const region = document.getElementById('ar-live-region-assertive');
             expect(region?.textContent?.trim()).to.equal('Limite dépassée de 3 caractères');
