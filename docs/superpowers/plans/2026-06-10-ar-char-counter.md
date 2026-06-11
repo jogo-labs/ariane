@@ -1,29 +1,29 @@
-# ar-char-counter Implementation Plan
+# ar-charcounter Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implémenter `ar-char-counter`, composant standalone qui observe un champ texte via `for="id"` et affiche le décompte de caractères restants avec 3 états (normal / warning / error) et hooks CSS externes.
+**Goal:** Implémenter `ar-charcounter`, composant standalone qui observe un champ texte via `for="id"` et affiche le décompte de caractères restants avec 3 états (normal / warning / error) et hooks CSS externes.
 
 **Architecture:** Composant LitElement headless sans wrapper — même pattern `for` qu'`ar-tooltip`. État calculé en interne (`_state`) réfléchi comme attribut sur le host pour le ciblage CSS. Effets de bord sur les éléments liés (`data-ar-char-state`) au lieu d'ARIA directement, laissant `aria-invalid` au consumer.
 
 **Tech Stack:** Lit 3, TypeScript, Vitest (happy-dom), WTR (@open-wc/testing), `announceA11y`, `warn`.
 
-**Spec:** `docs/superpowers/specs/2026-06-10-ar-char-counter-design.md`
+**Spec:** `docs/superpowers/specs/2026-06-10-ar-charcounter-design.md`
 
 ---
 
 ## Fichiers
 
-| Action               | Chemin                                                                |
-| -------------------- | --------------------------------------------------------------------- |
-| Créé par scaffold    | `packages/core/src/components/char-counter/char-counter.ts`           |
-| Créé par scaffold    | `packages/core/src/components/char-counter/char-counter.styles.ts`    |
-| Créé par scaffold    | `packages/core/src/components/char-counter/char-counter.test.ts`      |
-| Créé par scaffold    | `apps/docs/src/content/components/ar-char-counter.mdx`                |
-| Créé manuellement    | `packages/core/src/components/char-counter/char-counter.a11y.test.ts` |
-| Modifié par scaffold | `packages/core/src/index.ts`                                          |
-| Modifié manuellement | `packages/core/src/index.ts` (ajout export type)                      |
-| Modifié manuellement | `apps/docs/src/themes/default.css`                                    |
+| Action               | Chemin                                                              |
+| -------------------- | ------------------------------------------------------------------- |
+| Créé par scaffold    | `packages/core/src/components/charcounter/charcounter.ts`           |
+| Créé par scaffold    | `packages/core/src/components/charcounter/charcounter.styles.ts`    |
+| Créé par scaffold    | `packages/core/src/components/charcounter/charcounter.test.ts`      |
+| Créé par scaffold    | `apps/docs/src/content/components/ar-charcounter.mdx`               |
+| Créé manuellement    | `packages/core/src/components/charcounter/charcounter.a11y.test.ts` |
+| Modifié par scaffold | `packages/core/src/index.ts`                                        |
+| Modifié manuellement | `packages/core/src/index.ts` (ajout export type)                    |
+| Modifié manuellement | `apps/docs/src/themes/default.css`                                  |
 
 ---
 
@@ -34,10 +34,10 @@
 - [ ] **Step 1 : Créer la branche depuis `dev`**
 
 ```bash
-git checkout dev && git pull && git checkout -b feat/ar-char-counter
+git checkout dev && git pull && git checkout -b feat/ar-charcounter
 ```
 
-Expected: branche `feat/ar-char-counter` active, propre.
+Expected: branche `feat/ar-charcounter` active, propre.
 
 ---
 
@@ -45,32 +45,32 @@ Expected: branche `feat/ar-char-counter` active, propre.
 
 **Files:**
 
-- Create: `packages/core/src/components/char-counter/` (via script)
+- Create: `packages/core/src/components/charcounter/` (via script)
 - Modify: `packages/core/src/index.ts` (via script)
 
 - [ ] **Step 1 : Lancer le scaffold**
 
 ```bash
-cd /path/to/ariane && npm run create ar-char-counter
+cd /path/to/ariane && npm run create ar-charcounter
 ```
 
-Expected output: fichiers créés dans `packages/core/src/components/char-counter/` et export ajouté dans `index.ts`.
+Expected output: fichiers créés dans `packages/core/src/components/charcounter/` et export ajouté dans `index.ts`.
 
 - [ ] **Step 2 : Vérifier les fichiers générés**
 
 ```bash
-ls packages/core/src/components/char-counter/
+ls packages/core/src/components/charcounter/
 ```
 
-Expected: `char-counter.ts`, `char-counter.styles.ts`, `char-counter.test.ts`
+Expected: `charcounter.ts`, `charcounter.styles.ts`, `charcounter.test.ts`
 
 - [ ] **Step 3 : Vérifier l'export dans index.ts**
 
 ```bash
-grep 'char-counter' packages/core/src/index.ts
+grep 'charcounter' packages/core/src/index.ts
 ```
 
-Expected: une ligne `export { ArCharCounter } from './components/char-counter/char-counter.js';`
+Expected: une ligne `export { ArCharcounter } from './components/charcounter/charcounter.js';`
 
 ---
 
@@ -78,7 +78,7 @@ Expected: une ligne `export { ArCharCounter } from './components/char-counter/ch
 
 **Files:**
 
-- Modify: `packages/core/src/components/char-counter/char-counter.styles.ts`
+- Modify: `packages/core/src/components/charcounter/charcounter.styles.ts`
 
 - [ ] **Step 1 : Remplacer le contenu du fichier styles**
 
@@ -108,8 +108,8 @@ export default css`
 - [ ] **Step 2 : Commit**
 
 ```bash
-git add packages/core/src/components/char-counter/char-counter.styles.ts
-git commit -m "feat(char-counter): styles headless — visibilité slots icônes"
+git add packages/core/src/components/charcounter/charcounter.styles.ts
+git commit -m "feat(charcounter): styles headless — visibilité slots icônes"
 ```
 
 ---
@@ -118,19 +118,19 @@ git commit -m "feat(char-counter): styles headless — visibilité slots icônes
 
 **Files:**
 
-- Modify: `packages/core/src/components/char-counter/char-counter.test.ts`
-- Modify: `packages/core/src/components/char-counter/char-counter.ts`
+- Modify: `packages/core/src/components/charcounter/charcounter.test.ts`
+- Modify: `packages/core/src/components/charcounter/charcounter.ts`
 
 - [ ] **Step 1 : Écrire les tests (remplacer le contenu scaffoldé)**
 
 ```typescript
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
-import type { ArCharCounter } from './char-counter.js';
-import './char-counter.js';
+import type { ArCharcounter } from './charcounter.js';
+import './charcounter.js';
 
-describe('ArCharCounter', () => {
-    let el: ArCharCounter;
+describe('ArCharcounter', () => {
+    let el: ArCharcounter;
     afterEach(() => {
         el?.remove();
         document.body.innerHTML = '';
@@ -141,7 +141,7 @@ describe('ArCharCounter', () => {
     describe('valeurs par défaut', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
-            el = await fixture('<ar-char-counter for="f" max="200"></ar-char-counter>');
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
         });
 
         it('warnThreshold vaut 20', () => expect(el.warnThreshold).toBe(20));
@@ -157,7 +157,7 @@ describe('ArCharCounter', () => {
         it('lit warnThreshold depuis warn-threshold', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-char-counter for="f" max="200" warn-threshold="30"></ar-char-counter>',
+                '<ar-charcounter for="f" max="200" warn-threshold="30"></ar-charcounter>',
             );
             expect(el.warnThreshold).toBe(30);
         });
@@ -165,7 +165,7 @@ describe('ArCharCounter', () => {
         it("lit label depuis l'attribut", async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-char-counter for="f" max="200" label="remaining"></ar-char-counter>',
+                '<ar-charcounter for="f" max="200" label="remaining"></ar-charcounter>',
             );
             expect(el.label).toBe('remaining');
         });
@@ -176,7 +176,7 @@ describe('ArCharCounter', () => {
     describe('rendu shadow DOM', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
-            el = await fixture('<ar-char-counter for="f" max="200"></ar-char-counter>');
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
         });
 
         it('contient part="container"', () => expect(getPart(el, 'container')).not.toBeNull());
@@ -195,7 +195,7 @@ describe('ArCharCounter', () => {
         it("émet un warn si max n'est pas fourni", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             document.body.innerHTML = '<textarea id="f"></textarea>';
-            el = await fixture('<ar-char-counter for="f"></ar-char-counter>');
+            el = await fixture('<ar-charcounter for="f"></ar-charcounter>');
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('max'));
             spy.mockRestore();
         });
@@ -203,7 +203,7 @@ describe('ArCharCounter', () => {
         it('ne rend rien si max est absent', async () => {
             vi.spyOn(console, 'warn').mockImplementation(() => {});
             document.body.innerHTML = '<textarea id="f"></textarea>';
-            el = await fixture('<ar-char-counter for="f"></ar-char-counter>');
+            el = await fixture('<ar-charcounter for="f"></ar-charcounter>');
             expect(getPart(el, 'container')).toBeNull();
             vi.restoreAllMocks();
         });
@@ -214,7 +214,7 @@ describe('ArCharCounter', () => {
     describe('warn() si for invalide', () => {
         it("émet un warn si l'id est introuvable", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            el = await fixture('<ar-char-counter for="inexistant" max="100"></ar-char-counter>');
+            el = await fixture('<ar-charcounter for="inexistant" max="100"></ar-charcounter>');
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('inexistant'));
             spy.mockRestore();
         });
@@ -225,21 +225,21 @@ describe('ArCharCounter', () => {
 - [ ] **Step 2 : Lancer les tests — vérifier qu'ils échouent**
 
 ```bash
-npm run test -- --reporter=verbose packages/core/src/components/char-counter/char-counter.test.ts
+npm run test -- --reporter=verbose packages/core/src/components/charcounter/charcounter.test.ts
 ```
 
 Expected: échecs sur les assertions (composant scaffoldé vide).
 
-- [ ] **Step 3 : Écrire l'implémentation dans char-counter.ts**
+- [ ] **Step 3 : Écrire l'implémentation dans charcounter.ts**
 
 ```typescript
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
-import styles from './char-counter.styles.js';
+import styles from './charcounter.styles.js';
 
-export type CharCounterState = 'normal' | 'warning' | 'error';
+export type CharcounterState = 'normal' | 'warning' | 'error';
 
 /**
  * @summary Compteur de caractères restants pour un champ texte accessible.
@@ -256,14 +256,14 @@ export type CharCounterState = 'normal' | 'warning' | 'error';
  * @csspart remaining - Le chiffre des caractères restants.
  * @csspart label     - Le texte après le chiffre (ex: "restants").
  *
- * @cssprop --ar-char-counter-color         - Couleur état normal.
- * @cssprop --ar-char-counter-warning-color - Couleur état warning.
- * @cssprop --ar-char-counter-error-color   - Couleur état error.
+ * @cssprop --ar-charcounter-color         - Couleur état normal.
+ * @cssprop --ar-charcounter-warning-color - Couleur état warning.
+ * @cssprop --ar-charcounter-error-color   - Couleur état error.
  */
-@customElement('ar-char-counter')
-export class ArCharCounter extends LitElement {
+@customElement('ar-charcounter')
+export class ArCharcounter extends LitElement {
     static override styles = [styles];
-    static readonly NAME = 'ArCharCounter';
+    static readonly NAME = 'ArCharcounter';
 
     /** ID du champ observé. Requis. */
     @property({ reflect: true }) for = '';
@@ -278,19 +278,19 @@ export class ArCharCounter extends LitElement {
     @property({ reflect: true }) label = 'restants';
 
     @state() private _count = 0;
-    @state() private _state: CharCounterState = 'normal';
+    @state() private _state: CharcounterState = 'normal';
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
 
     /** État courant. Readonly — piloté par le composant. */
-    get state(): CharCounterState {
+    get state(): CharcounterState {
         return this._state;
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
         if (this.max === undefined) {
-            warn('ar-char-counter', "l'attribut max est requis.");
+            warn('ar-charcounter', "l'attribut max est requis.");
         }
     }
 
@@ -319,7 +319,7 @@ export class ArCharCounter extends LitElement {
             | HTMLTextAreaElement
             | null;
         if (!field) {
-            warn('ar-char-counter', `Aucun élément trouvé avec l'id "${this.for}".`);
+            warn('ar-charcounter', `Aucun élément trouvé avec l'id "${this.for}".`);
             return;
         }
         this._field = field;
@@ -347,7 +347,7 @@ export class ArCharCounter extends LitElement {
         const warnLimit = Math.floor((this.max * this.warnThreshold) / 100);
         const prevState = this._state;
 
-        let nextState: CharCounterState;
+        let nextState: CharcounterState;
         if (remaining < 0) {
             nextState = 'error';
         } else if (remaining <= warnLimit) {
@@ -367,7 +367,7 @@ export class ArCharCounter extends LitElement {
         }
     }
 
-    private _announceTransition(state: CharCounterState, remaining: number): void {
+    private _announceTransition(state: CharcounterState, remaining: number): void {
         if (state === 'warning') {
             announceA11y(`${remaining} ${this.label}`, 'polite');
         } else if (state === 'error') {
@@ -375,7 +375,7 @@ export class ArCharCounter extends LitElement {
         }
     }
 
-    private _setLinkedAttributes(state: CharCounterState): void {
+    private _setLinkedAttributes(state: CharcounterState): void {
         if (!this._field) return;
         this._field.setAttribute('data-ar-char-state', state);
         for (const lbl of Array.from((this._field as HTMLInputElement).labels ?? [])) {
@@ -409,7 +409,7 @@ export class ArCharCounter extends LitElement {
 
 declare global {
     interface HTMLElementTagNameMap {
-        'ar-char-counter': ArCharCounter;
+        'ar-charcounter': ArCharcounter;
     }
 }
 ```
@@ -417,7 +417,7 @@ declare global {
 - [ ] **Step 4 : Lancer les tests — vérifier qu'ils passent**
 
 ```bash
-npm run test -- --reporter=verbose packages/core/src/components/char-counter/char-counter.test.ts
+npm run test -- --reporter=verbose packages/core/src/components/charcounter/charcounter.test.ts
 ```
 
 Expected: tous les tests de la Task 3 passent.
@@ -425,9 +425,9 @@ Expected: tous les tests de la Task 3 passent.
 - [ ] **Step 5 : Commit**
 
 ```bash
-git add packages/core/src/components/char-counter/char-counter.ts \
-        packages/core/src/components/char-counter/char-counter.test.ts
-git commit -m "feat(char-counter): props, rendu de base, warn si max absent"
+git add packages/core/src/components/charcounter/charcounter.ts \
+        packages/core/src/components/charcounter/charcounter.test.ts
+git commit -m "feat(charcounter): props, rendu de base, warn si max absent"
 ```
 
 ---
@@ -436,13 +436,13 @@ git commit -m "feat(char-counter): props, rendu de base, warn si max absent"
 
 **Files:**
 
-- Modify: `packages/core/src/components/char-counter/char-counter.test.ts`
+- Modify: `packages/core/src/components/charcounter/charcounter.test.ts`
 
 L'implémentation est déjà présente dans Task 3. Cette tâche ajoute les tests manquants pour la logique d'observation.
 
 - [ ] **Step 1 : Ajouter les tests d'observation au fichier de tests existant**
 
-Ajouter après le dernier `describe` dans `char-counter.test.ts` :
+Ajouter après le dernier `describe` dans `charcounter.test.ts` :
 
 ```typescript
 // ── Observation du champ ──────────────────────────────────────────────
@@ -450,13 +450,13 @@ Ajouter après le dernier `describe` dans `char-counter.test.ts` :
 describe('observation du champ', () => {
     it('lit la valeur initiale du champ', async () => {
         document.body.innerHTML = '<textarea id="f">bonjour</textarea>';
-        el = await fixture('<ar-char-counter for="f" max="200"></ar-char-counter>');
+        el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
         expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('193');
     });
 
     it('met à jour le décompte à chaque event input', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
-        el = await fixture('<ar-char-counter for="f" max="200"></ar-char-counter>');
+        el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'hello';
         field.dispatchEvent(new Event('input'));
@@ -466,7 +466,7 @@ describe('observation du champ', () => {
 
     it('retire le listener input au changement de for', async () => {
         document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b"></textarea>';
-        el = await fixture('<ar-char-counter for="a" max="100"></ar-char-counter>');
+        el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
         el.for = 'b';
         await waitForUpdate(el);
         const fieldA = document.getElementById('a') as HTMLTextAreaElement;
@@ -478,7 +478,7 @@ describe('observation du champ', () => {
 
     it('observe le nouveau champ après changement de for', async () => {
         document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b">abc</textarea>';
-        el = await fixture('<ar-char-counter for="a" max="100"></ar-char-counter>');
+        el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
         el.for = 'b';
         await waitForUpdate(el);
         expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('97');
@@ -489,7 +489,7 @@ describe('observation du champ', () => {
 - [ ] **Step 2 : Lancer les tests**
 
 ```bash
-npm run test -- --reporter=verbose packages/core/src/components/char-counter/char-counter.test.ts
+npm run test -- --reporter=verbose packages/core/src/components/charcounter/charcounter.test.ts
 ```
 
 Expected: tous les tests passent.
@@ -497,8 +497,8 @@ Expected: tous les tests passent.
 - [ ] **Step 3 : Commit**
 
 ```bash
-git add packages/core/src/components/char-counter/char-counter.test.ts
-git commit -m "test(char-counter): observation du champ — input event, changement de for"
+git add packages/core/src/components/charcounter/charcounter.test.ts
+git commit -m "test(charcounter): observation du champ — input event, changement de for"
 ```
 
 ---
@@ -507,13 +507,13 @@ git commit -m "test(char-counter): observation du champ — input event, changem
 
 **Files:**
 
-- Modify: `packages/core/src/components/char-counter/char-counter.test.ts`
+- Modify: `packages/core/src/components/charcounter/charcounter.test.ts`
 
 L'implémentation est dans Task 3. Cette tâche couvre les transitions d'état et `data-ar-char-state`.
 
 - [ ] **Step 1 : Ajouter les tests d'état et de hooks CSS**
 
-Ajouter après le dernier `describe` dans `char-counter.test.ts` :
+Ajouter après le dernier `describe` dans `charcounter.test.ts` :
 
 ```typescript
 // ── Transitions d'état ────────────────────────────────────────────────
@@ -521,8 +521,8 @@ Ajouter après le dernier `describe` dans `char-counter.test.ts` :
 describe("transitions d'état", () => {
     async function setupWithCount(count: number, max = 200, threshold = 20) {
         document.body.innerHTML = `<textarea id="f">${'x'.repeat(count)}</textarea>`;
-        const el = await fixture<ArCharCounter>(
-            `<ar-char-counter for="f" max="${max}" warn-threshold="${threshold}"></ar-char-counter>`,
+        const el = await fixture<ArCharcounter>(
+            `<ar-charcounter for="f" max="${max}" warn-threshold="${threshold}"></ar-charcounter>`,
         );
         return el;
     }
@@ -563,7 +563,7 @@ describe("transitions d'état", () => {
     it('retour à normal depuis error après suppression de texte', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
         el = await fixture(
-            '<ar-char-counter for="f" max="10" warn-threshold="20"></ar-char-counter>',
+            '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
         );
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'xxxxxxxxxxxx';
@@ -582,8 +582,8 @@ describe("transitions d'état", () => {
 describe('data-ar-char-state', () => {
     it('pose data-ar-char-state="warning" sur le textarea', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
-        const el = await fixture<ArCharCounter>(
-            '<ar-char-counter for="f" max="10" warn-threshold="20"></ar-char-counter>',
+        const el = await fixture<ArCharcounter>(
+            '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
         );
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'xxxxxxxxxx';
@@ -595,8 +595,8 @@ describe('data-ar-char-state', () => {
 
     it('pose data-ar-char-state="error" sur le textarea', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
-        const el = await fixture<ArCharCounter>(
-            '<ar-char-counter for="f" max="5" warn-threshold="20"></ar-char-counter>',
+        const el = await fixture<ArCharcounter>(
+            '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
         );
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'xxxxxx';
@@ -608,8 +608,8 @@ describe('data-ar-char-state', () => {
 
     it('retire data-ar-char-state au retour à normal', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
-        const el = await fixture<ArCharCounter>(
-            '<ar-char-counter for="f" max="5" warn-threshold="20"></ar-char-counter>',
+        const el = await fixture<ArCharcounter>(
+            '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
         );
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'xxxxxx';
@@ -624,8 +624,8 @@ describe('data-ar-char-state', () => {
 
     it('retire data-ar-char-state au disconnectedCallback', async () => {
         document.body.innerHTML = '<textarea id="f"></textarea>';
-        const el = await fixture<ArCharCounter>(
-            '<ar-char-counter for="f" max="5" warn-threshold="20"></ar-char-counter>',
+        const el = await fixture<ArCharcounter>(
+            '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
         );
         const field = document.getElementById('f') as HTMLTextAreaElement;
         field.value = 'xxxxxx';
@@ -640,7 +640,7 @@ describe('data-ar-char-state', () => {
 - [ ] **Step 2 : Lancer les tests**
 
 ```bash
-npm run test -- --reporter=verbose packages/core/src/components/char-counter/char-counter.test.ts
+npm run test -- --reporter=verbose packages/core/src/components/charcounter/charcounter.test.ts
 ```
 
 Expected: tous les tests passent.
@@ -648,8 +648,8 @@ Expected: tous les tests passent.
 - [ ] **Step 3 : Commit**
 
 ```bash
-git add packages/core/src/components/char-counter/char-counter.test.ts
-git commit -m "test(char-counter): transitions d'état et data-ar-char-state"
+git add packages/core/src/components/charcounter/charcounter.test.ts
+git commit -m "test(charcounter): transitions d'état et data-ar-char-state"
 ```
 
 ---
@@ -658,17 +658,17 @@ git commit -m "test(char-counter): transitions d'état et data-ar-char-state"
 
 **Files:**
 
-- Create: `packages/core/src/components/char-counter/char-counter.a11y.test.ts`
+- Create: `packages/core/src/components/charcounter/charcounter.a11y.test.ts`
 
 - [ ] **Step 1 : Créer le fichier de tests browser**
 
 ```typescript
 /// <reference types="mocha" />
 import { fixture, html, expect } from '@open-wc/testing';
-import type { ArCharCounter } from './char-counter.js';
-import './char-counter.js';
+import type { ArCharcounter } from './charcounter.js';
+import './charcounter.js';
 
-describe('ar-char-counter — accessibilité', () => {
+describe('ar-charcounter — accessibilité', () => {
     // ── Audit axe ─────────────────────────────────────────────────────────
 
     describe('audit axe', () => {
@@ -677,7 +677,7 @@ describe('ar-char-counter — accessibilité', () => {
                 <div>
                     <label for="field">Commentaire</label>
                     <textarea id="field" aria-describedby="counter"></textarea>
-                    <ar-char-counter id="counter" for="field" max="200"></ar-char-counter>
+                    <ar-charcounter id="counter" for="field" max="200"></ar-charcounter>
                 </div>
             `);
             await expect(container).to.be.accessible();
@@ -688,7 +688,7 @@ describe('ar-char-counter — accessibilité', () => {
                 <div>
                     <label for="field2">Commentaire</label>
                     <textarea id="field2" aria-describedby="counter2">${'x'.repeat(165)}</textarea>
-                    <ar-char-counter id="counter2" for="field2" max="200"></ar-char-counter>
+                    <ar-charcounter id="counter2" for="field2" max="200"></ar-charcounter>
                 </div>
             `);
             await expect(container).to.be.accessible();
@@ -699,13 +699,13 @@ describe('ar-char-counter — accessibilité', () => {
 
     describe('announceA11y aux transitions', () => {
         it('annonce le seuil warning (polite)', async () => {
-            const el = await fixture<ArCharCounter>(html`
+            const el = await fixture<ArCharcounter>(html`
                 <div>
                     <textarea id="fa"></textarea>
-                    <ar-char-counter for="fa" max="10" warn-threshold="20"></ar-char-counter>
+                    <ar-charcounter for="fa" max="10" warn-threshold="20"></ar-charcounter>
                 </div>
             `);
-            const counter = el.querySelector<ArCharCounter>('ar-char-counter')!;
+            const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
             const field = el.querySelector<HTMLTextAreaElement>('textarea')!;
 
             field.value = 'xxxxxxxxxx';
@@ -718,13 +718,13 @@ describe('ar-char-counter — accessibilité', () => {
         });
 
         it('annonce "Limite dépassée" en assertive', async () => {
-            const el = await fixture<ArCharCounter>(html`
+            const el = await fixture<ArCharcounter>(html`
                 <div>
                     <textarea id="fb"></textarea>
-                    <ar-char-counter for="fb" max="5" warn-threshold="0"></ar-char-counter>
+                    <ar-charcounter for="fb" max="5" warn-threshold="0"></ar-charcounter>
                 </div>
             `);
-            const counter = el.querySelector<ArCharCounter>('ar-char-counter')!;
+            const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
             const field = el.querySelector<HTMLTextAreaElement>('textarea')!;
 
             field.value = 'xxxxxx';
@@ -741,13 +741,13 @@ describe('ar-char-counter — accessibilité', () => {
 
     describe('parts shadow DOM', () => {
         it('expose part="container"', async () => {
-            const el = await fixture<ArCharCounter>(html`
+            const el = await fixture<ArCharcounter>(html`
                 <div>
                     <textarea id="fc"></textarea>
-                    <ar-char-counter for="fc" max="100"></ar-char-counter>
+                    <ar-charcounter for="fc" max="100"></ar-charcounter>
                 </div>
             `);
-            const counter = el.querySelector<ArCharCounter>('ar-char-counter')!;
+            const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
             expect(counter.shadowRoot!.querySelector('[part="container"]')).to.not.equal(null);
         });
     });
@@ -765,8 +765,8 @@ Expected: tous les tests passent (Vitest + WTR).
 - [ ] **Step 3 : Commit**
 
 ```bash
-git add packages/core/src/components/char-counter/char-counter.a11y.test.ts
-git commit -m "test(char-counter): tests browser axe + annonces SR"
+git add packages/core/src/components/charcounter/charcounter.a11y.test.ts
+git commit -m "test(charcounter): tests browser axe + annonces SR"
 ```
 
 ---
@@ -778,12 +778,12 @@ git commit -m "test(char-counter): tests browser axe + annonces SR"
 - Modify: `packages/core/src/index.ts`
 - Modify: `apps/docs/src/themes/default.css`
 
-- [ ] **Step 1 : Ajouter l'export du type CharCounterState dans index.ts**
+- [ ] **Step 1 : Ajouter l'export du type CharcounterState dans index.ts**
 
-Trouver la ligne `export { ArCharCounter }` ajoutée par le scaffold et ajouter en dessous :
+Trouver la ligne `export { ArCharcounter }` ajoutée par le scaffold et ajouter en dessous :
 
 ```typescript
-export type { CharCounterState } from './components/char-counter/char-counter.js';
+export type { CharcounterState } from './components/charcounter/charcounter.js';
 ```
 
 - [ ] **Step 2 : Regénérer le manifest**
@@ -792,24 +792,24 @@ export type { CharCounterState } from './components/char-counter/char-counter.js
 npm run build:manifest
 ```
 
-Expected: `custom-elements.json` mis à jour avec `ar-char-counter`.
+Expected: `custom-elements.json` mis à jour avec `ar-charcounter`.
 
 - [ ] **Step 3 : Ajouter les tokens dans default.css**
 
 Dans `apps/docs/src/themes/default.css`, trouver le bloc des tokens `ar-table-sort` et ajouter après :
 
 ```css
-/* ar-char-counter */
-ar-char-counter::part(count) {
-    color: var(--ar-char-counter-color, var(--ar-color-text-muted));
+/* ar-charcounter */
+ar-charcounter::part(count) {
+    color: var(--ar-charcounter-color, var(--ar-color-text-muted));
     font-size: 0.875rem;
 }
-ar-char-counter[state='warning']::part(count) {
-    color: var(--ar-char-counter-warning-color, var(--ar-color-warning));
+ar-charcounter[state='warning']::part(count) {
+    color: var(--ar-charcounter-warning-color, var(--ar-color-warning));
     font-weight: 600;
 }
-ar-char-counter[state='error']::part(count) {
-    color: var(--ar-char-counter-error-color, var(--ar-color-error));
+ar-charcounter[state='error']::part(count) {
+    color: var(--ar-charcounter-error-color, var(--ar-color-error));
     font-weight: 700;
 }
 ```
@@ -818,7 +818,7 @@ ar-char-counter[state='error']::part(count) {
 
 ```bash
 git add packages/core/src/index.ts custom-elements.json apps/docs/src/themes/default.css
-git commit -m "feat(char-counter): export type + tokens thème default.css"
+git commit -m "feat(charcounter): export type + tokens thème default.css"
 ```
 
 ---
@@ -827,13 +827,13 @@ git commit -m "feat(char-counter): export type + tokens thème default.css"
 
 **Files:**
 
-- Modify: `apps/docs/src/content/components/ar-char-counter.mdx`
+- Modify: `apps/docs/src/content/components/ar-charcounter.mdx`
 
 - [ ] **Step 1 : Remplacer le contenu scaffoldé du fichier MDX**
 
 ````mdx
 ---
-tagName: ar-char-counter
+tagName: ar-charcounter
 title: Char Counter
 description: Compteur de caractères restants pour un champ texte — décompte accessible avec états warning et error.
 playgroundTemplate: default
@@ -841,7 +841,7 @@ variants:
     - name: default
       label: Par défaut
       description: |
-          Liez `ar-char-counter` à un `<textarea>` via `for="id"`.
+          Liez `ar-charcounter` à un `<textarea>` via `for="id"`.
           Utilisez `aria-describedby` sur le champ pour que les lecteurs d'écran annoncent le décompte au focus.
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
@@ -851,7 +851,7 @@ variants:
                   aria-describedby="cc-default-counter"
                   style="resize:vertical;min-height:80px;"
               ></textarea>
-              <ar-char-counter id="cc-default-counter" for="cc-default" max="200"></ar-char-counter>
+              <ar-charcounter id="cc-default-counter" for="cc-default" max="200"></ar-charcounter>
           </div>
     - name: warning
       label: Seuil warning
@@ -866,12 +866,12 @@ variants:
                   aria-describedby="cc-warn-counter"
                   style="resize:vertical;min-height:80px;"
               >Un texte déjà assez long pour déclencher le warning ici !</textarea>
-              <ar-char-counter
+              <ar-charcounter
                   id="cc-warn-counter"
                   for="cc-warn"
                   max="60"
                   warn-threshold="30"
-              ></ar-char-counter>
+              ></ar-charcounter>
           </div>
     - name: icon
       label: Icône non-couleur
@@ -886,10 +886,10 @@ variants:
                   aria-describedby="cc-icon-counter"
                   style="resize:vertical;min-height:80px;"
               ></textarea>
-              <ar-char-counter id="cc-icon-counter" for="cc-icon" max="50" warn-threshold="20">
+              <ar-charcounter id="cc-icon-counter" for="cc-icon" max="50" warn-threshold="20">
                   <span slot="icon-warning" aria-hidden="true" style="margin-right:.25rem;">⚠</span>
                   <span slot="icon-error"   aria-hidden="true" style="margin-right:.25rem;">✕</span>
-              </ar-char-counter>
+              </ar-charcounter>
           </div>
     - name: label
       label: Label personnalisé
@@ -898,7 +898,7 @@ variants:
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-label">Comment</label>
               <textarea id="cc-label" aria-describedby="cc-label-counter" style="resize:vertical;min-height:80px;"></textarea>
-              <ar-char-counter id="cc-label-counter" for="cc-label" max="200" label="remaining"></ar-char-counter>
+              <ar-charcounter id="cc-label-counter" for="cc-label" max="200" label="remaining"></ar-charcounter>
           </div>
 ---
 
@@ -924,7 +924,7 @@ Les critères WCAG suivants sont implémentés :
 ```html
 <label for="field">Commentaire</label>
 <textarea id="field" aria-describedby="field-counter"></textarea>
-<ar-char-counter id="field-counter" for="field" max="200"></ar-char-counter>
+<ar-charcounter id="field-counter" for="field" max="200"></ar-charcounter>
 ```
 ````
 
@@ -932,7 +932,7 @@ Le `aria-describedby` fait lire le contenu du counter au focus — le lecteur d'
 
 ### `aria-invalid` — responsabilité du consumer
 
-`ar-char-counter` ne pose pas `aria-invalid` automatiquement. Le poser pendant la frappe est désastreux pour les lecteurs d'écran (annonce répétée _"entrée non valide"_). Gérer sur `blur` ou `submit` :
+`ar-charcounter` ne pose pas `aria-invalid` automatiquement. Le poser pendant la frappe est désastreux pour les lecteurs d'écran (annonce répétée _"entrée non valide"_). Gérer sur `blur` ou `submit` :
 
 ```js
 field.addEventListener('blur', () => {
@@ -949,7 +949,7 @@ Pour les cas où l'icône doit apparaître dans le `<label>` plutôt que dans le
     Commentaire
     <svg class="warn-icon" style="display:none" aria-hidden="true">…</svg>
 </label>
-<ar-char-counter for="field" max="200"></ar-char-counter>
+<ar-charcounter for="field" max="200"></ar-charcounter>
 ```
 
 ```css
@@ -966,14 +966,14 @@ label[data-ar-char-state='warning'] .warn-icon {
 npm run dev
 ````
 
-Ouvrir `http://localhost:4321/components/ar-char-counter` dans le navigateur.
+Ouvrir `http://localhost:4321/components/ar-charcounter` dans le navigateur.
 Vérifier : playground fonctionnel, 4 variantes visibles, section Accessibilité complète.
 
 - [ ] **Step 3 : Commit**
 
 ```bash
-git add apps/docs/src/content/components/ar-char-counter.mdx
-git commit -m "docs(char-counter): page de documentation — playground, accessibilité, patterns"
+git add apps/docs/src/content/components/ar-charcounter.mdx
+git commit -m "docs(charcounter): page de documentation — playground, accessibilité, patterns"
 ```
 
 ---
@@ -991,22 +991,22 @@ Expected: tous les tests Vitest + WTR passent.
 - [ ] **Vérifier la couverture des exports**
 
 ```bash
-grep 'char-counter\|CharCounter' packages/core/src/index.ts
+grep 'charcounter\|CharCounter' packages/core/src/index.ts
 ```
 
-Expected: `ArCharCounter` et `CharCounterState` tous les deux exportés.
+Expected: `ArCharcounter` et `CharcounterState` tous les deux exportés.
 
 - [ ] **Pousser la branche et ouvrir la PR vers `dev`**
 
 ```bash
-git push -u origin feat/ar-char-counter
+git push -u origin feat/ar-charcounter
 gh pr create \
   --base dev \
-  --title "feat(char-counter): ar-char-counter — compteur de caractères accessible" \
+  --title "feat(charcounter): ar-charcounter — compteur de caractères accessible" \
   --body "$(cat <<'EOF'
 ## Summary
 
-- Composant standalone `ar-char-counter` observant un champ via `for="id"` (pattern `ar-tooltip`)
+- Composant standalone `ar-charcounter` observant un champ via `for="id"` (pattern `ar-tooltip`)
 - Décompte inversé avec 3 états : normal / warning / error
 - Slots `icon-warning` / `icon-error` pour signal non-couleur (WCAG 1.4.1)
 - `data-ar-char-state` posé sur le champ lié et ses labels pour CSS externe
@@ -1019,7 +1019,7 @@ Closes #13 (partiel — roadmap composants v1)
 ## Test plan
 
 - [ ] `npm run test:all` — tous les tests Vitest + WTR passent
-- [ ] Playground doc fonctionnel sur `/components/ar-char-counter`
+- [ ] Playground doc fonctionnel sur `/components/ar-charcounter`
 - [ ] Tester manuellement les 4 variantes dans le navigateur
 - [ ] Vérifier les annonces SR avec VoiceOver (warning → error → retour)
 - [ ] Vérifier `data-ar-char-state` dans les DevTools au passage des seuils
