@@ -211,6 +211,38 @@ const {
                 color:      var(--doc-text);
             }
 
+            .theme-trigger-chevron {
+                font-size:   0.55rem;
+                color:       var(--doc-text-muted);
+                margin-left: 2px;
+            }
+
+            .theme-menu-item {
+                display:         flex;
+                align-items:     center;
+                gap:             0.5rem;
+                width:           100%;
+                padding:         0.4rem 0.75rem;
+                background:      transparent;
+                border:          none;
+                border-radius:   0.3rem;
+                cursor:          pointer;
+                font-size:       0.85rem;
+                font-family:     inherit;
+                color:           var(--doc-text);
+                text-align:      left;
+                white-space:     nowrap;
+            }
+
+            .theme-menu-item:hover {
+                background: var(--doc-nav-bg-hover);
+            }
+
+            .theme-menu-item[aria-current="true"] {
+                color:       var(--doc-accent);
+                font-weight: 600;
+            }
+
             .brand-dot {
                 display:        inline-block;
                 font-size:      0.55rem;
@@ -229,41 +261,6 @@ const {
                 border:        1px solid var(--doc-accent-border, #e0d0ff);
                 padding:       1px 8px;
                 border-radius: 20px;
-            }
-
-            .theme-toggle {
-                display:       flex;
-                gap:           1px;
-                border:        1px solid var(--doc-border, #e8e6e0);
-                border-radius: 7px;
-                background:    var(--doc-nav-bg, #fafaf8);
-                padding:       2px;
-            }
-
-            .theme-btn {
-                width:           26px;
-                height:          26px;
-                border-radius:   5px;
-                border:          none;
-                background:      transparent;
-                display:         flex;
-                align-items:     center;
-                justify-content: center;
-                cursor:          pointer;
-                font-size:       0.72rem;
-                color:           var(--doc-text-muted, #6b7280);
-                transition:      background 0.12s, color 0.12s;
-            }
-
-            .theme-btn.active {
-                background: #fff;
-                color:      var(--doc-accent, #7c3aed);
-                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-            }
-
-            [data-theme="dark"] .theme-btn.active {
-                background: var(--doc-accent-bg, #2d2040);
-                color:      var(--doc-accent, #a78bfa);
             }
 
             /* ── Overlay drawer ─────────────────────────── */
