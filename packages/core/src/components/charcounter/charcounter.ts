@@ -38,15 +38,15 @@ export class ArCharcounter extends LitElement {
     private static _idCounter = 0;
 
     /** ID du champ observé. Requis. */
-    @property({ reflect: true }) for = '';
+    @property({ reflect: true }) for: undefined;
 
-    /** Limite de caractères. Requis — warn dev et rendu vide si absent. */
+    /** Limite de caractères. Requis. */
     @property({ type: Number }) max: number | undefined;
 
-    /** Pourcentage restant déclenchant l'état warning (défaut : 20). */
+    /** Nombre de caractères restants déclenchant l'état warning. */
     @property({ attribute: 'warn-threshold', reflect: true, type: Number }) warnThreshold = 20;
 
-    /** Texte affiché après le chiffre. Accepte "singulier|pluriel" (défaut : "caractère restant|caractères restants"). */
+    /** Texte affiché après le chiffre. Accepte "singulier|pluriel". */
     @property({ reflect: true }) label = 'caractère restant|caractères restants';
 
     private _count = 0;
@@ -153,7 +153,7 @@ export class ArCharcounter extends LitElement {
     private _computeState(): void {
         if (this.max === undefined) return;
         const remaining = this.max - this._count;
-        const warnLimit = Math.floor((this.max * this.warnThreshold) / 100);
+        const warnLimit = this.warnThreshold;
         const prevState = this._state;
 
         let nextState: CharcounterState;

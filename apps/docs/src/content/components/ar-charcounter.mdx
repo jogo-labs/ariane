@@ -20,14 +20,14 @@ variants:
     - name: warning
       label: Seuil d'avertissement personnalisé
       description: |
-          `warn-threshold="30"` déclenche l'état `warning` quand il reste ≤ 30 % des caractères.
-          La zone de texte est pré-remplie pour illustrer l'état d'avertissement (42 caractères sur 60).
+          `warn-threshold="15"` déclenche l'état `warning` quand il reste ≤ 15 caractères.
+          La zone de texte est pré-remplie pour illustrer l'état d'avertissement (45 caractères sur 60).
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-warn">Description</label>
               <textarea id="cc-warn" rows="3"
                   style="width:100%;resize:vertical;">Voici un exemple de texte assez long pour déclencher</textarea>
-              <ar-charcounter id="cc-warn-counter" for="cc-warn" max="60" warn-threshold="30"></ar-charcounter>
+              <ar-charcounter id="cc-warn-counter" for="cc-warn" max="60" warn-threshold="15"></ar-charcounter>
           </div>
     - name: icon
       label: Icônes dans les slots

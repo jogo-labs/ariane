@@ -196,19 +196,19 @@ describe('ArCharcounter', () => {
             expect(el.getAttribute('state')).toBe('normal');
         });
 
-        it('state="warning" quand remaining ≤ seuil (20% de 200 = 40)', async () => {
-            el = await setupWithCount(160, 200, 20);
+        it('state="warning" quand remaining ≤ seuil (seuil = 20)', async () => {
+            el = await setupWithCount(180, 200, 20);
             expect(el.state).toBe('warning');
             expect(el.getAttribute('state')).toBe('warning');
         });
 
-        it('state="warning" exactement au seuil (remaining = 40)', async () => {
-            el = await setupWithCount(160, 200, 20);
+        it('state="warning" exactement au seuil (remaining = 20)', async () => {
+            el = await setupWithCount(180, 200, 20);
             expect(el.state).toBe('warning');
         });
 
-        it('state="normal" quand remaining = 41 (juste au dessus du seuil)', async () => {
-            el = await setupWithCount(159, 200, 20);
+        it('state="normal" quand remaining = 21 (juste au-dessus du seuil)', async () => {
+            el = await setupWithCount(179, 200, 20);
             expect(el.state).toBe('normal');
         });
 
@@ -226,7 +226,7 @@ describe('ArCharcounter', () => {
         it('retour à normal depuis error après suppression de texte', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxxxxxxxx';
@@ -250,7 +250,7 @@ describe('ArCharcounter', () => {
         it('vide la région assertive lors du passage error → warning', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="5" warn-threshold="3"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
 
@@ -273,7 +273,7 @@ describe('ArCharcounter', () => {
         it('annonce le warning avec le label pluralisé (pluriel)', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-charcounter for="f" max="10" warn-threshold="50" label="caractère restant|caractères restants"></ar-charcounter>',
+                '<ar-charcounter for="f" max="10" warn-threshold="6" label="caractère restant|caractères restants"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxx';
@@ -289,7 +289,7 @@ describe('ArCharcounter', () => {
         it('annonce le warning avec le label pluralisé (singulier)', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture(
-                '<ar-charcounter for="f" max="10" warn-threshold="50" label="caractère restant|caractères restants"></ar-charcounter>',
+                '<ar-charcounter for="f" max="10" warn-threshold="5" label="caractère restant|caractères restants"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxxxxx';
@@ -364,7 +364,7 @@ describe('ArCharcounter', () => {
         it('pose data-ar-char-state="warning" sur le textarea', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             const el = await fixture<ArCharcounter>(
-                '<ar-charcounter for="f" max="10" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="10" warn-threshold="2"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxxxxxx';
@@ -377,7 +377,7 @@ describe('ArCharcounter', () => {
         it('pose data-ar-char-state="error" sur le textarea', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             const el = await fixture<ArCharcounter>(
-                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="5" warn-threshold="1"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxx';
@@ -390,7 +390,7 @@ describe('ArCharcounter', () => {
         it('retire data-ar-char-state au retour à normal', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             const el = await fixture<ArCharcounter>(
-                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="5" warn-threshold="1"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxx';
@@ -406,7 +406,7 @@ describe('ArCharcounter', () => {
         it('retire data-ar-char-state au disconnectedCallback', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             const el = await fixture<ArCharcounter>(
-                '<ar-charcounter for="f" max="5" warn-threshold="20"></ar-charcounter>',
+                '<ar-charcounter for="f" max="5" warn-threshold="1"></ar-charcounter>',
             );
             const field = document.getElementById('f') as HTMLTextAreaElement;
             field.value = 'xxxxxx';
