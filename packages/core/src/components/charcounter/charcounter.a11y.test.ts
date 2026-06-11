@@ -48,7 +48,7 @@ describe('ar-charcounter — accessibilité', () => {
             const el = await fixture<ArCharcounter>(html`
                 <div>
                     <textarea id="fa"></textarea>
-                    <ar-charcounter for="fa" max="10" warn-threshold="20"></ar-charcounter>
+                    <ar-charcounter for="fa" max="10" warn-threshold="1"></ar-charcounter>
                 </div>
             `);
             const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
@@ -60,7 +60,7 @@ describe('ar-charcounter — accessibilité', () => {
 
             await new Promise((r) => setTimeout(r, 80));
             const region = document.getElementById('ar-live-region-polite');
-            expect(region?.textContent?.trim()).to.equal('0 restants');
+            expect(region?.textContent?.trim()).to.equal('0 caractères restants');
         });
 
         it('annonce "Limite dépassée" en assertive', async () => {
@@ -79,7 +79,7 @@ describe('ar-charcounter — accessibilité', () => {
 
             await new Promise((r) => setTimeout(r, 80));
             const region = document.getElementById('ar-live-region-assertive');
-            expect(region?.textContent?.trim()).to.equal('Limite dépassée');
+            expect(region?.textContent?.trim()).to.equal('Limite dépassée de 1 caractère');
         });
     });
 
