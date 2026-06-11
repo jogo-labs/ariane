@@ -179,6 +179,8 @@ export class ArCharcounter extends LitElement {
             } else {
                 this._setLinkedAttributes(nextState);
             }
+        } else if (nextState === 'error') {
+            this._announceTransition(nextState, remaining);
         }
     }
 

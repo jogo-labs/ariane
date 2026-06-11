@@ -81,6 +81,30 @@ describe('ar-charcounter — accessibilité', () => {
             const region = document.getElementById('ar-live-region-assertive');
             expect(region?.textContent?.trim()).to.equal('Limite dépassée de 1 caractère');
         });
+
+        it('met à jour la région assertive à chaque frappe en état error', async () => {
+            const el = await fixture<ArCharcounter>(html`
+                <div>
+                    <textarea id="fc2"></textarea>
+                    <ar-charcounter for="fc2" max="5" warn-threshold="0"></ar-charcounter>
+                </div>
+            `);
+            const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
+            const field = el.querySelector<HTMLTextAreaElement>('textarea')!;
+
+            field.value = 'xxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await counter.updateComplete;
+            await new Promise((r) => setTimeout(r, 80));
+
+            field.value = 'xxxxxxxx';
+            field.dispatchEvent(new Event('input'));
+            await counter.updateComplete;
+            await new Promise((r) => setTimeout(r, 80));
+
+            const region = document.getElementById('ar-live-region-assertive');
+            expect(region?.textContent?.trim()).to.equal('Limite dépassée de 3 caractères');
+        });
     });
 
     // ── Parts shadow DOM ──────────────────────────────────────────────────
