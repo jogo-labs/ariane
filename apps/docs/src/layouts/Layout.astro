@@ -204,6 +204,11 @@ const {
                 color:           var(--doc-text-muted);
                 transition:      background 0.15s, color 0.15s;
                 text-decoration: none;
+                gap: .35rem;
+            }
+
+            #theme-trigger {
+                width: 3rem;
             }
 
             .icon-btn:hover {
@@ -483,27 +488,53 @@ const {
                 return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
 
+            const THEME_ICONS: Record<string, string> = {
+                light:  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+                dark:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>',
+                system: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+            };
+
+            const THEME_LABELS: Record<string, string> = {
+                light:  'Clair',
+                dark:   'Sombre',
+                system: 'Automatique',
+            };
+
+            function setTriggerIcon(mode: string) {
+                const trigger = document.getElementById('theme-trigger');
+                if (!trigger) return;
+                const icon = THEME_ICONS[mode] ?? THEME_ICONS.system;
+                const chevron = '<span class="theme-trigger-chevron" aria-hidden="true">▾</span>';
+                trigger.innerHTML = icon + chevron;
+                trigger.setAttribute('aria-label', `Thème : ${THEME_LABELS[mode] ?? 'Automatique'}`);
+            }
+
             function applyMode(mode: string) {
                 const theme = resolveTheme(mode);
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.dataset.themeMode = mode;
-
-                // Mettre à jour le bouton actif dans le toggle groupé
-                document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
-                    const isActive = btn.dataset.themeMode === mode;
-                    btn.classList.toggle('active', isActive);
-                    btn.setAttribute('aria-pressed', String(isActive));
+                setTriggerIcon(mode);
+                document.querySelectorAll<HTMLElement>('ar-dropdown-item[data-theme-mode]').forEach((item) => {
+                    const btn = item.querySelector<HTMLElement>('button');
+                    if (!btn) return;
+                    if (item.dataset.themeMode === mode) {
+                        btn.setAttribute('aria-current', 'true');
+                    } else {
+                        btn.removeAttribute('aria-current');
+                    }
                 });
             }
 
             const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
-            document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const mode = btn.dataset.themeMode || 'system';
+            document.querySelectorAll<HTMLElement>('ar-dropdown-item[data-theme-mode]').forEach((item) => {
+                item.addEventListener('click', () => {
+                    const mode = item.dataset.themeMode || 'system';
                     localStorage.setItem('ariane-theme', mode);
                     applyMode(mode);
+                    const dd = document.getElementById('theme-dropdown') as HTMLElement & { open?: boolean };
+                    if (dd) dd.open = false;
                 });
             });
 
