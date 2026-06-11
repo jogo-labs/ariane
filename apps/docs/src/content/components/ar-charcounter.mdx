@@ -13,7 +13,7 @@ variants:
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-default">Message</label>
-              <textarea id="cc-default" aria-describedby="cc-default-counter" rows="3"
+              <textarea id="cc-default" rows="3"
                   style="width:100%;resize:vertical;"></textarea>
               <ar-charcounter id="cc-default-counter" for="cc-default" max="100"></ar-charcounter>
           </div>
@@ -25,7 +25,7 @@ variants:
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-warn">Description</label>
-              <textarea id="cc-warn" aria-describedby="cc-warn-counter" rows="3"
+              <textarea id="cc-warn" rows="3"
                   style="width:100%;resize:vertical;">Voici un exemple de texte assez long pour déclencher</textarea>
               <ar-charcounter id="cc-warn-counter" for="cc-warn" max="60" warn-threshold="30"></ar-charcounter>
           </div>
@@ -37,7 +37,7 @@ variants:
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-icon">Commentaire</label>
-              <textarea id="cc-icon" aria-describedby="cc-icon-counter" rows="3"
+              <textarea id="cc-icon" rows="3"
                   style="width:100%;resize:vertical;"></textarea>
               <ar-charcounter id="cc-icon-counter" for="cc-icon" max="80">
                   <span slot="icon-warning" aria-hidden="true">⚠️</span>
@@ -52,7 +52,7 @@ variants:
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-label">Bio</label>
-              <textarea id="cc-label" aria-describedby="cc-label-counter" rows="3"
+              <textarea id="cc-label" rows="3"
                   style="width:100%;resize:vertical;"></textarea>
               <ar-charcounter id="cc-label-counter" for="cc-label" max="150" label="remaining"></ar-charcounter>
           </div>
@@ -66,23 +66,32 @@ import WcagRef from '../../components/WcagRef.astro';
 
 `ar-charcounter` gère les annonces et états sémantiques sans intervention du consumer :
 
+- Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés.
 - Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants — par exemple _"12 restants"_.
 - Une région `aria-live="assertive"` annonce _"Limite dépassée"_ dès que l'état `error` est atteint.
 - L'attribut `data-ar-char-state` (`"warning"` ou `"error"`) est posé sur le champ observé et sur ses `<label>` liés — retiré automatiquement au retour à l'état `normal`. Il permet au consumer de styler le champ en réponse à l'état sans JavaScript supplémentaire.
 
 Les critères WCAG suivants sont implémentés :
 
-- le compteur lié via `aria-describedby` est lisible par les technologies d'assistance (<WcagRef criterion="1.3.1" summary="Info and Relationships : le compteur lié via aria-describedby est disponible programmatiquement pour les technologies d'assistance." />)
+- le compteur est lié programmatiquement au champ via `aria-describedby` géré automatiquement (<WcagRef criterion="1.3.1" summary="Info and Relationships : le compteur lié via aria-describedby est disponible programmatiquement pour les technologies d'assistance." />)
 - les régions `aria-live` annoncent le passage en avertissement et le dépassement de limite sans déplacer le focus (<WcagRef criterion="4.1.3" summary="Status Messages : les régions aria-live annoncent warning et error sans déplacer le focus." />)
 
 ### Pattern recommandé
 
-Lier le compteur au champ via `aria-describedby` pour que les lecteurs d'écran annoncent le compteur lors de la prise de focus sur le champ :
+Aucun `aria-describedby` manuel n'est nécessaire — le composant se charge seul de la liaison :
 
 ```html
 <label for="mon-champ">Message</label>
-<textarea id="mon-champ" aria-describedby="mon-compteur"></textarea>
+<textarea id="mon-champ"></textarea>
+<ar-charcounter for="mon-champ" max="200"></ar-charcounter>
+```
+
+Si plusieurs descriptions coexistent sur le même champ, les ids sont préservés :
+
+```html
+<textarea id="mon-champ" aria-describedby="hint-format"></textarea>
 <ar-charcounter id="mon-compteur" for="mon-champ" max="200"></ar-charcounter>
+<!-- aria-describedby devient "hint-format mon-compteur" -->
 ```
 
 ### `aria-invalid` — responsabilité du consumer

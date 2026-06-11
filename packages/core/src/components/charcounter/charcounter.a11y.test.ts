@@ -7,12 +7,23 @@ describe('ar-charcounter — accessibilité', () => {
     // ── Audit axe ─────────────────────────────────────────────────────────
 
     describe('audit axe', () => {
-        it('passe axe avec aria-describedby', async () => {
+        it('passe axe sans aria-describedby consumer (géré automatiquement)', async () => {
             const container = await fixture(html`
                 <div>
                     <label for="field">Commentaire</label>
-                    <textarea id="field" aria-describedby="counter"></textarea>
-                    <ar-charcounter id="counter" for="field" max="200"></ar-charcounter>
+                    <textarea id="field"></textarea>
+                    <ar-charcounter for="field" max="200"></ar-charcounter>
+                </div>
+            `);
+            await expect(container).to.be.accessible();
+        });
+
+        it('passe axe avec aria-describedby consumer explicite', async () => {
+            const container = await fixture(html`
+                <div>
+                    <label for="field1">Commentaire</label>
+                    <textarea id="field1" aria-describedby="counter1"></textarea>
+                    <ar-charcounter id="counter1" for="field1" max="200"></ar-charcounter>
                 </div>
             `);
             await expect(container).to.be.accessible();
@@ -22,8 +33,8 @@ describe('ar-charcounter — accessibilité', () => {
             const container = await fixture(html`
                 <div>
                     <label for="field2">Commentaire</label>
-                    <textarea id="field2" aria-describedby="counter2">${'x'.repeat(165)}</textarea>
-                    <ar-charcounter id="counter2" for="field2" max="200"></ar-charcounter>
+                    <textarea id="field2">${'x'.repeat(165)}</textarea>
+                    <ar-charcounter for="field2" max="200"></ar-charcounter>
                 </div>
             `);
             await expect(container).to.be.accessible();

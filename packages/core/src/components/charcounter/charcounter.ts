@@ -29,6 +29,7 @@ export type CharcounterState = 'normal' | 'warning' | 'error';
 export class ArCharcounter extends LitElement {
     static override styles = [styles];
     static readonly NAME = 'ArCharcounter';
+    private static _idCounter = 0;
 
     /** ID du champ observé. Requis. */
     @property({ reflect: true }) for = '';
@@ -94,6 +95,7 @@ export class ArCharcounter extends LitElement {
         this._field = field;
         this._count = field.value.length;
         this._computeState();
+        this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
     }
@@ -101,8 +103,38 @@ export class ArCharcounter extends LitElement {
     private _detachField(): void {
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
+        this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;
+    }
+
+    private _ensureId(): string {
+        if (!this.id) {
+            this.id = `ar-charcounter-${++ArCharcounter._idCounter}`;
+        }
+        return this.id;
+    }
+
+    private _addAriaDescribedby(field: HTMLInputElement | HTMLTextAreaElement): void {
+        const id = this._ensureId();
+        const current = field.getAttribute('aria-describedby') ?? '';
+        const ids = current.split(/\s+/).filter(Boolean);
+        if (!ids.includes(id)) {
+            ids.push(id);
+            field.setAttribute('aria-describedby', ids.join(' '));
+        }
+    }
+
+    private _removeAriaDescribedby(field: HTMLInputElement | HTMLTextAreaElement): void {
+        const id = this.id;
+        if (!id) return;
+        const current = field.getAttribute('aria-describedby') ?? '';
+        const ids = current.split(/\s+/).filter((i) => i !== id);
+        if (ids.length > 0) {
+            field.setAttribute('aria-describedby', ids.join(' '));
+        } else {
+            field.removeAttribute('aria-describedby');
+        }
     }
 
     private readonly _handleInput = (): void => {

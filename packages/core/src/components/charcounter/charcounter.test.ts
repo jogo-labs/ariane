@@ -253,4 +253,62 @@ describe('ArCharcounter', () => {
             expect(field.hasAttribute('data-ar-char-state')).toBe(false);
         });
     });
+
+    // ── aria-describedby automatique ──────────────────────────────────────
+
+    describe('aria-describedby automatique', () => {
+        it("ajoute son id à aria-describedby du champ à l'attache", async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            expect(field.getAttribute('aria-describedby')).toContain(el.id);
+        });
+
+        it('génère un id si le composant en est dépourvu', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            expect(el.id).toMatch(/^ar-charcounter-\d+$/);
+        });
+
+        it('conserve les ids existants dans aria-describedby', async () => {
+            document.body.innerHTML = '<textarea id="f" aria-describedby="hint-1"></textarea>';
+            el = await fixture(
+                '<ar-charcounter id="my-counter" for="f" max="200"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            const ids = field.getAttribute('aria-describedby')?.split(' ') ?? [];
+            expect(ids).toContain('hint-1');
+            expect(ids).toContain('my-counter');
+        });
+
+        it("ne duplique pas l'id si aria-describedby est déjà présent", async () => {
+            document.body.innerHTML = '<textarea id="f" aria-describedby="my-counter"></textarea>';
+            el = await fixture(
+                '<ar-charcounter id="my-counter" for="f" max="200"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            const ids = (field.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean);
+            expect(ids.filter((i) => i === 'my-counter')).toHaveLength(1);
+        });
+
+        it('retire son id de aria-describedby au disconnectedCallback', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            const id = el.id;
+            el.remove();
+            const desc = field.getAttribute('aria-describedby') ?? '';
+            expect(desc).not.toContain(id);
+        });
+
+        it('conserve les autres ids lors de la suppression du composant', async () => {
+            document.body.innerHTML = '<textarea id="f" aria-describedby="hint-1"></textarea>';
+            el = await fixture(
+                '<ar-charcounter id="my-counter" for="f" max="200"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            el.remove();
+            expect(field.getAttribute('aria-describedby')).toBe('hint-1');
+        });
+    });
 });
