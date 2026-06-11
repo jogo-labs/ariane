@@ -64,12 +64,12 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-`ar-charcounter` gère les annonces et états sémantiques sans intervention du consumer :
+`ar-charcounter` gère les annonces et états sémantiques sans intervention de l'auteur :
 
 - Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés.
 - Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants — par exemple _"12 restants"_.
 - Une région `aria-live="assertive"` annonce _"Limite dépassée"_ dès que l'état `error` est atteint.
-- L'attribut `data-ar-char-state` (`"warning"` ou `"error"`) est posé sur le champ observé et sur ses `<label>` liés — retiré automatiquement au retour à l'état `normal`. Il permet au consumer de styler le champ en réponse à l'état sans JavaScript supplémentaire.
+- L'attribut `data-ar-char-state` (`"warning"` ou `"error"`) est posé sur le champ observé et sur ses `<label>` liés — retiré automatiquement au retour à l'état `normal`. Il permet à l'auteur de styler le champ en réponse à l'état sans JavaScript supplémentaire.
 
 Les critères WCAG suivants sont implémentés :
 
@@ -94,9 +94,9 @@ Si plusieurs descriptions coexistent sur le même champ, les ids sont préservé
 <!-- aria-describedby devient "hint-format mon-compteur" -->
 ```
 
-### `aria-invalid` — responsabilité du consumer
+### `aria-invalid` — à la charge de l'auteur
 
-`ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé au consumer car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
+`ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à la charge de l'auteur car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
 form.addEventListener('submit', (e) => {
