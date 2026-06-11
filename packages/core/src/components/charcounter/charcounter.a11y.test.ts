@@ -107,6 +107,29 @@ describe('ar-charcounter — accessibilité', () => {
         });
     });
 
+    // ── Cycle de vie ──────────────────────────────────────────────────────
+
+    describe('cycle de vie', () => {
+        it('ne lance pas de TypeError si déconnecté avant le microtask (isConnected guard)', async () => {
+            // Sans le guard : queueMicrotask appelle _attachField() sur un élément
+            // déconnecté → getRootNode() retourne l'élément lui-même → el.getElementById()
+            // n'existe pas → TypeError non rattrapée → WTR fait échouer le test.
+            // Avec le guard : return early → aucune erreur.
+            const el = await fixture<ArCharcounter>(html`
+                <div>
+                    <textarea id="fd1"></textarea>
+                    <textarea id="fd2"></textarea>
+                    <ar-charcounter for="fd1" max="100"></ar-charcounter>
+                </div>
+            `);
+            const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
+
+            counter.for = 'fd2'; // planifie queueMicrotask dans updated()
+            counter.remove(); // disconnectedCallback synchrone avant le microtask
+            await new Promise((r) => setTimeout(r, 0)); // vide tous les microtasks
+        });
+    });
+
     // ── Parts shadow DOM ──────────────────────────────────────────────────
 
     describe('parts shadow DOM', () => {

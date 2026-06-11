@@ -426,23 +426,6 @@ describe('ArCharcounter', () => {
     // ── Cycle de vie / fuites de listener ────────────────────────────────
 
     describe('cycle de vie', () => {
-        it("n'émet pas de warn parasite si déconnecté avant le microtask", async () => {
-            document.body.innerHTML = '<textarea id="fa"></textarea><textarea id="fb"></textarea>';
-            el = await fixture('<ar-charcounter for="fa" max="100"></ar-charcounter>');
-
-            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-            el.for = 'fb'; // planifie queueMicrotask dans updated()
-            el.remove(); // disconnectedCallback synchrone avant le microtask
-            await new Promise((r) => setTimeout(r, 0)); // vide tous les microtasks
-
-            // Sans fix : _attachField tente la requête DOM, ne trouve pas 'fb',
-            //            émet warn('Aucun élément trouvé avec l'id "fb"')
-            // Avec fix : guard isConnected → return early → pas de warn parasite
-            expect(spy).not.toHaveBeenCalled();
-            spy.mockRestore();
-        });
-
         it("ne déclenche pas de mutation de l'attribut state s'il ne change pas", async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f" max="100"></ar-charcounter>');
