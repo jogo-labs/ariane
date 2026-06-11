@@ -84,9 +84,16 @@ describe('ArCharcounter', () => {
         });
     });
 
-    // ── warn() si for invalide ────────────────────────────────────────────
+    // ── warn() si for absent ou invalide ─────────────────────────────────
 
-    describe('warn() si for invalide', () => {
+    describe('warn() si for absent ou invalide', () => {
+        it("émet un warn si for n'est pas fourni", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-charcounter max="100"></ar-charcounter>');
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('for'));
+            spy.mockRestore();
+        });
+
         it("émet un warn si l'id est introuvable", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-charcounter for="inexistant" max="100"></ar-charcounter>');

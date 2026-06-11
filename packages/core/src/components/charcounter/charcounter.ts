@@ -38,7 +38,7 @@ export class ArCharcounter extends LitElement {
     private static _idCounter = 0;
 
     /** ID du champ observé. Requis. */
-    @property({ reflect: true }) for: undefined;
+    @property({ reflect: true }) for: string | undefined;
 
     /** Limite de caractères. Requis. */
     @property({ type: Number }) max: number | undefined;
@@ -61,6 +61,9 @@ export class ArCharcounter extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        if (this.for === undefined) {
+            warn('ar-charcounter', "l'attribut for est requis.");
+        }
         if (this.max === undefined) {
             warn('ar-charcounter', "l'attribut max est requis.");
         }
