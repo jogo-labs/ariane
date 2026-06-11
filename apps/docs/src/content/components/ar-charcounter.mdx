@@ -47,14 +47,17 @@ variants:
     - name: label
       label: Label personnalisé
       description: |
-          La prop `label` remplace le texte affiché après le chiffre. Utile pour localiser
-          le composant ou adapter le libellé au contexte.
+          La prop `label` accepte la syntaxe `"singulier|pluriel"` — le composant choisit
+          automatiquement la forme selon le nombre de caractères restants. Le même label
+          est utilisé dans les annonces `aria-live` : l'annonce de passage en avertissement
+          dit par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
+          Sans pipe, le label est utilisé tel quel (compatibilité descendante).
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
               <label for="cc-label">Bio</label>
               <textarea id="cc-label" rows="3"
                   style="width:100%;resize:vertical;"></textarea>
-              <ar-charcounter id="cc-label-counter" for="cc-label" max="150" label="remaining"></ar-charcounter>
+              <ar-charcounter id="cc-label-counter" for="cc-label" max="150" label="character remaining|characters remaining"></ar-charcounter>
           </div>
 ---
 
@@ -67,8 +70,9 @@ import WcagRef from '../../components/WcagRef.astro';
 `ar-charcounter` gère les annonces et états sémantiques sans intervention de l'auteur :
 
 - Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés.
-- Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants — par exemple _"12 restants"_.
-- Une région `aria-live="assertive"` annonce _"Limite dépassée"_ dès que l'état `error` est atteint.
+- Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants et le label pluralisé — par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
+- Une région `aria-live="assertive"` annonce le dépassement avec son ampleur dès que l'état `error` est atteint — par exemple _"Limite dépassée de 1 caractère"_ ou _"Limite dépassée de 3 caractères"_.
+- Les régions `aria-live` sont vidées au retour à l'état `normal` (ou lors de la transition `error → warning`), ce qui garantit la ré-annonce si l'utilisateur repasse dans le même état.
 - L'attribut `data-ar-char-state` (`"warning"` ou `"error"`) est posé sur le champ observé et sur ses `<label>` liés — retiré automatiquement au retour à l'état `normal`. Il permet à l'auteur de styler le champ en réponse à l'état sans JavaScript supplémentaire.
 
 Les critères WCAG suivants sont implémentés :
