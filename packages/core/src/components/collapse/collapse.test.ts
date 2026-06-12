@@ -433,6 +433,24 @@ describe('ArCollapse', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(false);
         });
+
+        it('pose aria-disabled sur le bouton externe quand disabled=true', async () => {
+            document.body.innerHTML = '<button id="ext-dis">Btn</button>';
+            el = await fixture('<ar-collapse for="ext-dis" disabled></ar-collapse>');
+            await waitForUpdate(el);
+            const btn = document.getElementById('ext-dis')!;
+            expect(btn.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('retire aria-disabled du bouton externe quand disabled repasse à false', async () => {
+            document.body.innerHTML = '<button id="ext-dis2">Btn</button>';
+            el = await fixture('<ar-collapse for="ext-dis2" disabled></ar-collapse>');
+            await waitForUpdate(el);
+            el.disabled = false;
+            await waitForUpdate(el);
+            const btn = document.getElementById('ext-dis2')!;
+            expect(btn.getAttribute('aria-disabled')).toBeNull();
+        });
     });
 
     // ── trigger-position ──────────────────────────────────────────────────────

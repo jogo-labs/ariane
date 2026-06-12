@@ -223,11 +223,13 @@ export class ArCollapse extends LitElement {
     }
 
     private _syncTriggerDisabled(): void {
-        if (this.for) return;
         const trigger = this._resolvedTrigger;
         if (!trigger) return;
         if (this.disabled) {
-            trigger.setAttribute('disabled', '');
+            if (!this.for) {
+                // Trigger interne natif : disabled + aria-disabled
+                trigger.setAttribute('disabled', '');
+            }
             trigger.setAttribute('aria-disabled', 'true');
         } else {
             trigger.removeAttribute('disabled');
