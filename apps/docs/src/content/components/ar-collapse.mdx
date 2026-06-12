@@ -109,7 +109,7 @@ Les critères WCAG suivants sont implémentés :
 ### Limitations connues
 
 - **Cross-shadow DOM** : `for` et `aria-controls` reposent sur des IDs résolus dans le document. Si le trigger et le panel se trouvent dans des shadow roots différents, la référence `aria-controls` ne sera pas résolue par les technologies d'assistance. De même, le mode accordéon (`name`) ne fonctionne pas entre shadow roots distincts.
-- **`ariaControlsElements`** : la propriété IDL permettant des références cross-shadow est prévue mais le support navigateur est insuffisant en 2026. À adopter quand il sera stable.
+- **`aria-controls` → host element** : `aria-controls` pointe sur l'élément `<ar-collapse>` lui-même (pas sur le panel interne du shadow DOM). Les AT qui traversent le shadow DOM (NVDA 2024+, JAWS 2024+, VoiceOver macOS 14+) résolvent correctement la référence vers le contenu. Sur les AT plus anciens, la relation peut être ignorée. Mitigation en attente : `ElementInternals.ariaControlsElements` (référence cross-shadow IDL) sera adoptée quand le support navigateur sera suffisant.
 
 ### À votre charge
 
