@@ -64,6 +64,7 @@ export class ArCollapse extends LitElement {
     private _animating = false;
     private _initialized = false;
     private _externalTrigger: HTMLElement | null = null;
+    private _internalTrigger: HTMLElement | null = null;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -87,7 +88,6 @@ export class ArCollapse extends LitElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        // firstUpdated gère le premier rendu ; updated ne traite que les changements suivants.
         if (!this._initialized) return;
         if (changed.has('for')) {
             this._detachExternalTrigger();
@@ -108,6 +108,10 @@ export class ArCollapse extends LitElement {
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         this._detachExternalTrigger();
+        if (this._internalTrigger) {
+            this._internalTrigger.removeEventListener('click', this._handleTriggerClick);
+            this._internalTrigger = null;
+        }
     }
 
     override render(): TemplateResult {
@@ -181,8 +185,14 @@ export class ArCollapse extends LitElement {
             this._warnIfBothTriggers();
             return;
         }
+        // Détacher l'ancien trigger interne avant d'en attacher un nouveau
+        if (this._internalTrigger) {
+            this._internalTrigger.removeEventListener('click', this._handleTriggerClick);
+            this._internalTrigger = null;
+        }
         const trigger = this._resolvedTrigger;
         if (!trigger) return;
+        this._internalTrigger = trigger;
         trigger.addEventListener('click', this._handleTriggerClick);
         this._syncTriggerAria();
         this._syncTriggerDisabled();
