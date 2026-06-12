@@ -232,7 +232,6 @@ describe('ArCollapse', () => {
                     <button slot="trigger">Toggle</button>
                 </ar-collapse>
             `);
-            // Double await : le slotchange peut être asynchrone en happy-dom
             await waitForUpdate(el);
             const btn = el.querySelector<HTMLButtonElement>('button')!;
             btn.click();
@@ -246,7 +245,6 @@ describe('ArCollapse', () => {
                     <button slot="trigger">Toggle</button>
                 </ar-collapse>
             `);
-            // Double await : le slotchange peut être asynchrone en happy-dom
             await waitForUpdate(el);
             const btn = el.querySelector<HTMLButtonElement>('button')!;
             btn.click();
@@ -258,9 +256,14 @@ describe('ArCollapse', () => {
     // ── Trigger externe (for) ─────────────────────────────────────────────────
 
     describe('trigger externe (for)', () => {
+        afterEach(() => {
+            document.body.innerHTML = '';
+        });
+
         it('pose aria-expanded et aria-controls sur le bouton externe', async () => {
             document.body.innerHTML = '<button id="ext-btn">Toggle</button>';
             el = await fixture('<ar-collapse id="panel-1" for="ext-btn"></ar-collapse>');
+            await waitForUpdate(el);
             const btn = document.getElementById('ext-btn')!;
             expect(btn.getAttribute('aria-expanded')).toBe('false');
             expect(btn.getAttribute('aria-controls')).toBe('panel-1');
