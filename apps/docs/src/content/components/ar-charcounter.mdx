@@ -80,27 +80,9 @@ Les critères WCAG suivants sont implémentés :
 - le compteur est lié programmatiquement au champ via `aria-describedby` géré automatiquement (<WcagRef criterion="1.3.1" summary="Info and Relationships : le compteur lié via aria-describedby est disponible programmatiquement pour les technologies d'assistance." />)
 - les régions `aria-live` annoncent le passage en avertissement et le dépassement de limite sans déplacer le focus (<WcagRef criterion="4.1.3" summary="Status Messages : les régions aria-live annoncent warning et error sans déplacer le focus." />)
 
-### Pattern recommandé
+### À votre charge
 
-Aucun `aria-describedby` manuel n'est nécessaire — le composant se charge seul de la liaison :
-
-```html
-<label for="mon-champ">Message</label>
-<textarea id="mon-champ"></textarea>
-<ar-charcounter for="mon-champ" max="200"></ar-charcounter>
-```
-
-Si plusieurs descriptions coexistent sur le même champ, les ids sont préservés :
-
-```html
-<textarea id="mon-champ" aria-describedby="hint-format"></textarea>
-<ar-charcounter id="mon-compteur" for="mon-champ" max="200"></ar-charcounter>
-<!-- aria-describedby devient "hint-format mon-compteur" -->
-```
-
-### `aria-invalid` — à votre charge
-
-`ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
+- `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
 form.addEventListener('submit', (e) => {
@@ -111,6 +93,4 @@ form.addEventListener('submit', (e) => {
 });
 ```
 
-### WCAG 1.4.1 — icône dans le slot
-
-L'état `warning` et `error` ne sont pas communiqués uniquement par la couleur : les slots `icon-warning` et `icon-error` permettent d'insérer un signal visuel supplémentaire (icône, symbole) à côté du compteur. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
+- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="4.1.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `icon-warning` et `icon-error` permettent d'insérer un signal visuel supplémentaire (icône, symbole) à côté du compteur. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
