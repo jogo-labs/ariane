@@ -30,3 +30,4 @@ export { ArTableSort } from './components/table-sort/table-sort.js';
 export type { TableSortType, TableSortOrder } from './components/table-sort/table-sort.js';
 export { ArCharcounter } from './components/charcounter/charcounter.js';
 export type { CharcounterState } from './components/charcounter/charcounter.js';
+export { ArCollapse } from './components/collapse/collapse.js';
