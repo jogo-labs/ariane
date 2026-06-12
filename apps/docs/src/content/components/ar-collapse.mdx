@@ -52,12 +52,14 @@ variants:
           L'attribut `for` accepte l'ID d'un bouton natif situé n'importe où dans la page.
           `aria-expanded` et `aria-controls` sont posés automatiquement sur ce bouton.
       html: |
-          <button id="ar-doc-collapse-ext" class="btn btn-secondary">Révéler le contenu</button>
-          <ar-collapse for="ar-doc-collapse-ext" style="--ar-collapse-duration:200ms">
-              <div style="padding-top:0.75rem">
-                  <p style="margin:0">Contenu piloté par un trigger externe. Utile quand trigger et panel ne peuvent pas être enveloppés dans un wrapper commun.</p>
-              </div>
-          </ar-collapse>
+          <div>
+              <button id="ar-doc-collapse-ext" class="btn btn-secondary">Révéler le contenu</button>
+              <ar-collapse for="ar-doc-collapse-ext" style="--ar-collapse-duration:200ms">
+                  <div style="padding-top:0.75rem">
+                      <p style="margin:0">Contenu piloté par un trigger externe. Utile quand trigger et panel ne peuvent pas être enveloppés dans un wrapper commun.</p>
+                  </div>
+              </ar-collapse>
+          </div>
     - name: trigger-after
       label: Trigger après le contenu
       description: |
