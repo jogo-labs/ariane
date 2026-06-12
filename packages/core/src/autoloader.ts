@@ -32,6 +32,7 @@ const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
     'ar-tab-panel': () => import('./components/tab-panel/tab-panel.js'),
     'ar-table-sort': () => import('./components/table-sort/table-sort.js'),
     'ar-charcounter': () => import('./components/charcounter/charcounter.js'),
+    'ar-collapse': () => import('./components/collapse/collapse.js'),
     // ⚠ Mis à jour automatiquement par le script create-component.js
 };
 
