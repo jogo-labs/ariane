@@ -77,6 +77,10 @@ export class ArCollapse extends LitElement {
         if (this.for) {
             this._warnIfBothTriggers();
             this._attachExternalTrigger();
+        } else {
+            // Initialise le trigger interne si le slot est déjà peuplé au premier rendu.
+            // _handleTriggerSlotChange() sera rappelé si le slot change ultérieurement.
+            this._handleTriggerSlotChange();
         }
         this._syncTriggerAria();
         // État initial sans animation — updated() gère les changements ultérieurs.
