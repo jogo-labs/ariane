@@ -1,27 +1,305 @@
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
+import { warn } from '../../utils/warn.js';
+import { prefersReducedMotion } from '../../utils/media.js';
 import styles from './collapse.styles.js';
 
+export type ArCollapseEvents =
+    | 'ar-collapse-show'
+    | 'ar-collapse-shown'
+    | 'ar-collapse-hide'
+    | 'ar-collapse-hidden';
+
 /**
- * @summary Résumé du composant ar-collapse.
+ * @summary Panneau pliable/dépliable accessible avec animation de hauteur.
+ * @display demo
  *
- * @slot         - Contenu principal.
+ * @slot trigger - Élément déclencheur (ignoré si `for` est défini).
+ * @slot         - Contenu collapsible.
  *
- * @csspart base - L'élément racine du composant.
- * @cssprop [--ar-collapse-size=auto] - Taille du composant.
+ * @csspart base              - Conteneur racine.
+ * @csspart trigger-container - Wrapper du slot trigger.
+ * @csspart panel             - Zone animée (overflow hidden, height 0 → auto).
+ * @csspart content           - Wrapper interne du contenu.
  *
- * @event {CustomEvent} ar-collapse-change - Émis lors d'un changement.
+ * @cssprop [--ar-collapse-duration=0s]  - Durée de la transition height.
+ * @cssprop [--ar-collapse-easing=ease]  - Easing de la transition height.
+ *
+ * @event {CustomEvent} ar-collapse-show   - Avant l'ouverture. Annulable.
+ * @event {CustomEvent} ar-collapse-shown  - Après la fin de l'animation d'ouverture.
+ * @event {CustomEvent} ar-collapse-hide   - Avant la fermeture. Annulable.
+ * @event {CustomEvent} ar-collapse-hidden - Après la fin de l'animation de fermeture.
  */
 @customElement('ar-collapse')
 export class ArCollapse extends LitElement {
     static override styles = [styles];
+    static readonly NAME = 'ArCollapse';
+    private static _idCounter = 0;
 
-    override render() {
-        return html`
-            <div part="base">
-                <slot></slot>
+    /** Ouvre ou ferme le panel. */
+    @property({ reflect: true, type: Boolean }) open = false;
+
+    /**
+     * ID d'un élément déclencheur externe (light DOM).
+     * Quand défini, le slot `trigger` est ignoré.
+     */
+    @property({ reflect: true }) for = '';
+
+    /** Groupe accordéon — les panels partageant le même `name` se ferment mutuellement. */
+    @property({ reflect: true }) name = '';
+
+    /**
+     * Position du slot trigger par rapport au contenu dans le DOM.
+     * `before` (défaut) : trigger avant le panel. `after` : trigger après le panel.
+     * L'ordre DOM reflète l'ordre visuel — pas de CSS `order` — pour respecter WCAG 2.4.3.
+     */
+    @property({ attribute: 'trigger-position', reflect: true })
+    triggerPosition: 'before' | 'after' = 'before';
+
+    /** Désactive le composant — le trigger ne répond plus aux clics. */
+    @property({ reflect: true, type: Boolean }) disabled = false;
+
+    @query('[part="panel"]') private _panel!: HTMLElement;
+
+    private _animating = false;
+    private _initialized = false;
+    private _externalTrigger: HTMLElement | null = null;
+
+    override connectedCallback(): void {
+        super.connectedCallback();
+        if (!this.id) {
+            this.id = `ar-collapse-${++ArCollapse._idCounter}`;
+        }
+    }
+
+    override firstUpdated(): void {
+        if (this.for) {
+            this._warnIfBothTriggers();
+            this._attachExternalTrigger();
+        }
+        this._syncTriggerAria();
+        // État initial sans animation — updated() gère les changements ultérieurs.
+        if (this.open) {
+            this._panel.removeAttribute('hidden');
+            this._panel.style.height = 'auto';
+        }
+        this._initialized = true;
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        // firstUpdated gère le premier rendu ; updated ne traite que les changements suivants.
+        if (!this._initialized) return;
+        if (changed.has('for')) {
+            this._detachExternalTrigger();
+            if (this.for) {
+                this._warnIfBothTriggers();
+                this._attachExternalTrigger();
+            }
+        }
+        if (changed.has('open')) {
+            if (this.open) this._show();
+            else this._hide();
+        }
+        if (changed.has('disabled')) {
+            this._syncTriggerDisabled();
+        }
+    }
+
+    override disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this._detachExternalTrigger();
+    }
+
+    override render(): TemplateResult {
+        const trigger = html`
+            <slot
+                name="trigger"
+                part="trigger-container"
+                @slotchange=${this._handleTriggerSlotChange}
+            ></slot>
+        `;
+        const panel = html`
+            <div part="panel" hidden>
+                <div part="content">
+                    <slot></slot>
+                </div>
             </div>
         `;
+        return html`
+            <div part="base">
+                ${this.triggerPosition === 'after'
+                    ? html`${panel}${trigger}`
+                    : html`${trigger}${panel}`}
+            </div>
+        `;
+    }
+
+    /** Ouvre le panel. No-op si déjà ouvert, en cours d'animation, ou disabled. */
+    show(): void {
+        if (this.open || this._animating || this.disabled) return;
+        this.open = true;
+    }
+
+    /** Ferme le panel. No-op si déjà fermé ou en cours d'animation. */
+    hide(): void {
+        if (!this.open || this._animating) return;
+        this.open = false;
+    }
+
+    private _warnIfBothTriggers(): void {
+        if (!this.for) return;
+        const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+        if (slot?.assignedElements({ flatten: true }).length) {
+            warn(
+                'ar-collapse',
+                'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+            );
+        }
+    }
+
+    private _attachExternalTrigger(): void {
+        const el = document.getElementById(this.for);
+        if (!el) {
+            warn('ar-collapse', `Aucun élément trouvé avec l'id "${this.for}".`);
+            return;
+        }
+        this._externalTrigger = el;
+        el.addEventListener('click', this._handleTriggerClick);
+        this._syncTriggerAria();
+    }
+
+    private _detachExternalTrigger(): void {
+        if (!this._externalTrigger) return;
+        this._externalTrigger.removeEventListener('click', this._handleTriggerClick);
+        this._externalTrigger.removeAttribute('aria-expanded');
+        this._externalTrigger.removeAttribute('aria-controls');
+        this._externalTrigger = null;
+    }
+
+    private _handleTriggerSlotChange(): void {
+        if (this.for) {
+            this._warnIfBothTriggers();
+            return;
+        }
+        const trigger = this._resolvedTrigger;
+        if (!trigger) return;
+        trigger.addEventListener('click', this._handleTriggerClick);
+        this._syncTriggerAria();
+        this._syncTriggerDisabled();
+    }
+
+    private readonly _handleTriggerClick = (): void => {
+        if (this.disabled) return;
+        this.open = !this.open;
+    };
+
+    private get _resolvedTrigger(): HTMLElement | null {
+        if (this.for) return this._externalTrigger;
+        const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+        return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
+    }
+
+    private _syncTriggerAria(): void {
+        const trigger = this._resolvedTrigger;
+        if (!trigger) return;
+        trigger.setAttribute('aria-expanded', String(this.open));
+        trigger.setAttribute('aria-controls', this.id);
+    }
+
+    private _syncTriggerDisabled(): void {
+        if (this.for) return;
+        const trigger = this._resolvedTrigger;
+        if (!trigger) return;
+        if (this.disabled) {
+            trigger.setAttribute('disabled', '');
+            trigger.setAttribute('aria-disabled', 'true');
+        } else {
+            trigger.removeAttribute('disabled');
+            trigger.removeAttribute('aria-disabled');
+        }
+    }
+
+    private _closeGroupSiblings(): void {
+        if (!this.name) return;
+        document.querySelectorAll<ArCollapse>(`ar-collapse[name="${this.name}"]`).forEach((el) => {
+            if (el !== this && el.open) el.hide();
+        });
+    }
+
+    private _shouldAnimate(): boolean {
+        // transitionend ne se déclenche pas si duration=0s (défaut headless sans thème).
+        // On vérifie la durée calculée pour éviter que _animating reste bloqué à true.
+        const d = parseFloat(getComputedStyle(this._panel).transitionDuration) || 0;
+        return !prefersReducedMotion() && d > 0;
+    }
+
+    private _show(): void {
+        const ev = this._emit('ar-collapse-show');
+        if (ev.defaultPrevented) {
+            this.open = false;
+            return;
+        }
+        this._closeGroupSiblings();
+        this._syncTriggerAria();
+        this._animating = true;
+        const panel = this._panel;
+        panel.style.height = '0px';
+        panel.removeAttribute('hidden');
+        const targetH = panel.scrollHeight;
+        void panel.offsetHeight; // force reflow
+        if (!this._shouldAnimate()) {
+            panel.style.height = 'auto';
+            this._animating = false;
+            this._emit('ar-collapse-shown');
+            return;
+        }
+        panel.style.height = `${targetH}px`;
+        panel.addEventListener(
+            'transitionend',
+            () => {
+                this._animating = false;
+                panel.style.height = 'auto';
+                this._emit('ar-collapse-shown');
+            },
+            { once: true },
+        );
+    }
+
+    private _hide(): void {
+        const ev = this._emit('ar-collapse-hide');
+        if (ev.defaultPrevented) {
+            this.open = true;
+            return;
+        }
+        this._syncTriggerAria();
+        this._animating = true;
+        const panel = this._panel;
+        panel.style.height = `${panel.scrollHeight}px`;
+        void panel.offsetHeight; // force reflow
+        if (!this._shouldAnimate()) {
+            this._animating = false;
+            panel.setAttribute('hidden', '');
+            panel.style.height = '';
+            this._emit('ar-collapse-hidden');
+            return;
+        }
+        panel.style.height = '0px';
+        panel.addEventListener(
+            'transitionend',
+            () => {
+                this._animating = false;
+                panel.setAttribute('hidden', '');
+                panel.style.height = '';
+                this._emit('ar-collapse-hidden');
+            },
+            { once: true },
+        );
+    }
+
+    private _emit(name: ArCollapseEvents): CustomEvent {
+        const e = new CustomEvent(name, { bubbles: true, composed: true, cancelable: true });
+        this.dispatchEvent(e);
+        return e;
     }
 }
 
