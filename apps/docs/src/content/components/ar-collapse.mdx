@@ -1,12 +1,118 @@
 ---
 tagName: ar-collapse
 title: Collapse
-description: Description du composant ar-collapse.
+description: Panneau pliable/dépliable accessible — animation de hauteur, trigger interne ou externe, mode accordéon via attribut name.
+playgroundTemplate: default
 variants:
-    - name: Par défaut
-      description: Rendu par défaut du composant.
+    - name: default
+      label: Standalone
+      description: |
+          Collapse simple avec un trigger interne via `slot="trigger"`.
+          L'animation de hauteur est activée via `--ar-collapse-duration`.
       html: |
-          <ar-collapse></ar-collapse>
+          <ar-collapse style="--ar-collapse-duration:200ms;--ar-collapse-easing:ease">
+              <button slot="trigger" class="btn btn-secondary">Voir plus</button>
+              <div style="padding:1rem 0">
+                  <p>Contenu qui se révèle à l'ouverture. Peut contenir n'importe quel HTML.</p>
+              </div>
+          </ar-collapse>
+    - name: open
+      label: Ouvert par défaut
+      description: L'attribut `open` ouvre le panel sans animation au chargement.
+      html: |
+          <ar-collapse open style="--ar-collapse-duration:200ms">
+              <button slot="trigger" class="btn btn-secondary">Fermer</button>
+              <div style="padding:1rem 0">
+                  <p>Contenu visible dès le chargement.</p>
+              </div>
+          </ar-collapse>
+    - name: accordion
+      label: Accordéon (name)
+      description: |
+          Tous les `ar-collapse` partageant le même attribut `name` forment un groupe accordéon :
+          ouvrir un item ferme automatiquement les autres.
+      html: |
+          <div style="display:flex;flex-direction:column;gap:0.5rem">
+              <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
+                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 1</button>
+                  <div style="padding:0.75rem 0"><p>Réponse à la question 1.</p></div>
+              </ar-collapse>
+              <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
+                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 2</button>
+                  <div style="padding:0.75rem 0"><p>Réponse à la question 2.</p></div>
+              </ar-collapse>
+              <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
+                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 3</button>
+                  <div style="padding:0.75rem 0"><p>Réponse à la question 3.</p></div>
+              </ar-collapse>
+          </div>
+    - name: external-trigger
+      label: Trigger externe (for)
+      description: |
+          L'attribut `for` accepte l'ID d'un bouton natif situé n'importe où dans la page.
+          `aria-expanded` et `aria-controls` sont posés automatiquement sur ce bouton.
+      html: |
+          <button id="ar-doc-collapse-ext" class="btn btn-secondary">Révéler le contenu</button>
+          <ar-collapse for="ar-doc-collapse-ext" style="--ar-collapse-duration:200ms">
+              <div style="padding:0.75rem 0">
+                  <p>Contenu piloté par un trigger externe. Utile quand trigger et panel ne peuvent pas être enveloppés dans un wrapper commun.</p>
+              </div>
+          </ar-collapse>
+    - name: trigger-after
+      label: Trigger après le contenu
+      description: |
+          `trigger-position="after"` place le trigger après le contenu dans le DOM (et visuellement).
+          Utile pour les patterns "Lire la suite" où le bouton apparaît sous le texte tronqué.
+      html: |
+          <ar-collapse trigger-position="after" style="--ar-collapse-duration:200ms">
+              <div style="padding:0.75rem 0">
+                  <p>Contenu révélé. Le trigger est positionné après dans le DOM et visuellement.</p>
+              </div>
+              <button slot="trigger" class="btn btn-secondary">Lire la suite</button>
+          </ar-collapse>
+    - name: disabled
+      label: Désactivé
+      description: |
+          L'attribut `disabled` bloque l'interaction. Le composant pose `disabled` et
+          `aria-disabled="true"` sur le trigger interne.
+      html: |
+          <ar-collapse disabled>
+              <button slot="trigger" class="btn btn-secondary">Toggle (désactivé)</button>
+              <div style="padding:0.75rem 0"><p>Ce contenu ne peut pas être révélé.</p></div>
+          </ar-collapse>
 ---
 
-Documentation narrative du composant `ar-collapse`.
+import WcagRef from '../../components/WcagRef.astro';
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+`ar-collapse` gère les attributs ARIA et les comportements keyboard sans intervention :
+
+- `aria-expanded` est posé sur le trigger (interne ou externe) et mis à jour à chaque ouverture/fermeture.
+- `aria-controls` est posé sur le trigger et pointe vers l'`id` du host `ar-collapse`. Si l'auteur ne fournit pas d'`id`, un identifiant unique est généré automatiquement.
+- Le panel utilise l'attribut `hidden` pour les états stables (pas de `display:none` inline) — compatible avec les styles qui surchargeraient `display`.
+- `prefers-reduced-motion` : si l'utilisateur a activé la préférence système de réduction de mouvement, les animations sont supprimées et les transitions sont instantanées.
+
+Les critères WCAG suivants sont implémentés :
+
+- `aria-expanded` indique l'état ouvert/fermé du panel aux technologies d'assistance (<WcagRef criterion="4.1.2" summary="Name, Role, Value : aria-expanded communique l'état du composant aux AT." />)
+- L'ordre DOM du trigger reflète l'ordre visuel — `trigger-position` modifie le DOM, pas le CSS `order` (<WcagRef criterion="2.4.3" summary="Focus Order : l'ordre de focus suit l'ordre visuel." />)
+
+### Limitations connues
+
+- **Cross-shadow DOM** : `for` et `aria-controls` reposent sur des IDs résolus dans le document. Si le trigger et le panel se trouvent dans des shadow roots différents, la référence `aria-controls` ne sera pas résolue par les technologies d'assistance. De même, le mode accordéon (`name`) ne fonctionne pas entre shadow roots distincts.
+- **`ariaControlsElements`** : la propriété IDL permettant des références cross-shadow est prévue mais le support navigateur est insuffisant en 2026. À adopter quand il sera stable.
+
+### À votre charge
+
+- Le trigger doit être un élément focusable avec un nom accessible (texte visible, `aria-label`, ou `aria-labelledby`).
+- Pour un pattern accordéon, ajouter `role="region"` et `aria-labelledby` sur chaque panel si le contexte sémantique le demande (ex: FAQ dans un article).
+- L'animation `height` via `--ar-collapse-duration` n'est pas automatique — vous devez activer la transition dans votre thème :
+
+```css
+ar-collapse::part(panel) {
+    transition: height var(--ar-collapse-duration, 0s) var(--ar-collapse-easing, ease);
+}
+```
