@@ -10,8 +10,6 @@ describe('ar-collapse — accessibilité', () => {
         el?.remove();
     });
 
-    // ── Pas de violations axe-core ────────────────────────────────────────────
-
     describe('axe-core', () => {
         it('panel fermé — aucune violation', async () => {
             el = await fixture(html`
@@ -33,8 +31,6 @@ describe('ar-collapse — accessibilité', () => {
             await expect(el).to.be.accessible();
         });
     });
-
-    // ── Trigger interne ───────────────────────────────────────────────────────
 
     describe('trigger interne', () => {
         it('aria-expanded="false" sur le trigger au départ', async () => {
@@ -58,18 +54,24 @@ describe('ar-collapse — accessibilité', () => {
         });
     });
 
-    // ── Trigger externe ───────────────────────────────────────────────────────
-
     describe('trigger externe (for)', () => {
-        it('aria-expanded et aria-controls posés sur le bouton natif', async () => {
-            const btn = document.createElement('button');
+        let btn: HTMLButtonElement;
+
+        beforeEach(() => {
+            btn = document.createElement('button');
             btn.id = 'ext-a11y';
             btn.textContent = 'Btn';
             document.body.appendChild(btn);
+        });
+
+        afterEach(() => {
+            btn?.remove();
+        });
+
+        it('aria-expanded et aria-controls posés sur le bouton natif', async () => {
             el = await fixture(html`<ar-collapse id="panel-a11y" for="ext-a11y"></ar-collapse>`);
             expect(btn.getAttribute('aria-expanded')).to.equal('false');
             expect(btn.getAttribute('aria-controls')).to.equal('panel-a11y');
-            btn.remove();
         });
     });
 });
