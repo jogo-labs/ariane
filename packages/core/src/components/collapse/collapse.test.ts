@@ -371,6 +371,21 @@ describe('ArCollapse', () => {
             expect(el.open).toBe(true);
             expect(el2.open).toBe(true);
         });
+
+        it('un name contenant des guillemets ne crash pas', async () => {
+            el = await fixture("<ar-collapse name='foo\"]' ></ar-collapse>");
+            expect(() => el.show()).not.toThrow();
+            await waitForUpdate(el);
+        });
+
+        it('deux accordéons indépendants avec le même name ne se contaminent pas', async () => {
+            el = await fixture('<ar-collapse name="shared"></ar-collapse>');
+            el2 = await fixture('<ar-collapse name="shared"></ar-collapse>');
+            el.show();
+            await waitForUpdate(el);
+            expect(el.open).toBe(true);
+            el2.remove();
+        });
     });
 
     // ── disabled ──────────────────────────────────────────────────────────────
