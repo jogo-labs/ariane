@@ -557,4 +557,8 @@
             --ar-tooltip-color: var(--ar-color-neutral-10);
         }
     }
+
+    ar-collapse::part(panel) {
+        transition: height var(--ar-collapse-duration, 0s) var(--ar-collapse-easing, ease);
+    }
 }

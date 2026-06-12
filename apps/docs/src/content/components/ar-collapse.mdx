@@ -34,15 +34,15 @@ variants:
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem">
               <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
-                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 1</button>
+                  <button slot="trigger" class="btn btn-secondary">Question 1</button>
                   <div style="padding:0.75rem 0"><p>Réponse à la question 1.</p></div>
               </ar-collapse>
               <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
-                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 2</button>
+                  <button slot="trigger" class="btn btn-secondary">Question 2</button>
                   <div style="padding:0.75rem 0"><p>Réponse à la question 2.</p></div>
               </ar-collapse>
               <ar-collapse name="faq" style="--ar-collapse-duration:200ms">
-                  <button slot="trigger" class="btn btn-secondary" style="width:100%;text-align:left">Question 3</button>
+                  <button slot="trigger" class="btn btn-secondary">Question 3</button>
                   <div style="padding:0.75rem 0"><p>Réponse à la question 3.</p></div>
               </ar-collapse>
           </div>
@@ -64,12 +64,16 @@ variants:
           `trigger-position="after"` place le trigger après le contenu dans le DOM (et visuellement).
           Utile pour les patterns "Lire la suite" où le bouton apparaît sous le texte tronqué.
       html: |
-          <ar-collapse trigger-position="after" style="--ar-collapse-duration:200ms">
-              <div style="padding:0.75rem 0">
-                  <p>Contenu révélé. Le trigger est positionné après dans le DOM et visuellement.</p>
-              </div>
-              <button slot="trigger" class="btn btn-secondary">Lire la suite</button>
-          </ar-collapse>
+          <div>
+              <p style="margin:0 0 0.5rem">Les chimpanzés utilisent des outils, communiquent par gestes et sons, vivent en groupes sociaux complexes avec hiérarchies et alliances.</p>
+              <ar-collapse trigger-position="after" style="--ar-collapse-duration:200ms">
+                  <div>
+                      <p style="margin:0 0 0.5rem">Leur génome est similaire à 98,7 % à celui de l'humain. Ils fabriquent des outils en bois pour extraire des termites, et utilisent des pierres comme enclumes pour casser des noix.</p>
+                      <p style="margin:0">Les femelles transmettent ces techniques à leurs petits, une forme d'apprentissage culturel rare dans le règne animal.</p>
+                  </div>
+                  <button slot="trigger" style="background:none;border:none;padding:0.25rem 0 0;color:var(--ar-color-interactive,#283276);text-decoration:underline;cursor:pointer;font:inherit">Lire la suite ↓</button>
+              </ar-collapse>
+          </div>
     - name: disabled
       label: Désactivé
       description: |

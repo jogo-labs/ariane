@@ -8,6 +8,7 @@ export default css`
     [part='base'] {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
     }
 
     [part='panel'] {
