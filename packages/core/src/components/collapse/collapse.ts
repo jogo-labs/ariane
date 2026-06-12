@@ -100,7 +100,7 @@ export class ArCollapse extends LitElement {
                 this._attachExternalTrigger();
             }
         }
-        if (changed.has('open')) {
+        if (changed.has('open') && changed.get('open') !== undefined) {
             if (this.open) this._show();
             else this._hide();
         }
