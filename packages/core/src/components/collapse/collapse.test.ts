@@ -145,6 +145,24 @@ describe('ArCollapse', () => {
         });
     });
 
+    // ── Robustesse animation ──────────────────────────────────────────────────
+
+    describe('robustesse animation', () => {
+        it('annuler ar-collapse-show ne verrouille pas le composant', async () => {
+            el = await fixture('<ar-collapse><button slot="trigger">T</button></ar-collapse>');
+            const cancel = (e: Event) => e.preventDefault();
+            el.addEventListener('ar-collapse-show', cancel);
+            el.show();
+            await waitForUpdate(el);
+            expect(el.open).toBe(false);
+            el.removeEventListener('ar-collapse-show', cancel);
+            // Après annulation, show() doit fonctionner normalement
+            el.show();
+            await waitForUpdate(el);
+            expect(el.open).toBe(true);
+        });
+    });
+
     // ── Événements ────────────────────────────────────────────────────────────
 
     describe('événements', () => {

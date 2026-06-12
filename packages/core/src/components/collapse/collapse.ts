@@ -65,6 +65,7 @@ export class ArCollapse extends LitElement {
     private _initialized = false;
     private _externalTrigger: HTMLElement | null = null;
     private _internalTrigger: HTMLElement | null = null;
+    private _onTransitionEnd: (() => void) | null = null;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -111,6 +112,7 @@ export class ArCollapse extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        this._abortAnimation();
         this._detachExternalTrigger();
         if (this._internalTrigger) {
             this._internalTrigger.removeEventListener('click', this._handleTriggerClick);
@@ -148,9 +150,9 @@ export class ArCollapse extends LitElement {
         this.open = true;
     }
 
-    /** Ferme le panel. No-op si déjà fermé ou en cours d'animation. */
+    /** Ferme le panel. No-op si déjà fermé. */
     hide(): void {
-        if (!this.open || this._animating) return;
+        if (!this.open) return;
         this.open = false;
     }
 
@@ -233,6 +235,21 @@ export class ArCollapse extends LitElement {
         }
     }
 
+    private _abortAnimation(): void {
+        if (!this._onTransitionEnd) return;
+        this._panel.removeEventListener('transitionend', this._onTransitionEnd);
+        this._onTransitionEnd = null;
+        this._animating = false;
+        // Finalise l'état du panel dans la direction en cours pour que open reste cohérent.
+        if (this.open) {
+            this._panel.removeAttribute('hidden');
+            this._panel.style.height = 'auto';
+        } else {
+            this._panel.setAttribute('hidden', '');
+            this._panel.style.height = '';
+        }
+    }
+
     private _closeGroupSiblings(): void {
         if (!this.name) return;
         document.querySelectorAll<ArCollapse>(`ar-collapse[name="${this.name}"]`).forEach((el) => {
@@ -253,6 +270,7 @@ export class ArCollapse extends LitElement {
             this.open = false;
             return;
         }
+        this._abortAnimation();
         this._closeGroupSiblings();
         this._syncTriggerAria();
         this._animating = true;
@@ -268,24 +286,34 @@ export class ArCollapse extends LitElement {
             return;
         }
         panel.style.height = `${targetH}px`;
-        panel.addEventListener(
-            'transitionend',
-            () => {
-                this._animating = false;
-                panel.style.height = 'auto';
-                this._emit('ar-collapse-shown');
-            },
-            { once: true },
-        );
+        const onShow = () => {
+            this._onTransitionEnd = null;
+            this._animating = false;
+            panel.style.height = 'auto';
+            this._emit('ar-collapse-shown');
+        };
+        this._onTransitionEnd = onShow;
+        panel.addEventListener('transitionend', onShow, { once: true });
     }
 
     private _hide(): void {
+        // finding 2 : panel déjà caché (ex. ar-collapse-show annulé → open=false déclenché)
+        if (this._panel.hasAttribute('hidden') && !this._animating) return;
         const ev = this._emit('ar-collapse-hide');
         if (ev.defaultPrevented) {
             this.open = true;
             return;
         }
+        const wasAnimating = this._animating;
+        this._abortAnimation();
         this._syncTriggerAria();
+        if (wasAnimating) {
+            // finding 5 : snap immédiat — frère accordéon ou interruption externe
+            this._panel.setAttribute('hidden', '');
+            this._panel.style.height = '';
+            this._emit('ar-collapse-hidden');
+            return;
+        }
         this._animating = true;
         const panel = this._panel;
         panel.style.height = `${panel.scrollHeight}px`;
@@ -298,16 +326,15 @@ export class ArCollapse extends LitElement {
             return;
         }
         panel.style.height = '0px';
-        panel.addEventListener(
-            'transitionend',
-            () => {
-                this._animating = false;
-                panel.setAttribute('hidden', '');
-                panel.style.height = '';
-                this._emit('ar-collapse-hidden');
-            },
-            { once: true },
-        );
+        const onHide = () => {
+            this._onTransitionEnd = null;
+            this._animating = false;
+            panel.setAttribute('hidden', '');
+            panel.style.height = '';
+            this._emit('ar-collapse-hidden');
+        };
+        this._onTransitionEnd = onHide;
+        panel.addEventListener('transitionend', onHide, { once: true });
     }
 
     private _emit(name: ArCollapseEvents): CustomEvent {

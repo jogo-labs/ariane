@@ -26,6 +26,75 @@ describe('ar-collapse — browser', () => {
 
     afterEach(() => el?.remove());
 
+    // ── Robustesse animation ──────────────────────────────────────────────────
+
+    describe('robustesse animation', () => {
+        it('disconnect mid-animation ne bloque pas le composant après reconnect', async () => {
+            el = await fixture(html`
+                <ar-collapse>
+                    <button slot="trigger">T</button>
+                    <p>Contenu</p>
+                </ar-collapse>
+            `);
+            el.show();
+            await aTimeout(30); // mi-animation
+            const parent = el.parentElement!;
+            el.remove();
+            parent.appendChild(el);
+            el.show();
+            await aTimeout(ANIM_MS);
+            expect(getPanel(el).style.height).to.equal('auto');
+        });
+
+        it('assigner el.open=true pendant animation émet ar-collapse-shown une seule fois', async () => {
+            el = await fixture(html`
+                <ar-collapse>
+                    <button slot="trigger">T</button>
+                    <p>Contenu</p>
+                </ar-collapse>
+            `);
+            el.show();
+            await aTimeout(30); // mi-ouverture
+
+            let count = 0;
+            el.addEventListener('ar-collapse-shown', () => count++);
+            el.open = true; // forcer pendant animation
+            await aTimeout(ANIM_MS * 2);
+            expect(count).to.equal(1);
+        });
+    });
+
+    // ── Accordéon — snap mid-animation ───────────────────────────────────────
+
+    describe('accordéon — snap mid-animation', () => {
+        it('ouvrir item B ferme item A même si A est mid-animation', async () => {
+            const elA = await fixture<ArCollapse>(html`
+                <ar-collapse name="snap-grp">
+                    <button slot="trigger">A</button>
+                    <p>Contenu A</p>
+                </ar-collapse>
+            `);
+            const elB = await fixture<ArCollapse>(html`
+                <ar-collapse name="snap-grp">
+                    <button slot="trigger">B</button>
+                    <p>Contenu B</p>
+                </ar-collapse>
+            `);
+
+            elA.show();
+            await aTimeout(30); // A mid-animation
+
+            elB.show(); // doit fermer A immédiatement
+            await aTimeout(ANIM_MS);
+
+            expect(elA.open).to.equal(false);
+            expect(getPanel(elA).hasAttribute('hidden')).to.equal(true);
+            expect(elB.open).to.equal(true);
+            elA.remove();
+            elB.remove();
+        });
+    });
+
     // ── Ouverture avec animation ───────────────────────────────────────────────
 
     describe('ouverture', () => {
