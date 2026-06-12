@@ -98,6 +98,14 @@ a {
     text-decoration: none;
 }
 
+a:visited {
+    color: var(--doc-link-visited, #6d28d9);
+}
+
+a:active {
+    color: var(--doc-accent, #7c3aed);
+}
+
 a:hover {
     text-decoration: underline;
 }

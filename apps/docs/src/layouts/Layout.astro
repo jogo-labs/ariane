@@ -68,6 +68,24 @@ const {
                 white-space: nowrap;
                 border-width: 0;
             }
+
+            .narrative a {
+                color: var(--doc-accent);
+                text-decoration: none;
+            }
+
+            .narrative a:visited {
+                color: var(--doc-link-visited);
+                text-decoration: underline;
+            }
+
+            .narrative a:hover {
+                text-decoration: underline;
+            }
+
+            .narrative a:active {
+                color: var(--doc-accent);
+            }
         </style>
         <style>
             *, *::before, *::after { box-sizing: border-box; }
@@ -103,6 +121,7 @@ const {
                 --doc-accent:         #7c3aed;
                 --doc-accent-bg:      #f3efff;
                 --doc-accent-border:  #e0d0ff;
+                --doc-link-visited:   #6d28d9;
                 --doc-code-bg:        #f3f4f6;
                 --doc-code-block-bg:  #0d1219;
                 --doc-header-bg:      rgba(250,250,248,0.92);
@@ -124,6 +143,7 @@ const {
                 --doc-accent:         #a78bfa;
                 --doc-accent-bg:      #2d2040;
                 --doc-accent-border:  #4c3280;
+                --doc-link-visited:   #c4b5fd;
                 --doc-cta-bg:         #2d2040;
                 --doc-cta-border:     #30215a;
                 --doc-code-bg:        #1e1e2e;
