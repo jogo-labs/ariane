@@ -183,6 +183,7 @@ export class ArCollapse extends LitElement {
         this._externalTrigger.removeEventListener('click', this._handleTriggerClick);
         this._externalTrigger.removeAttribute('aria-expanded');
         this._externalTrigger.removeAttribute('aria-controls');
+        this._externalTrigger.removeAttribute('aria-disabled');
         this._externalTrigger = null;
     }
 
