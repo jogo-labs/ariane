@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { CalendarController } from './calendar.controller.js';
+import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -102,11 +102,9 @@ export class ArDatepicker extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('min') || changed.has('max') || changed.has('isDateDisabled')) {
-            this._calendar.update({
-                min: this.min,
-                max: this.max,
-                isDateDisabled: this.isDateDisabled,
-            });
+            const opts: CalendarControllerOptions = { min: this.min, max: this.max };
+            if (this.isDateDisabled !== undefined) opts.isDateDisabled = this.isDateDisabled;
+            this._calendar.update(opts);
         }
 
         this.toggleAttribute('has-error', this._hasSlot.test('error'));
