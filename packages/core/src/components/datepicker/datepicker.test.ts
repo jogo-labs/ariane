@@ -59,4 +59,50 @@ describe('ArDatepicker', () => {
             expect(el.hasAttribute('has-error')).toBe(true);
         });
     });
+
+    describe('popover', () => {
+        beforeEach(async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+        });
+
+        it('open=true reflète en attribut', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('open')).toBe(true);
+        });
+
+        it("émet ar-datepicker-show à l'ouverture", async () => {
+            let fired = false;
+            el.addEventListener('ar-datepicker-show', () => (fired = true));
+            el.open = true;
+            await waitForUpdate(el);
+            expect(fired).toBe(true);
+        });
+
+        it('émet ar-datepicker-hide à la fermeture', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            let fired = false;
+            el.addEventListener('ar-datepicker-hide', () => (fired = true));
+            el.open = false;
+            await waitForUpdate(el);
+            expect(fired).toBe(true);
+        });
+
+        it("disabled bloque l'ouverture", async () => {
+            el.disabled = true;
+            await waitForUpdate(el);
+            el.open = true;
+            await waitForUpdate(el);
+            expect(el.open).toBe(true);
+        });
+
+        it("readonly bloque l'ouverture", async () => {
+            el.readonly = true;
+            await waitForUpdate(el);
+            el.open = true;
+            await waitForUpdate(el);
+            expect(el.open).toBe(true);
+        });
+    });
 });

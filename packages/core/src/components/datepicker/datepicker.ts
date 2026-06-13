@@ -3,7 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { CalendarController } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-// parse, format from './date-parser.js' — utilisés en Task 8
+import { parse } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 
@@ -195,13 +195,84 @@ export class ArDatepicker extends LitElement {
     }
 
     private async _show(): Promise<void> {
-        /* Task 5 */
+        if (this.disabled || this.readonly) return;
+
+        const allowed = this.dispatchEvent(
+            new CustomEvent('ar-datepicker-show', {
+                bubbles: true,
+                composed: true,
+                cancelable: true,
+            }),
+        );
+        if (!allowed) {
+            this.open = false;
+            return;
+        }
+
+        const today = new Date();
+        if (this.value) {
+            const result = parse(this.value, 'yyyy-MM-dd');
+            if (result.valid && result.date) {
+                this._calendar.selectedDate = result.date;
+                this._calendar.currentViewMonth = new Date(
+                    result.date.getFullYear(),
+                    result.date.getMonth(),
+                    1,
+                );
+                this._calendar.focusedDate = new Date(
+                    result.date.getFullYear(),
+                    result.date.getMonth(),
+                    result.date.getDate(),
+                );
+            }
+        } else {
+            this._calendar.selectedDate = null;
+            this._calendar.currentViewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            this._calendar.focusedDate = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate(),
+            );
+        }
+
+        await this._anchored.show();
+        await this.updateComplete;
+        this._focusFocusedDay();
+
+        this.dispatchEvent(
+            new CustomEvent('ar-datepicker-shown', { bubbles: true, composed: true }),
+        );
     }
+
     private _hide(): void {
-        /* Task 5 */
+        const allowed = this.dispatchEvent(
+            new CustomEvent('ar-datepicker-hide', {
+                bubbles: true,
+                composed: true,
+                cancelable: true,
+            }),
+        );
+        if (!allowed) {
+            this.open = true;
+            return;
+        }
+
+        this._anchored.hide();
+
+        this.dispatchEvent(
+            new CustomEvent('ar-datepicker-hidden', { bubbles: true, composed: true }),
+        );
     }
+
     private _handleTriggerClick(): void {
-        /* Task 5 */
+        if (this.disabled || this.readonly) return;
+        this.open = !this.open;
+    }
+
+    private _focusFocusedDay(): void {
+        const grid = this.shadowRoot?.querySelector('[part="grid"]');
+        const btn = grid?.querySelector<HTMLButtonElement>('[tabindex="0"]');
+        btn?.focus();
     }
     private _handleInput(_e: Event): void {
         /* Task 8 */
