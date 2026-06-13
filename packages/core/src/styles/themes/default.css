@@ -452,6 +452,20 @@
         --ar-tab-group-border-color: var(--ar-color-border);
         --ar-tab-group-border-top-width: 0;
         --ar-tab-group-border-bottom-width: 1px;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * ar-datepicker
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-datepicker-panel-width: 20rem;
+        --ar-datepicker-day-size: 2.25rem;
+
+        --ar-datepicker-day-today-bg: var(--ar-color-primary-90);
+        --ar-datepicker-day-today-color: var(--ar-color-primary-40);
+
+        --ar-datepicker-day-selected-bg: var(--ar-color-primary-50);
+        --ar-datepicker-day-selected-color: var(--ar-color-white);
+
+        --ar-datepicker-input-error-border-color: var(--ar-color-red-50);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
