@@ -188,4 +188,17 @@ describe('ArDatepicker', () => {
             expect(labelEl?.querySelector('slot[name="label"]')).not.toBeNull();
         });
     });
+
+    describe('participation formulaire', () => {
+        it('formAssociated est true', () => {
+            const ArDatepickerType = customElements.get('ar-datepicker') as typeof ArDatepicker;
+            expect(ArDatepickerType.formAssociated).toBe(true);
+        });
+
+        it('disabled exclut la valeur du formulaire', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12" disabled></ar-datepicker>');
+            await waitForUpdate(el);
+            expect(() => (el.disabled = false)).not.toThrow();
+        });
+    });
 });

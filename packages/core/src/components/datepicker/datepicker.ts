@@ -632,7 +632,11 @@ export class ArDatepicker extends LitElement {
         }
     }
     private _syncFormValue(): void {
-        /* Task 10 */
+        if (this.disabled) {
+            this._internals?.setFormValue(null);
+            return;
+        }
+        this._internals?.setFormValue(this.value || null, this.value || null);
     }
 }
 
