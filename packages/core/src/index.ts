@@ -31,3 +31,4 @@ export type { TableSortType, TableSortOrder } from './components/table-sort/tabl
 export { ArCharcounter } from './components/charcounter/charcounter.js';
 export type { CharcounterState } from './components/charcounter/charcounter.js';
 export { ArCollapse } from './components/collapse/collapse.js';
+export { ArDatepicker } from './components/datepicker/datepicker.js';
