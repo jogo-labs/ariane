@@ -105,4 +105,47 @@ describe('ArDatepicker', () => {
             expect(el.open).toBe(true);
         });
     });
+
+    describe('synchronisation input ↔ calendrier', () => {
+        it('value ISO → input texte formaté', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            await waitForUpdate(el);
+            expect(el.inputElement.value).toBe('12/06/2026');
+        });
+
+        it('émet ar-datepicker-input-complete sur saisie complète', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            let detail: Record<string, unknown> | null = null;
+            el.addEventListener('ar-datepicker-input-complete', (e) => {
+                detail = (e as CustomEvent).detail;
+            });
+            el.inputElement.value = '12/06/2026';
+            el.inputElement.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(detail).not.toBeNull();
+            expect((detail as Record<string, unknown>).valid).toBe(true);
+        });
+
+        it('ar-datepicker-input-complete avec valid:false pour 30/02', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            let detail: Record<string, unknown> | null = null;
+            el.addEventListener('ar-datepicker-input-complete', (e) => {
+                detail = (e as CustomEvent).detail;
+            });
+            el.inputElement.value = '30/02/2026';
+            el.inputElement.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect((detail as Record<string, unknown>).valid).toBe(false);
+        });
+
+        it('émet ar-datepicker-input-change au blur', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            let fired = false;
+            el.addEventListener('ar-datepicker-input-change', () => (fired = true));
+            el.inputElement.value = '12/06/2026';
+            el.inputElement.dispatchEvent(new Event('blur'));
+            await waitForUpdate(el);
+            expect(fired).toBe(true);
+        });
+    });
 });

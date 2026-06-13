@@ -351,8 +351,26 @@ export class ArDatepicker extends LitElement {
         );
     }
 
-    private _emitChange(_date?: Date | null, _valid?: boolean): void {
-        /* Task 8 */
+    private _emitChange(date?: Date | null, valid?: boolean): void {
+        const emitDate = date ?? (this.value ? parse(this.value, 'yyyy-MM-dd').date : null);
+        const emitValid = valid ?? emitDate !== null;
+        const emitValue = emitDate ? this._toIso(emitDate) : null;
+
+        this.dispatchEvent(
+            new CustomEvent('ar-datepicker-input-change', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    value: emitValue,
+                    valueAsDate: emitDate,
+                    valid: emitValid,
+                },
+            }),
+        );
+    }
+
+    private _toIso(date: Date): string {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
 
     private async _show(): Promise<void> {
@@ -435,11 +453,49 @@ export class ArDatepicker extends LitElement {
         const btn = grid?.querySelector<HTMLButtonElement>('[tabindex="0"]');
         btn?.focus();
     }
-    private _handleInput(_e: Event): void {
-        /* Task 8 */
+    private _handleInput(e: Event): void {
+        const input = e.target as HTMLInputElement;
+        const result = parse(input.value, this.format);
+
+        if (result.complete) {
+            this.dispatchEvent(
+                new CustomEvent('ar-datepicker-input-complete', {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        value: result.valid && result.date ? this._toIso(result.date) : null,
+                        valueAsDate: result.date,
+                        valid: result.valid,
+                    },
+                }),
+            );
+
+            if (result.valid && result.date) {
+                this._calendar.selectedDate = result.date;
+                this._calendar.currentViewMonth = new Date(
+                    result.date.getFullYear(),
+                    result.date.getMonth(),
+                    1,
+                );
+                this._calendar.focusedDate = new Date(
+                    result.date.getFullYear(),
+                    result.date.getMonth(),
+                    result.date.getDate(),
+                );
+                this.requestUpdate();
+            }
+        }
     }
+
     private _handleBlur(): void {
-        /* Task 8 */
+        const raw = this._input?.value ?? '';
+        const result = parse(raw, this.format);
+
+        const isoValue = result.valid && result.date ? this._toIso(result.date) : null;
+        this.value = isoValue ?? '';
+        this._syncFormValue();
+
+        this._emitChange(result.date, result.valid);
     }
     private _handlePanelKeyDown(e: KeyboardEvent): void {
         if (e.key === 'Escape') {
@@ -565,7 +621,15 @@ export class ArDatepicker extends LitElement {
         void this.updateComplete.then(() => this._focusFocusedDay());
     }
     private _syncInputFromValue(): void {
-        /* Task 8 */
+        if (!this._input) return;
+        if (!this.value) {
+            this._input.value = '';
+            return;
+        }
+        const isoResult = parse(this.value, 'yyyy-MM-dd');
+        if (isoResult.valid && isoResult.date) {
+            this._input.value = format(isoResult.date, this.format);
+        }
     }
     private _syncFormValue(): void {
         /* Task 10 */
