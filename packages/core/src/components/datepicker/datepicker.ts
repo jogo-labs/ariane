@@ -3,7 +3,8 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { CalendarController } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import { parse } from './date-parser.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 
@@ -190,8 +191,170 @@ export class ArDatepicker extends LitElement {
         `;
     }
 
-    private _renderCalendar(_locale: string): TemplateResult {
-        return html`<!-- calendrier : Task 6 -->`;
+    private _renderCalendar(locale: string): TemplateResult {
+        const viewDate = this._calendar.currentViewMonth;
+        const monthLabel = new Intl.DateTimeFormat(locale, {
+            month: 'long',
+            year: 'numeric',
+        }).format(viewDate);
+
+        const dayNames = this._getDayNames(locale);
+        const weeks = this._calendar.getGridWeeks();
+
+        return html`
+            <div part="header">
+                <button
+                    type="button"
+                    aria-label="Année précédente"
+                    @click=${() => {
+                        this._calendar.previousYear();
+                        this._focusFocusedDay();
+                    }}
+                >
+                    «
+                </button>
+                <button
+                    type="button"
+                    aria-label="Mois précédent"
+                    @click=${() => {
+                        this._calendar.previousMonth();
+                        this._focusFocusedDay();
+                    }}
+                >
+                    ‹
+                </button>
+                <span aria-live="polite">${monthLabel}</span>
+                <button
+                    type="button"
+                    aria-label="Mois suivant"
+                    @click=${() => {
+                        this._calendar.nextMonth();
+                        this._focusFocusedDay();
+                    }}
+                >
+                    ›
+                </button>
+                <button
+                    type="button"
+                    aria-label="Année suivante"
+                    @click=${() => {
+                        this._calendar.nextYear();
+                        this._focusFocusedDay();
+                    }}
+                >
+                    »
+                </button>
+            </div>
+
+            <table role="grid" aria-label=${monthLabel} part="grid">
+                <thead>
+                    <tr>
+                        ${dayNames.map(
+                            ({ abbr, full }) => html`<th abbr=${full} scope="col">${abbr}</th>`,
+                        )}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${weeks.map(
+                        (week) => html`
+                            <tr>
+                                ${week.map((day) => this._renderDay(day, locale))}
+                            </tr>
+                        `,
+                    )}
+                </tbody>
+            </table>
+
+            <div part="footer">
+                <button type="button" @click=${this._handleTodayClick}>Aujourd'hui</button>
+                <button type="button" @click=${this._handleCloseClick}>Fermer</button>
+            </div>
+        `;
+    }
+
+    private _renderDay(day: Date, locale: string): TemplateResult {
+        const focused = this._isSameDay(day, this._calendar.focusedDate);
+        const selected = this._calendar.selectedDate
+            ? this._isSameDay(day, this._calendar.selectedDate)
+            : false;
+        const today = this._calendar.isToday(day);
+        const disabled = this._calendar.isDisabled(day);
+        const otherMonth = !this._calendar.isSameMonth(day);
+
+        const ariaLabel = new Intl.DateTimeFormat(locale, {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        }).format(day);
+
+        return html`
+            <td role="gridcell">
+                <button
+                    type="button"
+                    part="day"
+                    tabindex=${focused ? '0' : '-1'}
+                    aria-selected=${selected ? 'true' : 'false'}
+                    aria-label=${ariaLabel}
+                    aria-current=${today ? 'date' : nothing}
+                    aria-disabled=${disabled ? 'true' : nothing}
+                    class=${classMap({ 'other-month': otherMonth, today, selected, disabled })}
+                    @click=${() => !disabled && this._selectDay(day)}
+                >
+                    ${day.getDate()}
+                </button>
+            </td>
+        `;
+    }
+
+    private _getDayNames(locale: string): Array<{ abbr: string; full: string }> {
+        const monday = new Date(2024, 0, 1);
+        return Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            return {
+                abbr: new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d),
+                full: new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(d),
+            };
+        });
+    }
+
+    private _selectDay(day: Date): void {
+        this._calendar.selectedDate = day;
+        this._calendar.focusedDate = day;
+
+        const isoValue = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+        this.value = isoValue;
+
+        const formatted = format(day, this.format);
+        if (this._input) this._input.value = formatted;
+
+        this._syncFormValue();
+        this._emitChange();
+        this.open = false;
+    }
+
+    private _handleTodayClick(): void {
+        const today = new Date();
+        if (!this._calendar.isDisabled(today)) {
+            this._selectDay(today);
+        }
+    }
+
+    private _handleCloseClick(): void {
+        this.open = false;
+        this._trigger?.focus();
+    }
+
+    private _isSameDay(a: Date, b: Date): boolean {
+        return (
+            a.getDate() === b.getDate() &&
+            a.getMonth() === b.getMonth() &&
+            a.getFullYear() === b.getFullYear()
+        );
+    }
+
+    private _emitChange(_date?: Date | null, _valid?: boolean): void {
+        /* Task 8 */
     }
 
     private async _show(): Promise<void> {
