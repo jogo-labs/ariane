@@ -443,8 +443,128 @@ export class ArDatepicker extends LitElement {
     private _handleBlur(): void {
         /* Task 8 */
     }
-    private _handlePanelKeyDown(_e: KeyboardEvent): void {
-        /* Task 7 */
+    private _handlePanelKeyDown(e: KeyboardEvent): void {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            this.open = false;
+            this._trigger?.focus();
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            this._handleTabInPanel(e);
+            return;
+        }
+
+        if (this._isFocusInGrid()) {
+            this._handleGridKeyDown(e);
+        }
+    }
+
+    private _isFocusInGrid(): boolean {
+        const grid = this.shadowRoot?.querySelector('[part="grid"]');
+        const active = this.shadowRoot?.activeElement;
+        return Boolean(grid?.contains(active ?? null));
+    }
+
+    private _handleTabInPanel(e: KeyboardEvent): void {
+        const tabbable = Array.from(
+            this._panel?.querySelectorAll<HTMLElement>(
+                'button:not([disabled]):not([aria-disabled="true"]), [tabindex="0"]',
+            ) ?? [],
+        ).filter((el) => el.tabIndex >= 0);
+
+        if (!tabbable.length) return;
+
+        const active = this.shadowRoot?.activeElement;
+        const first = tabbable[0];
+        const last = tabbable[tabbable.length - 1];
+
+        if (e.shiftKey && active === first) {
+            e.preventDefault();
+            this.open = false;
+            this._trigger?.focus();
+        } else if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            this.open = false;
+            this._trigger?.focus();
+        }
+    }
+
+    private _handleGridKeyDown(e: KeyboardEvent): void {
+        let dayDelta = 0;
+
+        switch (e.key) {
+            case 'ArrowLeft':
+                dayDelta = -1;
+                break;
+            case 'ArrowRight':
+                dayDelta = 1;
+                break;
+            case 'ArrowUp':
+                dayDelta = -7;
+                break;
+            case 'ArrowDown':
+                dayDelta = 7;
+                break;
+            case 'Home': {
+                const dow = this._calendar.focusedDate.getDay();
+                dayDelta = -(dow === 0 ? 6 : dow - 1);
+                break;
+            }
+            case 'End': {
+                const dow = this._calendar.focusedDate.getDay();
+                dayDelta = dow === 0 ? 0 : 7 - dow;
+                break;
+            }
+            case 'PageUp':
+                e.preventDefault();
+                if (e.shiftKey) this._calendar.previousYear();
+                else this._calendar.previousMonth();
+                this._keepFocusedDayInView();
+                return;
+            case 'PageDown':
+                e.preventDefault();
+                if (e.shiftKey) this._calendar.nextYear();
+                else this._calendar.nextMonth();
+                this._keepFocusedDayInView();
+                return;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                if (!this._calendar.isDisabled(this._calendar.focusedDate)) {
+                    this._selectDay(this._calendar.focusedDate);
+                }
+                return;
+            default:
+                return;
+        }
+
+        e.preventDefault();
+
+        const next = new Date(this._calendar.focusedDate);
+        next.setDate(next.getDate() + dayDelta);
+
+        if (
+            next.getMonth() !== this._calendar.currentViewMonth.getMonth() ||
+            next.getFullYear() !== this._calendar.currentViewMonth.getFullYear()
+        ) {
+            this._calendar.currentViewMonth = new Date(next.getFullYear(), next.getMonth(), 1);
+        }
+
+        this._calendar.focusedDate = next;
+        this.requestUpdate();
+        void this.updateComplete.then(() => this._focusFocusedDay());
+    }
+
+    private _keepFocusedDayInView(): void {
+        const v = this._calendar.currentViewMonth;
+        const day = Math.min(
+            this._calendar.focusedDate.getDate(),
+            new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate(),
+        );
+        this._calendar.focusedDate = new Date(v.getFullYear(), v.getMonth(), day);
+        void this.updateComplete.then(() => this._focusFocusedDay());
     }
     private _syncInputFromValue(): void {
         /* Task 8 */
