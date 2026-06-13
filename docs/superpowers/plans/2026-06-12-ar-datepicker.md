@@ -32,6 +32,27 @@
 
 ---
 
+## Task 0 : Création de la branche
+
+**Files:** aucun
+
+- [ ] **Step 1 : Créer la branche depuis `dev`**
+
+```bash
+git checkout dev && git pull
+git checkout -b feat/ar-datepicker
+```
+
+- [ ] **Step 2 : Vérifier qu'on est sur la bonne branche**
+
+```bash
+git branch --show-current
+```
+
+Sortie attendue : `feat/ar-datepicker`
+
+---
+
 ## Task 1 : Scaffold du composant
 
 **Files:**
@@ -2328,7 +2349,19 @@ git add packages/core/custom-elements.json
 git commit -m "chore(datepicker): regénère custom-elements.json"
 ```
 
-- [ ] **Step 5 : Ouvrir la PR**
+---
+
+## Task 16 : Ouvrir la PR vers `dev`
+
+**Files:** aucun
+
+- [ ] **Step 1 : Pousser la branche**
+
+```bash
+git push -u origin feat/ar-datepicker
+```
+
+- [ ] **Step 2 : Ouvrir la PR**
 
 ```bash
 gh pr create \
@@ -2365,6 +2398,7 @@ EOF
 
 | Task | Commit                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------- |
+| 0    | _(pas de commit — création de branche)_                                                     |
 | 1    | `feat(datepicker): scaffold ar-datepicker`                                                  |
 | 2    | `feat(datepicker): date-parser — parse et format avec validation stricte`                   |
 | 3    | `feat(datepicker): CalendarController — navigation, grille 6 semaines, isDisabled`          |
@@ -2379,4 +2413,5 @@ EOF
 | 12   | `test(datepicker): tests browser — focus, navigation clavier, roving tabindex, sync`        |
 | 13   | `test(datepicker): tests accessibilité axe-core — audit ouvert/fermé, ARIA`                 |
 | 14   | `docs(datepicker): page de documentation — playground, API, accessibilité`                  |
-| 15   | `chore(datepicker): regénère custom-elements.json` + PR                                     |
+| 15   | `chore(datepicker): regénère custom-elements.json`                                          |
+| 16   | _(pas de commit — push + PR)_                                                               |
