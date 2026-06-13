@@ -148,4 +148,44 @@ describe('ArDatepicker', () => {
             expect(fired).toBe(true);
         });
     });
+
+    describe('slots et ARIA', () => {
+        it('has-error absent quand slot error est vide', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            await waitForUpdate(el);
+            expect(el.hasAttribute('has-error')).toBe(false);
+        });
+
+        it('has-error présent quand slot error a du contenu', async () => {
+            el = await fixture(`
+                <ar-datepicker>
+                    <span slot="error">Erreur</span>
+                </ar-datepicker>
+            `);
+            await waitForUpdate(el);
+            expect(el.hasAttribute('has-error')).toBe(true);
+        });
+
+        it("aria-describedby de l'input pointe vers les IDs internes", async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const input = el.inputElement;
+            const describedBy = input.getAttribute('aria-describedby') ?? '';
+            const parts = describedBy.split(' ');
+            expect(parts).toHaveLength(2);
+            parts.forEach((id) => {
+                expect(el.shadowRoot?.getElementById(id)).not.toBeNull();
+            });
+        });
+
+        it('slot label est rendu dans un <label>', async () => {
+            el = await fixture(`
+                <ar-datepicker>
+                    <span slot="label">Date de naissance</span>
+                </ar-datepicker>
+            `);
+            const labelEl = el.shadowRoot?.querySelector('label');
+            expect(labelEl).not.toBeNull();
+            expect(labelEl?.querySelector('slot[name="label"]')).not.toBeNull();
+        });
+    });
 });
