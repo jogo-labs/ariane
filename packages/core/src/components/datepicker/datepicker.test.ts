@@ -1,66 +1,62 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ArDatepicker } from './datepicker.js';
-import { fixture, getPart } from '../../test-utils.js';
+import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
 import './datepicker.js';
-
-// ─── Aide-mémoire tests Lit ────────────────────────────────────────────────────
-//
-// fixture(html)          — monte un élément dans le DOM et attend le premier rendu
-// waitForUpdate(el)      — attend le prochain cycle de rendu après une mutation
-// getPart(el, 'name')    — retourne un part="name" du Shadow DOM (| null)
-//                          → utiliser pour les assertions .toBeNull() / .not.toBeNull()
-// requirePart(el, 'name')— idem, mais lance une erreur si absent
-//                          → utiliser quand on enchaîne .getAttribute, .classList, etc.
-//
-// ⚠ happy-dom ne sérialise pas les Text nodes dynamiques Lit en textContent.
-//   Tester le contenu textuel via la propriété JS (el.myProp) plutôt que textContent.
-//
-// ⚠ Les propriétés ARIA assignées via .ariaCurrent, .ariaExpanded, etc. (liaisons
-//   Lit) ne reflètent pas en attribut HTML dans happy-dom. Tester la propriété
-//   JS : (el as unknown as { ariaCurrent: string }).ariaCurrent.
-//
-// ─── Éléments à tester selon le type de composant ─────────────────────────────
-//
-// Composant standard (avec Shadow DOM) :
-//   - Rendu : shadowRoot non null, parts présents (getPart)
-//   - Valeurs par défaut : vérifier chaque propriété à l'état initial
-//   - Attributs reflect : el.prop = x → await waitForUpdate → el.getAttribute(...)
-//   - Comportement : interactions (clic, événements custom)
-//   - Accessibilité : role, aria-*, labels sr-only
-//
-// Sous-composant (sans Shadow DOM, createRenderRoot → this) :
-//   - shadowRoot est null
-//   - setRegistry() appelle registerItem / unregisterItem
-//   - disconnectedCallback() appelle unregisterItem
-//   - updated() appelle notifyItemChanged après le premier rendu seulement
-// ──────────────────────────────────────────────────────────────────────────────
 
 describe('ArDatepicker', () => {
     let el: ArDatepicker;
-
     afterEach(() => el?.remove());
-
-    // ── Rendu ─────────────────────────────────────────────────────────────────
 
     describe('rendu', () => {
         beforeEach(async () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
         });
 
-        it('monte un shadow DOM', () => {
-            expect(el.shadowRoot).not.toBeNull();
-        });
-
-        it('contient un élément racine avec part="base"', () => {
-            expect(getPart(el, 'base')).not.toBeNull();
-        });
+        it('monte un shadow DOM', () => expect(el.shadowRoot).not.toBeNull());
+        it('contient un input part="input"', () => expect(getPart(el, 'input')).not.toBeNull());
+        it('contient un bouton part="trigger"', () =>
+            expect(getPart(el, 'trigger')).not.toBeNull());
+        it('contient un div part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());
+        it('expose inputElement getter', () =>
+            expect(el.inputElement).toBeInstanceOf(HTMLInputElement));
     });
 
-    // ── Valeurs par défaut ────────────────────────────────────────────────────
+    describe('valeurs par défaut', () => {
+        beforeEach(async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+        });
 
-    // describe('valeurs par défaut', () => { ... });
+        it('format vaut "dd/MM/yyyy"', () => expect(el.format).toBe('dd/MM/yyyy'));
+        it('disabled vaut false', () => expect(el.disabled).toBe(false));
+        it('readonly vaut false', () => expect(el.readonly).toBe(false));
+        it('open vaut false', () => expect(el.open).toBe(false));
+    });
 
-    // ── Propriétés ────────────────────────────────────────────────────────────
+    describe('propriétés reflect', () => {
+        beforeEach(async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+        });
 
-    // describe('propriétés', () => { ... });
+        it('disabled se reflète en attribut', async () => {
+            el.disabled = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('disabled')).toBe(true);
+        });
+
+        it('readonly se reflète en attribut', async () => {
+            el.readonly = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('readonly')).toBe(true);
+        });
+
+        it('has-error se reflète quand le slot error a du contenu', async () => {
+            el = await fixture(`
+                <ar-datepicker>
+                    <span slot="error">Date invalide</span>
+                </ar-datepicker>
+            `);
+            await waitForUpdate(el);
+            expect(el.hasAttribute('has-error')).toBe(true);
+        });
+    });
 });
