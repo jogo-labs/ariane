@@ -1,12 +1,127 @@
 ---
 tagName: ar-datepicker
 title: Datepicker
-description: Description du composant ar-datepicker.
+description: Champ de saisie de date avec calendrier popover accessible — saisie libre et sélection visuelle synchronisées.
 variants:
     - name: Par défaut
-      description: Rendu par défaut du composant.
+      description: Date unique avec format français.
       html: |
-          <ar-datepicker></ar-datepicker>
+          <ar-datepicker
+            label="Date de naissance"
+            format="dd/MM/yyyy"
+            locale="fr-FR"
+          >
+            <span slot="hint">Format attendu : jj/mm/aaaa</span>
+          </ar-datepicker>
+    - name: Avec erreur
+      description: État d'erreur visible via le slot error.
+      html: |
+          <ar-datepicker label="Date de naissance">
+            <span slot="error">Date invalide ou hors plage autorisée</span>
+          </ar-datepicker>
+    - name: Readonly
+      description: Valeur affichée non modifiable, soumise au formulaire.
+      html: |
+          <ar-datepicker value="2026-06-12" readonly label="Date"></ar-datepicker>
+    - name: Disabled
+      description: Composant désactivé, valeur exclue du formulaire.
+      html: |
+          <ar-datepicker value="2026-06-12" disabled label="Date"></ar-datepicker>
 ---
 
-Documentation narrative du composant `ar-datepicker`.
+import WcagRef from '../../components/WcagRef.astro';
+
+## Saisie texte
+
+L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
+
+- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
+- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
+
+```html
+<ar-datepicker id="dp" label="Date"></ar-datepicker>
+<script>
+    document.getElementById('dp').addEventListener('ar-datepicker-input-complete', (e) => {
+        if (e.detail.valid) console.log('Date valide :', e.detail.value);
+        else console.warn('Format complet mais date invalide');
+    });
+</script>
+```
+
+## Validation
+
+L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur via `ar-datepicker[has-error]::part(input)`.
+
+La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
+
+```js
+el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
+    errorSlot.hidden = detail.valid;
+});
+```
+
+## Dates désactivées
+
+Trois mécanismes complémentaires :
+
+- `min` / `max` — valeurs ISO `yyyy-MM-dd` définissant la plage sélectionnable.
+- `isDateDisabled` — callback `(date: Date) => boolean` pour des règles arbitraires (week-ends, jours fériés…).
+
+```html
+<ar-datepicker min="2026-01-01" max="2026-12-31" label="Date de rendez-vous"></ar-datepicker>
+```
+
+```js
+el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
+```
+
+Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
+
+## Formulaires
+
+`ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.
+
+| Prop       | Comportement                                          |
+| ---------- | ----------------------------------------------------- |
+| `name`     | Identifie le champ dans `FormData`                    |
+| `required` | Active la contrainte de validation native             |
+| `readonly` | Bloque la saisie et le calendrier, **valeur soumise** |
+| `disabled` | Bloque tout, **valeur exclue** du formulaire          |
+
+## Intégration masque de saisie
+
+Le getter `inputElement` expose l'`<input>` interne pour y brancher une bibliothèque de masque comme IMask :
+
+```js
+import IMask from 'imask';
+const picker = document.querySelector('ar-datepicker');
+IMask(picker.inputElement, { mask: Date });
+```
+
+## Accessibilité
+
+Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
+
+### Pris en charge automatiquement
+
+- Navigation clavier complète dans la grille de jours (<WcagRef criterion="2.1.1" summary="Keyboard : toutes les fonctionnalités sont accessibles au clavier." />)
+- Focus piégé dans le dialog calendrier lors de son ouverture, restitué à l'input à la fermeture (<WcagRef criterion="2.1.2" summary="No Keyboard Trap : le focus peut être déplacé hors du composant." />)
+- Le slot `error` est enveloppé dans un `role="alert"` — annoncé automatiquement aux lecteurs d'écran (<WcagRef criterion="4.1.3" summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus." />)
+- `aria-disabled="true"` sur les jours hors plage et les jours désactivés (<WcagRef criterion="4.1.2" summary="Name, Role, Value : les états des éléments interactifs sont communiqués aux AT." />)
+
+### Raccourcis clavier du calendrier
+
+| Touche                  | Action                               |
+| ----------------------- | ------------------------------------ |
+| `↑` `↓` `←` `→`         | Naviguer de jour en jour / semaine   |
+| `Home` / `End`          | Premier / dernier jour de la semaine |
+| `Page Up` / `Page Down` | Mois précédent / suivant             |
+| `Shift + Page Up/Down`  | Année précédente / suivante          |
+| `Entrée` / `Espace`     | Sélectionner le jour focalisé        |
+| `Escape`                | Fermer sans sélectionner             |
+
+### À votre charge
+
+- **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
+- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie).
+- **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
