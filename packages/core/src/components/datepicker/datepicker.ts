@@ -125,7 +125,7 @@ export class ArDatepicker extends LitElement {
         const defaultHint = `Format attendu : ${this.format}`;
 
         return html`
-            <label part="label">
+            <label part="label" id="dp-label-${this._uid}">
                 <slot name="label">${this.label}</slot>
             </label>
             <slot name="after-label"></slot>
@@ -139,6 +139,7 @@ export class ArDatepicker extends LitElement {
                     ?required=${this.required}
                     autocomplete=${this.autocomplete || nothing}
                     placeholder=${this.placeholder || nothing}
+                    aria-labelledby="dp-label-${this._uid}"
                     aria-describedby="dp-hint-${this._uid} dp-error-${this._uid}"
                     @input=${this._handleInput}
                     @blur=${this._handleBlur}
@@ -286,12 +287,11 @@ export class ArDatepicker extends LitElement {
         }).format(day);
 
         return html`
-            <td role="gridcell">
+            <td role="gridcell" aria-selected=${selected ? 'true' : 'false'}>
                 <button
                     type="button"
                     part="day"
                     tabindex=${focused ? '0' : '-1'}
-                    aria-selected=${selected ? 'true' : 'false'}
                     aria-label=${ariaLabel}
                     aria-current=${today ? 'date' : nothing}
                     aria-disabled=${disabled ? 'true' : nothing}

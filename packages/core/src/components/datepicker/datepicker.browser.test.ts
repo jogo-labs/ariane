@@ -182,8 +182,12 @@ describe('ar-datepicker — browser', () => {
 
             await openPicker(el);
 
-            const selected = el.shadowRoot?.querySelector('[part="day"][aria-selected="true"]');
-            expect(selected?.getAttribute('aria-label')).to.include('12');
+            // aria-selected est sur <td role="gridcell">, pas sur le bouton
+            const selectedCell = el.shadowRoot?.querySelector(
+                '[role="gridcell"][aria-selected="true"]',
+            );
+            const selectedBtn = selectedCell?.querySelector('[part="day"]');
+            expect(selectedBtn?.getAttribute('aria-label')).to.include('12');
         });
     });
 });
