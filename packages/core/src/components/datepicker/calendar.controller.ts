@@ -8,9 +8,9 @@ export interface CalendarControllerOptions {
 
 export class CalendarController implements ReactiveController {
     private readonly _host: ReactiveControllerHost;
-    private _min?: Date;
-    private _max?: Date;
-    private _isDateDisabledFn?: (date: Date) => boolean;
+    private _min: Date | undefined;
+    private _max: Date | undefined;
+    private _isDateDisabledFn: ((date: Date) => boolean) | undefined;
 
     currentViewMonth: Date;
     focusedDate: Date;
@@ -85,7 +85,7 @@ export class CalendarController implements ReactiveController {
     }
 
     isDisabled(date: Date): boolean {
-        const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const d = this._startOfDay(date);
         if (this._min && d < this._min) return true;
         if (this._max && d > this._max) return true;
         if (this._isDateDisabledFn?.(date)) return true;
