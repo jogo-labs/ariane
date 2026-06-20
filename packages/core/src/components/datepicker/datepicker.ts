@@ -249,7 +249,7 @@ export class ArDatepicker extends LitElement {
                     aria-label="Année précédente"
                     @click=${() => {
                         this._calendar.previousYear();
-                        this._focusFocusedDay();
+                        this._keepFocusedDayInView();
                     }}
                 >
                     «
@@ -260,7 +260,7 @@ export class ArDatepicker extends LitElement {
                     aria-label="Mois précédent"
                     @click=${() => {
                         this._calendar.previousMonth();
-                        this._focusFocusedDay();
+                        this._keepFocusedDayInView();
                     }}
                 >
                     ‹
@@ -272,7 +272,7 @@ export class ArDatepicker extends LitElement {
                     aria-label="Mois suivant"
                     @click=${() => {
                         this._calendar.nextMonth();
-                        this._focusFocusedDay();
+                        this._keepFocusedDayInView();
                     }}
                 >
                     ›
@@ -283,7 +283,7 @@ export class ArDatepicker extends LitElement {
                     aria-label="Année suivante"
                     @click=${() => {
                         this._calendar.nextYear();
-                        this._focusFocusedDay();
+                        this._keepFocusedDayInView();
                     }}
                 >
                     »
@@ -446,7 +446,6 @@ export class ArDatepicker extends LitElement {
             return;
         }
 
-        const today = new Date();
         if (this.value) {
             const result = parse(this.value, 'yyyy-MM-dd');
             if (result.valid && result.date) {
@@ -464,12 +463,7 @@ export class ArDatepicker extends LitElement {
             }
         } else {
             this._calendar.selectedDate = null;
-            this._calendar.currentViewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            this._calendar.focusedDate = new Date(
-                today.getFullYear(),
-                today.getMonth(),
-                today.getDate(),
-            );
+            // currentViewMonth et focusedDate conservés — mémorisent la navigation entre les ouvertures
         }
 
         await this._anchored.show();

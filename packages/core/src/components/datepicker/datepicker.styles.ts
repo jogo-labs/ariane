@@ -150,22 +150,31 @@ export default css`
         background: var(--ar-datepicker-day-today-bg);
     }
 
-    [part='day']:not([aria-disabled='true']):not(.disabled):not(:focus-visible):hover {
+    /* Efface la bordure au hover, sauf sur la cellule active de la grille */
+    [part='day']:not([aria-disabled='true']):not(.disabled):not([tabindex='0']):hover {
         border-color: transparent;
     }
 
-    [part='day']:not([aria-disabled='true']):not(.disabled):hover,
-    [part='day']:focus-visible {
+    [part='day']:not([aria-disabled='true']):not(.disabled):hover {
         background-color: var(--ar-datepicker-day-hover-bg);
         color: var(--ar-datepicker-day-hover-color);
     }
 
-    [part='day']:focus-visible,
-    [part='day']:focus-visible:hover {
+    /*
+     * Position courante dans la grille (roving tabindex).
+     * :focus-within couvre le focus programmatique (ouverture du picker) ET le focus clavier,
+     * contrairement à :focus-visible qui ne s'active pas pour le focus programmatique.
+     */
+    [part='grid']:focus-within [part='day'][tabindex='0'] {
         outline: solid var(--ar-datepicker-day-focus-ring-width)
             var(--ar-datepicker-day-focus-ring-color);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
-        border: var(--ar-datepicker-day-border-width) solid var(--ar-panel-bg);
+        border-color: var(--ar-panel-bg);
+    }
+
+    [part='grid']:focus-within [part='day'][tabindex='0']:not(.selected) {
+        background-color: var(--ar-datepicker-day-hover-bg);
+        color: var(--ar-datepicker-day-hover-color);
     }
 
     [part='day'].selected {

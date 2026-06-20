@@ -157,6 +157,113 @@ describe('ar-datepicker — browser', () => {
         });
     });
 
+    // ── Mémorisation de la position de navigation ─────────────────────────────
+
+    describe('mémorisation de position', () => {
+        it('conserve le mois affiché après fermeture sans sélection', async () => {
+            el = await fixture(html`<ar-datepicker locale="fr-FR"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Naviguer 2 mois en avant via PageDown
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const labelBefore = el.shadowRoot?.querySelector('[aria-live]')?.textContent;
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const labelAfter = el.shadowRoot?.querySelector('[aria-live]')?.textContent;
+            expect(labelAfter).to.equal(labelBefore);
+        });
+
+        it('conserve le jour navigué après fermeture sans sélection', async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-12"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Naviguer au mois suivant via le bouton nav — focusedDate suit (même jour)
+            const nextBtn = el.shadowRoot?.querySelector(
+                '[part~="next-month"]',
+            ) as HTMLButtonElement;
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const dayBefore = el.shadowRoot
+                ?.querySelector('[part="day"][tabindex="0"]')
+                ?.getAttribute('aria-label');
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const dayAfter = el.shadowRoot
+                ?.querySelector('[part="day"][tabindex="0"]')
+                ?.getAttribute('aria-label');
+            expect(dayAfter).to.equal(dayBefore);
+        });
+
+        it('les boutons nav maintiennent le curseur dans le mois affiché', async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-15"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Simuler navigation souris : 2 clics sur "mois suivant"
+            const nextBtn = el.shadowRoot?.querySelector(
+                '[part~="next-month"]',
+            ) as HTMLButtonElement;
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            // Le curseur (tabindex="0") doit être dans le mois visible (août 2026)
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part="day"][tabindex="0"]',
+            );
+            expect(focused).to.not.equal(null);
+            // Le jour doit être le 15 (même jour, mois décalé)
+            expect(focused?.getAttribute('aria-label')).to.include('15');
+        });
+
+        it('revient au mois de la date sélectionnée à la réouverture', async () => {
+            el = await fixture(
+                html`<ar-datepicker value="2026-06-12" locale="fr-FR"></ar-datepicker>`,
+            );
+            await openPicker(el);
+
+            // Naviguer 2 mois en avant
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const label = el.shadowRoot?.querySelector('[aria-live]')?.textContent?.toLowerCase();
+            expect(label).to.include('juin');
+            expect(label).to.include('2026');
+        });
+    });
+
     // ── Roving tabindex ───────────────────────────────────────────────────────
 
     describe('roving tabindex', () => {
