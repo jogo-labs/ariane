@@ -183,4 +183,50 @@ const tocEntries = [
         margin: 0;
         padding-left: 1.25rem;
     }
+
+    /* Tables narratives — alignées sur le style de ComponentApi (doc-table.css) */
+    .narrative :global(table) {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .narrative :global(th) {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        background: var(--doc-nav-bg, #f9fafb);
+        color: var(--doc-text, #111827);
+        font-weight: 600;
+        border-bottom: 1px solid var(--doc-border, #e5e7eb);
+    }
+
+    .narrative :global(td) {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--doc-border, #f3f4f6);
+        vertical-align: top;
+        color: var(--doc-text, #111827);
+    }
+
+    .narrative :global(td code),
+    .narrative :global(th code) {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.8rem;
+        background: var(--doc-accent-bg, #f3efff);
+        color: var(--doc-accent, #7c3aed);
+        padding: 0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+
+    .narrative :global(kbd) {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.75rem;
+        background: var(--doc-nav-bg, #f9fafb);
+        color: var(--doc-text, #111827);
+        border: 1px solid var(--doc-border, #d1d5db);
+        border-radius: 0.25rem;
+        padding: 0.15em 0.45em;
+        box-shadow: 0 1px 0 var(--doc-border, #d1d5db);
+        white-space: nowrap;
+    }
 </style>

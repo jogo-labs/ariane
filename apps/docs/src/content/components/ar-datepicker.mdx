@@ -90,12 +90,47 @@ Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut nati
 
 `ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.
 
-| Prop       | Comportement                                          |
-| ---------- | ----------------------------------------------------- |
-| `name`     | Identifie le champ dans `FormData`                    |
-| `required` | Active la contrainte de validation native             |
-| `readonly` | Bloque la saisie et le calendrier, **valeur soumise** |
-| `disabled` | Bloque tout, **valeur exclue** du formulaire          |
+<table>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Comportement</th>
+            <th style="text-align:center">Valeur soumise</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                Identifie le champ dans <code>FormData</code>
+            </td>
+            <td style="text-align:center">—</td>
+        </tr>
+        <tr>
+            <td>
+                <code>required</code>
+            </td>
+            <td>Active la contrainte de validation native</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>readonly</code>
+            </td>
+            <td>Bloque la saisie et le calendrier</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>disabled</code>
+            </td>
+            <td>Bloque tout</td>
+            <td style="text-align:center">—</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Intégration masque de saisie
 
@@ -120,14 +155,52 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 
 ### Raccourcis clavier du calendrier
 
-| Touche                  | Action                               |
-| ----------------------- | ------------------------------------ |
-| `↑` `↓` `←` `→`         | Naviguer de jour en jour / semaine   |
-| `Home` / `End`          | Premier / dernier jour de la semaine |
-| `Page Up` / `Page Down` | Mois précédent / suivant             |
-| `Shift + Page Up/Down`  | Année précédente / suivante          |
-| `Entrée` / `Espace`     | Sélectionner le jour focalisé        |
-| `Escape`                | Fermer sans sélectionner             |
+<table>
+    <thead>
+        <tr>
+            <th>Touche</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd>
+            </td>
+            <td>Naviguer de jour en jour / semaine</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Home</kbd> / <kbd>End</kbd>
+            </td>
+            <td>Premier / dernier jour de la semaine</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Page Up</kbd> / <kbd>Page Down</kbd>
+            </td>
+            <td>Mois précédent / suivant</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Shift</kbd> + <kbd>Page Up</kbd> / <kbd>Page Down</kbd>
+            </td>
+            <td>Année précédente / suivante</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Entrée</kbd> / <kbd>Espace</kbd>
+            </td>
+            <td>Sélectionner le jour focalisé</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Escape</kbd>
+            </td>
+            <td>Fermer sans sélectionner</td>
+        </tr>
+    </tbody>
+</table>
 
 ### À votre charge
 
