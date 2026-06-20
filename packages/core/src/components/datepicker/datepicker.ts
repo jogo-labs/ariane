@@ -60,6 +60,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
  * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.
  * @cssprop [--ar-datepicker-day-border-width]         - Épaisseur de bordure des cellules jour.
+ * @cssprop [--ar-datepicker-day-border-color]         - Couleur de bordure par défaut des cellules jour.
  * @cssprop [--ar-datepicker-day-other-month-color]    - Couleur des jours hors du mois affiché.
  * @cssprop [--ar-datepicker-day-today-bg]             - Fond du jour actuel.
  * @cssprop [--ar-datepicker-day-today-color]          - Couleur texte du jour actuel.
