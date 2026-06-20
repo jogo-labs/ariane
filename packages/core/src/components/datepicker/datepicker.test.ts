@@ -17,6 +17,9 @@ describe('ArDatepicker', () => {
         it('contient un bouton part="trigger"', () =>
             expect(getPart(el, 'trigger')).not.toBeNull());
         it('contient un div part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());
+        it('contient un label part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
+        it('contient un p part="hint"', () => expect(getPart(el, 'hint')).not.toBeNull());
+        it('contient un p part="error"', () => expect(getPart(el, 'error')).not.toBeNull());
         it('expose inputElement getter', () =>
             expect(el.inputElement).toBeInstanceOf(HTMLInputElement));
     });
