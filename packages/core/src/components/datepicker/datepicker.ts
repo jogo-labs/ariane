@@ -34,7 +34,7 @@ import styles from './datepicker.styles.js';
  * @csspart today-btn  - Bouton « Aujourd'hui ».
  * @csspart close-btn  - Bouton « Fermer ».
  *
- * @cssprop [--ar-datepicker-panel-width=20rem]        - Largeur du popover.
+ * @cssprop [--ar-datepicker-panel-width]        - Largeur du popover.
  * @cssprop [--ar-datepicker-header-font-size]         - Taille de police de l'en-tête.
  * @cssprop [--ar-datepicker-header-padding]           - Padding de l'en-tête.
  * @cssprop [--ar-datepicker-header-margin]            - Margin de l'en-tête.
@@ -59,7 +59,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-footer-btn-hover-border-color] - Couleur de bordure au survol des boutons footer.
  * @cssprop [--ar-datepicker-footer-btn-active-bg]          - Fond à l'état actif des boutons footer.
  * @cssprop [--ar-datepicker-weekday-color]            - Couleur des abréviations de jours.
- * @cssprop [--ar-datepicker-day-size=2.5rem]          - Taille des cellules jour.
+ * @cssprop [--ar-datepicker-day-size]                 - Taille des cellules jour.
  * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
  * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.
  * @cssprop [--ar-datepicker-day-border-width]         - Épaisseur de bordure des cellules jour.
