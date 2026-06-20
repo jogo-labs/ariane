@@ -3,7 +3,6 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import { classMap } from 'lit/directives/class-map.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
@@ -16,20 +15,62 @@ import styles from './datepicker.styles.js';
  * @slot hint        - Texte d'aide persistant (format attendu). Lié via aria-describedby.
  * @slot error       - Message d'erreur. Déclenche has-error sur le host.
  *
- * @csspart input   - Le champ texte.
- * @csspart trigger - Le bouton d'ouverture du calendrier.
- * @csspart panel   - Le popover flottant.
- * @csspart header  - En-tête du calendrier (navigation).
- * @csspart grid    - La grille calendrier.
- * @csspart day     - Les boutons jours.
- * @csspart footer  - Pied du calendrier (boutons Aujourd'hui / Fermer).
+ * @csspart input      - Le champ texte.
+ * @csspart trigger    - Le bouton d'ouverture du calendrier.
+ * @csspart panel      - Le popover flottant.
+ * @csspart header     - En-tête du calendrier (navigation).
+ * @csspart nav-btn    - Tous les boutons de navigation (ciblage groupé).
+ * @csspart prev-year  - Bouton année précédente.
+ * @csspart prev-month - Bouton mois précédent.
+ * @csspart next-month - Bouton mois suivant.
+ * @csspart next-year  - Bouton année suivante.
+ * @csspart grid       - La grille calendrier.
+ * @csspart day        - Les boutons jours.
+ * @csspart footer     - Pied du calendrier.
+ * @csspart footer-btn - Tous les boutons du footer (ciblage groupé).
+ * @csspart today-btn  - Bouton « Aujourd'hui ».
+ * @csspart close-btn  - Bouton « Fermer ».
  *
- * @cssprop [--ar-datepicker-panel-width=20rem] - Largeur du popover.
- * @cssprop [--ar-datepicker-day-size=2.25rem]  - Taille des cellules jour.
- * @cssprop [--ar-datepicker-day-today-bg]      - Fond du jour actuel.
- * @cssprop [--ar-datepicker-day-today-color]   - Couleur texte du jour actuel.
- * @cssprop [--ar-datepicker-day-selected-bg]   - Fond du jour sélectionné.
- * @cssprop [--ar-datepicker-day-selected-color]- Couleur texte du jour sélectionné.
+ * @cssprop [--ar-datepicker-panel-width=20rem]        - Largeur du popover.
+ * @cssprop [--ar-datepicker-header-font-size]         - Taille de police de l'en-tête.
+ * @cssprop [--ar-datepicker-header-padding]           - Padding de l'en-tête.
+ * @cssprop [--ar-datepicker-header-margin]            - Margin de l'en-tête.
+ * @cssprop [--ar-datepicker-header-radius]            - Border-radius de l'en-tête.
+ * @cssprop [--ar-datepicker-nav-btn-size]                  - Taille (width = height) des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-bg]                    - Fond des boutons de navigation.
+ * @cssprop [--ar-datepicker-nav-btn-border-width]          - Épaisseur de bordure des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-border-color]          - Couleur de bordure des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-color]                 - Couleur texte des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-radius]                - Border-radius des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-hover-bg]              - Fond au survol des boutons nav.
+ * @cssprop [--ar-datepicker-nav-btn-active-bg]             - Fond à l'état actif des boutons nav.
+ * @cssprop [--ar-datepicker-footer-padding]                - Padding du footer.
+ * @cssprop [--ar-datepicker-footer-margin]                 - Margin du footer.
+ * @cssprop [--ar-datepicker-footer-btn-bg]                 - Fond des boutons du footer.
+ * @cssprop [--ar-datepicker-footer-btn-border-width]       - Épaisseur de bordure des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-border-color]       - Couleur de bordure des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-color]              - Couleur texte des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-radius]             - Border-radius des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-padding]            - Padding des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-hover-bg]           - Fond au survol des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-hover-border-color] - Couleur de bordure au survol des boutons footer.
+ * @cssprop [--ar-datepicker-footer-btn-active-bg]          - Fond à l'état actif des boutons footer.
+ * @cssprop [--ar-datepicker-weekday-color]            - Couleur des abréviations de jours.
+ * @cssprop [--ar-datepicker-day-size=2.5rem]          - Taille des cellules jour.
+ * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
+ * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.
+ * @cssprop [--ar-datepicker-day-border-width]         - Épaisseur de bordure des cellules jour.
+ * @cssprop [--ar-datepicker-day-other-month-color]    - Couleur des jours hors du mois affiché.
+ * @cssprop [--ar-datepicker-day-today-bg]             - Fond du jour actuel.
+ * @cssprop [--ar-datepicker-day-today-color]          - Couleur texte du jour actuel.
+ * @cssprop [--ar-datepicker-day-today-border]         - Couleur de bordure du jour actuel.
+ * @cssprop [--ar-datepicker-day-hover-bg]             - Fond au survol d'un jour.
+ * @cssprop [--ar-datepicker-day-hover-color]          - Couleur texte au survol d'un jour.
+ * @cssprop [--ar-datepicker-day-focus-ring-color]     - Couleur du focus ring des jours.
+ * @cssprop [--ar-datepicker-day-focus-ring-width]     - Épaisseur du focus ring des jours.
+ * @cssprop [--ar-datepicker-day-focus-ring-offset]    - Décalage du focus ring des jours.
+ * @cssprop [--ar-datepicker-day-selected-bg]          - Fond du jour sélectionné.
+ * @cssprop [--ar-datepicker-day-selected-color]       - Couleur texte du jour sélectionné.
  * @cssprop [--ar-datepicker-input-error-border-color] - Bordure input en état d'erreur.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
@@ -203,6 +244,7 @@ export class ArDatepicker extends LitElement {
         return html`
             <div part="header">
                 <button
+                    part="nav-btn prev-year"
                     type="button"
                     aria-label="Année précédente"
                     @click=${() => {
@@ -213,6 +255,7 @@ export class ArDatepicker extends LitElement {
                     «
                 </button>
                 <button
+                    part="nav-btn prev-month"
                     type="button"
                     aria-label="Mois précédent"
                     @click=${() => {
@@ -224,6 +267,7 @@ export class ArDatepicker extends LitElement {
                 </button>
                 <span aria-live="polite">${monthLabel}</span>
                 <button
+                    part="nav-btn next-month"
                     type="button"
                     aria-label="Mois suivant"
                     @click=${() => {
@@ -234,6 +278,7 @@ export class ArDatepicker extends LitElement {
                     ›
                 </button>
                 <button
+                    part="nav-btn next-year"
                     type="button"
                     aria-label="Année suivante"
                     @click=${() => {
@@ -265,8 +310,12 @@ export class ArDatepicker extends LitElement {
             </table>
 
             <div part="footer">
-                <button type="button" @click=${this._handleTodayClick}>Aujourd'hui</button>
-                <button type="button" @click=${this._handleCloseClick}>Fermer</button>
+                <button part="footer-btn today-btn" type="button" @click=${this._handleTodayClick}>
+                    Aujourd'hui
+                </button>
+                <button part="footer-btn close-btn" type="button" @click=${this._handleCloseClick}>
+                    Fermer
+                </button>
             </div>
         `;
     }
@@ -286,6 +335,15 @@ export class ArDatepicker extends LitElement {
             year: 'numeric',
         }).format(day);
 
+        const classes = [
+            otherMonth && 'other-month',
+            today && 'today',
+            selected && 'selected',
+            disabled && 'disabled',
+        ]
+            .filter(Boolean)
+            .join(' ');
+
         return html`
             <td role="gridcell" aria-selected=${selected ? 'true' : 'false'}>
                 <button
@@ -295,7 +353,7 @@ export class ArDatepicker extends LitElement {
                     aria-label=${ariaLabel}
                     aria-current=${today ? 'date' : nothing}
                     aria-disabled=${disabled ? 'true' : nothing}
-                    class=${classMap({ 'other-month': otherMonth, today, selected, disabled })}
+                    class=${classes || nothing}
                     @click=${() => !disabled && this._selectDay(day)}
                 >
                     ${day.getDate()}
