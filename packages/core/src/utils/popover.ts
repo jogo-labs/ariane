@@ -66,11 +66,11 @@ export class Popover {
         }
     }
 
-    attach(trigger: HTMLElement, panel: HTMLElement): void {
+    attach(trigger: HTMLElement, panel: HTMLElement, anchor?: HTMLElement): void {
         if (this._panel && this._opts.popoverType === 'auto') {
             this._panel.removeEventListener('toggle', this._onToggle);
         }
-        this._trigger = trigger;
+        this._trigger = anchor ?? trigger;
         this._panel = panel;
         if (!panel.id) panel.id = `ar-popover-${crypto.randomUUID().slice(0, 8)}`;
         panel.setAttribute('popover', this._opts.popoverType);

@@ -140,6 +140,7 @@ export class ArDatepicker extends LitElement {
     @query('[part="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
     @query('[part="trigger"]') private _trigger!: HTMLButtonElement;
+    @query('.input-wrapper') private _inputWrapper!: HTMLDivElement;
 
     get inputElement(): HTMLInputElement {
         return this._input;
@@ -155,7 +156,7 @@ export class ArDatepicker extends LitElement {
     }
 
     override firstUpdated(): void {
-        this._anchored.attach(this._trigger, this._panel);
+        this._anchored.attach(this._trigger, this._panel, this._inputWrapper);
         this._syncFormValue();
     }
 

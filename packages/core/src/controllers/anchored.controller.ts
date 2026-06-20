@@ -56,10 +56,10 @@ export class AnchoredController implements ReactiveController {
         return this._popover.isOpen;
     }
 
-    attach(trigger: HTMLElement, panel: HTMLElement): void {
+    attach(trigger: HTMLElement, panel: HTMLElement, anchor?: HTMLElement): void {
         // Precondition: call hide() before re-attaching to avoid stale scroll-lock refs.
         this._trigger = trigger;
-        this._popover.attach(trigger, panel);
+        this._popover.attach(trigger, panel, anchor);
         const haspopup = this._opts.popupMode === 'dialog' ? 'dialog' : 'true';
         trigger.setAttribute('aria-haspopup', haspopup);
         trigger.setAttribute('aria-expanded', 'false');
