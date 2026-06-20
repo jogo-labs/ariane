@@ -31,6 +31,15 @@ variants:
 
 import WcagRef from '../../components/WcagRef.astro';
 
+## Comportement
+
+Le calendrier **mémorise la position de navigation** entre les ouvertures : mois affiché et jour exact conservés. À la réouverture :
+
+- Si une `value` est définie → le calendrier se repositionne sur la date sélectionnée.
+- Sinon → le mois et le jour navigué lors de la fermeture précédente sont restaurés.
+
+La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
+
 ## Saisie texte
 
 L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.

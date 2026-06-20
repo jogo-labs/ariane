@@ -585,6 +585,8 @@
 
         --ar-datepicker-day-selected-bg: var(--ar-color-primary-70);
         --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
+
+        --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -639,8 +641,12 @@
             --ar-datepicker-day-today-color: var(--ar-color-primary-70);
             --ar-datepicker-day-today-border: var(--ar-color-primary-70);
             --ar-datepicker-day-hover-bg: var(--ar-color-primary-60);
+            --ar-datepicker-day-hover-color: var(--ar-color-text-inverse);
 
             --ar-datepicker-day-selected-bg: var(--ar-color-primary-60);
+            --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
+
+            --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
         }
     }
 

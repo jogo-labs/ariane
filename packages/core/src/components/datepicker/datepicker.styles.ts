@@ -48,7 +48,7 @@ export default css`
         font-size: var(--ar-datepicker-header-font-size);
         margin: var(--ar-datepicker-header-margin);
         padding: var(--ar-datepicker-header-padding);
-        background: var(--ar-datepicker-header-bg, transparent);
+        background: var(--ar-datepicker-header-bg);
         border-radius: var(--ar-datepicker-header-radius);
     }
 
@@ -139,9 +139,8 @@ export default css`
         margin: auto;
         cursor: pointer;
         border-radius: var(--ar-datepicker-day-radius);
-        background-color: var(--ar-datepicker-day-bg, transparent);
-        border: var(--ar-datepicker-day-border-width) solid
-            var(--ar-datepicker-day-border-color, transparent);
+        background-color: var(--ar-datepicker-day-bg);
+        border: var(--ar-datepicker-day-border-width) solid var(--ar-datepicker-day-border-color);
     }
 
     [part='day'].today {
@@ -204,6 +203,6 @@ export default css`
         gap: 0.5rem;
         margin: var(--ar-datepicker-footer-margin);
         padding: var(--ar-datepicker-footer-padding);
-        background: var(--ar-datepicker-footer-bg, transparent);
+        background: var(--ar-datepicker-footer-bg);
     }
 `;

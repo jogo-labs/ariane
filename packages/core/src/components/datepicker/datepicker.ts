@@ -104,19 +104,33 @@ export class ArDatepicker extends LitElement {
         },
     });
 
+    /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
     @property({ reflect: true }) value = '';
+    /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
     @property() format = 'dd/MM/yyyy';
+    /** Locale BCP 47 pour les noms de jours et mois. Défaut : `navigator.language`. */
     @property() locale = '';
+    /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */
     @property() min = '';
+    /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
     @property() max = '';
+    /** Callback de désactivation arbitraire — retourne `true` pour désactiver un jour. */
     @property({ attribute: false }) isDateDisabled?: (date: Date) => boolean;
+    /** Texte placeholder de l'input. */
     @property() placeholder = '';
+    /** Valeur `autocomplete` de l'input natif. */
     @property() autocomplete = '';
+    /** Label du champ (alternative au slot `label`). */
     @property() label = '';
+    /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;
+    /** Bloque la saisie tout en soumettant la valeur au formulaire. */
     @property({ reflect: true, type: Boolean }) readonly = false;
+    /** Active la contrainte de validation native `required`. */
     @property({ reflect: true, type: Boolean }) required = false;
+    /** Identifie le champ dans `FormData`. */
     @property() name = '';
+    /** Ouvre ou ferme le popover calendrier. */
     @property({ reflect: true, type: Boolean }) open = false;
 
     @query('[part="input"]') private _input!: HTMLInputElement;
