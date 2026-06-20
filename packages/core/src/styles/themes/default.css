@@ -656,6 +656,70 @@
         --ar-panel-padding: 1rem;
     }
 
+    ar-datepicker::part(input) {
+        height: var(--ar-button-height);
+        padding: 0 0.75rem;
+        border: 1px solid var(--ar-color-border);
+        border-right: none;
+        border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
+        background: var(--ar-color-bg);
+        color: var(--ar-color-text);
+        font-size: var(--ar-font-size-md);
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    ar-datepicker::part(input):focus-visible {
+        outline: 2px solid var(--ar-focus-ring-color);
+        outline-offset: var(--ar-focus-ring-offset);
+        border-color: var(--ar-color-interactive);
+    }
+
+    ar-datepicker::part(input):read-only {
+        background: var(--ar-color-bg-subtle);
+        cursor: default;
+    }
+
+    ar-datepicker::part(input):disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--ar-color-bg-subtle);
+    }
+
+    ar-datepicker::part(trigger) {
+        width: var(--ar-button-height);
+        height: var(--ar-button-height);
+        background: var(--ar-color-interactive);
+        color: var(--ar-color-text-inverse);
+        border: 1px solid var(--ar-color-interactive);
+        border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
+        cursor: pointer;
+        transition:
+            background 0.15s ease,
+            border-color 0.15s ease;
+    }
+
+    ar-datepicker::part(trigger):hover:not(:disabled) {
+        background: var(--ar-color-interactive-hover);
+        border-color: var(--ar-color-interactive-hover);
+    }
+
+    ar-datepicker::part(trigger):active:not(:disabled) {
+        background: var(--ar-color-interactive-active);
+        border-color: var(--ar-color-interactive-active);
+    }
+
+    ar-datepicker::part(trigger):focus-visible {
+        outline: 2px solid var(--ar-focus-ring-color);
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    ar-datepicker::part(trigger):disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     ar-collapse::part(panel) {
         transition: height var(--ar-collapse-duration, 0s) var(--ar-collapse-easing, ease);
     }
