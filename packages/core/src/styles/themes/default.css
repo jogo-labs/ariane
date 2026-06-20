@@ -457,6 +457,10 @@
          * ar-datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
+        --ar-datepicker-gap: 0.35rem;
+        --ar-datepicker-label-gap: 0.5rem;
+        --ar-datepicker-error-color: var(--ar-color-red-50);
+
         --ar-datepicker-panel-width: 20rem;
 
         --ar-datepicker-header-font-size: 1rem;
@@ -579,6 +583,8 @@
         --ar-tooltip-color: var(--ar-color-neutral-10);
 
         /* Datepicker */
+        --ar-datepicker-error-color: var(--ar-color-red-40);
+
         --ar-datepicker-day-today-color: var(--ar-color-primary-70);
         --ar-datepicker-day-today-border: var(--ar-color-primary-70);
         --ar-datepicker-day-hover-bg: var(--ar-color-primary-70);
@@ -639,6 +645,8 @@
             --ar-tooltip-color: var(--ar-color-neutral-10);
 
             /* Datepicker */
+            --ar-datepicker-error-color: var(--ar-color-red-40);
+
             --ar-datepicker-day-today-color: var(--ar-color-primary-70);
             --ar-datepicker-day-today-border: var(--ar-color-primary-70);
             --ar-datepicker-day-hover-bg: var(--ar-color-primary-60);
@@ -656,8 +664,26 @@
         --ar-panel-padding: 1rem;
     }
 
+    ar-datepicker::part(label) {
+        font-size: var(--ar-font-size-sm);
+        font-weight: var(--ar-font-weight-medium);
+        color: var(--ar-color-text);
+        margin-bottom: calc(var(--ar-datepicker-label-gap) - var(--ar-datepicker-gap));
+    }
+
+    ar-datepicker::part(hint) {
+        font-size: var(--ar-font-size-sm);
+        color: var(--ar-color-text-muted);
+    }
+
+    ar-datepicker::part(error) {
+        font-size: var(--ar-font-size-sm);
+        color: var(--ar-datepicker-error-color);
+    }
+
     ar-datepicker::part(input) {
         height: var(--ar-button-height);
+        box-sizing: border-box;
         padding: 0 0.75rem;
         border: 1px solid var(--ar-color-border);
         border-right: none;

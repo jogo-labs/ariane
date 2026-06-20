@@ -2,7 +2,9 @@ import { css } from 'lit';
 
 export default css`
     :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: var(--ar-datepicker-gap);
     }
 
     p {

@@ -25,6 +25,9 @@ import styles from './datepicker.styles.js';
  * @csspart next-month - Bouton mois suivant.
  * @csspart next-year  - Bouton année suivante.
  * @csspart grid       - La grille calendrier.
+ * @csspart label      - L'élément label.
+ * @csspart hint       - Le texte d'aide sous l'input.
+ * @csspart error      - Le message d'erreur sous l'input.
  * @csspart day        - Les boutons jours.
  * @csspart footer     - Pied du calendrier.
  * @csspart footer-btn - Tous les boutons du footer (ciblage groupé).
@@ -225,10 +228,10 @@ export class ArDatepicker extends LitElement {
                 </button>
             </div>
 
-            <p id="dp-hint-${this._uid}">
+            <p part="hint" id="dp-hint-${this._uid}">
                 <slot name="hint">${defaultHint}</slot>
             </p>
-            <p id="dp-error-${this._uid}" role="alert">
+            <p part="error" id="dp-error-${this._uid}" role="alert">
                 <slot name="error"></slot>
             </p>
 
