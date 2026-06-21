@@ -170,7 +170,7 @@ export class ArDatepicker extends LitElement {
         this.toggleAttribute('has-error', this._hasSlot.test('error'));
 
         if (changed.has('open')) {
-            if (this.open) this._show();
+            if (this.open) void this._show().catch((e) => console.error('[ar-datepicker]', e));
             else this._hide();
         }
 
@@ -460,7 +460,8 @@ export class ArDatepicker extends LitElement {
             }),
         );
         if (!allowed) {
-            this.open = false;
+            // Évite une boucle si hide est aussi cancelled
+            if (this.open !== false) this.open = false;
             return;
         }
 
@@ -502,7 +503,8 @@ export class ArDatepicker extends LitElement {
             }),
         );
         if (!allowed) {
-            this.open = true;
+            // Évite une boucle si show est aussi cancelled
+            if (this.open !== true) this.open = true;
             return;
         }
 

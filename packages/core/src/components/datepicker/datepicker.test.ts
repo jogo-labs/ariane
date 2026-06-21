@@ -107,6 +107,24 @@ describe('ArDatepicker', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(true);
         });
+
+        it('canceller ar-datepicker-hide maintient le panel ouvert sans boucle', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            el.addEventListener('ar-datepicker-hide', (e) => e.preventDefault());
+            el.open = false;
+            await waitForUpdate(el);
+            // Le panel doit rester ouvert et la propriété doit être revenue à true
+            expect(el.open).toBe(true);
+        });
+
+        it('canceller ar-datepicker-show maintient le panel fermé sans boucle', async () => {
+            el.addEventListener('ar-datepicker-show', (e) => e.preventDefault());
+            el.open = true;
+            await waitForUpdate(el);
+            // Le panel doit rester fermé et la propriété doit être revenue à false
+            expect(el.open).toBe(false);
+        });
     });
 
     describe('synchronisation input ↔ calendrier', () => {
