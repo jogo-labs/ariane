@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDatepicker } from './datepicker.js';
 import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
 import './datepicker.js';
@@ -203,5 +203,62 @@ describe('ArDatepicker', () => {
             await waitForUpdate(el);
             expect(() => (el.disabled = false)).not.toThrow();
         });
+    });
+
+    describe('setValidity / required', () => {
+        // happy-dom ne supporte pas attachInternals() ni form.checkValidity() pour les FACE.
+        // On injecte un faux ElementInternals via attachInternals pour espionner setValidity.
+
+        function withFakeInternals(test: (spy: ReturnType<typeof vi.fn>) => Promise<void>) {
+            return async () => {
+                const setValiditySpy = vi.fn();
+                const setFormValueSpy = vi.fn();
+                const fakeInternals = {
+                    setFormValue: setFormValueSpy,
+                    setValidity: setValiditySpy,
+                };
+                // happy-dom : attachInternals n'existe pas, on l'injecte
+                (HTMLElement.prototype as unknown as Record<string, unknown>).attachInternals =
+                    () => fakeInternals;
+                await test(setValiditySpy);
+                delete (HTMLElement.prototype as unknown as Record<string, unknown>)
+                    .attachInternals;
+            };
+        }
+
+        it(
+            '<ar-datepicker required> vide → setValidity({ valueMissing:true }) appelé',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required></ar-datepicker>');
+                await waitForUpdate(el);
+                const valueMissingCall = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(valueMissingCall).toBeDefined();
+            }),
+        );
+
+        it(
+            '<ar-datepicker required> avec valeur → setValidity({}) appelé',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required value="2026-06-12"></ar-datepicker>');
+                await waitForUpdate(el);
+                const lastCall = setValiditySpy.mock.calls.at(-1);
+                expect(lastCall).toBeDefined();
+                expect(Object.keys(lastCall![0] as object)).toHaveLength(0);
+            }),
+        );
+
+        it(
+            '<ar-datepicker> sans required, vide → setValidity({}) appelé (pas de valueMissing)',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                await waitForUpdate(el);
+                const valueMissingCall = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(valueMissingCall).toBeUndefined();
+            }),
+        );
     });
 });

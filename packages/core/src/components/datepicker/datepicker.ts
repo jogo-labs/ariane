@@ -403,7 +403,6 @@ export class ArDatepicker extends LitElement {
         const formatted = format(day, this.format);
         if (this._input) this._input.value = formatted;
 
-        this._syncFormValue();
         this._emitChange();
         this.open = false;
     }
@@ -564,7 +563,6 @@ export class ArDatepicker extends LitElement {
 
         const isoValue = result.valid && result.date ? this._toIso(result.date) : null;
         this.value = isoValue ?? '';
-        this._syncFormValue();
 
         this._emitChange(result.date, result.valid);
     }
@@ -705,9 +703,20 @@ export class ArDatepicker extends LitElement {
     private _syncFormValue(): void {
         if (this.disabled) {
             this._internals?.setFormValue(null);
+            this._internals?.setValidity({});
             return;
         }
         this._internals?.setFormValue(this.value || null, this.value || null);
+        if (this.required && !this.value) {
+            const anchor = this._input ?? undefined;
+            this._internals?.setValidity(
+                { valueMissing: true },
+                'Veuillez sélectionner une date.',
+                anchor,
+            );
+        } else {
+            this._internals?.setValidity({});
+        }
     }
 }
 
