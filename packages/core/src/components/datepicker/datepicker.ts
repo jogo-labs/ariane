@@ -144,6 +144,8 @@ export class ArDatepicker extends LitElement {
 
     /** Ignore le prochain `updated()` open/close quand un event annulé re-set `open`. */
     private _skipNextOpenChange = false;
+    /** Dernière valeur ISO synchronisée dans le calendrier — évite de réinitialiser la navigation si la valeur n'a pas changé entre deux ouvertures. */
+    private _lastSyncedValue = '';
 
     @query('[part="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
@@ -493,19 +495,25 @@ export class ArDatepicker extends LitElement {
             const result = parse(this.value, 'yyyy-MM-dd');
             if (result.valid && result.date) {
                 this._calendar.selectedDate = result.date;
-                this._calendar.currentViewMonth = new Date(
-                    result.date.getFullYear(),
-                    result.date.getMonth(),
-                    1,
-                );
-                this._calendar.focusedDate = new Date(
-                    result.date.getFullYear(),
-                    result.date.getMonth(),
-                    result.date.getDate(),
-                );
+                // Ne naviguer vers la date que si la valeur a changé depuis le dernier open —
+                // préserve la position de navigation entre les ouvertures successives.
+                if (this.value !== this._lastSyncedValue) {
+                    this._calendar.currentViewMonth = new Date(
+                        result.date.getFullYear(),
+                        result.date.getMonth(),
+                        1,
+                    );
+                    this._calendar.focusedDate = new Date(
+                        result.date.getFullYear(),
+                        result.date.getMonth(),
+                        result.date.getDate(),
+                    );
+                    this._lastSyncedValue = this.value;
+                }
             }
         } else {
             this._calendar.selectedDate = null;
+            this._lastSyncedValue = '';
             // currentViewMonth et focusedDate conservés — mémorisent la navigation entre les ouvertures
         }
 
