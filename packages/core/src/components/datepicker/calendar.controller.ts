@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
+import { parse } from './date-parser.js';
 
 export interface CalendarControllerOptions {
     min?: string;
@@ -28,14 +29,9 @@ export class CalendarController implements ReactiveController {
     hostDisconnected(): void {}
 
     update(opts: CalendarControllerOptions): void {
-        this._min = opts.min ? this._parseDate(opts.min) : undefined;
-        this._max = opts.max ? this._parseDate(opts.max) : undefined;
+        this._min = opts.min ? (parse(opts.min, 'yyyy-MM-dd').date ?? undefined) : undefined;
+        this._max = opts.max ? (parse(opts.max, 'yyyy-MM-dd').date ?? undefined) : undefined;
         this._isDateDisabledFn = opts.isDateDisabled;
-    }
-
-    private _parseDate(dateStr: string): Date {
-        const [year, month, day] = dateStr.split('-').map(Number);
-        return new Date(year, month - 1, day);
     }
 
     previousMonth(): void {
@@ -93,7 +89,7 @@ export class CalendarController implements ReactiveController {
     }
 
     isToday(date: Date): boolean {
-        return this._isSameDay(date, new Date());
+        return this.isSameDay(date, new Date());
     }
 
     isSameMonth(date: Date): boolean {
@@ -107,7 +103,7 @@ export class CalendarController implements ReactiveController {
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
-    private _isSameDay(a: Date, b: Date): boolean {
+    isSameDay(a: Date, b: Date): boolean {
         return (
             a.getDate() === b.getDate() &&
             a.getMonth() === b.getMonth() &&

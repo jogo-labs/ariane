@@ -351,9 +351,9 @@ export class ArDatepicker extends LitElement {
         locale: string,
         dayLabelFormat: Intl.DateTimeFormat,
     ): TemplateResult {
-        const focused = this._isSameDay(day, this._calendar.focusedDate);
+        const focused = this._calendar.isSameDay(day, this._calendar.focusedDate);
         const selected = this._calendar.selectedDate
-            ? this._isSameDay(day, this._calendar.selectedDate)
+            ? this._calendar.isSameDay(day, this._calendar.selectedDate)
             : false;
         const today = this._calendar.isToday(day);
         const disabled = this._calendar.isDisabled(day);
@@ -411,8 +411,7 @@ export class ArDatepicker extends LitElement {
         this._calendar.selectedDate = day;
         this._calendar.focusedDate = day;
 
-        const isoValue = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
-        this.value = isoValue;
+        this.value = this._toIso(day);
 
         const formatted = format(day, this.format);
         if (this._input) this._input.value = formatted;
@@ -431,14 +430,6 @@ export class ArDatepicker extends LitElement {
     private _handleCloseClick(): void {
         this.open = false;
         this._trigger?.focus();
-    }
-
-    private _isSameDay(a: Date, b: Date): boolean {
-        return (
-            a.getDate() === b.getDate() &&
-            a.getMonth() === b.getMonth() &&
-            a.getFullYear() === b.getFullYear()
-        );
     }
 
     private _emitChange(date?: Date | null, valid?: boolean): void {
