@@ -439,6 +439,7 @@ export class ArDatepicker extends LitElement {
 
         this._emitChange();
         this.open = false;
+        this._input?.focus();
     }
 
     private _handleTodayClick(): void {

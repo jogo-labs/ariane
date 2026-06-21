@@ -56,7 +56,7 @@ describe('ar-datepicker — browser', () => {
 
     // ── Retour du focus au trigger à la fermeture ─────────────────────────────
 
-    describe('focus retourné au trigger à la fermeture', () => {
+    describe('focus retourné à la fermeture', () => {
         it('Escape retourne le focus au trigger', async () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             await openPicker(el);
@@ -68,6 +68,22 @@ describe('ar-datepicker — browser', () => {
 
             expect(el.shadowRoot?.activeElement).to.equal(
                 el.shadowRoot?.querySelector('[part="trigger"]'),
+            );
+        });
+
+        it("la sélection d'une date retourne le focus sur l'input", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part="day"][tabindex="0"]',
+            );
+            dayBtn?.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            expect(el.shadowRoot?.activeElement).to.equal(
+                el.shadowRoot?.querySelector('[part="input"]'),
             );
         });
     });
@@ -237,13 +253,13 @@ describe('ar-datepicker — browser', () => {
             expect(focused?.getAttribute('aria-label')).to.include('15');
         });
 
-        it('revient au mois de la date sélectionnée à la réouverture', async () => {
+        it('conserve le mois navigué à la réouverture (pas de reset au mois de la valeur)', async () => {
             el = await fixture(
                 html`<ar-datepicker value="2026-06-12" locale="fr-FR"></ar-datepicker>`,
             );
             await openPicker(el);
 
-            // Naviguer 2 mois en avant
+            // Naviguer 2 mois en avant (juin → août)
             const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
             panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
             await el.updateComplete;
@@ -259,7 +275,7 @@ describe('ar-datepicker — browser', () => {
             await openPicker(el);
 
             const label = el.shadowRoot?.querySelector('[aria-live]')?.textContent?.toLowerCase();
-            expect(label).to.include('juin');
+            expect(label).to.include('août');
             expect(label).to.include('2026');
         });
     });
