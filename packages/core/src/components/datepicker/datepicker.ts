@@ -100,6 +100,8 @@ export class ArDatepicker extends LitElement {
         'hint',
         'error',
     );
+    private _dayNamesCache = new Map<string, Array<{ abbr: string; full: string }>>();
+
     private readonly _anchored = new AnchoredController(this, {
         popupMode: 'dialog',
         placement: 'bottom-start',
@@ -259,6 +261,11 @@ export class ArDatepicker extends LitElement {
 
         const dayNames = this._getDayNames(locale);
         const weeks = this._calendar.getGridWeeks();
+        const dayLabelFormat = new Intl.DateTimeFormat(locale, {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
 
         return html`
             <div part="header">
@@ -321,7 +328,7 @@ export class ArDatepicker extends LitElement {
                     ${weeks.map(
                         (week) => html`
                             <tr>
-                                ${week.map((day) => this._renderDay(day, locale))}
+                                ${week.map((day) => this._renderDay(day, locale, dayLabelFormat))}
                             </tr>
                         `,
                     )}
@@ -339,7 +346,11 @@ export class ArDatepicker extends LitElement {
         `;
     }
 
-    private _renderDay(day: Date, locale: string): TemplateResult {
+    private _renderDay(
+        day: Date,
+        locale: string,
+        dayLabelFormat: Intl.DateTimeFormat,
+    ): TemplateResult {
         const focused = this._isSameDay(day, this._calendar.focusedDate);
         const selected = this._calendar.selectedDate
             ? this._isSameDay(day, this._calendar.selectedDate)
@@ -348,11 +359,7 @@ export class ArDatepicker extends LitElement {
         const disabled = this._calendar.isDisabled(day);
         const otherMonth = !this._calendar.isSameMonth(day);
 
-        const ariaLabel = new Intl.DateTimeFormat(locale, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        }).format(day);
+        const ariaLabel = dayLabelFormat.format(day);
 
         const classes = [
             otherMonth && 'other-month',
@@ -382,15 +389,22 @@ export class ArDatepicker extends LitElement {
     }
 
     private _getDayNames(locale: string): Array<{ abbr: string; full: string }> {
+        const cached = this._dayNamesCache.get(locale);
+        if (cached) return cached;
+
         const monday = new Date(2024, 0, 1);
-        return Array.from({ length: 7 }, (_, i) => {
+        const shortFormat = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+        const longFormat = new Intl.DateTimeFormat(locale, { weekday: 'long' });
+        const result = Array.from({ length: 7 }, (_, i) => {
             const d = new Date(monday);
             d.setDate(monday.getDate() + i);
             return {
-                abbr: new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d),
-                full: new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(d),
+                abbr: shortFormat.format(d),
+                full: longFormat.format(d),
             };
         });
+        this._dayNamesCache.set(locale, result);
+        return result;
     }
 
     private _selectDay(day: Date): void {
