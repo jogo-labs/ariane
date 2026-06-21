@@ -178,6 +178,15 @@ export default css`
         color: var(--ar-datepicker-day-hover-color);
     }
 
+    /*
+     * Curseur de navigation visible quand le focus est hors de la grille (boutons nav/footer).
+     * Indique quel jour prendra le focus au prochain Tab dans la grille.
+     */
+    [part='day'][tabindex='0']:not(:focus-visible) {
+        outline: 1px dashed var(--ar-datepicker-day-focus-ring-color);
+        outline-offset: var(--ar-datepicker-day-focus-ring-offset);
+    }
+
     [part='day'].selected {
         background-color: var(--ar-datepicker-day-selected-bg);
         color: var(--ar-datepicker-day-selected-color);

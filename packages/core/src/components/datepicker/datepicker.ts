@@ -679,13 +679,13 @@ export class ArDatepicker extends LitElement {
                 e.preventDefault();
                 if (e.shiftKey) this._calendar.previousYear();
                 else this._calendar.previousMonth();
-                this._keepFocusedDayInView();
+                this._keepFocusedDayInView(true);
                 return;
             case 'PageDown':
                 e.preventDefault();
                 if (e.shiftKey) this._calendar.nextYear();
                 else this._calendar.nextMonth();
-                this._keepFocusedDayInView();
+                this._keepFocusedDayInView(true);
                 return;
             case 'Enter':
             case ' ':
@@ -715,14 +715,16 @@ export class ArDatepicker extends LitElement {
         void this.updateComplete.then(() => this._focusFocusedDay());
     }
 
-    private _keepFocusedDayInView(): void {
+    private _keepFocusedDayInView(moveFocus = false): void {
         const v = this._calendar.currentViewMonth;
         const day = Math.min(
             this._calendar.focusedDate.getDate(),
             new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate(),
         );
         this._calendar.focusedDate = new Date(v.getFullYear(), v.getMonth(), day);
-        void this.updateComplete.then(() => this._focusFocusedDay());
+        if (moveFocus) {
+            void this.updateComplete.then(() => this._focusFocusedDay());
+        }
     }
     private _syncInputFromValue(): void {
         if (!this._input) return;
