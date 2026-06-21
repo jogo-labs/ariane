@@ -203,7 +203,23 @@ describe('ArDatepicker', () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
             const input = el.inputElement;
             const describedBy = input.getAttribute('aria-describedby') ?? '';
-            const parts = describedBy.split(' ');
+            const parts = describedBy.split(' ').filter(Boolean);
+            // Sans slot error, seul dp-hint est référencé
+            expect(parts).toHaveLength(1);
+            parts.forEach((id) => {
+                expect(el.shadowRoot?.getElementById(id)).not.toBeNull();
+            });
+        });
+
+        it('aria-describedby inclut dp-error quand le slot error est rempli', async () => {
+            el = await fixture(`
+                <ar-datepicker>
+                    <span slot="error">Date invalide</span>
+                </ar-datepicker>
+            `);
+            await waitForUpdate(el);
+            const describedBy = el.inputElement.getAttribute('aria-describedby') ?? '';
+            const parts = describedBy.split(' ').filter(Boolean);
             expect(parts).toHaveLength(2);
             parts.forEach((id) => {
                 expect(el.shadowRoot?.getElementById(id)).not.toBeNull();

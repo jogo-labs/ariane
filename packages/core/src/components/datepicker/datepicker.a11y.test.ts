@@ -115,10 +115,21 @@ describe('ar-datepicker — accessibilité', () => {
 
     // ── role="alert" ──────────────────────────────────────────────────────────
 
-    it('role="alert" sur le wrapper du slot error', async () => {
+    it('role="alert" absent sur le wrapper error quand le slot est vide', async () => {
         el = await fixture(html`<ar-datepicker></ar-datepicker>`);
         const alertEl = el.shadowRoot?.querySelector('[role="alert"]');
-        expect(alertEl).to.not.equal(null);
+        expect(alertEl, 'role="alert" ne doit pas être présent sans erreur').to.equal(null);
+    });
+
+    it('role="alert" présent sur le wrapper error quand le slot error est rempli', async () => {
+        el = await fixture(html`
+            <ar-datepicker>
+                <span slot="error">Date invalide</span>
+            </ar-datepicker>
+        `);
+        await el.updateComplete;
+        const alertEl = el.shadowRoot?.querySelector('[role="alert"]');
+        expect(alertEl, 'role="alert" doit être présent avec une erreur').to.not.equal(null);
     });
 
     // ── role="dialog" sur le panel ────────────────────────────────────────────

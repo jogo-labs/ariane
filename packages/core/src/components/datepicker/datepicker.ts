@@ -107,6 +107,9 @@ export class ArDatepicker extends LitElement {
         placement: 'bottom-start',
         onExternalClose: () => {
             this.open = false;
+            if (!document.activeElement || document.activeElement === document.body) {
+                this._trigger?.focus();
+            }
         },
     });
 
@@ -197,7 +200,7 @@ export class ArDatepicker extends LitElement {
         const defaultHint = `Format attendu : ${this.format}`;
 
         return html`
-            <label part="label" id="dp-label-${this._uid}">
+            <label part="label" id="dp-label-${this._uid}" for="dp-input-${this._uid}">
                 <slot name="label">${this.label}</slot>
             </label>
             <slot name="after-label"></slot>
@@ -205,14 +208,15 @@ export class ArDatepicker extends LitElement {
             <div class="input-wrapper">
                 <input
                     part="input"
+                    id="dp-input-${this._uid}"
                     type="text"
                     ?disabled=${this.disabled}
                     ?readonly=${this.readonly}
-                    ?required=${this.required}
+                    aria-required=${this.required ? 'true' : nothing}
                     autocomplete=${this.autocomplete || nothing}
                     placeholder=${this.placeholder || nothing}
                     aria-labelledby="dp-label-${this._uid}"
-                    aria-describedby="dp-hint-${this._uid} dp-error-${this._uid}"
+                    aria-describedby=${`dp-hint-${this._uid}${this._hasSlot.test('error') ? ` dp-error-${this._uid}` : ''}`}
                     @input=${this._handleInput}
                     @blur=${this._handleBlur}
                 />
@@ -222,6 +226,7 @@ export class ArDatepicker extends LitElement {
                     ?disabled=${this.disabled || this.readonly}
                     aria-label="Ouvrir le calendrier"
                     aria-haspopup="dialog"
+                    aria-expanded=${this.open}
                     @click=${this._handleTriggerClick}
                 >
                     <svg
@@ -244,7 +249,11 @@ export class ArDatepicker extends LitElement {
             <p part="hint" id="dp-hint-${this._uid}">
                 <slot name="hint">${defaultHint}</slot>
             </p>
-            <p part="error" id="dp-error-${this._uid}" role="alert">
+            <p
+                part="error"
+                id="dp-error-${this._uid}"
+                role=${this._hasSlot.test('error') ? 'alert' : nothing}
+            >
                 <slot name="error"></slot>
             </p>
 
@@ -254,6 +263,7 @@ export class ArDatepicker extends LitElement {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Sélectionner une date"
+                aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
                 id="ar-dp-panel-${this._uid}"
                 @keydown=${this._handlePanelKeyDown}
             >
@@ -301,7 +311,7 @@ export class ArDatepicker extends LitElement {
                 >
                     ‹
                 </button>
-                <span aria-live="polite">${monthLabel}</span>
+                <span id="dp-month-${this._uid}" aria-live="polite">${monthLabel}</span>
                 <button
                     part="nav-btn next-month"
                     type="button"
@@ -330,7 +340,8 @@ export class ArDatepicker extends LitElement {
                 <thead>
                     <tr>
                         ${dayNames.map(
-                            ({ abbr, full }) => html`<th abbr=${full} scope="col">${abbr}</th>`,
+                            ({ abbr, full }) =>
+                                html`<th aria-label=${full} scope="col">${abbr}</th>`,
                         )}
                     </tr>
                 </thead>
@@ -338,7 +349,7 @@ export class ArDatepicker extends LitElement {
                     ${weeks.map(
                         (week) => html`
                             <tr>
-                                ${week.map((day) => this._renderDay(day, locale, dayLabelFormat))}
+                                ${week.map((day) => this._renderDay(day, dayLabelFormat))}
                             </tr>
                         `,
                     )}
@@ -356,11 +367,7 @@ export class ArDatepicker extends LitElement {
         `;
     }
 
-    private _renderDay(
-        day: Date,
-        locale: string,
-        dayLabelFormat: Intl.DateTimeFormat,
-    ): TemplateResult {
+    private _renderDay(day: Date, dayLabelFormat: Intl.DateTimeFormat): TemplateResult {
         const focused = this._calendar.isSameDay(day, this._calendar.focusedDate);
         const selected = this._calendar.selectedDate
             ? this._calendar.isSameDay(day, this._calendar.selectedDate)
@@ -369,7 +376,9 @@ export class ArDatepicker extends LitElement {
         const disabled = this._calendar.isDisabled(day);
         const otherMonth = !this._calendar.isSameMonth(day);
 
-        const ariaLabel = dayLabelFormat.format(day);
+        const ariaLabel = selected
+            ? `${dayLabelFormat.format(day)}, sélectionné`
+            : dayLabelFormat.format(day);
 
         const classes = [
             otherMonth && 'other-month',
