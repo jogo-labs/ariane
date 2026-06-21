@@ -125,6 +125,18 @@ describe('ArDatepicker', () => {
             // Le panel doit rester fermé et la propriété doit être revenue à false
             expect(el.open).toBe(false);
         });
+
+        it("ne boucle pas à l'infini si hide et show sont tous les deux annulés", async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.addEventListener('ar-datepicker-show', (e) => e.preventDefault());
+            el.addEventListener('ar-datepicker-hide', (e) => e.preventDefault());
+            // Tenter d'ouvrir ne doit pas bloquer
+            el.open = true;
+            await el.updateComplete;
+            await new Promise((r) => setTimeout(r, 50));
+            // Le panel doit rester fermé (show annulé)
+            expect(el.open).toBe(false);
+        });
     });
 
     describe('synchronisation input ↔ calendrier', () => {
@@ -276,6 +288,36 @@ describe('ArDatepicker', () => {
                     ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
                 );
                 expect(valueMissingCall).toBeUndefined();
+            }),
+        );
+
+        it(
+            're-valide quand required change au runtime',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                await waitForUpdate(el);
+                // Pas required par défaut → pas de valueMissing
+                const initialMissingCall = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(initialMissingCall).toBeUndefined();
+
+                // On rend required → doit appeler setValidity({ valueMissing: true })
+                setValiditySpy.mockClear();
+                el.required = true;
+                await waitForUpdate(el);
+                const afterRequiredCall = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(afterRequiredCall).toBeDefined();
+
+                // On annule required → doit appeler setValidity({})
+                setValiditySpy.mockClear();
+                el.required = false;
+                await waitForUpdate(el);
+                const lastCall = setValiditySpy.mock.calls.at(-1);
+                expect(lastCall).toBeDefined();
+                expect(Object.keys(lastCall![0] as object)).toHaveLength(0);
             }),
         );
     });

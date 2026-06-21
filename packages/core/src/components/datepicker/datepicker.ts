@@ -139,6 +139,9 @@ export class ArDatepicker extends LitElement {
     /** Ouvre ou ferme le popover calendrier. */
     @property({ reflect: true, type: Boolean }) open = false;
 
+    /** Ignore le prochain `updated()` open/close quand un event annulé re-set `open`. */
+    private _skipNextOpenChange = false;
+
     @query('[part="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
     @query('[part="trigger"]') private _trigger!: HTMLButtonElement;
@@ -172,12 +175,19 @@ export class ArDatepicker extends LitElement {
         this.toggleAttribute('has-error', this._hasSlot.test('error'));
 
         if (changed.has('open')) {
-            if (this.open) void this._show().catch((e) => console.error('[ar-datepicker]', e));
-            else this._hide();
+            if (this._skipNextOpenChange) {
+                this._skipNextOpenChange = false;
+            } else if (this.open) {
+                void this._show().catch((e) => {
+                    if (__DEV__) console.error('[ar-datepicker]', e);
+                });
+            } else {
+                this._hide();
+            }
         }
 
-        if (changed.has('value')) {
-            this._syncInputFromValue();
+        if (changed.has('value') || changed.has('required') || changed.has('disabled')) {
+            if (changed.has('value')) this._syncInputFromValue();
             this._syncFormValue();
         }
     }
@@ -465,8 +475,8 @@ export class ArDatepicker extends LitElement {
             }),
         );
         if (!allowed) {
-            // Évite une boucle si hide est aussi cancelled
-            if (this.open !== false) this.open = false;
+            this._skipNextOpenChange = true;
+            this.open = false;
             return;
         }
 
@@ -508,8 +518,8 @@ export class ArDatepicker extends LitElement {
             }),
         );
         if (!allowed) {
-            // Évite une boucle si show est aussi cancelled
-            if (this.open !== true) this.open = true;
+            this._skipNextOpenChange = true;
+            this.open = true;
             return;
         }
 
