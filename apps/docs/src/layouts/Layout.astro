@@ -166,6 +166,25 @@ const {
                 transition: color 0.2s;
             }
 
+            .skip-link {
+                position:        absolute;
+                top:             -3rem;
+                left:            0.5rem;
+                z-index:         1000;
+                padding:         0.5rem 1rem;
+                background:      var(--doc-accent);
+                color:           #fff;
+                border-radius:   0 0 0.4rem 0.4rem;
+                text-decoration: none;
+                font-size:       0.85rem;
+                font-weight:     600;
+                transition:      top 0.15s ease;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
             /* ── Header (toujours visible) ──────────────── */
 
             .site-header {
@@ -409,6 +428,9 @@ const {
         </style>
     </head>
     <body>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        {showToc && <a href="#toc" class="skip-link">Aller au sommaire</a>}
+
         <div class="alpha-banner" role="banner">
             Librairie en cours de développement — API instable, ne pas utiliser en production.
             <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
@@ -487,13 +509,13 @@ const {
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
-            <main>
+            <main id="main-content">
                 <div class="main-inner">
                     <slot />
                 </div>
             </main>
             {showToc && (
-                <aside class="toc-column">
+                <aside class="toc-column" id="toc">
                     <slot name="toc" />
                 </aside>
             )}
