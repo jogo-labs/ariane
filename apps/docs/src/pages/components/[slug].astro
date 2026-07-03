@@ -67,12 +67,13 @@ const controls = buildControls(component.members ?? []);
 // L'id utilisé ici doit correspondre exactement à celui posé par NarrativeHeading.astro,
 // qui utilise le même algorithme (github-slugger) pour garantir la synchronisation.
 
+// Les h3 sont dépliés en sous-menu sous leur h2 parent (comme les variantes sous Exemples).
 const narrativeTocEntries = headings
-    .filter((h: { depth: number }) => h.depth === 2)
-    .map((h: { slug: string; text: string }) => ({
+    .filter((h: { depth: number }) => h.depth === 2 || h.depth === 3)
+    .map((h: { depth: number; slug: string; text: string }) => ({
         id:    h.slug,
         label: h.text,
-        level: 1 as const,
+        level: h.depth === 2 ? (1 as const) : (2 as const),
     }));
 
 const tocEntries = [

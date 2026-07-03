@@ -31,117 +31,6 @@ variants:
 
 import WcagRef from '../../components/WcagRef.astro';
 
-## Comportement
-
-Le calendrier **mémorise la position de navigation** entre les ouvertures : mois affiché et jour exact conservés. À la réouverture :
-
-- Si une `value` est définie → le calendrier se repositionne sur la date sélectionnée.
-- Sinon → le mois et le jour navigué lors de la fermeture précédente sont restaurés.
-
-La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
-
-## Saisie texte
-
-L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
-
-- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
-- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
-
-```html
-<ar-datepicker id="dp" label="Date"></ar-datepicker>
-<script>
-    document.getElementById('dp').addEventListener('ar-datepicker-input-complete', (e) => {
-        if (e.detail.valid) console.log('Date valide :', e.detail.value);
-        else console.warn('Format complet mais date invalide');
-    });
-</script>
-```
-
-## Validation
-
-L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur via `ar-datepicker[has-error]::part(input)`.
-
-La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
-
-```js
-el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
-    errorSlot.hidden = detail.valid;
-});
-```
-
-## Dates désactivées
-
-Trois mécanismes complémentaires :
-
-- `min` / `max` — valeurs ISO `yyyy-MM-dd` définissant la plage sélectionnable.
-- `isDateDisabled` — callback `(date: Date) => boolean` pour des règles arbitraires (week-ends, jours fériés…).
-
-```html
-<ar-datepicker min="2026-01-01" max="2026-12-31" label="Date de rendez-vous"></ar-datepicker>
-```
-
-```js
-el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
-```
-
-Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
-
-## Formulaires
-
-`ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.
-
-<table>
-    <thead>
-        <tr>
-            <th>Prop</th>
-            <th>Comportement</th>
-            <th style="text-align:center">Valeur soumise</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                Identifie le champ dans <code>FormData</code>
-            </td>
-            <td style="text-align:center">—</td>
-        </tr>
-        <tr>
-            <td>
-                <code>required</code>
-            </td>
-            <td>Active la contrainte de validation native</td>
-            <td style="text-align:center">✓</td>
-        </tr>
-        <tr>
-            <td>
-                <code>readonly</code>
-            </td>
-            <td>Bloque la saisie et le calendrier</td>
-            <td style="text-align:center">✓</td>
-        </tr>
-        <tr>
-            <td>
-                <code>disabled</code>
-            </td>
-            <td>Bloque tout</td>
-            <td style="text-align:center">—</td>
-        </tr>
-    </tbody>
-</table>
-
-## Intégration masque de saisie
-
-Le getter `inputElement` expose l'`<input>` interne pour y brancher une bibliothèque de masque comme IMask :
-
-```js
-import IMask from 'imask';
-const picker = document.querySelector('ar-datepicker');
-IMask(picker.inputElement, { mask: Date });
-```
-
 ## Accessibilité
 
 Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
@@ -207,3 +96,116 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 - **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
 - **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie).
 - **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
+
+## Utilisation
+
+### Comportement
+
+Le calendrier **mémorise la position de navigation** entre les ouvertures : mois affiché et jour exact conservés. À la réouverture :
+
+- Si une `value` est définie → le calendrier se repositionne sur la date sélectionnée.
+- Sinon → le mois et le jour navigué lors de la fermeture précédente sont restaurés.
+
+La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
+
+### Saisie texte
+
+L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
+
+- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
+- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
+
+```html
+<ar-datepicker id="dp" label="Date"></ar-datepicker>
+<script>
+    document.getElementById('dp').addEventListener('ar-datepicker-input-complete', (e) => {
+        if (e.detail.valid) console.log('Date valide :', e.detail.value);
+        else console.warn('Format complet mais date invalide');
+    });
+</script>
+```
+
+### Validation
+
+L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur via `ar-datepicker[has-error]::part(input)`.
+
+La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
+
+```js
+el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
+    errorSlot.hidden = detail.valid;
+});
+```
+
+### Dates désactivées
+
+Trois mécanismes complémentaires :
+
+- `min` / `max` — valeurs ISO `yyyy-MM-dd` définissant la plage sélectionnable.
+- `isDateDisabled` — callback `(date: Date) => boolean` pour des règles arbitraires (week-ends, jours fériés…).
+
+```html
+<ar-datepicker min="2026-01-01" max="2026-12-31" label="Date de rendez-vous"></ar-datepicker>
+```
+
+```js
+el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
+```
+
+Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
+
+### Formulaires
+
+`ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.
+
+<table>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Comportement</th>
+            <th style="text-align:center">Valeur soumise</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                Identifie le champ dans <code>FormData</code>
+            </td>
+            <td style="text-align:center">—</td>
+        </tr>
+        <tr>
+            <td>
+                <code>required</code>
+            </td>
+            <td>Active la contrainte de validation native</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>readonly</code>
+            </td>
+            <td>Bloque la saisie et le calendrier</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>disabled</code>
+            </td>
+            <td>Bloque tout</td>
+            <td style="text-align:center">—</td>
+        </tr>
+    </tbody>
+</table>
+
+### Intégration masque de saisie
+
+Le getter `inputElement` expose l'`<input>` interne pour y brancher une bibliothèque de masque comme IMask :
+
+```js
+import IMask from 'imask';
+const picker = document.querySelector('ar-datepicker');
+IMask(picker.inputElement, { mask: Date });
+```
