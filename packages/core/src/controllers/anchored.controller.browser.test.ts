@@ -146,6 +146,46 @@ describe('AnchoredController', () => {
         });
     });
 
+    describe('anchor séparé du trigger', () => {
+        it("attach(trigger, panel, anchor) pose aria-haspopup sur le trigger, pas l'anchor", async () => {
+            const host = await fixture<TestAnchoredHost>(html`
+                <test-anchored-host>
+                    <div id="anchor">Anchor</div>
+                    <button id="trigger">Trigger</button>
+                    <div id="panel">Panel</div>
+                </test-anchored-host>
+            `);
+            const anchor = host.querySelector<HTMLElement>('#anchor');
+            const trigger = host.querySelector<HTMLElement>('#trigger');
+            const panel = host.querySelector<HTMLElement>('#panel');
+            if (!anchor || !trigger || !panel) throw new Error('éléments introuvables');
+            const ctrl = new AnchoredController(host, { popupMode: 'menu' });
+            ctrl.attach(trigger, panel, anchor);
+            expect(trigger.getAttribute('aria-haspopup')).to.equal('true');
+            expect(anchor.hasAttribute('aria-haspopup')).to.equal(false);
+        });
+
+        it("show() met aria-expanded sur le trigger, pas l'anchor", async () => {
+            const host = await fixture<TestAnchoredHost>(html`
+                <test-anchored-host>
+                    <div id="anchor">Anchor</div>
+                    <button id="trigger">Trigger</button>
+                    <div id="panel">Panel</div>
+                </test-anchored-host>
+            `);
+            const anchor = host.querySelector<HTMLElement>('#anchor');
+            const trigger = host.querySelector<HTMLElement>('#trigger');
+            const panel = host.querySelector<HTMLElement>('#panel');
+            if (!anchor || !trigger || !panel) throw new Error('éléments introuvables');
+            const ctrl = new AnchoredController(host);
+            ctrl.attach(trigger, panel, anchor);
+            await ctrl.show();
+            expect(trigger.getAttribute('aria-expanded')).to.equal('true');
+            expect(anchor.hasAttribute('aria-expanded')).to.equal(false);
+            ctrl.hide();
+        });
+    });
+
     describe('onExternalClose', () => {
         it("onExternalClose est appelé lors d'un light-dismiss et met aria-expanded à false", async () => {
             let called = false;

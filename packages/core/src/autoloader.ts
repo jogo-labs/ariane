@@ -33,6 +33,7 @@ const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
     'ar-table-sort': () => import('./components/table-sort/table-sort.js'),
     'ar-charcounter': () => import('./components/charcounter/charcounter.js'),
     'ar-collapse': () => import('./components/collapse/collapse.js'),
+    'ar-datepicker': () => import('./components/datepicker/datepicker.js'),
     // ⚠ Mis à jour automatiquement par le script create-component.js
 };
 

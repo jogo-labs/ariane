@@ -1,0 +1,259 @@
+---
+tagName: ar-datepicker
+title: Datepicker
+description: Champ de saisie de date avec calendrier popover accessible — saisie libre et sélection visuelle synchronisées.
+variants:
+    - name: Par défaut
+      description: >
+          Date unique avec format français. Le hint par défaut (non surchargé ici) affiche
+          automatiquement un exemple de date formatée.
+      html: |
+          <ar-datepicker
+            label="Date de naissance"
+            format="dd/MM/yyyy"
+            locale="fr-FR"
+          ></ar-datepicker>
+    - name: Avec erreur
+      description: État d'erreur visible via le slot error.
+      html: |
+          <ar-datepicker label="Date de naissance">
+            <span slot="error">Date invalide ou hors plage autorisée</span>
+          </ar-datepicker>
+    - name: Readonly
+      description: Valeur affichée non modifiable, soumise au formulaire.
+      html: |
+          <ar-datepicker value="2026-06-12" readonly label="Date"></ar-datepicker>
+    - name: Disabled
+      description: Composant désactivé, valeur exclue du formulaire.
+      html: |
+          <ar-datepicker value="2026-06-12" disabled label="Date"></ar-datepicker>
+    - name: Plage de dates
+      description: >
+          `min` et `max` restreignent les jours sélectionnables (grisés, `aria-disabled`). Le
+          hint par défaut annonce la plage aux technologies d'assistance sans configuration
+          supplémentaire.
+      html: |
+          <ar-datepicker
+            label="Date de rendez-vous"
+            min="2026-01-01"
+            max="2026-12-31"
+            locale="fr-FR"
+          ></ar-datepicker>
+    - name: Locale et format
+      description: >
+          `locale` pilote les noms de mois/jours ; `format` définit le motif de saisie/affichage
+          attendu dans l'input. Le texte du hint par défaut ("Format attendu :", "ex.") reste en
+          français quelle que soit `locale` — à traduire via le slot `hint`, comme les libellés
+          des boutons « Aujourd'hui » / « Fermer » via `today-label` / `close-label`.
+      html: |
+          <ar-datepicker
+            label="Date of birth"
+            format="MM/dd/yyyy"
+            locale="en-US"
+            today-label="Today"
+            close-label="Close"
+          >
+            <span slot="hint">Expected format: mm/dd/yyyy (e.g. 12/31/2026)</span>
+          </ar-datepicker>
+---
+
+import WcagRef from '../../components/WcagRef.astro';
+
+## Accessibilité
+
+Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/).
+
+### Pris en charge automatiquement
+
+- Navigation clavier complète dans la grille de jours (<WcagRef criterion="2.1.1" summary="Keyboard : toutes les fonctionnalités sont accessibles au clavier." />)
+- Focus piégé dans le dialog calendrier lors de son ouverture, restitué à l'input à la fermeture (<WcagRef criterion="2.1.2" summary="No Keyboard Trap : le focus peut être déplacé hors du composant." />)
+- Le slot `error` est enveloppé dans un `role="alert"` — annoncé automatiquement aux lecteurs d'écran (<WcagRef criterion="4.1.3" summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus." />)
+- `aria-disabled="true"` sur les jours hors plage et les jours désactivés (<WcagRef criterion="4.1.2" summary="Name, Role, Value : les états des éléments interactifs sont communiqués aux AT." />)
+- Le hint par défaut inclut un exemple de date formatée (ex. "Format attendu : dd/MM/yyyy (ex. 31/12/2026)"), pour rester compréhensible sans connaître la signification des tokens `dd`/`MM`/`yyyy`.
+- Quand `min` et/ou `max` sont définis, une seconde ligne du hint annonce la plage sélectionnable (ex. "Dates disponibles : entre le 1er janvier 2026 et le 31 décembre 2026") — l'utilisateur au clavier ou au lecteur d'écran connaît la contrainte avant de naviguer dans la grille, sans devoir découvrir les jours désactivés un par un (<WcagRef criterion="3.3.2" summary="Labels or Instructions : des instructions sont fournies lorsque le contenu nécessite une saisie de l'utilisateur." />)
+
+### Raccourcis clavier du calendrier
+
+<table>
+    <thead>
+        <tr>
+            <th>Touche</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd>
+            </td>
+            <td>Naviguer de jour en jour / semaine</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Home</kbd> / <kbd>End</kbd>
+            </td>
+            <td>Premier / dernier jour de la semaine</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Page Up</kbd> / <kbd>Page Down</kbd>
+            </td>
+            <td>Mois précédent / suivant</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Shift</kbd> + <kbd>Page Up</kbd> / <kbd>Page Down</kbd>
+            </td>
+            <td>Année précédente / suivante</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Entrée</kbd> / <kbd>Espace</kbd>
+            </td>
+            <td>Sélectionner le jour focalisé</td>
+        </tr>
+        <tr>
+            <td>
+                <kbd>Escape</kbd>
+            </td>
+            <td>Fermer sans sélectionner</td>
+        </tr>
+    </tbody>
+</table>
+
+### À votre charge
+
+- **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
+- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. **Le texte du hint par défaut ne suit pas `locale`** (contrairement aux noms de mois/jours) : dans une interface non francophone, fournir un slot `hint` traduit.
+- **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
+
+## Utilisation
+
+### Comportement
+
+Le calendrier **mémorise la position de navigation** entre les ouvertures : mois affiché et jour exact conservés. À la réouverture :
+
+- Si une `value` est définie → le calendrier se repositionne sur la date sélectionnée.
+- Sinon → le mois et le jour navigué lors de la fermeture précédente sont restaurés.
+
+La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
+
+### Saisie texte
+
+L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
+
+- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
+- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
+
+```html
+<ar-datepicker id="dp" label="Date"></ar-datepicker>
+<script>
+    document.getElementById('dp').addEventListener('ar-datepicker-input-complete', (e) => {
+        if (e.detail.valid) console.log('Date valide :', e.detail.value);
+        else console.warn('Format complet mais date invalide');
+    });
+</script>
+```
+
+### Validation
+
+L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur via `ar-datepicker[has-error]::part(input)`.
+
+La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
+
+```js
+el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
+    errorSlot.hidden = detail.valid;
+});
+```
+
+### Dates désactivées
+
+Trois mécanismes complémentaires :
+
+- `min` / `max` — valeurs ISO `yyyy-MM-dd` définissant la plage sélectionnable.
+- `isDateDisabled` — callback `(date: Date) => boolean` pour des règles arbitraires (week-ends, jours fériés…).
+
+```html
+<ar-datepicker min="2026-01-01" max="2026-12-31" label="Date de rendez-vous"></ar-datepicker>
+```
+
+```js
+el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
+```
+
+Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
+
+`min` et `max` sont en plus reflétés sur une seconde ligne du hint par défaut (ex. "Dates disponibles : entre le 1er janvier 2026 et le 31 décembre 2026"), pour que la plage soit connue avant toute navigation dans la grille. `isDateDisabled` n'est pas décrit dans le hint : ses règles étant arbitraires, il n'existe pas de formulation générique — à documenter via le slot `hint` si nécessaire.
+
+### Formulaires
+
+`ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.
+
+<table>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Comportement</th>
+            <th style="text-align:center">Valeur soumise</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                Identifie le champ dans <code>FormData</code>
+            </td>
+            <td style="text-align:center">—</td>
+        </tr>
+        <tr>
+            <td>
+                <code>required</code>
+            </td>
+            <td>Active la contrainte de validation native</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>readonly</code>
+            </td>
+            <td>Bloque la saisie et le calendrier</td>
+            <td style="text-align:center">✓</td>
+        </tr>
+        <tr>
+            <td>
+                <code>disabled</code>
+            </td>
+            <td>Bloque tout</td>
+            <td style="text-align:center">—</td>
+        </tr>
+    </tbody>
+</table>
+
+### Intégration masque de saisie
+
+Le getter `inputElement` expose l'`<input>` interne pour y brancher une bibliothèque de masque comme IMask :
+
+```js
+import IMask from 'imask';
+const picker = document.querySelector('ar-datepicker');
+IMask(picker.inputElement, { mask: Date });
+```
+
+### Libellés des boutons « Aujourd'hui » et « Fermer »
+
+Ces deux textes ne sont pas dérivés de `locale` (contrairement aux noms de mois/jours) : à traduire manuellement via les props `today-label` / `close-label`.
+
+```html
+<ar-datepicker label="Date of birth" today-label="Today" close-label="Close"></ar-datepicker>
+```
+
+Pour un contenu plus riche (icône + texte), les slots `today-label` / `close-label` remplacent le contenu du bouton. La prop reste alors la source du `aria-label` posé sur le `<button>`, ce qui garantit un nom accessible même si le slot ne contient qu'une icône :
+
+```html
+<ar-datepicker close-label="Fermer le calendrier">
+    <span slot="close-label" aria-hidden="true">✕</span>
+</ar-datepicker>
+```
