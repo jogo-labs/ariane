@@ -503,12 +503,13 @@ const {
 
         <div class={['layout-body', showNav ? 'with-nav' : '', showToc ? 'with-toc' : ''].filter(Boolean).join(' ')}>
             {showNav && (
-                <div class="nav-column" id="site-nav-column">
+                <div class="nav-column" id="site-nav-column" tabindex="-1">
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
             <main id="main-content" tabindex="-1">
                 <div class="main-inner">
+                    {showNav && <a href="#site-nav-column" class="skip-link">Aller au menu</a>}
                     <slot />
                 </div>
             </main>
