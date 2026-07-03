@@ -42,12 +42,15 @@ variants:
     - name: Locale et format
       description: >
           `locale` pilote les noms de mois/jours et le hint de plage ; `format` définit le motif
-          de saisie/affichage attendu dans l'input.
+          de saisie/affichage attendu dans l'input. Les libellés des boutons « Aujourd'hui » /
+          « Fermer » ne suivent pas `locale` — à traduire via `today-label` / `close-label`.
       html: |
           <ar-datepicker
             label="Date of birth"
             format="MM/dd/yyyy"
             locale="en-US"
+            today-label="Today"
+            close-label="Close"
           >
             <span slot="hint">Expected format: mm/dd/yyyy</span>
           </ar-datepicker>
@@ -235,4 +238,20 @@ Le getter `inputElement` expose l'`<input>` interne pour y brancher une biblioth
 import IMask from 'imask';
 const picker = document.querySelector('ar-datepicker');
 IMask(picker.inputElement, { mask: Date });
+```
+
+### Libellés des boutons « Aujourd'hui » et « Fermer »
+
+Ces deux textes ne sont pas dérivés de `locale` (contrairement aux noms de mois/jours) : à traduire manuellement via les props `today-label` / `close-label`.
+
+```html
+<ar-datepicker label="Date of birth" today-label="Today" close-label="Close"></ar-datepicker>
+```
+
+Pour un contenu plus riche (icône + texte), les slots `today-label` / `close-label` remplacent le contenu du bouton. La prop reste alors la source du `aria-label` posé sur le `<button>`, ce qui garantit un nom accessible même si le slot ne contient qu'une icône :
+
+```html
+<ar-datepicker close-label="Fermer le calendrier">
+    <span slot="close-label" aria-hidden="true">✕</span>
+</ar-datepicker>
 ```

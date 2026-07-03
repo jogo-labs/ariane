@@ -280,6 +280,60 @@ describe('ArDatepicker', () => {
         });
     });
 
+    describe('libellés today/close', () => {
+        it('todayLabel et closeLabel valent "Aujourd\'hui" / "Fermer" par défaut', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            expect(el.todayLabel).toBe("Aujourd'hui");
+            expect(el.closeLabel).toBe('Fermer');
+        });
+
+        it('les props todayLabel/closeLabel changent le texte des boutons', async () => {
+            el = await fixture(
+                '<ar-datepicker today-label="Today" close-label="Close"></ar-datepicker>',
+            );
+            el.open = true;
+            await waitForUpdate(el);
+            const todayBtn = getPart(el, 'footer-btn today-btn');
+            const closeBtn = getPart(el, 'footer-btn close-btn');
+            expect(todayBtn?.textContent?.trim()).toBe('Today');
+            expect(todayBtn?.getAttribute('aria-label')).toBe('Today');
+            expect(closeBtn?.textContent?.trim()).toBe('Close');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
+        });
+
+        it('les slots today-label/close-label remplacent le contenu par défaut', async () => {
+            el = await fixture(`
+                <ar-datepicker>
+                    <span slot="today-label">📅 Aujourd'hui</span>
+                    <span slot="close-label">✕</span>
+                </ar-datepicker>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+
+            const todaySlot = el.shadowRoot?.querySelector(
+                'slot[name="today-label"]',
+            ) as HTMLSlotElement;
+            const closeSlot = el.shadowRoot?.querySelector(
+                'slot[name="close-label"]',
+            ) as HTMLSlotElement;
+            expect(todaySlot.assignedElements()).toHaveLength(1);
+            expect(closeSlot.assignedElements()).toHaveLength(1);
+        });
+
+        it('aria-label reste posé sur le bouton même quand le slot est utilisé (icône seule)', async () => {
+            el = await fixture(`
+                <ar-datepicker close-label="Fermer le calendrier">
+                    <span slot="close-label" aria-hidden="true">✕</span>
+                </ar-datepicker>
+            `);
+            el.open = true;
+            await waitForUpdate(el);
+            const closeBtn = getPart(el, 'footer-btn close-btn');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
+        });
+    });
+
     describe('participation formulaire', () => {
         it('formAssociated est true', () => {
             const ArDatepickerType = customElements.get('ar-datepicker') as typeof ArDatepicker;

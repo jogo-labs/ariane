@@ -17,6 +17,10 @@ import styles from './datepicker.styles.js';
  *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
  *                     si nécessaire.
  * @slot error       - Message d'erreur. Déclenche has-error sur le host.
+ * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le prop
+ *                     `todayLabel`).
+ * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le prop
+ *                     `closeLabel`).
  *
  * @csspart input      - Le champ texte.
  * @csspart trigger    - Le bouton d'ouverture du calendrier.
@@ -134,6 +138,10 @@ export class ArDatepicker extends LitElement {
     @property() autocomplete = '';
     /** Label du champ (alternative au slot `label`). */
     @property() label = '';
+    /** Libellé du bouton « Aujourd'hui » (alternative au slot `today-label`). */
+    @property({ attribute: 'today-label' }) todayLabel = "Aujourd'hui";
+    /** Libellé du bouton « Fermer » (alternative au slot `close-label`). */
+    @property({ attribute: 'close-label' }) closeLabel = 'Fermer';
     /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
@@ -362,11 +370,21 @@ export class ArDatepicker extends LitElement {
             </table>
 
             <div part="footer">
-                <button part="footer-btn today-btn" type="button" @click=${this._handleTodayClick}>
-                    Aujourd'hui
+                <button
+                    part="footer-btn today-btn"
+                    type="button"
+                    aria-label=${this.todayLabel}
+                    @click=${this._handleTodayClick}
+                >
+                    <slot name="today-label">${this.todayLabel}</slot>
                 </button>
-                <button part="footer-btn close-btn" type="button" @click=${this._handleCloseClick}>
-                    Fermer
+                <button
+                    part="footer-btn close-btn"
+                    type="button"
+                    aria-label=${this.closeLabel}
+                    @click=${this._handleCloseClick}
+                >
+                    <slot name="close-label">${this.closeLabel}</slot>
                 </button>
             </div>
         `;
