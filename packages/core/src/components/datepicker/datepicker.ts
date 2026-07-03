@@ -210,7 +210,12 @@ export class ArDatepicker extends LitElement {
 
     override render(): TemplateResult {
         const locale = this.locale || navigator.language;
-        const defaultHint = `Format attendu : ${this.format}${this._rangeHint(locale)}`;
+        const exampleDate = new Date(new Date().getFullYear(), 11, 31);
+        const formatLine = `Format attendu : ${this.format} (ex. ${format(exampleDate, this.format)})`;
+        const rangeText = this._rangeText(locale);
+        const defaultHint = rangeText
+            ? html`${formatLine}<br />Dates disponibles : ${rangeText}`
+            : formatLine;
 
         return html`
             <label part="label" id="dp-label-${this._uid}" for="dp-input-${this._uid}">
@@ -497,22 +502,32 @@ export class ArDatepicker extends LitElement {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
 
-    private _rangeHint(locale: string): string {
+    private _rangeText(locale: string): string {
         const minDate = this.min ? parse(this.min, 'yyyy-MM-dd').date : null;
         const maxDate = this.max ? parse(this.max, 'yyyy-MM-dd').date : null;
         if (!minDate && !maxDate) return '';
 
-        const dateFormat = new Intl.DateTimeFormat(locale, {
+        if (minDate && maxDate) {
+            return `entre le ${this._formatOrdinalDate(minDate, locale)} et le ${this._formatOrdinalDate(maxDate, locale)}`;
+        }
+        if (minDate) return `à partir du ${this._formatOrdinalDate(minDate, locale)}`;
+        return `jusqu'au ${this._formatOrdinalDate(maxDate as Date, locale)}`;
+    }
+
+    /** Formate une date longue en respectant l'ordinal du 1er du mois en français ("1er janvier 2026"). */
+    private _formatOrdinalDate(date: Date, locale: string): string {
+        if (locale.toLowerCase().startsWith('fr') && date.getDate() === 1) {
+            const monthYear = new Intl.DateTimeFormat(locale, {
+                month: 'long',
+                year: 'numeric',
+            }).format(date);
+            return `1er ${monthYear}`;
+        }
+        return new Intl.DateTimeFormat(locale, {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
-        });
-
-        if (minDate && maxDate) {
-            return ` (entre le ${dateFormat.format(minDate)} et le ${dateFormat.format(maxDate)})`;
-        }
-        if (minDate) return ` (à partir du ${dateFormat.format(minDate)})`;
-        return ` (jusqu'au ${dateFormat.format(maxDate as Date)})`;
+        }).format(date);
     }
 
     private async _show(): Promise<void> {

@@ -4,15 +4,15 @@ title: Datepicker
 description: Champ de saisie de date avec calendrier popover accessible — saisie libre et sélection visuelle synchronisées.
 variants:
     - name: Par défaut
-      description: Date unique avec format français.
+      description: >
+          Date unique avec format français. Le hint par défaut (non surchargé ici) affiche
+          automatiquement un exemple de date formatée.
       html: |
           <ar-datepicker
             label="Date de naissance"
             format="dd/MM/yyyy"
             locale="fr-FR"
-          >
-            <span slot="hint">Format attendu : jj/mm/aaaa</span>
-          </ar-datepicker>
+          ></ar-datepicker>
     - name: Avec erreur
       description: État d'erreur visible via le slot error.
       html: |
@@ -41,9 +41,10 @@ variants:
           ></ar-datepicker>
     - name: Locale et format
       description: >
-          `locale` pilote les noms de mois/jours et le hint de plage ; `format` définit le motif
-          de saisie/affichage attendu dans l'input. Les libellés des boutons « Aujourd'hui » /
-          « Fermer » ne suivent pas `locale` — à traduire via `today-label` / `close-label`.
+          `locale` pilote les noms de mois/jours ; `format` définit le motif de saisie/affichage
+          attendu dans l'input. Le texte du hint par défaut ("Format attendu :", "ex.") reste en
+          français quelle que soit `locale` — à traduire via le slot `hint`, comme les libellés
+          des boutons « Aujourd'hui » / « Fermer » via `today-label` / `close-label`.
       html: |
           <ar-datepicker
             label="Date of birth"
@@ -52,7 +53,7 @@ variants:
             today-label="Today"
             close-label="Close"
           >
-            <span slot="hint">Expected format: mm/dd/yyyy</span>
+            <span slot="hint">Expected format: mm/dd/yyyy (e.g. 12/31/2026)</span>
           </ar-datepicker>
 ---
 
@@ -68,7 +69,8 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 - Focus piégé dans le dialog calendrier lors de son ouverture, restitué à l'input à la fermeture (<WcagRef criterion="2.1.2" summary="No Keyboard Trap : le focus peut être déplacé hors du composant." />)
 - Le slot `error` est enveloppé dans un `role="alert"` — annoncé automatiquement aux lecteurs d'écran (<WcagRef criterion="4.1.3" summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus." />)
 - `aria-disabled="true"` sur les jours hors plage et les jours désactivés (<WcagRef criterion="4.1.2" summary="Name, Role, Value : les états des éléments interactifs sont communiqués aux AT." />)
-- Quand `min` et/ou `max` sont définis, le hint par défaut annonce la plage sélectionnable (ex. "Format attendu : dd/MM/yyyy (entre le 1 janvier 2026 et le 31 décembre 2026)") — l'utilisateur au clavier ou au lecteur d'écran connaît la contrainte avant de naviguer dans la grille, sans devoir découvrir les jours désactivés un par un (<WcagRef criterion="3.3.2" summary="Labels or Instructions : des instructions sont fournies lorsque le contenu nécessite une saisie de l'utilisateur." />)
+- Le hint par défaut inclut un exemple de date formatée (ex. "Format attendu : dd/MM/yyyy (ex. 31/12/2026)"), pour rester compréhensible sans connaître la signification des tokens `dd`/`MM`/`yyyy`.
+- Quand `min` et/ou `max` sont définis, une seconde ligne du hint annonce la plage sélectionnable (ex. "Dates disponibles : entre le 1er janvier 2026 et le 31 décembre 2026") — l'utilisateur au clavier ou au lecteur d'écran connaît la contrainte avant de naviguer dans la grille, sans devoir découvrir les jours désactivés un par un (<WcagRef criterion="3.3.2" summary="Labels or Instructions : des instructions sont fournies lorsque le contenu nécessite une saisie de l'utilisateur." />)
 
 ### Raccourcis clavier du calendrier
 
@@ -122,7 +124,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 ### À votre charge
 
 - **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
-- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris la mention de la plage `min`/`max` : la répéter manuellement si `min` ou `max` sont définis.
+- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. **Le texte du hint par défaut ne suit pas `locale`** (contrairement aux noms de mois/jours) : dans une interface non francophone, fournir un slot `hint` traduit.
 - **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
 
 ## Utilisation
@@ -182,7 +184,7 @@ el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
 
 Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
 
-`min` et `max` sont en plus reflétés dans le hint par défaut (ex. "entre le 1 janvier 2026 et le 31 décembre 2026"), pour que la plage soit connue avant toute navigation dans la grille. `isDateDisabled` n'est pas décrit dans le hint : ses règles étant arbitraires, il n'existe pas de formulation générique — à documenter via le slot `hint` si nécessaire.
+`min` et `max` sont en plus reflétés sur une seconde ligne du hint par défaut (ex. "Dates disponibles : entre le 1er janvier 2026 et le 31 décembre 2026"), pour que la plage soit connue avant toute navigation dans la grille. `isDateDisabled` n'est pas décrit dans le hint : ses règles étant arbitraires, il n'existe pas de formulation générique — à documenter via le slot `hint` si nécessaire.
 
 ### Formulaires
 
