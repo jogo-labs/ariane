@@ -214,7 +214,8 @@ export class ArDatepicker extends LitElement {
         const formatLine = `Format attendu : ${this.format} (ex. ${format(exampleDate, this.format)})`;
         const rangeText = this._rangeText(locale);
         const defaultHint = rangeText
-            ? html`${formatLine}<br />Dates disponibles : ${rangeText}`
+            ? html`${formatLine}<br />
+                  Dates disponibles : ${rangeText}`
             : formatLine;
 
         return html`

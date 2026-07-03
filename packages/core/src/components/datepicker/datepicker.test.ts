@@ -255,6 +255,15 @@ describe('ArDatepicker', () => {
             expect(hint?.textContent).toContain('entre le 1er janvier 2026 et le 31 décembre 2026');
         });
 
+        it('la ligne de plage ne colle pas au texte du format (séparateur non vide entre les deux)', async () => {
+            el = await fixture(
+                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+            );
+            await waitForUpdate(el);
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).not.toContain(')Dates disponibles');
+        });
+
         it('hint par défaut mentionne uniquement min quand max est absent', async () => {
             el = await fixture('<ar-datepicker locale="fr-FR" min="2026-01-01"></ar-datepicker>');
             await waitForUpdate(el);
