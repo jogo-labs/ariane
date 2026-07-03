@@ -12,6 +12,7 @@ export class CalendarController implements ReactiveController {
     private _min: Date | undefined;
     private _max: Date | undefined;
     private _isDateDisabledFn: ((date: Date) => boolean) | undefined;
+    private _gridWeeksCache: { key: string; weeks: Date[][] } | undefined;
 
     currentViewMonth: Date;
     focusedDate: Date;
@@ -35,32 +36,32 @@ export class CalendarController implements ReactiveController {
     }
 
     previousMonth(): void {
-        const d = this.currentViewMonth;
-        this.currentViewMonth = new Date(d.getFullYear(), d.getMonth() - 1, 1);
-        this._host.requestUpdate();
+        this._shiftView(0, -1);
     }
 
     nextMonth(): void {
-        const d = this.currentViewMonth;
-        this.currentViewMonth = new Date(d.getFullYear(), d.getMonth() + 1, 1);
-        this._host.requestUpdate();
+        this._shiftView(0, 1);
     }
 
     previousYear(): void {
-        const d = this.currentViewMonth;
-        this.currentViewMonth = new Date(d.getFullYear() - 1, d.getMonth(), 1);
-        this._host.requestUpdate();
+        this._shiftView(-1, 0);
     }
 
     nextYear(): void {
+        this._shiftView(1, 0);
+    }
+
+    private _shiftView(yearDelta: number, monthDelta: number): void {
         const d = this.currentViewMonth;
-        this.currentViewMonth = new Date(d.getFullYear() + 1, d.getMonth(), 1);
+        this.currentViewMonth = new Date(d.getFullYear() + yearDelta, d.getMonth() + monthDelta, 1);
         this._host.requestUpdate();
     }
 
     getGridWeeks(): Date[][] {
         const year = this.currentViewMonth.getFullYear();
         const month = this.currentViewMonth.getMonth();
+        const cacheKey = `${year}-${month}`;
+        if (this._gridWeeksCache?.key === cacheKey) return this._gridWeeksCache.weeks;
 
         const firstOfMonth = new Date(year, month, 1);
         let dow = firstOfMonth.getDay();
@@ -77,6 +78,7 @@ export class CalendarController implements ReactiveController {
             }
             weeks.push(week);
         }
+        this._gridWeeksCache = { key: cacheKey, weeks };
         return weeks;
     }
 

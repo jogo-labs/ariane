@@ -10,9 +10,20 @@ const TOKEN_REGEX: Record<string, string> = {
     yyyy: '(\\d{4})',
 };
 
-export function parse(input: string, formatPattern: string): ParseResult {
-    const tokenOrder: string[] = [];
+interface CompiledPattern {
+    regex: RegExp;
+    tokenOrder: string[];
+}
 
+// formatPattern est une chaîne de configuration (prop `format`), un nombre fini de valeurs
+// distinctes par application — pas d'entrée utilisateur, pas de croissance non bornée.
+const patternCache = new Map<string, CompiledPattern>();
+
+function compilePattern(formatPattern: string): CompiledPattern {
+    const cached = patternCache.get(formatPattern);
+    if (cached) return cached;
+
+    const tokenOrder: string[] = [];
     const regexStr = formatPattern
         .replace(/[.*+?^${}()|[\]\\]/g, (ch) => `\\${ch}`)
         .replace(/yyyy|MM|dd/g, (token) => {
@@ -20,7 +31,15 @@ export function parse(input: string, formatPattern: string): ParseResult {
             return TOKEN_REGEX[token];
         });
 
-    const match = input.match(new RegExp(`^${regexStr}$`));
+    const compiled: CompiledPattern = { regex: new RegExp(`^${regexStr}$`), tokenOrder };
+    patternCache.set(formatPattern, compiled);
+    return compiled;
+}
+
+export function parse(input: string, formatPattern: string): ParseResult {
+    const { regex, tokenOrder } = compilePattern(formatPattern);
+
+    const match = input.match(regex);
     if (!match) return { complete: false, valid: false, date: null };
 
     const values: Record<string, number> = {};

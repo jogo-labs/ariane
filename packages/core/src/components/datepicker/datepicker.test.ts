@@ -118,6 +118,23 @@ describe('ArDatepicker', () => {
             expect(el.open).toBe(true);
         });
 
+        it("ne déplace pas le focus vers l'input si ar-datepicker-hide est annulé après sélection", async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            el.addEventListener('ar-datepicker-hide', (e) => e.preventDefault());
+
+            const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part="day"][tabindex="0"]',
+            );
+            dayBtn?.focus();
+            dayBtn?.click();
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(true);
+            expect(el.shadowRoot?.activeElement).not.toBe(el.inputElement);
+        });
+
         it('canceller ar-datepicker-show maintient le panel fermé sans boucle', async () => {
             el.addEventListener('ar-datepicker-show', (e) => e.preventDefault());
             el.open = true;

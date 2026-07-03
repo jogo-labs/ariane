@@ -108,6 +108,7 @@ export class ArDatepicker extends LitElement {
         'error',
     );
     private _dayNamesCache = new Map<string, Array<{ abbr: string; full: string }>>();
+    private _formatterCache = new Map<string, Intl.DateTimeFormat>();
 
     private readonly _anchored = new AnchoredController(this, {
         popupMode: 'dialog',
@@ -155,8 +156,8 @@ export class ArDatepicker extends LitElement {
 
     /** Ignore le prochain `updated()` open/close quand un event annulé re-set `open`. */
     private _skipNextOpenChange = false;
-    /** Dernière valeur ISO synchronisée dans le calendrier — évite de réinitialiser la navigation si la valeur n'a pas changé entre deux ouvertures. */
-    private _lastSyncedValue = '';
+    /** Élément à focus une fois la fermeture confirmée (non annulée par ar-datepicker-hide). */
+    private _focusTargetAfterHide: HTMLElement | null = null;
 
     @query('[part="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
@@ -202,8 +203,11 @@ export class ArDatepicker extends LitElement {
             }
         }
 
+        if (changed.has('value') || changed.has('format')) {
+            this._syncInputFromValue();
+        }
+
         if (changed.has('value') || changed.has('required') || changed.has('disabled')) {
-            if (changed.has('value')) this._syncInputFromValue();
             this._syncFormValue();
         }
     }
@@ -293,14 +297,14 @@ export class ArDatepicker extends LitElement {
 
     private _renderCalendar(locale: string): TemplateResult {
         const viewDate = this._calendar.currentViewMonth;
-        const monthLabel = new Intl.DateTimeFormat(locale, {
+        const monthLabel = this._getFormatter(locale, 'month-year', {
             month: 'long',
             year: 'numeric',
         }).format(viewDate);
 
         const dayNames = this._getDayNames(locale);
         const weeks = this._calendar.getGridWeeks();
-        const dayLabelFormat = new Intl.DateTimeFormat(locale, {
+        const dayLabelFormat = this._getFormatter(locale, 'day-month-year', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -312,10 +316,7 @@ export class ArDatepicker extends LitElement {
                     part="nav-btn prev-year"
                     type="button"
                     aria-label="Année précédente"
-                    @click=${() => {
-                        this._calendar.previousYear();
-                        this._keepFocusedDayInView();
-                    }}
+                    @click=${() => this._nav(() => this._calendar.previousYear())}
                 >
                     «
                 </button>
@@ -323,10 +324,7 @@ export class ArDatepicker extends LitElement {
                     part="nav-btn prev-month"
                     type="button"
                     aria-label="Mois précédent"
-                    @click=${() => {
-                        this._calendar.previousMonth();
-                        this._keepFocusedDayInView();
-                    }}
+                    @click=${() => this._nav(() => this._calendar.previousMonth())}
                 >
                     ‹
                 </button>
@@ -335,10 +333,7 @@ export class ArDatepicker extends LitElement {
                     part="nav-btn next-month"
                     type="button"
                     aria-label="Mois suivant"
-                    @click=${() => {
-                        this._calendar.nextMonth();
-                        this._keepFocusedDayInView();
-                    }}
+                    @click=${() => this._nav(() => this._calendar.nextMonth())}
                 >
                     ›
                 </button>
@@ -346,10 +341,7 @@ export class ArDatepicker extends LitElement {
                     part="nav-btn next-year"
                     type="button"
                     aria-label="Année suivante"
-                    @click=${() => {
-                        this._calendar.nextYear();
-                        this._keepFocusedDayInView();
-                    }}
+                    @click=${() => this._nav(() => this._calendar.nextYear())}
                 >
                     »
                 </button>
@@ -465,8 +457,8 @@ export class ArDatepicker extends LitElement {
         if (this._input) this._input.value = formatted;
 
         this._emitChange();
+        this._focusTargetAfterHide = this._input ?? null;
         this.open = false;
-        this._input?.focus();
     }
 
     private _handleTodayClick(): void {
@@ -477,8 +469,8 @@ export class ArDatepicker extends LitElement {
     }
 
     private _handleCloseClick(): void {
+        this._focusTargetAfterHide = this._trigger ?? null;
         this.open = false;
-        this._trigger?.focus();
     }
 
     private _emitChange(date?: Date | null, valid?: boolean): void {
@@ -500,7 +492,7 @@ export class ArDatepicker extends LitElement {
     }
 
     private _toIso(date: Date): string {
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        return format(date, 'yyyy-MM-dd');
     }
 
     private _rangeText(locale: string): string {
@@ -518,17 +510,32 @@ export class ArDatepicker extends LitElement {
     /** Formate une date longue en respectant l'ordinal du 1er du mois en français ("1er janvier 2026"). */
     private _formatOrdinalDate(date: Date, locale: string): string {
         if (locale.toLowerCase().startsWith('fr') && date.getDate() === 1) {
-            const monthYear = new Intl.DateTimeFormat(locale, {
+            const monthYear = this._getFormatter(locale, 'month-year', {
                 month: 'long',
                 year: 'numeric',
             }).format(date);
             return `1er ${monthYear}`;
         }
-        return new Intl.DateTimeFormat(locale, {
+        return this._getFormatter(locale, 'day-month-year', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         }).format(date);
+    }
+
+    /** Cache des Intl.DateTimeFormat par locale — évite de reconstruire un formatter à chaque render. */
+    private _getFormatter(
+        locale: string,
+        key: string,
+        options: Intl.DateTimeFormatOptions,
+    ): Intl.DateTimeFormat {
+        const cacheKey = `${locale}|${key}`;
+        let formatter = this._formatterCache.get(cacheKey);
+        if (!formatter) {
+            formatter = new Intl.DateTimeFormat(locale, options);
+            this._formatterCache.set(cacheKey, formatter);
+        }
+        return formatter;
     }
 
     private async _show(): Promise<void> {
@@ -550,10 +557,11 @@ export class ArDatepicker extends LitElement {
         if (this.value) {
             const result = parse(this.value, 'yyyy-MM-dd');
             if (result.valid && result.date) {
+                const previousSelected = this._calendar.selectedDate;
                 this._calendar.selectedDate = result.date;
                 // Ne naviguer vers la date que si la valeur a changé depuis le dernier open —
                 // préserve la position de navigation entre les ouvertures successives.
-                if (this.value !== this._lastSyncedValue) {
+                if (!previousSelected || !this._calendar.isSameDay(previousSelected, result.date)) {
                     this._calendar.currentViewMonth = new Date(
                         result.date.getFullYear(),
                         result.date.getMonth(),
@@ -564,12 +572,10 @@ export class ArDatepicker extends LitElement {
                         result.date.getMonth(),
                         result.date.getDate(),
                     );
-                    this._lastSyncedValue = this.value;
                 }
             }
         } else {
             this._calendar.selectedDate = null;
-            this._lastSyncedValue = '';
             // currentViewMonth et focusedDate conservés — mémorisent la navigation entre les ouvertures
         }
 
@@ -593,10 +599,13 @@ export class ArDatepicker extends LitElement {
         if (!allowed) {
             this._skipNextOpenChange = true;
             this.open = true;
+            this._focusTargetAfterHide = null;
             return;
         }
 
         this._anchored.hide();
+        this._focusTargetAfterHide?.focus();
+        this._focusTargetAfterHide = null;
 
         this.dispatchEvent(
             new CustomEvent('ar-datepicker-hidden', { bubbles: true, composed: true }),
@@ -659,8 +668,8 @@ export class ArDatepicker extends LitElement {
     private _handlePanelKeyDown(e: KeyboardEvent): void {
         if (e.key === 'Escape') {
             e.preventDefault();
+            this._focusTargetAfterHide = this._trigger ?? null;
             this.open = false;
-            this._trigger?.focus();
             return;
         }
 
@@ -695,12 +704,12 @@ export class ArDatepicker extends LitElement {
 
         if (e.shiftKey && active === first) {
             e.preventDefault();
+            this._focusTargetAfterHide = this._trigger ?? null;
             this.open = false;
-            this._trigger?.focus();
         } else if (!e.shiftKey && active === last) {
             e.preventDefault();
+            this._focusTargetAfterHide = this._trigger ?? null;
             this.open = false;
-            this._trigger?.focus();
         }
     }
 
@@ -768,6 +777,12 @@ export class ArDatepicker extends LitElement {
         this._calendar.focusedDate = next;
         this.requestUpdate();
         void this.updateComplete.then(() => this._focusFocusedDay());
+    }
+
+    /** Exécute une action de navigation du calendrier (clic souris) et garde le curseur dans le mois affiché. */
+    private _nav(action: () => void): void {
+        action();
+        this._keepFocusedDayInView();
     }
 
     private _keepFocusedDayInView(moveFocus = false): void {
