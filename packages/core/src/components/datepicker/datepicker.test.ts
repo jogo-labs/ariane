@@ -236,6 +236,48 @@ describe('ArDatepicker', () => {
             expect(labelEl).not.toBeNull();
             expect(labelEl?.querySelector('slot[name="label"]')).not.toBeNull();
         });
+
+        it('hint par défaut ne mentionne pas de plage sans min/max', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent?.trim()).toBe('Format attendu : dd/MM/yyyy');
+        });
+
+        it('hint par défaut mentionne la plage quand min et max sont définis', async () => {
+            el = await fixture(
+                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+            );
+            await waitForUpdate(el);
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).toContain('entre le 1 janvier 2026 et le 31 décembre 2026');
+        });
+
+        it('hint par défaut mentionne uniquement min quand max est absent', async () => {
+            el = await fixture('<ar-datepicker locale="fr-FR" min="2026-01-01"></ar-datepicker>');
+            await waitForUpdate(el);
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).toContain('à partir du 1 janvier 2026');
+        });
+
+        it('hint par défaut mentionne uniquement max quand min est absent', async () => {
+            el = await fixture('<ar-datepicker locale="fr-FR" max="2026-12-31"></ar-datepicker>');
+            await waitForUpdate(el);
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).toContain("jusqu'au 31 décembre 2026");
+        });
+
+        it('slot hint personnalisé remplace le hint par défaut (plage incluse)', async () => {
+            el = await fixture(`
+                <ar-datepicker min="2026-01-01">
+                    <span slot="hint">Format jj/mm/aaaa</span>
+                </ar-datepicker>
+            `);
+            await waitForUpdate(el);
+            const slotEl = el.shadowRoot?.querySelector('slot[name="hint"]') as HTMLSlotElement;
+            const assigned = slotEl.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect(assigned[0].textContent).toBe('Format jj/mm/aaaa');
+        });
     });
 
     describe('participation formulaire', () => {

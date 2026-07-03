@@ -12,7 +12,10 @@ import styles from './datepicker.styles.js';
  *
  * @slot label       - Contenu riche du label (remplace le prop `label`).
  * @slot after-label - Éléments après le label (bouton d'aide, tooltip…).
- * @slot hint        - Texte d'aide persistant (format attendu). Lié via aria-describedby.
+ * @slot hint        - Texte d'aide persistant (format attendu, plage min/max si définie). Lié
+ *                     via aria-describedby. Un contenu personnalisé remplace entièrement le
+ *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
+ *                     si nécessaire.
  * @slot error       - Message d'erreur. Déclenche has-error sur le host.
  *
  * @csspart input      - Le champ texte.
@@ -199,7 +202,7 @@ export class ArDatepicker extends LitElement {
 
     override render(): TemplateResult {
         const locale = this.locale || navigator.language;
-        const defaultHint = `Format attendu : ${this.format}`;
+        const defaultHint = `Format attendu : ${this.format}${this._rangeHint(locale)}`;
 
         return html`
             <label part="label" id="dp-label-${this._uid}" for="dp-input-${this._uid}">
@@ -474,6 +477,24 @@ export class ArDatepicker extends LitElement {
 
     private _toIso(date: Date): string {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    private _rangeHint(locale: string): string {
+        const minDate = this.min ? parse(this.min, 'yyyy-MM-dd').date : null;
+        const maxDate = this.max ? parse(this.max, 'yyyy-MM-dd').date : null;
+        if (!minDate && !maxDate) return '';
+
+        const dateFormat = new Intl.DateTimeFormat(locale, {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+
+        if (minDate && maxDate) {
+            return ` (entre le ${dateFormat.format(minDate)} et le ${dateFormat.format(maxDate)})`;
+        }
+        if (minDate) return ` (à partir du ${dateFormat.format(minDate)})`;
+        return ` (jusqu'au ${dateFormat.format(maxDate as Date)})`;
     }
 
     private async _show(): Promise<void> {
