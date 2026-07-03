@@ -509,13 +509,13 @@ const {
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
-            <main id="main-content">
+            <main id="main-content" tabindex="-1">
                 <div class="main-inner">
                     <slot />
                 </div>
             </main>
             {showToc && (
-                <aside class="toc-column" id="toc">
+                <aside class="toc-column" id="toc" tabindex="-1">
                     <slot name="toc" />
                 </aside>
             )}
