@@ -105,3 +105,44 @@ se déplace dans l'élément ciblé sur desktop, et revient à sa position d'ori
 <aside id="stepper-sidebar"></aside>
 <ar-stepper desktop-target="stepper-sidebar" desktop-from="992"> ... </ar-stepper>
 ```
+
+## Utilisation
+
+### Écouter le changement d'étape
+
+`ar-stepper` émet `ar-stepper-step-changed` au clic sur une étape, avec le `path` (le `href`) de l'étape sélectionnée dans `detail` :
+
+```js
+document.querySelector('ar-stepper').addEventListener('ar-stepper-step-changed', (e) => {
+    console.log('Étape sélectionnée :', e.detail.path);
+});
+```
+
+### Mode `create` vs `edit`
+
+La prop `mode` détermine quelles étapes sont cliquables :
+
+- **`create`** (défaut) : seules les étapes déjà **complétées** (avant l'étape courante) sont cliquables — navigation linéaire, cohérente avec un parcours de création où les étapes suivantes n'ont pas encore de contenu à afficher.
+- **`edit`** : toutes les étapes sauf l'étape courante sont cliquables, y compris celles qui n'ont pas encore été visitées — adapté à un parcours de modification où tout le contenu existe déjà.
+
+```html
+<ar-stepper mode="edit">...</ar-stepper>
+```
+
+### Navigation synchronisée au scroll (`follow-scroll`)
+
+Avec `follow-scroll`, la prop `current-path` se met à jour automatiquement pendant que l'utilisateur scrolle la page : le stepper détecte quelle section est visible et se synchronise sans action de votre part.
+
+```html
+<ar-stepper follow-scroll>...</ar-stepper>
+```
+
+### Navigation programmatique
+
+Mettre à jour `current-path` depuis l'extérieur pilote le stepper comme un clic utilisateur :
+
+```js
+document.querySelector('ar-stepper').currentPath = '#etape-2';
+```
+
+En mode `create`, cette mise à jour ne rend pas les étapes suivantes cliquables pour autant — seul `mode="edit"` lève cette restriction.
