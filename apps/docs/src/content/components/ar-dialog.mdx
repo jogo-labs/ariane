@@ -116,3 +116,48 @@ import WcagRef from '../../components/WcagRef.astro';
 - **Si vous bloquez la fermeture, renseigner `prevented-message`.** Le message doit expliquer quoi faire pour continuer ou confirmer l'action.
 - **Piloter le focus initial si nécessaire.** Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — utile par exemple pour un champ de saisie dans un drawer.
 - **Adapter `close-label` à la langue de l'interface.** Par défaut `"Fermer"` — à remplacer si l'interface n'est pas en français (`close-label="Close"`, `close-label="Schließen"`, etc.).
+
+## Utilisation
+
+### Déclaration via `data-ar-dialog-open`
+
+Plutôt que de piloter `open` en JavaScript, un élément cliquable peut ouvrir un dialog par son `id` via l'attribut `data-ar-dialog-open` — un écouteur global au niveau du document intercepte le clic :
+
+```html
+<button data-ar-dialog-open="confirm-dialog">Supprimer</button>
+
+<ar-dialog id="confirm-dialog" label="Confirmer la suppression">
+    Cette action est irréversible.
+    <div slot="footer">
+        <button data-ar-dismiss>Annuler</button>
+        <button data-ar-accept>Confirmer</button>
+    </div>
+</ar-dialog>
+```
+
+### Cycle d'événements
+
+| Événement                       | Moment                                                | Annulable |
+| ------------------------------- | ----------------------------------------------------- | --------- |
+| `ar-dialog-show`                | Avant l'ouverture                                     | Oui       |
+| `ar-dialog-shown`               | Après l'ouverture (post-render)                       | Non       |
+| `ar-dialog-hide`                | Avant la fermeture (Escape, backdrop, `open = false`) | Oui       |
+| `ar-dialog-hide-prevented`      | Si `ar-dialog-hide` est annulé                        | Non       |
+| `ar-dialog-hidden`              | Après la fermeture (post-animation)                   | Non       |
+| `ar-dialog-dismissed`           | Clic sur un élément `data-ar-dismiss`                 | Oui       |
+| `ar-dialog-dismissed-prevented` | Si `ar-dialog-dismissed` est annulé                   | Non       |
+| `ar-dialog-accepted`            | Clic sur un élément `data-ar-accept`                  | Oui       |
+| `ar-dialog-accepted-prevented`  | Si `ar-dialog-accepted` est annulé                    | Non       |
+
+Tous portent `detail: { id }` (l'id du dialog). `data-ar-dismiss` et `data-ar-accept` sont deux conventions distinctes de `ar-dialog-hide` : elles permettent de distinguer une annulation ("Annuler") d'une confirmation ("Confirmer") sur le même geste de fermeture.
+
+```js
+document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted', (e) => {
+    if (e.defaultPrevented) return;
+    console.log('Confirmé, dialog :', e.detail.id);
+});
+```
+
+### Dialogs empilés
+
+Plusieurs `ar-dialog` peuvent être ouverts simultanément (un dialog ouvert depuis un autre, par exemple). Seul le dialog du dessus de la pile intercepte la touche `Escape` — les dialogs en dessous restent ouverts et inertes tant qu'il n'est pas fermé. Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme.

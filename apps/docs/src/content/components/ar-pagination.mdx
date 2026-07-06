@@ -54,3 +54,17 @@ En dessous de **640px**, le composant réduit automatiquement le nombre de pages
 
 - Seules les pages **précédente**, **active**, **suivante** et les deux voisines directes restent visibles.
 - Les autres pages sont masquées — aucune configuration nécessaire.
+
+## Utilisation
+
+### Écouter le changement de page
+
+`ar-pagination` émet `ar-pagination-page-change` à chaque changement de page (clic sur une page, précédent/suivant), avec `detail: { from, to }` :
+
+```js
+document.querySelector('ar-pagination').addEventListener('ar-pagination-page-change', (e) => {
+    const { from, to } = e.detail;
+    console.log(`Page ${from} → ${to}`);
+    // Charger les données de la page `to`, puis mettre à jour `current` / `total` si besoin.
+});
+```

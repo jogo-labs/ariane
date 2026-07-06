@@ -233,3 +233,25 @@ Le tablist utilise un scroll horizontal natif (`overflow-x: auto`). Les onglets 
 
 - **Nommer le tablist** : si la page contient plusieurs `ar-tab-group`, ajoutez l'attribut `label` sur chacun — il devient l'`aria-label` du tablist, permettant aux lecteurs d'écran de les distinguer.
 - **Libellés des onglets** : le texte visible de l'onglet est son nom accessible. Évitez les onglets avec des icônes seules sans texte alternatif (`aria-label` sur `ar-tab`).
+
+## Utilisation
+
+### Écouter le changement d'onglet
+
+`ar-tab-group` émet `ar-tab-group-change` à chaque changement d'onglet actif, avec le nom du panel dans `detail` :
+
+```js
+document.querySelector('ar-tab-group').addEventListener('ar-tab-group-change', (e) => {
+    console.log('Onglet actif :', e.detail.active);
+});
+```
+
+L'événement se déclenche aussi automatiquement quand l'onglet actif est retiré du DOM : un autre onglet est réélu et `ar-tab-group-change` est émis avec son nom, sans action de votre part.
+
+### Activation manuelle vs automatique
+
+Par défaut (`manual-activation` absent), les flèches déplacent le focus **et** activent immédiatement l'onglet ciblé — `ar-tab-group-change` se déclenche à chaque flèche. Avec `manual-activation`, les flèches ne font que déplacer le focus : l'activation (et l'événement) n'a lieu qu'à l'appui sur `Entrée` ou `Espace`.
+
+```html
+<ar-tab-group manual-activation>...</ar-tab-group>
+```

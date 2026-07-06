@@ -65,3 +65,19 @@ import WcagRef from '../../components/WcagRef.astro';
   `info` pour les informations neutres.
 - **`next-focus` obligatoire sur les alertes dismissibles.** Un bouton de fermeture sans
   destination de focus laisse l'utilisateur clavier sans repère.
+
+## Utilisation
+
+### Fermeture et cycle de vie
+
+À la fermeture, `ar-alert` **se retire du DOM** (`this.remove()`) une fois la transition terminée — l'alerte n'est pas simplement masquée, elle disparaît définitivement de la page. Toute référence conservée à l'élément pointe alors vers un noeud détaché ; il n'existe pas de méthode pour la réafficher.
+
+`ar-alert-close` (sans `detail`) est émis à ce moment-là, après la fin de la transition et juste avant le retrait du DOM :
+
+```js
+document.querySelector('ar-alert').addEventListener('ar-alert-close', () => {
+    console.log('Alerte fermée et retirée du DOM');
+});
+```
+
+Le bouton de fermeture n'est rendu que si `next-focus` est défini et non vide (`canBeHidden`) : sans `next-focus`, l'alerte n'a pas de bouton de fermeture et reste donc affichée en permanence — c'est voulu, pour éviter de fermer une alerte sans savoir où renvoyer le focus clavier.

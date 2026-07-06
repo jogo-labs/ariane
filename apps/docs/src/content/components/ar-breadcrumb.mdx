@@ -57,3 +57,17 @@ En dessous de **768px**, le composant bascule automatiquement vers un affichage 
 - Le dropdown expose son état via `aria-expanded` — le comportement clavier et vocal est géré automatiquement.
 
 Pour observer ce rendu, utiliser les DevTools du navigateur en mode responsive.
+
+## Utilisation
+
+### Écouter l'ouverture/fermeture du dropdown mobile
+
+En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-open` et `ar-breadcrumb-close` (sans `detail`) à chaque changement d'état du dropdown condensé :
+
+```js
+const breadcrumb = document.querySelector('ar-breadcrumb');
+breadcrumb.addEventListener('ar-breadcrumb-open', () => console.log('Dropdown ouvert'));
+breadcrumb.addEventListener('ar-breadcrumb-close', () => console.log('Dropdown fermé'));
+```
+
+Ces événements se déclenchent à chaque changement d'état du dropdown : clic sur le bouton toggle, mise à jour programmatique de la prop `open`, ou fermeture externe (clic en dehors, `Escape`) — pratique pour synchroniser un état d'UI externe ou pour de l'analytics.
