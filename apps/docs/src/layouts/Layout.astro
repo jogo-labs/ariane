@@ -380,13 +380,22 @@ const {
 
             /* ── Responsive ─────────────────────────────── */
 
-            /* Sur desktop : burger masqué, nav-overlay masqué */
-            #burger-btn   { display: none; }
-            .nav-overlay  { display: none; }
+            /* Sur desktop : burger masqué, nav-overlay masqué, pas de bouton de fermeture */
+            #burger-btn    { display: none; }
+            .nav-overlay   { display: none; }
+            #nav-close-btn { display: none; }
 
             @media (max-width: 768px) {
                 #burger-btn  { display: flex; }
                 .nav-overlay { display: block; }
+
+                #nav-close-btn {
+                    display:  flex;
+                    position: absolute;
+                    top:      0.75rem;
+                    right:    0.75rem;
+                    z-index:  1;
+                }
 
                 .layout-body.with-nav {
                     display: block;
@@ -509,6 +518,12 @@ const {
         <div class={['layout-body', showNav ? 'with-nav' : '', showToc ? 'with-toc' : ''].filter(Boolean).join(' ')}>
             {showNav && (
                 <div class="nav-column" id="site-nav-column" tabindex="-1">
+                    <button class="icon-btn" id="nav-close-btn" aria-label="Fermer la navigation">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
@@ -595,15 +610,17 @@ const {
 
             // ── Nav burger ─────────────────────────────────────────────────────────
 
-            const burgerBtn  = document.getElementById('burger-btn');
-            const navOverlay = document.getElementById('nav-overlay');
-            const navColumn  = document.getElementById('site-nav-column');
+            const burgerBtn   = document.getElementById('burger-btn');
+            const navOverlay  = document.getElementById('nav-overlay');
+            const navColumn   = document.getElementById('site-nav-column');
+            const navCloseBtn = document.getElementById('nav-close-btn');
 
             function openNav() {
                 navColumn?.classList.add('open');
                 navOverlay?.classList.add('open');
                 burgerBtn?.setAttribute('aria-expanded', 'true');
                 document.body.style.overflow = 'hidden';
+                navCloseBtn?.focus();
             }
 
             function closeNav() {
@@ -611,11 +628,19 @@ const {
                 navOverlay?.classList.remove('open');
                 burgerBtn?.setAttribute('aria-expanded', 'false');
                 document.body.style.overflow = '';
+                burgerBtn?.focus();
             }
 
             burgerBtn?.addEventListener('click', openNav);
+            navCloseBtn?.addEventListener('click', closeNav);
             navOverlay?.addEventListener('click', closeNav);
             navColumn?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeNav));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navColumn?.classList.contains('open')) {
+                    closeNav();
+                }
+            });
         </script>
     </body>
 </html>
