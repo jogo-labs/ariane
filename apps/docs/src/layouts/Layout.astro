@@ -166,6 +166,25 @@ const {
                 transition: color 0.2s;
             }
 
+            .skip-link {
+                position:        absolute;
+                top:             -3rem;
+                left:            0.5rem;
+                z-index:         1000;
+                padding:         0.5rem 1rem;
+                background:      var(--doc-accent);
+                color:           #fff;
+                border-radius:   0 0 0.4rem 0.4rem;
+                text-decoration: none;
+                font-size:       0.85rem;
+                font-weight:     600;
+                transition:      top 0.15s ease;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
             /* ── Header (toujours visible) ──────────────── */
 
             .site-header {
@@ -307,33 +326,31 @@ const {
 
             /* ── Layout body ────────────────────────────── */
 
-            .layout-body {
-                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
-            }
-
             .layout-body.with-nav {
                 display:               grid;
-                grid-template-columns: 270px 1fr;
+                grid-template-columns: 270px minmax(0, 1fr);
                 max-width:             1640px;
                 margin:                0 auto;
             }
 
             .layout-body.with-nav.with-toc {
-                grid-template-columns: 270px 1fr 180px;
+                grid-template-columns: 270px minmax(0, 1fr) 270px;
             }
 
             .nav-column {
-                height:     100%;
+                position:   sticky;
+                top:        var(--doc-header-h);
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
                 overflow-y: auto;
                 display:    flex;
                 flex-direction: column;
                 flex-grow:  1;
+                min-width:  0;
             }
 
             main {
-                padding:    0;
-                height:     100%;
-                overflow-y: auto;
+                padding:   0;
+                min-width: 0;
             }
 
             /* Contenu centré dans main */
@@ -353,20 +370,32 @@ const {
             }
 
             .toc-column {
-                height:     100%;
+                position:   sticky;
+                top:        var(--doc-header-h);
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
                 overflow-y: auto;
-                padding:    3rem 0.5rem 3rem 0;
+                padding:    3rem 1rem 3rem 0;
+                min-width:  0;
             }
 
             /* ── Responsive ─────────────────────────────── */
 
-            /* Sur desktop : burger masqué, nav-overlay masqué */
-            #burger-btn   { display: none; }
-            .nav-overlay  { display: none; }
+            /* Sur desktop : burger masqué, nav-overlay masqué, pas de bouton de fermeture */
+            #burger-btn    { display: none; }
+            .nav-overlay   { display: none; }
+            #nav-close-btn { display: none; }
 
             @media (max-width: 768px) {
                 #burger-btn  { display: flex; }
                 .nav-overlay { display: block; }
+
+                #nav-close-btn {
+                    display:  flex;
+                    position: absolute;
+                    top:      0.75rem;
+                    right:    0.75rem;
+                    z-index:  1;
+                }
 
                 .layout-body.with-nav {
                     display: block;
@@ -377,6 +406,8 @@ const {
                     top:        0;
                     left:       0;
                     height:     100vh;
+                    height:     100dvh;
+                    max-height: none;
                     width:      280px;
                     z-index:    300;
                     transform:  translateX(-100%);
@@ -409,6 +440,9 @@ const {
         </style>
     </head>
     <body>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        {showToc && <a href="#toc" class="skip-link">Aller au sommaire</a>}
+
         <div class="alpha-banner" role="banner">
             Librairie en cours de développement — API instable, ne pas utiliser en production.
             <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
@@ -483,17 +517,25 @@ const {
 
         <div class={['layout-body', showNav ? 'with-nav' : '', showToc ? 'with-toc' : ''].filter(Boolean).join(' ')}>
             {showNav && (
-                <div class="nav-column" id="site-nav-column">
+                <div class="nav-column" id="site-nav-column" tabindex="-1">
+                    <button class="icon-btn" id="nav-close-btn" aria-label="Fermer la navigation">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
-            <main>
+            <main id="main-content" tabindex="-1">
                 <div class="main-inner">
+                    {showNav && <a href="#site-nav-column" class="skip-link">Aller à la liste des composants</a>}
+                    {showToc && <a href="#toc" class="skip-link">Aller au menu de la page</a>}
                     <slot />
                 </div>
             </main>
             {showToc && (
-                <aside class="toc-column">
+                <aside class="toc-column" id="toc" tabindex="-1">
                     <slot name="toc" />
                 </aside>
             )}
@@ -568,15 +610,17 @@ const {
 
             // ── Nav burger ─────────────────────────────────────────────────────────
 
-            const burgerBtn  = document.getElementById('burger-btn');
-            const navOverlay = document.getElementById('nav-overlay');
-            const navColumn  = document.getElementById('site-nav-column');
+            const burgerBtn   = document.getElementById('burger-btn');
+            const navOverlay  = document.getElementById('nav-overlay');
+            const navColumn   = document.getElementById('site-nav-column');
+            const navCloseBtn = document.getElementById('nav-close-btn');
 
             function openNav() {
                 navColumn?.classList.add('open');
                 navOverlay?.classList.add('open');
                 burgerBtn?.setAttribute('aria-expanded', 'true');
                 document.body.style.overflow = 'hidden';
+                navCloseBtn?.focus();
             }
 
             function closeNav() {
@@ -584,11 +628,19 @@ const {
                 navOverlay?.classList.remove('open');
                 burgerBtn?.setAttribute('aria-expanded', 'false');
                 document.body.style.overflow = '';
+                burgerBtn?.focus();
             }
 
             burgerBtn?.addEventListener('click', openNav);
+            navCloseBtn?.addEventListener('click', closeNav);
             navOverlay?.addEventListener('click', closeNav);
             navColumn?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeNav));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navColumn?.classList.contains('open')) {
+                    closeNav();
+                }
+            });
         </script>
     </body>
 </html>
