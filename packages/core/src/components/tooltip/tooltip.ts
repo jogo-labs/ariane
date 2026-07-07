@@ -39,6 +39,8 @@ export type ArTooltipPlacement =
  * @cssprop --ar-tooltip-font-size          - Taille de police.
  * @cssprop --ar-tooltip-max-width              - Largeur maximale.
  * @cssprop --ar-tooltip-arrow-size               - Taille du caret.
+ * @cssprop [--ar-tooltip-distance=6px] - Espacement entre le trigger et la bulle.
+ * @cssprop [--ar-tooltip-offset=var(--ar-anchor-offset)] - Décalage latéral de la bulle.
  */
 @customElement('ar-tooltip')
 export class ArTooltip extends LitElement {
@@ -49,12 +51,6 @@ export class ArTooltip extends LitElement {
 
     /** Placement Floating UI (12 valeurs, ex: "top", "bottom-start"). */
     @property({ reflect: true }) placement: ArTooltipPlacement = 'top';
-
-    /** Espacement trigger→bulle en px. */
-    @property({ reflect: true, type: Number }) distance = 6;
-
-    /** Décalage latéral en px. */
-    @property({ reflect: true, type: Number }) offset = 0;
 
     /** Délai avant affichage en ms (WCAG 1.4.13). */
     @property({
@@ -86,7 +82,10 @@ export class ArTooltip extends LitElement {
 
     @query('[part="bubble"]') private _bubble!: HTMLElement;
 
-    private readonly _tooltip = new TooltipController(this, { placement: 'top', distance: 6 });
+    private readonly _tooltip = new TooltipController(this, {
+        placement: 'top',
+        cssVarPrefix: 'tooltip',
+    });
     private _trigger: HTMLElement | null = null;
     private _showTimer = 0;
     private _hideTimer = 0;
@@ -103,8 +102,6 @@ export class ArTooltip extends LitElement {
             this._attachTrigger();
         }
         if (changed.has('placement')) this._tooltip.setPlacement(this.placement);
-        if (changed.has('distance')) this._tooltip.setDistance(this.distance);
-        if (changed.has('offset')) this._tooltip.setOffset(this.offset);
         if (changed.has('disabled') && this.disabled) {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
