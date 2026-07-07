@@ -33,7 +33,7 @@ export type ArTooltipPlacement =
  * @csspart arrow  - Le caret directionnel.
  *
  * @cssprop --ar-tooltip-bg                  - Fond de la bulle.
- * @cssprop --ar-tooltip-color]                  - Couleur du texte.
+ * @cssprop --ar-tooltip-color                  - Couleur du texte.
  * @cssprop --ar-tooltip-border-radius        - Arrondi.
  * @cssprop --ar-tooltip-padding    - Marge interne.
  * @cssprop --ar-tooltip-font-size          - Taille de police.
