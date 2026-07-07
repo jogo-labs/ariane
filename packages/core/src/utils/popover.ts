@@ -6,10 +6,10 @@ type PopoverPanel = HTMLElement & { showPopover(): void; hidePopover(): void };
 
 export interface PopoverOptions {
     placement?: Placement;
-    /** Espacement perpendiculaire trigger→panel (mainAxis). Défaut : 4. */
-    distance?: number;
-    /** Décalage latéral (crossAxis). Défaut : 0. */
-    offset?: number;
+    /** Espacement perpendiculaire trigger→panel (mainAxis) en px, statique ou résolu à chaque repositionnement. Défaut : 0. */
+    distance?: number | (() => number);
+    /** Décalage latéral (crossAxis) en px, statique ou résolu à chaque repositionnement. Défaut : 0. */
+    offset?: number | (() => number);
     popoverType?: 'auto' | 'manual';
     /** Appelé lors du light-dismiss natif (popoverType 'auto' uniquement). */
     onExternalClose?: () => void;
@@ -32,7 +32,7 @@ export class Popover {
         this._host = host;
         this._opts = {
             placement: options.placement ?? 'bottom-start',
-            distance: options.distance ?? 4,
+            distance: options.distance ?? 0,
             offset: options.offset ?? 0,
             popoverType: options.popoverType ?? 'auto',
             ...(options.onExternalClose !== undefined && {
@@ -48,14 +48,6 @@ export class Popover {
 
     setPlacement(v: Placement): void {
         this._opts.placement = v;
-    }
-
-    setDistance(v: number): void {
-        this._opts.distance = v;
-    }
-
-    setOffset(v: number): void {
-        this._opts.offset = v;
     }
 
     setArrow(el: HTMLElement | null): void {
@@ -141,7 +133,10 @@ export class Popover {
                 placement: this._opts.placement,
                 strategy: 'absolute',
                 middleware: [
-                    offset({ mainAxis: this._opts.distance, crossAxis: this._opts.offset }),
+                    offset({
+                        mainAxis: this._resolve(this._opts.distance),
+                        crossAxis: this._resolve(this._opts.offset),
+                    }),
                     flip(),
                     ...(arrowEl ? [arrow({ element: arrowEl })] : []),
                     shift({ padding: 4 }),
@@ -171,6 +166,10 @@ export class Popover {
                 [staticSide]: `-${halfSize}px`,
             });
         }
+    }
+
+    private _resolve(v: number | (() => number)): number {
+        return typeof v === 'function' ? v() : v;
     }
 
     private _roundByDPR(value: number): number {
