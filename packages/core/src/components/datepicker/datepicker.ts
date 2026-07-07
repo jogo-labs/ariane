@@ -42,6 +42,8 @@ import styles from './datepicker.styles.js';
  * @csspart close-btn  - Bouton « Fermer ».
  *
  * @cssprop [--ar-datepicker-panel-width]        - Largeur du popover.
+ * @cssprop [--ar-datepicker-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel.
+ * @cssprop [--ar-datepicker-offset=var(--ar-anchor-offset)] - Décalage latéral du panel.
  * @cssprop [--ar-datepicker-header-font-size]         - Taille de police de l'en-tête.
  * @cssprop [--ar-datepicker-header-padding]           - Padding de l'en-tête.
  * @cssprop [--ar-datepicker-header-margin]            - Margin de l'en-tête.
@@ -113,6 +115,7 @@ export class ArDatepicker extends LitElement {
     private readonly _anchored = new AnchoredController(this, {
         popupMode: 'dialog',
         placement: 'bottom-start',
+        cssVarPrefix: 'datepicker',
         onExternalClose: () => {
             this.open = false;
             if (!document.activeElement || document.activeElement === document.body) {
