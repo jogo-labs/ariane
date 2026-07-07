@@ -36,6 +36,8 @@ export type ArDropdownPlacement =
  * @cssprop [--ar-dropdown-border-color=var(--ar-panel-border-color)] - Bordure (cascade vers --ar-panel-border-color).
  * @cssprop [--ar-dropdown-border-radius=var(--ar-panel-radius)] - Arrondi (cascade vers --ar-panel-radius).
  * @cssprop [--ar-dropdown-shadow=var(--ar-panel-shadow)] - Ombre (cascade vers --ar-panel-shadow).
+ * @cssprop [--ar-dropdown-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel (axe principal).
+ * @cssprop [--ar-dropdown-offset=var(--ar-anchor-offset)] - Décalage latéral du panel (axe transversal).
  *
  * @event {CustomEvent} ar-dropdown-show    - Émis avant l'ouverture (annulable).
  * @event {CustomEvent} ar-dropdown-shown   - Émis après l'ouverture.
@@ -62,12 +64,6 @@ export class ArDropdown extends LitElement {
      */
     @property({ attribute: 'no-scroll-lock', reflect: true, type: Boolean }) noScrollLock = false;
 
-    /** Espacement en pixels entre le trigger et le panel (axe principal). */
-    @property({ reflect: true, type: Number }) distance = 4;
-
-    /** Décalage latéral en pixels du panel par rapport au trigger (axe transversal). */
-    @property({ reflect: true, type: Number }) offset = 0;
-
     /**
      * ID d'un élément déclencheur externe (light DOM). Quand défini, le slot
      * `trigger` est ignoré.
@@ -77,6 +73,7 @@ export class ArDropdown extends LitElement {
     @query('[part="panel"]') private _panel!: HTMLElement;
 
     private readonly _popover = new AnchoredController(this, {
+        cssVarPrefix: 'dropdown',
         onExternalClose: () => {
             this.open = false;
         },
@@ -115,12 +112,6 @@ export class ArDropdown extends LitElement {
         }
         if (changed.has('noScrollLock')) {
             this._popover.setLockScroll(!this.noScrollLock);
-        }
-        if (changed.has('distance')) {
-            this._popover.setDistance(this.distance);
-        }
-        if (changed.has('offset')) {
-            this._popover.setOffset(this.offset);
         }
         if (changed.has('for')) {
             this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);

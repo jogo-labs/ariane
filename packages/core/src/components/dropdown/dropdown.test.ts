@@ -46,8 +46,6 @@ describe('ArDropdown', () => {
         it('placement="bottom-start"', () => expect(el.placement).toBe('bottom-start'));
         it('disabled=false', () => expect(el.disabled).toBe(false));
         it('noScrollLock=false', () => expect(el.noScrollLock).toBe(false));
-        it('distance=4', () => expect(el.distance).toBe(4));
-        it('offset=0', () => expect(el.offset).toBe(0));
         it('for=""', () => expect(el.for).toBe(''));
     });
 
@@ -81,18 +79,6 @@ describe('ArDropdown', () => {
             el.noScrollLock = true;
             await waitForUpdate(el);
             expect(el.hasAttribute('no-scroll-lock')).toBe(true);
-        });
-
-        it('distance reflète en attribut', async () => {
-            el.distance = 12;
-            await waitForUpdate(el);
-            expect(el.getAttribute('distance')).toBe('12');
-        });
-
-        it('offset reflète en attribut', async () => {
-            el.offset = 8;
-            await waitForUpdate(el);
-            expect(el.getAttribute('offset')).toBe('8');
         });
 
         it('for reflète en attribut', async () => {

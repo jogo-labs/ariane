@@ -4,25 +4,28 @@ import { Popover } from '../utils/popover.js';
 
 export interface TooltipControllerOptions {
     placement?: Placement;
-    /** Espacement perpendiculaire trigger→tooltip. Défaut : 6. */
-    distance?: number;
-    /** Décalage latéral. Défaut : 0. */
-    offset?: number;
+    /**
+     * Slug utilisé pour lire les custom properties CSS `--ar-<cssVarPrefix>-distance`
+     * et `--ar-<cssVarPrefix>-offset` sur l'hôte. Si omis, distance/offset valent 0.
+     */
+    cssVarPrefix?: string;
 }
 
 export class TooltipController implements ReactiveController {
     private readonly _host: ReactiveControllerHost & HTMLElement;
     private readonly _popover: Popover;
+    private readonly _cssVarPrefix: string | undefined;
 
     constructor(
         host: ReactiveControllerHost & HTMLElement,
         options: TooltipControllerOptions = {},
     ) {
         this._host = host;
+        this._cssVarPrefix = options.cssVarPrefix;
         this._popover = new Popover(host, {
             placement: options.placement ?? 'top',
-            distance: options.distance ?? 6,
-            offset: options.offset ?? 0,
+            distance: () => this._readCssVar('distance'),
+            offset: () => this._readCssVar('offset'),
             popoverType: 'manual',
         });
         host.addController(this);
@@ -51,14 +54,6 @@ export class TooltipController implements ReactiveController {
         this._popover.setPlacement(v);
     }
 
-    setDistance(v: number): void {
-        this._popover.setDistance(v);
-    }
-
-    setOffset(v: number): void {
-        this._popover.setOffset(v);
-    }
-
     setArrow(el: HTMLElement | null): void {
         this._popover.setArrow(el);
     }
@@ -67,5 +62,14 @@ export class TooltipController implements ReactiveController {
 
     hostDisconnected(): void {
         this._popover.destroy();
+    }
+
+    private _readCssVar(kind: 'distance' | 'offset'): number {
+        if (!this._cssVarPrefix) return 0;
+        const raw = getComputedStyle(this._host)
+            .getPropertyValue(`--ar-${this._cssVarPrefix}-${kind}`)
+            .trim();
+        const parsed = parseFloat(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
     }
 }

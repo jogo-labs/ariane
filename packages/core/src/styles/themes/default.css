@@ -343,12 +343,16 @@
         --ar-button-ratio-square-lg-width: 3rem;
 
         /* breadcrumb */
+        --ar-breadcrumb-distance: var(--ar-anchor-distance);
+        --ar-breadcrumb-offset: var(--ar-anchor-offset);
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
 
         /* stepper */
+        --ar-stepper-distance: var(--ar-anchor-distance);
+        --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
         --ar-stepper-bullet-radius: 0.75rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
@@ -377,6 +381,8 @@
         --ar-spinner-stroke-color: currentColor;
 
         /* tooltip */
+        --ar-tooltip-distance: 10px;
+        --ar-tooltip-offset: var(--ar-anchor-offset);
         --ar-tooltip-bg: var(--ar-color-neutral-20);
         --ar-tooltip-color: var(--ar-color-white);
         --ar-tooltip-border-radius: var(--ar-border-radius-sm);
@@ -395,7 +401,13 @@
         --ar-panel-min-width: 18rem;
         --ar-panel-max-width: 18rem;
 
+        /* anchor (partagé — positionnement des composants ancrés / popovers) */
+        --ar-anchor-distance: 4px;
+        --ar-anchor-offset: 0px;
+
         /* dropdown */
+        --ar-dropdown-distance: var(--ar-anchor-distance);
+        --ar-dropdown-offset: var(--ar-anchor-offset);
         --ar-dropdown-bg: var(--ar-panel-bg);
         --ar-dropdown-color: var(--ar-panel-text);
         --ar-dropdown-border-color: var(--ar-panel-border-color);
@@ -457,6 +469,8 @@
          * ar-datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
+        --ar-datepicker-distance: var(--ar-anchor-distance);
+        --ar-datepicker-offset: var(--ar-anchor-offset);
         --ar-datepicker-gap: 0.35rem;
         --ar-datepicker-label-gap: 0.5rem;
         --ar-datepicker-error-color: var(--ar-color-red-50);

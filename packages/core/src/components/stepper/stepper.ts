@@ -67,6 +67,8 @@ export interface ArStepperStepChangeDetail {
  * @cssprop [--ar-stepper-bullet-radius=0.75rem]                                              - Border-radius de la puce.
  * @cssprop [--ar-stepper-label-color=var(--ar-color-text-muted)]                             - Couleur des labels des étapes inactives.
  * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
+ * @cssprop [--ar-stepper-distance=var(--ar-anchor-distance)]                                 - Espacement entre le trigger et le panel mobile.
+ * @cssprop [--ar-stepper-offset=var(--ar-anchor-offset)]                                     - Décalage latéral du panel mobile.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
@@ -160,6 +162,7 @@ export class ArStepper extends LitElement {
     private readonly _popover = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
+        cssVarPrefix: 'stepper',
         onExternalClose: () => {
             this.open = false;
         },

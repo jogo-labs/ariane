@@ -166,13 +166,13 @@ Ajouter la méthode privée juste avant `_roundByDPR` :
     }
 ```
 
-- [ ] **Étape 4 : Vérifier que ça compile et que les tests passent (vert)**
+- [ ] **Étape 4 : Vérifier que ça compile (dans le périmètre de cette tâche) et que les tests passent (vert)**
 
 Run: `cd /Users/jon/Code/Active_projects/ariane/packages/core && npx tsc --noEmit`
-Expected: aucune erreur.
+Expected : aucune erreur liée à `popover.ts` ou `popover.browser.test.ts`. En revanche, il est **normal et attendu** que cette commande rapporte encore des erreurs dans exactement 4 fichiers hors périmètre de cette tâche — `anchored.controller.ts`, `tooltip.controller.ts`, `components/dropdown/dropdown.ts`, `components/tooltip/tooltip.ts` — car ils appellent encore `setDistance`/`setOffset`, supprimés ici. Ces 4 fichiers sont corrigés dans les Tasks 2, 3, 5, 6. Vérifier que les erreurs sont bien confinées à ces 4 fichiers, rien d'autre.
 
 Run: `cd /Users/jon/Code/Active_projects/ariane/packages/core && npx web-test-runner --group default --files "src/utils/popover.browser.test.ts"`
-Expected: tous les tests passent, y compris les 2 nouveaux.
+Expected: tous les tests passent, y compris les 2 nouveaux (web-test-runner transpile fichier par fichier via esbuild et ne type-check pas le reste du projet — les erreurs TS des 4 fichiers hors périmètre n'affectent pas ce test).
 
 - [ ] **Étape 5 : Commit**
 
@@ -336,10 +336,10 @@ Ajouter la méthode privée juste avant `hostConnected()` :
     }
 ```
 
-- [ ] **Étape 4 : Vérifier que ça compile et que les tests passent (vert)**
+- [ ] **Étape 4 : Vérifier que ça compile (dans le périmètre de cette tâche) et que les tests passent (vert)**
 
 Run: `cd /Users/jon/Code/Active_projects/ariane/packages/core && npx tsc --noEmit`
-Expected: aucune erreur.
+Expected : aucune erreur liée à `anchored.controller.ts` ou `anchored.controller.browser.test.ts`. Il est **normal et attendu** que cette commande rapporte encore des erreurs dans exactement 3 fichiers hors périmètre — `tooltip.controller.ts` (Task 3), `components/dropdown/dropdown.ts` (Task 5), `components/tooltip/tooltip.ts` (Task 6). Vérifier que les erreurs sont bien confinées à ces 3 fichiers, rien d'autre.
 
 Run: `cd /Users/jon/Code/Active_projects/ariane/packages/core && npx web-test-runner --group default --files "src/controllers/anchored.controller.browser.test.ts"`
 Expected: tous les tests passent, y compris les 2 nouveaux.

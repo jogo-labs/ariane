@@ -51,8 +51,6 @@ describe('ArTooltip', () => {
         });
 
         it('placement="top"', () => expect(el.placement).toBe('top'));
-        it('distance=6', () => expect(el.distance).toBe(6));
-        it('offset=0', () => expect(el.offset).toBe(0));
         it('showDelay=300', () => expect(el.showDelay).toBe(300));
         it('hideDelay=150', () => expect(el.hideDelay).toBe(150));
         it('withoutArrow=false', () => expect(el.withoutArrow).toBe(false));
