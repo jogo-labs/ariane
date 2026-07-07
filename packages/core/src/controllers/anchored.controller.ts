@@ -6,10 +6,11 @@ import { acquireScrollLock, isScrollLocked, releaseScrollLock } from '../utils/s
 export interface AnchoredControllerOptions {
     popupMode?: 'menu' | 'dialog';
     placement?: Placement;
-    /** Espacement perpendiculaire trigger→panel (mainAxis). Défaut : 4. */
-    distance?: number;
-    /** Décalage latéral (crossAxis). Défaut : 0. */
-    offset?: number;
+    /**
+     * Slug utilisé pour lire les custom properties CSS `--ar-<cssVarPrefix>-distance`
+     * et `--ar-<cssVarPrefix>-offset` sur l'hôte. Si omis, distance/offset valent 0.
+     */
+    cssVarPrefix?: string;
     /** Verrouille le scroll des ancêtres scrollables à l'ouverture. Défaut : true. */
     lockScroll?: boolean;
     /** Appelé lors d'un light-dismiss natif (popover auto). */
@@ -17,10 +18,12 @@ export interface AnchoredControllerOptions {
 }
 
 export class AnchoredController implements ReactiveController {
+    private readonly _host: HTMLElement;
     private _trigger: HTMLElement | null = null;
     private _scrollLocks: HTMLElement[] = [];
-    private _opts: Required<Omit<AnchoredControllerOptions, 'onExternalClose'>> & {
+    private _opts: Required<Omit<AnchoredControllerOptions, 'onExternalClose' | 'cssVarPrefix'>> & {
         onExternalClose?: () => void;
+        cssVarPrefix?: string;
     };
     private readonly _popover: Popover;
 
@@ -28,20 +31,20 @@ export class AnchoredController implements ReactiveController {
         host: ReactiveControllerHost & HTMLElement,
         options: AnchoredControllerOptions = {},
     ) {
+        this._host = host;
         this._opts = {
             popupMode: options.popupMode ?? 'menu',
             placement: options.placement ?? 'bottom-start',
-            distance: options.distance ?? 4,
-            offset: options.offset ?? 0,
             lockScroll: options.lockScroll ?? true,
+            ...(options.cssVarPrefix !== undefined && { cssVarPrefix: options.cssVarPrefix }),
             ...(options.onExternalClose !== undefined && {
                 onExternalClose: options.onExternalClose,
             }),
         };
         this._popover = new Popover(host, {
             placement: this._opts.placement,
-            distance: this._opts.distance,
-            offset: this._opts.offset,
+            distance: () => this._readCssVar('distance'),
+            offset: () => this._readCssVar('offset'),
             popoverType: 'auto',
             onExternalClose: () => {
                 this._releaseScrollLocks();
@@ -92,18 +95,17 @@ export class AnchoredController implements ReactiveController {
         this._popover.setPlacement(v);
     }
 
-    setDistance(v: number): void {
-        this._opts.distance = v;
-        this._popover.setDistance(v);
-    }
-
-    setOffset(v: number): void {
-        this._opts.offset = v;
-        this._popover.setOffset(v);
-    }
-
     setLockScroll(v: boolean): void {
         this._opts.lockScroll = v;
+    }
+
+    private _readCssVar(kind: 'distance' | 'offset'): number {
+        if (!this._opts.cssVarPrefix) return 0;
+        const raw = getComputedStyle(this._host)
+            .getPropertyValue(`--ar-${this._opts.cssVarPrefix}-${kind}`)
+            .trim();
+        const parsed = parseFloat(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
     }
 
     hostConnected(): void {}

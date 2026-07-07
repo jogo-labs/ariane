@@ -201,4 +201,43 @@ describe('AnchoredController', () => {
             expect(trigger.getAttribute('aria-expanded')).to.equal('false');
         });
     });
+
+    describe('cssVarPrefix — lecture des custom properties CSS', () => {
+        function parseTranslateY(transform: string): number {
+            const match = transform.match(/translate\([-\d.]+px,\s*([-\d.]+)px\)/);
+            if (!match) throw new Error(`transform inattendu: ${transform}`);
+            return Number(match[1]);
+        }
+
+        it('lit --ar-<prefix>-distance sur le host et la répercute au positionnement', async () => {
+            const { host, panel, ctrl } = await setupAnchored({
+                cssVarPrefix: 'test',
+                placement: 'bottom-start',
+            });
+            host.style.setProperty('--ar-test-distance', '0px');
+            await ctrl.show();
+            const y0 = parseTranslateY(panel.style.transform);
+
+            host.style.setProperty('--ar-test-distance', '20px');
+            window.dispatchEvent(new Event('resize'));
+            await aTimeout(50);
+            const y1 = parseTranslateY(panel.style.transform);
+
+            expect(y1 - y0).to.be.closeTo(20, 1);
+            ctrl.hide();
+        });
+
+        it('sans cssVarPrefix, distance/offset valent 0', async () => {
+            const { panel, ctrl } = await setupAnchored({ placement: 'bottom-start' });
+            await ctrl.show();
+            const y0 = parseTranslateY(panel.style.transform);
+
+            window.dispatchEvent(new Event('resize'));
+            await aTimeout(50);
+            const y1 = parseTranslateY(panel.style.transform);
+
+            expect(y1).to.equal(y0);
+            ctrl.hide();
+        });
+    });
 });
