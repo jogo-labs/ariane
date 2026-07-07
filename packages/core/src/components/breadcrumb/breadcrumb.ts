@@ -85,9 +85,6 @@ export class ArBreadcrumb extends LitElement {
         placement: 'bottom-end',
         onExternalClose: () => {
             this.open = false;
-            this.dispatchEvent(
-                new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-            );
         },
     });
 

@@ -77,19 +77,19 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('light-dismiss', () => {
-        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-close', async () => {
+        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-close une seule fois', async () => {
             el = await mobileBreadcrumb();
-            const closeHandler = (() => {
-                (closeHandler as { called?: boolean }).called = true;
-            }) as EventListener & { called?: boolean };
-            el.addEventListener('ar-breadcrumb-close', closeHandler);
+            let callCount = 0;
+            el.addEventListener('ar-breadcrumb-close', () => {
+                callCount += 1;
+            });
             getBtn(el).click();
             await aTimeout(50);
 
             (getPanel(el) as HTMLElement & { hidePopover(): void }).hidePopover();
             await aTimeout(50);
 
-            expect(closeHandler.called).to.equal(true);
+            expect(callCount).to.equal(1);
             expect(getPanel(el).matches(':popover-open')).to.equal(false);
         });
     });
