@@ -381,7 +381,7 @@
         --ar-spinner-stroke-color: currentColor;
 
         /* tooltip */
-        --ar-tooltip-distance: 6px;
+        --ar-tooltip-distance: 10px;
         --ar-tooltip-offset: var(--ar-anchor-offset);
         --ar-tooltip-bg: var(--ar-color-neutral-20);
         --ar-tooltip-color: var(--ar-color-white);
