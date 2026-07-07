@@ -46,9 +46,9 @@ variants:
           </ar-dropdown>
     - name: distance
       label: Distance personnalisée
-      description: Espacement en pixels entre le trigger et le panel (axe principal). La valeur par défaut est 4px.
+      description: 'Espacement en pixels entre le trigger et le panel (axe principal), piloté par la custom property CSS `--ar-dropdown-distance` (défaut : `var(--ar-anchor-distance)`, 4px).'
       html: |
-          <ar-dropdown distance="16">
+          <ar-dropdown style="--ar-dropdown-distance: 16px">
               <button class="btn btn-secondary" slot="trigger">Distance 16px ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
@@ -56,9 +56,9 @@ variants:
           </ar-dropdown>
     - name: offset
       label: Offset latéral
-      description: Décalage latéral en pixels du panel par rapport au trigger (axe transversal). La valeur par défaut est 0.
+      description: 'Décalage latéral en pixels du panel par rapport au trigger (axe transversal), piloté par la custom property CSS `--ar-dropdown-offset` (défaut : `var(--ar-anchor-offset)`, 0).'
       html: |
-          <ar-dropdown offset="32">
+          <ar-dropdown style="--ar-dropdown-offset: 32px">
               <button class="btn btn-secondary" slot="trigger">Offset 32px ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
