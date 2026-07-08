@@ -11,7 +11,7 @@
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArDialog } from './dialog.js';
-import './dialog.js';
+import './index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

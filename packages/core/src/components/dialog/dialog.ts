@@ -6,7 +6,7 @@ import {
     type CSSResultGroup,
     type PropertyValues,
 } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
@@ -74,7 +74,6 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. Annulable.
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
-@customElement('ar-dialog')
 export class ArDialog extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
 
@@ -511,11 +510,5 @@ export class ArDialog extends LitElement {
         this._triggerElement = null;
         (trigger as HTMLElement | null)?.focus?.();
         this.updateComplete.then(() => this._emit('ar-dialog-hidden'));
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-dialog': ArDialog;
     }
 }

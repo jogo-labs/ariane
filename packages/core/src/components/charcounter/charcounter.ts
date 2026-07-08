@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
@@ -31,7 +31,6 @@ function pluralize(count: number, label: string): string {
  * @cssprop --ar-charcounter-warning-color - Couleur état warning.
  * @cssprop --ar-charcounter-error-color   - Couleur état error.
  */
-@customElement('ar-charcounter')
 export class ArCharcounter extends LitElement {
     static override styles = [styles];
     static readonly NAME = 'ArCharcounter';
@@ -239,11 +238,5 @@ export class ArCharcounter extends LitElement {
                 </span>
             </span>
         `;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-charcounter': ArCharcounter;
     }
 }

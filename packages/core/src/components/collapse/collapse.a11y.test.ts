@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArCollapse } from './collapse.js';
-import './collapse.js';
+import './index.js';
 
 describe('ar-collapse — accessibilité', () => {
     let el: ArCollapse;

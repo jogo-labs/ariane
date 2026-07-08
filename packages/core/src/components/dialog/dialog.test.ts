@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDialog } from './dialog.js';
 import { fixture, waitForUpdate, getPart, requireShadow } from '../../test-utils.js';
-import './dialog.js';
+import './index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

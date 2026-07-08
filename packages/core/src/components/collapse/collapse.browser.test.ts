@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArCollapse } from './collapse.js';
-import './collapse.js';
+import './index.js';
 
 const ANIM_MS = 400;
 

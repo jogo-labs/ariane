@@ -8,7 +8,7 @@
  */
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArDialog } from './dialog.js';
-import './dialog.js';
+import './index.js';
 
 function requireShadow(el: Element): ShadowRoot {
     if (!el.shadowRoot) throw new Error(`shadowRoot absent sur <${el.tagName.toLowerCase()}>`);

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDatepicker } from './datepicker.js';
 import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
-import './datepicker.js';
+import './index.js';
 
 describe('ArDatepicker', () => {
     let el: ArDatepicker;

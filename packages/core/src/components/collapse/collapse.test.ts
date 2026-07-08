@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import type { ArCollapse } from './collapse.js';
-import './collapse.js';
+import './index.js';
 
 // happy-dom ne déclenche pas transitionend — prefersReducedMotion=true
 // fait passer show/hide dans la branche synchrone.
