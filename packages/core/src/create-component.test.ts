@@ -99,10 +99,11 @@ describe('create-component.js', () => {
     // ── Création de fichiers ────────────────────────────────────────────────
 
     describe('création de fichiers', () => {
-        it('crée les 3 fichiers du composant (.ts, .styles.ts, .test.ts)', () => {
+        it('crée les 4 fichiers du composant (.ts, index.ts, .styles.ts, .test.ts)', () => {
             runScript(tmpDir, ['tooltip']);
 
             expect(existsSync(join(tmpDir, 'src/components/tooltip/tooltip.ts'))).toBe(true);
+            expect(existsSync(join(tmpDir, 'src/components/tooltip/index.ts'))).toBe(true);
             expect(existsSync(join(tmpDir, 'src/components/tooltip/tooltip.styles.ts'))).toBe(true);
             expect(existsSync(join(tmpDir, 'src/components/tooltip/tooltip.test.ts'))).toBe(true);
         });
@@ -110,13 +111,18 @@ describe('create-component.js', () => {
         it('génère le bon tag name dans le composant', () => {
             runScript(tmpDir, ['tooltip']);
 
-            const content = readFileSync(
+            const componentContent = readFileSync(
                 join(tmpDir, 'src/components/tooltip/tooltip.ts'),
                 'utf-8',
             );
-            expect(content).toContain("@customElement('ar-tooltip')");
-            expect(content).toContain('export class ArTooltip');
-            expect(content).toContain("'ar-tooltip': ArTooltip");
+            expect(componentContent).toContain('export class ArTooltip');
+
+            const indexContent = readFileSync(
+                join(tmpDir, 'src/components/tooltip/index.ts'),
+                'utf-8',
+            );
+            expect(indexContent).toContain("customElements.define('ar-tooltip', ArTooltip)");
+            expect(indexContent).toContain("'ar-tooltip': ArTooltip");
         });
 
         it('génère le bon import dans le fichier de test', () => {
@@ -129,6 +135,7 @@ describe('create-component.js', () => {
             expect(content).toContain('import type { ArTooltip }');
             expect(content).toContain("describe('ArTooltip'");
             expect(content).toContain('<ar-tooltip></ar-tooltip>');
+            expect(content).toContain("import './index.js';");
         });
     });
 
@@ -138,12 +145,17 @@ describe('create-component.js', () => {
         it('ne double pas le prefix si déjà présent', () => {
             runScript(tmpDir, ['ar-tooltip']);
 
-            const content = readFileSync(
+            const componentContent = readFileSync(
                 join(tmpDir, 'src/components/tooltip/tooltip.ts'),
                 'utf-8',
             );
-            expect(content).toContain("@customElement('ar-tooltip')");
-            expect(content).not.toContain('ar-ar-tooltip');
+            const indexContent = readFileSync(
+                join(tmpDir, 'src/components/tooltip/index.ts'),
+                'utf-8',
+            );
+            expect(indexContent).toContain("customElements.define('ar-tooltip'");
+            expect(componentContent).not.toContain('ar-ar-tooltip');
+            expect(indexContent).not.toContain('ar-ar-tooltip');
         });
 
         it('gère les noms composés (my-component → ar-my-component)', () => {
@@ -152,12 +164,19 @@ describe('create-component.js', () => {
             expect(existsSync(join(tmpDir, 'src/components/my-component/my-component.ts'))).toBe(
                 true,
             );
-            const content = readFileSync(
+            const componentContent = readFileSync(
                 join(tmpDir, 'src/components/my-component/my-component.ts'),
                 'utf-8',
             );
-            expect(content).toContain("@customElement('ar-my-component')");
-            expect(content).toContain('export class ArMyComponent');
+            expect(componentContent).toContain('export class ArMyComponent');
+
+            const indexContent = readFileSync(
+                join(tmpDir, 'src/components/my-component/index.ts'),
+                'utf-8',
+            );
+            expect(indexContent).toContain(
+                "customElements.define('ar-my-component', ArMyComponent)",
+            );
         });
 
         it('lit le prefix depuis config.componentPrefix dans package.json', () => {
@@ -167,12 +186,17 @@ describe('create-component.js', () => {
             );
             runScript(tmpDir, ['tooltip']);
 
-            const content = readFileSync(
+            const componentContent = readFileSync(
                 join(tmpDir, 'src/components/tooltip/tooltip.ts'),
                 'utf-8',
             );
-            expect(content).toContain("@customElement('ft-tooltip')");
-            expect(content).toContain('export class FtTooltip');
+            expect(componentContent).toContain('export class FtTooltip');
+
+            const indexContent = readFileSync(
+                join(tmpDir, 'src/components/tooltip/index.ts'),
+                'utf-8',
+            );
+            expect(indexContent).toContain("customElements.define('ft-tooltip'");
         });
     });
 
@@ -210,7 +234,7 @@ describe('create-component.js', () => {
 
             const autoloader = readFileSync(join(tmpDir, 'src/autoloader.ts'), 'utf-8');
             expect(autoloader).toContain(
-                "'ar-tooltip': () => import('./components/tooltip/tooltip.js')",
+                "tooltip: () => import('./components/tooltip/tooltip.js')",
             );
         });
 
@@ -220,7 +244,7 @@ describe('create-component.js', () => {
             runScript(tmpDir, ['tooltip']);
 
             const autoloader = readFileSync(join(tmpDir, 'src/autoloader.ts'), 'utf-8');
-            const matches = autoloader.match(/ar-tooltip/g);
+            const matches = autoloader.match(/tooltip: \(\) => import/g);
             expect(matches).toHaveLength(1);
         });
     });
