@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, html, type CSSResultGroup, svg } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import animationsStyles from '../../styles/animations.styles.js';
 import styles from './spinner.styles.js';
@@ -18,7 +18,6 @@ import { warn } from '../../utils/warn.js';
  *
  * @cssprop [--ar-spinner-stroke-color=currentColor] - Couleur du trait SVG. Hérite de `currentColor` par défaut.
  */
-@customElement('ar-spinner')
 export class ArSpinner extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];
 
@@ -89,11 +88,5 @@ export class ArSpinner extends LitElement {
             <div part="status" role="alert" class="sr-only">
                 <p>${this.done ? this.doneLabel : this.loadingLabel}</p>
             </div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-spinner': ArSpinner;
     }
 }

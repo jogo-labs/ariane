@@ -21,7 +21,7 @@ const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
     'ar-breadcrumb-item': () => import('./components/breadcrumb-item/breadcrumb-item.js'),
     'ar-pagination': () => import('./components/pagination/pagination.js'),
     'ar-progressbar': () => import('./components/progressbar/progressbar.js'),
-    'ar-spinner': () => import('./components/spinner/spinner.js'),
+    'ar-spinner': () => import('./components/spinner/index.js'),
     'ar-stepper': () => import('./components/stepper/stepper.js'),
     'ar-stepper-item': () => import('./components/stepper-item/stepper-item.js'),
     'ar-dialog': () => import('./components/dialog/dialog.js'),

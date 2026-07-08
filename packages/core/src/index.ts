@@ -12,6 +12,7 @@ export { ArAlert } from './components/alert/alert.js';
 export { ArBreadcrumb } from './components/breadcrumb/breadcrumb.js';
 export { ArBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';
 export { ArProgressbar } from './components/progressbar/progressbar.js';
+import './components/spinner/index.js';
 export { ArSpinner } from './components/spinner/spinner.js';
 export { ArPagination } from './components/pagination/pagination.js';
 export { ArStepper } from './components/stepper/stepper.js';
