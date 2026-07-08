@@ -8,6 +8,7 @@ export { whenAllDefined } from './utils/when-all-defined.js';
 export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';
 export { announceA11y } from './a11y/announce-a11y.js';
+import './components/alert/index.js';
 export { ArAlert } from './components/alert/alert.js';
 export { ArBreadcrumb } from './components/breadcrumb/breadcrumb.js';
 export { ArBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';

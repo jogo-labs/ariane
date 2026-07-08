@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ArAlert } from './alert.js';
 import { fixture, waitForUpdate, getPart, requirePart, requireShadow } from '../../test-utils.js';
-import './alert.js';
+import './index.js';
 
 describe('ArAlert', () => {
     let el: ArAlert;
