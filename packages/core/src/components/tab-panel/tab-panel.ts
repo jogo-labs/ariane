@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import styles from './tab-panel.styles.js';
@@ -13,7 +13,6 @@ import styles from './tab-panel.styles.js';
  *
  * @csspart base - Wrapper du slot.
  */
-@customElement('ar-tab-panel')
 export class ArTabPanel extends LitElement {
     static override styles = [styles];
 
@@ -44,11 +43,5 @@ export class ArTabPanel extends LitElement {
 
     override render() {
         return html`<div part="base"><slot></slot></div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab-panel': ArTabPanel;
     }
 }

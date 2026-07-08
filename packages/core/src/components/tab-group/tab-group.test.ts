@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArTabGroup } from './tab-group.js';
-import './tab-group.js';
-import '../tab/tab.js';
-import '../tab-panel/tab-panel.js';
+import './index.js';
+import '../tab/index.js';
+import '../tab-panel/index.js';
 
 const DEFAULT_HTML = `
     <ar-tab-group>

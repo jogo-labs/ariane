@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import type { ArTab } from './tab.js';
-import './tab.js';
+import './index.js';
 
 describe('ArTab', () => {
     let el: ArTab;
