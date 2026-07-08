@@ -3,11 +3,13 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'prerequis',  label: 'Prérequis',         level: 1 as const },
-    { id: 'cdn',        label: 'Via CDN',            level: 1 as const },
-    { id: 'autoloader', label: 'Autoloader',         level: 2 as const },
-    { id: 'bundle',     label: 'Bundle complet',     level: 2 as const },
-    { id: 'npm',        label: 'Setup avancé (npm)', level: 1 as const },
+    { id: 'prerequis',      label: 'Prérequis',         level: 1 as const },
+    { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
+    { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
+    { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
+    { id: 'prefix',         label: 'Renommer les tags',  level: 2 as const },
+    { id: 'npm',            label: 'Setup avancé (npm)', level: 1 as const },
+    { id: 'headless-import', label: 'Import headless',   level: 2 as const },
 ];
 
 const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
@@ -24,13 +26,27 @@ const codeUsage = `<ar-alert version="success">
   <span slot="content">Opération réussie.</span>
 </ar-alert>`;
 
+const codePrefixConfig = `<script>
+  window.ARIANE_CONFIG = { prefix: 'acme' };
+</script>
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
+
+const codePrefixUsage = `<acme-alert version="success">
+  <span slot="title">Succès</span>
+  <span slot="content">Opération réussie.</span>
+</acme-alert>`;
+
 const codeNpmInstall = `npm install @ariane-ui/core`;
 
 const codeNpmGlobal = `import '@ariane-ui/core';
 import '@ariane-ui/core/themes/default.css';`;
 
-const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/alert.js';
+const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.js';
 import '@ariane-ui/core/themes/default.css';`;
+
+const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
+
+customElements.define('acme-alert', ArAlert);`;
 ---
 
 <Layout
@@ -93,6 +109,23 @@ import '@ariane-ui/core/themes/default.css';`;
                 </p>
                 <pre><code class="language-html" set:text={codeBundle} /></pre>
             </section>
+
+            <section id="prefix" class="subsection">
+                <h4 class="subsection-title">Renommer les tags</h4>
+                <p>
+                    Pour éviter toute collision avec une autre librairie, ou adopter votre propre
+                    convention de nommage, définissez <code>window.ARIANE_CONFIG.prefix</code>
+                    <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
+                </p>
+                <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
+                <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
+                <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
+                <p class="hint">
+                    Le préfixe par défaut est <code>ar</code>. Un seul préfixe global s'applique
+                    à tous les composants — pour un renommage libre par composant, voir
+                    l'<a href="#headless-import">import headless</a> côté npm.
+                </p>
+            </section>
         </section>
 
         <section id="npm" class="main-section">
@@ -116,6 +149,23 @@ import '@ariane-ui/core/themes/default.css';`;
                 </h4>
                 <p>Pour inclure uniquement les composants effectivement utilisés :</p>
                 <pre><code class="language-typescript" set:text={codeNpmIndividuel} /></pre>
+            </section>
+
+            <section id="headless-import" class="subsection">
+                <h4 class="subsection-title">
+                    Import headless <span class="badge badge-subtle">Renommage libre</span>
+                </h4>
+                <p>
+                    Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
+                    tags <code>ar-*</code> par défaut, importez les classes depuis
+                    <code>@ariane-ui/core/headless</code> — aucun enregistrement automatique,
+                    vous appelez <code>customElements.define()</code> vous-même :
+                </p>
+                <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
+                <p class="hint">
+                    Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
+                    composant individuellement.
+                </p>
             </section>
         </section>
     </div>
