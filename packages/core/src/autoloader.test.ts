@@ -107,10 +107,24 @@ describe('autoloader — préfixe configurable', () => {
         expect(customElements.get('acme-spinner')).toBeDefined();
     });
 
-    it("charge un composant composé (stepper + stepper-item) sous un préfixe personnalisé et l'enfant est bien retrouvé par le parent", async () => {
+    it('charge un composant composé (stepper + stepper-item imbriqués) sous un préfixe personnalisé et le lien parent/enfant est bien reconstruit', async () => {
         window.ARIANE_CONFIG = { prefix: 'acme' };
-        document.body.innerHTML =
-            '<acme-stepper current-path="/a"><acme-stepper-item path="/a" label="A"></acme-stepper-item></acme-stepper>';
+        // Fixture IMBRIQUÉE : un <acme-stepper-item> enfant à l'intérieur d'un autre.
+        // Un fixture plat (un seul item) ne suffit pas à prouver le fix : l'item
+        // s'enregistre déjà auprès du stepper via le ContextConsumer (@lit/context),
+        // un mécanisme indépendant du nom de tag qui fonctionne même si le fallback
+        // `collectExistingItems()` / `closestInstanceOf()` est cassé. Seule une relation
+        // parent/enfant ENTRE DEUX items exerce `closestInstanceOf()` dans
+        // navigation-tree.controller.ts, qui avant le fix faisait
+        // `item.parentElement?.closest('ar-stepper-item')` — un tag hardcodé qui ne
+        // matche jamais sous le préfixe 'acme'.
+        document.body.innerHTML = `
+            <acme-stepper mode="edit">
+                <acme-stepper-item path="/a" label="A">
+                    <acme-stepper-item path="/a/b" label="B"></acme-stepper-item>
+                </acme-stepper-item>
+            </acme-stepper>
+        `;
         await import('./autoloader.js');
 
         await customElements.whenDefined('acme-stepper');
@@ -120,8 +134,9 @@ describe('autoloader — préfixe configurable', () => {
         expect(customElements.get('acme-stepper-item')).toBeDefined();
 
         const StepperItemClass = customElements.get('acme-stepper-item');
-        const item = document.querySelector('acme-stepper-item');
-        expect(item).toBeInstanceOf(StepperItemClass);
+        const items = document.querySelectorAll('acme-stepper-item');
+        expect(items).toHaveLength(2);
+        items.forEach((item) => expect(item).toBeInstanceOf(StepperItemClass));
 
         const stepper = document.querySelector('acme-stepper') as HTMLElement & {
             updateComplete: Promise<boolean>;
@@ -132,10 +147,15 @@ describe('autoloader — préfixe configurable', () => {
         await stepper.updateComplete;
         await tick();
 
-        // Preuve que le parent a bien retrouvé son enfant sous le préfixe custom :
-        // le <nav part="nav"> n'est rendu que lorsque navigation.tree contient des étapes,
-        // ce qui exige que le lookup interne (hardcodé 'ar-stepper-item' avant le fix) ait
-        // fonctionné sous le préfixe 'acme'.
-        expect(stepper.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
+        // Preuve que le lien parent/enfant a bien été reconstruit sous le préfixe custom :
+        // l'item "B" n'est rendu comme sous-étape imbriquée (un <li class="stepper-item">
+        // dans le <ol class="stepper-list"> DU <li> de "A") QUE si buildFromItems() a réussi
+        // à retrouver le parent de "B" via closestInstanceOf(). Si ce lookup échoue (comme
+        // avec l'ancien `.closest('ar-stepper-item')` hardcodé), "A" et "B" deviennent tous
+        // les deux des racines indépendantes et cette structure imbriquée n'apparaît jamais.
+        const nestedSubstep = stepper.shadowRoot?.querySelector(
+            'li.stepper-item ol.stepper-list li.stepper-item',
+        );
+        expect(nestedSubstep).not.toBeNull();
     });
 });
