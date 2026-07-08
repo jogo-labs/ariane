@@ -87,7 +87,7 @@ if (existsSync(componentDir)) {
 // ─── Templates ────────────────────────────────────────────────────────────────
 
 const componentTemplate = `import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import styles from './${fileName}.styles.js';
 
 /**
@@ -100,7 +100,6 @@ import styles from './${fileName}.styles.js';
  *
  * @event {CustomEvent} ${tagName}-change - Émis lors d'un changement.
  */
-@customElement('${tagName}')
 export class ${className} extends LitElement {
     static override styles = [styles];
 
@@ -112,12 +111,19 @@ export class ${className} extends LitElement {
         \`;
     }
 }
+`;
+
+const indexTemplate = `import { ${className} } from './${fileName}.js';
+
+customElements.define('${tagName}', ${className});
 
 declare global {
     interface HTMLElementTagNameMap {
         '${tagName}': ${className};
     }
 }
+
+export { ${className} };
 `;
 
 const stylesTemplate = `import { css } from 'lit';
@@ -133,7 +139,7 @@ export default css\`
 const testTemplate = `import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ${className} } from './${fileName}.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
-import './${fileName}.js';
+import './index.js';
 
 // ─── Aide-mémoire tests Lit ────────────────────────────────────────────────────
 //
@@ -223,6 +229,11 @@ const files = [
         label: `src/components/${dirName}/${fileName}.ts`,
     },
     {
+        path: join(componentDir, 'index.ts'),
+        content: indexTemplate,
+        label: `src/components/${dirName}/index.ts`,
+    },
+    {
         path: join(componentDir, `${fileName}.styles.ts`),
         content: stylesTemplate,
         label: `src/components/${dirName}/${fileName}.styles.ts`,
@@ -258,10 +269,11 @@ for (const { path, content, label } of files) {
 
 const barrelPath = join(ROOT, 'src', 'index.ts');
 const barrelContent = readFileSync(barrelPath, 'utf-8');
+const sideEffectImportLine = `import './components/${dirName}/index.js';\n`;
 const exportLine = `export { ${className} } from './components/${dirName}/${fileName}.js';\n`;
 
 if (!barrelContent.includes(exportLine)) {
-    writeFileSync(barrelPath, barrelContent + exportLine, 'utf-8');
+    writeFileSync(barrelPath, barrelContent + sideEffectImportLine + exportLine, 'utf-8');
     console.log(`  ✓ src/index.ts mis à jour`);
 }
 
@@ -269,10 +281,10 @@ if (!barrelContent.includes(exportLine)) {
 
 const autoloaderPath = join(ROOT, 'src', 'autoloader.ts');
 const autoloaderContent = readFileSync(autoloaderPath, 'utf-8');
-const autoloaderEntry = `    '${tagName}': () => import('./components/${dirName}/${fileName}.js'),`;
+const autoloaderEntry = `    ${dirName.includes('-') ? `'${dirName}'` : dirName}: () => import('./components/${dirName}/${fileName}.js'),`;
 const marker = '    // ⚠ Mis à jour automatiquement par le script create-component.js';
 
-if (!autoloaderContent.includes(`'${tagName}'`)) {
+if (!autoloaderContent.includes(`import('./components/${dirName}/${fileName}.js')`)) {
     const updated = autoloaderContent.replace(marker, `${autoloaderEntry}\n${marker}`);
     writeFileSync(autoloaderPath, updated, 'utf-8');
     console.log(`  ✓ src/autoloader.ts mis à jour`);
