@@ -8,6 +8,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./headless": {
+      "types": "./dist/headless.d.ts",
+      "default": "./dist/headless.js"
+    },
     "./cdn": "./cdn/index.js",
     "./cdn.prod": "./cdn/index.prod.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
