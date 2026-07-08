@@ -2,7 +2,7 @@
  * Point d'entrée principal du package.
  * Ce fichier est généré/mis à jour par scripts/create-component.js.
  * Pour importer un seul composant (tree-shaking) :
- *   import '@ariane-ui/core/components/alert/alert.js';
+ *   import '@ariane-ui/core/components/alert/index.js';
  */
 export { whenAllDefined } from './utils/when-all-defined.js';
 export { prefersReducedMotion } from './utils/media.js';
