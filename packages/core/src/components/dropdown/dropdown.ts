@@ -1,5 +1,5 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
@@ -44,7 +44,6 @@ export type ArDropdownPlacement =
  * @event {CustomEvent} ar-dropdown-hide    - Émis avant la fermeture (annulable).
  * @event {CustomEvent} ar-dropdown-hidden  - Émis après la fermeture.
  */
-@customElement('ar-dropdown')
 export class ArDropdown extends LitElement {
     static override styles = [panelStyles, styles];
 
@@ -285,11 +284,5 @@ export class ArDropdown extends LitElement {
         });
         this._activeIndex = clamped;
         items[clamped].focus({ preventScroll: true });
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-dropdown': ArDropdown;
     }
 }
