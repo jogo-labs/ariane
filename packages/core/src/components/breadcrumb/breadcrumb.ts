@@ -6,7 +6,7 @@ import {
     nothing,
     type PropertyValues,
 } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
@@ -43,7 +43,6 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
  * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
  */
-@customElement('ar-breadcrumb')
 export class ArBreadcrumb extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, panelStyles, buttonStyles, styles];
 
@@ -234,10 +233,4 @@ export class ArBreadcrumb extends LitElement {
     private _handleMediaChange = (): void => {
         this.isMobile = ArBreadcrumb.mobileQuery.matches;
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-breadcrumb': ArBreadcrumb;
-    }
 }

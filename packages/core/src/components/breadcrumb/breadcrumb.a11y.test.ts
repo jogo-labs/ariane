@@ -7,8 +7,8 @@
  * avant le contrôle axe.
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
-import './breadcrumb.js';
-import '../breadcrumb-item/breadcrumb-item.js';
+import './index.js';
+import '../breadcrumb-item/index.js';
 
 describe('ar-breadcrumb — accessibilité', () => {
     it("fil d'ariane avec plusieurs items est accessible", async () => {

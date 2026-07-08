@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArBreadcrumb } from './breadcrumb.js';
 import { getPart } from '../../test-utils.js';
-import './breadcrumb.js';
-import '../breadcrumb-item/breadcrumb-item.js';
+import './index.js';
+import '../breadcrumb-item/index.js';
 
 type LitEl = { updateComplete: Promise<boolean> };
 

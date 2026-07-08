@@ -1,5 +1,5 @@
 import { LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 
 import { breadcrumbContext, type BreadcrumbRegistry } from '../../context/breadcrumb.context.js';
@@ -9,7 +9,6 @@ import { breadcrumbContext, type BreadcrumbRegistry } from '../../context/breadc
  * @parent ar-breadcrumb
  * @display docs
  */
-@customElement('ar-breadcrumb-item')
 export class ArBreadcrumbItem extends LitElement {
     @property({ type: String }) label = '';
     @property({ type: String }) href?: string;
@@ -45,11 +44,5 @@ export class ArBreadcrumbItem extends LitElement {
 
     override createRenderRoot() {
         return this;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-breadcrumb-item': ArBreadcrumbItem;
     }
 }
