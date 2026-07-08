@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type ArStepperItem } from './stepper-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
-import './stepper-item.js';
+import './index.js';
 
 describe('ArStepperItem', () => {
     let el: ArStepperItem;

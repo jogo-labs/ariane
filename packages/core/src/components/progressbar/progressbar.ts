@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import { warn } from '../../utils/warn.js';
@@ -31,7 +31,6 @@ export class ArProgressbarConfig {
  * @cssprop [--ar-progressbar-fill-color=var(--ar-color-interactive)]  - Couleur de la progression.
  * @cssprop [--ar-progressbar-percent-color=var(--ar-color-text-muted)] - Couleur du texte du pourcentage.
  */
-@customElement('ar-progressbar')
 export class ArProgressbar extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, styles];
 
@@ -82,11 +81,5 @@ export class ArProgressbar extends LitElement {
                 ></div>
             </div>
         </div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-progressbar': ArProgressbar;
     }
 }

@@ -5,7 +5,7 @@ import {
     type CSSResultGroup,
     type PropertyValues,
 } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -72,7 +72,6 @@ export interface ArStepperStepChangeDetail {
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
-@customElement('ar-stepper')
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [
         resetStyles,
@@ -465,10 +464,4 @@ export class ArStepper extends LitElement {
     private handleScrollChange = (event: CustomEvent<string>): void => {
         this.currentPath = event.detail;
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-stepper': ArStepper;
-    }
 }

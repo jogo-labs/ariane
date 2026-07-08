@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, type CSSResultGroup, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
@@ -45,7 +45,6 @@ export interface ArPaginationPageChangeDetail {
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
-@customElement('ar-pagination')
 export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
 
@@ -232,11 +231,5 @@ export class ArPagination extends LitElement {
 
     private _announcePageChange(): void {
         announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-pagination': ArPagination;
     }
 }

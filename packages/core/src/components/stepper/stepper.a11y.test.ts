@@ -7,8 +7,8 @@
  * avant le contrôle axe.
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
-import './stepper.js';
-import '../stepper-item/stepper-item.js';
+import './index.js';
+import '../stepper-item/index.js';
 
 describe('ar-stepper — accessibilité', () => {
     it('stepper desktop (mode create, etape 1) est accessible', async () => {

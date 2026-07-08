@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArProgressbar } from './progressbar.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
-import './progressbar.js';
+import './index.js';
 
 describe('ArProgressbar', () => {
     let el: ArProgressbar;

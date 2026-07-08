@@ -1,5 +1,5 @@
 import { LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
@@ -9,7 +9,6 @@ import { stepperContext, type StepperRegistry } from '../../context/stepper.cont
  * @parent ar-stepper
  * @display docs
  */
-@customElement('ar-stepper-item')
 export class ArStepperItem extends LitElement {
     @property({ type: String }) path = '';
     @property({ type: String }) label = '';
@@ -83,11 +82,5 @@ export class ArStepperItem extends LitElement {
     // Le rendu visuel est délégué à ft-stepper via NavigationNode.
     override createRenderRoot() {
         return this;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-stepper-item': ArStepperItem;
     }
 }
