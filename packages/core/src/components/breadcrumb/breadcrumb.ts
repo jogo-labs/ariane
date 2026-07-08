@@ -14,8 +14,9 @@ import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
-import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
+import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
+import { getRuntimePrefix } from '../../utils/runtime-prefix.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
@@ -97,7 +98,10 @@ export class ArBreadcrumb extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
-        customElements.whenDefined('ar-breadcrumb-item').then(() => this._collectExistingItems());
+        const prefix = getRuntimePrefix(this.tagName, 'breadcrumb');
+        customElements
+            .whenDefined(`${prefix}-breadcrumb-item`)
+            .then(() => this._collectExistingItems());
     }
 
     override disconnectedCallback(): void {
@@ -196,15 +200,17 @@ export class ArBreadcrumb extends LitElement {
     // ---------------------------------------------------------------------------
 
     private get _orderedItems(): ArBreadcrumbItem[] {
-        return [...this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item')];
+        return [...this.querySelectorAll('*')].filter(
+            (el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem,
+        );
     }
 
     private _collectExistingItems(): void {
         const registry = this._provider.value;
         if (!registry) return;
-        this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item').forEach((item) =>
-            item.setRegistry(registry),
-        );
+        [...this.querySelectorAll('*')]
+            .filter((el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem)
+            .forEach((item) => item.setRegistry(registry));
     }
 
     private _scheduleRebuild(): void {

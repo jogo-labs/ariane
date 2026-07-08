@@ -20,8 +20,9 @@ import { NavigationTreeController } from '../../controllers/navigation-tree.cont
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
-import { type ArStepperItem } from '../stepper-item/stepper-item.js';
+import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
+import { getRuntimePrefix } from '../../utils/runtime-prefix.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
 export interface ArStepperStepChangeDetail {
@@ -212,7 +213,8 @@ export class ArStepper extends LitElement {
         this.setupResponsiveMode();
 
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
-        customElements.whenDefined('ar-stepper-item').then(() => {
+        const prefix = getRuntimePrefix(this.tagName, 'stepper');
+        customElements.whenDefined(`${prefix}-stepper-item`).then(() => {
             if (!this.isConnected) return;
             this.collectExistingItems();
         });
@@ -333,9 +335,9 @@ export class ArStepper extends LitElement {
 
     /** Collecte les items déjà présents dans le light DOM (cas du premier render) */
     private collectExistingItems(): void {
-        this.querySelectorAll<ArStepperItem>('ar-stepper-item').forEach((item) =>
-            item.setRegistry(this._registry),
-        );
+        [...this.querySelectorAll('*')]
+            .filter((el): el is ArStepperItem => el instanceof ArStepperItem)
+            .forEach((item) => item.setRegistry(this._registry));
     }
 
     private setupResponsiveMode(): void {

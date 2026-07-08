@@ -1,7 +1,7 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
+import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
@@ -179,7 +179,9 @@ export class ArDropdown extends LitElement {
     }
 
     private _detectMenuMode(): void {
-        this._menuItems = [...this.querySelectorAll<ArDropdownItem>('ar-dropdown-item')];
+        this._menuItems = [...this.querySelectorAll('*')].filter(
+            (el): el is ArDropdownItem => el instanceof ArDropdownItem,
+        );
         this._menuMode = this._menuItems.length > 0;
         if (this._panel) {
             if (this._menuMode) {

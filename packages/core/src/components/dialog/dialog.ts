@@ -39,8 +39,8 @@ if (typeof document !== 'undefined') {
             const trigger = (e.target as Element).closest('[data-ar-dialog-open]');
             if (!trigger) return;
             const id = trigger.getAttribute('data-ar-dialog-open');
-            const target = id ? (document.getElementById(id) as ArDialog | null) : null;
-            if (target?.tagName === 'AR-DIALOG') target.open = true;
+            const target = id ? document.getElementById(id) : null;
+            if (target instanceof ArDialog) target.open = true;
         },
         { capture: true },
     );

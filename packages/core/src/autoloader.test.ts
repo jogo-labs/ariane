@@ -106,4 +106,36 @@ describe('autoloader — préfixe configurable', () => {
         await customElements.whenDefined('acme-spinner');
         expect(customElements.get('acme-spinner')).toBeDefined();
     });
+
+    it("charge un composant composé (stepper + stepper-item) sous un préfixe personnalisé et l'enfant est bien retrouvé par le parent", async () => {
+        window.ARIANE_CONFIG = { prefix: 'acme' };
+        document.body.innerHTML =
+            '<acme-stepper current-path="/a"><acme-stepper-item path="/a" label="A"></acme-stepper-item></acme-stepper>';
+        await import('./autoloader.js');
+
+        await customElements.whenDefined('acme-stepper');
+        await customElements.whenDefined('acme-stepper-item');
+
+        expect(customElements.get('acme-stepper')).toBeDefined();
+        expect(customElements.get('acme-stepper-item')).toBeDefined();
+
+        const StepperItemClass = customElements.get('acme-stepper-item');
+        const item = document.querySelector('acme-stepper-item');
+        expect(item).toBeInstanceOf(StepperItemClass);
+
+        const stepper = document.querySelector('acme-stepper') as HTMLElement & {
+            updateComplete: Promise<boolean>;
+        };
+        // Laisse le temps au fallback collectExistingItems() / au contexte de s'enregistrer
+        // et au rebuildTree() (queueMicrotask) de reconstruire l'arbre de navigation.
+        await stepper.updateComplete;
+        await stepper.updateComplete;
+        await tick();
+
+        // Preuve que le parent a bien retrouvé son enfant sous le préfixe custom :
+        // le <nav part="nav"> n'est rendu que lorsque navigation.tree contient des étapes,
+        // ce qui exige que le lookup interne (hardcodé 'ar-stepper-item' avant le fix) ait
+        // fonctionné sous le préfixe 'acme'.
+        expect(stepper.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
+    });
 });

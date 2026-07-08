@@ -255,7 +255,8 @@ export class ArCollapse extends LitElement {
     private _closeGroupSiblings(): void {
         if (!this.name) return;
         const root = this.getRootNode() as Document | ShadowRoot;
-        root.querySelectorAll<ArCollapse>(`ar-collapse[name='${CSS.escape(this.name)}']`).forEach(
+        const tag = this.tagName.toLowerCase();
+        root.querySelectorAll<ArCollapse>(`${tag}[name='${CSS.escape(this.name)}']`).forEach(
             (el) => {
                 if (el !== this && el.open) el.hide();
             },
