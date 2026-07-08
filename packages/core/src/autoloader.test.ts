@@ -82,3 +82,28 @@ describe('autoloader', () => {
         expect(mockAlertImport).not.toHaveBeenCalled();
     });
 });
+
+// ─── Préfixe configurable via window.ARIANE_CONFIG ─────────────────────────────
+
+describe('autoloader — préfixe configurable', () => {
+    afterEach(() => {
+        delete window.ARIANE_CONFIG;
+        document.body.innerHTML = '';
+        vi.resetModules();
+    });
+
+    it('charge un composant sous le tag ar-x par défaut sans config', async () => {
+        document.body.innerHTML = '<ar-spinner></ar-spinner>';
+        await import('./autoloader.js');
+        await customElements.whenDefined('ar-spinner');
+        expect(customElements.get('ar-spinner')).toBeDefined();
+    });
+
+    it('charge un composant sous le préfixe configuré via window.ARIANE_CONFIG', async () => {
+        window.ARIANE_CONFIG = { prefix: 'acme' };
+        document.body.innerHTML = '<acme-spinner></acme-spinner>';
+        await import('./autoloader.js');
+        await customElements.whenDefined('acme-spinner');
+        expect(customElements.get('acme-spinner')).toBeDefined();
+    });
+});
