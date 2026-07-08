@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
@@ -67,7 +67,6 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  *
  * @event {CustomEvent<{ type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
  */
-@customElement('ar-table-sort')
 export class ArTableSort extends LitElement {
     static override styles = [utilitiesStyles, styles];
 
@@ -186,11 +185,5 @@ export class ArTableSort extends LitElement {
             </button>
             <ar-tooltip for=${this._buttonId}>${label}</ar-tooltip>
         `;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-table-sort': ArTableSort;
     }
 }

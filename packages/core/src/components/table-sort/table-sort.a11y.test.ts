@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArTableSort } from './table-sort.js';
-import './table-sort.js';
+import './index.js';
 
 describe('ar-table-sort — accessibilité', () => {
     // ── Audit axe ─────────────────────────────────────────────────────────

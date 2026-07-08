@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
 import { warn } from '../../utils/warn.js';
 import styles from './tooltip.styles.js';
@@ -42,7 +42,6 @@ export type ArTooltipPlacement =
  * @cssprop [--ar-tooltip-distance=10px] - Espacement entre le trigger et la bulle.
  * @cssprop [--ar-tooltip-offset=var(--ar-anchor-offset)] - Décalage latéral de la bulle.
  */
-@customElement('ar-tooltip')
 export class ArTooltip extends LitElement {
     static override styles = [styles];
 
@@ -205,10 +204,4 @@ export class ArTooltip extends LitElement {
             document.removeEventListener('keydown', this._handleKeyDown);
         }
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tooltip': ArTooltip;
-    }
 }

@@ -11,7 +11,7 @@
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArTooltip } from './tooltip.js';
-import './tooltip.js';
+import './index.js';
 
 function getBubble(el: ArTooltip): HTMLElement {
     const bubble = el.shadowRoot?.querySelector('[part="bubble"]');
