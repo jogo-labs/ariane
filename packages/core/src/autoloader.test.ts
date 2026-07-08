@@ -56,7 +56,7 @@ describe('autoloader', () => {
         expect(mockAlertImport).not.toHaveBeenCalled();
     });
 
-    it('ne charge pas de module pour un tag inconnu de COMPONENT_MAP', async () => {
+    it('ne charge pas de module pour un tag inconnu de COMPONENT_DEFS', async () => {
         appendElement('ar-unknown');
         await tick();
 

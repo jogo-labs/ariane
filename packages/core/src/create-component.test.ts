@@ -34,7 +34,7 @@ function createTmpProject(): string {
     writeFileSync(
         join(dir, 'src', 'autoloader.ts'),
         [
-            'const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {',
+            'const COMPONENT_DEFS: Record<string, () => Promise<unknown>> = {',
             '    // ⚠ Mis à jour automatiquement par le script create-component.js',
             '};',
             '',
@@ -229,7 +229,7 @@ describe('create-component.js', () => {
     // ── Mise à jour de l'autoloader ─────────────────────────────────────────
 
     describe('autoloader', () => {
-        it("ajoute l'entrée dans COMPONENT_MAP", () => {
+        it("ajoute l'entrée dans COMPONENT_DEFS", () => {
             runScript(tmpDir, ['tooltip']);
 
             const autoloader = readFileSync(join(tmpDir, 'src/autoloader.ts'), 'utf-8');

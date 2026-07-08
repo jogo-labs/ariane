@@ -7,7 +7,7 @@
  *   - src/components/<n>/<tagname>.styles.ts
  *   - src/components/<n>/<tagname>.test.ts
  *   - ../../apps/docs/src/content/components/<tagname>.mdx
- *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_MAP)
+ *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_DEFS)
  *
  * Usage (avec config.componentPrefix = "ar" dans package.json) :
  *   npm run create -- spinner         → ar-spinner
