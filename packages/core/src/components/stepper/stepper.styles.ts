@@ -5,6 +5,14 @@ export default css`
         display: none !important;
     }
 
+    ol {
+        margin-top: 0;
+    }
+
+    ol ol {
+        margin-bottom: 0;
+    }
+
     .stepper-dropdown {
         position: relative;
         display: flex;
@@ -70,6 +78,7 @@ export default css`
     }
 
     .stepper-item .stepper-link {
+        color: var(--ar-stepper-link-color);
         text-decoration: none;
     }
 

@@ -9,6 +9,7 @@ import {
 import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import resetStyles from '../../styles/components/reset.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
@@ -45,7 +46,13 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
  */
 export class ArBreadcrumb extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, panelStyles, buttonStyles, styles];
+    static override styles: CSSResultGroup = [
+        utilitiesStyles,
+        resetStyles,
+        panelStyles,
+        buttonStyles,
+        styles,
+    ];
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 

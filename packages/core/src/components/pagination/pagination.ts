@@ -2,6 +2,7 @@ import { LitElement, type TemplateResult, type CSSResultGroup, html } from 'lit'
 import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import resetStyles from '../../styles/components/reset.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
 import { mrPaginationUtils } from './pagination.utils.js';
@@ -46,7 +47,7 @@ export interface ArPaginationPageChangeDetail {
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
 export class ArPagination extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, buttonStyles, styles];
 
     static readonly DEFAULT_CURRENT: number = 1;
     static readonly DEFAULT_TOTAL: number = 5;
