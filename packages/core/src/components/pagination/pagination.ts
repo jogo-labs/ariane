@@ -114,7 +114,7 @@ export class ArPagination extends LitElement {
                 <li part="item" class="pagination-item">
                     <a
                         part="prev"
-                        class="btn btn-tertiary light btn-ratio-square"
+                        class="btn btn-tertiary ${this.variant} btn-ratio-square"
                         href="javascript:;"
                         .ariaDisabled=${isPreviousDisabled}
                         aria-disabled=${isPreviousDisabled}
@@ -141,7 +141,7 @@ export class ArPagination extends LitElement {
                 <li part="item" class="pagination-item">
                     <a
                         part="next"
-                        class="btn btn-tertiary light btn-ratio-square"
+                        class="btn btn-tertiary ${this.variant} btn-ratio-square"
                         href="javascript:;"
                         .ariaDisabled=${isNextDisabled}
                         aria-disabled=${isNextDisabled}
