@@ -78,17 +78,6 @@ export default css`
         color: #9ea2b3 !important;
     }
 
-    .high-contrast .btn[aria-disabled='true'],
-    .high-contrast .btn[aria-disabled='true']:hover {
-        color: var(--ar-color-text-base, #2e2e31) !important;
-        border-color: #b5b8c5 !important;
-    }
-
-    .high-contrast .btn[aria-disabled='true'] .icon,
-    .high-contrast .btn[aria-disabled='true']:hover .icon {
-        color: #71747f !important;
-    }
-
     .btn:not(.btn-link):not(.btn-reset):focus {
         outline: 0;
         -webkit-box-shadow: none;
@@ -186,11 +175,6 @@ export default css`
         }
     }
 
-    .btn-link.high-contrast,
-    .high-contrast .btn-link {
-        color: var(--ar-button-link-contrast, #1644c0);
-    }
-
     a.btn {
         color: var(--ar-button-link-color, #2458e5);
         background-color: transparent;
@@ -221,11 +205,6 @@ export default css`
         color: var(--ar-color-white, #fff);
     }
 
-    .high-contrast .btn-group .btn-primary,
-    .high-contrast .btn-group a.btn-primary {
-        border: 1px solid var(--ar-color-white, #fff);
-    }
-
     .btn-primary:focus,
     .btn-primary:hover,
     a.btn-primary:focus,
@@ -251,24 +230,12 @@ export default css`
         border-color: var(--ar-color-neutral-40, #5b5d65);
     }
 
-    .high-contrast .btn-secondary,
-    .high-contrast a.btn-secondary {
-        border-color: var(--ar-color-text-base, #2e2e31);
-    }
-
     .btn-secondary:focus,
     .btn-secondary:hover,
     a.btn-secondary:focus,
     a.btn-secondary:hover {
         background-color: var(--ar-button-secondary-bg-hover, var(--ar-color-neutral-40, #5b5d65));
         color: var(--ar-color-white, #fff);
-    }
-
-    .high-contrast .btn-secondary:focus,
-    .high-contrast .btn-secondary:hover,
-    .high-contrast a.btn-secondary:focus,
-    .high-contrast a.btn-secondary:hover {
-        background-color: var(--ar-color-neutral-30, #44454b);
     }
 
     .btn-secondary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
@@ -283,10 +250,6 @@ export default css`
         background-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         border-color: var(--ar-color-interactive, var(--ar-color-primary-40, #283276));
         color: var(--ar-color-white, #fff);
-    }
-
-    .high-contrast .btn-group .btn-transverse.dark {
-        border: 1px solid var(--ar-color-white, #fff);
     }
 
     .btn-transverse.dark:hover {
@@ -347,23 +310,12 @@ export default css`
         color: var(--ar-color-text, #2e2e31);
     }
 
-    .high-contrast .btn-tertiary.light,
-    .high-contrast a.btn-tertiary:not([aria-disabled='true']).light {
-        border-color: var(--ar-color-text-base, #2e2e31);
-    }
-
     .btn-tertiary:hover,
     a.btn-tertiary:not([aria-disabled='true']):hover,
     .btn-tertiary.light:hover,
     a.btn-tertiary:not([aria-disabled='true']).light:hover {
         background-color: var(--ar-button-tertiary-bg-hover, rgba(18, 20, 55, 0.7));
         color: var(--ar-color-white, #fff);
-    }
-
-    .high-contrast .btn-tertiary.light:hover,
-    .high-contrast a.btn-tertiary:not([aria-disabled='true']).light:hover {
-        background-color: var(--ar-color-neutral-30, #44454b);
-        border-color: var(--ar-color-neutral-30, #44454b);
     }
 
     .btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
@@ -432,57 +384,6 @@ export default css`
         background-color: hsla(0, 0%, 9%, 0.4);
     }
 
-    .high-contrast .btn-tertiary.dark,
-    .high-contrast a.btn-tertiary:not([aria-disabled='true']).dark {
-        background-color: hsla(0, 0%, 9%, 0.3);
-        border: 1px solid var(--ar-color-white, #fff) !important;
-    }
-
-    .high-contrast .btn-tertiary.dark:hover,
-    .high-contrast a.btn-tertiary:not([aria-disabled='true']).dark:hover {
-        background-color: hsla(0, 0%, 9%, 0.4);
-    }
-
-    .high-contrast
-        .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']).active
-        .high-contrast
-        .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active:focus,
-    .high-contrast
-        .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']).active
-        .high-contrast
-        a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active:focus,
-    .high-contrast
-        .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
-    .high-contrast
-        a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ).active
-        .high-contrast
-        .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active:focus,
-    .high-contrast
-        a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ).active
-        .high-contrast
-        a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active:focus,
-    .high-contrast
-        a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active {
-        background-color: hsla(0, 0%, 9%, 0.6);
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
-        box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
-    }
-
-    .high-contrast .btn-tertiary.dark:focus,
-    .high-contrast a.btn-tertiary:not([aria-disabled='true']).dark:focus {
-        background-color: hsla(0, 0%, 9%, 0.5);
-    }
-
     .btn-ghost,
     a.btn-ghost {
         background-color: transparent;
@@ -532,10 +433,6 @@ export default css`
     .btn-table:focus:not(:focus-visible) {
         outline-offset: 0;
         background-color: var(--ar-button-table-bg-hover, var(--ar-color-neutral-90, #e6e7ec));
-    }
-
-    .high-contrast .btn-table {
-        color: var(--ar-color-text-base, #2e2e31);
     }
 
     .table-rounded .table-sort:first-child > .btn-table {
