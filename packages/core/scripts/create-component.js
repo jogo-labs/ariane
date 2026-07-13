@@ -7,7 +7,8 @@
  *   - src/components/<n>/<tagname>.styles.ts
  *   - src/components/<n>/<tagname>.test.ts
  *   - ../../apps/docs/src/content/components/<tagname>.mdx
- *   Et met à jour src/index.ts (barrel) et src/autoloader.ts (COMPONENT_DEFS)
+ *   Et met à jour src/index.ts (barrel), src/autoloader.ts (COMPONENT_DEFS)
+ *   et src/headless.ts (export de la classe pure)
  *
  * Usage (avec config.componentPrefix = "ar" dans package.json) :
  *   npm run create -- spinner         → ar-spinner
@@ -288,6 +289,17 @@ if (!autoloaderContent.includes(`import('./components/${dirName}/${fileName}.js'
     const updated = autoloaderContent.replace(marker, `${autoloaderEntry}\n${marker}`);
     writeFileSync(autoloaderPath, updated, 'utf-8');
     console.log(`  ✓ src/autoloader.ts mis à jour`);
+}
+
+// ─── Mise à jour du point d'entrée headless ──────────────────────────────────
+
+const headlessPath = join(ROOT, 'src', 'headless.ts');
+const headlessContent = readFileSync(headlessPath, 'utf-8');
+const headlessExportLine = `export { ${className} } from './components/${dirName}/${fileName}.js';\n`;
+
+if (!headlessContent.includes(headlessExportLine)) {
+    writeFileSync(headlessPath, headlessContent + headlessExportLine, 'utf-8');
+    console.log(`  ✓ src/headless.ts mis à jour`);
 }
 
 // ─── Résumé ───────────────────────────────────────────────────────────────────

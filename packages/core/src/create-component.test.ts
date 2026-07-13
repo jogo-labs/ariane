@@ -30,6 +30,9 @@ function createTmpProject(): string {
     // barrel vide
     writeFileSync(join(dir, 'src', 'index.ts'), '// barrel\n');
 
+    // point d'entrée headless vide
+    writeFileSync(join(dir, 'src', 'headless.ts'), '// headless\n');
+
     // autoloader avec marker
     writeFileSync(
         join(dir, 'src', 'autoloader.ts'),
@@ -222,6 +225,32 @@ describe('create-component.js', () => {
             runScript(tmpDir, ['dialog']);
             const barrel = readFileSync(barrelPath, 'utf-8');
             const tooltipMatches = barrel.match(/ArTooltip/g);
+            expect(tooltipMatches).toHaveLength(1);
+        });
+    });
+
+    // ── Mise à jour du point d'entrée headless ──────────────────────────────
+
+    describe('headless (headless.ts)', () => {
+        it("ajoute la ligne d'export dans headless.ts", () => {
+            runScript(tmpDir, ['tooltip']);
+
+            const headless = readFileSync(join(tmpDir, 'src/headless.ts'), 'utf-8');
+            expect(headless).toContain(
+                "export { ArTooltip } from './components/tooltip/tooltip.js';",
+            );
+        });
+
+        it("n'ajoute pas de doublon si le composant existe déjà dans headless.ts", () => {
+            const headlessPath = join(tmpDir, 'src/headless.ts');
+            writeFileSync(
+                headlessPath,
+                "export { ArTooltip } from './components/tooltip/tooltip.js';\n",
+            );
+
+            runScript(tmpDir, ['dialog']);
+            const headless = readFileSync(headlessPath, 'utf-8');
+            const tooltipMatches = headless.match(/ArTooltip/g);
             expect(tooltipMatches).toHaveLength(1);
         });
     });
