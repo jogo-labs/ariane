@@ -45,6 +45,30 @@ export default css`
         }
     }
 
+    /* ── Boutons prev/next/page (tokens scopés au composant) ──────────────────
+     * Sélecteurs volontairement plus spécifiques que a.btn-tertiary.light dans
+     * button.styles.ts (ajout de .pagination + .btn) pour gagner la cascade
+     * indépendamment de l'ordre des styles. Ne cible que les <a> (prev/next/
+     * page non active) — la page courante est un <span>, gérée séparément par
+     * --ar-pagination-active-color ci-dessous. */
+
+    .pagination a.btn.btn-tertiary.light {
+        background-color: var(--ar-pagination-bg);
+    }
+
+    .pagination a.btn.btn-tertiary.light:hover {
+        background-color: var(--ar-pagination-bg-hover);
+    }
+
+    .pagination
+        a.btn.btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
+        background-color: var(--ar-pagination-bg-pressed);
+    }
+
+    .pagination a.btn.btn-tertiary.light:focus {
+        background-color: var(--ar-pagination-bg-focus);
+    }
+
     .pagination-item.active .btn-tertiary {
         z-index: 3;
         color: var(--ar-pagination-active-color);

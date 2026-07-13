@@ -187,6 +187,29 @@ export default [
             flex-shrink: 0;
         }
 
+        /* ── Bouton de fermeture (tokens scopés au composant) ────────────────────
+         * Sélecteurs volontairement plus spécifiques que .btn-tertiary.light dans
+         * button.styles.ts (ajout de [part='close'].btn) pour gagner la cascade
+         * indépendamment de l'ordre des styles. */
+
+        [part='close'].btn.btn-tertiary.light {
+            background-color: var(--ar-dialog-close-bg);
+        }
+
+        [part='close'].btn.btn-tertiary.light:hover {
+            background-color: var(--ar-dialog-close-bg-hover);
+        }
+
+        [part='close'].btn.btn-tertiary.light:not(:disabled):not(.disabled):not(
+                [aria-disabled='true']
+            ):active {
+            background-color: var(--ar-dialog-close-bg-pressed);
+        }
+
+        [part='close'].btn.btn-tertiary.light:focus {
+            background-color: var(--ar-dialog-close-bg-focus);
+        }
+
         /* ── Shake (fermeture bloquée) ────────────────────────────────────────── */
 
         dialog.shake {

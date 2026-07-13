@@ -345,6 +345,10 @@
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
+        --ar-breadcrumb-toggle-bg: var(--ar-button-tertiary-bg);
+        --ar-breadcrumb-toggle-bg-hover: var(--ar-button-tertiary-bg-hover);
+        --ar-breadcrumb-toggle-bg-pressed: var(--ar-button-tertiary-bg-active);
+        --ar-breadcrumb-toggle-bg-focus: var(--ar-button-tertiary-bg-focus);
 
         /* stepper */
         --ar-stepper-distance: var(--ar-anchor-distance);
@@ -365,6 +369,8 @@
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
         --ar-stepper-panel-min-width: var(--ar-panel-min-width);
         --ar-stepper-panel-max-width: var(--ar-panel-max-width);
+        --ar-stepper-trigger-bg: var(--ar-button-secondary-bg);
+        --ar-stepper-trigger-bg-hover: var(--ar-button-secondary-bg-hover);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -373,6 +379,10 @@
 
         /* pagination */
         --ar-pagination-active-color: var(--ar-color-interactive);
+        --ar-pagination-bg: var(--ar-button-tertiary-bg);
+        --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
+        --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
+        --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
 
         /* spinner */
         --ar-spinner-stroke-color: currentColor;
@@ -416,6 +426,10 @@
 
         /* dialog */
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
+        --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
+        --ar-dialog-close-bg-hover: var(--ar-button-tertiary-bg-hover);
+        --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);
+        --ar-dialog-close-bg-focus: var(--ar-button-tertiary-bg-focus);
 
         /* table */
         --ar-table-padding-x: 1rem;

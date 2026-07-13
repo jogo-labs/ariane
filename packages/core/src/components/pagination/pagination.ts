@@ -43,6 +43,10 @@ export interface ArPaginationPageChangeDetail {
  * @csspart next     - Le bouton "Page suivante".
  *
  * @cssprop [--ar-pagination-active-color=var(--ar-color-interactive)] - Couleur de la page active (texte + bordure).
+ * @cssprop [--ar-pagination-bg=var(--ar-button-tertiary-bg)] - Fond des boutons prev/next/page (non actifs).
+ * @cssprop [--ar-pagination-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond des boutons prev/next/page au survol.
+ * @cssprop [--ar-pagination-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond des boutons prev/next/page pressés.
+ * @cssprop [--ar-pagination-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond des boutons prev/next/page au focus.
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */

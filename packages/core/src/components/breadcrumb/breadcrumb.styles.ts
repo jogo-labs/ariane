@@ -146,4 +146,31 @@ export default css`
         min-width: var(--ar-breadcrumb-panel-min-width);
         max-width: var(--ar-breadcrumb-panel-max-width);
     }
+
+    /* ── Boutons trigger/home mobile (tokens scopés au composant) ──────────
+     * #mobile-home-btn gagne la cascade par spécificité d'ID. [part='trigger']
+     * reçoit .btn + l'attribut pour dépasser .btn-tertiary dans
+     * button.styles.ts, indépendamment de l'ordre des styles. */
+
+    #mobile-home-btn,
+    [part='trigger'].btn.btn-tertiary {
+        background-color: var(--ar-breadcrumb-toggle-bg);
+    }
+
+    #mobile-home-btn:hover,
+    [part='trigger'].btn.btn-tertiary:hover {
+        background-color: var(--ar-breadcrumb-toggle-bg-hover);
+    }
+
+    #mobile-home-btn:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
+    [part='trigger'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
+            [aria-disabled='true']
+        ):active {
+        background-color: var(--ar-breadcrumb-toggle-bg-pressed);
+    }
+
+    #mobile-home-btn:focus,
+    [part='trigger'].btn.btn-tertiary:focus {
+        background-color: var(--ar-breadcrumb-toggle-bg-focus);
+    }
 `;
