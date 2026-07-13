@@ -322,25 +322,20 @@
         --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
         --ar-button-disabled-bg: var(--ar-color-neutral-90);
         --ar-button-disabled-border: var(--ar-color-neutral-80);
-        --ar-button-table-bg-hover: var(--ar-color-neutral-90);
-        --ar-button-help-bg: var(--ar-color-blue-50);
+        --ar-button-disabled-color: #71747f;
+        --ar-button-disabled-icon-color: #9ea2b3;
         --ar-button-tertiary-bg: rgba(26, 26, 26, 0.05);
         --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
         --ar-button-tertiary-bg-active: rgba(18, 20, 55, 0.8);
         --ar-button-tertiary-bg-focus: rgba(26, 26, 26, 0.05);
+        --ar-button-link-color: #2458e5;
+        --ar-button-focus-ring-color: var(--ar-color-neutral-20);
         --ar-button-border-radius: var(--ar-border-radius-md);
         --ar-button-font-weight: var(--ar-font-weight-medium);
         --ar-button-height: 2.5rem;
-        --ar-button-sm-height: 2rem;
-        --ar-button-lg-height: 3rem;
         --ar-button-padding-x: 1rem;
-        --ar-button-sm-padding-x: 0.75rem;
-        --ar-button-lg-padding-x: 1.25rem;
         --ar-button-border-radius-pill: 0.75rem;
-        --ar-button-border-radius-sm-pill: 0.5rem;
         --ar-button-ratio-square-width: 2.5rem;
-        --ar-button-ratio-square-sm-width: 2rem;
-        --ar-button-ratio-square-lg-width: 3rem;
 
         /* breadcrumb */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
@@ -580,8 +575,6 @@
         --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
         --ar-button-disabled-bg: var(--ar-color-neutral-30);
         --ar-button-disabled-border: var(--ar-color-neutral-40);
-        --ar-button-table-bg-hover: var(--ar-color-neutral-30);
-        --ar-button-help-bg: var(--ar-color-blue-40);
         --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
         --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
@@ -642,8 +635,6 @@
             --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
             --ar-button-disabled-bg: var(--ar-color-neutral-30);
             --ar-button-disabled-border: var(--ar-color-neutral-40);
-            --ar-button-table-bg-hover: var(--ar-color-neutral-30);
-            --ar-button-help-bg: var(--ar-color-blue-40);
             --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
             --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
