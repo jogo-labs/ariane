@@ -355,6 +355,7 @@
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
+        --ar-stepper-link-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-color: var(--ar-color-text-muted);
         --ar-stepper-active-label-color: var(--ar-color-interactive);
         --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);

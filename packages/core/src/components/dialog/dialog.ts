@@ -8,6 +8,7 @@ import {
 } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import resetStyles from '../../styles/components/reset.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
@@ -76,7 +77,7 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
 export class ArDialog extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, buttonStyles, styles];
 
     // ── Public properties ──────────────────────────────────────────────────────
 
