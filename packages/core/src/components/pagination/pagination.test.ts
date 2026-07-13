@@ -79,6 +79,18 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
             expect(el.getAttribute('variant')).toBe('dark');
         });
+
+        it('prev suit variant="dark"', async () => {
+            el = await fixture('<ar-pagination variant="dark"></ar-pagination>');
+            expect(requirePart(el, 'prev').classList.contains('dark')).toBe(true);
+            expect(requirePart(el, 'prev').classList.contains('light')).toBe(false);
+        });
+
+        it('next suit variant="dark"', async () => {
+            el = await fixture('<ar-pagination variant="dark"></ar-pagination>');
+            expect(requirePart(el, 'next').classList.contains('dark')).toBe(true);
+            expect(requirePart(el, 'next').classList.contains('light')).toBe(false);
+        });
     });
 
     // ── Accessibilité ─────────────────────────────────────────────────────────
