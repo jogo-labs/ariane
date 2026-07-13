@@ -69,6 +69,8 @@ export interface ArStepperStepChangeDetail {
  * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
  * @cssprop [--ar-stepper-distance=var(--ar-anchor-distance)]                                 - Espacement entre le trigger et le panel mobile.
  * @cssprop [--ar-stepper-offset=var(--ar-anchor-offset)]                                     - Décalage latéral du panel mobile.
+ * @cssprop [--ar-stepper-trigger-bg=var(--ar-button-secondary-bg)]                             - Fond du bouton trigger mobile.
+ * @cssprop [--ar-stepper-trigger-bg-hover=var(--ar-button-secondary-bg-hover)]                 - Fond du bouton trigger mobile au survol.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */

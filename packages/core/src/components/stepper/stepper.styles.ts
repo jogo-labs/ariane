@@ -31,6 +31,16 @@ export default css`
         text-align: left;
     }
 
+    /* Tokens scopés au composant — .btn + [part='trigger'] pour dépasser
+     * .btn-secondary dans button.styles.ts, indépendamment de l'ordre des styles. */
+    [part='trigger'].btn.btn-secondary {
+        background-color: var(--ar-stepper-trigger-bg);
+    }
+
+    [part='trigger'].btn.btn-secondary:hover {
+        background-color: var(--ar-stepper-trigger-bg-hover);
+    }
+
     [part='panel'] {
         padding: 0.75rem;
         min-width: var(--ar-stepper-panel-min-width);

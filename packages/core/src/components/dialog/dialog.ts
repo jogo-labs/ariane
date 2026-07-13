@@ -65,6 +65,10 @@ if (typeof document !== 'undefined') {
  * @cssprop [--spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
  * @cssprop [--spacing-block] - Padding haut/bas. Prend le pas sur `--spacing` si défini.
  * @cssprop [--spacing-inline] - Padding gauche/droite. Prend le pas sur `--spacing` si défini.
+ * @cssprop [--ar-dialog-close-bg=var(--ar-button-tertiary-bg)] - Fond du bouton de fermeture.
+ * @cssprop [--ar-dialog-close-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond du bouton de fermeture au survol.
+ * @cssprop [--ar-dialog-close-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton de fermeture pressé.
+ * @cssprop [--ar-dialog-close-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton de fermeture au focus.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
