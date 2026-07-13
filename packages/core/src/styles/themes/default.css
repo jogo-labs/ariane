@@ -345,6 +345,7 @@
         /* breadcrumb */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
         --ar-breadcrumb-offset: var(--ar-anchor-offset);
+        --ar-breadcrumb-color: var(--ar-color-text);
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);

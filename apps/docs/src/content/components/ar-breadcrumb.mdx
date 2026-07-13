@@ -12,15 +12,6 @@ variants:
             <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
             <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
           </ar-breadcrumb>
-    - name: dark
-      label: Thème sombre
-      description: Variante avec le thème sombre activé.
-      html: |
-          <ar-breadcrumb dark>
-            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
-          </ar-breadcrumb>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -71,3 +62,16 @@ breadcrumb.addEventListener('ar-breadcrumb-close', () => console.log('Dropdown f
 ```
 
 Ces événements se déclenchent à chaque changement d'état du dropdown : clic sur le bouton toggle, mise à jour programmatique de la prop `open`, ou fermeture externe (clic en dehors, `Escape`) — pratique pour synchroniser un état d'UI externe ou pour de l'analytics.
+
+### Sur un fond sombre ponctuel
+
+`--ar-breadcrumb-color` hérite du token sémantique `--ar-color-text`, qui s'inverse déjà
+automatiquement avec `[data-theme="dark"]`. Si le breadcrumb est posé sur un fond sombre
+**indépendamment du thème global** (bannière, section à fond coloré...), surchargez le token
+localement pour garantir la lisibilité :
+
+```css
+.hero ar-breadcrumb {
+    --ar-breadcrumb-color: white;
+}
+```

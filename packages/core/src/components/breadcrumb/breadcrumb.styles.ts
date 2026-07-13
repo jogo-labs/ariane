@@ -17,7 +17,7 @@ export default css`
         padding: 0;
         border-radius: 0;
         background-color: transparent;
-        color: var(--ar-color-text);
+        color: var(--ar-breadcrumb-color);
     }
 
     .breadcrumb-link {
@@ -50,12 +50,8 @@ export default css`
     }
 
     .breadcrumb-item.active {
-        color: var(--ar-color-text);
+        color: var(--ar-breadcrumb-color);
         font-weight: 700;
-    }
-
-    .high-contrast .breadcrumb-item.active {
-        color: var(--ar-color-text);
     }
 
     /* ── Desktop layout ──────────────────────────────────────── */
@@ -78,10 +74,6 @@ export default css`
         width: 1px;
         transform: rotate(15deg);
         transform-origin: center;
-    }
-
-    .high-contrast .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item:before {
-        background-color: var(--ar-color-text);
     }
 
     /* ── Mobile layout ───────────────────────────────────────── */
@@ -107,10 +99,6 @@ export default css`
         margin: 0 0.75rem;
         flex-shrink: 0;
         box-shadow: 0 0 0 2px var(--ar-color-bg);
-    }
-
-    .high-contrast .breadcrumb-mobile .breadcrumb-item:before {
-        background-color: var(--ar-color-neutral-50);
     }
 
     .breadcrumb-mobile .breadcrumb-item:first-child:before,
@@ -143,10 +131,6 @@ export default css`
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
-    }
-
-    .high-contrast .breadcrumb-mobile:before {
-        background-image: linear-gradient(var(--ar-color-neutral-70) 25%, transparent 0);
     }
 
     /* ── Wrapper dropdown mobile ────────────────────────────── */

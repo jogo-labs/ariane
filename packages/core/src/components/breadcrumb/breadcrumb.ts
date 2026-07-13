@@ -33,6 +33,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
+ * @cssprop [--ar-breadcrumb-color=var(--ar-color-text)] - Couleur du texte (labels et lien actif). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
  * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
  * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
