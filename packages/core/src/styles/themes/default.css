@@ -379,6 +379,7 @@
 
         /* pagination */
         --ar-pagination-active-color: var(--ar-color-interactive);
+        --ar-pagination-color: var(--ar-color-text);
         --ar-pagination-bg: var(--ar-button-tertiary-bg);
         --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);

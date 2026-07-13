@@ -46,26 +46,30 @@ export default css`
     }
 
     /* ── Boutons prev/next/page (tokens scopés au composant) ──────────────────
-     * Sélecteurs volontairement plus spécifiques que a.btn-tertiary.light dans
+     * Sélecteurs volontairement plus spécifiques que a.btn-tertiary dans
      * button.styles.ts (ajout de .pagination + .btn) pour gagner la cascade
      * indépendamment de l'ordre des styles. Ne cible que les <a> (prev/next/
      * page non active) — la page courante est un <span>, gérée séparément par
-     * --ar-pagination-active-color ci-dessous. */
+     * --ar-pagination-active-color ci-dessous. --ar-pagination-color et
+     * --ar-pagination-bg permettent de rendre la pagination lisible sur un
+     * fond sombre ponctuel, indépendamment du thème global (ex-variant="dark",
+     * retiré au profit de tokens purs — cf. --ar-breadcrumb-color). */
 
-    .pagination a.btn.btn-tertiary.light {
+    .pagination a.btn.btn-tertiary {
+        color: var(--ar-pagination-color);
         background-color: var(--ar-pagination-bg);
     }
 
-    .pagination a.btn.btn-tertiary.light:hover {
+    .pagination a.btn.btn-tertiary:hover {
         background-color: var(--ar-pagination-bg-hover);
     }
 
     .pagination
-        a.btn.btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
+        a.btn.btn-tertiary:not(:disabled):not(.disabled):not([aria-disabled='true']):active {
         background-color: var(--ar-pagination-bg-pressed);
     }
 
-    .pagination a.btn.btn-tertiary.light:focus {
+    .pagination a.btn.btn-tertiary:focus {
         background-color: var(--ar-pagination-bg-focus);
     }
 
@@ -83,6 +87,6 @@ export default css`
         box-shadow: none !important;
         cursor: default !important;
         border-color: transparent !important;
-        color: var(--ar-color-text) !important;
+        color: var(--ar-pagination-color) !important;
     }
 `;

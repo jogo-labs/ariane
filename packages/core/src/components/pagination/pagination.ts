@@ -13,11 +13,7 @@ import { warn } from '../../utils/warn.js';
 export class ArPaginationConfig {
     current?: number = 1;
     total?: number = 5;
-    variant?: ArPaginationVariant = 'light';
 }
-
-/** Variantes de style disponibles */
-export type ArPaginationVariant = 'light' | 'dark';
 
 /** Détail de l'événement émis lors d'un changement de page */
 export interface ArPaginationPageChangeDetail {
@@ -43,6 +39,7 @@ export interface ArPaginationPageChangeDetail {
  * @csspart next     - Le bouton "Page suivante".
  *
  * @cssprop [--ar-pagination-active-color=var(--ar-color-interactive)] - Couleur de la page active (texte + bordure).
+ * @cssprop [--ar-pagination-color=var(--ar-color-text)] - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop [--ar-pagination-bg=var(--ar-button-tertiary-bg)] - Fond des boutons prev/next/page (non actifs).
  * @cssprop [--ar-pagination-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond des boutons prev/next/page au survol.
  * @cssprop [--ar-pagination-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond des boutons prev/next/page pressés.
@@ -55,7 +52,6 @@ export class ArPagination extends LitElement {
 
     static readonly DEFAULT_CURRENT: number = 1;
     static readonly DEFAULT_TOTAL: number = 5;
-    static readonly DEFAULT_VARIANT: ArPaginationVariant = 'light';
 
     /**
      * Numéro de la page courante (commence à 1).
@@ -72,14 +68,6 @@ export class ArPagination extends LitElement {
      */
     @property({ reflect: true, type: Number, useDefault: true })
     total: number = ArPagination.DEFAULT_TOTAL;
-
-    /**
-     * Variante de style. Adapter selon la couleur de fond de la page.
-     * @attr variant
-     * @default 'light'
-     */
-    @property({ reflect: true, type: String, useDefault: true })
-    variant: 'light' | 'dark' = ArPagination.DEFAULT_VARIANT;
 
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('total') && this.total < 1) {
@@ -114,7 +102,7 @@ export class ArPagination extends LitElement {
                 <li part="item" class="pagination-item">
                     <a
                         part="prev"
-                        class="btn btn-tertiary ${this.variant} btn-ratio-square"
+                        class="btn btn-tertiary btn-ratio-square"
                         href="javascript:;"
                         .ariaDisabled=${isPreviousDisabled}
                         aria-disabled=${isPreviousDisabled}
@@ -132,16 +120,16 @@ export class ArPagination extends LitElement {
                         // -1 et -2 sont des sentinelles représentant les ellipses
                         return page === -1 || page === -2
                             ? html` <li part="item" class="pagination-item" aria-hidden="true">
-                                  <span class="btn btn-tertiary ${this.variant}">...</span>
+                                  <span class="btn btn-tertiary">...</span>
                               </li>`
-                            : this.renderPage(page, page === current, this.variant);
+                            : this.renderPage(page, page === current);
                     },
                 )}
 
                 <li part="item" class="pagination-item">
                     <a
                         part="next"
-                        class="btn btn-tertiary ${this.variant} btn-ratio-square"
+                        class="btn btn-tertiary btn-ratio-square"
                         href="javascript:;"
                         .ariaDisabled=${isNextDisabled}
                         aria-disabled=${isNextDisabled}
@@ -156,27 +144,19 @@ export class ArPagination extends LitElement {
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
-    protected renderPage(
-        page: number,
-        active: boolean,
-        variant: ArPaginationVariant = 'light',
-    ): TemplateResult {
+    protected renderPage(page: number, active: boolean): TemplateResult {
         return html` <li part="item" class="pagination-item${active ? ' active' : ''}">
-            ${this.renderPageLink(page, active, variant)}
+            ${this.renderPageLink(page, active)}
         </li>`;
     }
 
     /** Génère le lien ou le span (si page active) d'une page */
-    protected renderPageLink(
-        page: number,
-        active: boolean,
-        variant: ArPaginationVariant = 'light',
-    ): TemplateResult {
+    protected renderPageLink(page: number, active: boolean): TemplateResult {
         if (active) {
             return html` <span
                 part="current"
                 aria-current="true"
-                class="btn btn-tertiary ${variant}"
+                class="btn btn-tertiary"
                 data-ar-pagination-page="${page}"
             >
                 ${this.renderPageLabel(page)}
@@ -184,7 +164,7 @@ export class ArPagination extends LitElement {
         }
         return html` <a
             part="link"
-            class="btn btn-tertiary ${variant}"
+            class="btn btn-tertiary"
             data-ar-pagination-page="${page}"
             href="javascript:;"
         >
