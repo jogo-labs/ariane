@@ -16,7 +16,6 @@ import styles from './breadcrumb.styles.js';
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import { getRuntimePrefix } from '../../utils/runtime-prefix.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
@@ -98,10 +97,13 @@ export class ArBreadcrumb extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
-        const prefix = getRuntimePrefix(this.tagName, 'breadcrumb');
-        customElements
-            .whenDefined(`${prefix}-breadcrumb-item`)
-            .then(() => this._collectExistingItems());
+        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
+        // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
+        // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
+        const tags = new Set([...this.querySelectorAll('*')].map((el) => el.localName));
+        Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() =>
+            this._collectExistingItems(),
+        );
     }
 
     override disconnectedCallback(): void {

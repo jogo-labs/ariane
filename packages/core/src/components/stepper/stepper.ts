@@ -22,7 +22,6 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
-import { getRuntimePrefix } from '../../utils/runtime-prefix.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
 export interface ArStepperStepChangeDetail {
@@ -212,9 +211,11 @@ export class ArStepper extends LitElement {
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
         this.setupResponsiveMode();
 
-        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
-        const prefix = getRuntimePrefix(this.tagName, 'stepper');
-        customElements.whenDefined(`${prefix}-stepper-item`).then(() => {
+        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
+        // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
+        // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
+        const tags = new Set([...this.querySelectorAll('*')].map((el) => el.localName));
+        Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() => {
             if (!this.isConnected) return;
             this.collectExistingItems();
         });
