@@ -11,7 +11,7 @@
  */
 import { expect, fixture, html, aTimeout } from '@open-wc/testing';
 import type { ArDatepicker } from './datepicker.js';
-import './datepicker.js';
+import './index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArPagination, type ArPaginationPageChangeDetail } from './pagination.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
-import './pagination.js';
+import './index.js';
 
 describe('ArPagination', () => {
     let el: ArPagination;

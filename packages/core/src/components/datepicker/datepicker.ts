@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
@@ -93,7 +93,6 @@ import styles from './datepicker.styles.js';
  * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture.
  * @event {CustomEvent} ar-datepicker-hidden         - Après fermeture.
  */
-@customElement('ar-datepicker')
 export class ArDatepicker extends LitElement {
     static override styles = [panelStyles, styles];
     static formAssociated = true;
@@ -827,11 +826,5 @@ export class ArDatepicker extends LitElement {
         } else {
             this._internals?.setValidity({});
         }
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-datepicker': ArDatepicker;
     }
 }

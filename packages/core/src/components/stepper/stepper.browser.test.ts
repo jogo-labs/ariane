@@ -8,8 +8,8 @@
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArStepper } from './stepper.js';
-import './stepper.js';
-import '../stepper-item/stepper-item.js';
+import './index.js';
+import '../stepper-item/index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

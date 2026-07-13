@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArCharcounter } from './charcounter.js';
-import './charcounter.js';
+import './index.js';
 
 describe('ArCharcounter', () => {
     let el: ArCharcounter;

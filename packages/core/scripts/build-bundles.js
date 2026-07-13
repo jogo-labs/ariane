@@ -76,6 +76,7 @@ function toEntryKey(file) {
 
 const entryPoints = {
     index: join(SRC, 'index.ts'),
+    headless: join(SRC, 'headless.ts'),
     ...Object.fromEntries(componentFiles.map((f) => [toEntryKey(f), f])),
 };
 

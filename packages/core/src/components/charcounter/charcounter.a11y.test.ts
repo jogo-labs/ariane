@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArCharcounter } from './charcounter.js';
-import './charcounter.js';
+import './index.js';
 
 describe('ar-charcounter — accessibilité', () => {
     // ── Audit axe ─────────────────────────────────────────────────────────

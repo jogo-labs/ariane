@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import type { ArTab } from '../tab/tab.js';
@@ -27,7 +27,6 @@ import styles from './tab-group.styles.js';
  *
  * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
  */
-@customElement('ar-tab-group')
 export class ArTabGroup extends LitElement {
     static override styles = [styles];
 
@@ -266,11 +265,5 @@ export class ArTabGroup extends LitElement {
         nav.addEventListener('scroll', update, { passive: true });
         this._scrollHintsUnlisten = () => nav.removeEventListener('scroll', update);
         update();
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab-group': ArTabGroup;
     }
 }

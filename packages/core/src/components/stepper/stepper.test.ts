@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ArStepper } from './stepper.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
-import './stepper.js';
-import '../stepper-item/stepper-item.js';
+import './index.js';
+import '../stepper-item/index.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

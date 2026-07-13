@@ -2,19 +2,22 @@
  * Attend que tous les custom elements avec le préfixe donné présents dans le document
  * soient définis dans le registre CustomElementRegistry.
  *
- * @param prefix - Préfixe des tags à attendre (défaut : 'ar-')
+ * @param prefix - Préfixe des tags à attendre. Par défaut, celui configuré via
+ * `window.ARIANE_CONFIG.prefix` (CDN) ou `'ar'` si absent.
  * @returns Promise résolue quand tous les éléments correspondants sont définis.
  *
  * @example
  * import { whenAllDefined } from '@ariane-ui/core';
  * await whenAllDefined();
- * // Tous les ar-* présents dans la page sont prêts
+ * // Tous les ar-* (ou le préfixe configuré via ARIANE_CONFIG) présents dans la page sont prêts
  *
  * @example
  * await whenAllDefined('my-');
  * // Attend les éléments avec un préfixe personnalisé
  */
-export function whenAllDefined(prefix = 'ar-'): Promise<CustomElementConstructor[]> {
+export function whenAllDefined(
+    prefix = `${window.ARIANE_CONFIG?.prefix ?? 'ar'}-`,
+): Promise<CustomElementConstructor[]> {
     const tags = [
         ...new Set(
             [...document.querySelectorAll('*')]

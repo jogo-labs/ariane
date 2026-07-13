@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import styles from './tab.styles.js';
@@ -29,7 +29,6 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
  */
-@customElement('ar-tab')
 export class ArTab extends LitElement {
     static override styles = [styles];
 
@@ -75,11 +74,5 @@ export class ArTab extends LitElement {
 
     override render() {
         return html`<div part="base"><slot></slot></div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab': ArTab;
     }
 }

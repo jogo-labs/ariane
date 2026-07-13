@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDropdown } from './dropdown.js';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
-import './dropdown.js';
-import '../dropdown-item/dropdown-item.js';
+import './index.js';
+import '../dropdown-item/index.js';
 
 // happy-dom does not implement the Popover API — mock showPopover/hidePopover on the panel.
 function mockPanelPopover(el: ArDropdown): void {

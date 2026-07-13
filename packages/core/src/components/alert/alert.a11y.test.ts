@@ -6,7 +6,7 @@
  * fixture() de @open-wc/testing attend déjà updateComplete — aucun délai supplémentaire requis.
  */
 import { fixture, html, expect } from '@open-wc/testing';
-import './alert.js';
+import './index.js';
 
 describe('ar-alert — accessibilité', () => {
     it('version "info" est accessible', async () => {

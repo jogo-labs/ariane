@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 
@@ -51,7 +51,6 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
-@customElement('ar-alert')
 export class ArAlert extends LitElement {
     static override styles = [styles];
 
@@ -199,10 +198,4 @@ export class ArAlert extends LitElement {
         }
         $focusableElement.focus();
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-alert': ArAlert;
-    }
 }

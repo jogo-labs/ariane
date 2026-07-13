@@ -1,5 +1,5 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import styles from './collapse.styles.js';
@@ -30,7 +30,6 @@ export type ArCollapseEvents =
  * @event {CustomEvent} ar-collapse-hide   - Avant la fermeture. Annulable.
  * @event {CustomEvent} ar-collapse-hidden - Après la fin de l'animation de fermeture.
  */
-@customElement('ar-collapse')
 export class ArCollapse extends LitElement {
     static override styles = [styles];
     static readonly NAME = 'ArCollapse';
@@ -256,7 +255,8 @@ export class ArCollapse extends LitElement {
     private _closeGroupSiblings(): void {
         if (!this.name) return;
         const root = this.getRootNode() as Document | ShadowRoot;
-        root.querySelectorAll<ArCollapse>(`ar-collapse[name='${CSS.escape(this.name)}']`).forEach(
+        const tag = this.tagName.toLowerCase();
+        root.querySelectorAll<ArCollapse>(`${tag}[name='${CSS.escape(this.name)}']`).forEach(
             (el) => {
                 if (el !== this && el.open) el.hide();
             },
@@ -347,11 +347,5 @@ export class ArCollapse extends LitElement {
         const e = new CustomEvent(name, { bubbles: true, composed: true, cancelable: true });
         this.dispatchEvent(e);
         return e;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-collapse': ArCollapse;
     }
 }

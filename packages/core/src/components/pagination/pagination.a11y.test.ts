@@ -5,7 +5,7 @@
  * Tests d'accessibilité axe-core pour ar-pagination, via @web/test-runner (Chromium).
  */
 import { fixture, html, expect } from '@open-wc/testing';
-import './pagination.js';
+import './index.js';
 
 describe('ar-pagination — accessibilité', () => {
     it('premiere page est accessible', async () => {

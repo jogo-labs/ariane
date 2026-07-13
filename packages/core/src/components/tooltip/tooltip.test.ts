@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArTooltip } from './tooltip.js';
-import './tooltip.js';
+import './index.js';
 
 // happy-dom ne supporte pas l'API Popover — on mock showPopover/hidePopover sur la bulle.
 function mockBubblePopover(el: ArTooltip): void {

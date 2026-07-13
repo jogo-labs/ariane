@@ -6,8 +6,8 @@
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArDropdown } from './dropdown.js';
-import './dropdown.js';
-import '../dropdown-item/dropdown-item.js';
+import './index.js';
+import '../dropdown-item/index.js';
 
 function getPanel(el: ArDropdown): HTMLElement {
     const panel = el.shadowRoot?.querySelector('[part="panel"]');

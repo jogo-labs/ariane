@@ -15,27 +15,41 @@
  *      éléments qui étaient déjà dans le DOM ont maintenant un shadowRoot (après upgrade).
  */
 
-const COMPONENT_MAP: Record<string, () => Promise<unknown>> = {
-    'ar-alert': () => import('./components/alert/alert.js'),
-    'ar-breadcrumb': () => import('./components/breadcrumb/breadcrumb.js'),
-    'ar-breadcrumb-item': () => import('./components/breadcrumb-item/breadcrumb-item.js'),
-    'ar-pagination': () => import('./components/pagination/pagination.js'),
-    'ar-progressbar': () => import('./components/progressbar/progressbar.js'),
-    'ar-spinner': () => import('./components/spinner/spinner.js'),
-    'ar-stepper': () => import('./components/stepper/stepper.js'),
-    'ar-stepper-item': () => import('./components/stepper-item/stepper-item.js'),
-    'ar-dialog': () => import('./components/dialog/dialog.js'),
-    'ar-dropdown': () => import('./components/dropdown/dropdown.js'),
-    'ar-dropdown-item': () => import('./components/dropdown-item/dropdown-item.js'),
-    'ar-tab-group': () => import('./components/tab-group/tab-group.js'),
-    'ar-tab': () => import('./components/tab/tab.js'),
-    'ar-tab-panel': () => import('./components/tab-panel/tab-panel.js'),
-    'ar-table-sort': () => import('./components/table-sort/table-sort.js'),
-    'ar-charcounter': () => import('./components/charcounter/charcounter.js'),
-    'ar-collapse': () => import('./components/collapse/collapse.js'),
-    'ar-datepicker': () => import('./components/datepicker/datepicker.js'),
+/**
+ * Table nom-de-composant → loader de la classe pure (aucun effet de bord).
+ * Le tag effectivement enregistré est construit dynamiquement avec le préfixe
+ * configuré (voir `prefix` ci-dessous), pas hardcodé ici.
+ */
+const COMPONENT_DEFS: Record<string, () => Promise<Record<string, unknown>>> = {
+    alert: () => import('./components/alert/alert.js'),
+    breadcrumb: () => import('./components/breadcrumb/breadcrumb.js'),
+    'breadcrumb-item': () => import('./components/breadcrumb-item/breadcrumb-item.js'),
+    pagination: () => import('./components/pagination/pagination.js'),
+    progressbar: () => import('./components/progressbar/progressbar.js'),
+    spinner: () => import('./components/spinner/spinner.js'),
+    stepper: () => import('./components/stepper/stepper.js'),
+    'stepper-item': () => import('./components/stepper-item/stepper-item.js'),
+    dialog: () => import('./components/dialog/dialog.js'),
+    dropdown: () => import('./components/dropdown/dropdown.js'),
+    'dropdown-item': () => import('./components/dropdown-item/dropdown-item.js'),
+    'tab-group': () => import('./components/tab-group/tab-group.js'),
+    tab: () => import('./components/tab/tab.js'),
+    'tab-panel': () => import('./components/tab-panel/tab-panel.js'),
+    'table-sort': () => import('./components/table-sort/table-sort.js'),
+    charcounter: () => import('./components/charcounter/charcounter.js'),
+    collapse: () => import('./components/collapse/collapse.js'),
+    datepicker: () => import('./components/datepicker/datepicker.js'),
+    tooltip: () => import('./components/tooltip/tooltip.js'),
     // ⚠ Mis à jour automatiquement par le script create-component.js
 };
+
+/** Préfixe des tags, lu une seule fois au chargement du module. Défaut : 'ar'. */
+const prefix = window.ARIANE_CONFIG?.prefix ?? 'ar';
+
+/** Map inverse tag → nom de composant, construite à partir du préfixe résolu. */
+const TAG_TO_COMPONENT: Record<string, string> = Object.fromEntries(
+    Object.keys(COMPONENT_DEFS).map((name) => [`${prefix}-${name}`, name]),
+);
 
 /** Roots actuellement observés (évite les doublons). */
 const observedRoots = new Set<Node>();
@@ -130,13 +144,29 @@ function scanElement(el: Element): void {
  * les composants enfants qu'il contient.
  */
 async function loadComponent(tagName: string): Promise<void> {
-    if (loaded.has(tagName) || !COMPONENT_MAP[tagName]) return;
+    const componentName = TAG_TO_COMPONENT[tagName];
+    if (loaded.has(tagName) || !componentName) return;
 
     // Marque comme "en cours" immédiatement pour éviter les appels parallèles
     loaded.add(tagName);
 
     try {
-        await COMPONENT_MAP[tagName]();
+        const componentModule = await COMPONENT_DEFS[componentName]();
+        // Le module peut exporter d'autres classes utilitaires (ex. `ArAlertConfig`) en plus
+        // de l'élément lui-même : on prend le premier export qui est un constructeur de
+        // HTMLElement, pas simplement le premier export nommé.
+        const ExportedClass = Object.values(componentModule).find(
+            (value): value is CustomElementConstructor =>
+                typeof value === 'function' && value.prototype instanceof HTMLElement,
+        );
+
+        if (!ExportedClass) {
+            throw new Error(`No HTMLElement constructor exported for component "${componentName}"`);
+        }
+
+        if (!customElements.get(tagName)) {
+            customElements.define(tagName, ExportedClass);
+        }
 
         // Attend que le custom element soit effectivement enregistré dans la registry
         // (le module peut définir l'élément de façon asynchrone dans certains cas)

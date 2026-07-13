@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArSpinner } from './spinner.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
-import './spinner.js';
+import './index.js';
 
 describe('ArSpinner', () => {
     let el: ArSpinner;

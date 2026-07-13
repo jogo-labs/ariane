@@ -5,7 +5,7 @@ import {
     type CSSResultGroup,
     type PropertyValues,
 } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -20,7 +20,7 @@ import { NavigationTreeController } from '../../controllers/navigation-tree.cont
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
-import { type ArStepperItem } from '../stepper-item/stepper-item.js';
+import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
 
 /** Détail de l'événement émis lors d'un changement d'étape */
@@ -72,7 +72,6 @@ export interface ArStepperStepChangeDetail {
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
  */
-@customElement('ar-stepper')
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [
         resetStyles,
@@ -212,8 +211,11 @@ export class ArStepper extends LitElement {
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
         this.setupResponsiveMode();
 
-        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
-        customElements.whenDefined('ar-stepper-item').then(() => {
+        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
+        // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
+        // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
+        const tags = new Set([...this.querySelectorAll('*')].map((el) => el.localName));
+        Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() => {
             if (!this.isConnected) return;
             this.collectExistingItems();
         });
@@ -334,9 +336,9 @@ export class ArStepper extends LitElement {
 
     /** Collecte les items déjà présents dans le light DOM (cas du premier render) */
     private collectExistingItems(): void {
-        this.querySelectorAll<ArStepperItem>('ar-stepper-item').forEach((item) =>
-            item.setRegistry(this._registry),
-        );
+        [...this.querySelectorAll('*')]
+            .filter((el): el is ArStepperItem => el instanceof ArStepperItem)
+            .forEach((item) => item.setRegistry(this._registry));
     }
 
     private setupResponsiveMode(): void {
@@ -465,10 +467,4 @@ export class ArStepper extends LitElement {
     private handleScrollChange = (event: CustomEvent<string>): void => {
         this.currentPath = event.detail;
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-stepper': ArStepper;
-    }
 }

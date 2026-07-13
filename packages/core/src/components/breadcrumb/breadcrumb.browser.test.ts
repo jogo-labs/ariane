@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
-import './breadcrumb.js';
-import '../breadcrumb-item/breadcrumb-item.js';
+import './index.js';
+import '../breadcrumb-item/index.js';
 import type { ArBreadcrumb } from './breadcrumb.js';
 
 function getBtn(el: ArBreadcrumb): HTMLButtonElement {

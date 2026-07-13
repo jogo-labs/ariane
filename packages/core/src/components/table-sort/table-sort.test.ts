@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ArTableSort } from './table-sort.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
-import './table-sort.js';
+import './index.js';
 
 describe('ArTableSort', () => {
     let el: ArTableSort;

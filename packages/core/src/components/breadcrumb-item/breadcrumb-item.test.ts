@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type ArBreadcrumbItem } from './breadcrumb-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
-import './breadcrumb-item.js';
+import './index.js';
 
 describe('ArBreadcrumbItem', () => {
     let el: ArBreadcrumbItem;
