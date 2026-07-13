@@ -54,6 +54,10 @@ describe('ArDialog', () => {
             expect(requireShadow(el).querySelector('[data-ar-dismiss]')).not.toBeNull();
         });
 
+        it('contient part="close"', () => {
+            expect(getPart(el, 'close')).not.toBeNull();
+        });
+
         it("le bouton close n'a pas d'aria-describedby", async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             const closeBtn = requireShadow(el).querySelector('[data-ar-dismiss]');

@@ -56,6 +56,7 @@ if (typeof document !== 'undefined') {
  * @csspart dialog - L'élément <dialog> racine.
  * @csspart header - L'en-tête contenant le titre et le bouton de fermeture.
  * @csspart title - Le titre du dialog.
+ * @csspart close - Le bouton de fermeture dans l'en-tête.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
@@ -242,6 +243,7 @@ export class ArDialog extends LitElement {
                             : headingLabel}
                     </h1>
                     <button
+                        part="close"
                         type="button"
                         class="btn btn-tertiary light btn-ratio-square"
                         data-ar-dismiss
