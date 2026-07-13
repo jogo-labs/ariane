@@ -50,10 +50,6 @@ describe('ArPagination', () => {
         it('total vaut DEFAULT_TOTAL (5)', () => {
             expect(el.total).toBe(ArPagination.DEFAULT_TOTAL);
         });
-
-        it('variant vaut DEFAULT_VARIANT ("light")', () => {
-            expect(el.variant).toBe(ArPagination.DEFAULT_VARIANT);
-        });
     });
 
     // ── Réflexion des attributs ───────────────────────────────────────────────
@@ -73,23 +69,12 @@ describe('ArPagination', () => {
             expect(el.getAttribute('total')).toBe('20');
         });
 
-        it('reflète variant en attribut HTML', async () => {
+        it('ne pose pas de classe light/dark sur prev/next (variant retiré au profit de tokens)', async () => {
             el = await fixture('<ar-pagination></ar-pagination>');
-            el.variant = 'dark';
-            await waitForUpdate(el);
-            expect(el.getAttribute('variant')).toBe('dark');
-        });
-
-        it('prev suit variant="dark"', async () => {
-            el = await fixture('<ar-pagination variant="dark"></ar-pagination>');
-            expect(requirePart(el, 'prev').classList.contains('dark')).toBe(true);
             expect(requirePart(el, 'prev').classList.contains('light')).toBe(false);
-        });
-
-        it('next suit variant="dark"', async () => {
-            el = await fixture('<ar-pagination variant="dark"></ar-pagination>');
-            expect(requirePart(el, 'next').classList.contains('dark')).toBe(true);
+            expect(requirePart(el, 'prev').classList.contains('dark')).toBe(false);
             expect(requirePart(el, 'next').classList.contains('light')).toBe(false);
+            expect(requirePart(el, 'next').classList.contains('dark')).toBe(false);
         });
     });
 
