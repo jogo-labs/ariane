@@ -28,7 +28,7 @@ const panelBaseStyles = css`
     }
 
     [part='panel']:popover-open {
-        animation: arPanelShow 0.2s ease-out;
+        animation: arPanelShow var(--ar-panel-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {

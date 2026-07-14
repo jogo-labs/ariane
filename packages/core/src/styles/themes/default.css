@@ -413,6 +413,7 @@
         --ar-panel-padding: 0.25rem;
         --ar-panel-min-width: 18rem;
         --ar-panel-max-width: 18rem;
+        --ar-panel-show-duration: 0.2s;
 
         /* anchor (partagé — positionnement des composants ancrés / popovers) */
         --ar-anchor-distance: 4px;
