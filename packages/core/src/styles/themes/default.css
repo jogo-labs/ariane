@@ -386,6 +386,7 @@
         --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-pagination-radius: var(--ar-border-radius-lg);
 
         /* spinner */
         --ar-spinner-stroke-color: currentColor;
