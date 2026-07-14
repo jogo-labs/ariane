@@ -3,14 +3,8 @@ import { css } from 'lit';
 export default css`
     .btn {
         position: relative;
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
         display: inline-flex;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
         justify-content: center;
         padding: 0 var(--ar-button-padding-x);
         min-height: var(--ar-button-height);
@@ -24,7 +18,6 @@ export default css`
     }
 
     .btn .icon {
-        -ms-flex-negative: 0;
         flex-shrink: 0;
     }
 
@@ -46,7 +39,6 @@ export default css`
     }
 
     .btn:not(:disabled):not(.disabled):not([aria-disabled='true']):active:focus {
-        -webkit-box-shadow: none;
         box-shadow: none;
     }
 
@@ -56,7 +48,6 @@ export default css`
         background-color: var(--ar-button-disabled-bg) !important;
         border-color: var(--ar-button-disabled-border) !important;
         color: var(--ar-button-disabled-color) !important;
-        -webkit-box-shadow: none;
         box-shadow: none;
         cursor: not-allowed;
     }
@@ -68,12 +59,8 @@ export default css`
 
     .btn:focus {
         outline: 0;
-        -webkit-box-shadow: none;
         box-shadow: none;
         border-color: transparent;
-        -webkit-box-shadow:
-            0 0 0 0.125rem var(--ar-button-focus-ring-color) inset,
-            0 0 0 0.25rem var(--ar-color-white) inset;
         box-shadow:
             inset 0 0 0 0.125rem var(--ar-button-focus-ring-color),
             inset 0 0 0 0.25rem var(--ar-color-white);
@@ -149,7 +136,6 @@ export default css`
         ):active {
         background-color: var(--ar-button-tertiary-bg-active);
         border-color: var(--ar-button-tertiary-bg-active);
-        -webkit-box-shadow: var(--ar-button-tertiary-active-shadow) inset;
         box-shadow: inset var(--ar-button-tertiary-active-shadow);
         color: var(--ar-color-white);
     }
@@ -163,16 +149,12 @@ export default css`
 
     .btn-ratio-square {
         padding: 0;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
         justify-content: center;
         aspect-ratio: 1/1;
         min-width: var(--ar-button-ratio-square-width);
     }
 
     .btn-block {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
     }
 `;
