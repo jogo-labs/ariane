@@ -25,7 +25,7 @@ export default css`
 
     [part='trigger'] {
         padding: 0.5rem 0.75rem;
-        border-radius: 0.75rem;
+        border-radius: var(--ar-stepper-trigger-radius);
         justify-content: space-between;
         line-height: normal;
         text-align: left;
@@ -122,7 +122,7 @@ export default css`
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
         outline-color: var(--ar-color-interactive);
-        border-radius: 0.125rem;
+        border-radius: var(--ar-stepper-link-focus-radius);
     }
 
     .stepper-item.active > .stepper-item-inner {
@@ -151,7 +151,7 @@ export default css`
         margin-bottom: 0;
     }
 
-    .stepper-list:not(.stepper-horizontal) .stepper-item:after {
+    .stepper-list .stepper-item:after {
         width: 2.25rem;
         height: var(--ar-stepper-gap);
         background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
@@ -193,16 +193,6 @@ export default css`
             display: flex !important;
             flex-flow: column !important;
         }
-    }
-
-    .stepper-edition .stepper-item-inner .icon {
-        margin-bottom: 0;
-        margin-left: 0.5rem;
-    }
-
-    .stepper-edition .stepper-item-bullet {
-        color: var(--ar-stepper-bullet-color);
-        background-color: var(--ar-stepper-bullet-bg);
     }
 
     :host([align='right']) .stepper-desktop .stepper-item {

@@ -9,7 +9,7 @@ export default css`
     .pagination {
         padding-left: 0;
         list-style: none;
-        border-radius: 0.5rem;
+        border-radius: var(--ar-pagination-radius);
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;

@@ -296,6 +296,7 @@
         --ar-alert-border-width: 1px;
         --ar-alert-border-style: solid;
         --ar-alert-close-size: 2rem;
+        --ar-alert-close-radius: 7px;
         --ar-alert-close-bg: color-mix(in srgb, currentColor 8%, transparent);
         --ar-alert-close-hover-bg: color-mix(in srgb, currentColor 20%, transparent);
         --ar-alert-info-bg: var(--ar-color-info-bg);
@@ -328,10 +329,7 @@
         --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
         --ar-button-tertiary-bg-active: rgba(18, 20, 55, 0.8);
         --ar-button-tertiary-bg-focus: rgba(26, 26, 26, 0.05);
-        --ar-button-tertiary-dark-bg: hsla(0, 0%, 100%, 0.1);
-        --ar-button-tertiary-dark-bg-hover: hsla(0, 0%, 9%, 0.3);
-        --ar-button-tertiary-dark-bg-active: hsla(0, 0%, 9%, 0.5);
-        --ar-button-tertiary-dark-bg-focus: hsla(0, 0%, 9%, 0.4);
+        --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
         --ar-button-link-color: #2458e5;
         --ar-button-focus-ring-color: var(--ar-color-neutral-20);
         --ar-button-border-radius: var(--ar-border-radius-md);
@@ -359,6 +357,8 @@
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
         --ar-stepper-bullet-radius: 0.75rem;
+        --ar-stepper-trigger-radius: 0.75rem;
+        --ar-stepper-link-focus-radius: 0.125rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
@@ -388,6 +388,7 @@
         --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-pagination-radius: var(--ar-border-radius-lg);
 
         /* spinner */
         --ar-spinner-stroke-color: currentColor;
@@ -535,6 +536,7 @@
 
         /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
+        --ar-datepicker-weekday-font-size: 0.75rem;
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
         --ar-datepicker-day-font-size: 1rem;

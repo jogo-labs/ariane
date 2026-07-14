@@ -11,6 +11,8 @@ export default [
 
             /* Taille modale par défaut (md = 500px). Surchargeable par --width sur l'instance. */
             --width: 500px;
+            /* Padding interne par défaut. Surchargeable par --spacing/--spacing-block/--spacing-inline sur l'instance. */
+            --spacing: 1.25rem;
         }
 
         /* Tailles modal */
@@ -82,7 +84,7 @@ export default [
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            border-radius: 0.5rem;
+            border-radius: var(--ar-border-radius-lg);
             /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
             width: min(var(--width), calc(100vw - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
@@ -146,7 +148,7 @@ export default [
 
         h1 {
             margin: 0;
-            font-size: 1rem;
+            font-size: var(--ar-font-size-md);
             font-weight: 600;
             line-height: 1.4;
             color: inherit;
@@ -171,8 +173,8 @@ export default [
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            padding-block: var(--spacing-block, var(--spacing, 1.25rem));
-            padding-inline: var(--spacing-inline, var(--spacing, 1.25rem));
+            padding-block: var(--spacing-block, var(--spacing));
+            padding-inline: var(--spacing-inline, var(--spacing));
         }
 
         /* ── Footer ───────────────────────────────────────────────────────────── */
@@ -188,25 +190,25 @@ export default [
         }
 
         /* ── Bouton de fermeture (tokens scopés au composant) ────────────────────
-         * Sélecteurs volontairement plus spécifiques que .btn-tertiary.light dans
+         * Sélecteurs volontairement plus spécifiques que .btn-tertiary dans
          * button.styles.ts (ajout de [part='close'].btn) pour gagner la cascade
          * indépendamment de l'ordre des styles. */
 
-        [part='close'].btn.btn-tertiary.light {
+        [part='close'].btn.btn-tertiary {
             background-color: var(--ar-dialog-close-bg);
         }
 
-        [part='close'].btn.btn-tertiary.light:hover {
+        [part='close'].btn.btn-tertiary:hover {
             background-color: var(--ar-dialog-close-bg-hover);
         }
 
-        [part='close'].btn.btn-tertiary.light:not(:disabled):not(.disabled):not(
+        [part='close'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
                 [aria-disabled='true']
             ):active {
             background-color: var(--ar-dialog-close-bg-pressed);
         }
 
-        [part='close'].btn.btn-tertiary.light:focus {
+        [part='close'].btn.btn-tertiary:focus {
             background-color: var(--ar-dialog-close-bg-focus);
         }
 

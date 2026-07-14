@@ -33,6 +33,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures.
  * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures.
  * @cssprop [--ar-alert-close-size=2rem]                           - Taille (width/height) du bouton de fermeture.
+ * @cssprop [--ar-alert-close-radius=7px]                          - Arrondi du bouton de fermeture.
  * @cssprop [--ar-alert-close-bg=color-mix(in srgb, currentColor 8%, transparent)]    - Fond du bouton de fermeture au repos.
  * @cssprop [--ar-alert-close-hover-bg=color-mix(in srgb, currentColor 20%, transparent)] - Fond du bouton de fermeture au survol.
  * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".

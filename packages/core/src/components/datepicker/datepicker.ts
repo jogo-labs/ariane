@@ -68,6 +68,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-footer-btn-hover-border-color] - Couleur de bordure au survol des boutons footer.
  * @cssprop [--ar-datepicker-footer-btn-active-bg]          - Fond à l'état actif des boutons footer.
  * @cssprop [--ar-datepicker-weekday-color]            - Couleur des abréviations de jours.
+ * @cssprop [--ar-datepicker-weekday-font-size]        - Taille de police des abréviations de jours.
  * @cssprop [--ar-datepicker-day-size]                 - Taille des cellules jour.
  * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
  * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.

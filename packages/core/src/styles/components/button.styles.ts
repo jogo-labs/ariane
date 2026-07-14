@@ -128,17 +128,13 @@ export default css`
     }
 
     .btn-tertiary,
-    a.btn-tertiary:not([aria-disabled='true']),
-    .btn-tertiary.light,
-    a.btn-tertiary:not([aria-disabled='true']).light {
+    a.btn-tertiary:not([aria-disabled='true']) {
         background-color: var(--ar-button-tertiary-bg);
         color: var(--ar-color-text);
     }
 
     .btn-tertiary:hover,
-    a.btn-tertiary:not([aria-disabled='true']):hover,
-    .btn-tertiary.light:hover,
-    a.btn-tertiary:not([aria-disabled='true']).light:hover {
+    a.btn-tertiary:not([aria-disabled='true']):hover {
         background-color: var(--ar-button-tertiary-bg-hover);
         color: var(--ar-color-white);
     }
@@ -150,63 +146,19 @@ export default css`
         ).active,
     a.btn-tertiary:not([aria-disabled='true']):not(:disabled):not(.disabled):not(
             [aria-disabled='true']
-        ):active,
-    .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
-    .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
-    a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ).active,
-    a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
         ):active {
         background-color: var(--ar-button-tertiary-bg-active);
         border-color: var(--ar-button-tertiary-bg-active);
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
-        box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+        -webkit-box-shadow: var(--ar-button-tertiary-active-shadow) inset;
+        box-shadow: inset var(--ar-button-tertiary-active-shadow);
         color: var(--ar-color-white);
     }
 
     .btn-tertiary:focus,
-    a.btn-tertiary:not([aria-disabled='true']):focus,
-    .btn-tertiary.light:focus,
-    a.btn-tertiary:not([aria-disabled='true']).light:focus {
+    a.btn-tertiary:not([aria-disabled='true']):focus {
         background-color: var(--ar-button-tertiary-bg-focus);
         border-color: var(--ar-button-tertiary-bg-focus);
         color: var(--ar-color-text);
-    }
-
-    .btn-tertiary.dark,
-    a.btn-tertiary:not([aria-disabled='true']).dark {
-        background-color: var(--ar-button-tertiary-dark-bg);
-        border-width: 0;
-        color: var(--ar-color-white);
-    }
-
-    .btn-tertiary.dark:hover,
-    a.btn-tertiary:not([aria-disabled='true']).dark:hover {
-        background-color: var(--ar-button-tertiary-dark-bg-hover);
-    }
-
-    .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
-    .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
-    .btn-tertiary.dark:not(:disabled):not(.disabled):not([aria-disabled='true']):active:focus,
-    a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ).active,
-    a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active,
-    a.btn-tertiary:not([aria-disabled='true']).dark:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active:focus {
-        background-color: var(--ar-button-tertiary-dark-bg-active);
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
-        box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
-    }
-
-    .btn-tertiary.dark:focus,
-    a.btn-tertiary:not([aria-disabled='true']).dark:focus {
-        background-color: var(--ar-button-tertiary-dark-bg-focus);
     }
 
     .btn-ratio-square {

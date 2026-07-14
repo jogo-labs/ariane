@@ -250,7 +250,7 @@ export class ArDialog extends LitElement {
                     <button
                         part="close"
                         type="button"
-                        class="btn btn-tertiary light btn-ratio-square"
+                        class="btn btn-tertiary btn-ratio-square"
                         data-ar-dismiss
                     >
                         <svg
