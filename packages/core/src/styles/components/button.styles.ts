@@ -128,17 +128,13 @@ export default css`
     }
 
     .btn-tertiary,
-    a.btn-tertiary:not([aria-disabled='true']),
-    .btn-tertiary.light,
-    a.btn-tertiary:not([aria-disabled='true']).light {
+    a.btn-tertiary:not([aria-disabled='true']) {
         background-color: var(--ar-button-tertiary-bg);
         color: var(--ar-color-text);
     }
 
     .btn-tertiary:hover,
-    a.btn-tertiary:not([aria-disabled='true']):hover,
-    .btn-tertiary.light:hover,
-    a.btn-tertiary:not([aria-disabled='true']).light:hover {
+    a.btn-tertiary:not([aria-disabled='true']):hover {
         background-color: var(--ar-button-tertiary-bg-hover);
         color: var(--ar-color-white);
     }
@@ -150,14 +146,6 @@ export default css`
         ).active,
     a.btn-tertiary:not([aria-disabled='true']):not(:disabled):not(.disabled):not(
             [aria-disabled='true']
-        ):active,
-    .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']).active,
-    .btn-tertiary.light:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
-    a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ).active,
-    a.btn-tertiary:not([aria-disabled='true']).light:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
         ):active {
         background-color: var(--ar-button-tertiary-bg-active);
         border-color: var(--ar-button-tertiary-bg-active);
@@ -167,9 +155,7 @@ export default css`
     }
 
     .btn-tertiary:focus,
-    a.btn-tertiary:not([aria-disabled='true']):focus,
-    .btn-tertiary.light:focus,
-    a.btn-tertiary:not([aria-disabled='true']).light:focus {
+    a.btn-tertiary:not([aria-disabled='true']):focus {
         background-color: var(--ar-button-tertiary-bg-focus);
         border-color: var(--ar-button-tertiary-bg-focus);
         color: var(--ar-color-text);

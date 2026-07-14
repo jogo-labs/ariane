@@ -188,25 +188,25 @@ export default [
         }
 
         /* ── Bouton de fermeture (tokens scopés au composant) ────────────────────
-         * Sélecteurs volontairement plus spécifiques que .btn-tertiary.light dans
+         * Sélecteurs volontairement plus spécifiques que .btn-tertiary dans
          * button.styles.ts (ajout de [part='close'].btn) pour gagner la cascade
          * indépendamment de l'ordre des styles. */
 
-        [part='close'].btn.btn-tertiary.light {
+        [part='close'].btn.btn-tertiary {
             background-color: var(--ar-dialog-close-bg);
         }
 
-        [part='close'].btn.btn-tertiary.light:hover {
+        [part='close'].btn.btn-tertiary:hover {
             background-color: var(--ar-dialog-close-bg-hover);
         }
 
-        [part='close'].btn.btn-tertiary.light:not(:disabled):not(.disabled):not(
+        [part='close'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
                 [aria-disabled='true']
             ):active {
             background-color: var(--ar-dialog-close-bg-pressed);
         }
 
-        [part='close'].btn.btn-tertiary.light:focus {
+        [part='close'].btn.btn-tertiary:focus {
             background-color: var(--ar-dialog-close-bg-focus);
         }
 
