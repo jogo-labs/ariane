@@ -47,7 +47,7 @@ export default [
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
 
         dialog::backdrop {
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--ar-dialog-backdrop);
             opacity: 0;
             transition: opacity 0.25s ease;
         }
