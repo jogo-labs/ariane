@@ -338,6 +338,7 @@
         --ar-button-padding-x: 1rem;
         --ar-button-border-radius-pill: 0.75rem;
         --ar-button-ratio-square-width: 2.5rem;
+        --ar-button-transition-duration: 0.15s;
 
         /* breadcrumb */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);

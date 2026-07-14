@@ -15,6 +15,10 @@ export default css`
         font-size: var(--ar-font-size-md);
         line-height: 1;
         font-weight: 500;
+        transition:
+            background-color var(--ar-button-transition-duration),
+            color var(--ar-button-transition-duration),
+            border-color var(--ar-button-transition-duration);
     }
 
     .btn .icon {
