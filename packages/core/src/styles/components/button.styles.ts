@@ -149,8 +149,8 @@ export default css`
         ):active {
         background-color: var(--ar-button-tertiary-bg-active);
         border-color: var(--ar-button-tertiary-bg-active);
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25) inset;
-        box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+        -webkit-box-shadow: var(--ar-button-tertiary-active-shadow) inset;
+        box-shadow: inset var(--ar-button-tertiary-active-shadow);
         color: var(--ar-color-white);
     }
 

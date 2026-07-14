@@ -328,6 +328,7 @@
         --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
         --ar-button-tertiary-bg-active: rgba(18, 20, 55, 0.8);
         --ar-button-tertiary-bg-focus: rgba(26, 26, 26, 0.05);
+        --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
         --ar-button-link-color: #2458e5;
         --ar-button-focus-ring-color: var(--ar-color-neutral-20);
         --ar-button-border-radius: var(--ar-border-radius-md);
