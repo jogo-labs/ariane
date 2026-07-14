@@ -9,19 +9,12 @@ export default css`
     }
 
     .progressbar-container {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
         flex-direction: column;
         row-gap: 0.75rem;
     }
 
     .progress {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
         display: inline-flex;
         position: relative;
         height: 0.5rem;
@@ -35,16 +28,9 @@ export default css`
     }
 
     .progress-label {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
         display: inline-flex;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
         justify-content: space-between;
-        -ms-flex-wrap: nowrap;
         flex-wrap: nowrap;
-        -webkit-column-gap: 2rem;
-        -moz-column-gap: 2rem;
         column-gap: 2rem;
         margin: 0;
     }
@@ -68,7 +54,6 @@ export default css`
 
     .progress-label .progress-percent {
         color: var(--ar-progressbar-percent-color);
-        -ms-flex-negative: 0;
         flex-shrink: 0;
     }
 `;

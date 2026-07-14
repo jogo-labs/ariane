@@ -19,15 +19,10 @@ export default css`
     }
 
     .d-inline-flex {
-        display: -webkit-inline-box !important;
-        display: -ms-inline-flexbox !important;
         display: inline-flex !important;
     }
 
     .flex-column {
-        -webkit-box-orient: vertical !important;
-        -webkit-box-direction: normal !important;
-        -ms-flex-direction: column !important;
         flex-direction: column !important;
     }
 `;
