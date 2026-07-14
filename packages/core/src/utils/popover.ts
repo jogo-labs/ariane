@@ -1,6 +1,7 @@
 import { arrow, computePosition, flip, hide, offset, shift, autoUpdate } from '@floating-ui/dom';
 import type { Placement } from '@floating-ui/dom';
 import type { ReactiveControllerHost } from 'lit';
+import { warn } from './warn.js';
 
 type PopoverPanel = HTMLElement & { showPopover(): void; hidePopover(): void };
 
@@ -73,7 +74,7 @@ export class Popover {
 
     show(): Promise<void> {
         if (!this._panel || !this._trigger) {
-            console.warn('[Popover] show() called before attach()');
+            warn('Popover', 'show() called before attach()');
             return Promise.resolve();
         }
         if (this._isOpen) return Promise.resolve();

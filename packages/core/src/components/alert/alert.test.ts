@@ -244,8 +244,8 @@ describe('ArAlert', () => {
             expect(handler).not.toHaveBeenCalled();
         });
 
-        it('logue une erreur si next-focus pointe vers un ID inexistant', async () => {
-            const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        it('logue un avertissement si next-focus pointe vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-alert next-focus="id-inexistant"></ar-alert>');
 
             (requirePart(el, 'close') as HTMLButtonElement).click();
@@ -272,6 +272,23 @@ describe('ArAlert', () => {
             expect(document.activeElement).toBe(target);
 
             target.remove();
+        });
+    });
+
+    // ── next-focus invalide ──────────────────────────────────────────────────
+
+    describe('next-focus invalide', () => {
+        it("n'appelle pas console.error directement", async () => {
+            el = await fixture(
+                '<ar-alert next-focus="id-inexistant"><span slot="close-icon">x</span></ar-alert>',
+            );
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const closeButton = getPart(el, 'close') as HTMLButtonElement;
+
+            closeButton.click();
+
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+            consoleErrorSpy.mockRestore();
         });
     });
 });

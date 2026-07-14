@@ -6,6 +6,8 @@ import { ArStepperItem } from '../components/stepper-item/stepper-item.js';
 
 import { computeNavigationStates } from '../state/navigation-state.engine.js';
 
+import { warn } from '../utils/warn.js';
+
 function closestInstanceOf<T extends HTMLElement>(
     el: HTMLElement,
     ctor: new (...args: never[]) => T,
@@ -58,7 +60,7 @@ export class NavigationTreeController implements ReactiveController {
 
         sorted.forEach((item) => {
             if (this.nodeMap.has(item.path)) {
-                console.warn(`[ar-stepper] duplicate path "${item.path}"`);
+                warn('ar-stepper', `duplicate path "${item.path}"`);
             }
 
             const node: NavigationNode = {

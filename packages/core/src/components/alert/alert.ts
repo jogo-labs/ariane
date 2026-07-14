@@ -2,6 +2,7 @@ import { LitElement, type TemplateResult, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
+import { warn } from '../../utils/warn.js';
 
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
@@ -192,8 +193,9 @@ export class ArAlert extends LitElement {
             `${(this.nextFocus as string).replace('#', '')}`,
         );
         if (!$focusableElement) {
-            console.error(
-                `${ArAlert.NAME} - L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
+            warn(
+                ArAlert.NAME,
+                `L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
             );
             return;
         }

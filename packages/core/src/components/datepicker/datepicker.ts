@@ -6,6 +6,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
+import { warn } from '../../utils/warn.js';
 
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
@@ -198,8 +199,8 @@ export class ArDatepicker extends LitElement {
             if (this._skipNextOpenChange) {
                 this._skipNextOpenChange = false;
             } else if (this.open) {
-                void this._show().catch((e) => {
-                    if (__DEV__) console.error('[ar-datepicker]', e);
+                void this._show().catch((e: unknown) => {
+                    warn('ar-datepicker', String(e));
                 });
             } else {
                 this._hide();
