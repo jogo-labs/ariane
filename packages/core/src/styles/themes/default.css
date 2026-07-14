@@ -534,6 +534,7 @@
 
         /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
+        --ar-datepicker-weekday-font-size: 0.75rem;
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
         --ar-datepicker-day-font-size: 1rem;
