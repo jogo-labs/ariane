@@ -120,9 +120,40 @@ Classés par impact utilisateur, à traiter avant toute release beta.
 
 ---
 
-## Recommandation de priorisation
+## Décisions de priorisation (2026-07-14, actées avec l'utilisateur)
 
-1. **Transversaux #1, #3, #5, #6** — un seul correctif chacun peut couvrir plusieurs composants ; #3 (conventions d'events) est le plus structurant pour la "cohérence API" visée par cette passe et mérite une décision explicite avant toute correction ponctuelle.
-2. **Bloquants beta** (tableau ci-dessus) — 7 constats, tous à fort impact utilisateur (crash, vol de focus, navigation cassée, état ARIA incohérent, rendu cassé).
-3. **i18n (#2)** — décision de fond déjà actée en amont (traiter conjointement au chantier #80) : cette passe fournit l'inventaire précis des libellés concernés, pas une raison de rouvrir la décision de scope.
-4. **"À corriger" et dette notée** — au fil de l'eau, une fois les deux premiers points traités.
+### Convention cible — events de disclosure (show/hide)
+
+Généraliser le pattern déjà majoritaire (`dropdown`, `dialog`, `collapse`) à tous les composants d'ouverture/fermeture :
+
+- `<composant>-show` (annulable, avant le changement) → `<composant>-shown` (après, non annulable)
+- `<composant>-hide` (annulable, avant le changement) → `<composant>-hidden` (après, non annulable)
+- `detail: { id }` systématique (aligné sur `ar-dialog`, qui le fait déjà)
+
+**Composants impactés (breaking change assumé, alpha)** :
+
+- `ar-breadcrumb` — actuellement `ar-breadcrumb-open`/`ar-breadcrumb-close` (non annulables) → migrer vers `show`/`shown`/`hide`/`hidden`
+- `ar-tooltip` — n'émet aucun event → ajouter `ar-tooltip-shown`/`ar-tooltip-hidden` (pas de version annulable : la doc constate qu'un tooltip n'a pas de raison métier d'annuler son ouverture, à documenter comme choix volontaire)
+- `ar-dropdown` — déjà `show`/`hide`, à compléter avec `detail: { id }` (actuellement absent)
+
+### Convention cible — events de changement de valeur
+
+Suffixe unique `-change` (aligne `ar-stepper`, actuellement `-changed`). Le `detail` garde une clé sémantique par domaine (`path` pour stepper, `active` pour tab-group, forme actuelle de `table-sort` à vérifier/aligner) plutôt qu'une clé `value` uniforme forcée.
+
+**Composants impactés** : `ar-stepper` (event renommé `ar-stepper-step-change`).
+
+### Autres conventions mécaniques tranchées
+
+- **`aria-disabled` (#4)** : un seul mécanisme — attribut `aria-disabled=${... : nothing}` uniquement (pattern déjà utilisé par `table-sort`). Retirer la propriété IDL `.ariaDisabled` dupliquée sur `pagination`.
+- **Préfixage CSS `ar-dialog` (#8)** : renommer `--width`/`--spacing`/`--spacing-block`/`--spacing-inline` en `--ar-dialog-width`/`--ar-dialog-spacing*`, breaking change CSS assumé (alpha).
+- **`for` shadow DOM (#5)** : aligner `ar-dropdown` sur le pattern déjà validé de `ar-tooltip` (`getRootNode().getElementById()`).
+- **`aria-controls` (#6)** : généraliser la pose de `aria-controls` sur le trigger dans `AnchoredController.attach()`, sur le modèle de `ar-collapse._syncTriggerAria`.
+
+## Découpage en PR (ordre d'exécution)
+
+1. **PR 1 — Transversaux mécaniques** : #1 (`warn()` partout), #5 (`for` shadow DOM sur dropdown), #6 (`aria-controls` via `AnchoredController`), #4 (`aria-disabled` unifié), #8 (préfixage `ar-dialog`), #7 (`@cssprop` manquants + tokens datepicker à définir dans le thème — ce dernier point recoupe aussi un bloquant beta, traité ici en amont).
+2. **PR 2 — Convention d'events unifiée** : disclosure (show/shown/hide/hidden + detail id) sur `breadcrumb`/`tooltip`/`dropdown`, renommage `stepper-step-change`. Isolée car breaking change API le plus visible pour les consommateurs.
+3. **PR 3 — Bloquants beta restants** : `ar-alert` (vol de focus), `ar-pagination` (crash `total` négatif), `ar-table-sort` (dépendance `ar-tooltip` non importée), `ar-stepper` (navigation `href` cassée), `ar-tab` (désync `disabled` à chaud). Chacun isolé, testable indépendamment.
+4. **PR 4 (optionnelle, à discuter après 1-3)** — "à corriger" notables restants + dette notée jugée pertinente avant beta.
+
+**Hors scope de ce chantier** : i18n (#2) — traité avec #80 comme déjà acté ; le reste de la dette notée reste documentée ci-dessus sans action immédiate.
