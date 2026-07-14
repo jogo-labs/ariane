@@ -10,13 +10,8 @@ export default css`
         padding-left: 0;
         list-style: none;
         border-radius: var(--ar-pagination-radius);
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
         justify-content: center;
-        -ms-flex-wrap: wrap;
         flex-wrap: wrap;
         margin-bottom: 0;
     }
@@ -24,14 +19,8 @@ export default css`
     .pagination .btn-tertiary {
         aspect-ratio: 1/1;
         padding: 0;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
         justify-content: center;
         margin: 0 0.125rem;
     }
@@ -83,7 +72,6 @@ export default css`
 
     .pagination-item[aria-hidden='true'] .btn-tertiary:not([aria-disabled='true']) {
         background: none !important;
-        -webkit-box-shadow: none !important;
         box-shadow: none !important;
         cursor: default !important;
         border-color: transparent !important;
