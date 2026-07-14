@@ -35,7 +35,7 @@ const tooltipStyles = css`
     }
 
     [part='bubble']:popover-open {
-        animation: arPanelShow 0.15s ease-out;
+        animation: arPanelShow var(--ar-panel-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {
