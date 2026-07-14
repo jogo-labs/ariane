@@ -151,7 +151,7 @@ export default css`
         margin-bottom: 0;
     }
 
-    .stepper-list:not(.stepper-horizontal) .stepper-item:after {
+    .stepper-list .stepper-item:after {
         width: 2.25rem;
         height: var(--ar-stepper-gap);
         background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
@@ -193,16 +193,6 @@ export default css`
             display: flex !important;
             flex-flow: column !important;
         }
-    }
-
-    .stepper-edition .stepper-item-inner .icon {
-        margin-bottom: 0;
-        margin-left: 0.5rem;
-    }
-
-    .stepper-edition .stepper-item-bullet {
-        color: var(--ar-stepper-bullet-color);
-        background-color: var(--ar-stepper-bullet-bg);
     }
 
     :host([align='right']) .stepper-desktop .stepper-item {
