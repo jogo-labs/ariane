@@ -47,7 +47,7 @@ Pour chaque composant avec une paire annulable (`breadcrumb`) : test qu'appeler 
 
 Pour `breadcrumb` et `tooltip` : test que `shown`/`hidden` portent `detail: { id }` avec l'id de l'hôte.
 
-Pour `stepper` : test négatif — `step-changed` (sans préfixe `ar-`) n'est plus émis du tout (regression guard direct sur le bug corrigé). Si un consommateur interne du composant écoutait `step-changed` en interne (voir `stepper.test.ts:161` mentionné dans l'audit), vérifier son rôle exact avant suppression et migrer si nécessaire.
+Pour `stepper` : test négatif — `step-changed` (sans préfixe `ar-`) n'est plus émis du tout (regression guard direct sur le bug corrigé, remplace le test dédié supprimé de `stepper.test.ts:152-169`).
 
 ## Documentation
 
