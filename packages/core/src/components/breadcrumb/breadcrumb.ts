@@ -112,7 +112,11 @@ export class ArBreadcrumb extends LitElement {
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
         // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
-        const tags = new Set([...this.querySelectorAll('*')].map((el) => el.localName));
+        const tags = new Set(
+            [...this.querySelectorAll('*')]
+                .map((el) => el.localName)
+                .filter((tag) => tag.includes('-')),
+        );
         Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() =>
             this._collectExistingItems(),
         );
