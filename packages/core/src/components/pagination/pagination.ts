@@ -88,8 +88,10 @@ export class ArPagination extends LitElement {
 
     override render(): TemplateResult {
         // Garde défensive : total/current invalides sont déjà signalés par warn() dans
-        // updated(), mais render() doit rester fonctionnel (pas de RangeError sur
-        // Array.from({ length: total < 0 ... })).
+        // updated(), mais render() doit rester fonctionnel — sans ce clamp, un total
+        // négatif produit des numéros de page négatifs affichés (previousPageNumber/
+        // nextPageNumber) et une liste de pages vide, sans qu'aucune erreur ne le
+        // signale à l'exécution.
         const total = Math.max(this.total, 1);
         const current = mrPaginationUtils._clamp(this.current, 1, total);
         const isNextDisabled = current >= total;
