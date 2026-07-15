@@ -215,6 +215,30 @@ describe('ArTabGroup', () => {
 
             expect(tabB.getAttribute('aria-disabled')).toBe('true');
         });
+
+        it("réconcilie active et émet ar-tab-group-change quand l'onglet actif devient disabled", async () => {
+            el = await fixture(`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">Tab A</ar-tab>
+                    <ar-tab panel="b">Tab B</ar-tab>
+                    <ar-tab-panel name="a">Panel A</ar-tab-panel>
+                    <ar-tab-panel name="b">Panel B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            await waitForUpdate(el);
+
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-tab-group-change', (e) => events.push(e as CustomEvent));
+
+            const tabA = el.querySelector<ArTab>('ar-tab[panel="a"]')!;
+            tabA.disabled = true;
+            await waitForUpdate(el);
+
+            expect(el.active).not.toBe('a');
+            expect(el.active).toBe('b');
+            expect(events.length).toBe(1);
+            expect(events[0].detail).toEqual({ active: 'b' });
+        });
     });
 
     // ── Événement ─────────────────────────────────────────────────────────
