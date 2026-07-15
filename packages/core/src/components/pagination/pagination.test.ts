@@ -368,5 +368,12 @@ describe('ArPagination', () => {
 
             expect(spy).not.toHaveBeenCalled();
         });
+
+        it('ne lève pas de RangeError quand total est négatif (render() reste fonctionnel)', async () => {
+            el = await fixture('<ar-pagination total="-3"></ar-pagination>');
+            // Si render() a jeté une RangeError, la ligne ci-dessus a déjà fait échouer le test —
+            // cette assertion vérifie en plus que le composant est retombé sur un état affichable.
+            expect(el.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
+        });
     });
 });

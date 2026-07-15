@@ -87,15 +87,19 @@ export class ArPagination extends LitElement {
     }
 
     override render(): TemplateResult {
-        const isNextDisabled = this.current >= this.total;
-        const isPreviousDisabled = this.current <= 1;
+        // Garde défensive : total/current invalides sont déjà signalés par warn() dans
+        // updated(), mais render() doit rester fonctionnel (pas de RangeError sur
+        // Array.from({ length: total < 0 ... })).
+        const total = Math.max(this.total, 1);
+        const current = mrPaginationUtils._clamp(this.current, 1, total);
+        const isNextDisabled = current >= total;
+        const isPreviousDisabled = current <= 1;
         const previousPageNumber = mrPaginationUtils._clamp(
-            this.current - 1,
+            current - 1,
             1,
-            this.total > 1 ? this.total - 1 : 1,
+            total > 1 ? total - 1 : 1,
         );
-        const nextPageNumber = mrPaginationUtils._clamp(this.current + 1, 1, this.total);
-        const current = mrPaginationUtils._clamp(this.current, 1, this.total);
+        const nextPageNumber = mrPaginationUtils._clamp(current + 1, 1, total);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
@@ -114,7 +118,7 @@ export class ArPagination extends LitElement {
                 </li>
 
                 ${repeat(
-                    mrPaginationUtils._calculatePages(this.current, this.total),
+                    mrPaginationUtils._calculatePages(current, total),
                     (page) => page,
                     (page) => {
                         // -1 et -2 sont des sentinelles représentant les ellipses
