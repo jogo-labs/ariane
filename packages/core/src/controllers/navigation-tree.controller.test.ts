@@ -86,7 +86,7 @@ describe('NavigationTreeController', () => {
         ctrl.setCurrentPath('/b');
 
         expect(ctrl.currentNode?.path).toBe('/b');
-        expect(host.requestUpdate).toHaveBeenCalledTimes(1); // setCurrentPath seulement
+        expect(host.requestUpdate).toHaveBeenCalledOnce(); // setCurrentPath seulement
     });
 
     it('setCurrentPath() ne fait rien si le path est identique', () => {
