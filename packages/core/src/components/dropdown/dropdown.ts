@@ -151,7 +151,8 @@ export class ArDropdown extends LitElement {
 
     private get _resolvedTrigger(): HTMLElement | null {
         if (this.for) {
-            return document.getElementById(this.for);
+            const root = this.getRootNode() as Document | ShadowRoot;
+            return root.getElementById(this.for);
         }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
