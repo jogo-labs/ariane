@@ -388,4 +388,21 @@ describe('ArDropdown', () => {
             host.remove();
         });
     });
+
+    describe('detail des events de cycle de vie', () => {
+        it('ar-dropdown-shown porte detail.id', async () => {
+            el = await fixture('<ar-dropdown id="my-dropdown"><div>Contenu</div></ar-dropdown>');
+            mockPanelPopover(el);
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(shownHandler).toHaveBeenCalledTimes(1);
+            const event = shownHandler.mock.calls[0][0] as CustomEvent;
+            expect(event.detail).toEqual({ id: 'my-dropdown' });
+        });
+    });
 });
