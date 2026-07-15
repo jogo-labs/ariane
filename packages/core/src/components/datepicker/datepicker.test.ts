@@ -470,4 +470,25 @@ describe('ArDatepicker', () => {
             }),
         );
     });
+
+    describe('fonds par défaut du calendrier (thème)', () => {
+        it('default.css définit --ar-datepicker-header-bg, -day-bg et -footer-bg', async () => {
+            // Lecture directe du fichier source : le thème n'est pas chargé dans
+            // l'environnement de test (happy-dom), voir vitest.config.ts.
+            // `new URL(relative, import.meta.url)` est évité car happy-dom remplace le
+            // constructeur URL global et résout la base sur `window.location` au lieu
+            // de l'argument fourni — on passe donc par node:url/node:path.
+            const { readFileSync } = await import('node:fs');
+            const { fileURLToPath } = await import('node:url');
+            const { dirname, join } = await import('node:path');
+            const themePath = join(
+                dirname(fileURLToPath(import.meta.url)),
+                '../../styles/themes/default.css',
+            );
+            const themeCss = readFileSync(themePath, 'utf-8');
+            expect(themeCss).toMatch(/--ar-datepicker-header-bg:/);
+            expect(themeCss).toMatch(/--ar-datepicker-day-bg:/);
+            expect(themeCss).toMatch(/--ar-datepicker-footer-bg:/);
+        });
+    });
 });

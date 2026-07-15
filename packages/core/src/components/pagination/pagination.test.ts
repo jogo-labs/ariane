@@ -112,6 +112,15 @@ describe('ArPagination', () => {
         });
     });
 
+    describe('aria-disabled', () => {
+        it('pose uniquement l\'attribut aria-disabled sur le lien "prev" à la première page', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const prevLink = getPart(el, 'prev') as HTMLAnchorElement;
+
+            expect(prevLink.getAttribute('aria-disabled')).toBe('true');
+        });
+    });
+
     // ── Pages affichées ───────────────────────────────────────────────────────
 
     describe('pages affichées', () => {

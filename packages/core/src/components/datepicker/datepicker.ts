@@ -6,6 +6,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
+import { warn } from '../../utils/warn.js';
 
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
@@ -48,6 +49,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-header-padding]           - Padding de l'en-tête.
  * @cssprop [--ar-datepicker-header-margin]            - Margin de l'en-tête.
  * @cssprop [--ar-datepicker-header-radius]            - Border-radius de l'en-tête.
+ * @cssprop [--ar-datepicker-header-bg=transparent]     - Fond de l'en-tête.
  * @cssprop [--ar-datepicker-nav-btn-size]                  - Taille (width = height) des boutons nav.
  * @cssprop [--ar-datepicker-nav-btn-bg]                    - Fond des boutons de navigation.
  * @cssprop [--ar-datepicker-nav-btn-border-width]          - Épaisseur de bordure des boutons nav.
@@ -57,6 +59,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-nav-btn-hover-bg]              - Fond au survol des boutons nav.
  * @cssprop [--ar-datepicker-nav-btn-active-bg]             - Fond à l'état actif des boutons nav.
  * @cssprop [--ar-datepicker-footer-padding]                - Padding du footer.
+ * @cssprop [--ar-datepicker-footer-bg=transparent]          - Fond du footer.
  * @cssprop [--ar-datepicker-footer-margin]                 - Margin du footer.
  * @cssprop [--ar-datepicker-footer-btn-bg]                 - Fond des boutons du footer.
  * @cssprop [--ar-datepicker-footer-btn-border-width]       - Épaisseur de bordure des boutons footer.
@@ -72,6 +75,7 @@ import styles from './datepicker.styles.js';
  * @cssprop [--ar-datepicker-day-size]                 - Taille des cellules jour.
  * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
  * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.
+ * @cssprop [--ar-datepicker-day-bg=transparent]        - Fond des cellules jour.
  * @cssprop [--ar-datepicker-day-border-width]         - Épaisseur de bordure des cellules jour.
  * @cssprop [--ar-datepicker-day-border-color]         - Couleur de bordure par défaut des cellules jour.
  * @cssprop [--ar-datepicker-day-other-month-color]    - Couleur des jours hors du mois affiché.
@@ -198,8 +202,8 @@ export class ArDatepicker extends LitElement {
             if (this._skipNextOpenChange) {
                 this._skipNextOpenChange = false;
             } else if (this.open) {
-                void this._show().catch((e) => {
-                    if (__DEV__) console.error('[ar-datepicker]', e);
+                void this._show().catch((e: unknown) => {
+                    warn('ar-datepicker', String(e));
                 });
             } else {
                 this._hide();

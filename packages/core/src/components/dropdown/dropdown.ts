@@ -30,6 +30,7 @@ export type ArDropdownPlacement =
  * @csspart panel - Le panel flottant.
  *
  * @cssprop [--ar-dropdown-min-width=10rem] - Largeur minimale du panel.
+ * @cssprop [--ar-dropdown-color=var(--ar-panel-text)] - Couleur du texte (cascade vers --ar-panel-text).
  * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width)] - Largeur maximale (cascade vers --ar-panel-max-width).
  * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding)] - Marge interne (cascade vers --ar-panel-padding).
  * @cssprop [--ar-dropdown-bg=var(--ar-panel-bg)] - Fond du panel (cascade vers --ar-panel-bg).
@@ -151,7 +152,8 @@ export class ArDropdown extends LitElement {
 
     private get _resolvedTrigger(): HTMLElement | null {
         if (this.for) {
-            return document.getElementById(this.for);
+            const root = this.getRootNode() as Document | ShadowRoot;
+            return root.getElementById(this.for);
         }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
@@ -228,7 +230,12 @@ export class ArDropdown extends LitElement {
     }
 
     private _emit(name: string): CustomEvent {
-        const e = new CustomEvent(name, { bubbles: true, composed: true, cancelable: true });
+        const e = new CustomEvent(name, {
+            bubbles: true,
+            composed: true,
+            cancelable: true,
+            detail: { id: this.id || undefined },
+        });
         this.dispatchEvent(e);
         return e;
     }

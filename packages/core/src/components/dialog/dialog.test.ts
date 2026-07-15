@@ -606,6 +606,26 @@ describe('ArDialog', () => {
         });
     });
 
+    describe('personnalisation --ar-dialog-width', () => {
+        it('la sélection de taille pilote --ar-dialog-width', async () => {
+            el = await fixture('<ar-dialog size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('360px');
+        });
+    });
+
+    describe('personnalisation --ar-dialog-spacing', () => {
+        it('applique --ar-dialog-spacing au padding du body', async () => {
+            el = await fixture('<ar-dialog style="--ar-dialog-spacing: 42px"></ar-dialog>');
+            await waitForUpdate(el);
+
+            const bodyEl = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
+            const computed = getComputedStyle(bodyEl);
+            expect(computed.getPropertyValue('padding-block').trim()).toBe('42px');
+            expect(computed.getPropertyValue('padding-inline').trim()).toBe('42px');
+        });
+    });
+
     describe('warn() — label manquant et placement/modal', () => {
         afterEach(() => {
             vi.restoreAllMocks();

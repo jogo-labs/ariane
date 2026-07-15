@@ -105,7 +105,6 @@ export class ArPagination extends LitElement {
                         part="prev"
                         class="btn btn-tertiary btn-ratio-square"
                         href="javascript:;"
-                        .ariaDisabled=${isPreviousDisabled}
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
                     >
@@ -132,7 +131,6 @@ export class ArPagination extends LitElement {
                         part="next"
                         class="btn btn-tertiary btn-ratio-square"
                         href="javascript:;"
-                        .ariaDisabled=${isNextDisabled}
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
                     >

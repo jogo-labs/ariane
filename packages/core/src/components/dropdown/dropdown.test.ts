@@ -350,4 +350,59 @@ describe('ArDropdown', () => {
             spy.mockRestore();
         });
     });
+
+    // ── for en shadow DOM ────────────────────────────────────────────────────
+
+    describe('for en shadow DOM', () => {
+        it('résout le trigger via getRootNode() quand ar-dropdown est dans un shadow root', async () => {
+            class HostWithShadow extends HTMLElement {
+                constructor() {
+                    super();
+                    const root = this.attachShadow({ mode: 'open' });
+                    root.innerHTML = `
+                        <button id="trigger-in-shadow">Ouvrir</button>
+                        <ar-dropdown for="trigger-in-shadow">
+                            <div>Contenu</div>
+                        </ar-dropdown>
+                    `;
+                }
+            }
+            if (!customElements.get('ar-test-shadow-host')) {
+                customElements.define('ar-test-shadow-host', HostWithShadow);
+            }
+            const host = document.createElement('ar-test-shadow-host');
+            document.body.appendChild(host);
+
+            const dropdown = host.shadowRoot!.querySelector('ar-dropdown') as ArDropdown;
+            mockPanelPopover(dropdown);
+            await waitForUpdate(dropdown);
+
+            const trigger = host.shadowRoot!.getElementById(
+                'trigger-in-shadow',
+            ) as HTMLButtonElement;
+            trigger.click();
+            await waitForUpdate(dropdown);
+
+            expect(dropdown.open).toBe(true);
+
+            host.remove();
+        });
+    });
+
+    describe('detail des events de cycle de vie', () => {
+        it('ar-dropdown-shown porte detail.id', async () => {
+            el = await fixture('<ar-dropdown id="my-dropdown"><div>Contenu</div></ar-dropdown>');
+            mockPanelPopover(el);
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(shownHandler).toHaveBeenCalledTimes(1);
+            const event = shownHandler.mock.calls[0][0] as CustomEvent;
+            expect(event.detail).toEqual({ id: 'my-dropdown' });
+        });
+    });
 });

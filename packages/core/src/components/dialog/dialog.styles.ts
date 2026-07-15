@@ -9,41 +9,41 @@ export default [
         :host {
             display: block;
 
-            /* Taille modale par défaut (md = 500px). Surchargeable par --width sur l'instance. */
-            --width: 500px;
-            /* Padding interne par défaut. Surchargeable par --spacing/--spacing-block/--spacing-inline sur l'instance. */
-            --spacing: 1.25rem;
+            /* Taille modale par défaut (md = 500px). Surchargeable par --ar-dialog-width sur l'instance. */
+            --ar-dialog-width: 500px;
+            /* Padding interne par défaut. Surchargeable par --ar-dialog-spacing/-block/-inline sur l'instance. */
+            --ar-dialog-spacing: 1.25rem;
         }
 
         /* Tailles modal */
         :host([size='sm']) {
-            --width: 360px;
+            --ar-dialog-width: 360px;
         }
         :host([size='md']) {
-            --width: 500px;
+            --ar-dialog-width: 500px;
         }
         :host([size='lg']) {
-            --width: 800px;
+            --ar-dialog-width: 800px;
         }
         :host([size='xl']) {
-            --width: 1140px;
+            --ar-dialog-width: 1140px;
         }
 
         /* Tailles drawer — ont priorité sur les valeurs modal via la spécificité */
         :host([mode='drawer']) {
-            --width: 720px;
+            --ar-dialog-width: 720px;
         }
         :host([mode='drawer'][size='sm']) {
-            --width: 360px;
+            --ar-dialog-width: 360px;
         }
         :host([mode='drawer'][size='md']) {
-            --width: 720px;
+            --ar-dialog-width: 720px;
         }
         :host([mode='drawer'][size='lg']) {
-            --width: 960px;
+            --ar-dialog-width: 960px;
         }
         :host([mode='drawer'][size='xl']) {
-            --width: 1440px;
+            --ar-dialog-width: 1440px;
         }
 
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
@@ -86,7 +86,7 @@ export default [
         :host(:not([mode='drawer'])) dialog {
             border-radius: var(--ar-border-radius-lg);
             /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
-            width: min(var(--width), calc(100vw - 2rem));
+            width: min(var(--ar-dialog-width), calc(100vw - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
         }
 
@@ -102,7 +102,7 @@ export default [
 
         :host([mode='drawer']) dialog {
             /* Sur petit écran, le drawer peut occuper 100% de la largeur */
-            width: min(var(--width), 100vw);
+            width: min(var(--ar-dialog-width), 100vw);
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
@@ -173,8 +173,8 @@ export default [
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            padding-block: var(--spacing-block, var(--spacing));
-            padding-inline: var(--spacing-inline, var(--spacing));
+            padding-block: var(--ar-dialog-spacing-block, var(--ar-dialog-spacing));
+            padding-inline: var(--ar-dialog-spacing-inline, var(--ar-dialog-spacing));
         }
 
         /* ── Footer ───────────────────────────────────────────────────────────── */

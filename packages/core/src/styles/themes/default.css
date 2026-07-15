@@ -501,6 +501,7 @@
         --ar-datepicker-header-margin: 0;
         --ar-datepicker-header-padding: 0 0 0.75rem;
         --ar-datepicker-header-radius: 0;
+        --ar-datepicker-header-bg: transparent;
 
         --ar-datepicker-nav-btn-size: 2rem;
         --ar-datepicker-nav-btn-bg: transparent;
@@ -517,6 +518,7 @@
 
         --ar-datepicker-footer-margin: 0;
         --ar-datepicker-footer-padding: 0.75rem 0 0;
+        --ar-datepicker-footer-bg: transparent;
 
         --ar-datepicker-footer-btn-bg: transparent;
         --ar-datepicker-footer-btn-border-width: 1px;
@@ -544,6 +546,7 @@
         --ar-datepicker-day-font-size: 1rem;
         --ar-datepicker-day-size: 2.5rem;
         --ar-datepicker-day-radius: 0.5rem;
+        --ar-datepicker-day-bg: transparent;
 
         --ar-datepicker-day-today-color: var(--ar-color-primary-40);
         --ar-datepicker-day-today-border: var(--ar-color-primary-50);
