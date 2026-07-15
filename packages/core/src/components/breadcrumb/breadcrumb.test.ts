@@ -259,44 +259,6 @@ describe('ArBreadcrumb', () => {
             expect(hideHandler).toHaveBeenCalledOnce();
         });
 
-        it('émet ar-breadcrumb-show au premier clic sur le bouton', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            let fired = false;
-            el.addEventListener('ar-breadcrumb-show', () => {
-                fired = true;
-            });
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
-            btn.click();
-            await waitForUpdate(el);
-
-            expect(fired).toBe(true);
-        });
-
-        it('émet ar-breadcrumb-hide au deuxième clic sur le bouton', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            let fired = false;
-            el.addEventListener('ar-breadcrumb-hide', () => {
-                fired = true;
-            });
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
-            btn.click();
-            await waitForUpdate(el);
-            btn.click();
-            await waitForUpdate(el);
-
-            expect(fired).toBe(true);
-        });
-
         it('open vaut false par défaut', async () => {
             el = await fixture(`
                 <ar-breadcrumb>

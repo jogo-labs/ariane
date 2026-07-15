@@ -75,21 +75,21 @@ describe('ArDatepicker', () => {
         });
 
         it("émet ar-datepicker-show à l'ouverture", async () => {
-            let fired = false;
-            el.addEventListener('ar-datepicker-show', () => (fired = true));
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-show', handler);
             el.open = true;
             await waitForUpdate(el);
-            expect(fired).toBe(true);
+            expect(handler).toHaveBeenCalledOnce();
         });
 
         it('émet ar-datepicker-hide à la fermeture', async () => {
             el.open = true;
             await waitForUpdate(el);
-            let fired = false;
-            el.addEventListener('ar-datepicker-hide', () => (fired = true));
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-hide', handler);
             el.open = false;
             await waitForUpdate(el);
-            expect(fired).toBe(true);
+            expect(handler).toHaveBeenCalledOnce();
         });
 
         it("disabled bloque l'ouverture", async () => {
@@ -190,12 +190,12 @@ describe('ArDatepicker', () => {
 
         it('émet ar-datepicker-input-change au blur', async () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
-            let fired = false;
-            el.addEventListener('ar-datepicker-input-change', () => (fired = true));
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-input-change', handler);
             el.inputElement.value = '12/06/2026';
             el.inputElement.dispatchEvent(new Event('blur'));
             await waitForUpdate(el);
-            expect(fired).toBe(true);
+            expect(handler).toHaveBeenCalledOnce();
         });
     });
 
