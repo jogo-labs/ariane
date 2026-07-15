@@ -140,8 +140,13 @@ export class ArBreadcrumb extends LitElement {
             });
         }
         if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
-            if (this.open) this._show();
-            else this._hide();
+            // Différé après la fin du cycle courant : _show()/_hide() déclenchent
+            // Popover.show()/hide(), qui appelle host.requestUpdate() — un appel synchrone
+            // ici déclencherait l'avertissement dev Lit "change-in-update".
+            void this.updateComplete.then(() => {
+                if (this.open) this._show();
+                else this._hide();
+            });
         }
     }
 

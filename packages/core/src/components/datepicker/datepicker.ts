@@ -201,12 +201,19 @@ export class ArDatepicker extends LitElement {
         if (changed.has('open')) {
             if (this._skipNextOpenChange) {
                 this._skipNextOpenChange = false;
-            } else if (this.open) {
-                void this._show().catch((e: unknown) => {
-                    warn('ar-datepicker', String(e));
-                });
             } else {
-                this._hide();
+                // Différé après la fin du cycle courant : _show()/_hide() déclenchent
+                // AnchoredController.show()/hide(), qui appelle host.requestUpdate() — un appel
+                // synchrone ici déclencherait l'avertissement dev Lit "change-in-update".
+                void this.updateComplete.then(() => {
+                    if (this.open) {
+                        void this._show().catch((e: unknown) => {
+                            warn('ar-datepicker', String(e));
+                        });
+                    } else {
+                        this._hide();
+                    }
+                });
             }
         }
 

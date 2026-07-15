@@ -131,6 +131,20 @@ describe('ArDropdown', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(true);
         });
+
+        it("n'émet ar-dropdown-show qu'une fois quand open est déjà vrai au premier rendu", async () => {
+            // Écoute posée avant connexion : fixture() connecte puis résout après le premier
+            // rendu, trop tard pour capter un événement émis dès firstUpdated()/updated().
+            const openEl = document.createElement('ar-dropdown') as ArDropdown;
+            openEl.innerHTML = '<button slot="trigger">Trigger</button>';
+            openEl.open = true;
+            const handler = vi.fn();
+            openEl.addEventListener('ar-dropdown-show', handler);
+            document.body.appendChild(openEl);
+            await waitForUpdate(openEl);
+            expect(handler).toHaveBeenCalledOnce();
+            openEl.remove();
+        });
     });
 
     // ── Disabled ─────────────────────────────────────────────────────────────
