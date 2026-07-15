@@ -46,8 +46,10 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop [--ar-breadcrumb-toggle-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton retour/trigger mobile pressé.
  * @cssprop [--ar-breadcrumb-toggle-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton retour/trigger mobile au focus.
  *
- * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
- * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-show   - Émis avant l'ouverture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-shown  - Émis après l'ouverture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-hide   - Émis avant la fermeture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-hidden - Émis après la fermeture du dropdown mobile.
  */
 export class ArBreadcrumb extends LitElement {
     static override styles: CSSResultGroup = [
@@ -134,17 +136,8 @@ export class ArBreadcrumb extends LitElement {
             });
         }
         if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
-            if (this.open) {
-                void this._popover.show();
-                this.dispatchEvent(
-                    new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
-                );
-            } else {
-                this._popover.hide();
-                this.dispatchEvent(
-                    new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-                );
-            }
+            if (this.open) this._show();
+            else this._hide();
         }
     }
 
@@ -187,7 +180,7 @@ export class ArBreadcrumb extends LitElement {
                               <span class="btn-content">${items[0]?.label}</span>
                           </a>
                           <button
-                              @click=${this.open ? this._hide : this._show}
+                              @click=${this._handleTriggerClick}
                               type="button"
                               part="trigger"
                               class="btn btn-tertiary btn-ratio-square"
@@ -242,12 +235,40 @@ export class ArBreadcrumb extends LitElement {
         }
     }
 
+    private _handleTriggerClick = (): void => {
+        this.open = !this.open;
+    };
+
     private _show(): void {
-        this.open = true;
+        const showEv = this._emit('ar-breadcrumb-show');
+        if (showEv.defaultPrevented) {
+            this.open = false;
+            return;
+        }
+        void this._popover.show().then(() => {
+            this._emit('ar-breadcrumb-shown');
+        });
     }
 
     private _hide(): void {
-        this.open = false;
+        const hideEv = this._emit('ar-breadcrumb-hide');
+        if (hideEv.defaultPrevented) {
+            this.open = true;
+            return;
+        }
+        this._popover.hide();
+        this._emit('ar-breadcrumb-hidden');
+    }
+
+    private _emit(name: string): CustomEvent {
+        const e = new CustomEvent(name, {
+            bubbles: true,
+            composed: true,
+            cancelable: true,
+            detail: { id: this.id || undefined },
+        });
+        this.dispatchEvent(e);
+        return e;
     }
 
     private _handleMediaChange = (): void => {

@@ -77,10 +77,10 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('light-dismiss', () => {
-        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-close une seule fois', async () => {
+        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-hide une seule fois', async () => {
             el = await mobileBreadcrumb();
             let callCount = 0;
-            el.addEventListener('ar-breadcrumb-close', () => {
+            el.addEventListener('ar-breadcrumb-hide', () => {
                 callCount += 1;
             });
             getBtn(el).click();
