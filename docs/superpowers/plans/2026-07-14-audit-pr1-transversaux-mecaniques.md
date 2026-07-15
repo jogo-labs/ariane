@@ -447,6 +447,18 @@ git commit -m "fix(dropdown): ajoute detail.id aux events de cycle de vie et doc
 
 ### Task 5: Généraliser `aria-controls` trigger→panel dans `AnchoredController` (constat transversal #6)
 
+> **Revert (2026-07-14) :** cette tâche a été annulée après implémentation. Le commit
+> `43041b0` réintroduisait `aria-controls` sur `AnchoredController.attach()` sans tenir
+> compte de la décision documentée dans `9d8cf86` (#69) qui l'avait délibérément retiré —
+> `aria-controls` repose sur une résolution IDREF dans le même arbre DOM, or le trigger
+> (contenu slotté en light DOM) et le panel (dans le shadow root du composant) vivent
+> couramment dans des arbres différents pour `dropdown`/`tooltip`/`breadcrumb`/
+> `datepicker`/`stepper`. Les tests browser (WTR) existants pour `AnchoredController` et
+> `ar-dropdown` encodaient déjà cette contrainte et ont échoué en conditions réelles ; le
+> test Vitest ajouté par cette tâche (`dropdown.test.ts`) ne l'a pas détecté car jsdom ne
+> modélise pas le scoping d'ID par shadow tree. `aria-haspopup` + `aria-expanded` restent
+> la seule ARIA posée par `AnchoredController.attach()`, conformément à `9d8cf86`.
+
 **Files:**
 
 - Modify: `packages/core/src/controllers/anchored.controller.ts:62-69`
