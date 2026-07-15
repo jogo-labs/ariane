@@ -286,6 +286,8 @@ describe('ArAlert', () => {
             const closeButton = getPart(el, 'close') as HTMLButtonElement;
 
             closeButton.click();
+            await waitForUpdate(el);
+            el.dispatchEvent(new Event('transitionend'));
 
             expect(consoleErrorSpy).not.toHaveBeenCalled();
             consoleErrorSpy.mockRestore();
