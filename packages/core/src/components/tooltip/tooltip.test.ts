@@ -128,4 +128,52 @@ describe('ArTooltip', () => {
             expect((getPart(el, 'bubble') as any).showPopover).not.toHaveBeenCalled();
         });
     });
+
+    describe('events de cycle de vie', () => {
+        beforeEach(async () => {
+            document.body.innerHTML = '<button id="btn">x</button>';
+            el = await fixture<ArTooltip>(
+                '<ar-tooltip id="my-tooltip" for="btn" show-delay="0">Aide</ar-tooltip>',
+            );
+            mockBubblePopover(el);
+        });
+
+        it('émet ar-tooltip-shown avec detail.id après affichage', async () => {
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-tooltip-shown', shownHandler);
+
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            trigger.dispatchEvent(new Event('mouseenter'));
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(shownHandler).toHaveBeenCalledOnce();
+            const event = shownHandler.mock.calls[0][0] as CustomEvent;
+            expect(event.detail).toEqual({ id: 'my-tooltip' });
+        });
+
+        it('émet ar-tooltip-hidden après masquage effectif', async () => {
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            trigger.dispatchEvent(new Event('mouseenter'));
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-tooltip-hidden', hiddenHandler);
+            trigger.dispatchEvent(new Event('mouseleave'));
+            await new Promise((resolve) => setTimeout(resolve, el.hideDelay + 10));
+
+            expect(hiddenHandler).toHaveBeenCalledOnce();
+        });
+
+        it("n'émet pas ar-tooltip-hidden si le tooltip n'a jamais été affiché", async () => {
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-tooltip-hidden', hiddenHandler);
+
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            // mouseleave sans mouseenter préalable : ne doit rien émettre.
+            trigger.dispatchEvent(new Event('mouseleave'));
+            await new Promise((resolve) => setTimeout(resolve, el.hideDelay + 10));
+
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+    });
 });
