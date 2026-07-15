@@ -358,20 +358,23 @@ describe('ArBreadcrumb', () => {
             expect(handler).toHaveBeenCalledOnce();
         });
 
-        it('émet ar-breadcrumb-shown après ar-breadcrumb-show', async () => {
+        it('émet ar-breadcrumb-shown après ar-breadcrumb-show, avec le bon detail.id', async () => {
             el = await fixture(`
                 <ar-breadcrumb id="my-breadcrumb">
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const shownHandler = vi.fn();
+            const order: string[] = [];
+            el.addEventListener('ar-breadcrumb-show', () => order.push('show'));
+            const shownHandler = vi.fn(() => order.push('shown'));
             el.addEventListener('ar-breadcrumb-shown', shownHandler);
 
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
+            expect(order).toEqual(['show', 'shown']);
             expect(shownHandler).toHaveBeenCalledOnce();
             const event = shownHandler.mock.calls[0][0] as CustomEvent;
             expect(event.detail).toEqual({ id: 'my-breadcrumb' });
