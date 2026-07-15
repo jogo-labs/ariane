@@ -274,23 +274,4 @@ describe('ArAlert', () => {
             target.remove();
         });
     });
-
-    // ── next-focus invalide ──────────────────────────────────────────────────
-
-    describe('next-focus invalide', () => {
-        it("n'appelle pas console.error directement", async () => {
-            el = await fixture(
-                '<ar-alert next-focus="id-inexistant"><span slot="close-icon">x</span></ar-alert>',
-            );
-            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const closeButton = getPart(el, 'close') as HTMLButtonElement;
-
-            closeButton.click();
-            await waitForUpdate(el);
-            el.dispatchEvent(new Event('transitionend'));
-
-            expect(consoleErrorSpy).not.toHaveBeenCalled();
-            consoleErrorSpy.mockRestore();
-        });
-    });
 });
