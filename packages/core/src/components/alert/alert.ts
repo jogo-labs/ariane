@@ -56,9 +56,6 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 export class ArAlert extends LitElement {
     static override styles = [styles];
 
-    /** Nom du composant affiché dans les logs */
-    // @ignore
-    static readonly NAME = 'ArAlert';
     // @ignore
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
@@ -194,7 +191,7 @@ export class ArAlert extends LitElement {
         );
         if (!$focusableElement) {
             warn(
-                ArAlert.NAME,
+                'ar-alert',
                 `L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
             );
             return;

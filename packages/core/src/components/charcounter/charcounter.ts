@@ -36,7 +36,6 @@ function pluralize(count: number, label: string): string {
  */
 export class ArCharcounter extends LitElement {
     static override styles = [styles];
-    static readonly NAME = 'ArCharcounter';
     private static _idCounter = 0;
 
     /** ID du champ observé. Requis. */
