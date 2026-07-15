@@ -279,34 +279,25 @@ Expected: aucune occurrence.
 
 - [ ] **Step 9: Mettre à jour la doc `ar-breadcrumb.mdx`**
 
-Dans `apps/docs/src/content/components/ar-breadcrumb.mdx`, remplacer (chercher le bloc autour de "Écouter l'ouverture/fermeture du dropdown mobile") :
+Dans `apps/docs/src/content/components/ar-breadcrumb.mdx`, chercher le bloc sous le titre "Écouter l'ouverture/fermeture du dropdown mobile". La phrase d'intro actuelle est : "En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-open` et `ar-breadcrumb-close` (sans `detail`) à chaque changement d'état du dropdown condensé :". La remplacer par : "En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-show`/`ar-breadcrumb-shown` (annulable puis confirmé) et `ar-breadcrumb-hide`/`ar-breadcrumb-hidden` à chaque changement d'état du dropdown condensé, avec `detail: { id }` :".
 
-````markdown
-En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-open` et `ar-breadcrumb-close` (sans `detail`) à chaque changement d'état du dropdown condensé :
+Le bloc de code JS qui suit cette phrase est actuellement :
 
 ```js
 const breadcrumb = document.querySelector('ar-breadcrumb');
 breadcrumb.addEventListener('ar-breadcrumb-open', () => console.log('Dropdown ouvert'));
 breadcrumb.addEventListener('ar-breadcrumb-close', () => console.log('Dropdown fermé'));
 ```
-````
 
-````
-
-par :
-
-```markdown
-En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-show`/`ar-breadcrumb-shown` (annulable puis confirmé) et `ar-breadcrumb-hide`/`ar-breadcrumb-hidden` à chaque changement d'état du dropdown condensé, avec `detail: { id }` :
+Le remplacer par :
 
 ```js
 const breadcrumb = document.querySelector('ar-breadcrumb');
 breadcrumb.addEventListener('ar-breadcrumb-shown', () => console.log('Dropdown ouvert'));
 breadcrumb.addEventListener('ar-breadcrumb-hidden', () => console.log('Dropdown fermé'));
-````
+```
 
-````
-
-Ne pas toucher au reste de la page (forme/contenu hors scope, cf. passe doc séparée) — uniquement ce bloc et ses occurrences des anciens noms d'events.
+Ne pas toucher au reste de la page (forme/contenu hors scope, cf. passe doc séparée) — uniquement cette phrase et ce bloc de code.
 
 - [ ] **Step 10: Lancer la suite complète breadcrumb (Vitest) et vérifier les imports**
 
@@ -328,7 +319,7 @@ git commit -m "fix(breadcrumb)!: aligne les events sur le pattern show/shown/hid
 BREAKING CHANGE: ar-breadcrumb-open et ar-breadcrumb-close sont retirés,
 remplacés par ar-breadcrumb-show (annulable) / ar-breadcrumb-shown et
 ar-breadcrumb-hide (annulable) / ar-breadcrumb-hidden, avec detail: { id }."
-````
+```
 
 ---
 
@@ -661,32 +652,23 @@ Expected: PASS, tous les tests.
 
 - [ ] **Step 6: Mettre à jour la doc `ar-stepper.mdx`**
 
-Dans `apps/docs/src/content/components/ar-stepper.mdx`, remplacer :
+Dans `apps/docs/src/content/components/ar-stepper.mdx`, chercher le bloc sous le titre "Écouter le changement d'étape". La phrase d'intro actuelle est : "`ar-stepper` émet `ar-stepper-step-changed` au clic sur une étape, avec l'attribut `path` de l'étape sélectionnée dans `detail` :". La remplacer par : "`ar-stepper` émet `ar-stepper-step-change` au clic sur une étape, avec l'attribut `path` de l'étape sélectionnée dans `detail` :".
 
-````markdown
-`ar-stepper` émet `ar-stepper-step-changed` au clic sur une étape, avec l'attribut `path` de l'étape sélectionnée dans `detail` :
+Le bloc de code JS qui suit cette phrase est actuellement :
 
 ```js
 document.querySelector('ar-stepper').addEventListener('ar-stepper-step-changed', (e) => {
     console.log('Étape sélectionnée :', e.detail.path);
 });
 ```
-````
 
-````
-
-par :
-
-```markdown
-`ar-stepper` émet `ar-stepper-step-change` au clic sur une étape, avec l'attribut `path` de l'étape sélectionnée dans `detail` :
+Le remplacer par :
 
 ```js
 document.querySelector('ar-stepper').addEventListener('ar-stepper-step-change', (e) => {
     console.log('Étape sélectionnée :', e.detail.path);
 });
-````
-
-````
+```
 
 - [ ] **Step 7: Typecheck et suite complète du composant**
 
@@ -707,7 +689,7 @@ git commit -m "fix(stepper)!: retire le dispatch interne step-changed, renomme l
 BREAKING CHANGE: l'event non documenté step-changed (sans préfixe, composed,
 fuite hors shadow DOM) est retiré. ar-stepper-step-changed est renommé
 ar-stepper-step-change (suffixe -change unifié avec le reste de la librairie)."
-````
+```
 
 ---
 
