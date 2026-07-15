@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
@@ -52,6 +52,12 @@ export class ArTab extends LitElement {
         }
         this._registry = registry;
         registry.registerTab(this);
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        if (changed.has('disabled') && changed.get('disabled') !== undefined) {
+            this._registry?.notifyTabChanged(this);
+        }
     }
 
     override connectedCallback(): void {
