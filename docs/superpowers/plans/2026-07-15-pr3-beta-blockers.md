@@ -146,7 +146,15 @@ git commit -m "fix(alert): le survol/focus du bouton close ne vole plus le focus
 
 ### Task 2: `ar-pagination` — `total` négatif ne doit plus crasher `render()`
 
-**Contexte du bug :** `updated()` avertit via `warn()` si `total < 1`, mais ne clampe rien. `render()` transmet `this.total` tel quel à `mrPaginationUtils._calculatePages(current, total)`, qui fait `Array.from({ length: total }, ...)` — une longueur négative lève `RangeError: Invalid array length`, qui casse tout le rendu du composant (pas seulement un avertissement dev). Référence audit : `pagination.ts:74-97`, `pagination.utils.ts:10`.
+> **Correction (2026-07-15, post-implémentation) :** vérifié empiriquement que
+> `Array.from({ length: négatif }, fn)` ne lève jamais de `RangeError` — `ToLength`
+> clampe les longueurs négatives à 0. Le mécanisme de crash décrit ci-dessous est
+> inexact. Le vrai bug (moins sévère mais réel) : `total` négatif affiche des
+> numéros de page négatifs ("Page suivante (page -3)") sans qu'aucune erreur ne
+> le signale. Le clamp reste une correction pertinente ; commentaire/test/commit
+> ont été corrigés en conséquence (commit `0f704aa`).
+
+**Contexte du bug (tel qu'affirmé par l'audit, non vérifié empiriquement avant écriture du plan) :** `updated()` avertit via `warn()` si `total < 1`, mais ne clampe rien. `render()` transmet `this.total` tel quel à `mrPaginationUtils._calculatePages(current, total)`, qui fait `Array.from({ length: total }, ...)` — une longueur négative lève `RangeError: Invalid array length`, qui casse tout le rendu du composant (pas seulement un avertissement dev). Référence audit : `pagination.ts:74-97`, `pagination.utils.ts:10`.
 
 **Files:**
 
