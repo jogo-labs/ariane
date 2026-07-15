@@ -41,6 +41,12 @@ export type ArTooltipPlacement =
  * @cssprop --ar-tooltip-arrow-size               - Taille du caret.
  * @cssprop [--ar-tooltip-distance=10px] - Espacement entre le trigger et la bulle.
  * @cssprop [--ar-tooltip-offset=var(--ar-anchor-offset)] - Décalage latéral de la bulle.
+ *
+ * Pas d'events show/hide annulables : un tooltip n'a pas de raison métier de bloquer
+ * son affichage (contrairement à un dialog ou un menu), contrairement à
+ * ar-dropdown/ar-dialog/ar-breadcrumb.
+ * @event {CustomEvent} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
+ * @event {CustomEvent} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
  */
 export class ArTooltip extends LitElement {
     static override styles = [styles];
@@ -104,7 +110,7 @@ export class ArTooltip extends LitElement {
         if (changed.has('disabled') && this.disabled) {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
-            this._tooltip.hide();
+            this._hide();
         }
         if (changed.has('withoutArrow')) {
             const arrowEl = this.withoutArrow
@@ -162,7 +168,30 @@ export class ArTooltip extends LitElement {
         this._trigger.removeEventListener('blur', this._handleBlur);
         this._trigger.removeAttribute('aria-describedby');
         this._trigger = null;
+        this._hide();
+    }
+
+    private _show(): void {
+        if (this._tooltip.isOpen) return;
+        void this._tooltip.show().then(() => {
+            this._emit('ar-tooltip-shown');
+        });
+    }
+
+    private _hide(): void {
+        if (!this._tooltip.isOpen) return;
         this._tooltip.hide();
+        this._emit('ar-tooltip-hidden');
+    }
+
+    private _emit(name: string): void {
+        this.dispatchEvent(
+            new CustomEvent(name, {
+                bubbles: true,
+                composed: true,
+                detail: { id: this.id || undefined },
+            }),
+        );
     }
 
     private _scheduleShow(): void {
@@ -171,14 +200,14 @@ export class ArTooltip extends LitElement {
         // Listener attaché avant le délai : Escape pendant showDelay doit aussi annuler l'affichage.
         document.addEventListener('keydown', this._handleKeyDown);
         this._showTimer = window.setTimeout(() => {
-            void this._tooltip.show();
+            this._show();
         }, this.showDelay);
     }
 
     private _scheduleHide(): void {
         clearTimeout(this._showTimer);
         this._hideTimer = window.setTimeout(() => {
-            this._tooltip.hide();
+            this._hide();
             document.removeEventListener('keydown', this._handleKeyDown);
         }, this.hideDelay);
     }
@@ -200,7 +229,7 @@ export class ArTooltip extends LitElement {
         if (e.key === 'Escape') {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
-            this._tooltip.hide();
+            this._hide();
             document.removeEventListener('keydown', this._handleKeyDown);
         }
     };

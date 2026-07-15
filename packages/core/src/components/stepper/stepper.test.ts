@@ -127,7 +127,7 @@ describe('ArStepper', () => {
     // ── Événements ───────────────────────────────────────────────────────────
 
     describe('événements', () => {
-        it('émet ar-stepper-step-changed au clic sur un lien', async () => {
+        it('émet ar-stepper-step-change au clic sur un lien', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -136,7 +136,7 @@ describe('ArStepper', () => {
             `);
 
             const handler = vi.fn();
-            el.addEventListener('ar-stepper-step-changed', handler);
+            el.addEventListener('ar-stepper-step-change', handler);
 
             const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
             if (link) {
@@ -146,10 +146,10 @@ describe('ArStepper', () => {
                 expect(event.detail).toHaveProperty('path');
             }
 
-            el.removeEventListener('ar-stepper-step-changed', handler);
+            el.removeEventListener('ar-stepper-step-change', handler);
         });
 
-        it('émet aussi step-changed (nom court) au clic', async () => {
+        it("n'émet plus step-changed (nom court) au clic", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -163,7 +163,7 @@ describe('ArStepper', () => {
             const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
             if (link) {
                 link.click();
-                expect(handler).toHaveBeenCalledTimes(1);
+                expect(handler).not.toHaveBeenCalled();
             }
 
             el.removeEventListener('step-changed', handler);

@@ -74,7 +74,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop [--ar-stepper-trigger-bg-hover=var(--ar-button-secondary-bg-hover)]                 - Fond du bouton trigger mobile au survol.
  * @cssprop [--ar-stepper-trigger-radius=0.75rem]                                              - Border-radius du bouton trigger mobile.
  *
- * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
+ * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
  */
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [
@@ -458,12 +458,8 @@ export class ArStepper extends LitElement {
 
         const detail: ArStepperStepChangeDetail = { path };
 
-        // Double dispatch : nom court pour usage interne, nom préfixé pour usage externe
         this.dispatchEvent(
-            new CustomEvent('step-changed', { bubbles: true, composed: true, detail }),
-        );
-        this.dispatchEvent(
-            new CustomEvent('ar-stepper-step-changed', { bubbles: true, composed: true, detail }),
+            new CustomEvent('ar-stepper-step-change', { bubbles: true, composed: true, detail }),
         );
 
         const stepLabel =
