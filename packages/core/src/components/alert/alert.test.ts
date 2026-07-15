@@ -244,6 +244,24 @@ describe('ArAlert', () => {
             expect(handler).not.toHaveBeenCalled();
         });
 
+        it('un transitionend qui bubble sans clic sur close (hiding=false) ne vole pas le focus', async () => {
+            const target = document.createElement('button');
+            target.id = 'btn-cible-survol';
+            document.body.appendChild(target);
+
+            el = await fixture('<ar-alert next-focus="btn-cible-survol"></ar-alert>');
+            const initiallyFocused = document.activeElement;
+
+            // Simule un transitionend qui bubble jusqu'à l'hôte SANS clic préalable sur le bouton
+            // close (ex: transition CSS de survol/focus sur le bouton lui-même) — hiding reste false.
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(document.activeElement).toBe(initiallyFocused);
+            expect(document.activeElement).not.toBe(target);
+
+            target.remove();
+        });
+
         it('logue un avertissement si next-focus pointe vers un ID inexistant', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-alert next-focus="id-inexistant"></ar-alert>');
