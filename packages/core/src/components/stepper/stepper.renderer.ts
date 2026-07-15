@@ -64,7 +64,7 @@ function renderSubStep(
                           class="stepper-item-inner stepper-link"
                           data-substep-order=${order}
                           data-path=${sub.path}
-                          href=${sub.href ?? 'javascript:;'}
+                          href=${sub.href ?? '#'}
                           @click=${onClickLink}
                       >
                           ${renderStepText(sub.label, order, true)}

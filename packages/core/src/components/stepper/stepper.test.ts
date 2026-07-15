@@ -170,6 +170,26 @@ describe('ArStepper', () => {
         });
     });
 
+    describe('navigation — preventDefault sur les liens sans href réel', () => {
+        it("appelle preventDefault() au clic sur un lien d'étape (empêche le scroll-to-top natif)", async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            expect(link).not.toBeNull();
+            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+            const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+
+            link!.dispatchEvent(clickEvent);
+
+            expect(preventDefaultSpy).toHaveBeenCalledOnce();
+        });
+    });
+
     // ── Mise à jour de currentPath ─────────────────────────────────────────────
 
     describe('mise à jour de currentPath', () => {

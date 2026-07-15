@@ -456,6 +456,11 @@ export class ArStepper extends LitElement {
         const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
         if (!path) return;
 
+        // Ces liens ne sont jamais des URLs réellement navigables (fallback '#') — la
+        // navigation est entièrement pilotée par ar-stepper-step-change, pas par le
+        // comportement natif de l'ancre.
+        event.preventDefault();
+
         const detail: ArStepperStepChangeDetail = { path };
 
         this.dispatchEvent(
