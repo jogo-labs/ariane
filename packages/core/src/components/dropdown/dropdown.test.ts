@@ -405,4 +405,19 @@ describe('ArDropdown', () => {
             expect(event.detail).toEqual({ id: 'my-dropdown' });
         });
     });
+
+    describe('aria-controls', () => {
+        it("attach() pose aria-controls sur le trigger, référençant l'id du panel", async () => {
+            el = await fixture(
+                '<ar-dropdown><button slot="trigger">Ouvrir</button><div>Contenu</div></ar-dropdown>',
+            );
+            mockPanelPopover(el);
+            await waitForUpdate(el);
+
+            const trigger = el.querySelector('[slot="trigger"]') as HTMLButtonElement;
+            const panel = getPart(el, 'panel') as HTMLElement;
+
+            expect(trigger.getAttribute('aria-controls')).toBe(panel.id);
+        });
+    });
 });
