@@ -430,16 +430,16 @@ Dans `packages/core/src/components/dropdown/dropdown.ts`, le token est utilisé 
 
 - [ ] **Step 6: Régénérer le manifeste des custom elements et vérifier qu'il capte le nouveau `@cssprop`**
 
-Run: `npm run build:manifest`
+Run: `npm run build:manifest -w packages/core`
 Expected: exit 0. Vérifier dans `packages/core/custom-elements.json` (ou l'emplacement configuré) que `cssProperties` de `ar-dropdown` contient désormais une entrée `--ar-dropdown-color`.
 
-Run: `grep -c "ar-dropdown-color" packages/core/custom-elements.json`
+Run: `grep -c "ar-dropdown-color" packages/core/dist/custom-elements.json`
 Expected: `1` ou plus.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add packages/core/src/components/dropdown/dropdown.ts packages/core/src/components/dropdown/dropdown.test.ts packages/core/custom-elements.json
+git add packages/core/src/components/dropdown/dropdown.ts packages/core/src/components/dropdown/dropdown.test.ts
 git commit -m "fix(dropdown): ajoute detail.id aux events de cycle de vie et documente --ar-dropdown-color"
 ```
 
@@ -854,17 +854,17 @@ Expected: tous PASS.
 
 - [ ] **Step 7: Régénérer le manifeste des custom elements**
 
-Run: `npm run build:manifest`
+Run: `npm run build:manifest -w packages/core`
 Expected: exit 0.
 
-Run: `grep -c "ar-dialog-width\|ar-dialog-spacing" packages/core/custom-elements.json`
+Run: `grep -c "ar-dialog-width\|ar-dialog-spacing" packages/core/dist/custom-elements.json`
 Expected: `4` ou plus (les 4 nouveaux noms de tokens apparaissent).
 
 - [ ] **Step 8: Commit**
 
 ```bash
 git add packages/core/src/components/dialog/dialog.styles.ts packages/core/src/components/dialog/dialog.ts \
-        packages/core/src/components/dialog/dialog.test.ts packages/core/custom-elements.json
+        packages/core/src/components/dialog/dialog.test.ts
 git commit -m "fix(dialog)!: préfixe --width/--spacing en --ar-dialog-width/--ar-dialog-spacing
 
 BREAKING CHANGE: les custom properties --width, --spacing, --spacing-block
@@ -910,16 +910,16 @@ par :
 
 - [ ] **Step 2: Régénérer le manifeste des custom elements**
 
-Run: `npm run build:manifest`
+Run: `npm run build:manifest -w packages/core`
 Expected: exit 0.
 
-Run: `grep -c "charcounter-font-size\|charcounter-warning-weight\|charcounter-error-weight" packages/core/custom-elements.json`
+Run: `grep -c "charcounter-font-size\|charcounter-warning-weight\|charcounter-error-weight" packages/core/dist/custom-elements.json`
 Expected: `3` ou plus.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add packages/core/src/components/charcounter/charcounter.ts packages/core/custom-elements.json
+git add packages/core/src/components/charcounter/charcounter.ts
 git commit -m "docs(charcounter): documente les 3 @cssprop manquants et harmonise le format"
 ```
 
@@ -1031,17 +1031,17 @@ Expected: PASS.
 
 - [ ] **Step 6: Régénérer le manifeste des custom elements**
 
-Run: `npm run build:manifest`
+Run: `npm run build:manifest -w packages/core`
 Expected: exit 0.
 
-Run: `grep -c "datepicker-header-bg\|datepicker-day-bg\|datepicker-footer-bg" packages/core/custom-elements.json`
+Run: `grep -c "datepicker-header-bg\|datepicker-day-bg\|datepicker-footer-bg" packages/core/dist/custom-elements.json`
 Expected: `3` ou plus.
 
 - [ ] **Step 7: Commit**
 
 ```bash
 git add packages/core/src/styles/themes/default.css packages/core/src/components/datepicker/datepicker.ts \
-        packages/core/src/components/datepicker/datepicker.test.ts packages/core/custom-elements.json
+        packages/core/src/components/datepicker/datepicker.test.ts
 git commit -m "fix(datepicker): définit --ar-datepicker-header/day/footer-bg dans le thème (jusque-là non résolus)"
 ```
 
