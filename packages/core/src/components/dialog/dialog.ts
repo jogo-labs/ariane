@@ -61,10 +61,10 @@ if (typeof document !== 'undefined') {
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
- * @cssprop [--width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
- * @cssprop [--spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
- * @cssprop [--spacing-block] - Padding haut/bas. Prend le pas sur `--spacing` si défini.
- * @cssprop [--spacing-inline] - Padding gauche/droite. Prend le pas sur `--spacing` si défini.
+ * @cssprop [--ar-dialog-width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
+ * @cssprop [--ar-dialog-spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
+ * @cssprop [--ar-dialog-spacing-block] - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
+ * @cssprop [--ar-dialog-spacing-inline] - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop [--ar-dialog-close-bg=var(--ar-button-tertiary-bg)] - Fond du bouton de fermeture.
  * @cssprop [--ar-dialog-close-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond du bouton de fermeture au survol.
  * @cssprop [--ar-dialog-close-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton de fermeture pressé.
@@ -130,7 +130,7 @@ export class ArDialog extends LitElement {
 
     /**
      * Taille du dialog. Les valeurs correspondent à des largeurs CSS prédéfinies.
-     * Utilisez `--width` pour une valeur personnalisée.
+     * Utilisez `--ar-dialog-width` pour une valeur personnalisée.
      *
      * @attr size
      * @default 'md'
