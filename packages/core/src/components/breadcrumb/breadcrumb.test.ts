@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArBreadcrumb } from './breadcrumb.js';
-import { getPart } from '../../test-utils.js';
+import { getPart, mockPopoverPanel } from '../../test-utils.js';
 import './index.js';
 import '../breadcrumb-item/index.js';
 
@@ -37,17 +37,6 @@ function mockMediaQuery(matches: boolean): MediaQueryList {
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
     } as unknown as MediaQueryList;
-}
-
-// happy-dom does not implement the Popover API — mock showPopover/hidePopover on the panel
-// (même pattern que dropdown.test.ts), nécessaire pour que Popover.isOpen reflète l'état réel.
-function mockPanelPopover(el: ArBreadcrumb): void {
-    const panel = getPart(el, 'panel') as HTMLElement | null;
-    if (!panel) return;
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).showPopover =
-        vi.fn();
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).hidePopover =
-        vi.fn();
 }
 
 describe('ArBreadcrumb', () => {
@@ -238,7 +227,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -256,7 +245,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const showHandler = vi.fn();
             const hideHandler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', showHandler);
@@ -279,7 +268,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             expect(el.open).toBe(false);
             expect(el.hasAttribute('open')).toBe(false);
         });
@@ -291,7 +280,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -307,7 +296,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -324,7 +313,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -344,7 +333,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const order: string[] = [];
             el.addEventListener('ar-breadcrumb-show', () => order.push('show'));
             const shownHandler = vi.fn(() => order.push('shown'));
@@ -370,7 +359,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
 
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
@@ -387,7 +376,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -406,7 +395,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
             const hideHandler = vi.fn();
             const hiddenHandler = vi.fn();
@@ -414,7 +403,6 @@ describe('ArBreadcrumb', () => {
             el.addEventListener('ar-breadcrumb-hidden', hiddenHandler);
 
             el.open = true;
-            await waitForUpdate(el);
             await waitForUpdate(el);
             await waitForUpdate(el);
 
@@ -429,7 +417,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -441,7 +429,6 @@ describe('ArBreadcrumb', () => {
             el.addEventListener('ar-breadcrumb-shown', shownHandler);
 
             el.open = false;
-            await waitForUpdate(el);
             await waitForUpdate(el);
             await waitForUpdate(el);
 

@@ -1,15 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart, mockPopoverPanel } from '../../test-utils.js';
 import type { ArTooltip } from './tooltip.js';
 import './index.js';
-
-// happy-dom ne supporte pas l'API Popover — on mock showPopover/hidePopover sur la bulle.
-function mockBubblePopover(el: ArTooltip): void {
-    const bubble = getPart(el, 'bubble') as HTMLElement | null;
-    if (!bubble) return;
-    (bubble as any).showPopover = vi.fn();
-    (bubble as any).hidePopover = vi.fn();
-}
 
 describe('ArTooltip', () => {
     let el: ArTooltip;
@@ -20,7 +12,7 @@ describe('ArTooltip', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
             el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
-            mockBubblePopover(el);
+            mockPopoverPanel(el, 'bubble');
         });
 
         it('monte un shadow DOM', () => {
@@ -122,7 +114,7 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>(
                 '<ar-tooltip for="btn" disabled show-delay="0">Aide</ar-tooltip>',
             );
-            mockBubblePopover(el);
+            mockPopoverPanel(el, 'bubble');
             document.getElementById('btn')!.dispatchEvent(new Event('mouseenter'));
             await new Promise((r) => setTimeout(r, 10));
             expect((getPart(el, 'bubble') as any).showPopover).not.toHaveBeenCalled();
@@ -135,7 +127,7 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>(
                 '<ar-tooltip id="my-tooltip" for="btn" show-delay="0">Aide</ar-tooltip>',
             );
-            mockBubblePopover(el);
+            mockPopoverPanel(el, 'bubble');
         });
 
         it('émet ar-tooltip-shown avec detail.id après affichage', async () => {

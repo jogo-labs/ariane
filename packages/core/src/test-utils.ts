@@ -11,6 +11,8 @@
  * le cast fourni à l'appel (ex: `fixture<ArAlert>(...)`).
  */
 
+import { vi } from 'vitest';
+
 /** Alias pour contourner le protected de `updateComplete` dans LitElement. */
 type LitEl = { updateComplete: Promise<boolean> };
 
@@ -81,4 +83,23 @@ export function requirePart(el: Element, part: string): Element {
     if (!found)
         throw new Error(`Part "${part}" not found in shadow DOM of <${el.tagName.toLowerCase()}>`);
     return found;
+}
+
+/**
+ * happy-dom n'implémente pas l'API Popover native (`showPopover`/`hidePopover`) — mock ces
+ * méthodes sur le part flottant d'un composant (`ar-dropdown`, `ar-breadcrumb`, `ar-tooltip`…)
+ * pour que `Popover.isOpen` (utils/popover.ts) reflète un état réel dans les tests unitaires.
+ *
+ * Le comportement natif complet (`:popover-open`, light-dismiss, événement `toggle`) reste
+ * couvert par les tests navigateur (`*.browser.test.ts`, WTR) — ne pas chercher à le simuler ici.
+ *
+ * @param part - Nom du `part` shadow DOM portant `popover="auto"` (défaut : "panel").
+ */
+export function mockPopoverPanel(el: Element, part = 'panel'): void {
+    const target = getPart(el, part) as
+        | (HTMLElement & { showPopover?: () => void; hidePopover?: () => void })
+        | null;
+    if (!target) return;
+    target.showPopover = vi.fn();
+    target.hidePopover = vi.fn();
 }

@@ -216,7 +216,6 @@ describe('ArCollapse', () => {
             el.open = true;
             await waitForUpdate(el);
             await waitForUpdate(el);
-            await waitForUpdate(el);
 
             expect(hideHandler).not.toHaveBeenCalled();
             expect(hiddenHandler).not.toHaveBeenCalled();
@@ -233,7 +232,6 @@ describe('ArCollapse', () => {
             el.addEventListener('ar-collapse-shown', shownHandler);
 
             el.open = false;
-            await waitForUpdate(el);
             await waitForUpdate(el);
             await waitForUpdate(el);
 
