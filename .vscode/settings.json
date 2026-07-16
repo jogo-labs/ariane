@@ -14,5 +14,9 @@
   "lit-plugin.rules.no-unknown-tag-name": "warning",
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  // Générés par `npm run build:manifest` (packages/core/cem.config.js) — lancer un build
+  // avant que l'autocomplétion des tags ar-* / --ar-* fonctionne sur un clone neuf.
+  "html.customData": ["./packages/core/dist/vscode.html-custom-data.json"],
+  "css.customData": ["./packages/core/dist/vscode.css-custom-data.json"]
 }
