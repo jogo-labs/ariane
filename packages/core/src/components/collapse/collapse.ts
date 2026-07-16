@@ -2,13 +2,9 @@ import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit'
 import { property, query } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
+import { ToggleController } from '../../controllers/toggle.controller.js';
+import { emitToggleEvent } from '../../utils/toggle-events.js';
 import styles from './collapse.styles.js';
-
-export type ArCollapseEvents =
-    | 'ar-collapse-show'
-    | 'ar-collapse-shown'
-    | 'ar-collapse-hide'
-    | 'ar-collapse-hidden';
 
 /**
  * @summary Panneau pliable/dépliable accessible avec animation de hauteur.
@@ -25,10 +21,12 @@ export type ArCollapseEvents =
  * @cssprop [--ar-collapse-duration=0s]  - Durée de la transition height.
  * @cssprop [--ar-collapse-easing=ease]  - Easing de la transition height.
  *
- * @event {CustomEvent} ar-collapse-show   - Avant l'ouverture. Annulable.
- * @event {CustomEvent} ar-collapse-shown  - Après la fin de l'animation d'ouverture.
- * @event {CustomEvent} ar-collapse-hide   - Avant la fermeture. Annulable.
- * @event {CustomEvent} ar-collapse-hidden - Après la fin de l'animation de fermeture.
+ * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. Annulable.
+ * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
+ * @event {CustomEvent} ar-collapse-shown          - Après la fin de l'animation d'ouverture.
+ * @event {CustomEvent} ar-collapse-hide           - Avant la fermeture. Annulable.
+ * @event {CustomEvent} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
+ * @event {CustomEvent} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
  */
 export class ArCollapse extends LitElement {
     static override styles = [styles];
@@ -65,6 +63,16 @@ export class ArCollapse extends LitElement {
     private _internalTrigger: HTMLElement | null = null;
     private _onTransitionEnd: (() => void) | null = null;
 
+    constructor() {
+        super();
+        new ToggleController(this, {
+            eventPrefix: 'ar-collapse',
+            skipInitialTransition: true,
+            onShow: () => this._onShow(),
+            onHide: () => this._onHide(),
+        });
+    }
+
     override connectedCallback(): void {
         super.connectedCallback();
         if (!this.id) {
@@ -98,10 +106,6 @@ export class ArCollapse extends LitElement {
                 this._warnIfBothTriggers();
                 this._attachExternalTrigger();
             }
-        }
-        if (changed.has('open') && changed.get('open') !== undefined) {
-            if (this.open) this._show();
-            else this._hide();
         }
         if (changed.has('disabled')) {
             this._syncTriggerDisabled();
@@ -269,15 +273,7 @@ export class ArCollapse extends LitElement {
         return !prefersReducedMotion() && d > 0;
     }
 
-    private _show(): void {
-        // symétrique de la garde de _hide() : panel déjà visible (ex. ar-collapse-hide
-        // annulé → open=true redéclenché) — évite de réémettre show/shown pour rien.
-        if (!this._panel.hasAttribute('hidden') && !this._animating) return;
-        const ev = this._emit('ar-collapse-show');
-        if (ev.defaultPrevented) {
-            this.open = false;
-            return;
-        }
+    private _onShow(): void {
         this._abortAnimation();
         this._closeGroupSiblings();
         this._syncTriggerAria();
@@ -290,7 +286,7 @@ export class ArCollapse extends LitElement {
         if (!this._shouldAnimate()) {
             panel.style.height = 'auto';
             this._animating = false;
-            this._emit('ar-collapse-shown');
+            emitToggleEvent(this, 'ar-collapse-shown', { cancelable: false });
             return;
         }
         panel.style.height = `${targetH}px`;
@@ -298,20 +294,13 @@ export class ArCollapse extends LitElement {
             this._onTransitionEnd = null;
             this._animating = false;
             panel.style.height = 'auto';
-            this._emit('ar-collapse-shown');
+            emitToggleEvent(this, 'ar-collapse-shown', { cancelable: false });
         };
         this._onTransitionEnd = onShow;
         panel.addEventListener('transitionend', onShow, { once: true });
     }
 
-    private _hide(): void {
-        // finding 2 : panel déjà caché (ex. ar-collapse-show annulé → open=false déclenché)
-        if (this._panel.hasAttribute('hidden') && !this._animating) return;
-        const ev = this._emit('ar-collapse-hide');
-        if (ev.defaultPrevented) {
-            this.open = true;
-            return;
-        }
+    private _onHide(): void {
         const wasAnimating = this._animating;
         this._abortAnimation();
         this._syncTriggerAria();
@@ -319,7 +308,7 @@ export class ArCollapse extends LitElement {
             // finding 5 : snap immédiat — frère accordéon ou interruption externe
             this._panel.setAttribute('hidden', '');
             this._panel.style.height = '';
-            this._emit('ar-collapse-hidden');
+            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
             return;
         }
         this._animating = true;
@@ -330,7 +319,7 @@ export class ArCollapse extends LitElement {
             this._animating = false;
             panel.setAttribute('hidden', '');
             panel.style.height = '';
-            this._emit('ar-collapse-hidden');
+            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
             return;
         }
         panel.style.height = '0px';
@@ -339,15 +328,9 @@ export class ArCollapse extends LitElement {
             this._animating = false;
             panel.setAttribute('hidden', '');
             panel.style.height = '';
-            this._emit('ar-collapse-hidden');
+            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
         };
         this._onTransitionEnd = onHide;
         panel.addEventListener('transitionend', onHide, { once: true });
-    }
-
-    private _emit(name: ArCollapseEvents): CustomEvent {
-        const e = new CustomEvent(name, { bubbles: true, composed: true, cancelable: true });
-        this.dispatchEvent(e);
-        return e;
     }
 }
