@@ -103,7 +103,6 @@ export class ArDropdown extends LitElement {
                 this._externalTrigger = trigger;
             }
         }
-        if (this.open) this._show();
     }
 
     override updated(changed: PropertyValues<this>): void {
@@ -129,8 +128,13 @@ export class ArDropdown extends LitElement {
             }
         }
         if (changed.has('open')) {
-            if (this.open) this._show();
-            else this._hide();
+            // Différé après la fin du cycle courant : _show()/_hide() déclenchent
+            // Popover.show()/hide(), qui appelle host.requestUpdate() — un appel synchrone
+            // ici déclencherait l'avertissement dev Lit "change-in-update".
+            void this.updateComplete.then(() => {
+                if (this.open) this._show();
+                else this._hide();
+            });
         }
     }
 

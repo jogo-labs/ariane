@@ -368,11 +368,14 @@ describe('ArBreadcrumb', () => {
             const order: string[] = [];
             el.addEventListener('ar-breadcrumb-show', () => order.push('show'));
             const shownHandler = vi.fn(() => order.push('shown'));
+            const shownPromise = new Promise<void>((resolve) => {
+                el.addEventListener('ar-breadcrumb-shown', () => resolve(), { once: true });
+            });
             el.addEventListener('ar-breadcrumb-shown', shownHandler);
 
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
-            await waitForUpdate(el);
+            await shownPromise;
 
             expect(order).toEqual(['show', 'shown']);
             expect(shownHandler).toHaveBeenCalledOnce();

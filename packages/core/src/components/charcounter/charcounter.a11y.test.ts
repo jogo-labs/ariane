@@ -33,10 +33,18 @@ describe('ar-charcounter — accessibilité', () => {
             const container = await fixture(html`
                 <div>
                     <label for="field2">Commentaire</label>
-                    <textarea id="field2">${'x'.repeat(165)}</textarea>
+                    <textarea id="field2"></textarea>
                     <ar-charcounter for="field2" max="200"></ar-charcounter>
                 </div>
             `);
+            // Interpoler dans <textarea> n'est pas supporté par lit-html (contenu raw-text) —
+            // on fixe la valeur après coup et on déclenche 'input' pour que ar-charcounter
+            // (qui ne recalcule que sur cet événement) recalcule bien son état "warning".
+            const counter = container.querySelector<ArCharcounter>('ar-charcounter')!;
+            const field = container.querySelector<HTMLTextAreaElement>('#field2')!;
+            field.value = 'x'.repeat(165);
+            field.dispatchEvent(new Event('input'));
+            await counter.updateComplete;
             await expect(container).to.be.accessible();
         });
     });
