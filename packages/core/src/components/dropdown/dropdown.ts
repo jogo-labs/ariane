@@ -91,6 +91,7 @@ export class ArDropdown extends LitElement {
 
     constructor() {
         super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
         new ToggleController(this, {
             eventPrefix: 'ar-dropdown',
             onShow: () => this._onShow(),

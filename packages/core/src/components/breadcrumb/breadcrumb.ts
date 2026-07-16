@@ -110,6 +110,7 @@ export class ArBreadcrumb extends LitElement {
 
     constructor() {
         super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
         new ToggleController(this, {
             eventPrefix: 'ar-breadcrumb',
             shouldToggle: () => this.isMobile,
