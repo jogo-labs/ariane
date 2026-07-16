@@ -10,6 +10,7 @@ const tocEntries = [
     { id: 'prefix',         label: 'Renommer les tags',  level: 2 as const },
     { id: 'npm',            label: 'Setup avancé (npm)', level: 1 as const },
     { id: 'headless-import', label: 'Import headless',   level: 2 as const },
+    { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
 ];
 
 const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
@@ -47,6 +48,11 @@ import '@ariane-ui/core/themes/default.css';`;
 const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
 
 customElements.define('acme-alert', ArAlert);`;
+
+const codeVsCodeSettings = `{
+  "html.customData": ["node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
+  "css.customData": ["node_modules/@ariane-ui/core/dist/vscode.css-custom-data.json"]
+}`;
 ---
 
 <Layout
@@ -166,6 +172,17 @@ customElements.define('acme-alert', ArAlert);`;
                     Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
                     composant individuellement.
                 </p>
+            </section>
+
+            <section id="ide-autocomplete" class="subsection">
+                <h4 class="subsection-title">Autocomplétion IDE</h4>
+                <p>
+                    Le paquet npm publie des fichiers de données VS Code générés automatiquement
+                    depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
+                    de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
+                    Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
+                </p>
+                <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
             </section>
         </section>
     </div>
