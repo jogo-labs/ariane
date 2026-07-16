@@ -566,7 +566,7 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             el.appendChild(document.createTextNode(' '));
             await waitForUpdate(el);
-            expect(spy).toHaveBeenCalledTimes(1);
+            expect(spy).toHaveBeenCalledOnce();
         });
     });
 

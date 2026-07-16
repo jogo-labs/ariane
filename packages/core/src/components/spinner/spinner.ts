@@ -20,8 +20,6 @@ import { warn } from '../../utils/warn.js';
  */
 export class ArSpinner extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];
-
-    static readonly NAME = 'ArSpinner';
     static readonly DEFAULT_DONE: boolean = false;
     static readonly DEFAULT_LOADING_LABEL: string = 'Contenu en cours de chargement';
     static readonly DEFAULT_DONE_LABEL: string = 'Chargement terminé';

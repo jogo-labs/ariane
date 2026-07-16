@@ -34,9 +34,6 @@ export class ArProgressbarConfig {
 export class ArProgressbar extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, styles];
 
-    /** Nom du composant affiché dans les logs */
-    static readonly NAME = 'ArProgressbar';
-
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
      * @attr percent

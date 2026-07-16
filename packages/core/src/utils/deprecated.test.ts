@@ -11,7 +11,7 @@ describe('warnDeprecated', () => {
 
         warnDeprecated('ar-alert', 'links', 'Utilisez des slots.');
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith(expect.stringContaining('ar-alert'));
         expect(spy).toHaveBeenCalledWith(expect.stringContaining('links'));
         expect(spy).toHaveBeenCalledWith(expect.stringContaining('Utilisez des slots.'));
@@ -24,7 +24,7 @@ describe('warnDeprecated', () => {
         warnDeprecated('ar-breadcrumb', 'dark', 'Message.');
         warnDeprecated('ar-breadcrumb', 'dark', 'Message.');
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
     });
 
     it('affiche des warnings distincts pour des paires tag:member différentes', () => {

@@ -45,7 +45,7 @@ describe('autoloader', () => {
         appendElement('ar-alert');
         await tick();
 
-        expect(mockAlertImport).toHaveBeenCalledTimes(1);
+        expect(mockAlertImport).toHaveBeenCalledOnce();
     });
 
     it('ne recharge pas le module si ar-alert est ajouté une seconde fois (loaded Set)', async () => {

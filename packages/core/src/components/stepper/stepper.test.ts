@@ -141,7 +141,7 @@ describe('ArStepper', () => {
             const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
             if (link) {
                 link.click();
-                expect(handler).toHaveBeenCalledTimes(1);
+                expect(handler).toHaveBeenCalledOnce();
                 const event = handler.mock.calls[0][0] as CustomEvent;
                 expect(event.detail).toHaveProperty('path');
             }
@@ -375,7 +375,7 @@ describe('ArStepper', () => {
             );
             el.remove();
 
-            expect(removeListenerSpy).toHaveBeenCalledTimes(1);
+            expect(removeListenerSpy).toHaveBeenCalledOnce();
         });
     });
 

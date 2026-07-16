@@ -62,7 +62,7 @@ describe('whenAllDefined', () => {
 
         await whenAllDefined();
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith('ar-alert');
         expect(spy).not.toHaveBeenCalledWith('my-button');
     });
@@ -78,7 +78,7 @@ describe('whenAllDefined', () => {
 
         await whenAllDefined();
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith('acme-alert');
         expect(spy).not.toHaveBeenCalledWith('ar-alert');
     });
@@ -93,7 +93,7 @@ describe('whenAllDefined', () => {
 
         await whenAllDefined('my-');
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith('my-button');
         expect(spy).not.toHaveBeenCalledWith('ar-alert');
     });

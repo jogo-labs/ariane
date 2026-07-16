@@ -32,7 +32,6 @@ export type ArCollapseEvents =
  */
 export class ArCollapse extends LitElement {
     static override styles = [styles];
-    static readonly NAME = 'ArCollapse';
     private static _idCounter = 0;
 
     /** Ouvre ou ferme le panel. */

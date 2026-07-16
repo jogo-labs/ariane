@@ -414,7 +414,7 @@ describe('ArDropdown', () => {
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 0));
 
-            expect(shownHandler).toHaveBeenCalledTimes(1);
+            expect(shownHandler).toHaveBeenCalledOnce();
             const event = shownHandler.mock.calls[0][0] as CustomEvent;
             expect(event.detail).toEqual({ id: 'my-dropdown' });
         });
