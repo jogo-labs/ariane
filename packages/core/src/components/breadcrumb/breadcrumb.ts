@@ -77,6 +77,14 @@ export class ArBreadcrumb extends LitElement {
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
 
+    /**
+     * Quand _show()/_hide() annule et revient sur `open`, ça redéclenche un second cycle
+     * updated() qui appellerait la branche opposée pour rien (le panel n'a jamais changé
+     * d'état). Ce flag fait de ce second appel un no-op, sans affecter les fermetures
+     * externes légitimes (onExternalClose), qui ne passent pas par cette annulation.
+     */
+    private _suppressNextToggle = false;
+
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
         initialValue: {
@@ -249,9 +257,13 @@ export class ArBreadcrumb extends LitElement {
     };
 
     private _show(): void {
-        if (this._popover.isOpen) return;
+        if (this._suppressNextToggle) {
+            this._suppressNextToggle = false;
+            return;
+        }
         const showEv = this._emit('ar-breadcrumb-show');
         if (showEv.defaultPrevented) {
+            this._suppressNextToggle = true;
             this.open = false;
             return;
         }
@@ -261,9 +273,13 @@ export class ArBreadcrumb extends LitElement {
     }
 
     private _hide(): void {
-        if (!this._popover.isOpen) return;
+        if (this._suppressNextToggle) {
+            this._suppressNextToggle = false;
+            return;
+        }
         const hideEv = this._emit('ar-breadcrumb-hide');
         if (hideEv.defaultPrevented) {
+            this._suppressNextToggle = true;
             this.open = true;
             return;
         }
