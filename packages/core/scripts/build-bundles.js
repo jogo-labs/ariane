@@ -104,12 +104,22 @@ const commonOptions = {
 // build-css.js --watch tourne en parallèle — un rmSync ici créerait une race
 // condition (dist/styles/ wipeé pendant que build-css.js y écrit).
 if (!WATCH) {
-    // Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
-    // besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
-    const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
-    let preservedManifest = null;
-    if (existsSync(manifestPath)) {
-        preservedManifest = readFileSync(manifestPath, 'utf-8');
+    // Préserver les artefacts générés par build:manifest (qui tourne avant ce script
+    // dans la chaîne `build`) pendant le clean : la doc Astro peut avoir besoin de
+    // custom-elements.json pendant que ce build tourne (race condition Turbo avec les
+    // tâches persistent), et les fichiers vscode.*.json seraient sinon effacés sans
+    // jamais être régénérés (build:manifest ne re-tourne pas après ce script).
+    const preservedFiles = [
+        'custom-elements.json',
+        'vscode.html-custom-data.json',
+        'vscode.css-custom-data.json',
+    ];
+    const preserved = new Map();
+    for (const name of preservedFiles) {
+        const path = join(ROOT, 'dist', name);
+        if (existsSync(path)) {
+            preserved.set(name, readFileSync(path, 'utf-8'));
+        }
     }
 
     for (const dir of ['dist', 'cdn']) {
@@ -120,8 +130,8 @@ if (!WATCH) {
         mkdirSync(target, { recursive: true });
     }
 
-    if (preservedManifest !== null) {
-        writeFileSync(manifestPath, preservedManifest, 'utf-8');
+    for (const [name, content] of preserved) {
+        writeFileSync(join(ROOT, 'dist', name), content, 'utf-8');
     }
 }
 

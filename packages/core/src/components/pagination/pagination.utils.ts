@@ -34,8 +34,3 @@ export function _calculatePages(current: number, total: number) {
 export function _clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
 }
-
-export const mrPaginationUtils = {
-    _calculatePages,
-    _clamp,
-};
