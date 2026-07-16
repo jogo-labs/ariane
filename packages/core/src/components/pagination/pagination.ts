@@ -5,7 +5,7 @@ import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
 import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
-import { mrPaginationUtils } from './pagination.utils.js';
+import { _calculatePages, _clamp } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
 
@@ -93,15 +93,11 @@ export class ArPagination extends LitElement {
         // nextPageNumber) et une liste de pages vide, sans qu'aucune erreur ne le
         // signale à l'exécution.
         const total = Math.max(this.total, 1);
-        const current = mrPaginationUtils._clamp(this.current, 1, total);
+        const current = _clamp(this.current, 1, total);
         const isNextDisabled = current >= total;
         const isPreviousDisabled = current <= 1;
-        const previousPageNumber = mrPaginationUtils._clamp(
-            current - 1,
-            1,
-            total > 1 ? total - 1 : 1,
-        );
-        const nextPageNumber = mrPaginationUtils._clamp(current + 1, 1, total);
+        const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
+        const nextPageNumber = _clamp(current + 1, 1, total);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
@@ -120,7 +116,7 @@ export class ArPagination extends LitElement {
                 </li>
 
                 ${repeat(
-                    mrPaginationUtils._calculatePages(current, total),
+                    _calculatePages(current, total),
                     (page) => page,
                     (page) => {
                         // -1 et -2 sont des sentinelles représentant les ellipses
