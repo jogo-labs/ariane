@@ -180,14 +180,10 @@ export class ArAlert extends LitElement {
 
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
     private _finishHide = (): void => {
-        if (!this.canBeHidden) return;
+        if (!this.canBeHidden || !this.hiding) return;
 
-        if (this.hiding) {
-            this.dispatchEvent(
-                new CustomEvent('ar-alert-close', { bubbles: true, composed: true }),
-            );
-            this.remove();
-        }
+        this.dispatchEvent(new CustomEvent('ar-alert-close', { bubbles: true, composed: true }));
+        this.remove();
 
         const $focusableElement = document.getElementById(
             `${(this.nextFocus as string).replace('#', '')}`,

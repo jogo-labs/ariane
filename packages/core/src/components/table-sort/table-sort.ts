@@ -4,6 +4,7 @@ import styles from './table-sort.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
+import '../tooltip/index.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';

@@ -456,16 +456,26 @@ export class ArStepper extends LitElement {
         const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
         if (!path) return;
 
+        const node = this.navigation.tree
+            .flatMap((s) => [s, ...s.children])
+            .find((s) => s.path === path);
+
+        // Sans href réel fourni par le consommateur (omis, ou explicitement '#' — la
+        // convention documentée pour un item sans navigation propre), l'ancre est purement
+        // décorative : la navigation est pilotée par l'event, pas par le comportement natif.
+        // Un href réel (ex: navigation en dur vers une autre page) reste navigable
+        // normalement, y compris ctrl/cmd/clic-molette pour ouvrir dans un nouvel onglet.
+        if (node?.href === undefined || node.href === '#') {
+            event.preventDefault();
+        }
+
         const detail: ArStepperStepChangeDetail = { path };
 
         this.dispatchEvent(
             new CustomEvent('ar-stepper-step-change', { bubbles: true, composed: true, detail }),
         );
 
-        const stepLabel =
-            this.navigation.tree.flatMap((s) => [s, ...s.children]).find((s) => s.path === path)
-                ?.label ?? path;
-        announceA11y(stepLabel, 'polite');
+        announceA11y(node?.label ?? path, 'polite');
     };
 
     private handleScrollChange = (event: CustomEvent<string>): void => {

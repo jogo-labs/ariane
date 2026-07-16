@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArTabGroup } from './tab-group.js';
+import type { ArTab } from '../tab/tab.js';
 import './index.js';
 import '../tab/index.js';
 import '../tab-panel/index.js';
@@ -191,6 +192,52 @@ describe('ArTabGroup', () => {
             await waitForUpdate(el);
             const tabB = el.querySelector<HTMLElement>('ar-tab[panel="b"]')!;
             expect(tabB.getAttribute('aria-selected')).toBe('true');
+        });
+    });
+
+    describe('disabled à chaud', () => {
+        it('met à jour aria-disabled quand tab.disabled change après le montage', async () => {
+            el = await fixture(`
+                <ar-tab-group>
+                    <ar-tab panel="a">Tab A</ar-tab>
+                    <ar-tab panel="b">Tab B</ar-tab>
+                    <ar-tab-panel name="a">Panel A</ar-tab-panel>
+                    <ar-tab-panel name="b">Panel B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            await waitForUpdate(el);
+
+            const tabB = el.querySelector<ArTab>('ar-tab[panel="b"]')!;
+            expect(tabB.hasAttribute('aria-disabled')).toBe(false);
+
+            tabB.disabled = true;
+            await waitForUpdate(el);
+
+            expect(tabB.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it("réconcilie active et émet ar-tab-group-change quand l'onglet actif devient disabled", async () => {
+            el = await fixture(`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">Tab A</ar-tab>
+                    <ar-tab panel="b">Tab B</ar-tab>
+                    <ar-tab-panel name="a">Panel A</ar-tab-panel>
+                    <ar-tab-panel name="b">Panel B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            await waitForUpdate(el);
+
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-tab-group-change', (e) => events.push(e as CustomEvent));
+
+            const tabA = el.querySelector<ArTab>('ar-tab[panel="a"]')!;
+            tabA.disabled = true;
+            await waitForUpdate(el);
+
+            expect(el.active).not.toBe('a');
+            expect(el.active).toBe('b');
+            expect(events.length).toBe(1);
+            expect(events[0].detail).toEqual({ active: 'b' });
         });
     });
 

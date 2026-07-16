@@ -337,3 +337,9 @@ describe('ArTableSort', () => {
         });
     });
 });
+
+describe('dépendance ar-tooltip', () => {
+    it('ar-tooltip est défini après import isolé de ar-table-sort', () => {
+        expect(customElements.get('ar-tooltip')).toBeDefined();
+    });
+});

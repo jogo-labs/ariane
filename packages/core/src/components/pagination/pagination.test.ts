@@ -368,5 +368,15 @@ describe('ArPagination', () => {
 
             expect(spy).not.toHaveBeenCalled();
         });
+
+        it('total négatif : render() reste fonctionnel et ne montre aucun numéro de page négatif', async () => {
+            el = await fixture('<ar-pagination total="-3"></ar-pagination>');
+            expect(el.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
+
+            const prevLabel = el.shadowRoot?.querySelector('[part="prev"] .sr-only')?.textContent;
+            const nextLabel = el.shadowRoot?.querySelector('[part="next"] .sr-only')?.textContent;
+            expect(prevLabel).not.toMatch(/-\d/);
+            expect(nextLabel).not.toMatch(/-\d/);
+        });
     });
 });
