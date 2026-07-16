@@ -189,6 +189,26 @@ describe('ArStepper', () => {
             expect(preventDefaultSpy).toHaveBeenCalledOnce();
         });
 
+        it("appelle preventDefault() quand href vaut explicitement '#' (convention documentée)", async () => {
+            // La doc (ar-stepper.mdx) pose systématiquement href="#" plutôt que de l'omettre —
+            // ce cas doit être traité comme décoratif au même titre qu'un href absent.
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" href="#" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            expect(link).not.toBeNull();
+            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+            const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+
+            link!.dispatchEvent(clickEvent);
+
+            expect(preventDefaultSpy).toHaveBeenCalledOnce();
+        });
+
         it("n'appelle pas preventDefault() quand l'étape a un href réel fourni par le consommateur", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
