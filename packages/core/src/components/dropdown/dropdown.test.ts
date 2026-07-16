@@ -132,6 +132,41 @@ describe('ArDropdown', () => {
             expect(el.open).toBe(true);
         });
 
+        it("n'émet pas ar-dropdown-hide/-hidden quand ar-dropdown-show est annulé", async () => {
+            el.addEventListener('ar-dropdown-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-dropdown-hide', hideHandler);
+            el.addEventListener('ar-dropdown-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet pas ar-dropdown-show/-shown quand ar-dropdown-hide est annulé", async () => {
+            el.open = true;
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-dropdown-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-show', showHandler);
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
+        });
+
         it("n'émet ar-dropdown-show qu'une fois quand open est déjà vrai au premier rendu", async () => {
             // Écoute posée avant connexion : fixture() connecte puis résout après le premier
             // rendu, trop tard pour capter un événement émis dès firstUpdated()/updated().

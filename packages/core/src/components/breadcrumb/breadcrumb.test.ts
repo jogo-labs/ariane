@@ -39,6 +39,17 @@ function mockMediaQuery(matches: boolean): MediaQueryList {
     } as unknown as MediaQueryList;
 }
 
+// happy-dom does not implement the Popover API — mock showPopover/hidePopover on the panel
+// (même pattern que dropdown.test.ts), nécessaire pour que Popover.isOpen reflète l'état réel.
+function mockPanelPopover(el: ArBreadcrumb): void {
+    const panel = getPart(el, 'panel') as HTMLElement | null;
+    if (!panel) return;
+    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).showPopover =
+        vi.fn();
+    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).hidePopover =
+        vi.fn();
+}
+
 describe('ArBreadcrumb', () => {
     let el: ArBreadcrumb;
 
@@ -227,6 +238,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -244,6 +256,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const showHandler = vi.fn();
             const hideHandler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', showHandler);
@@ -266,6 +279,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             expect(el.open).toBe(false);
             expect(el.hasAttribute('open')).toBe(false);
         });
@@ -277,6 +291,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -292,6 +307,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -308,6 +324,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -327,6 +344,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const order: string[] = [];
             el.addEventListener('ar-breadcrumb-show', () => order.push('show'));
             const shownHandler = vi.fn(() => order.push('shown'));
@@ -352,6 +370,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
 
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
@@ -368,6 +387,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPanelPopover(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -377,6 +397,56 @@ describe('ArBreadcrumb', () => {
             await waitForUpdate(el);
 
             expect(el.open).toBe(true);
+        });
+
+        it("n'émet pas ar-breadcrumb-hide/-hidden quand ar-breadcrumb-show est annulé", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPanelPopover(el);
+            el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-breadcrumb-hide', hideHandler);
+            el.addEventListener('ar-breadcrumb-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet pas ar-breadcrumb-show/-shown quand ar-breadcrumb-hide est annulé", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPanelPopover(el);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-breadcrumb-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-breadcrumb-show', showHandler);
+            el.addEventListener('ar-breadcrumb-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
         });
     });
 

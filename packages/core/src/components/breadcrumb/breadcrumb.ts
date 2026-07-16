@@ -249,6 +249,7 @@ export class ArBreadcrumb extends LitElement {
     };
 
     private _show(): void {
+        if (this._popover.isOpen) return;
         const showEv = this._emit('ar-breadcrumb-show');
         if (showEv.defaultPrevented) {
             this.open = false;
@@ -260,6 +261,7 @@ export class ArBreadcrumb extends LitElement {
     }
 
     private _hide(): void {
+        if (!this._popover.isOpen) return;
         const hideEv = this._emit('ar-breadcrumb-hide');
         if (hideEv.defaultPrevented) {
             this.open = true;

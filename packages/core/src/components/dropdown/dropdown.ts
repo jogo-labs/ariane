@@ -205,6 +205,7 @@ export class ArDropdown extends LitElement {
     };
 
     private _show(): void {
+        if (this._popover.isOpen) return;
         const showEv = this._emit('ar-dropdown-show');
         if (showEv.defaultPrevented) {
             this.open = false;
@@ -220,6 +221,7 @@ export class ArDropdown extends LitElement {
     }
 
     private _hide(): void {
+        if (!this._popover.isOpen) return;
         const hideEv = this._emit('ar-dropdown-hide');
         if (hideEv.defaultPrevented) {
             this.open = true;
