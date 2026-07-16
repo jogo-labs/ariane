@@ -1,18 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDropdown } from './dropdown.js';
-import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart, mockPopoverPanel } from '../../test-utils.js';
 import './index.js';
 import '../dropdown-item/index.js';
-
-// happy-dom does not implement the Popover API — mock showPopover/hidePopover on the panel.
-function mockPanelPopover(el: ArDropdown): void {
-    const panel = getPart(el, 'panel') as HTMLElement | null;
-    if (!panel) return;
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).showPopover =
-        vi.fn();
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).hidePopover =
-        vi.fn();
-}
 
 describe('ArDropdown', () => {
     let el: ArDropdown;
@@ -57,7 +47,7 @@ describe('ArDropdown', () => {
         });
 
         it('open reflète en attribut', async () => {
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             el.open = true;
             await waitForUpdate(el);
             expect(el.hasAttribute('open')).toBe(true);
@@ -95,7 +85,7 @@ describe('ArDropdown', () => {
             el = await fixture(
                 '<ar-dropdown><button slot="trigger">Trigger</button></ar-dropdown>',
             );
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
         });
 
         it('émet ar-dropdown-show avant ouverture', async () => {
@@ -132,6 +122,39 @@ describe('ArDropdown', () => {
             expect(el.open).toBe(true);
         });
 
+        it("n'émet pas ar-dropdown-hide/-hidden quand ar-dropdown-show est annulé", async () => {
+            el.addEventListener('ar-dropdown-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-dropdown-hide', hideHandler);
+            el.addEventListener('ar-dropdown-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet pas ar-dropdown-show/-shown quand ar-dropdown-hide est annulé", async () => {
+            el.open = true;
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-dropdown-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-show', showHandler);
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
+        });
+
         it("n'émet ar-dropdown-show qu'une fois quand open est déjà vrai au premier rendu", async () => {
             // Écoute posée avant connexion : fixture() connecte puis résout après le premier
             // rendu, trop tard pour capter un événement émis dès firstUpdated()/updated().
@@ -154,7 +177,7 @@ describe('ArDropdown', () => {
             el = await fixture(
                 '<ar-dropdown disabled><button slot="trigger">Trigger</button></ar-dropdown>',
             );
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const trigger = el.querySelector<HTMLButtonElement>('button');
             trigger?.click();
             await waitForUpdate(el);
@@ -178,7 +201,7 @@ describe('ArDropdown', () => {
         it("bloque overflowY des ancêtres scroll à l'ouverture", async () => {
             el = await fixture('<ar-dropdown><button slot="trigger">T</button></ar-dropdown>');
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -189,7 +212,7 @@ describe('ArDropdown', () => {
         it('restaure overflowY des ancêtres à la fermeture', async () => {
             el = await fixture('<ar-dropdown><button slot="trigger">T</button></ar-dropdown>');
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -206,7 +229,7 @@ describe('ArDropdown', () => {
             );
             await waitForUpdate(el);
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -236,7 +259,7 @@ describe('ArDropdown', () => {
 
         it('le clic sur le trigger externe ouvre le dropdown', async () => {
             el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             externalBtn.click();
             await waitForUpdate(el);
@@ -271,7 +294,7 @@ describe('ArDropdown', () => {
                     <button slot="trigger">Menu</button>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             // Append items after fixture to trigger slotchange
             const item1 = document.createElement('ar-dropdown-item');
             item1.innerHTML = '<button>Item 1</button>';
@@ -291,7 +314,7 @@ describe('ArDropdown', () => {
                     <p>Contenu libre</p>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             await waitForUpdate(el);
             const panel = getPart(el, 'panel');
             expect(panel?.getAttribute('role')).toBeNull();
@@ -303,7 +326,7 @@ describe('ArDropdown', () => {
                     <button slot="trigger">Menu</button>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const item1 = document.createElement('ar-dropdown-item');
             item1.innerHTML = '<button>Item 1</button>';
             const hr = document.createElement('hr');
@@ -388,7 +411,7 @@ describe('ArDropdown', () => {
             document.body.appendChild(host);
 
             const dropdown = host.shadowRoot!.querySelector('ar-dropdown') as ArDropdown;
-            mockPanelPopover(dropdown);
+            mockPopoverPanel(dropdown);
             await waitForUpdate(dropdown);
 
             const trigger = host.shadowRoot!.getElementById(
@@ -406,7 +429,7 @@ describe('ArDropdown', () => {
     describe('detail des events de cycle de vie', () => {
         it('ar-dropdown-shown porte detail.id', async () => {
             el = await fixture('<ar-dropdown id="my-dropdown"><div>Contenu</div></ar-dropdown>');
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const shownHandler = vi.fn();
             el.addEventListener('ar-dropdown-shown', shownHandler);
 

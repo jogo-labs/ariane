@@ -270,6 +270,9 @@ export class ArCollapse extends LitElement {
     }
 
     private _show(): void {
+        // symétrique de la garde de _hide() : panel déjà visible (ex. ar-collapse-hide
+        // annulé → open=true redéclenché) — évite de réémettre show/shown pour rien.
+        if (!this._panel.hasAttribute('hidden') && !this._animating) return;
         const ev = this._emit('ar-collapse-show');
         if (ev.defaultPrevented) {
             this.open = false;

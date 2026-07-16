@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ArBreadcrumb } from './breadcrumb.js';
-import { getPart } from '../../test-utils.js';
+import { getPart, mockPopoverPanel } from '../../test-utils.js';
 import './index.js';
 import '../breadcrumb-item/index.js';
 
@@ -227,6 +227,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -244,6 +245,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const showHandler = vi.fn();
             const hideHandler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', showHandler);
@@ -266,6 +268,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             expect(el.open).toBe(false);
             expect(el.hasAttribute('open')).toBe(false);
         });
@@ -277,6 +280,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -292,6 +296,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
@@ -308,6 +313,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -327,6 +333,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const order: string[] = [];
             el.addEventListener('ar-breadcrumb-show', () => order.push('show'));
             const shownHandler = vi.fn(() => order.push('shown'));
@@ -352,6 +359,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
 
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
@@ -368,6 +376,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
+            mockPopoverPanel(el);
             const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
@@ -377,6 +386,54 @@ describe('ArBreadcrumb', () => {
             await waitForUpdate(el);
 
             expect(el.open).toBe(true);
+        });
+
+        it("n'émet pas ar-breadcrumb-hide/-hidden quand ar-breadcrumb-show est annulé", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPopoverPanel(el);
+            el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-breadcrumb-hide', hideHandler);
+            el.addEventListener('ar-breadcrumb-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet pas ar-breadcrumb-show/-shown quand ar-breadcrumb-hide est annulé", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPopoverPanel(el);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-breadcrumb-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-breadcrumb-show', showHandler);
+            el.addEventListener('ar-breadcrumb-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
         });
     });
 

@@ -85,6 +85,14 @@ export class ArDropdown extends LitElement {
     private _externalTrigger: HTMLElement | null = null;
     private readonly _uniqueId = Math.random().toString(36).slice(2, 9);
 
+    /**
+     * Quand _show()/_hide() annule et revient sur `open`, ça redéclenche un second cycle
+     * updated() qui appellerait la branche opposée pour rien (le panel n'a jamais changé
+     * d'état). Ce flag fait de ce second appel un no-op, sans affecter les fermetures
+     * externes légitimes (onExternalClose), qui ne passent pas par cette annulation.
+     */
+    private _suppressNextToggle = false;
+
     override firstUpdated(): void {
         if (this.for) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
@@ -205,8 +213,13 @@ export class ArDropdown extends LitElement {
     };
 
     private _show(): void {
+        if (this._suppressNextToggle) {
+            this._suppressNextToggle = false;
+            return;
+        }
         const showEv = this._emit('ar-dropdown-show');
         if (showEv.defaultPrevented) {
+            this._suppressNextToggle = true;
             this.open = false;
             return;
         }
@@ -220,8 +233,13 @@ export class ArDropdown extends LitElement {
     }
 
     private _hide(): void {
+        if (this._suppressNextToggle) {
+            this._suppressNextToggle = false;
+            return;
+        }
         const hideEv = this._emit('ar-dropdown-hide');
         if (hideEv.defaultPrevented) {
+            this._suppressNextToggle = true;
             this.open = true;
             return;
         }

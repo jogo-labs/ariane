@@ -205,6 +205,39 @@ describe('ArCollapse', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(true);
         });
+
+        it("n'émet pas ar-collapse-hide/-hidden quand ar-collapse-show est annulé", async () => {
+            el.addEventListener('ar-collapse-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-collapse-hide', hideHandler);
+            el.addEventListener('ar-collapse-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet pas ar-collapse-show/-shown quand ar-collapse-hide est annulé", async () => {
+            el.show();
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-collapse-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-collapse-show', showHandler);
+            el.addEventListener('ar-collapse-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
+        });
     });
 
     // ── Trigger interne + ARIA ────────────────────────────────────────────────
