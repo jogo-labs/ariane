@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { extractThemeTokens, validateCssPropertyDefaults } from './validate-cssprop-defaults.js';
+import {
+    extractThemeTokens,
+    validateCssPropertyDefaults,
+    validateCssPropertyCoverage,
+} from './validate-cssprop-defaults.js';
 
 describe('extractThemeTokens', () => {
     it('extrait un token simple', () => {
@@ -180,5 +184,129 @@ describe('validateCssPropertyDefaults', () => {
         const themeTokens = new Map([['--ar-pagination-radius', '0.75rem']]);
         const manifest = manifestWith([{ name: '--ar-pagination-radius', default: '  0.75rem  ' }]);
         expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
+    });
+});
+
+describe('validateCssPropertyCoverage', () => {
+    function manifestWithTag(tagName, cssProperties, customElement = true) {
+        return {
+            modules: [
+                {
+                    declarations: [
+                        {
+                            name: tagName
+                                .replace(/-/g, ' ')
+                                .split(' ')
+                                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                .join(''),
+                            tagName,
+                            customElement,
+                            cssProperties,
+                        },
+                    ],
+                },
+            ],
+        };
+    }
+
+    it('ne retourne aucune erreur quand un token est documenté dans cssProperties', () => {
+        const manifest = manifestWithTag('ar-alert', [{ name: '--ar-alert-border-radius' }]);
+        const themeTokens = new Map([['--ar-alert-border-radius', '0.5rem']]);
+        expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
+    });
+
+    it("retourne une erreur quand un token du thème n'est pas documenté en @cssprop", () => {
+        const manifest = manifestWithTag('ar-alert', []);
+        const themeTokens = new Map([['--ar-alert-border-radius', '0.5rem']]);
+        const errors = validateCssPropertyCoverage(manifest, themeTokens);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('ArAlert');
+        expect(errors[0]).toContain('--ar-alert-border-radius');
+    });
+
+    it('ignore les tokens globaux qui ne matchent aucun tag (ex. --ar-color-*, --ar-spacing-*)', () => {
+        const manifest = manifestWithTag('ar-alert', []);
+        const themeTokens = new Map([
+            ['--ar-color-text', '#171717'],
+            ['--ar-spacing-sm', '0.5rem'],
+        ]);
+        expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
+    });
+
+    it('attribue correctement un token au composant avec le tag le plus long (ar-tab-group vs ar-tab)', () => {
+        const manifest = {
+            modules: [
+                {
+                    declarations: [
+                        {
+                            name: 'ArTab',
+                            tagName: 'ar-tab',
+                            customElement: true,
+                            cssProperties: [],
+                        },
+                        {
+                            name: 'ArTabGroup',
+                            tagName: 'ar-tab-group',
+                            customElement: true,
+                            cssProperties: [],
+                        },
+                    ],
+                },
+            ],
+        };
+        const themeTokens = new Map([
+            ['--ar-tab-group-active-shadow', '0 2px 4px rgba(0,0,0,0.1)'],
+        ]);
+        const errors = validateCssPropertyCoverage(manifest, themeTokens);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('ArTabGroup');
+        expect(errors[0]).toContain('--ar-tab-group-active-shadow');
+    });
+
+    it('ignore les déclarations sans customElement:true (ex. classe TypeScript, interface, type)', () => {
+        const manifest = {
+            modules: [
+                {
+                    declarations: [
+                        { name: 'ArButtonHelper', tagName: undefined, customElement: false },
+                    ],
+                },
+            ],
+        };
+        const themeTokens = new Map([['--ar-button-helper-color', 'red']]);
+        expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
+    });
+
+    it('ignore les déclarations sans tagName (ex. type alias, interface)', () => {
+        const manifest = {
+            modules: [
+                {
+                    declarations: [
+                        { name: 'ArButtonConfig', customElement: true, tagName: undefined },
+                    ],
+                },
+            ],
+        };
+        const themeTokens = new Map([['--ar-button-config-value', 'test']]);
+        expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
+    });
+
+    it('documente un token avec default optionnel (la présence suffit, pas la valeur)', () => {
+        const manifest = manifestWithTag('ar-alert', [
+            { name: '--ar-alert-padding', default: '1rem' },
+        ]);
+        const themeTokens = new Map([['--ar-alert-padding', '0.75rem']]);
+        expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
+    });
+
+    it('agrège les erreurs sur plusieurs tokens undocumented du même composant', () => {
+        const manifest = manifestWithTag('ar-alert', []);
+        const themeTokens = new Map([
+            ['--ar-alert-border-radius', '0.5rem'],
+            ['--ar-alert-padding', '1rem'],
+        ]);
+        const errors = validateCssPropertyCoverage(manifest, themeTokens);
+        expect(errors).toHaveLength(2);
+        expect(errors.every((e) => e.includes('ArAlert'))).toBe(true);
     });
 });

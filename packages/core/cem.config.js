@@ -15,6 +15,7 @@ import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
 import {
     extractThemeTokens,
     validateCssPropertyDefaults,
+    validateCssPropertyCoverage,
 } from './scripts/validate-cssprop-defaults.js';
 
 export default {
@@ -180,14 +181,27 @@ export default {
                     'utf-8',
                 );
                 const themeTokens = extractThemeTokens(themeCss);
-                const cssPropErrors = validateCssPropertyDefaults(
+                const cssPropDefaultErrors = validateCssPropertyDefaults(
                     customElementsManifest,
                     themeTokens,
                 );
-                if (cssPropErrors.length > 0) {
+                const cssPropCoverageErrors = validateCssPropertyCoverage(
+                    customElementsManifest,
+                    themeTokens,
+                );
+
+                const allErrors = [...cssPropDefaultErrors, ...cssPropCoverageErrors];
+                if (allErrors.length > 0) {
+                    const defaultErrorsMsg =
+                        cssPropDefaultErrors.length > 0
+                            ? `\n  désynchronisé(s) :\n${cssPropDefaultErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
+                    const coverageErrorsMsg =
+                        cssPropCoverageErrors.length > 0
+                            ? `\n  non documenté(s) :\n${cssPropCoverageErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${cssPropErrors.length} @cssprop désynchronisé(s) avec default.css :\n` +
-                            cssPropErrors.map((e) => `  - ${e}`).join('\n'),
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${defaultErrorsMsg}${coverageErrorsMsg}`,
                     );
                 }
             },
