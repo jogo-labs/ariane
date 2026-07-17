@@ -617,13 +617,34 @@ describe('ArDialog', () => {
     });
 
     describe('personnalisation --ar-dialog-width', () => {
+        let presetStyle: HTMLStyleElement;
+
+        afterEach(() => {
+            presetStyle?.remove();
+        });
+
         it('la sélection de taille pilote --ar-dialog-width', async () => {
+            // happy-dom ne charge pas default.css : on simule les tokens de préréglage
+            // que le thème fournit normalement, pour vérifier que la résolution en
+            // cascade fonctionne réellement (et pas seulement que la chaîne var()
+            // est présente dans le CSS du composant).
+            presetStyle = document.createElement('style');
+            presetStyle.textContent = ':root { --ar-dialog-width-sm: 360px; }';
+            document.head.appendChild(presetStyle);
+
             el = await fixture('<ar-dialog size="sm"></ar-dialog>');
 
-            // happy-dom ne charge pas default.css : --ar-dialog-width-sm n'est jamais défini,
-            // donc la référence var() imbriquée ne se résout pas et getPropertyValue renvoie ''.
-            // La résolution finale en pixels est hors de portée d'un test de composant isolé.
-            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('');
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('360px');
+        });
+
+        it('le mode drawer pilote --ar-dialog-width via son propre préréglage', async () => {
+            presetStyle = document.createElement('style');
+            presetStyle.textContent = ':root { --ar-dialog-drawer-width-sm: 280px; }';
+            document.head.appendChild(presetStyle);
+
+            el = await fixture('<ar-dialog mode="drawer" size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('280px');
         });
     });
 
