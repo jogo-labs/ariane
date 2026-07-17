@@ -1,7 +1,7 @@
 /**
  * Thème par défaut — à inclure dans le <head> ou importer globalement.
  * Utilise @layer pour éviter les conflits de spécificité avec les styles utilisateur.
- * Le bloc `:root` de base doit être déclaré avant tout surcharge dark mode (`:root[data-theme='dark']` ou `@media (prefers-color-scheme: dark)`).
+ * Le bloc `:root` de base doit être déclaré avant toute surcharge dark mode (`:root[data-theme='dark']` ou `@media (prefers-color-scheme: dark)`), car `packages/core/cem.config.js` valide les `@cssprop` en s'y fiérant.
  *
  * Usage :
  *   <link rel="stylesheet" href="@ariane-ui/core/themes/default.css">

@@ -61,7 +61,7 @@ export function validateCssPropertyDefaults(customElementsManifest, themeTokens)
                 if (prop.default === undefined) continue;
                 const themeValue = themeTokens.get(prop.name);
                 if (themeValue === undefined) continue;
-                const jsdocValue = prop.default.replace(/\s+/g, ' ');
+                const jsdocValue = prop.default.trim().replace(/\s+/g, ' ');
                 if (jsdocValue !== themeValue) {
                     errors.push(
                         `${decl.name} : ${prop.name} déclare [default=${jsdocValue}] dans le JSDoc mais default.css définit "${themeValue}"`,

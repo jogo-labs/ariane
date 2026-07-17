@@ -175,4 +175,10 @@ describe('validateCssPropertyDefaults', () => {
         ]);
         expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
     });
+
+    it('accepte une valeur JSDoc avec espaces leading/trailing qui correspond à la valeur thème après trim', () => {
+        const themeTokens = new Map([['--ar-pagination-radius', '0.75rem']]);
+        const manifest = manifestWith([{ name: '--ar-pagination-radius', default: '  0.75rem  ' }]);
+        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
+    });
 });
