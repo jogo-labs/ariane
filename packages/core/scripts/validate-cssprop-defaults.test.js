@@ -39,6 +39,40 @@ describe('extractThemeTokens', () => {
         const tokens = extractThemeTokens(css);
         expect(tokens.size).toBe(0);
     });
+
+    it("ignore la surcharge dark mode manuelle (:root[data-theme='dark']) et garde la valeur claire", () => {
+        const css = `
+            @layer ariane.theme {
+                :root {
+                    --ar-alert-info-border: var(--ar-color-info-bg);
+                }
+
+                :root[data-theme='dark'] {
+                    --ar-alert-info-border: var(--ar-color-info-40);
+                }
+            }
+        `;
+        const tokens = extractThemeTokens(css);
+        expect(tokens.get('--ar-alert-info-border')).toBe('var(--ar-color-info-bg)');
+    });
+
+    it('ignore la surcharge dark mode automatique (@media prefers-color-scheme: dark) et garde la valeur claire', () => {
+        const css = `
+            @layer ariane.theme {
+                :root {
+                    --ar-alert-info-border: var(--ar-color-info-bg);
+                }
+
+                @media (prefers-color-scheme: dark) {
+                    :root:not([data-theme='light']) {
+                        --ar-alert-info-border: var(--ar-color-info-40);
+                    }
+                }
+            }
+        `;
+        const tokens = extractThemeTokens(css);
+        expect(tokens.get('--ar-alert-info-border')).toBe('var(--ar-color-info-bg)');
+    });
 });
 
 describe('validateCssPropertyDefaults', () => {

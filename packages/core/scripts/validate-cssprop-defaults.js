@@ -10,18 +10,33 @@
 const TOKEN_RE = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
 
 /**
+ * Marqueur du début des surcharges dark mode dans `default.css` : le bloc manuel
+ * `:root[data-theme='dark']` ou le bloc automatique `@media (prefers-color-scheme: dark)`.
+ * Par convention, le thème de base (`:root`) est toujours déclaré avant ces blocs.
+ */
+const DARK_OVERRIDE_RE =
+    /:root\[data-theme=['"]dark['"]\]|@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/;
+
+/**
  * Parse un fichier CSS de thème et retourne une map nom de token → valeur nettoyée
  * (commentaire `/* ... *\/` trailing retiré, valeur triée). Ignore le nesting
- * (`@layer`/`:root`) — la regex matche sur le contenu brut du fichier.
+ * (`@layer`/`:root`) — la regex matche sur le contenu brut du fichier. Ne considère
+ * que le thème de base (`:root`), en ignorant tout ce qui suit le début des
+ * surcharges dark mode (`:root[data-theme='dark']` ou `@media (prefers-color-scheme: dark)`),
+ * pour ne pas confondre une valeur dark avec la valeur par défaut (claire) documentée
+ * dans le JSDoc des composants.
  *
  * @param {string} css
  * @returns {Map<string, string>}
  */
 export function extractThemeTokens(css) {
+    const darkStart = css.search(DARK_OVERRIDE_RE);
+    const baseCss = darkStart === -1 ? css : css.slice(0, darkStart);
+
     const tokens = new Map();
     TOKEN_RE.lastIndex = 0;
     let match;
-    while ((match = TOKEN_RE.exec(css)) !== null) {
+    while ((match = TOKEN_RE.exec(baseCss)) !== null) {
         const name = match[1].trim();
         const value = match[2].split('/*')[0].trim();
         tokens.set(name, value);
