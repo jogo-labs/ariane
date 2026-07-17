@@ -1,6 +1,7 @@
 /**
  * Thème par défaut — à inclure dans le <head> ou importer globalement.
  * Utilise @layer pour éviter les conflits de spécificité avec les styles utilisateur.
+ * Le bloc `:root` de base doit être déclaré avant toute surcharge dark mode (`:root[data-theme='dark']` ou `@media (prefers-color-scheme: dark)`), car `packages/core/cem.config.js` valide les `@cssprop` en s'y fiant.
  *
  * Usage :
  *   <link rel="stylesheet" href="@ariane-ui/core/themes/default.css">
@@ -433,6 +434,15 @@
         --ar-dropdown-max-width: var(--ar-panel-max-width);
 
         /* dialog */
+        --ar-dialog-width-sm: 360px;
+        --ar-dialog-width-md: 500px;
+        --ar-dialog-width-lg: 800px;
+        --ar-dialog-width-xl: 1140px;
+        --ar-dialog-drawer-width-sm: 360px;
+        --ar-dialog-drawer-width-md: 720px;
+        --ar-dialog-drawer-width-lg: 960px;
+        --ar-dialog-drawer-width-xl: 1440px;
+        --ar-dialog-spacing: 1.25rem;
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
         --ar-dialog-close-bg: var(--ar-button-tertiary-bg);

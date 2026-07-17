@@ -63,6 +63,14 @@ if (typeof document !== 'undefined') {
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
  * @cssprop [--ar-dialog-width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
+ * @cssprop [--ar-dialog-width-sm=360px] - Largeur du dialog modal, taille `sm`.
+ * @cssprop [--ar-dialog-width-md=500px] - Largeur du dialog modal, taille `md`.
+ * @cssprop [--ar-dialog-width-lg=800px] - Largeur du dialog modal, taille `lg`.
+ * @cssprop [--ar-dialog-width-xl=1140px] - Largeur du dialog modal, taille `xl`.
+ * @cssprop [--ar-dialog-drawer-width-sm=360px] - Largeur du drawer, taille `sm`.
+ * @cssprop [--ar-dialog-drawer-width-md=720px] - Largeur du drawer, taille `md`.
+ * @cssprop [--ar-dialog-drawer-width-lg=960px] - Largeur du drawer, taille `lg`.
+ * @cssprop [--ar-dialog-drawer-width-xl=1440px] - Largeur du drawer, taille `xl`.
  * @cssprop [--ar-dialog-spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
  * @cssprop [--ar-dialog-spacing-block] - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop [--ar-dialog-spacing-inline] - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.

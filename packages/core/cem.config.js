@@ -12,6 +12,15 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
+import {
+    extractThemeTokens,
+    validateCssPropertyDefaults,
+    validateCssPropertyCoverage,
+} from './scripts/validate-cssprop-defaults.js';
+import {
+    findHardcodedTokenAssignments,
+    findStylesFiles,
+} from './scripts/validate-no-hardcoded-tokens.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -166,6 +175,55 @@ export default {
                             return member;
                         });
                     }
+                }
+
+                // Valide que les @cssprop [--nom=valeur] écrits à la main dans le JSDoc
+                // des composants correspondent aux valeurs réelles de default.css —
+                // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
+                const themeCss = readFileSync(
+                    resolve(process.cwd(), 'src/styles/themes/default.css'),
+                    'utf-8',
+                );
+                const themeTokens = extractThemeTokens(themeCss);
+                const cssPropDefaultErrors = validateCssPropertyDefaults(
+                    customElementsManifest,
+                    themeTokens,
+                );
+                const cssPropCoverageErrors = validateCssPropertyCoverage(
+                    customElementsManifest,
+                    themeTokens,
+                );
+
+                // Valide qu'aucun composant n'assigne une valeur littérale à une
+                // custom property --ar-* dans ses *.styles.ts au lieu de référencer
+                // un token default.css via var() — cf.
+                // docs/superpowers/specs/2026-07-16-dialog-width-headless-tokens-design.md
+                const stylesFiles = findStylesFiles(resolve(process.cwd(), 'src'));
+                const hardcodedErrors = stylesFiles.flatMap((filePath) =>
+                    findHardcodedTokenAssignments(filePath, readFileSync(filePath, 'utf-8')),
+                );
+
+                const allErrors = [
+                    ...cssPropDefaultErrors,
+                    ...cssPropCoverageErrors,
+                    ...hardcodedErrors,
+                ];
+                if (allErrors.length > 0) {
+                    const defaultErrorsMsg =
+                        cssPropDefaultErrors.length > 0
+                            ? `\n  désynchronisé(s) :\n${cssPropDefaultErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
+                    const coverageErrorsMsg =
+                        cssPropCoverageErrors.length > 0
+                            ? `\n  non documenté(s) :\n${cssPropCoverageErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
+                    const hardcodedErrorsMsg =
+                        hardcodedErrors.length > 0
+                            ? `\n  codé(s) en dur :\n${hardcodedErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
+                    throw new Error(
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${defaultErrorsMsg}${coverageErrorsMsg}${hardcodedErrorsMsg}`,
+                    );
                 }
             },
         },

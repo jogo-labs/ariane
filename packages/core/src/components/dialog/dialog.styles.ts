@@ -9,41 +9,39 @@ export default [
         :host {
             display: block;
 
-            /* Taille modale par défaut (md = 500px). Surchargeable par --ar-dialog-width sur l'instance. */
-            --ar-dialog-width: 500px;
-            /* Padding interne par défaut. Surchargeable par --ar-dialog-spacing/-block/-inline sur l'instance. */
-            --ar-dialog-spacing: 1.25rem;
+            /* Taille modale par défaut (md). Surchargeable par --ar-dialog-width sur l'instance. */
+            --ar-dialog-width: var(--ar-dialog-width-md);
         }
 
         /* Tailles modal */
         :host([size='sm']) {
-            --ar-dialog-width: 360px;
+            --ar-dialog-width: var(--ar-dialog-width-sm);
         }
         :host([size='md']) {
-            --ar-dialog-width: 500px;
+            --ar-dialog-width: var(--ar-dialog-width-md);
         }
         :host([size='lg']) {
-            --ar-dialog-width: 800px;
+            --ar-dialog-width: var(--ar-dialog-width-lg);
         }
         :host([size='xl']) {
-            --ar-dialog-width: 1140px;
+            --ar-dialog-width: var(--ar-dialog-width-xl);
         }
 
         /* Tailles drawer — ont priorité sur les valeurs modal via la spécificité */
         :host([mode='drawer']) {
-            --ar-dialog-width: 720px;
+            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
         }
         :host([mode='drawer'][size='sm']) {
-            --ar-dialog-width: 360px;
+            --ar-dialog-width: var(--ar-dialog-drawer-width-sm);
         }
         :host([mode='drawer'][size='md']) {
-            --ar-dialog-width: 720px;
+            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
         }
         :host([mode='drawer'][size='lg']) {
-            --ar-dialog-width: 960px;
+            --ar-dialog-width: var(--ar-dialog-drawer-width-lg);
         }
         :host([mode='drawer'][size='xl']) {
-            --ar-dialog-width: 1440px;
+            --ar-dialog-width: var(--ar-dialog-drawer-width-xl);
         }
 
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
