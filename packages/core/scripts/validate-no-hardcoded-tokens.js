@@ -12,7 +12,7 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const HARDCODED_ASSIGNMENT_RE = /(--ar[\w-]+)\s*:\s+(?!var\()[^;]+;/g;
+const HARDCODED_ASSIGNMENT_RE = /(--ar[\w-]+)\s*:(?!\s*var\()\s*[^;]+;/g;
 
 /**
  * Recense récursivement tous les fichiers `*.styles.ts` sous `dir`.

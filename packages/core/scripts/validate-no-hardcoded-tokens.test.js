@@ -18,6 +18,18 @@ describe('findHardcodedTokenAssignments', () => {
         expect(errors[0]).toContain('--ar-dialog-width');
     });
 
+    it('détecte une assignation littérale sans espace après le deux-points', () => {
+        const source = `
+            :host {
+                --ar-dialog-width:500px;
+            }
+        `;
+        const errors = findHardcodedTokenAssignments('dialog.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('dialog.styles.ts');
+        expect(errors[0]).toContain('--ar-dialog-width');
+    });
+
     it("n'agit pas sur une référence var()", () => {
         const source = `
             :host {
