@@ -434,6 +434,15 @@
         --ar-dropdown-max-width: var(--ar-panel-max-width);
 
         /* dialog */
+        --ar-dialog-width-sm: 360px;
+        --ar-dialog-width-md: 500px;
+        --ar-dialog-width-lg: 800px;
+        --ar-dialog-width-xl: 1140px;
+        --ar-dialog-drawer-width-sm: 360px;
+        --ar-dialog-drawer-width-md: 720px;
+        --ar-dialog-drawer-width-lg: 960px;
+        --ar-dialog-drawer-width-xl: 1440px;
+        --ar-dialog-spacing: 1.25rem;
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
         --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
