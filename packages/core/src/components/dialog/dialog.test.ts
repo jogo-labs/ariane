@@ -248,6 +248,16 @@ describe('ArDialog', () => {
             expect(el.open).toBe(false);
         });
 
+        it('ar-dialog-show annulé émet ar-dialog-show-prevented', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            el.addEventListener('ar-dialog-show', (e) => e.preventDefault());
+            const prevented = vi.fn();
+            el.addEventListener('ar-dialog-show-prevented', prevented);
+            el.open = true;
+            await waitForUpdate(el);
+            expect(prevented).toHaveBeenCalledOnce();
+        });
+
         it('open=true deux fois ne double-appelle pas showModal', async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             el.open = true;

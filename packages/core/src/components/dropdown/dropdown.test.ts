@@ -137,6 +137,36 @@ describe('ArDropdown', () => {
             expect(hiddenHandler).not.toHaveBeenCalled();
         });
 
+        it('émet ar-dropdown-show-prevented (non cancelable) quand ar-dropdown-show est annulé', async () => {
+            el.addEventListener('ar-dropdown-show', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-dropdown-show-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+            expect(event?.detail).toEqual({ id: undefined });
+        });
+
+        it('émet ar-dropdown-hide-prevented (non cancelable) quand ar-dropdown-hide est annulé', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            el.addEventListener('ar-dropdown-hide', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-dropdown-hide-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+            expect(event?.detail).toEqual({ id: undefined });
+        });
+
         it("n'émet pas ar-dropdown-show/-shown quand ar-dropdown-hide est annulé", async () => {
             el.open = true;
             await waitForUpdate(el);

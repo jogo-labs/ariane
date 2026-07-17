@@ -20,6 +20,7 @@ import { warn } from '../../utils/warn.js';
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
     | 'ar-dialog-show'
+    | 'ar-dialog-show-prevented'
     | 'ar-dialog-shown'
     | 'ar-dialog-hide'
     | 'ar-dialog-hide-prevented'
@@ -71,6 +72,7 @@ if (typeof document !== 'undefined') {
  * @cssprop [--ar-dialog-close-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton de fermeture au focus.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
+ * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
  * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. Annulable.
  * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
@@ -411,6 +413,7 @@ export class ArDialog extends LitElement {
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
             this._triggerElement = null;
+            this._emit('ar-dialog-show-prevented');
             void this.updateComplete.then(() => {
                 if (this.isConnected && this.open && !this.dialog?.open) {
                     this.open = false;

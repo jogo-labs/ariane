@@ -7,6 +7,8 @@ import {
     type PropertyValues,
 } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
+import { ToggleController } from '../../controllers/toggle.controller.js';
+import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -46,10 +48,12 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop [--ar-breadcrumb-toggle-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton retour/trigger mobile pressé.
  * @cssprop [--ar-breadcrumb-toggle-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton retour/trigger mobile au focus.
  *
- * @event {CustomEvent} ar-breadcrumb-show   - Émis avant l'ouverture du dropdown mobile. Annulable.
- * @event {CustomEvent} ar-breadcrumb-shown  - Émis après l'ouverture du dropdown mobile.
- * @event {CustomEvent} ar-breadcrumb-hide   - Émis avant la fermeture du dropdown mobile. Annulable.
- * @event {CustomEvent} ar-breadcrumb-hidden - Émis après la fermeture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
+ * @event {CustomEvent} ar-breadcrumb-shown          - Émis après l'ouverture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
+ * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  */
 export class ArBreadcrumb extends LitElement {
     static override styles: CSSResultGroup = [
@@ -77,14 +81,6 @@ export class ArBreadcrumb extends LitElement {
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
 
-    /**
-     * Quand _show()/_hide() annule et revient sur `open`, ça redéclenche un second cycle
-     * updated() qui appellerait la branche opposée pour rien (le panel n'a jamais changé
-     * d'état). Ce flag fait de ce second appel un no-op, sans affecter les fermetures
-     * externes légitimes (onExternalClose), qui ne passent pas par cette annulation.
-     */
-    private _suppressNextToggle = false;
-
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
         initialValue: {
@@ -111,6 +107,18 @@ export class ArBreadcrumb extends LitElement {
             this.open = false;
         },
     });
+
+    constructor() {
+        super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
+        new ToggleController(this, {
+            eventPrefix: 'ar-breadcrumb',
+            shouldToggle: () => this.isMobile,
+            skipInitialTransition: true,
+            onShow: () => this._onShow(),
+            onHide: () => this._onHide(),
+        });
+    }
 
     // ---------------------------------------------------------------------------
     // Lifecycle
@@ -145,15 +153,6 @@ export class ArBreadcrumb extends LitElement {
         if ((changed as Map<PropertyKey, unknown>).has('isMobile') && this.isMobile) {
             void this.updateComplete.then(() => {
                 if (this.isConnected) this._attachDropdown();
-            });
-        }
-        if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
-            // Différé après la fin du cycle courant : _show()/_hide() déclenchent
-            // Popover.show()/hide(), qui appelle host.requestUpdate() — un appel synchrone
-            // ici déclencherait l'avertissement dev Lit "change-in-update".
-            void this.updateComplete.then(() => {
-                if (this.open) this._show();
-                else this._hide();
             });
         }
     }
@@ -256,46 +255,15 @@ export class ArBreadcrumb extends LitElement {
         this.open = !this.open;
     };
 
-    private _show(): void {
-        if (this._suppressNextToggle) {
-            this._suppressNextToggle = false;
-            return;
-        }
-        const showEv = this._emit('ar-breadcrumb-show');
-        if (showEv.defaultPrevented) {
-            this._suppressNextToggle = true;
-            this.open = false;
-            return;
-        }
+    private _onShow(): void {
         void this._popover.show().then(() => {
-            this._emit('ar-breadcrumb-shown');
+            emitToggleEvent(this, 'ar-breadcrumb-shown', { cancelable: false });
         });
     }
 
-    private _hide(): void {
-        if (this._suppressNextToggle) {
-            this._suppressNextToggle = false;
-            return;
-        }
-        const hideEv = this._emit('ar-breadcrumb-hide');
-        if (hideEv.defaultPrevented) {
-            this._suppressNextToggle = true;
-            this.open = true;
-            return;
-        }
+    private _onHide(): void {
         this._popover.hide();
-        this._emit('ar-breadcrumb-hidden');
-    }
-
-    private _emit(name: string): CustomEvent {
-        const e = new CustomEvent(name, {
-            bubbles: true,
-            composed: true,
-            cancelable: true,
-            detail: { id: this.id || undefined },
-        });
-        this.dispatchEvent(e);
-        return e;
+        emitToggleEvent(this, 'ar-breadcrumb-hidden', { cancelable: false });
     }
 
     private _handleMediaChange = (): void => {

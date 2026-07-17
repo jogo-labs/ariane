@@ -435,6 +435,49 @@ describe('ArBreadcrumb', () => {
             expect(showHandler).not.toHaveBeenCalled();
             expect(shownHandler).not.toHaveBeenCalled();
         });
+
+        it('émet ar-breadcrumb-show-prevented (non cancelable) quand ar-breadcrumb-show est annulé', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPopoverPanel(el);
+            el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-breadcrumb-show-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+        });
+
+        it('émet ar-breadcrumb-hide-prevented (non cancelable) quand ar-breadcrumb-hide est annulé', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            mockPopoverPanel(el);
+            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            btn.click();
+            await waitForUpdate(el);
+            el.addEventListener('ar-breadcrumb-hide', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-breadcrumb-hide-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            btn.click();
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+        });
     });
 
     // ── Attribut open (desktop) ───────────────────────────────────────────────

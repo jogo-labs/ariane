@@ -1,4 +1,6 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
+import { ToggleController } from '../../controllers/toggle.controller.js';
+import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
@@ -40,10 +42,12 @@ export type ArDropdownPlacement =
  * @cssprop [--ar-dropdown-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel (axe principal).
  * @cssprop [--ar-dropdown-offset=var(--ar-anchor-offset)] - Décalage latéral du panel (axe transversal).
  *
- * @event {CustomEvent} ar-dropdown-show    - Émis avant l'ouverture (annulable).
- * @event {CustomEvent} ar-dropdown-shown   - Émis après l'ouverture.
- * @event {CustomEvent} ar-dropdown-hide    - Émis avant la fermeture (annulable).
- * @event {CustomEvent} ar-dropdown-hidden  - Émis après la fermeture.
+ * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture (annulable).
+ * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
+ * @event {CustomEvent} ar-dropdown-shown          - Émis après l'ouverture.
+ * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture (annulable).
+ * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
+ * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
  */
 export class ArDropdown extends LitElement {
     static override styles = [panelStyles, styles];
@@ -85,13 +89,15 @@ export class ArDropdown extends LitElement {
     private _externalTrigger: HTMLElement | null = null;
     private readonly _uniqueId = Math.random().toString(36).slice(2, 9);
 
-    /**
-     * Quand _show()/_hide() annule et revient sur `open`, ça redéclenche un second cycle
-     * updated() qui appellerait la branche opposée pour rien (le panel n'a jamais changé
-     * d'état). Ce flag fait de ce second appel un no-op, sans affecter les fermetures
-     * externes légitimes (onExternalClose), qui ne passent pas par cette annulation.
-     */
-    private _suppressNextToggle = false;
+    constructor() {
+        super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
+        new ToggleController(this, {
+            eventPrefix: 'ar-dropdown',
+            onShow: () => this._onShow(),
+            onHide: () => this._onHide(),
+        });
+    }
 
     override firstUpdated(): void {
         if (this.for) {
@@ -134,15 +140,6 @@ export class ArDropdown extends LitElement {
                     this._externalTrigger = newTrigger;
                 }
             }
-        }
-        if (changed.has('open')) {
-            // Différé après la fin du cycle courant : _show()/_hide() déclenchent
-            // Popover.show()/hide(), qui appelle host.requestUpdate() — un appel synchrone
-            // ici déclencherait l'avertissement dev Lit "change-in-update".
-            void this.updateComplete.then(() => {
-                if (this.open) this._show();
-                else this._hide();
-            });
         }
     }
 
@@ -212,54 +209,23 @@ export class ArDropdown extends LitElement {
         this.open = !this.open;
     };
 
-    private _show(): void {
-        if (this._suppressNextToggle) {
-            this._suppressNextToggle = false;
-            return;
-        }
-        const showEv = this._emit('ar-dropdown-show');
-        if (showEv.defaultPrevented) {
-            this._suppressNextToggle = true;
-            this.open = false;
-            return;
-        }
+    private _onShow(): void {
         this._detectMenuMode();
         this._panel?.addEventListener('keydown', this._handlePanelKeyDown);
         if (this._menuMode) this._activateMenuListeners();
         void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
-            this._emit('ar-dropdown-shown');
+            emitToggleEvent(this, 'ar-dropdown-shown', { cancelable: false });
         });
     }
 
-    private _hide(): void {
-        if (this._suppressNextToggle) {
-            this._suppressNextToggle = false;
-            return;
-        }
-        const hideEv = this._emit('ar-dropdown-hide');
-        if (hideEv.defaultPrevented) {
-            this._suppressNextToggle = true;
-            this.open = true;
-            return;
-        }
+    private _onHide(): void {
         this._panel?.removeEventListener('keydown', this._handlePanelKeyDown);
         this._removeMenuListeners();
         this._activeIndex = -1;
         this._popover.hide();
         this._resolvedTrigger?.focus();
-        this._emit('ar-dropdown-hidden');
-    }
-
-    private _emit(name: string): CustomEvent {
-        const e = new CustomEvent(name, {
-            bubbles: true,
-            composed: true,
-            cancelable: true,
-            detail: { id: this.id || undefined },
-        });
-        this.dispatchEvent(e);
-        return e;
+        emitToggleEvent(this, 'ar-dropdown-hidden', { cancelable: false });
     }
 
     private _activateMenuListeners(): void {

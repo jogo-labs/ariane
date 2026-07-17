@@ -238,6 +238,42 @@ describe('ArCollapse', () => {
             expect(showHandler).not.toHaveBeenCalled();
             expect(shownHandler).not.toHaveBeenCalled();
         });
+
+        it('émet ar-collapse-show-prevented (non cancelable) quand ar-collapse-show est annulé', async () => {
+            el.addEventListener('ar-collapse-show', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-collapse-show-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = true;
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+        });
+
+        it('émet ar-collapse-hide-prevented (non cancelable) quand ar-collapse-hide est annulé', async () => {
+            el.show();
+            await waitForUpdate(el);
+            el.addEventListener('ar-collapse-hide', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-collapse-hide-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = false;
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+        });
+
+        it('ar-collapse-show porte desormais detail.id (id auto-généré)', async () => {
+            let detail: { id?: string } | undefined;
+            el.addEventListener('ar-collapse-show', (e) => {
+                detail = (e as CustomEvent).detail;
+            });
+            el.show();
+            await waitForUpdate(el);
+            expect(detail?.id).toBe(el.id);
+        });
     });
 
     // ── Trigger interne + ARIA ────────────────────────────────────────────────
