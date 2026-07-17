@@ -12,6 +12,10 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
+import {
+    extractThemeTokens,
+    validateCssPropertyDefaults,
+} from './scripts/validate-cssprop-defaults.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -166,6 +170,25 @@ export default {
                             return member;
                         });
                     }
+                }
+
+                // Valide que les @cssprop [--nom=valeur] écrits à la main dans le JSDoc
+                // des composants correspondent aux valeurs réelles de default.css —
+                // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
+                const themeCss = readFileSync(
+                    resolve(process.cwd(), 'src/styles/themes/default.css'),
+                    'utf-8',
+                );
+                const themeTokens = extractThemeTokens(themeCss);
+                const cssPropErrors = validateCssPropertyDefaults(
+                    customElementsManifest,
+                    themeTokens,
+                );
+                if (cssPropErrors.length > 0) {
+                    throw new Error(
+                        `[CEM] ${cssPropErrors.length} @cssprop désynchronisé(s) avec default.css :\n` +
+                            cssPropErrors.map((e) => `  - ${e}`).join('\n'),
+                    );
                 }
             },
         },
