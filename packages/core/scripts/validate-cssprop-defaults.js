@@ -38,7 +38,7 @@ export function extractThemeTokens(css) {
     let match;
     while ((match = TOKEN_RE.exec(baseCss)) !== null) {
         const name = match[1].trim();
-        const value = match[2].split('/*')[0].trim();
+        const value = match[2].split('/*')[0].trim().replace(/\s+/g, ' ');
         tokens.set(name, value);
     }
     return tokens;
@@ -61,9 +61,10 @@ export function validateCssPropertyDefaults(customElementsManifest, themeTokens)
                 if (prop.default === undefined) continue;
                 const themeValue = themeTokens.get(prop.name);
                 if (themeValue === undefined) continue;
-                if (prop.default !== themeValue) {
+                const jsdocValue = prop.default.replace(/\s+/g, ' ');
+                if (jsdocValue !== themeValue) {
                     errors.push(
-                        `${decl.name} : ${prop.name} déclare [default=${prop.default}] dans le JSDoc mais default.css définit "${themeValue}"`,
+                        `${decl.name} : ${prop.name} déclare [default=${jsdocValue}] dans le JSDoc mais default.css définit "${themeValue}"`,
                     );
                 }
             }

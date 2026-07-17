@@ -73,6 +73,25 @@ describe('extractThemeTokens', () => {
         const tokens = extractThemeTokens(css);
         expect(tokens.get('--ar-alert-info-border')).toBe('var(--ar-color-info-bg)');
     });
+
+    it('normalise les espaces internes dans les valeurs multi-lignes (ex. box-shadow, gradient)', () => {
+        const css = `
+            @layer ariane.theme {
+                :root {
+                    --ar-test-shadow: 0 1px 2px
+                        rgba(0,0,0,0.1);
+                    --ar-test-gradient: linear-gradient(
+                        90deg,
+                        red,
+                        blue
+                    );
+                }
+            }
+        `;
+        const tokens = extractThemeTokens(css);
+        expect(tokens.get('--ar-test-shadow')).toBe('0 1px 2px rgba(0,0,0,0.1)');
+        expect(tokens.get('--ar-test-gradient')).toBe('linear-gradient( 90deg, red, blue )');
+    });
 });
 
 describe('validateCssPropertyDefaults', () => {
@@ -133,5 +152,27 @@ describe('validateCssPropertyDefaults', () => {
             ],
         };
         expect(validateCssPropertyDefaults(manifest, themeTokens)).toHaveLength(2);
+    });
+
+    it('accepte une valeur JSDoc single-line qui correspond à une valeur thème multi-ligne après normalisation', () => {
+        const themeTokens = new Map([['--ar-test-shadow', '0 1px 2px rgba(0,0,0,0.1)']]);
+        const manifest = manifestWith([
+            {
+                name: '--ar-test-shadow',
+                default: '0 1px 2px rgba(0,0,0,0.1)',
+            },
+        ]);
+        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
+    });
+
+    it('normalise aussi la valeur JSDoc avant comparaison (ex. espaces multiples → single)', () => {
+        const themeTokens = new Map([['--ar-test-shadow', '0 1px 2px rgba(0,0,0,0.1)']]);
+        const manifest = manifestWith([
+            {
+                name: '--ar-test-shadow',
+                default: '0  1px   2px\n            rgba(0,0,0,0.1)',
+            },
+        ]);
+        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
     });
 });
