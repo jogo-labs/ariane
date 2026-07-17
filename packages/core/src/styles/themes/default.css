@@ -450,6 +450,10 @@
         --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-dialog-close-bg-focus: var(--ar-button-tertiary-bg-focus);
 
+        /* collapse */
+        --ar-collapse-duration: 0s;
+        --ar-collapse-easing: ease;
+
         /* table */
         --ar-table-padding-x: 1rem;
 
@@ -791,6 +795,6 @@
     }
 
     ar-collapse::part(panel) {
-        transition: height var(--ar-collapse-duration, 0s) var(--ar-collapse-easing, ease);
+        transition: height var(--ar-collapse-duration) var(--ar-collapse-easing);
     }
 }
