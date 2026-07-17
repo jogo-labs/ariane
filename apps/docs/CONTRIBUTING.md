@@ -172,8 +172,9 @@ apps/docs/
 ├── src/
 │   ├── components/
 │   │   ├── ComponentApi.astro      ← Tables de référence API (attributs, events, slots…)
-│   │   ├── NarrativeHeading.astro  ← Composant MDX custom : h2 avec id slugifié (ancres TOC)
-│   │   ├── NarrativeList.astro     ← Composant MDX custom : ul avec classe .narrative-list
+│   │   ├── NarrativeHeading.astro    ← Composant MDX custom : h2 MDX → <h3> avec id slugifié (ancres TOC)
+│   │   ├── NarrativeSubheading.astro ← Composant MDX custom : h3 MDX → <h4> avec id slugifié (ancres TOC)
+│   │   ├── NarrativeList.astro       ← Composant MDX custom : ul avec classe .narrative-list
 │   │   ├── Playground.astro        ← Variantes + playground + controls
 │   │   ├── SiteNav.astro           ← Navigation gauche (auto-générée depuis CEM + MDX)
 │   │   └── TableOfContents.astro   ← TOC sticky droite + collapse mobile
@@ -208,14 +209,14 @@ apps/docs/
   │     └── getCustomElements()  → liste de tous les custom elements
   ├── getCollection('components') → données MDX (titre, variantes, description)
   ├── render(mdx)                 → { Content, headings[] }
-  │     └── headings (depth=2)   → narrativeTocEntries (ancres depuis les h2 MDX)
+  │     └── headings (depth=2/3) → narrativeTocEntries (ancres depuis les h2/h3 MDX)
   ├── buildControls()             → contrôles playground depuis les membres CEM
   └── tocEntries[]                → narrativeTocEntries + Exemples + Playground + API
         ↓
   Layout.astro (3 colonnes)
     ├── SiteNav.astro             ← nav gauche
     ├── <section class="narrative">
-    │     └── <Content components={{ h2: NarrativeHeading, ul: NarrativeList }} />
+    │     └── <Content components={{ h2: NarrativeHeading, h3: NarrativeSubheading, ul: NarrativeList }} />
     ├── Playground.astro          ← variantes + playground + ComponentApi
     └── TableOfContents           ← TOC droite (slot="toc")
 ```
@@ -325,35 +326,39 @@ entre le header de la page et les exemples. C'est l'endroit pour documenter l'us
 Certains éléments HTML générés par le MDX sont remplacés par des composants Astro afin de contrôler
 précisément le rendu. Le mapping est déclaré dans `[slug].astro` via la prop `components` de `<Content>` :
 
-| Élément MDX | Composant Astro          | Rôle                                                       |
-| ----------- | ------------------------ | ---------------------------------------------------------- |
-| `ul`        | `NarrativeList.astro`    | Ajoute la classe `.narrative-list` pour le ciblage CSS     |
-| `h2`        | `NarrativeHeading.astro` | Génère un `id` slugifié automatiquement (ancre TOC + lien) |
+| Élément MDX | Composant Astro             | Rôle                                                                        |
+| ----------- | --------------------------- | --------------------------------------------------------------------------- |
+| `ul`        | `NarrativeList.astro`       | Ajoute la classe `.narrative-list` pour le ciblage CSS                      |
+| `h2`        | `NarrativeHeading.astro`    | Rendu en `<h3>` (sections, sous `.page-title` en `<h2>`), id slugifié (TOC) |
+| `h3`        | `NarrativeSubheading.astro` | Rendu en `<h4>` (sous-sections), même mécanisme d'id slugifié (TOC)         |
 
 **Ajouter un nouveau composant custom :** créer `src/components/Narrative<Nom>.astro`, l'importer
 dans `[slug].astro` et l'ajouter dans le spread `components={{ … }}`.
 
-### TOC automatique depuis les `h2`
+### TOC automatique depuis les `h2`/`h3`
 
-Les titres `## Titre` du MDX sont **automatiquement ajoutés à la TOC** — il n'y a rien à déclarer
-dans le frontmatter. Le mécanisme fonctionne ainsi :
+Les titres `## Titre` et `### Sous-titre` du MDX sont **automatiquement ajoutés à la TOC** — il
+n'y a rien à déclarer dans le frontmatter. Le mécanisme fonctionne ainsi :
 
 1. `render(mdx)` retourne un tableau `headings` (fourni par Astro/remark)
-2. `[slug].astro` filtre les `depth === 2` et les injecte dans `tocEntries` avant les exemples
-3. `NarrativeHeading.astro` pose le même `id` sur le `h2` rendu, via `github-slugger` — le même
-   algorithme qu'Astro, ce qui garantit que l'ancre et l'entrée TOC sont toujours synchronisées
+2. `[slug].astro` filtre les `depth === 2 || depth === 3` et les injecte dans `tocEntries` avant
+   les exemples (`depth === 2` en entrée de premier niveau, `depth === 3` en sous-menu)
+3. `NarrativeHeading.astro`/`NarrativeSubheading.astro` posent le même `id` sur le `h3`/`h4` rendu,
+   via `github-slugger` — le même algorithme qu'Astro, ce qui garantit que l'ancre et l'entrée TOC
+   sont toujours synchronisées
 
-**Conséquence :** renommer un `h2` dans le MDX met à jour l'ancre et la TOC simultanément, sans
-aucune intervention manuelle.
+**Conséquence :** renommer un `h2`/`h3` dans le MDX met à jour l'ancre et la TOC simultanément,
+sans aucune intervention manuelle.
 
 ### Flux de données narratif
 
 ```text
 ar-alert.mdx (corps)
   → render(mdx) → { Content, headings[] }
-  → headings filtrés depth=2 → narrativeTocEntries → tocEntries[]
-  → <Content components={{ ul: NarrativeList, h2: NarrativeHeading }} />
-      → h2 "Accessibilité" → <NarrativeHeading> → <h2 id="accessibilité">
+  → headings filtrés depth=2/3 → narrativeTocEntries → tocEntries[]
+  → <Content components={{ ul: NarrativeList, h2: NarrativeHeading, h3: NarrativeSubheading }} />
+      → h2 "Accessibilité" → <NarrativeHeading> → <h3 id="accessibilité">
+      → h3 "Pris en charge automatiquement" → <NarrativeSubheading> → <h4 id="pris-en-charge-automatiquement">
       → ul → <NarrativeList> → <ul class="narrative-list">
 ```
 
