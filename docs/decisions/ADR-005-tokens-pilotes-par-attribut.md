@@ -37,6 +37,24 @@ Un garde-fou automatique (`packages/core/scripts/validate-no-hardcoded-tokens.js
 `cem.config.js`) fait échouer `npm run build:manifest` si une assignation `--ar-*: <valeur littérale>;`
 est détectée dans un fichier `*.styles.ts`.
 
+## Exception assumée : l'attribut `size`
+
+`size` (`sm`/`md`/`lg`/`xl`) sort de l'esprit headless, indépendamment de la règle ci-dessus sur
+le sourcing des tokens. Le sourcing est conforme (chaque palier vient d'un token `default.css`,
+rien n'est codé en dur) — ce qui sort du cadre, c'est l'existence même d'une taxonomie de tailles
+imposée par le composant : une librairie headless au sens strict n'a pas d'opinion sur les
+paliers de largeur d'un dialog, elle expose juste le point de surcharge (`--ar-dialog-width`) et
+laisse le consommateur choisir sa valeur. C'est le choix fait par des libs comparables comme
+WebAwesome, qui n'a pas d'attribut `size` sur son dialog.
+
+Ariane assume cette exception plutôt que de la corriger : les paliers apportent une valeur a11y/DX
+réelle (évite les dialogs démesurés par défaut, cohérence visuelle immédiate) sans rien retirer au
+modèle headless — `--ar-dialog-width` reste un point de surcharge direct, `size` n'est qu'une
+commodité au-dessus. C'est aujourd'hui un cas isolé : aucun autre composant de la librairie
+n'expose d'attribut de taille équivalent. Un futur composant qui voudrait reproduire ce pattern
+doit se reposer la question plutôt que copier `size` par mimétisme — l'exception n'est pas un
+précédent générique.
+
 ## Conséquences
 
 - `dialog.styles.ts` migré : `--ar-dialog-spacing` et les 8 variantes de `--ar-dialog-width`
