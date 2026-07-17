@@ -17,6 +17,10 @@ import {
     validateCssPropertyDefaults,
     validateCssPropertyCoverage,
 } from './scripts/validate-cssprop-defaults.js';
+import {
+    findHardcodedTokenAssignments,
+    findStylesFiles,
+} from './scripts/validate-no-hardcoded-tokens.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -190,7 +194,20 @@ export default {
                     themeTokens,
                 );
 
-                const allErrors = [...cssPropDefaultErrors, ...cssPropCoverageErrors];
+                // Valide qu'aucun composant n'assigne une valeur littérale à une
+                // custom property --ar-* dans ses *.styles.ts au lieu de référencer
+                // un token default.css via var() — cf.
+                // docs/superpowers/specs/2026-07-16-dialog-width-headless-tokens-design.md
+                const stylesFiles = findStylesFiles(resolve(process.cwd(), 'src'));
+                const hardcodedErrors = stylesFiles.flatMap((filePath) =>
+                    findHardcodedTokenAssignments(filePath, readFileSync(filePath, 'utf-8')),
+                );
+
+                const allErrors = [
+                    ...cssPropDefaultErrors,
+                    ...cssPropCoverageErrors,
+                    ...hardcodedErrors,
+                ];
                 if (allErrors.length > 0) {
                     const defaultErrorsMsg =
                         cssPropDefaultErrors.length > 0
@@ -200,8 +217,12 @@ export default {
                         cssPropCoverageErrors.length > 0
                             ? `\n  non documenté(s) :\n${cssPropCoverageErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
+                    const hardcodedErrorsMsg =
+                        hardcodedErrors.length > 0
+                            ? `\n  codé(s) en dur :\n${hardcodedErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${defaultErrorsMsg}${coverageErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${defaultErrorsMsg}${coverageErrorsMsg}${hardcodedErrorsMsg}`,
                     );
                 }
             },
