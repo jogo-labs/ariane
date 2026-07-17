@@ -28,3 +28,31 @@ export function extractThemeTokens(css) {
     }
     return tokens;
 }
+
+/**
+ * Compare les `@cssprop [--nom=valeur]` déjà résolus dans le manifest CEM
+ * aux valeurs réelles du thème par défaut. Ne modifie rien : retourne la liste
+ * des désaccords trouvés (tableau vide si tout est cohérent).
+ *
+ * @param {{ modules?: Array<{ declarations?: Array<{ name: string, cssProperties?: Array<{ name: string, default?: string }> }> }> }} customElementsManifest
+ * @param {Map<string, string>} themeTokens
+ * @returns {string[]}
+ */
+export function validateCssPropertyDefaults(customElementsManifest, themeTokens) {
+    const errors = [];
+    for (const mod of customElementsManifest.modules ?? []) {
+        for (const decl of mod.declarations ?? []) {
+            for (const prop of decl.cssProperties ?? []) {
+                if (prop.default === undefined) continue;
+                const themeValue = themeTokens.get(prop.name);
+                if (themeValue === undefined) continue;
+                if (prop.default !== themeValue) {
+                    errors.push(
+                        `${decl.name} : ${prop.name} déclare [default=${prop.default}] dans le JSDoc mais default.css définit "${themeValue}"`,
+                    );
+                }
+            }
+        }
+    }
+    return errors;
+}
