@@ -5,6 +5,7 @@ import Playground from '../../components/Playground.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeList from '../../components/NarrativeList.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 import manifest from '@cem';
 import { getSlug } from '../../utils/tag-name.ts';
 import { type CemDeclaration, getCustomElements, buildControls } from '../../utils/cem-types.ts';
@@ -107,7 +108,7 @@ const tocEntries = [
 
     <div class="page-container">
         <div class="page-header">
-            <h3 class="page-title">{pageTitle}</h3>
+            <h2 class="page-title">{pageTitle}</h2>
 
             <div class="meta">
                 <code>&lt;{component.tagName}&gt;</code>
@@ -119,13 +120,21 @@ const tocEntries = [
         {/*
           * Contenu narratif du MDX (usage, accessibilité…).
           * Les composants custom remplacent les éléments HTML natifs générés par le MDX :
-          *   - h2 → NarrativeHeading : pose un id slugifié pour les ancres TOC
-          *   - ul → NarrativeList    : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
+          *   - h2 → NarrativeHeading   : rendu en <h3> (sections, enfant de .page-title en h2),
+          *                               pose un id slugifié pour les ancres TOC
+          *   - h3 → NarrativeSubheading : rendu en <h4> (sous-sections), même mécanisme d'id
+          *   - ul → NarrativeList      : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
           * Voir apps/docs/CONTRIBUTING.md § "Contenu narratif MDX" pour la documentation complète.
           */}
         {Content && (
             <section class="narrative">
-                <Content components={{ ul: NarrativeList, h2: NarrativeHeading }} />
+                <Content
+                    components={{
+                        ul: NarrativeList,
+                        h2: NarrativeHeading,
+                        h3: NarrativeSubheading,
+                    }}
+                />
             </section>
         )}
 
@@ -152,7 +161,7 @@ const tocEntries = [
         .toc-mobile-inline { display: block; }
     }
 
-    .narrative :global(h2) {
+    .narrative :global(h3) {
         font-size: 1.25rem;
         font-weight: 600;
         border-bottom: 2px solid var(--doc-border, #e5e7eb);
@@ -161,9 +170,9 @@ const tocEntries = [
         color: var(--doc-text, #111827);
     }
 
-    .narrative :global(h2:first-child) { margin-top: 0; }
+    .narrative :global(h3:first-child) { margin-top: 0; }
 
-    .narrative :global(h3) {
+    .narrative :global(h4) {
         font-size: 1.05rem;
         font-weight: 600;
         color: var(--doc-text-subtle, #374151);

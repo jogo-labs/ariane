@@ -2,7 +2,9 @@
 /**
  * NarrativeHeading.astro
  *
- * Composant MDX custom pour les titres h2 du contenu narratif des pages composant.
+ * Composant MDX custom pour les titres h2 (source MDX) du contenu narratif des
+ * pages composant — rendu en <h3>, car .page-title (le titre de page) occupe le
+ * niveau h2. Le niveau MDX (##) reste inchangé : seul le tag HTML rendu diffère.
  *
  * Rôle : générer un `id` slugifié depuis le texte du titre, afin que chaque h2
  * du MDX soit accessible comme ancre et apparaisse correctement dans la TOC.
@@ -26,4 +28,4 @@ const text = await Astro.slots.render('default');
 const plainText = text.replace(/<[^>]+>/g, '').trim();
 const slug = id ?? new GithubSlugger().slug(plainText);
 ---
-<h2 id={slug} {...rest}><slot /></h2>
+<h3 id={slug} {...rest}><slot /></h3>

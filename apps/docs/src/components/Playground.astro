@@ -47,11 +47,11 @@ const showPlayground = displayMode === 'demo';
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section id="exemples">
-        <h4 class="section-title">Exemples</h4>
+        <h3 class="section-title">Exemples</h3>
         <div class="main-section">
             {variants.map((variant) => (
                 <section id={`exemple-${variant.name}`}>
-                    <h5 class="subsection-title">{variant.label ?? variant.name}</h5>
+                    <h4 class="subsection-title">{variant.label ?? variant.name}</h4>
                     {variant.description && (
                         <p class="variant-description">{variant.description}</p>
                     )}
@@ -155,7 +155,7 @@ const showPlayground = displayMode === 'demo';
 
 {/* ── Référence API ── */}
 <section id="reference-api">
-    <h4 class="section-title">Référence API</h4>
+    <h3 class="section-title">Référence API</h3>
     <ComponentApi component={component} />
 </section>
 
