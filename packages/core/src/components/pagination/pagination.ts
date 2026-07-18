@@ -209,7 +209,6 @@ export class ArPagination extends LitElement {
             new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-change', {
                 bubbles: true,
                 composed: true,
-                cancelable: true,
                 detail,
             }),
         );

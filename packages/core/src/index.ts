@@ -31,7 +31,6 @@ export { ArDropdown } from './components/dropdown/dropdown.js';
 import './components/dropdown-item/index.js';
 export { ArDropdownItem } from './components/dropdown-item/dropdown-item.js';
 export { AnchoredController } from './controllers/anchored.controller.js';
-export { TooltipController } from './controllers/tooltip.controller.js';
 import './components/tooltip/index.js';
 export { ArTooltip } from './components/tooltip/tooltip.js';
 export type { ArTooltipPlacement } from './components/tooltip/tooltip.js';
