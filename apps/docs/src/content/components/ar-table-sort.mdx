@@ -167,3 +167,18 @@ Voir la variante **Multi-colonnes** ci-dessous pour un exemple complet. Pour per
 ### Localisation
 
 Les labels sont en français par défaut. Une infrastructure de localisation (`setLocale()`) est prévue — voir l'issue GitHub correspondante.
+
+## Utilisation
+
+### Détail de l'événement
+
+L'événement `ar-table-sort-change` porte un objet `detail` structuré ainsi :
+
+| Champ            | Type                             | Description                                                   |
+| ---------------- | -------------------------------- | ------------------------------------------------------------- |
+| `type`           | `'alpha' \| 'numeric' \| 'date'` | Type de tri du composant qui a émis l'événement.              |
+| `currentOrder`   | `'none' \| 'asc' \| 'desc'`      | Ordre de tri actuel avant le clic.                            |
+| `requestedOrder` | `'none' \| 'asc' \| 'desc'`      | Ordre demandé — le cycle suivant dans la séquence.            |
+| `columnLabel`    | `string`                         | Libellé textuel de la colonne (contenu du slot du composant). |
+
+Consulter les variantes **Alphabétique**, **Numérique** et **Date** ci-dessus pour voir comment accéder à `e.detail` dans un écouteur `ar-table-sort-change`.
