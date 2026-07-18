@@ -42,10 +42,10 @@ export type ArDropdownPlacement =
  * @cssprop [--ar-dropdown-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel (axe principal).
  * @cssprop [--ar-dropdown-offset=var(--ar-anchor-offset)] - Décalage latéral du panel (axe transversal).
  *
- * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture (annulable).
+ * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
  * @event {CustomEvent} ar-dropdown-shown          - Émis après l'ouverture.
- * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture (annulable).
+ * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
  * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
  * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
  */

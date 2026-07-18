@@ -21,10 +21,10 @@ import styles from './collapse.styles.js';
  * @cssprop [--ar-collapse-duration=0s]  - Durée de la transition height.
  * @cssprop [--ar-collapse-easing=ease]  - Easing de la transition height.
  *
- * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. Annulable.
+ * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
  * @event {CustomEvent} ar-collapse-shown          - Après la fin de l'animation d'ouverture.
- * @event {CustomEvent} ar-collapse-hide           - Avant la fermeture. Annulable.
+ * @event {CustomEvent} ar-collapse-hide           - Avant la fermeture. @cancelable
  * @event {CustomEvent} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
  * @event {CustomEvent} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
  */

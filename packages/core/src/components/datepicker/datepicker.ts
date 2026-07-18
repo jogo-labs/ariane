@@ -93,9 +93,9 @@ import { warn } from '../../utils/warn.js';
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
- * @event {CustomEvent} ar-datepicker-show           - Avant ouverture du popover.
+ * @event {CustomEvent} ar-datepicker-show           - Avant ouverture du popover. @cancelable
  * @event {CustomEvent} ar-datepicker-shown          - Après ouverture.
- * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture.
+ * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture. @cancelable
  * @event {CustomEvent} ar-datepicker-hidden         - Après fermeture.
  */
 export class ArDatepicker extends LitElement {
