@@ -48,10 +48,10 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop [--ar-breadcrumb-toggle-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton retour/trigger mobile pressé.
  * @cssprop [--ar-breadcrumb-toggle-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton retour/trigger mobile au focus.
  *
- * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
  * @event {CustomEvent} ar-breadcrumb-shown          - Émis après l'ouverture du dropdown mobile.
- * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. Annulable.
+ * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
  * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  */

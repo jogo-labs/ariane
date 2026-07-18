@@ -79,15 +79,15 @@ if (typeof document !== 'undefined') {
  * @cssprop [--ar-dialog-close-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton de fermeture pressé.
  * @cssprop [--ar-dialog-close-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton de fermeture au focus.
  *
- * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
+ * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
- * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. Annulable.
+ * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. @cancelable
  * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
  * @event {CustomEvent} ar-dialog-hidden - Émis après la fermeture (après animation).
- * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. Annulable.
+ * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
  * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
- * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. Annulable.
+ * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
 export class ArDialog extends LitElement {

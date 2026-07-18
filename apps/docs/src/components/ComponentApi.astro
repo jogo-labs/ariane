@@ -10,6 +10,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { type CemDeclaration } from '../utils/cem-types.ts';
 import { buildTokenMap, resolveColor } from '../utils/parse-tokens.ts';
+import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 
 interface Props {
     component: CemDeclaration;
@@ -70,16 +71,16 @@ const publicMethods = (component.members ?? []).filter(
                     <thead>
                         <tr>
                             <th>Nom</th>
-                            <th>Type</th>
                             <th>Description</th>
+                            <th>Annulable</th>
                         </tr>
                     </thead>
                     <tbody>
                         {component.events.map((event) => (
                             <tr>
                                 <td><code>{event.name}</code></td>
-                                <td><code>{event.type?.text ?? 'CustomEvent'}</code></td>
-                                <td>{event.description ?? ''}</td>
+                                <td>{stripCancelableMarker(event.description)}</td>
+                                <td>{isCancelableEvent(event.description) ? 'Oui' : 'Non'}</td>
                             </tr>
                         ))}
                     </tbody>
