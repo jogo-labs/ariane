@@ -52,27 +52,27 @@ export interface ArStepperStepChangeDetail {
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width)]                         - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width)]                         - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-stepper-gap=1.5rem]                                                         - Hauteur du connecteur entre les étapes principales.
- * @cssprop [--ar-stepper-substep-gap=1rem]                                                   - Hauteur du connecteur entre les sous-étapes.
- * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
- * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
- * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.
- * @cssprop [--ar-stepper-bullet-bg=var(--ar-color-primary-80)]                               - Fond des puces des étapes visitables.
- * @cssprop [--ar-stepper-bullet-color=var(--ar-color-interactive)]                           - Couleur du numéro dans les puces visitables.
- * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)]                     - Bordure des puces des étapes suivantes.
- * @cssprop [--ar-stepper-bullet-hover-bg=var(--ar-color-text-muted)]                         - Fond de la puce au survol.
- * @cssprop [--ar-stepper-link-hover-color=var(--ar-color-text-muted)]                       - Couleur du texte du lien au survol.
- * @cssprop [--ar-stepper-bullet-radius=0.75rem]                                              - Border-radius de la puce.
- * @cssprop [--ar-stepper-link-focus-radius=0.125rem]                                         - Border-radius de l'anneau de focus du lien.
- * @cssprop [--ar-stepper-label-color=var(--ar-color-text-muted)]                             - Couleur des labels des étapes inactives.
- * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
- * @cssprop [--ar-stepper-distance=var(--ar-anchor-distance)]                                 - Espacement entre le trigger et le panel mobile.
- * @cssprop [--ar-stepper-offset=var(--ar-anchor-offset)]                                     - Décalage latéral du panel mobile.
- * @cssprop [--ar-stepper-trigger-bg=var(--ar-button-secondary-bg)]                             - Fond du bouton trigger mobile.
- * @cssprop [--ar-stepper-trigger-bg-hover=var(--ar-button-secondary-bg-hover)]                 - Fond du bouton trigger mobile au survol.
- * @cssprop [--ar-stepper-trigger-radius=0.75rem]                                              - Border-radius du bouton trigger mobile.
+ * @cssprop --ar-stepper-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop --ar-stepper-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
+ * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
+ * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.
+ * @cssprop --ar-stepper-active-bullet-bg - Fond de la puce de l'étape active.
+ * @cssprop --ar-stepper-active-bullet-color - Couleur du numéro dans la puce active.
+ * @cssprop --ar-stepper-bullet-bg - Fond des puces des étapes visitables.
+ * @cssprop --ar-stepper-bullet-color - Couleur du numéro dans les puces visitables.
+ * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
+ * @cssprop --ar-stepper-bullet-hover-bg - Fond de la puce au survol.
+ * @cssprop --ar-stepper-link-hover-color - Couleur du texte du lien au survol.
+ * @cssprop --ar-stepper-bullet-radius - Border-radius de la puce.
+ * @cssprop --ar-stepper-link-focus-radius - Border-radius de l'anneau de focus du lien.
+ * @cssprop --ar-stepper-label-color - Couleur des labels des étapes inactives.
+ * @cssprop --ar-stepper-active-label-color - Couleur du label de l'étape active.
+ * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
+ * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
+ * @cssprop --ar-stepper-trigger-bg - Fond du bouton trigger mobile.
+ * @cssprop --ar-stepper-trigger-bg-hover - Fond du bouton trigger mobile au survol.
+ * @cssprop --ar-stepper-trigger-radius - Border-radius du bouton trigger mobile.
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
  */

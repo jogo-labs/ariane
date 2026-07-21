@@ -42,54 +42,54 @@ import { warn } from '../../utils/warn.js';
  * @csspart today-btn  - Bouton « Aujourd'hui ».
  * @csspart close-btn  - Bouton « Fermer ».
  *
- * @cssprop [--ar-datepicker-panel-width]        - Largeur du popover.
- * @cssprop [--ar-datepicker-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel.
- * @cssprop [--ar-datepicker-offset=var(--ar-anchor-offset)] - Décalage latéral du panel.
- * @cssprop [--ar-datepicker-header-font-size]         - Taille de police de l'en-tête.
- * @cssprop [--ar-datepicker-header-padding]           - Padding de l'en-tête.
- * @cssprop [--ar-datepicker-header-margin]            - Margin de l'en-tête.
- * @cssprop [--ar-datepicker-header-radius]            - Border-radius de l'en-tête.
- * @cssprop [--ar-datepicker-header-bg=transparent]     - Fond de l'en-tête.
- * @cssprop [--ar-datepicker-nav-btn-size]                  - Taille (width = height) des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-bg]                    - Fond des boutons de navigation.
- * @cssprop [--ar-datepicker-nav-btn-border-width]          - Épaisseur de bordure des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-border-color]          - Couleur de bordure des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-color]                 - Couleur texte des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-radius]                - Border-radius des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-hover-bg]              - Fond au survol des boutons nav.
- * @cssprop [--ar-datepicker-nav-btn-active-bg]             - Fond à l'état actif des boutons nav.
- * @cssprop [--ar-datepicker-footer-padding]                - Padding du footer.
- * @cssprop [--ar-datepicker-footer-bg=transparent]          - Fond du footer.
- * @cssprop [--ar-datepicker-footer-margin]                 - Margin du footer.
- * @cssprop [--ar-datepicker-footer-btn-bg]                 - Fond des boutons du footer.
- * @cssprop [--ar-datepicker-footer-btn-border-width]       - Épaisseur de bordure des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-border-color]       - Couleur de bordure des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-color]              - Couleur texte des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-radius]             - Border-radius des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-padding]            - Padding des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-hover-bg]           - Fond au survol des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-hover-border-color] - Couleur de bordure au survol des boutons footer.
- * @cssprop [--ar-datepicker-footer-btn-active-bg]          - Fond à l'état actif des boutons footer.
- * @cssprop [--ar-datepicker-weekday-color]            - Couleur des abréviations de jours.
- * @cssprop [--ar-datepicker-weekday-font-size]        - Taille de police des abréviations de jours.
- * @cssprop [--ar-datepicker-day-size]                 - Taille des cellules jour.
- * @cssprop [--ar-datepicker-day-font-size]            - Taille de police des jours.
- * @cssprop [--ar-datepicker-day-radius]               - Border-radius des cellules jour.
- * @cssprop [--ar-datepicker-day-bg=transparent]        - Fond des cellules jour.
- * @cssprop [--ar-datepicker-day-border-width]         - Épaisseur de bordure des cellules jour.
- * @cssprop [--ar-datepicker-day-border-color]         - Couleur de bordure par défaut des cellules jour.
- * @cssprop [--ar-datepicker-day-other-month-color]    - Couleur des jours hors du mois affiché.
- * @cssprop [--ar-datepicker-day-today-bg]             - Fond du jour actuel.
- * @cssprop [--ar-datepicker-day-today-color]          - Couleur texte du jour actuel.
- * @cssprop [--ar-datepicker-day-today-border]         - Couleur de bordure du jour actuel.
- * @cssprop [--ar-datepicker-day-hover-bg]             - Fond au survol d'un jour.
- * @cssprop [--ar-datepicker-day-hover-color]          - Couleur texte au survol d'un jour.
- * @cssprop [--ar-datepicker-day-focus-ring-color]     - Couleur du focus ring des jours.
- * @cssprop [--ar-datepicker-day-focus-ring-width]     - Épaisseur du focus ring des jours.
- * @cssprop [--ar-datepicker-day-focus-ring-offset]    - Décalage du focus ring des jours.
- * @cssprop [--ar-datepicker-day-selected-bg]          - Fond du jour sélectionné.
- * @cssprop [--ar-datepicker-day-selected-color]       - Couleur texte du jour sélectionné.
- * @cssprop [--ar-datepicker-input-error-border-color] - Bordure input en état d'erreur.
+ * @cssprop --ar-datepicker-panel-width - Largeur du popover.
+ * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
+ * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
+ * @cssprop --ar-datepicker-header-font-size - Taille de police de l'en-tête.
+ * @cssprop --ar-datepicker-header-padding - Padding de l'en-tête.
+ * @cssprop --ar-datepicker-header-margin - Margin de l'en-tête.
+ * @cssprop --ar-datepicker-header-radius - Border-radius de l'en-tête.
+ * @cssprop --ar-datepicker-header-bg - Fond de l'en-tête.
+ * @cssprop --ar-datepicker-nav-btn-size - Taille (width = height) des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-bg - Fond des boutons de navigation.
+ * @cssprop --ar-datepicker-nav-btn-border-width - Épaisseur de bordure des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-color - Couleur texte des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-radius - Border-radius des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-hover-bg - Fond au survol des boutons nav.
+ * @cssprop --ar-datepicker-nav-btn-active-bg - Fond à l'état actif des boutons nav.
+ * @cssprop --ar-datepicker-footer-padding - Padding du footer.
+ * @cssprop --ar-datepicker-footer-bg - Fond du footer.
+ * @cssprop --ar-datepicker-footer-margin - Margin du footer.
+ * @cssprop --ar-datepicker-footer-btn-bg - Fond des boutons du footer.
+ * @cssprop --ar-datepicker-footer-btn-border-width - Épaisseur de bordure des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-color - Couleur texte des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-radius - Border-radius des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-padding - Padding des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-hover-bg - Fond au survol des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-hover-border-color - Couleur de bordure au survol des boutons footer.
+ * @cssprop --ar-datepicker-footer-btn-active-bg - Fond à l'état actif des boutons footer.
+ * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
+ * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.
+ * @cssprop --ar-datepicker-day-size - Taille des cellules jour.
+ * @cssprop --ar-datepicker-day-font-size - Taille de police des jours.
+ * @cssprop --ar-datepicker-day-radius - Border-radius des cellules jour.
+ * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
+ * @cssprop --ar-datepicker-day-border-width - Épaisseur de bordure des cellules jour.
+ * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour.
+ * @cssprop --ar-datepicker-day-other-month-color - Couleur des jours hors du mois affiché.
+ * @cssprop --ar-datepicker-day-today-bg - Fond du jour actuel.
+ * @cssprop --ar-datepicker-day-today-color - Couleur texte du jour actuel.
+ * @cssprop --ar-datepicker-day-today-border - Couleur de bordure du jour actuel.
+ * @cssprop --ar-datepicker-day-hover-bg - Fond au survol d'un jour.
+ * @cssprop --ar-datepicker-day-hover-color - Couleur texte au survol d'un jour.
+ * @cssprop --ar-datepicker-day-focus-ring-color - Couleur du focus ring des jours.
+ * @cssprop --ar-datepicker-day-focus-ring-width - Épaisseur du focus ring des jours.
+ * @cssprop --ar-datepicker-day-focus-ring-offset - Décalage du focus ring des jours.
+ * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné.
+ * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné.
+ * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).

@@ -62,22 +62,22 @@ if (typeof document !== 'undefined') {
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
- * @cssprop [--ar-dialog-width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
- * @cssprop [--ar-dialog-width-sm=360px] - Largeur du dialog modal, taille `sm`.
- * @cssprop [--ar-dialog-width-md=500px] - Largeur du dialog modal, taille `md`.
- * @cssprop [--ar-dialog-width-lg=800px] - Largeur du dialog modal, taille `lg`.
- * @cssprop [--ar-dialog-width-xl=1140px] - Largeur du dialog modal, taille `xl`.
- * @cssprop [--ar-dialog-drawer-width-sm=360px] - Largeur du drawer, taille `sm`.
- * @cssprop [--ar-dialog-drawer-width-md=720px] - Largeur du drawer, taille `md`.
- * @cssprop [--ar-dialog-drawer-width-lg=960px] - Largeur du drawer, taille `lg`.
- * @cssprop [--ar-dialog-drawer-width-xl=1440px] - Largeur du drawer, taille `xl`.
- * @cssprop [--ar-dialog-spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
- * @cssprop [--ar-dialog-spacing-block] - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
- * @cssprop [--ar-dialog-spacing-inline] - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
- * @cssprop [--ar-dialog-close-bg=var(--ar-button-tertiary-bg)] - Fond du bouton de fermeture.
- * @cssprop [--ar-dialog-close-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond du bouton de fermeture au survol.
- * @cssprop [--ar-dialog-close-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton de fermeture pressé.
- * @cssprop [--ar-dialog-close-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton de fermeture au focus.
+ * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
+ * @cssprop --ar-dialog-width-sm - Largeur du dialog modal, taille `sm`.
+ * @cssprop --ar-dialog-width-md - Largeur du dialog modal, taille `md`.
+ * @cssprop --ar-dialog-width-lg - Largeur du dialog modal, taille `lg`.
+ * @cssprop --ar-dialog-width-xl - Largeur du dialog modal, taille `xl`.
+ * @cssprop --ar-dialog-drawer-width-sm - Largeur du drawer, taille `sm`.
+ * @cssprop --ar-dialog-drawer-width-md - Largeur du drawer, taille `md`.
+ * @cssprop --ar-dialog-drawer-width-lg - Largeur du drawer, taille `lg`.
+ * @cssprop --ar-dialog-drawer-width-xl - Largeur du drawer, taille `xl`.
+ * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
+ * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
+ * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
+ * @cssprop --ar-dialog-close-bg - Fond du bouton de fermeture.
+ * @cssprop --ar-dialog-close-bg-hover - Fond du bouton de fermeture au survol.
+ * @cssprop --ar-dialog-close-bg-pressed - Fond du bouton de fermeture pressé.
+ * @cssprop --ar-dialog-close-bg-focus - Fond du bouton de fermeture au focus.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.

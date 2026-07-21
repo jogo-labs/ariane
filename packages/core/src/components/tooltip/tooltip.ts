@@ -32,15 +32,15 @@ export type ArTooltipPlacement =
  * @csspart bubble - Le panel flottant.
  * @csspart arrow  - Le caret directionnel.
  *
- * @cssprop --ar-tooltip-bg                  - Fond de la bulle.
- * @cssprop --ar-tooltip-color                  - Couleur du texte.
- * @cssprop --ar-tooltip-border-radius        - Arrondi.
- * @cssprop --ar-tooltip-padding    - Marge interne.
- * @cssprop --ar-tooltip-font-size          - Taille de police.
- * @cssprop --ar-tooltip-max-width              - Largeur maximale.
- * @cssprop --ar-tooltip-arrow-size               - Taille du caret.
- * @cssprop [--ar-tooltip-distance=10px] - Espacement entre le trigger et la bulle.
- * @cssprop [--ar-tooltip-offset=var(--ar-anchor-offset)] - Décalage latéral de la bulle.
+ * @cssprop --ar-tooltip-bg - Fond de la bulle.
+ * @cssprop --ar-tooltip-color - Couleur du texte.
+ * @cssprop --ar-tooltip-border-radius - Arrondi.
+ * @cssprop --ar-tooltip-padding - Marge interne.
+ * @cssprop --ar-tooltip-font-size - Taille de police.
+ * @cssprop --ar-tooltip-max-width - Largeur maximale.
+ * @cssprop --ar-tooltip-arrow-size - Taille du caret.
+ * @cssprop --ar-tooltip-distance - Espacement entre le trigger et la bulle.
+ * @cssprop --ar-tooltip-offset - Décalage latéral de la bulle.
  *
  * Pas d'events show/hide annulables : un tooltip n'a pas de raison métier de bloquer
  * son affichage (contrairement à un dialog ou un menu), contrairement à

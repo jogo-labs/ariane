@@ -14,7 +14,6 @@ import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
 import {
     extractThemeTokens,
-    validateCssPropertyDefaults,
     validateCssPropertyCoverage,
 } from './scripts/validate-cssprop-defaults.js';
 import {
@@ -177,18 +176,14 @@ export default {
                     }
                 }
 
-                // Valide que les @cssprop [--nom=valeur] écrits à la main dans le JSDoc
-                // des composants correspondent aux valeurs réelles de default.css —
+                // Valide que chaque token --ar-* de default.css appartenant à un composant
+                // a bien une entrée @cssprop dans son JSDoc (trou de documentation) —
                 // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
                 const themeCss = readFileSync(
                     resolve(process.cwd(), 'src/styles/themes/default.css'),
                     'utf-8',
                 );
                 const themeTokens = extractThemeTokens(themeCss);
-                const cssPropDefaultErrors = validateCssPropertyDefaults(
-                    customElementsManifest,
-                    themeTokens,
-                );
                 const cssPropCoverageErrors = validateCssPropertyCoverage(
                     customElementsManifest,
                     themeTokens,
@@ -203,16 +198,8 @@ export default {
                     findHardcodedTokenAssignments(filePath, readFileSync(filePath, 'utf-8')),
                 );
 
-                const allErrors = [
-                    ...cssPropDefaultErrors,
-                    ...cssPropCoverageErrors,
-                    ...hardcodedErrors,
-                ];
+                const allErrors = [...cssPropCoverageErrors, ...hardcodedErrors];
                 if (allErrors.length > 0) {
-                    const defaultErrorsMsg =
-                        cssPropDefaultErrors.length > 0
-                            ? `\n  désynchronisé(s) :\n${cssPropDefaultErrors.map((e) => `    - ${e}`).join('\n')}`
-                            : '';
                     const coverageErrorsMsg =
                         cssPropCoverageErrors.length > 0
                             ? `\n  non documenté(s) :\n${cssPropCoverageErrors.map((e) => `    - ${e}`).join('\n')}`
@@ -222,7 +209,7 @@ export default {
                             ? `\n  codé(s) en dur :\n${hardcodedErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${defaultErrorsMsg}${coverageErrorsMsg}${hardcodedErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}`,
                     );
                 }
             },

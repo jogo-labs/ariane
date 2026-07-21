@@ -48,6 +48,14 @@ const showPlayground = displayMode === 'demo';
 {variants.length > 0 && (
     <section id="exemples">
         <h3 class="section-title">Exemples</h3>
+        {/* ── Encart thème de démo ── */}
+        {/* Ariane est headless : aucun style n'est intégré au composant. Les previews
+            ci-dessous chargent le thème de démo `default.css` fourni avec la librairie —
+            à ne pas confondre avec un style par défaut intrinsèque au composant. */}
+        <ar-alert variant="info" style="margin-bottom: 1rem">
+            <p style="margin: 0">Les exemples ci-dessous sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.<br>
+            Un composant headless n'a aucun style intégré — remplacez ce thème par le vôtre pour un rendu différent.</p>
+        </ar-alert>
         <div class="main-section">
             {variants.map((variant) => (
                 <section id={`exemple-${variant.name}`}>
@@ -161,6 +169,12 @@ const showPlayground = displayMode === 'demo';
 
 <style>
     @import '../styles/doc-prose.css';
+
+    /* Évite le flash non-stylé le temps de l'hydratation du custom element
+       (Lit n'applique son shadow DOM/style qu'une fois défini côté client). */
+    ar-alert:not(:defined) {
+        visibility: hidden;
+    }
 
     /* ── Variantes ─────────────────────────────────────── */
 

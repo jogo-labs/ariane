@@ -27,12 +27,12 @@ function pluralize(count: number, label: string): string {
  * @csspart remaining - Le chiffre des caractères restants.
  * @csspart label     - Le texte après le chiffre (ex: "restants").
  *
- * @cssprop [--ar-charcounter-color]                - Couleur état normal.
- * @cssprop [--ar-charcounter-warning-color]         - Couleur état warning.
- * @cssprop [--ar-charcounter-error-color]           - Couleur état error.
- * @cssprop [--ar-charcounter-font-size=0.875rem]    - Taille de police.
- * @cssprop [--ar-charcounter-warning-weight=600]    - Graisse du texte en état warning.
- * @cssprop [--ar-charcounter-error-weight=700]      - Graisse du texte en état error.
+ * @cssprop --ar-charcounter-color - Couleur état normal.
+ * @cssprop --ar-charcounter-warning-color - Couleur état warning.
+ * @cssprop --ar-charcounter-error-color - Couleur état error.
+ * @cssprop --ar-charcounter-font-size - Taille de police.
+ * @cssprop --ar-charcounter-warning-weight - Graisse du texte en état warning.
+ * @cssprop --ar-charcounter-error-weight - Graisse du texte en état error.
  */
 export class ArCharcounter extends LitElement {
     static override styles = [styles];

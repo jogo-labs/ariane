@@ -27,9 +27,9 @@ export class ArProgressbarConfig {
  * @csspart track        - Le `<div>` représentant le fond de la barre (rail).
  * @csspart bar          - Le `<div>` représentant la progression (la partie remplie).
  *
- * @cssprop [--ar-progressbar-track-color=var(--ar-color-bg-subtle)]   - Couleur du rail (fond).
- * @cssprop [--ar-progressbar-fill-color=var(--ar-color-interactive)]  - Couleur de la progression.
- * @cssprop [--ar-progressbar-percent-color=var(--ar-color-text-muted)] - Couleur du texte du pourcentage.
+ * @cssprop --ar-progressbar-track-color - Couleur du rail (fond).
+ * @cssprop --ar-progressbar-fill-color - Couleur de la progression.
+ * @cssprop --ar-progressbar-percent-color - Couleur du texte du pourcentage.
  */
 export class ArProgressbar extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, styles];

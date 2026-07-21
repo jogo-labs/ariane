@@ -36,17 +36,17 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
- * @cssprop [--ar-breadcrumb-color=var(--ar-color-text)] - Couleur du texte (labels et lien actif). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
- * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
- * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
- * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop [--ar-breadcrumb-panel-max-width=var(--ar-panel-max-width)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-breadcrumb-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel mobile.
- * @cssprop [--ar-breadcrumb-offset=var(--ar-anchor-offset)] - Décalage latéral du panel mobile.
- * @cssprop [--ar-breadcrumb-toggle-bg=var(--ar-button-tertiary-bg)] - Fond du bouton retour/trigger mobile.
- * @cssprop [--ar-breadcrumb-toggle-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond du bouton retour/trigger mobile au survol.
- * @cssprop [--ar-breadcrumb-toggle-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond du bouton retour/trigger mobile pressé.
- * @cssprop [--ar-breadcrumb-toggle-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond du bouton retour/trigger mobile au focus.
+ * @cssprop --ar-breadcrumb-color - Couleur du texte (labels et lien actif). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
+ * @cssprop --ar-breadcrumb-separator-color - Couleur du séparateur entre les items (desktop).
+ * @cssprop --ar-breadcrumb-bullet-color - Couleur des puces de la liste mobile.
+ * @cssprop --ar-breadcrumb-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
+ * @cssprop --ar-breadcrumb-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
+ * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
+ * @cssprop --ar-breadcrumb-toggle-bg - Fond du bouton retour/trigger mobile.
+ * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
+ * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
+ * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
  *
  * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.

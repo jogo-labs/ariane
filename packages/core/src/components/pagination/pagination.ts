@@ -38,13 +38,13 @@ export interface ArPaginationPageChangeDetail {
  * @csspart prev     - Le bouton "Page précédente".
  * @csspart next     - Le bouton "Page suivante".
  *
- * @cssprop [--ar-pagination-radius=var(--ar-border-radius-lg)] - Arrondi du conteneur de pagination.
- * @cssprop [--ar-pagination-active-color=var(--ar-color-interactive)] - Couleur de la page active (texte + bordure).
- * @cssprop [--ar-pagination-color=var(--ar-color-text)] - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
- * @cssprop [--ar-pagination-bg=var(--ar-button-tertiary-bg)] - Fond des boutons prev/next/page (non actifs).
- * @cssprop [--ar-pagination-bg-hover=var(--ar-button-tertiary-bg-hover)] - Fond des boutons prev/next/page au survol.
- * @cssprop [--ar-pagination-bg-pressed=var(--ar-button-tertiary-bg-active)] - Fond des boutons prev/next/page pressés.
- * @cssprop [--ar-pagination-bg-focus=var(--ar-button-tertiary-bg-focus)] - Fond des boutons prev/next/page au focus.
+ * @cssprop --ar-pagination-radius - Arrondi du conteneur de pagination.
+ * @cssprop --ar-pagination-active-color - Couleur de la page active (texte + bordure).
+ * @cssprop --ar-pagination-color - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
+ * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs).
+ * @cssprop --ar-pagination-bg-hover - Fond des boutons prev/next/page au survol.
+ * @cssprop --ar-pagination-bg-pressed - Fond des boutons prev/next/page pressés.
+ * @cssprop --ar-pagination-bg-focus - Fond des boutons prev/next/page au focus.
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
