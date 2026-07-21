@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    extractThemeTokens,
-    validateCssPropertyDefaults,
-    validateCssPropertyCoverage,
-} from './validate-cssprop-defaults.js';
+import { extractThemeTokens, validateCssPropertyCoverage } from './validate-cssprop-defaults.js';
 
 describe('extractThemeTokens', () => {
     it('extrait un token simple', () => {
@@ -95,95 +91,6 @@ describe('extractThemeTokens', () => {
         const tokens = extractThemeTokens(css);
         expect(tokens.get('--ar-test-shadow')).toBe('0 1px 2px rgba(0,0,0,0.1)');
         expect(tokens.get('--ar-test-gradient')).toBe('linear-gradient( 90deg, red, blue )');
-    });
-});
-
-describe('validateCssPropertyDefaults', () => {
-    function manifestWith(cssProperties) {
-        return {
-            modules: [{ declarations: [{ name: 'ArPagination', cssProperties }] }],
-        };
-    }
-
-    it('ne retourne aucune erreur quand la valeur JSDoc correspond au thème', () => {
-        const themeTokens = new Map([['--ar-pagination-radius', '0.75rem']]);
-        const manifest = manifestWith([{ name: '--ar-pagination-radius', default: '0.75rem' }]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
-    });
-
-    it('retourne une erreur détaillée quand la valeur JSDoc diverge du thème', () => {
-        const themeTokens = new Map([['--ar-pagination-radius', '0.75rem']]);
-        const manifest = manifestWith([{ name: '--ar-pagination-radius', default: '1rem' }]);
-        const errors = validateCssPropertyDefaults(manifest, themeTokens);
-        expect(errors).toHaveLength(1);
-        expect(errors[0]).toContain('ArPagination');
-        expect(errors[0]).toContain('--ar-pagination-radius');
-        expect(errors[0]).toContain('1rem');
-        expect(errors[0]).toContain('0.75rem');
-    });
-
-    it('ignore les cssProperties sans default (rien à comparer)', () => {
-        const themeTokens = new Map([['--ar-charcounter-color', '#171717']]);
-        const manifest = manifestWith([{ name: '--ar-charcounter-color' }]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
-    });
-
-    it('ignore les tokens absents du thème (props hors thème, ex. --ar-dialog-width)', () => {
-        const themeTokens = new Map();
-        const manifest = manifestWith([{ name: '--ar-dialog-width', default: '500px' }]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
-    });
-
-    it('agrège les erreurs sur plusieurs déclarations', () => {
-        const themeTokens = new Map([
-            ['--ar-pagination-radius', '0.75rem'],
-            ['--ar-alert-padding', '1rem'],
-        ]);
-        const manifest = {
-            modules: [
-                {
-                    declarations: [
-                        {
-                            name: 'ArPagination',
-                            cssProperties: [{ name: '--ar-pagination-radius', default: '1rem' }],
-                        },
-                        {
-                            name: 'ArAlert',
-                            cssProperties: [{ name: '--ar-alert-padding', default: '2rem' }],
-                        },
-                    ],
-                },
-            ],
-        };
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toHaveLength(2);
-    });
-
-    it('accepte une valeur JSDoc single-line qui correspond à une valeur thème multi-ligne après normalisation', () => {
-        const themeTokens = new Map([['--ar-test-shadow', '0 1px 2px rgba(0,0,0,0.1)']]);
-        const manifest = manifestWith([
-            {
-                name: '--ar-test-shadow',
-                default: '0 1px 2px rgba(0,0,0,0.1)',
-            },
-        ]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
-    });
-
-    it('normalise aussi la valeur JSDoc avant comparaison (ex. espaces multiples → single)', () => {
-        const themeTokens = new Map([['--ar-test-shadow', '0 1px 2px rgba(0,0,0,0.1)']]);
-        const manifest = manifestWith([
-            {
-                name: '--ar-test-shadow',
-                default: '0  1px   2px\n            rgba(0,0,0,0.1)',
-            },
-        ]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
-    });
-
-    it('accepte une valeur JSDoc avec espaces leading/trailing qui correspond à la valeur thème après trim', () => {
-        const themeTokens = new Map([['--ar-pagination-radius', '0.75rem']]);
-        const manifest = manifestWith([{ name: '--ar-pagination-radius', default: '  0.75rem  ' }]);
-        expect(validateCssPropertyDefaults(manifest, themeTokens)).toEqual([]);
     });
 });
 
@@ -291,10 +198,8 @@ describe('validateCssPropertyCoverage', () => {
         expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
     });
 
-    it('documente un token avec default optionnel (la présence suffit, pas la valeur)', () => {
-        const manifest = manifestWithTag('ar-alert', [
-            { name: '--ar-alert-padding', default: '1rem' },
-        ]);
+    it("ne compare pas la valeur du token, seule la présence de l'entrée @cssprop compte", () => {
+        const manifest = manifestWithTag('ar-alert', [{ name: '--ar-alert-padding' }]);
         const themeTokens = new Map([['--ar-alert-padding', '0.75rem']]);
         expect(validateCssPropertyCoverage(manifest, themeTokens)).toEqual([]);
     });

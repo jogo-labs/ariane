@@ -18,8 +18,8 @@ import styles from './collapse.styles.js';
  * @csspart panel             - Zone animée (overflow hidden, height 0 → auto).
  * @csspart content           - Wrapper interne du contenu.
  *
- * @cssprop [--ar-collapse-duration=0s]  - Durée de la transition height.
- * @cssprop [--ar-collapse-easing=ease]  - Easing de la transition height.
+ * @cssprop --ar-collapse-duration - Durée de la transition height.
+ * @cssprop --ar-collapse-easing - Easing de la transition height.
  *
  * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.

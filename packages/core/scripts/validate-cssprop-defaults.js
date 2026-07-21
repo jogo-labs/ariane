@@ -1,10 +1,10 @@
 /**
- * Extrait et valide les valeurs par défaut des CSS custom properties (`@cssprop`)
- * documentées à la main dans le JSDoc des composants, en les comparant à leur
- * définition réelle dans le thème par défaut (`src/styles/themes/default.css`).
+ * Extrait les tokens du thème par défaut (`src/styles/themes/default.css`) et
+ * vérifie que chaque token appartenant à un composant a bien une entrée
+ * `@cssprop` dans son JSDoc — un trou de documentation silencieux.
  *
  * Utilisé par `cem.config.js` (hook `packageLinkPhase`) pour faire échouer
- * `npm run build:manifest` en cas de désaccord — cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
+ * `npm run build:manifest` en cas de trou — cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
  */
 
 const TOKEN_RE = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
@@ -45,40 +45,12 @@ export function extractThemeTokens(css) {
 }
 
 /**
- * Compare les `@cssprop [--nom=valeur]` déjà résolus dans le manifest CEM
- * aux valeurs réelles du thème par défaut. Ne modifie rien : retourne la liste
- * des désaccords trouvés (tableau vide si tout est cohérent).
- *
- * @param {{ modules?: Array<{ declarations?: Array<{ name: string, cssProperties?: Array<{ name: string, default?: string }> }> }> }} customElementsManifest
- * @param {Map<string, string>} themeTokens
- * @returns {string[]}
- */
-export function validateCssPropertyDefaults(customElementsManifest, themeTokens) {
-    const errors = [];
-    for (const mod of customElementsManifest.modules ?? []) {
-        for (const decl of mod.declarations ?? []) {
-            for (const prop of decl.cssProperties ?? []) {
-                if (prop.default === undefined) continue;
-                const themeValue = themeTokens.get(prop.name);
-                if (themeValue === undefined) continue;
-                const jsdocValue = prop.default.trim().replace(/\s+/g, ' ');
-                if (jsdocValue !== themeValue) {
-                    errors.push(
-                        `${decl.name} : ${prop.name} déclare [default=${jsdocValue}] dans le JSDoc mais default.css définit "${themeValue}"`,
-                    );
-                }
-            }
-        }
-    }
-    return errors;
-}
-
-/**
  * Détecte les tokens de default.css qui appartiennent à un composant (par
  * préfixe de tag, ex. --ar-alert-* pour <ar-alert>) mais qui n'ont aucune
  * entrée @cssprop dans le JSDoc de ce composant — un trou de documentation
- * silencieux. Ne vérifie pas la valeur (cf. validateCssPropertyDefaults pour
- * ça), seulement la présence d'une entrée cssProperties portant ce nom.
+ * silencieux. Seule la présence d'une entrée cssProperties portant ce nom est
+ * vérifiée (aucun concept de valeur par défaut à comparer : ni le JSDoc ni la
+ * doc générée n'en documentent, cf. suppression de la colonne « Défaut »).
  *
  * L'appartenance à un composant se détermine par préfixe de tag le plus long
  * (ex. --ar-tab-group-active-shadow appartient à <ar-tab-group>, pas à

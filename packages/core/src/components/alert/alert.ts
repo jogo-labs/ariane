@@ -29,26 +29,26 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
- * @cssprop [--ar-alert-border-radius=0.75rem]                     - Arrondi des alertes.
- * @cssprop [--ar-alert-padding=1rem]                              - Marge interne des alertes.
- * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures.
- * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures.
- * @cssprop [--ar-alert-close-size=2rem]                           - Taille (width/height) du bouton de fermeture.
- * @cssprop [--ar-alert-close-radius=7px]                          - Arrondi du bouton de fermeture.
- * @cssprop [--ar-alert-close-bg=color-mix(in srgb, currentColor 8%, transparent)]    - Fond du bouton de fermeture au repos.
- * @cssprop [--ar-alert-close-hover-bg=color-mix(in srgb, currentColor 20%, transparent)] - Fond du bouton de fermeture au survol.
- * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
- * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
- * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".
- * @cssprop [--ar-alert-warning-bg=var(--ar-color-warning-bg)]     - Fond de l'alerte "warning".
- * @cssprop [--ar-alert-warning-border=var(--ar-color-warning-bg)] - Bordure de l'alerte "warning".
- * @cssprop [--ar-alert-warning-icon=var(--ar-color-warning-text)] - Couleur de l'icône "warning".
- * @cssprop [--ar-alert-error-bg=var(--ar-color-danger-bg)]        - Fond de l'alerte "error".
- * @cssprop [--ar-alert-error-border=var(--ar-color-danger-bg)]    - Bordure de l'alerte "error".
- * @cssprop [--ar-alert-error-icon=var(--ar-color-danger-text)]    - Couleur de l'icône "error".
- * @cssprop [--ar-alert-success-bg=var(--ar-color-success-bg)]     - Fond de l'alerte "success".
- * @cssprop [--ar-alert-success-border=var(--ar-color-success-bg)] - Bordure de l'alerte "success".
- * @cssprop [--ar-alert-success-icon=var(--ar-color-success-text)] - Couleur de l'icône "success".
+ * @cssprop --ar-alert-border-radius - Arrondi des alertes.
+ * @cssprop --ar-alert-padding - Marge interne des alertes.
+ * @cssprop --ar-alert-border-width - Epaisseur des bordures.
+ * @cssprop --ar-alert-border-style - Style des bordures.
+ * @cssprop --ar-alert-close-size - Taille (width/height) du bouton de fermeture.
+ * @cssprop --ar-alert-close-radius - Arrondi du bouton de fermeture.
+ * @cssprop --ar-alert-close-bg - Fond du bouton de fermeture au repos.
+ * @cssprop --ar-alert-close-hover-bg - Fond du bouton de fermeture au survol.
+ * @cssprop --ar-alert-info-bg - Fond de l'alerte "info".
+ * @cssprop --ar-alert-info-border - Bordure de l'alerte "info".
+ * @cssprop --ar-alert-info-icon - Couleur de l'icône "info".
+ * @cssprop --ar-alert-warning-bg - Fond de l'alerte "warning".
+ * @cssprop --ar-alert-warning-border - Bordure de l'alerte "warning".
+ * @cssprop --ar-alert-warning-icon - Couleur de l'icône "warning".
+ * @cssprop --ar-alert-error-bg - Fond de l'alerte "error".
+ * @cssprop --ar-alert-error-border - Bordure de l'alerte "error".
+ * @cssprop --ar-alert-error-icon - Couleur de l'icône "error".
+ * @cssprop --ar-alert-success-bg - Fond de l'alerte "success".
+ * @cssprop --ar-alert-success-border - Bordure de l'alerte "success".
+ * @cssprop --ar-alert-success-icon - Couleur de l'icône "success".
 
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).

@@ -16,7 +16,7 @@ import { warn } from '../../utils/warn.js';
  * @csspart spinner   - L'élément `<svg>` du spinner (visible quand `done` est false).
  * @csspart status    - Le `<div role="alert">` lu par les lecteurs d'écran.
  *
- * @cssprop [--ar-spinner-stroke-color=currentColor] - Couleur du trait SVG. Hérite de `currentColor` par défaut.
+ * @cssprop --ar-spinner-stroke-color - Couleur du trait SVG. Hérite de `currentColor` par défaut.
  */
 export class ArSpinner extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];

@@ -31,16 +31,16 @@ export type ArDropdownPlacement =
  *
  * @csspart panel - Le panel flottant.
  *
- * @cssprop [--ar-dropdown-min-width=10rem] - Largeur minimale du panel.
- * @cssprop [--ar-dropdown-color=var(--ar-panel-text)] - Couleur du texte (cascade vers --ar-panel-text).
- * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width)] - Largeur maximale (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding)] - Marge interne (cascade vers --ar-panel-padding).
- * @cssprop [--ar-dropdown-bg=var(--ar-panel-bg)] - Fond du panel (cascade vers --ar-panel-bg).
- * @cssprop [--ar-dropdown-border-color=var(--ar-panel-border-color)] - Bordure (cascade vers --ar-panel-border-color).
- * @cssprop [--ar-dropdown-border-radius=var(--ar-panel-radius)] - Arrondi (cascade vers --ar-panel-radius).
- * @cssprop [--ar-dropdown-shadow=var(--ar-panel-shadow)] - Ombre (cascade vers --ar-panel-shadow).
- * @cssprop [--ar-dropdown-distance=var(--ar-anchor-distance)] - Espacement entre le trigger et le panel (axe principal).
- * @cssprop [--ar-dropdown-offset=var(--ar-anchor-offset)] - Décalage latéral du panel (axe transversal).
+ * @cssprop --ar-dropdown-min-width - Largeur minimale du panel.
+ * @cssprop --ar-dropdown-color - Couleur du texte (cascade vers --ar-panel-text).
+ * @cssprop --ar-dropdown-max-width - Largeur maximale (cascade vers --ar-panel-max-width).
+ * @cssprop --ar-dropdown-padding - Marge interne (cascade vers --ar-panel-padding).
+ * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg).
+ * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color).
+ * @cssprop --ar-dropdown-border-radius - Arrondi (cascade vers --ar-panel-radius).
+ * @cssprop --ar-dropdown-shadow - Ombre (cascade vers --ar-panel-shadow).
+ * @cssprop --ar-dropdown-distance - Espacement entre le trigger et le panel (axe principal).
+ * @cssprop --ar-dropdown-offset - Décalage latéral du panel (axe transversal).
  *
  * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
