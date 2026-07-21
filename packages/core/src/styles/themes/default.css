@@ -430,6 +430,9 @@
         --ar-dropdown-border-radius: var(--ar-panel-radius);
         --ar-dropdown-shadow: var(--ar-panel-shadow);
         --ar-dropdown-padding: var(--ar-panel-padding);
+        /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
+           dropdown reste lisible plus étroit qu'un panel de disclosure générique (breadcrumb,
+           stepper). */
         --ar-dropdown-min-width: 10rem;
         --ar-dropdown-max-width: var(--ar-panel-max-width);
 
