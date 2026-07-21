@@ -510,7 +510,9 @@
         --ar-datepicker-offset: var(--ar-anchor-offset);
         --ar-datepicker-gap: 0.35rem;
         --ar-datepicker-label-gap: 0.5rem;
-        --ar-datepicker-error-color: var(--ar-color-red-50);
+        /* --ar-color-danger-text (pas red-50 directement) : même convention que
+           ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
+        --ar-datepicker-error-color: var(--ar-color-danger-text);
 
         --ar-datepicker-panel-width: 20rem;
 

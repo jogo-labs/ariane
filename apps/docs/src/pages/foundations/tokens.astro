@@ -121,6 +121,7 @@ const tocEntries = [
     }
 
     .value {
-        color: var(--doc-text-muted, #6b7280);
+        /* var(--doc-text-muted) échoue le contraste AA sur le fond de <code> (axe-core) */
+        color: var(--doc-text, #111827);
     }
 </style>

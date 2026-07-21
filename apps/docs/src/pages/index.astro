@@ -364,7 +364,8 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .cta-bottom p {
         font-size:     0.9rem;
-        color:         var(--doc-text-muted, #6b7280);
+        /* var(--doc-text-muted) échoue le contraste AA sur ce fond (axe-core) */
+        color:         var(--doc-text, #1a1a1a);
         margin-bottom: 1.75rem;
     }
 
@@ -395,10 +396,9 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .landing-footer a {
         color:           var(--doc-accent, #7c3aed);
-        text-decoration: none;
+        text-decoration: underline;
+        text-underline-offset: 2px;
     }
-
-    .landing-footer a:hover { text-decoration: underline; }
 
     /* ── Responsive ─────────────────────────────────────── */
 

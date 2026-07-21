@@ -95,7 +95,10 @@ ul {
 
 a {
     color: var(--doc-accent, #7c3aed);
-    text-decoration: none;
+    /* Un lien dans du texte courant ne doit pas être distingué par la seule
+       couleur (WCAG 1.4.1) — soulignement permanent, pas seulement au survol. */
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 a:visited {
@@ -104,10 +107,6 @@ a:visited {
 
 a:active {
     color: var(--doc-accent, #7c3aed);
-}
-
-a:hover {
-    text-decoration: underline;
 }
 
 pre {
@@ -168,6 +167,7 @@ pre code {
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
     background: color-mix(in srgb, var(--doc-border, #e5e7eb) 80%, transparent);
-    color: var(--doc-text-muted, #6b7280);
+    /* var(--doc-text-muted) échoue le contraste AA sur ce fond clair (axe-core) */
+    color: var(--doc-text, #111827);
     letter-spacing: 0.02em;
 }
