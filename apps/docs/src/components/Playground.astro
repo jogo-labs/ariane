@@ -204,7 +204,7 @@ const showPlayground = displayMode === 'demo';
         font-weight:    600;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-        color:          var(--doc-accent, #7c3aed);
+        color:          var(--doc-accent);
         margin-bottom:  0.5rem;
         display:        flex;
         align-items:    center;
@@ -218,7 +218,7 @@ const showPlayground = displayMode === 'demo';
     h5 {
         font-size:   1rem;
         font-weight: 600;
-        color:       var(--doc-text, #374151);
+        color:       var(--doc-text);
         margin:      0;
     }
 
@@ -243,17 +243,17 @@ const showPlayground = displayMode === 'demo';
         justify-content: center;
         width:           1.75rem;
         height:          1.75rem;
-        background:      color-mix(in srgb, var(--doc-bg, #ffffff) 75%, transparent);
+        background:      color-mix(in srgb, var(--doc-bg) 75%, transparent);
         backdrop-filter: blur(4px);
-        border:          1px solid var(--doc-border, #e5e7eb);
+        border:          1px solid var(--doc-border);
         border-radius:   0.375rem;
         cursor:          pointer;
-        color:           var(--doc-text-muted, #6b7280);
+        color:           var(--doc-text-muted);
         transition:      background 0.15s;
     }
 
     .preview-theme-toggle:hover {
-        background: var(--doc-bg, #ffffff);
+        background: var(--doc-bg);
     }
 
     .preview {
@@ -262,7 +262,7 @@ const showPlayground = displayMode === 'demo';
         gap:           0.75rem;
         align-items:   center;
         padding:       2rem;
-        border:        1px solid var(--doc-border, #e5e7eb);
+        border:        1px solid var(--doc-border);
         border-bottom: 0;
         border-radius: 0.5rem 0.5rem 0 0;
         background: var(--doc-bg);
@@ -273,7 +273,7 @@ const showPlayground = displayMode === 'demo';
     .code-block,
     .playground-code-block {
         position:   relative;
-        border:     1px solid var(--doc-border, #e5e7eb);
+        border:     1px solid var(--doc-border);
         border-top: none;
         overflow:   hidden;
     }
@@ -308,7 +308,7 @@ const showPlayground = displayMode === 'demo';
         font-family: 'Fira Code', 'Cascadia Code', monospace;
         font-size:   0.8rem;
         line-height: 1.6;
-        background:  var(--doc-code-block-bg, #1e1e2e);
+        background:  var(--doc-code-block-bg);
     }
 
     :global(.code-block pre code),
@@ -333,14 +333,14 @@ const showPlayground = displayMode === 'demo';
     .playground-section .preview-wrap { margin-bottom: 0; }
     .playground-section .preview {
         border:        none;
-        border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 1px solid var(--doc-border);
         border-bottom: 0;
         border-radius: 0;
     }
 
     .playground-section .playground-code-block {
         border:        none;
-        border-bottom: 1px solid var(--doc-border, #e8e6e0);
+        border-bottom: 1px solid var(--doc-border);
         border-bottom: 0;
     }
 
@@ -350,11 +350,11 @@ const showPlayground = displayMode === 'demo';
     }
 
     .controls-panel {
-        border:        1px solid var(--doc-border, #e5e7eb);
+        border:        1px solid var(--doc-border);
         border-top:    none;
         border-radius: 0 0 0.5rem 0.5rem;
         padding:       1rem 1.5rem;
-        background:    var(--doc-nav-bg, #f9fafb);
+        background:    var(--doc-nav-bg);
         display:       flex;
         flex-wrap:     wrap;
         gap:           1rem 2rem;
@@ -371,7 +371,7 @@ const showPlayground = displayMode === 'demo';
     .control-label {
         font-size:   0.75rem;
         font-weight: 600;
-        color:       var(--doc-text-muted, #6b7280);
+        color:       var(--doc-text-muted);
         font-family: 'Fira Code', 'Cascadia Code', monospace;
     }
 
@@ -379,11 +379,11 @@ const showPlayground = displayMode === 'demo';
     .control-row input[type="text"],
     .control-row input[type="number"] {
         padding:       0.3rem 0.5rem;
-        border:        1px solid var(--doc-accent-border, #e0d0ff);
+        border:        1px solid var(--doc-accent-border);
         border-radius: 0.25rem;
         font-size:     0.875rem;
-        background:    var(--doc-bg, #fff);
-        color:         var(--doc-text, #111827);
+        background:    var(--doc-bg);
+        color:         var(--doc-text);
         width:         100%;
     }
 
@@ -405,7 +405,7 @@ const showPlayground = displayMode === 'demo';
         border:        1px solid color-mix(in srgb, var(--ar-color-interactive, #2563eb) 20%, transparent);
         border-radius: 0.5rem;
         font-size:     0.875rem;
-        color:         var(--doc-text, #374151);
+        color:         var(--doc-text);
         margin:        1rem 0;
     }
 

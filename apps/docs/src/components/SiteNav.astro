@@ -149,18 +149,18 @@ const componentItems: NavItem[] = allComponents
         justify-content: space-between;
         flex-grow:       1;
         padding:         4rem 0.75rem 1.25rem;
-        border-right:    1px solid var(--doc-nav-border, #e2e4e9);
-        background:      var(--doc-nav-bg, #f8f9fb);
+        border-right:    1px solid var(--doc-nav-border);
+        background:      var(--doc-nav-bg);
         position:        sticky;
         top:             0;
         height:          100%;
         overflow-y:      auto;
         scrollbar-width: thin;
-        scrollbar-color: var(--doc-border, #d1d5db) transparent;
+        scrollbar-color: var(--doc-border) transparent;
     }
 
     nav::-webkit-scrollbar       { width: 4px; }
-    nav::-webkit-scrollbar-thumb { background: var(--doc-border, #d1d5db); border-radius: 4px; }
+    nav::-webkit-scrollbar-thumb { background: var(--doc-border); border-radius: 4px; }
 
     /* ── Marque (masquée sur desktop, le header a déjà le logo) ── */
 
@@ -168,7 +168,7 @@ const componentItems: NavItem[] = allComponents
         font-weight:     500;
         font-size:       .8rem;
         letter-spacing:  -0.02em;
-        color:           var(--doc-text, #1a1d26);
+        color:           var(--doc-text);
         text-decoration: none;
         margin: 0;
         flex-shrink:     0;
@@ -195,7 +195,7 @@ const componentItems: NavItem[] = allComponents
         font-weight:    600;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color:          var(--doc-text-muted, #6b7280);
+        color:          var(--doc-text-muted);
         padding:        0 0.75rem;
         margin:         0 0 0.4rem;
     }
@@ -212,7 +212,7 @@ const componentItems: NavItem[] = allComponents
     .nav-list a {
         display:         block;
         padding:         0.4rem 0.75rem;
-        color:           var(--doc-text-subtle, #4b5563);
+        color:           var(--doc-text-subtle);
         text-decoration: none;
         border-radius:   0.375rem;
         font-size:       0.85rem;
@@ -222,16 +222,16 @@ const componentItems: NavItem[] = allComponents
     }
 
     .nav-list a:hover {
-        background: var(--doc-nav-bg-hover, #f3efff);
+        background: var(--doc-nav-bg-hover);
         color:      var(--doc-text);
     }
 
     .nav-list a[aria-current="page"] {
-        background:                var(--doc-accent-bg, #f3efff);
-        color:                     var(--doc-accent, #7c3aed);
+        background:                var(--doc-accent-bg);
+        color:                     var(--doc-accent);
         border-top-left-radius:    0;
         border-bottom-left-radius: 0;
-        border-left-color:         var(--doc-accent, #7c3aed);
+        border-left-color:         var(--doc-accent);
     }
 
     /* ── Enfants (sous-composants) ───────────────────────────── */
@@ -239,13 +239,13 @@ const componentItems: NavItem[] = allComponents
     .nav-children {
         margin:       0.15rem 0 0.25rem 1.2rem;
         padding-left: 0;
-        border-left:  1.5px solid var(--doc-border, #dfe1e7);
+        border-left:  1.5px solid var(--doc-border);
     }
 
     .nav-children a {
         font-size: 0.78rem;
         padding:   0.3rem 0.6rem;
-        color:     var(--doc-text-subtle, #4b5563);
+        color:     var(--doc-text-subtle);
     }
 
     /* ── Footer nav (theme toggle dans le drawer mobile uniquement) ── */
@@ -257,7 +257,7 @@ const componentItems: NavItem[] = allComponents
         flex-direction: column;
         row-gap: .5rem;
         padding:     1rem 0.75rem 0;
-        border-top:  1px solid var(--doc-border, #e5e7eb);
+        border-top:  1px solid var(--doc-border);
         flex-shrink: 0;
     }
 
@@ -274,18 +274,18 @@ const componentItems: NavItem[] = allComponents
         display:         flex;
         align-items:     center;
         gap:             0.3rem;
-        color:           var(--doc-text-muted, #6b7280);
+        color:           var(--doc-text-muted);
         text-decoration: none;
         font-size:       0.8rem;
         transition:      color 0.12s;
     }
 
-    .nav-footer-link:hover { color: var(--doc-text, #111827); }
+    .nav-footer-link:hover { color: var(--doc-text); }
 
     .nav-footer-version {
         font-size:   0.7rem;
         margin: 0;
         font-family: 'Fira Code', 'Cascadia Code', monospace;
-        color:       var(--doc-text-muted, #9ca3af);
+        color:       var(--doc-text-muted);
     } */
 </style>

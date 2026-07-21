@@ -22,17 +22,17 @@ table {
 th {
     text-align: left;
     padding: 0.5rem 0.75rem;
-    background: var(--doc-nav-bg, #f9fafb);
-    color: var(--doc-text, #111827);
+    background: var(--doc-nav-bg);
+    color: var(--doc-text);
     font-weight: 600;
-    border-bottom: 1px solid var(--doc-border, #e5e7eb);
+    border-bottom: 1px solid var(--doc-border);
 }
 
 td {
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--doc-border, #f3f4f6);
+    border-bottom: 1px solid var(--doc-border);
     vertical-align: top;
-    color: var(--doc-text, #111827);
+    color: var(--doc-text);
 }
 
 /* La première colonne (Nom) se cale sur son contenu (nom de token/attribut,
@@ -48,8 +48,8 @@ td:first-child {
 code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.8rem;
-    background: var(--doc-accent-bg, #f3efff);
-    color: var(--doc-accent, #7c3aed);
+    background: var(--doc-accent-bg);
+    color: var(--doc-accent);
     padding: 0.1em 0.35em;
     border-radius: 0.25em;
 }
@@ -59,7 +59,7 @@ code {
     width: 2rem;
     height: 2rem;
     border-radius: 4px;
-    outline: var(--doc-swatch-outline, 1px solid rgba(0, 0, 0, 0.25));
+    outline: var(--doc-swatch-outline);
     outline-offset: 1px;
     vertical-align: middle;
     margin-right: 0.5rem;

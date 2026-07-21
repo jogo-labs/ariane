@@ -14,6 +14,8 @@ node-compile-cache/
 
 # ── Tests ─────────────────────────────────────────────────────
 coverage/
+test-results/
+playwright-report/
 
 # ── Logs ──────────────────────────────────────────────────────
 *.log

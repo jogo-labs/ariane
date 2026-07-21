@@ -1,10 +1,11 @@
 /**
  * playground.js
  *
- * Gère trois responsabilités :
+ * Gère quatre responsabilités :
  * 1. Coloration syntaxique — highlight.js colore tous les blocs au chargement
  * 2. Boutons "Copier" — copie le contenu du bloc code adjacent
  * 3. Playground interactif — les contrôles modifient les attributs du composant en live
+ * 4. Accessibilité clavier des blocs de code qui débordent horizontalement
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -13,6 +14,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.hljs) {
         window.hljs.highlightAll();
     }
+
+    // ── Accessibilité clavier des <pre> scrollables (WCAG 2.1.1) ────────────────
+    // Tous les blocs de code ont overflow-x:auto (doc-prose.css/Playground.astro) —
+    // rendus focusables inconditionnellement plutôt que de tester scrollWidth vs
+    // clientWidth, qui peut être en course avec le layout/la coloration syntaxique.
+    // axe-core (règle scrollable-region-focusable) cible le <code> lui-même —
+    // plus large que son <pre> parent une fois coloré par highlight.js — pas
+    // seulement le <pre> : un ancêtre focusable ne suffit pas pour cette règle.
+
+    document.querySelectorAll('pre').forEach(function (pre) {
+        pre.setAttribute('tabindex', '0');
+        var code = pre.querySelector('code');
+        if (code) code.setAttribute('tabindex', '0');
+    });
 
     // ── Boutons Copier (blocs variantes) ────────────────────────────────────────
 

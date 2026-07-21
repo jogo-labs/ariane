@@ -106,7 +106,7 @@ const { entries, mobileOnly = false } = Astro.props;
         font-weight:    600;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color:          var(--doc-text-muted, #6b7280);
+        color:          var(--doc-text-muted);
         margin:         0 0 0.5rem;
     }
 
@@ -124,7 +124,7 @@ const { entries, mobileOnly = false } = Astro.props;
         display:         block;
         padding:         0.25rem 0;
         padding-left:    0.75rem;
-        color:           var(--doc-text-subtle, #4b5563);
+        color:           var(--doc-text-subtle);
         text-decoration: none;
         border-left:     2px solid transparent;
         line-height:     1.4;
@@ -134,13 +134,13 @@ const { entries, mobileOnly = false } = Astro.props;
 
     .toc-link:hover,
     .toc-link-m:hover {
-        color:        var(--doc-text, #111827);
-        border-color: var(--doc-border, #e5e7eb);
+        color:        var(--doc-text);
+        border-color: var(--doc-border);
     }
 
     .toc-link.active {
-        color:        var(--doc-accent, #7c3aed);
-        border-color: var(--doc-accent, #7c3aed);
+        color:        var(--doc-accent);
+        border-color: var(--doc-accent);
     }
 
     /* ── Mobile ─────────────────────────────────────────────── */
@@ -150,9 +150,9 @@ const { entries, mobileOnly = false } = Astro.props;
         .toc-mobile  {
             display:       block;
             margin:        0 0 1.5rem;
-            border:        1px solid var(--doc-border, #e5e7eb);
+            border:        1px solid var(--doc-border);
             border-radius: 0.5rem;
-            background:    var(--doc-nav-bg, #f8f9fb);
+            background:    var(--doc-nav-bg);
             font-size:     0.875rem;
         }
 
@@ -162,7 +162,7 @@ const { entries, mobileOnly = false } = Astro.props;
             font-size:       0.8rem;
             text-transform:  uppercase;
             letter-spacing:  0.06em;
-            color:           var(--doc-text-muted, #6b7280);
+            color:           var(--doc-text-muted);
             cursor:          pointer;
             list-style:      none;
             display:         flex;
@@ -182,7 +182,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
         .toc-mobile ul {
             padding:       0 0.5rem 0.5rem;
-            border-top:    1px solid var(--doc-border, #e5e7eb);
+            border-top:    1px solid var(--doc-border);
         }
     }
 </style>
