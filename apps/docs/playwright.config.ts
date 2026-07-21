@@ -22,5 +22,19 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 30_000,
     },
-    projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+    projects: [
+        {
+            name: 'chromium',
+            use: {
+                browserName: 'chromium',
+                // En CI : utilise google-chrome-stable préinstallé sur le runner
+                // (évite `playwright install --with-deps`, ~10 min d'apt-get sur
+                // ubuntu-latest) — même convention que web-test-runner.config.js
+                // côté packages/core.
+                launchOptions: {
+                    executablePath: process.env.CI ? '/usr/bin/google-chrome-stable' : undefined,
+                },
+            },
+        },
+    ],
 });

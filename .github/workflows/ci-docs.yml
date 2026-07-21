@@ -52,9 +52,6 @@ jobs:
       - name: Check build output
         run: npm run test:build --workspace=apps/docs
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
       - name: Test docs (a11y)
         run: npm run test:a11y --workspace=apps/docs
 
