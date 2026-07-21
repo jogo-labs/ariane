@@ -35,6 +35,16 @@ td {
     color: var(--doc-text, #111827);
 }
 
+/* La première colonne (Nom) se cale sur son contenu (nom de token/attribut,
+   généralement court et sans espace) au lieu de rétrécir sous la pression
+   d'une colonne Description longue — les colonnes suivantes se partagent
+   l'espace restant. */
+th:first-child,
+td:first-child {
+    width: 1%;
+    white-space: nowrap;
+}
+
 code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.8rem;
