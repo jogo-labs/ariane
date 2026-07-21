@@ -29,9 +29,9 @@ function needsBorder(value: string): boolean {
     <table class="palette-table">
         <thead>
             <tr>
-                <th class="hue-label"></th>
+                <th class="hue-label" scope="col"></th>
                 {displayStops.map((stop) => (
-                    <th class="stop-header">{stop}</th>
+                    <th class="stop-header" scope="col">{stop}</th>
                 ))}
             </tr>
         </thead>
