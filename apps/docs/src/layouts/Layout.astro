@@ -62,7 +62,7 @@ const {
             input:focus-visible,
             select:focus-visible,
             summary:focus-visible {
-                outline: 2px solid var(--doc-accent, #7c3aed);
+                outline: 2px solid var(--doc-accent);
                 outline-offset: 2px;
                 border-radius: 2px;
             }
@@ -130,6 +130,7 @@ const {
                 --doc-accent-hover:   #6d28d9;
                 --doc-accent-bg:      #f3efff;
                 --doc-accent-border:  #e0d0ff;
+                --doc-link-visited:   #6d28d9;
                 --doc-code-bg:        #f3f4f6;
                 --doc-code-block-bg:  #0d1219;
                 --doc-header-bg:      rgba(250,250,248,0.92);
@@ -152,6 +153,9 @@ const {
                 --doc-accent-hover:   #8b5cf6;
                 --doc-accent-bg:      #2d2040;
                 --doc-accent-border:  #4c3280;
+                /* #8b5cf6 (--doc-accent-hover) échoue l'AA sur ce fond (4.09:1) —
+                   teinte plus claire dédiée aux liens visités (9.37:1) */
+                --doc-link-visited:   #c4b5fd;
                 --doc-cta-bg:         #2d2040;
                 --doc-cta-border:     #30215a;
                 --doc-code-bg:        #1e1e2e;
@@ -298,7 +302,7 @@ const {
             .brand-dot {
                 display:        inline-block;
                 font-size:      0.55rem;
-                color:          var(--doc-accent, #7c3aed);
+                color:          var(--doc-accent);
                 margin-left:    3px;
                 vertical-align: middle;
                 position:       relative;
@@ -311,9 +315,9 @@ const {
                 /* var(--doc-text-muted) échoue le contraste AA (4.28:1) sur ce fond en
                    thème clair — même paire que .badge (var(--doc-accent)/-bg), conforme
                    dans les deux thèmes (5.05:1 clair, 5.54:1 sombre). */
-                color:         var(--doc-accent, #7c3aed);
-                background:    var(--doc-accent-bg, #f3efff);
-                border:        1px solid var(--doc-accent-border, #e0d0ff);
+                color:         var(--doc-accent);
+                background:    var(--doc-accent-bg);
+                border:        1px solid var(--doc-accent-border);
                 padding:       1px 8px;
                 border-radius: 20px;
             }

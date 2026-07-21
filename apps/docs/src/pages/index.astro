@@ -114,9 +114,9 @@ const firstComponentHref = rootComponents[0]?.tagName
         gap:            0.4rem;
         font-size:      0.75rem;
         font-weight:    600;
-        color:          var(--doc-accent, #7c3aed);
-        background:     var(--doc-accent-bg, #f3efff);
-        border:         1px solid var(--doc-accent-border, #e0d0ff);
+        color:          var(--doc-accent);
+        background:     var(--doc-accent-bg);
+        border:         1px solid var(--doc-accent-border);
         padding:        0.25rem 0.85rem;
         border-radius:  20px;
         margin-bottom:  1.75rem;
@@ -127,7 +127,7 @@ const firstComponentHref = rootComponents[0]?.tagName
         content:       '';
         width:         6px;
         height:        6px;
-        background:    var(--doc-accent, #7c3aed);
+        background:    var(--doc-accent);
         border-radius: 50%;
         display:       inline-block;
     }
@@ -137,7 +137,7 @@ const firstComponentHref = rootComponents[0]?.tagName
         font-weight:    800;
         letter-spacing: -0.04em;
         line-height:    1.1;
-        color:          var(--doc-text, #0f0f0f);
+        color:          var(--doc-text);
         margin-bottom:  1.25rem;
     }
 
@@ -151,7 +151,7 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .hero-pitch {
         font-size:    1.05rem;
-        color:        var(--doc-text-subtle, #4b5563);
+        color:        var(--doc-text-subtle);
         line-height:  1.75;
         max-width:    560px;
         margin:       0 auto 2rem;
@@ -171,9 +171,9 @@ const firstComponentHref = rootComponents[0]?.tagName
         gap:           0.35rem;
         font-size:     0.72rem;
         font-weight:   500;
-        color:         var(--doc-text-muted, #6b7280);
-        background:    var(--doc-bg, #fff);
-        border:        1px solid var(--doc-border, #e8e6e0);
+        color:         var(--doc-text-muted);
+        background:    var(--doc-bg);
+        border:        1px solid var(--doc-border);
         padding:       0.25rem 0.75rem;
         border-radius: 20px;
     }
@@ -182,7 +182,7 @@ const firstComponentHref = rootComponents[0]?.tagName
         width:         6px;
         height:        6px;
         border-radius: 50%;
-        background:    var(--doc-accent, #7c3aed);
+        background:    var(--doc-accent);
         flex-shrink:   0;
     }
 
@@ -223,28 +223,28 @@ const firstComponentHref = rootComponents[0]?.tagName
         align-items:     center;
         gap:             0.4rem;
         background:      transparent;
-        color:           var(--doc-text, #374151);
+        color:           var(--doc-text);
         font-family:     inherit;
         font-size:       0.9rem;
         font-weight:     600;
         padding:         0.65rem 1.5rem;
         border-radius:   8px;
         text-decoration: none;
-        border:          1.5px solid var(--doc-border, #e8e6e0);
+        border:          1.5px solid var(--doc-border);
         cursor:          pointer;
         transition:      border-color 0.15s, color 0.15s;
     }
 
     .btn-secondary:hover {
-        border-color: var(--doc-accent, #7c3aed);
-        color:        var(--doc-accent, #7c3aed);
+        border-color: var(--doc-accent);
+        color:        var(--doc-accent);
     }
 
     /* ── Séparateur ────────────────────────────────────────── */
 
     .divider {
         border:     none;
-        border-top: 1px solid var(--doc-border, #e8e6e0);
+        border-top: 1px solid var(--doc-border);
         margin:     0;
     }
 
@@ -265,13 +265,13 @@ const firstComponentHref = rootComponents[0]?.tagName
         font-size:      1.85rem;
         font-weight:    700;
         letter-spacing: -0.03em;
-        color:          var(--doc-text, #0f0f0f);
+        color:          var(--doc-text);
         margin-bottom:  0.6rem;
     }
 
     .selling-header p {
         font-size:  0.95rem;
-        color:      var(--doc-text-muted, #6b7280);
+        color:      var(--doc-text-muted);
         max-width:  480px;
         margin:     0 auto;
     }
@@ -284,8 +284,8 @@ const firstComponentHref = rootComponents[0]?.tagName
     }
 
     .selling-card {
-        background:    var(--doc-bg, #fff);
-        border:        1px solid var(--doc-border, #e8e6e0);
+        background:    var(--doc-bg);
+        border:        1px solid var(--doc-border);
         border-radius: 12px;
         padding:       1.75rem;
         transition:    border-color 0.15s, box-shadow 0.15s;
@@ -299,7 +299,7 @@ const firstComponentHref = rootComponents[0]?.tagName
     .selling-icon {
         width:           40px;
         height:          40px;
-        background:      var(--doc-accent-bg, #f3efff);
+        background:      var(--doc-accent-bg);
         border-radius:   10px;
         display:         flex;
         align-items:     center;
@@ -311,14 +311,14 @@ const firstComponentHref = rootComponents[0]?.tagName
     .selling-card h3 {
         font-size:      0.95rem;
         font-weight:    700;
-        color:          var(--doc-text, #111);
+        color:          var(--doc-text);
         letter-spacing: -0.01em;
         margin-bottom:  0.4rem;
     }
 
     .selling-card p {
         font-size:   0.82rem;
-        color:       var(--doc-text-muted, #6b7280);
+        color:       var(--doc-text-muted);
         line-height: 1.7;
         margin:      0;
     }
@@ -326,30 +326,30 @@ const firstComponentHref = rootComponents[0]?.tagName
     /* ── Placeholder différentiation ────────────────────── */
 
     .placeholder-section {
-        border:        2px dashed var(--doc-accent-border, #e0d0ff);
+        border:        2px dashed var(--doc-accent-border);
         border-radius: 12px;
         padding:       2rem;
         text-align:    center;
-        background:    color-mix(in srgb, var(--doc-accent-bg, #f3efff) 30%, transparent);
+        background:    color-mix(in srgb, var(--doc-accent-bg) 30%, transparent);
         margin-bottom: 0;
     }
 
     .placeholder-section p {
         font-size:   0.82rem;
-        color:       var(--doc-text-muted, #9d8fc2);
+        color:       var(--doc-text-muted);
         margin:      0 0 0.25rem;
     }
 
     .placeholder-section strong {
-        color: var(--doc-accent, #7c3aed);
+        color: var(--doc-accent);
     }
 
     /* ── CTA bas de page ────────────────────────────────── */
 
     .cta-bottom {
-        background:    var(--doc-cta-bg, var(--doc-accent-bg, #f3efff));
-        border-top:    1px solid var(--doc-cta-border, var(--doc-accent-border, #e0d0ff));
-        border-bottom: 1px solid var(--doc-cta-border, var(--doc-accent-border, #e0d0ff));
+        background:    var(--doc-cta-bg);
+        border-top:    1px solid var(--doc-cta-border);
+        border-bottom: 1px solid var(--doc-cta-border);
         text-align:    center;
         padding:       4rem 2rem;
     }
@@ -358,14 +358,14 @@ const firstComponentHref = rootComponents[0]?.tagName
         font-size:      1.6rem;
         font-weight:    700;
         letter-spacing: -0.03em;
-        color:          var(--doc-text, #0f0f0f);
+        color:          var(--doc-text);
         margin-bottom:  0.5rem;
     }
 
     .cta-bottom p {
         font-size:     0.9rem;
         /* var(--doc-text-muted) échoue le contraste AA sur ce fond (axe-core) */
-        color:         var(--doc-text, #1a1a1a);
+        color:         var(--doc-text);
         margin-bottom: 1.75rem;
     }
 
@@ -380,7 +380,7 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .landing-footer {
         padding:         2rem 2.5rem;
-        border-top:      1px solid var(--doc-border, #e8e6e0);
+        border-top:      1px solid var(--doc-border);
         display:         flex;
         justify-content: space-between;
         align-items:     center;
@@ -390,12 +390,12 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .landing-footer p {
         font-size: 0.78rem;
-        color:     var(--doc-text-muted, #6b7280);
+        color:     var(--doc-text-muted);
         margin:    0;
     }
 
     .landing-footer a {
-        color:           var(--doc-accent, #7c3aed);
+        color:           var(--doc-accent);
         text-decoration: underline;
         text-underline-offset: 2px;
     }

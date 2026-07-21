@@ -25,7 +25,7 @@
 }
 
 .page-title {
-    color: var(--doc-text, #111827);
+    color: var(--doc-text);
     font-size: 2rem;
     margin: 0;
 }
@@ -55,10 +55,10 @@
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    border-bottom: 2px solid var(--doc-border, #e5e7eb);
+    border-bottom: 2px solid var(--doc-border);
     padding-bottom: 1rem;
     margin: 0 0 2rem;
-    color: var(--doc-text, #111827);
+    color: var(--doc-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -67,7 +67,7 @@
 .subsection-title {
     font-size: 1.05rem;
     font-weight: 600;
-    color: var(--doc-text-subtle, #374151);
+    color: var(--doc-text-subtle);
     margin: 0;
     display: flex;
     align-items: center;
@@ -76,25 +76,25 @@
 
 .summary {
     font-size: 1.05rem;
-    color: var(--doc-text-muted, #4b5563);
+    color: var(--doc-text-muted);
     margin: 0;
 }
 
 /* p {
-    color: var(--doc-text, #374151);
+    color: var(--doc-text);
     margin-bottom: 0.75rem;
     line-height: 1.65;
 } */
 
 ul {
     font-size: 0.95rem;
-    color: var(--doc-text, #374151);
+    color: var(--doc-text);
     padding-left: 1.25rem;
     line-height: 1.8;
 }
 
 a {
-    color: var(--doc-accent, #7c3aed);
+    color: var(--doc-accent);
     /* Un lien dans du texte courant ne doit pas être distingué par la seule
        couleur (WCAG 1.4.1) — soulignement permanent, pas seulement au survol. */
     text-decoration: underline;
@@ -102,15 +102,15 @@ a {
 }
 
 a:visited {
-    color: var(--doc-link-visited, #6d28d9);
+    color: var(--doc-link-visited);
 }
 
 a:active {
-    color: var(--doc-accent, #7c3aed);
+    color: var(--doc-accent);
 }
 
 pre {
-    background: var(--doc-code-block-bg, #1e1e2e);
+    background: var(--doc-code-block-bg);
     border-radius: 0.5rem;
     padding: 1rem 1.25rem;
     overflow-x: auto;
@@ -131,16 +131,16 @@ pre code {
     font-weight: 600;
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
-    background: var(--doc-accent-bg, #f3efff);
-    color: var(--doc-accent, #7c3aed);
-    border: 1px solid var(--doc-accent-border, #e0d0ff);
+    background: var(--doc-accent-bg);
+    color: var(--doc-accent);
+    border: 1px solid var(--doc-accent-border);
     letter-spacing: 0.02em;
 }
 
 .callout {
     padding: 1rem 1.25rem;
-    background: var(--doc-accent-bg, rgba(243, 239, 255, 0.5));
-    border: 1px solid var(--doc-accent-border, #e0d0ff);
+    background: var(--doc-accent-bg);
+    border: 1px solid var(--doc-accent-border);
     border-radius: 0.5rem;
 }
 
@@ -149,7 +149,7 @@ pre code {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--doc-accent, #7c3aed);
+    color: var(--doc-accent);
     margin: 0 0 0.6rem;
 }
 
@@ -158,7 +158,7 @@ pre code {
     padding-left: 1.25rem;
     font-size: 0.875rem;
     line-height: 1.7;
-    color: var(--doc-text, #374151);
+    color: var(--doc-text);
 }
 
 .badge-subtle {
@@ -166,8 +166,8 @@ pre code {
     font-weight: 600;
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
-    background: color-mix(in srgb, var(--doc-border, #e5e7eb) 80%, transparent);
+    background: color-mix(in srgb, var(--doc-border) 80%, transparent);
     /* var(--doc-text-muted) échoue le contraste AA sur ce fond clair (axe-core) */
-    color: var(--doc-text, #111827);
+    color: var(--doc-text);
     letter-spacing: 0.02em;
 }
