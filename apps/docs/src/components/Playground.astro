@@ -44,6 +44,16 @@ const {
 const showPlayground = displayMode === 'demo';
 ---
 
+{/* ── Encart thème de démo ── */}
+{/* Ariane est headless : aucun style n'est intégré au composant. Les previews
+    ci-dessous chargent le thème de démo `default.css` fourni avec la librairie —
+    à ne pas confondre avec un style par défaut intrinsèque au composant. */}
+<div class="theme-notice">
+    Les exemples ci-dessous sont affichés avec le thème de démo
+    <code>default.css</code> fourni par Ariane. Un composant headless n'a
+    aucun style intégré — remplacez ce thème par le vôtre pour un rendu différent.
+</div>
+
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section id="exemples">
@@ -378,6 +388,22 @@ const showPlayground = displayMode === 'demo';
         height:     1.1rem;
         cursor:     pointer;
         margin-top: 0.2rem;
+    }
+
+    /* ── Encart thème de démo ────────────────────────── */
+
+    .theme-notice {
+        padding:       0.75rem 1rem;
+        background:    color-mix(in srgb, var(--ar-color-interactive, #2563eb) 8%, transparent);
+        border:        1px solid color-mix(in srgb, var(--ar-color-interactive, #2563eb) 20%, transparent);
+        border-radius: 0.5rem;
+        font-size:     0.875rem;
+        color:         var(--doc-text, #374151);
+        margin:        0 0 1rem;
+    }
+
+    .theme-notice code {
+        font-size: 0.85em;
     }
 
     /* ── Encart parent ───────────────────────────────── */
