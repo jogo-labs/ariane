@@ -25,7 +25,7 @@ Face à ce volume de défauts, la question posée n'était plus "comment corrige
 - **Pas de nouvelle page, pas de nouveau lien de nav.** La page `apps/docs/src/pages/getting-started/utilisation.astro` a déjà une section "Design Tokens" (`id="tokens"`, lignes 133-147) qui pointait vers la page supprimée — elle est modifiée sur place :
     - Le texte est enrichi pour rappeler explicitement que `default.css` est un thème de démo remplaçable (même registre que la section "Modèle headless" juste au-dessus dans la même page), pas des valeurs par défaut intrinsèques aux composants.
     - Le lien mort vers l'ancienne page est remplacé par un bouton/lien **"Télécharger default.css"**.
-- **Mécanisme de téléchargement** : un endpoint statique Astro (`apps/docs/src/pages/downloads/default.css.ts`, export `GET`) lit `packages/core/src/styles/themes/default.css` au moment du build et le sert tel quel à l'URL `/downloads/default.css` (`Content-Type: text/css`) — pattern Astro standard pour générer un asset statique depuis une source de données au build (déjà utilisé ailleurs pour des sitemaps/flux RSS), plus robuste qu'une copie manuelle vers `public/` (pas de dépendance à l'ordre d'exécution des étapes de build). Toujours synchronisé avec le code source local, sans dépendre d'une publication npm ni d'un CDN externe.
+- **Mécanisme de téléchargement** : réutilise le mécanisme déjà en place dans `apps/docs/astro.config.mjs` (`ASSET_MAPPINGS`, préfixe `/themes/`) qui sert déjà `packages/core/dist/styles/themes/default.css` (avec fallback `src/`) à l'URL `/themes/default.css` — à la fois en dev (middleware Vite) et au build (hook `generateBundle` qui copie le répertoire dans `dist/themes/`). Vérifié : `/themes/default.css` est déjà généré par `npm run build --workspace=@ariane-ui/docs`. Aucun nouveau mécanisme à construire — juste un lien `<a href="/themes/default.css" download>` dans la section modifiée.
 - **Aucun contrôle interactif, aucune fusion CEM ∙ default.css, aucun color picker, aucune preview live, aucune persistance, aucun export généré côté client.** Tout ce qui a été construit pour la version interactive (`build-theme-manifest.ts`, `ThemeTokenControl.astro`, le script client, etc., sur `feat/theme-configurator-120`) est abandonné avec cette branche.
 
 ## Hors périmètre (tracé séparément)
@@ -39,5 +39,5 @@ Abandonnée (à discarder) une fois ce document validé — son contenu (spec, p
 
 ## Tests
 
-- Vérification manuelle du build docs (`npm run build --workspace=@ariane-ui/docs`) : page `utilisation` généré correctement, asset `downloads/default.css` présent et son contenu correspond à `packages/core/src/styles/themes/default.css`.
-- Pas de test automatisé dédié : changement de contenu statique (Astro + un fichier copié au build), pas de logique à tester unitairement.
+- Vérification manuelle du build docs (`npm run build --workspace=@ariane-ui/docs`) : page `utilisation` générée correctement, `dist/themes/default.css` déjà présent (mécanisme existant, pas modifié par ce chantier).
+- Pas de test automatisé dédié : changement de contenu statique (Astro), pas de logique à tester unitairement.
