@@ -14,6 +14,28 @@ describe('extractThemeTokens', () => {
         expect(tokens.get('--ar-color-primary-05')).toBe('#010105');
     });
 
+    it("ignore une occurrence du marqueur dark mode a l'interieur d'un commentaire (faux-positif du header de default.css)", () => {
+        // Reproduit le header réel de default.css : le commentaire de tête mentionne
+        // littéralement ":root[data-theme='dark']" à titre de documentation, avant le
+        // vrai bloc :root de base. Sans filtrage des commentaires, DARK_OVERRIDE_RE
+        // matche cette occurrence textuelle et tronque baseCss dès le commentaire,
+        // ne laissant plus aucun token "clair" détecté.
+        const css = `
+            /**
+             * Le bloc de base doit précéder toute surcharge (:root[data-theme='dark']).
+             */
+            :root {
+                --ar-color-text: #171717;
+            }
+
+            :root[data-theme='dark'] {
+                --ar-color-text: #e6e7ec;
+            }
+        `;
+        const tokens = extractThemeTokens(css);
+        expect(tokens.get('--ar-color-text')).toBe('#171717');
+    });
+
     it('garde une référence var() non résolue', () => {
         const css = `:root { --ar-pagination-bg: var(--ar-button-tertiary-bg); }`;
         const tokens = extractThemeTokens(css);

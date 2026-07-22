@@ -18,6 +18,21 @@ const DARK_OVERRIDE_RE =
     /:root\[data-theme=['"]dark['"]\]|@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)/;
 
 /**
+ * Remplace le contenu de chaque commentaire `/* ... *\/` par des espaces de même
+ * longueur, pour que `DARK_OVERRIDE_RE` ne matche jamais une mention purement
+ * documentaire (ex. le header de `default.css` qui cite littéralement
+ * `:root[data-theme='dark']` en prose) tout en préservant les index d'origine —
+ * indispensable puisque `darkStart` sert ensuite à découper la chaîne source non
+ * modifiée via `.slice()`.
+ *
+ * @param {string} css
+ * @returns {string}
+ */
+function blankComments(css) {
+    return css.replace(/\/\*[\s\S]*?\*\//g, (comment) => ' '.repeat(comment.length));
+}
+
+/**
  * Parse un fichier CSS de thème et retourne une map nom de token → valeur nettoyée
  * (commentaire `/* ... *\/` trailing retiré, valeur triée). Ignore le nesting
  * (`@layer`/`:root`) — la regex matche sur le contenu brut du fichier. Ne considère
@@ -30,7 +45,7 @@ const DARK_OVERRIDE_RE =
  * @returns {Map<string, string>}
  */
 export function extractThemeTokens(css) {
-    const darkStart = css.search(DARK_OVERRIDE_RE);
+    const darkStart = blankComments(css).search(DARK_OVERRIDE_RE);
     const baseCss = darkStart === -1 ? css : css.slice(0, darkStart);
 
     const tokens = new Map();
