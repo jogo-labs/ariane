@@ -35,13 +35,6 @@ const gettingStartedLinks: NavLink[] = [
     ariaCurrent: currentPath === link.href ? ('page' as const) : undefined,
 }));
 
-const foundationsLinks: NavLink[] = [
-    { href: '/foundations/tokens', label: 'Design Tokens', ariaCurrent: undefined },
-].map((link) => ({
-    ...link,
-    ariaCurrent: currentPath === link.href ? ('page' as const) : undefined,
-}));
-
 // ─── Composants (dynamique depuis CEM + MDX) ────────────────────────────────
 
 interface NavChild {
@@ -100,17 +93,6 @@ const componentItems: NavItem[] = allComponents
             <h2>Bien démarrer</h2>
             <ul class="nav-list">
                 {gettingStartedLinks.map((link) => (
-                    <li>
-                        <a href={link.href} aria-current={link.ariaCurrent}>{link.label}</a>
-                    </li>
-                ))}
-            </ul>
-        </div>
-
-        <div class="nav-section">
-            <h2>Fondations</h2>
-            <ul class="nav-list">
-                {foundationsLinks.map((link) => (
                     <li>
                         <a href={link.href} aria-current={link.ariaCurrent}>{link.label}</a>
                     </li>
