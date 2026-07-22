@@ -40,6 +40,8 @@ export default css`
 
     [part='panel'] {
         width: var(--ar-datepicker-panel-width);
+        max-width: var(--ar-datepicker-panel-max-width);
+        padding: var(--ar-datepicker-panel-padding);
     }
 
     [part='header'] {
