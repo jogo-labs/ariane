@@ -516,11 +516,12 @@
         --ar-datepicker-error-color: var(--ar-color-danger-text);
 
         --ar-datepicker-panel-width: 20rem;
-        /* Alias scopés au composant : cascadent vers --ar-panel-max-width/--ar-panel-padding
-           (bloc partagé dropdown/breadcrumb/stepper) sans que datepicker.styles.ts consomme
-           ces tokens partagés en dur — même pattern que ar-dropdown (ADR-005). */
-        --ar-datepicker-panel-max-width: var(--ar-panel-max-width);
-        --ar-datepicker-panel-padding: var(--ar-panel-padding);
+        /* Valeurs propres, volontairement non cascadées depuis --ar-panel-max-width/--ar-panel-padding
+           (bloc partagé dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours
+           nécessité une taille plus généreuse (25rem/1rem) que la valeur par défaut partagée
+           (18rem/0.25rem) — même précédent que --ar-dropdown-min-width. */
+        --ar-datepicker-panel-max-width: 25rem;
+        --ar-datepicker-panel-padding: 1rem;
 
         --ar-datepicker-header-font-size: 1rem;
         --ar-datepicker-header-margin: 0;
