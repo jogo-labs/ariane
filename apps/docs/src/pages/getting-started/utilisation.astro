@@ -3,11 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'composants',       label: 'Utiliser les composants', level: 1 as const },
-    { id: 'chargement',       label: 'Attendre le chargement',  level: 1 as const },
-    { id: 'headless',         label: 'Modèle headless',         level: 1 as const },
-    { id: 'personnalisation', label: 'Personnalisation CSS',    level: 1 as const },
-    { id: 'tokens',           label: 'Design Tokens',           level: 1 as const },
+    { id: 'composants',       label: 'Utiliser les composants',   level: 1 as const },
+    { id: 'chargement',       label: 'Attendre le chargement',    level: 1 as const },
+    { id: 'personnalisation', label: 'Thème et personnalisation', level: 1 as const },
 ];
 
 const codeHtml = `<ar-alert version="success">
@@ -33,7 +31,7 @@ const codeWhenAllDefinedCdn = `const tags = [...new Set(
 await Promise.all(tags.map(tag => customElements.whenDefined(tag)));
 // Tous les composants ar-* sont prêts`;
 
-const codeCustomProps = `ar-alert {
+const codeCustomProps = `.alerte-succes-perso {
     --ar-alert-info-bg:   #f5f0ff;
     --ar-alert-info-icon: #7c3aed;
 }`;
@@ -41,6 +39,11 @@ const codeCustomProps = `ar-alert {
 const codeTokens = `:root {
     --ar-color-interactive: #7c3aed;
     --ar-border-radius-md:  0.75rem;
+}`;
+
+const codeTokensAlias = `:root {
+    --ar-color-interactive: var(--mon-ds-color-primary);
+    --ar-color-text:        var(--mon-ds-color-text);
 }`;
 ---
 
@@ -94,56 +97,63 @@ const codeTokens = `:root {
             </section>
         </section>
 
-        <section id="headless" class="main-section">
-            <div>
-                <h3 class="section-title">Modèle headless</h3>
-                <p>
-                    Ariane est une librairie <strong>headless</strong> : les composants ne portent
-                    aucun style visuel par défaut. Couleurs, espacements et typographie proviennent
-                    exclusivement du fichier de thème chargé séparément.
-                </p>
-                <p>
-                    Sans thème, les composants fonctionnent (accessibilité, interactions, slots)
-                    mais leur rendu visuel est indéfini. C'est intentionnel — Ariane est une
-                    fondation sur laquelle construire un design system, pas un kit d'UI clé en main.
-                </p>
-                <p>
-                    Les exemples de cette documentation utilisent <code>themes/default.css</code>.
-                    Vous pouvez le remplacer par votre propre thème en définissant les tokens CSS
-                    de chaque composant sur <code>:root</code>.
-                </p>
-            </div>
-        </section>
-
         <section id="personnalisation" class="main-section">
             <div>
-                <h3 class="section-title">Personnalisation CSS</h3>
+                <h3 class="section-title">Thème et personnalisation</h3>
                 <p>
-                    Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
-                    l'apparence sans surcharger les styles internes.
+                    Ariane est une librairie <strong>headless</strong> : les composants ne portent
+                    aucun style visuel par défaut. Sans thème, ils fonctionnent (accessibilité,
+                    interactions, slots) mais leur rendu visuel est indéfini — c'est intentionnel,
+                    Ariane est une fondation sur laquelle construire un design system, pas un kit
+                    d'UI clé en main. Couleurs, espacements et typographie proviennent exclusivement
+                    d'un fichier de thème chargé séparément.
                 </p>
             </div>
-            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
-            <p>
-                Les propriétés disponibles par composant sont listées dans la section
-                <strong>Référence API</strong> de chaque page de composant.
-            </p>
-        </section>
 
-        <section id="tokens" class="main-section">
-            <div>
-                <h3 class="section-title">Design Tokens</h3>
+            <section class="subsection">
+                <h4 class="subsection-title">Charger un thème</h4>
                 <p>
-                    Les valeurs globales (couleurs, espacements, typographie) viennent du fichier
-                    de thème <code>themes/default.css</code>. Surchargez-les via <code>:root</code>
-                    pour modifier l'ensemble de la librairie :
+                    Les exemples de cette documentation utilisent <code>themes/default.css</code>,
+                    un thème de démo fourni avec Ariane (modes clair et sombre inclus) — pas les
+                    valeurs par défaut intrinsèques des composants. Utilisez-le comme point de
+                    départ pour construire votre propre thème :
                 </p>
-            </div>
-            <pre><code class="language-css" set:text={codeTokens} /></pre>
-            <p>
-                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste
-                complète des variables disponibles.
-            </p>
+                <p>
+                    <a class="download-theme" href="/themes/default.css" download>
+                        Télécharger default.css
+                    </a>
+                </p>
+            </section>
+
+            <section class="subsection">
+                <h4 class="subsection-title">Personnaliser une instance</h4>
+                <p>
+                    Chaque composant expose des <strong>CSS Custom Properties</strong>. Pour
+                    personnaliser une instance précise, ajoutez-lui une classe et surchargez ses
+                    propriétés sur cette classe :
+                </p>
+                <pre><code class="language-css" set:text={codeCustomProps} /></pre>
+            </section>
+
+            <section class="subsection">
+                <h4 class="subsection-title">Personnaliser toute la librairie</h4>
+                <p>
+                    Pour modifier l'ensemble de la librairie, surchargez plutôt les tokens
+                    globaux (couleurs, espacements, typographie) sur <code>:root</code> :
+                </p>
+                <pre><code class="language-css" set:text={codeTokens} /></pre>
+                <p>
+                    Si vous avez déjà votre propre design system, pointez les tokens Ariane vers
+                    les vôtres au lieu de dupliquer les valeurs — le nom du token Ariane reste
+                    stable, sa valeur suit la vôtre (y compris un éventuel mode sombre déjà géré
+                    de votre côté) :
+                </p>
+                <pre><code class="language-css" set:text={codeTokensAlias} /></pre>
+                <p class="hint">
+                    Les propriétés disponibles par composant sont listées dans la section
+                    <strong>Référence API</strong> de chaque page de composant.
+                </p>
+            </section>
         </section>
     </div>
 
@@ -162,5 +172,24 @@ const codeTokens = `:root {
         font-size: 0.875rem;
         color: var(--doc-text-muted);
         margin-top: -0.5rem;
+    }
+
+    .download-theme {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--doc-border);
+        border-radius: 0.375rem;
+        background: var(--doc-nav-bg);
+        color: var(--doc-text);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .download-theme:hover {
+        background: var(--doc-accent-bg);
+        color: var(--doc-accent);
     }
 </style>

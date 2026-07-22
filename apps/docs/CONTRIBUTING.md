@@ -186,8 +186,7 @@ apps/docs/
 │   ├── pages/
 │   │   ├── index.astro             ← Page d'accueil (liste des composants)
 │   │   ├── components/[slug].astro ← Route dynamique — une page par composant
-│   │   ├── getting-started/        ← Pages Démarrage rapide (quickstart) et Utilisation
-│   │   └── foundations/tokens.astro ← Page Design Tokens (auto-extraite du CSS)
+│   │   └── getting-started/        ← Pages Démarrage rapide (quickstart) et Utilisation
 │   ├── styles/
 │   │   ├── doc-prose.css           ← Typographie partagée (h2→h4, p, pre, badge…)
 │   │   └── doc-table.css           ← Tableaux + .doc-section-title
@@ -220,16 +219,6 @@ apps/docs/
     ├── Playground.astro          ← variantes + playground + ComponentApi
     └── TableOfContents           ← TOC droite (slot="toc")
 ```
-
----
-
-## Page Design Tokens
-
-La page `/foundations/tokens` est **entièrement auto-générée** depuis
-`packages/core/src/styles/themes/default.css`.
-
-Ajouter une variable `--ar-*` dans ce fichier → elle apparaît automatiquement dans la page,
-classée par catégorie (Couleurs, Typographie, Espacement, Forme, Focus).
 
 ---
 
