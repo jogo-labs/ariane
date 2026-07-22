@@ -42,6 +42,9 @@ import { warn } from '../../utils/warn.js';
  * @csspart today-btn  - Bouton « Aujourd'hui ».
  * @csspart close-btn  - Bouton « Fermer ».
  *
+ * @cssprop --ar-datepicker-gap - Espacement vertical entre le label, le champ et l'indice.
+ * @cssprop --ar-datepicker-label-gap - Marge sous le label (combinée à `--ar-datepicker-gap` via `calc()`).
+ * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-panel-width - Largeur du popover.
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.

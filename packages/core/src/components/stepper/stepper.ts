@@ -63,6 +63,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-bullet-color - Couleur du numéro dans les puces visitables.
  * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
  * @cssprop --ar-stepper-bullet-hover-bg - Fond de la puce au survol.
+ * @cssprop --ar-stepper-link-color - Couleur du texte du lien.
  * @cssprop --ar-stepper-link-hover-color - Couleur du texte du lien au survol.
  * @cssprop --ar-stepper-bullet-radius - Border-radius de la puce.
  * @cssprop --ar-stepper-link-focus-radius - Border-radius de l'anneau de focus du lien.
