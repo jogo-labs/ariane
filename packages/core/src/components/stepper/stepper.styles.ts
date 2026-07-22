@@ -42,9 +42,13 @@ export default css`
     }
 
     [part='panel'] {
-        padding: 0.75rem;
+        padding: var(--ar-stepper-panel-padding);
         min-width: var(--ar-stepper-panel-min-width);
         max-width: var(--ar-stepper-panel-max-width);
+        background-color: var(--ar-stepper-panel-bg);
+        border-color: var(--ar-stepper-panel-border-color);
+        border-radius: var(--ar-stepper-panel-border-radius);
+        box-shadow: var(--ar-stepper-panel-shadow);
     }
 
     .stepper-list {
