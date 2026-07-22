@@ -141,8 +141,19 @@ const codeTokens = `:root {
             </div>
             <pre><code class="language-css" set:text={codeTokens} /></pre>
             <p>
-                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste
-                complète des variables disponibles.
+                <code>themes/default.css</code> est un thème de démo fourni avec Ariane — pas les
+                valeurs par défaut intrinsèques des composants (Ariane est headless, cf.
+                <a href="#headless">Modèle headless</a> ci-dessus). Utilisez-le comme point de
+                départ pour construire votre propre thème :
+            </p>
+            <p>
+                <a class="download-theme" href="/themes/default.css" download>
+                    Télécharger default.css
+                </a>
+            </p>
+            <p>
+                Les propriétés disponibles par composant sont listées dans la section
+                <strong>Référence API</strong> de chaque page de composant.
             </p>
         </section>
     </div>
@@ -162,5 +173,24 @@ const codeTokens = `:root {
         font-size: 0.875rem;
         color: var(--doc-text-muted);
         margin-top: -0.5rem;
+    }
+
+    .download-theme {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--doc-border);
+        border-radius: 0.375rem;
+        background: var(--doc-nav-bg);
+        color: var(--doc-text);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .download-theme:hover {
+        background: var(--doc-accent-bg);
+        color: var(--doc-accent);
     }
 </style>
