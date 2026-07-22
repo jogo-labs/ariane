@@ -28,6 +28,12 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
+ *
+ * Note d'implémentation : la mise en page de [part='base'] compense la bordure de son parent
+ * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
+ * (déclarés et documentés sur ar-tab-group, cf. tab-group.ts) — pas des tokens propres à ar-tab.
+ * Le fallback 0px est structurel (évite un décalage visuel si ar-tab est utilisé hors d'un
+ * ar-tab-group) et reste volontaire.
  */
 export class ArTab extends LitElement {
     static override styles = [styles];
