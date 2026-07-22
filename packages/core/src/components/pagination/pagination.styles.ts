@@ -9,7 +9,6 @@ export default css`
     .pagination {
         padding-left: 0;
         list-style: none;
-        border-radius: var(--ar-pagination-radius);
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
