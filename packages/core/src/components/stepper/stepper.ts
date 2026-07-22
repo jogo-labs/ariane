@@ -58,7 +58,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color).
  * @cssprop --ar-stepper-panel-border-radius - Border-radius du panel mobile (cascade vers --ar-panel-radius).
  * @cssprop --ar-stepper-panel-shadow - Ombre portée du panel mobile (cascade vers --ar-panel-shadow).
- * @cssprop --ar-stepper-panel-padding - Padding interne du panel mobile. Valeur propre (0.75rem), non cascadée depuis --ar-panel-padding.
+ * @cssprop --ar-stepper-panel-padding - Padding interne du panel mobile (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
  * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
  * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.
