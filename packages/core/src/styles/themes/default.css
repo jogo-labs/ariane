@@ -471,9 +471,6 @@
         --ar-collapse-duration: 0s;
         --ar-collapse-easing: ease;
 
-        /* table */
-        --ar-table-padding-x: 1rem;
-
         /* charcounter */
         --ar-charcounter-color: var(--ar-color-text-muted);
         --ar-charcounter-font-size: 0.875rem;
