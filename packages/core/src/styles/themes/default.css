@@ -350,6 +350,11 @@
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
+        --ar-breadcrumb-panel-bg: var(--ar-panel-bg);
+        --ar-breadcrumb-panel-border-color: var(--ar-panel-border-color);
+        --ar-breadcrumb-panel-border-radius: var(--ar-panel-radius);
+        --ar-breadcrumb-panel-shadow: var(--ar-panel-shadow);
+        --ar-breadcrumb-panel-padding: var(--ar-panel-padding);
         --ar-breadcrumb-toggle-bg: var(--ar-button-tertiary-bg);
         --ar-breadcrumb-toggle-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-breadcrumb-toggle-bg-pressed: var(--ar-button-tertiary-bg-active);
