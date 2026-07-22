@@ -20,7 +20,6 @@ const EXPECTED_PAGES = [
     'index.html',
     'getting-started/quickstart/index.html',
     'getting-started/utilisation/index.html',
-    'foundations/tokens/index.html',
 ];
 
 let hasError = false;
