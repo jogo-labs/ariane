@@ -460,6 +460,11 @@
         --ar-dialog-drawer-width-lg: 960px;
         --ar-dialog-drawer-width-xl: 1440px;
         --ar-dialog-spacing: 1.25rem;
+        /* --ar-dialog-spacing-block / --ar-dialog-spacing-inline : points d'extension
+           optionnels, consommés avec fallback dans dialog.styles.ts (padding-block/-inline
+           de [part='body']). Volontairement non déclarés ici — --ar-dialog-spacing suffit
+           par défaut ; les définir permet de différencier le padding vertical/horizontal
+           sans surcharge globale de --ar-dialog-spacing. */
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
         --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
