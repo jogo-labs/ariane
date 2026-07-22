@@ -13,6 +13,7 @@ export default css`
 
     [part='panel'] {
         overflow: hidden;
+        transition: height var(--ar-collapse-duration) var(--ar-collapse-easing);
     }
 
     [part='panel'][hidden] {

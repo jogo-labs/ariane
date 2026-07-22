@@ -815,8 +815,4 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
-
-    ar-collapse::part(panel) {
-        transition: height var(--ar-collapse-duration) var(--ar-collapse-easing);
-    }
 }
