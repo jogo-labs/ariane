@@ -84,8 +84,8 @@ export default css`
         cursor: pointer;
         opacity: 0.75;
         transition:
-            opacity var(--ar-button-transition-duration),
-            background-color var(--ar-button-transition-duration);
+            opacity var(--ar-alert-close-transition-duration),
+            background-color var(--ar-alert-close-transition-duration);
         position: relative;
         top: -0.2rem;
         right: -0.2rem;
