@@ -145,8 +145,8 @@ export default css`
     [part='panel'] {
         min-width: var(--ar-breadcrumb-panel-min-width);
         max-width: var(--ar-breadcrumb-panel-max-width);
-        background-color: var(--ar-breadcrumb-panel-bg);
-        border-color: var(--ar-breadcrumb-panel-border-color);
+        background-color: var(--ar-breadcrumb-panel-bg, Canvas);
+        border-color: var(--ar-breadcrumb-panel-border-color, ButtonBorder);
         border-radius: var(--ar-breadcrumb-panel-border-radius);
         box-shadow: var(--ar-breadcrumb-panel-shadow);
         padding: var(--ar-breadcrumb-panel-padding);
