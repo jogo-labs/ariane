@@ -40,7 +40,11 @@ export default css`
 
     [part='panel'] {
         width: var(--ar-datepicker-panel-width);
-        max-width: var(--ar-datepicker-panel-max-width);
+        max-width: var(
+            --ar-datepicker-panel-max-width,
+            /* a11y-fallback: évite que la grille de ~35 jours s'étale sur toute la largeur de la page sans thème chargé */
+            25rem
+        );
         padding: var(--ar-datepicker-panel-padding);
     }
 
@@ -135,8 +139,16 @@ export default css`
     [part='day'] {
         font-size: var(--ar-datepicker-day-font-size);
         color: var(--ar-color-text);
-        width: var(--ar-datepicker-day-size);
-        height: var(--ar-datepicker-day-size);
+        width: var(
+            --ar-datepicker-day-size,
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
+            2.5rem
+        );
+        height: var(
+            --ar-datepicker-day-size,
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
+            2.5rem
+        );
         display: flex;
         align-items: center;
         justify-content: center;

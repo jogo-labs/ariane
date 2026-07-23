@@ -313,4 +313,30 @@ describe('ar-datepicker — browser', () => {
             expect(selectedBtn?.getAttribute('aria-label')).to.include('12');
         });
     });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a une largeur maximale de 25rem par défaut', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+            if (!panel) throw new Error('[part="panel"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            expect(getComputedStyle(panel).maxWidth).to.equal(`${25 * rootFontSize}px`);
+        });
+
+        it('les cellules jour font 2.5rem × 2.5rem par défaut (WCAG 2.5.8)', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const day = el.shadowRoot?.querySelector<HTMLElement>('[part="day"]');
+            if (!day) throw new Error('[part="day"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const expectedPx = `${2.5 * rootFontSize}px`;
+            expect(getComputedStyle(day).width).to.equal(expectedPx);
+            expect(getComputedStyle(day).height).to.equal(expectedPx);
+        });
+    });
 });

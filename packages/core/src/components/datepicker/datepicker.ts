@@ -46,7 +46,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-label-gap - Marge sous le label (combinée à `--ar-datepicker-gap` via `calc()`).
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-panel-width - Largeur du popover.
- * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width).
+ * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
  * @cssprop --ar-datepicker-panel-padding - Padding interne du popover (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
@@ -77,7 +77,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-footer-btn-active-bg - Fond à l'état actif des boutons footer.
  * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
  * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.
- * @cssprop --ar-datepicker-day-size - Taille des cellules jour.
+ * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
  * @cssprop --ar-datepicker-day-font-size - Taille de police des jours.
  * @cssprop --ar-datepicker-day-radius - Border-radius des cellules jour.
  * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
