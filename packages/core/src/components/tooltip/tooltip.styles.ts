@@ -21,8 +21,8 @@ const tooltipStyles = css`
         overflow: visible;
 
         /* Visual */
-        background-color: var(--ar-tooltip-bg);
-        color: var(--ar-tooltip-color);
+        background-color: var(--ar-tooltip-bg, Canvas);
+        color: var(--ar-tooltip-color, CanvasText);
         border: none;
         border-radius: var(--ar-tooltip-border-radius);
         font-size: var(--ar-tooltip-font-size);
@@ -48,7 +48,7 @@ const tooltipStyles = css`
         position: absolute;
         width: var(--ar-tooltip-arrow-size);
         height: var(--ar-tooltip-arrow-size);
-        background-color: var(--ar-tooltip-bg);
+        background-color: var(--ar-tooltip-bg, Canvas);
         transform: rotate(45deg);
         pointer-events: none;
     }

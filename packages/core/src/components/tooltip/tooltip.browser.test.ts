@@ -170,4 +170,33 @@ describe('ar-tooltip — browser', () => {
             expect(arrowEl?.style.cssText).to.not.equal('');
         });
     });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('la bulle et la flèche ont un fond visible même sans default.css', async () => {
+            const wrapper = await fixture<HTMLElement>(html`
+                <div>
+                    <button id="btn10">x</button>
+                    <ar-tooltip for="btn10" show-delay="0">Aide</ar-tooltip>
+                </div>
+            `);
+            const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
+            const btn = wrapper.querySelector<HTMLElement>('#btn10')!;
+            btn.dispatchEvent(new MouseEvent('mouseenter'));
+            await aTimeout(20);
+
+            const bubble = getBubble(el);
+            const bubbleComputed = getComputedStyle(bubble);
+            expect(bubbleComputed.backgroundColor).to.not.equal('');
+            expect(bubbleComputed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(bubbleComputed.color).to.not.equal('');
+
+            const arrow = el.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]');
+            if (!arrow) throw new Error('[part="arrow"] introuvable');
+            const arrowComputed = getComputedStyle(arrow);
+            expect(arrowComputed.backgroundColor).to.not.equal('');
+            expect(arrowComputed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+        });
+    });
 });
