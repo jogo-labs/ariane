@@ -95,6 +95,10 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné.
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
+ * @cssprop --ar-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation et du footer. Token sémantique global (non scopé à ar-datepicker) — les cellules jour ont leur propre token scopé, --ar-datepicker-day-focus-ring-color.
+ * @cssprop --ar-focus-ring-offset - Décalage de l'anneau de focus des boutons de navigation et du footer. Token sémantique global (non scopé à ar-datepicker).
+ * @cssprop --ar-color-text - Couleur du texte des cellules jour. Token sémantique global (non scopé à ar-datepicker).
+ * @cssprop --ar-color-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Token sémantique global (non scopé à ar-datepicker).
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
