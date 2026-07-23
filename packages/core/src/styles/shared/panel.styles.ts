@@ -14,9 +14,9 @@ const panelBaseStyles = css`
         overflow-y: auto;
 
         /* Tokens visuels */
-        background-color: var(--ar-panel-bg);
-        color: var(--ar-panel-text);
-        border: 1px solid var(--ar-panel-border-color);
+        background-color: var(--ar-panel-bg, Canvas);
+        color: var(--ar-panel-text, CanvasText);
+        border: 1px solid var(--ar-panel-border-color, ButtonBorder);
         border-radius: var(--ar-panel-radius);
         box-shadow: var(--ar-panel-shadow);
         padding: var(--ar-panel-padding);

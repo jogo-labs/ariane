@@ -7,9 +7,9 @@ export default css`
 
     [part='panel'] {
         /* Overrides composant — chaînent vers les tokens shared --ar-panel-* */
-        background-color: var(--ar-dropdown-bg);
-        color: var(--ar-dropdown-color);
-        border-color: var(--ar-dropdown-border-color);
+        background-color: var(--ar-dropdown-bg, Canvas);
+        color: var(--ar-dropdown-color, CanvasText);
+        border-color: var(--ar-dropdown-border-color, ButtonBorder);
         border-radius: var(--ar-dropdown-border-radius);
         box-shadow: var(--ar-dropdown-shadow);
         padding: var(--ar-dropdown-padding);

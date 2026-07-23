@@ -41,8 +41,8 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-bullet-color - Couleur des puces de la liste mobile.
  * @cssprop --ar-breadcrumb-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
  * @cssprop --ar-breadcrumb-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg).
- * @cssprop --ar-breadcrumb-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color).
+ * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
+ * @cssprop --ar-breadcrumb-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-breadcrumb-panel-border-radius - Border-radius du panel mobile (cascade vers --ar-panel-radius).
  * @cssprop --ar-breadcrumb-panel-shadow - Ombre portée du panel mobile (cascade vers --ar-panel-shadow).
  * @cssprop --ar-breadcrumb-panel-padding - Padding interne du panel mobile (cascade vers --ar-panel-padding).
