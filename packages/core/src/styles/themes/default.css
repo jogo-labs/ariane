@@ -228,26 +228,26 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* Interaction */
-        --ar-color-interactive: var(--ar-color-primary-40);
+        --ar-color-interactive: var(--ar-color-primary-40); /* ar-breadcrumb, ar-stepper */
         --ar-color-interactive-hover: var(--ar-color-primary-30);
         --ar-color-interactive-active: var(--ar-color-primary-20);
         --ar-color-interactive-subtle: var(--ar-color-primary-95);
 
         /* Texte */
-        --ar-color-text: #2e2e31;
+        --ar-color-text: #2e2e31; /* ar-alert, ar-datepicker, ar-dialog, ar-stepper */
         --ar-color-text-muted: var(--ar-color-neutral-40);
-        --ar-color-text-inverse: var(--ar-color-white);
+        --ar-color-text-inverse: var(--ar-color-white); /* ar-stepper */
 
         /* Surface */
-        --ar-color-bg: var(--ar-color-white);
+        --ar-color-bg: var(--ar-color-white); /* ar-breadcrumb, ar-datepicker, ar-dialog */
         --ar-color-bg-subtle: var(--ar-color-neutral-95);
 
         /* Bordure */
         --ar-color-border: var(--ar-color-neutral-90);
 
         /* Focus */
-        --ar-focus-ring-color: var(--ar-color-interactive);
-        --ar-focus-ring-offset: 2px;
+        --ar-focus-ring-color: var(--ar-color-interactive); /* ar-datepicker, ar-tab */
+        --ar-focus-ring-offset: 2px; /* ar-datepicker */
 
         /* États — tokens d'usage (light mode) */
         --ar-color-success-bg: var(--ar-color-success-95);
