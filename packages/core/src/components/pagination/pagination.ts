@@ -38,7 +38,6 @@ export interface ArPaginationPageChangeDetail {
  * @csspart prev     - Le bouton "Page précédente".
  * @csspart next     - Le bouton "Page suivante".
  *
- * @cssprop --ar-pagination-radius - Arrondi du conteneur de pagination.
  * @cssprop --ar-pagination-active-color - Couleur de la page active (texte + bordure).
  * @cssprop --ar-pagination-color - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs).

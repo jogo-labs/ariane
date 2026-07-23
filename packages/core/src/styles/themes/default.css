@@ -312,6 +312,7 @@
         --ar-alert-success-bg: var(--ar-color-success-bg);
         --ar-alert-success-border: var(--ar-color-success-bg);
         --ar-alert-success-icon: var(--ar-color-success-text);
+        --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
 
         /* button */
         --ar-button-bg: var(--ar-color-interactive);
@@ -349,6 +350,11 @@
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
+        --ar-breadcrumb-panel-bg: var(--ar-panel-bg);
+        --ar-breadcrumb-panel-border-color: var(--ar-panel-border-color);
+        --ar-breadcrumb-panel-border-radius: var(--ar-panel-radius);
+        --ar-breadcrumb-panel-shadow: var(--ar-panel-shadow);
+        --ar-breadcrumb-panel-padding: var(--ar-panel-padding);
         --ar-breadcrumb-toggle-bg: var(--ar-button-tertiary-bg);
         --ar-breadcrumb-toggle-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-breadcrumb-toggle-bg-pressed: var(--ar-button-tertiary-bg-active);
@@ -375,6 +381,14 @@
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
         --ar-stepper-panel-min-width: var(--ar-panel-min-width);
         --ar-stepper-panel-max-width: var(--ar-panel-max-width);
+        --ar-stepper-panel-bg: var(--ar-panel-bg);
+        --ar-stepper-panel-border-color: var(--ar-panel-border-color);
+        --ar-stepper-panel-border-radius: var(--ar-panel-radius);
+        --ar-stepper-panel-shadow: var(--ar-panel-shadow);
+        /* Valeur propre (0.75rem), volontairement non cascadée depuis --ar-panel-padding :
+           le panel disclosure du stepper a toujours eu un padding plus généreux que le
+           défaut partagé (0.25rem) — même logique que --ar-dropdown-min-width. */
+        --ar-stepper-panel-padding: 0.75rem;
         --ar-stepper-trigger-bg: var(--ar-button-secondary-bg);
         --ar-stepper-trigger-bg-hover: var(--ar-button-secondary-bg-hover);
 
@@ -390,7 +404,6 @@
         --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
-        --ar-pagination-radius: var(--ar-border-radius-lg);
 
         /* spinner */
         --ar-spinner-stroke-color: currentColor;
@@ -405,6 +418,7 @@
         --ar-tooltip-padding: 0.375rem 0.625rem;
         --ar-tooltip-max-width: 18rem;
         --ar-tooltip-arrow-size: 6px;
+        --ar-tooltip-show-duration: var(--ar-panel-show-duration);
 
         /* panel (shared — dropdown, breadcrumb, stepper) */
         --ar-panel-bg: var(--ar-color-bg);
@@ -446,6 +460,11 @@
         --ar-dialog-drawer-width-lg: 960px;
         --ar-dialog-drawer-width-xl: 1440px;
         --ar-dialog-spacing: 1.25rem;
+        /* --ar-dialog-spacing-block / --ar-dialog-spacing-inline : points d'extension
+           optionnels, consommés avec fallback dans dialog.styles.ts (padding-block/-inline
+           de [part='body']). Volontairement non déclarés ici — --ar-dialog-spacing suffit
+           par défaut ; les définir permet de différencier le padding vertical/horizontal
+           sans surcharge globale de --ar-dialog-spacing. */
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
         --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
@@ -456,9 +475,6 @@
         /* collapse */
         --ar-collapse-duration: 0s;
         --ar-collapse-easing: ease;
-
-        /* table */
-        --ar-table-padding-x: 1rem;
 
         /* charcounter */
         --ar-charcounter-color: var(--ar-color-text-muted);
@@ -515,6 +531,12 @@
         --ar-datepicker-error-color: var(--ar-color-danger-text);
 
         --ar-datepicker-panel-width: 20rem;
+        /* Valeurs propres, volontairement non cascadées depuis --ar-panel-max-width/--ar-panel-padding
+           (bloc partagé dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours
+           nécessité une taille plus généreuse (25rem/1rem) que la valeur par défaut partagée
+           (18rem/0.25rem) — même précédent que --ar-dropdown-min-width. */
+        --ar-datepicker-panel-max-width: 25rem;
+        --ar-datepicker-panel-padding: 1rem;
 
         --ar-datepicker-header-font-size: 1rem;
         --ar-datepicker-header-margin: 0;
@@ -712,11 +734,6 @@
         }
     }
 
-    ar-datepicker::part(panel) {
-        --ar-panel-max-width: 25rem;
-        --ar-panel-padding: 1rem;
-    }
-
     ar-datepicker::part(label) {
         font-size: var(--ar-font-size-sm);
         font-weight: var(--ar-font-weight-medium);
@@ -797,9 +814,5 @@
     ar-datepicker::part(trigger):disabled {
         opacity: 0.5;
         cursor: not-allowed;
-    }
-
-    ar-collapse::part(panel) {
-        transition: height var(--ar-collapse-duration) var(--ar-collapse-easing);
     }
 }

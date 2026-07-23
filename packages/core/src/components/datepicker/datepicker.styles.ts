@@ -40,6 +40,8 @@ export default css`
 
     [part='panel'] {
         width: var(--ar-datepicker-panel-width);
+        max-width: var(--ar-datepicker-panel-max-width);
+        padding: var(--ar-datepicker-panel-padding);
     }
 
     [part='header'] {
@@ -170,7 +172,7 @@ export default css`
         outline: solid var(--ar-datepicker-day-focus-ring-width)
             var(--ar-datepicker-day-focus-ring-color);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
-        border-color: var(--ar-panel-bg);
+        border-color: var(--ar-color-bg);
     }
 
     [part='grid']:focus-within [part='day'][tabindex='0']:not(.selected) {

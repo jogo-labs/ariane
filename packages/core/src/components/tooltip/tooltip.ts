@@ -39,6 +39,7 @@ export type ArTooltipPlacement =
  * @cssprop --ar-tooltip-font-size - Taille de police.
  * @cssprop --ar-tooltip-max-width - Largeur maximale.
  * @cssprop --ar-tooltip-arrow-size - Taille du caret.
+ * @cssprop --ar-tooltip-show-duration - Durée de l'animation d'apparition de la bulle (cascade vers --ar-panel-show-duration).
  * @cssprop --ar-tooltip-distance - Espacement entre le trigger et la bulle.
  * @cssprop --ar-tooltip-offset - Décalage latéral de la bulle.
  *

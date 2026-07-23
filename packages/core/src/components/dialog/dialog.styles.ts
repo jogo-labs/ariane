@@ -227,7 +227,7 @@ export default [
 
             dialog.shake {
                 animation: none;
-                outline: 3px solid var(--ar-color-danger-50);
+                outline: 3px solid var(--ar-color-danger-text);
                 outline-offset: 2px;
             }
         }
