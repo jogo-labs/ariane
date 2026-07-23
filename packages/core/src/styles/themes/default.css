@@ -228,26 +228,28 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* Interaction */
-        --ar-color-interactive: var(--ar-color-primary-40);
+        --ar-color-interactive: var(--ar-color-primary-40); /* ar-breadcrumb, ar-stepper */
         --ar-color-interactive-hover: var(--ar-color-primary-30);
         --ar-color-interactive-active: var(--ar-color-primary-20);
         --ar-color-interactive-subtle: var(--ar-color-primary-95);
 
         /* Texte */
-        --ar-color-text: #2e2e31;
+        --ar-color-text: #2e2e31; /* ar-alert, ar-datepicker, ar-dialog, ar-stepper */
         --ar-color-text-muted: var(--ar-color-neutral-40);
-        --ar-color-text-inverse: var(--ar-color-white);
+        --ar-color-text-inverse: var(--ar-color-white); /* ar-stepper */
 
         /* Surface */
-        --ar-color-bg: var(--ar-color-white);
+        --ar-color-bg: var(
+            --ar-color-white
+        ); /* ar-breadcrumb, ar-datepicker, ar-dialog, ar-pagination */
         --ar-color-bg-subtle: var(--ar-color-neutral-95);
 
         /* Bordure */
         --ar-color-border: var(--ar-color-neutral-90);
 
         /* Focus */
-        --ar-focus-ring-color: var(--ar-color-interactive);
-        --ar-focus-ring-offset: 2px;
+        --ar-focus-ring-color: var(--ar-color-interactive); /* ar-datepicker, ar-tab */
+        --ar-focus-ring-offset: 2px; /* ar-datepicker */
 
         /* États — tokens d'usage (light mode) */
         --ar-color-success-bg: var(--ar-color-success-95);
@@ -348,6 +350,7 @@
         --ar-breadcrumb-color: var(--ar-color-text);
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
+        --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
         --ar-breadcrumb-panel-bg: var(--ar-panel-bg);
@@ -471,6 +474,9 @@
         --ar-dialog-close-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-dialog-close-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-dialog-border-radius: var(--ar-border-radius-lg);
+        --ar-dialog-title-font-size: var(--ar-font-size-md);
+        --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
 
         /* collapse */
         --ar-collapse-duration: 0s;

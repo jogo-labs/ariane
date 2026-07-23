@@ -39,6 +39,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-color - Couleur du texte (labels et lien actif). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop --ar-breadcrumb-separator-color - Couleur du séparateur entre les items (desktop).
  * @cssprop --ar-breadcrumb-bullet-color - Couleur des puces de la liste mobile.
+ * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
  * @cssprop --ar-breadcrumb-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
  * @cssprop --ar-breadcrumb-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
@@ -52,6 +53,8 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
  * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
  * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
+ * @cssprop --ar-color-bg - Couleur du liseré autour des puces de la liste mobile (`box-shadow`). Token sémantique global (non scopé à ar-breadcrumb).
+ * @cssprop --ar-color-interactive - Couleur de la puce du dernier élément de la liste mobile (élément actif/courant). Token sémantique global (non scopé à ar-breadcrumb).
  *
  * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
