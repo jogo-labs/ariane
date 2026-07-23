@@ -63,3 +63,34 @@ précédent générique.
   conception — le garde-fou automatique le rappellera sinon au premier `npm run build:manifest`.
 - Pas de convention de nommage pour des tokens véritablement internes/non documentables — écartée
   faute de cas concret (YAGNI), à documenter séparément si un besoin apparaît.
+
+## Amendement (2026-07-22) : fallback d'accessibilité sur les surfaces flottantes
+
+L'interdiction stricte de tout fallback (section « Décision » ci-dessus) suppose implicitement
+qu'un thème (`default.css` ou équivalent) est toujours chargé par le consommateur. En pratique,
+son absence rend certaines surfaces flottantes avec fond (dropdown/breadcrumb/stepper mobile/
+datepicker via `panel.styles.ts`, plus `ar-tooltip`) confuses ou inaccessibles : panel
+transparent qui se confond avec la page, texte illisible, cible tactile sous le seuil WCAG 2.5.8.
+
+**Critère retenu :** un token peut recevoir un fallback fonctionnel dans le composant si, et
+seulement si, son absence rend le composant confus, cassé ou inaccessible sans thème chargé —
+pas juste « moins joli ». Présomption d'éligibilité pour les cas relevant d'un critère WCAG
+précis (1.4.3, 1.4.11, 2.4.7, 2.5.8…) ; éligibilité sans présomption pour le reste, à justifier
+individuellement.
+
+**Deux mécanismes, jamais un fallback « à nous » choisi arbitrairement :**
+
+1. **Couleur système CSS4** (préféré) : mots-clés (`Canvas`, `CanvasText`, `ButtonBorder`, etc.)
+   pour tout ce qui touche au contraste — héritent du thème OS/navigateur, y compris le mode
+   contraste élevé.
+2. **Valeur littérale justifiée** : pour les dimensions sans équivalent système, un commentaire
+   `/* a11y-fallback: <raison> */` sur la ligne précédant la valeur, vérifié automatiquement par
+   `validate-no-hardcoded-tokens.js` (`findUnjustifiedFallbacks`, branché dans `cem.config.js`).
+
+`border-radius`, `box-shadow` et le padding générique restent hors exception (purement
+cosmétiques). Ce critère devient la règle générale de la librairie ; son application immédiate se
+limite aux surfaces flottantes déjà identifiées — l'audit du reste des composants est suivi par
+l'issue #129.
+
+Détail complet du raisonnement, du périmètre et des tokens concernés :
+`docs/superpowers/specs/2026-07-22-css-fallback-accessibilite-design.md`.

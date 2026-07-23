@@ -32,11 +32,11 @@ export type ArDropdownPlacement =
  * @csspart panel - Le panel flottant.
  *
  * @cssprop --ar-dropdown-min-width - Largeur minimale du panel.
- * @cssprop --ar-dropdown-color - Couleur du texte (cascade vers --ar-panel-text).
+ * @cssprop --ar-dropdown-color - Couleur du texte (cascade vers --ar-panel-text, repli système `CanvasText` si aucun thème n'est chargé).
  * @cssprop --ar-dropdown-max-width - Largeur maximale (cascade vers --ar-panel-max-width).
  * @cssprop --ar-dropdown-padding - Marge interne (cascade vers --ar-panel-padding).
- * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg).
- * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color).
+ * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
+ * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-dropdown-border-radius - Arrondi (cascade vers --ar-panel-radius).
  * @cssprop --ar-dropdown-shadow - Ombre (cascade vers --ar-panel-shadow).
  * @cssprop --ar-dropdown-distance - Espacement entre le trigger et le panel (axe principal).

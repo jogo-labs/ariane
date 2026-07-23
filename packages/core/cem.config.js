@@ -19,6 +19,7 @@ import {
 import {
     findHardcodedTokenAssignments,
     findStylesFiles,
+    findUnjustifiedFallbacks,
 } from './scripts/validate-no-hardcoded-tokens.js';
 
 export default {
@@ -198,7 +199,19 @@ export default {
                     findHardcodedTokenAssignments(filePath, readFileSync(filePath, 'utf-8')),
                 );
 
-                const allErrors = [...cssPropCoverageErrors, ...hardcodedErrors];
+                // Valide que tout var(--ar-*, fallback) en consommation utilise un
+                // fallback justifié (couleur système whitelistée ou commentaire
+                // a11y-fallback) — cf. section « Garde-fou CI » de
+                // docs/superpowers/specs/2026-07-22-css-fallback-accessibilite-design.md
+                const unjustifiedFallbackErrors = stylesFiles.flatMap((filePath) =>
+                    findUnjustifiedFallbacks(filePath, readFileSync(filePath, 'utf-8')),
+                );
+
+                const allErrors = [
+                    ...cssPropCoverageErrors,
+                    ...hardcodedErrors,
+                    ...unjustifiedFallbackErrors,
+                ];
                 if (allErrors.length > 0) {
                     const coverageErrorsMsg =
                         cssPropCoverageErrors.length > 0
@@ -208,8 +221,12 @@ export default {
                         hardcodedErrors.length > 0
                             ? `\n  codé(s) en dur :\n${hardcodedErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
+                    const unjustifiedFallbackErrorsMsg =
+                        unjustifiedFallbackErrors.length > 0
+                            ? `\n  fallback(s) non justifié(s) :\n${unjustifiedFallbackErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}`,
                     );
                 }
             },

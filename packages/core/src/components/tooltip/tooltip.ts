@@ -32,8 +32,8 @@ export type ArTooltipPlacement =
  * @csspart bubble - Le panel flottant.
  * @csspart arrow  - Le caret directionnel.
  *
- * @cssprop --ar-tooltip-bg - Fond de la bulle.
- * @cssprop --ar-tooltip-color - Couleur du texte.
+ * @cssprop --ar-tooltip-bg - Fond de la bulle (repli système `Canvas` si aucun thème n'est chargé).
+ * @cssprop --ar-tooltip-color - Couleur du texte (repli système `CanvasText` si aucun thème n'est chargé).
  * @cssprop --ar-tooltip-border-radius - Arrondi.
  * @cssprop --ar-tooltip-padding - Marge interne.
  * @cssprop --ar-tooltip-font-size - Taille de police.

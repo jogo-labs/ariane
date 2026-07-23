@@ -195,4 +195,30 @@ describe('ar-dropdown — browser', () => {
             expect(el.open).to.equal(false);
         });
     });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a un fond, un texte et une bordure visibles même sans default.css', async () => {
+            el = await fixture(html`
+                <ar-dropdown>
+                    <button slot="trigger">Trigger</button>
+                    <p>Contenu</p>
+                </ar-dropdown>
+            `);
+            await openDropdown(el);
+            const panel = getPanel(el);
+            const computed = getComputedStyle(panel);
+
+            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts, pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.color).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopWidth).to.equal('1px');
+        });
+    });
 });

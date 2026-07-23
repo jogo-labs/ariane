@@ -313,4 +313,50 @@ describe('ar-datepicker — browser', () => {
             expect(selectedBtn?.getAttribute('aria-label')).to.include('12');
         });
     });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a une largeur maximale de 25rem par défaut', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+            if (!panel) throw new Error('[part="panel"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            expect(getComputedStyle(panel).maxWidth).to.equal(`${25 * rootFontSize}px`);
+        });
+
+        it('les cellules jour font 2.5rem × 2.5rem par défaut (WCAG 2.5.8)', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const day = el.shadowRoot?.querySelector<HTMLElement>('[part="day"]');
+            if (!day) throw new Error('[part="day"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const expectedPx = `${2.5 * rootFontSize}px`;
+            expect(getComputedStyle(day).width).to.equal(expectedPx);
+            expect(getComputedStyle(day).height).to.equal(expectedPx);
+        });
+
+        it('le panel a un fond, un texte et une bordure visibles même sans default.css', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+            if (!panel) throw new Error('[part="panel"] introuvable');
+            const computed = getComputedStyle(panel);
+
+            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts (ar-datepicker ne redéclare pas background-color/
+            // color/border-color), pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.color).to.not.equal('');
+            expect(computed.color).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+        });
+    });
 });

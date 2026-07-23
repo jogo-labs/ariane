@@ -80,4 +80,25 @@ describe('ar-stepper — browser', () => {
             expect(panel).to.not.equal(null);
         });
     });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a un fond et une bordure visibles même sans default.css', async () => {
+            el = await mobileStepper();
+            getTrigger(el).click();
+            await aTimeout(50);
+            const panel = getPanel(el);
+            const computed = getComputedStyle(panel);
+
+            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // stepper.styles.ts, pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopWidth).to.equal('1px');
+        });
+    });
 });
