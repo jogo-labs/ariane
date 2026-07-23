@@ -127,7 +127,10 @@ export default css`
         top: 1.5rem;
         bottom: 1.5rem;
         left: 0;
-        background-image: linear-gradient(var(--ar-color-neutral-90) 25%, transparent 0);
+        background-image: linear-gradient(
+            var(--ar-breadcrumb-mobile-separator-color) 25%,
+            transparent 0
+        );
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
