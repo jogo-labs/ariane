@@ -239,7 +239,9 @@
         --ar-color-text-inverse: var(--ar-color-white); /* ar-stepper */
 
         /* Surface */
-        --ar-color-bg: var(--ar-color-white); /* ar-breadcrumb, ar-datepicker, ar-dialog */
+        --ar-color-bg: var(
+            --ar-color-white
+        ); /* ar-breadcrumb, ar-datepicker, ar-dialog, ar-pagination */
         --ar-color-bg-subtle: var(--ar-color-neutral-95);
 
         /* Bordure */
