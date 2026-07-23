@@ -82,7 +82,7 @@ export default [
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            border-radius: var(--ar-border-radius-lg);
+            border-radius: var(--ar-dialog-border-radius);
             /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
             width: min(var(--ar-dialog-width), calc(100vw - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
@@ -146,7 +146,7 @@ export default [
 
         h1 {
             margin: 0;
-            font-size: var(--ar-font-size-md);
+            font-size: var(--ar-dialog-title-font-size);
             font-weight: 600;
             line-height: 1.4;
             color: inherit;
@@ -227,7 +227,7 @@ export default [
 
             dialog.shake {
                 animation: none;
-                outline: 3px solid var(--ar-color-danger-text);
+                outline: 3px solid var(--ar-dialog-shake-outline-color);
                 outline-offset: 2px;
             }
         }

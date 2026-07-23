@@ -472,6 +472,9 @@
         --ar-dialog-close-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-dialog-close-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-dialog-border-radius: var(--ar-border-radius-lg);
+        --ar-dialog-title-font-size: var(--ar-font-size-md);
+        --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
 
         /* collapse */
         --ar-collapse-duration: 0s;

@@ -82,9 +82,9 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-close-bg-focus - Fond du bouton de fermeture au focus.
  * @cssprop --ar-color-bg - Fond du dialog. Token sémantique global (non scopé à ar-dialog).
  * @cssprop --ar-color-text - Couleur du texte du dialog. Token sémantique global (non scopé à ar-dialog).
- * @cssprop --ar-border-radius-lg - Border-radius du dialog en mode modal (non-drawer). Token sémantique global (non scopé à ar-dialog).
- * @cssprop --ar-font-size-md - Taille de police du titre (h1). Token sémantique global (non scopé à ar-dialog).
- * @cssprop --ar-color-danger-text - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce`. Token sémantique global (non scopé à ar-dialog).
+ * @cssprop --ar-dialog-border-radius - Border-radius du dialog en mode modal (non-drawer) (cascade vers --ar-border-radius-lg).
+ * @cssprop --ar-dialog-title-font-size - Taille de police du titre (h1) (cascade vers --ar-font-size-md).
+ * @cssprop --ar-dialog-shake-outline-color - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce` (cascade vers --ar-color-danger-text).
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
