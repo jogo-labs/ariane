@@ -40,7 +40,7 @@ const SYSTEM_COLOR_KEYWORDS = new Set([
 // layout) sont acceptables. » — ex. tab.styles.ts:20-21, `calc(-1 * var(--ar-tab-
 // group-border-top-width, 0px))`. Pas une valeur de design, pas besoin de
 // commentaire a11y-fallback.
-const STRUCTURAL_LITERAL_KEYWORDS = new Set(['0px', '0']);
+const STRUCTURAL_LITERAL_KEYWORDS = new Set(['0px']);
 
 // Un fallback qui est lui-même une référence nue à un autre token --ar-* (sans son
 // propre fallback) n'est pas une valeur de design codée en dur — c'est une cascade
