@@ -72,30 +72,38 @@ analysant `ar-datepicker` :
   chaînée après `::part()`** (`::part(day).today`) — les pseudo-éléments n'acceptent
   généralement pas de sélecteur de classe à leur suite en CSS standard. Les deux tokens
   concernés chez `ar-datepicker` (`day-today-bg`, `day-today-color`) sont donc classés
-  **provisoires** : à vérifier empiriquement (test navigateur réel, pas happy-dom) avant de
-  les migrer. S'ils s'avèrent non chaînables, ils restent des tokens scopés — ce n'est pas
-  bloquant pour le reste du chantier.
+  **provisoires**, avec deux issues possibles, à trancher à l'implémentation :
+    1. **Option préférée — nouveau part dédié.** Le fichier utilise déjà ce pattern ailleurs
+       (`part="footer-btn today-btn"` sur le bouton « aujourd'hui » du footer,
+       `datepicker.ts:405`) : un attribut `part` multi-valeurs (`part="day today"` sur la
+       cellule du jour courant, en plus de `part="day"`). `default.css` cible alors
+       `ar-datepicker::part(today)` directement, sans dépendre du chaînage `::part(x).y`. Ne
+       nécessite pas de vérification préalable — le mécanisme est déjà prouvé dans ce même
+       fichier.
+    2. **Repli — rester des tokens scopés** si l'option 1 s'avère indésirable pour une raison
+       non anticipée (ex. collision de nommage avec un futur part `today` sur un autre
+       composant). Pas bloquant pour le reste du chantier dans tous les cas.
 
 ## Application à `ar-datepicker`
 
 Classification complète des 58 tokens actuels, par branche :
 
-| Branche                                                         | Nombre                                | Traitement                                                                      |
-| --------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------- |
-| 1. Fallback WCAG/fonctionnel                                    | 15                                    | Inchangé (déjà des tokens avec fallback)                                        |
-| 2. Lu en JS                                                     | 2 (`distance`, `offset`)              | Inchangé                                                                        |
-| 3. Réutilisé ≥2×                                                | 1 (`day-focus-ring-offset`)           | Inchangé                                                                        |
-| — Sur `:host` (exclu de la branche 4)                           | 1 (`gap`)                             | Inchangé — reste un token                                                       |
-| 5. Consommé uniquement par le `::part()` du thème               | 2 (`error-color`, `label-gap`)        | Retiré, valeur repliée en clair dans `::part(error)`/`::part(label)` existantes |
-| 4. Candidat `::part()`, provisoire (chaînage classe à vérifier) | 2 (`day-today-bg`, `day-today-color`) | Migration conditionnée à une vérification navigateur                            |
-| 4. Candidat `::part()`, confirmé                                | 35                                    | Regroupés dans de nouvelles règles `::part()`                                   |
+| Branche                                           | Nombre                                | Traitement                                                                            |
+| ------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------- |
+| 1. Fallback WCAG/fonctionnel                      | 15                                    | Inchangé (déjà des tokens avec fallback)                                              |
+| 2. Lu en JS                                       | 2 (`distance`, `offset`)              | Inchangé                                                                              |
+| 3. Réutilisé ≥2×                                  | 1 (`day-focus-ring-offset`)           | Inchangé                                                                              |
+| — Sur `:host` (exclu de la branche 4)             | 1 (`gap`)                             | Inchangé — reste un token                                                             |
+| 5. Consommé uniquement par le `::part()` du thème | 2 (`error-color`, `label-gap`)        | Retiré, valeur repliée en clair dans `::part(error)`/`::part(label)` existantes       |
+| 4. Candidat `::part()`, via nouveau part dédié    | 2 (`day-today-bg`, `day-today-color`) | `part="day today"` sur la cellule, ciblé via `::part(today)` (repli tokens si écarté) |
+| 4. Candidat `::part()`, confirmé                  | 35                                    | Regroupés dans de nouvelles règles `::part()`                                         |
 
 **Total : 18 tokens conservés** (15+2+1) sur 58, soit une réduction d'environ **68%** de la
 surface de tokens `:root` d'`ar-datepicker`.
 
 ### Nouvelles règles `::part()` à créer dans `default.css`
 
-Regroupement des 35 tokens confirmés (+ 2 provisoires) par part, dans le même style que le
+Regroupement des 35 tokens confirmés (+ 2 via nouveau part `today`) par part, dans le même style que le
 bloc `input`/`trigger` déjà existant :
 
 - **`ar-datepicker::part(nav-btn)`** (+ `:hover`, `:active`) : `background`, `border-width`,
@@ -111,8 +119,9 @@ bloc `input`/`trigger` déjà existant :
   existant déjà pour cibler les en-têtes de colonnes)_ : `color`, `font-size`.
 - **`ar-datepicker::part(day)`** : `background`, `font-size`, `color`, `border-radius`.
   `border-width`/`border-color` restent pilotés par les tokens conservés (branche 1, cutout
-  de focus). `.today` reste en tokens scopés en attendant la vérification technique
-  ci-dessus.
+  de focus).
+- **`ar-datepicker::part(today)`** _(nouveau part sur la cellule du jour courant, en plus de
+  `day`)_ : `background`, `color` — remplace `day-today-bg`/`day-today-color`.
 - **`ar-datepicker::part(panel)`** : `width`, `padding`. `max-width` reste piloté par le
   token conservé (branche 1, fallback WCAG 25rem).
 - **`ar-datepicker::part(input)`** _(règle existante, amendée)_ : ajoute `border-color` pour
