@@ -571,6 +571,8 @@
             var(--ar-color-text) 14%,
             transparent
         );
+        --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-datepicker-nav-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         --ar-datepicker-footer-margin: 0;
         --ar-datepicker-footer-padding: 0.75rem 0 0;
@@ -593,6 +595,8 @@
             var(--ar-color-interactive) 18%,
             transparent
         );
+        --ar-datepicker-footer-btn-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-datepicker-footer-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
@@ -600,6 +604,7 @@
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
         --ar-datepicker-day-font-size: 1rem;
+        --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-size: 2.5rem;
         --ar-datepicker-day-radius: 0.5rem;
         --ar-datepicker-day-bg: transparent;
