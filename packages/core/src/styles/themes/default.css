@@ -379,6 +379,10 @@
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
         --ar-stepper-link-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-color: var(--ar-color-text-muted);
+        --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
+        --ar-stepper-link-hover-label-color: var(--ar-color-text);
+        --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
+        --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
         --ar-stepper-active-label-color: var(--ar-color-interactive);
         --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
         --ar-stepper-active-bullet-bg: var(--ar-color-interactive);

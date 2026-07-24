@@ -107,25 +107,25 @@ export default css`
 
     .stepper-item .stepper-link:focus:before,
     .stepper-item .stepper-link:hover:before {
-        background-color: var(--ar-color-interactive);
+        background-color: var(--ar-stepper-link-hover-bullet-color);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-label,
     .stepper-item .stepper-link:hover .stepper-item-label {
         text-decoration: none;
-        color: var(--ar-color-text);
+        color: var(--ar-stepper-link-hover-label-color);
     }
 
     .stepper-item .stepper-link:focus .stepper-item-bullet,
     .stepper-item .stepper-link:hover .stepper-item-bullet {
-        color: var(--ar-color-text-inverse);
+        color: var(--ar-stepper-link-hover-bullet-text-color);
         background-color: var(--ar-stepper-bullet-hover-bg);
         box-shadow: none;
     }
 
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
-        outline-color: var(--ar-color-interactive);
+        outline-color: var(--ar-stepper-link-focus-outline-color);
         border-radius: var(--ar-stepper-link-focus-radius);
     }
 
