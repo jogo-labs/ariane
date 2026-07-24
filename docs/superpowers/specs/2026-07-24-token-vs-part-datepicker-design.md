@@ -115,8 +115,12 @@ bloc `input`/`trigger` déjà existant :
 - **`ar-datepicker::part(footer)`** : `background`, `margin`, `padding`.
 - **`ar-datepicker::part(header)`** : `background`, `font-size`, `margin`, `padding`,
   `border-radius`.
-- **`ar-datepicker [part='grid'] th`** _(pas un `::part()` — sélecteur interne au thème
-  existant déjà pour cibler les en-têtes de colonnes)_ : `color`, `font-size`.
+- **`ar-datepicker::part(weekday)`** _(nouveau part — correction apportée pendant l'écriture
+  du plan : les `<th>` d'en-tête de colonne n'ont aujourd'hui **aucun** attribut `part`,
+  contrairement à ce qu'affirmait une version précédente de cette spec ; un sélecteur de
+  thème ne peut de toute façon pas traverser la frontière du shadow DOM sans `::part()`, donc
+  un `part="weekday"` doit être ajouté sur le `<th>` dans `datepicker.ts`)_ : `color`,
+  `font-size`.
 - **`ar-datepicker::part(day)`** : `background`, `font-size`, `color`, `border-radius`.
   `border-width`/`border-color` restent pilotés par les tokens conservés (branche 1, cutout
   de focus).
