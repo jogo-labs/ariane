@@ -472,7 +472,7 @@ describe('ArDatepicker', () => {
     });
 
     describe('fonds par défaut du calendrier (thème)', () => {
-        it('default.css définit -day-bg et un background pour ::part(header)/::part(footer)', async () => {
+        it('default.css définit ::part(day) et un background pour ::part(header)/::part(footer)', async () => {
             // Lecture directe du fichier source : le thème n'est pas chargé dans
             // l'environnement de test (happy-dom), voir vitest.config.ts.
             // `new URL(relative, import.meta.url)` est évité car happy-dom remplace le
@@ -486,12 +486,10 @@ describe('ArDatepicker', () => {
                 '../../styles/themes/default.css',
             );
             const themeCss = readFileSync(themePath, 'utf-8');
-            expect(themeCss).toMatch(/--ar-datepicker-day-bg:/);
             // Regex agnostiques du préfixe de sélecteur (flat `ar-datepicker::part(...)`
             // ou nesting CSS `&::part(...)`) et de la valeur exacte — seule la présence
-            // de la déclaration `background:` est vérifiée.
-            // TODO: ajouter une assertion ::part(day) background-color une fois cette
-            // migration effectuée (tâche ultérieure du même plan).
+            // de la déclaration `background:`/`background-color:` est vérifiée.
+            expect(themeCss).toMatch(/::part\(day\)\s*{[^}]*background-color:/);
             expect(themeCss).toMatch(/::part\(header\)\s*{[^}]*background:/);
             expect(themeCss).toMatch(/::part\(footer\)\s*{[^}]*background:/);
         });

@@ -54,10 +54,6 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
- * @cssprop --ar-datepicker-day-font-size - Taille de police des jours.
- * @cssprop --ar-datepicker-day-radius - Border-radius des cellules jour.
- * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
- * @cssprop --ar-datepicker-day-border-width - Épaisseur de bordure des cellules jour.
  * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (préserve l'absence de bordure voulue par défaut ; sans ce repli, une propriété longhand `border-color` isolée dégraderait vers `currentcolor`, une bordure non désirée sur chaque cellule).
  * @cssprop --ar-datepicker-day-other-month-color - Couleur des jours hors du mois affiché. Repli `GrayText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-today-bg - Fond du jour actuel.
@@ -73,7 +69,6 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
  * @cssprop --ar-panel-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Le popover pilote son fond réel via ce token (panelStyles) ; référencer --ar-color-bg directement casserait ce cutout pour un consommateur ne surchargeant que --ar-panel-bg.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).

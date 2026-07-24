@@ -102,8 +102,6 @@ export default css`
     }
 
     [part='day'] {
-        font-size: var(--ar-datepicker-day-font-size);
-        color: var(--ar-datepicker-day-color);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
         width: var(--ar-datepicker-day-size, 2.5rem);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
@@ -113,10 +111,7 @@ export default css`
         justify-content: center;
         margin: auto;
         cursor: pointer;
-        border-radius: var(--ar-datepicker-day-radius);
-        background-color: var(--ar-datepicker-day-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-day-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui casse la surcharge border-color de .today ci-dessous */
         border-color: var(--ar-datepicker-day-border-color, transparent);
     }

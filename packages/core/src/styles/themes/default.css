@@ -561,11 +561,7 @@
 
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
-        --ar-datepicker-day-font-size: 1rem;
-        --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-size: 2.5rem;
-        --ar-datepicker-day-radius: 0.5rem;
-        --ar-datepicker-day-bg: transparent;
 
         --ar-datepicker-day-today-color: var(--ar-color-primary-40);
         --ar-datepicker-day-today-border: var(--ar-color-primary-50);
@@ -577,7 +573,6 @@
         --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
         --ar-datepicker-day-focus-ring-width: 2px;
         --ar-datepicker-day-focus-ring-offset: 0;
-        --ar-datepicker-day-border-width: 2px;
         --ar-datepicker-day-border-color: transparent;
 
         --ar-datepicker-day-selected-bg: var(--ar-color-primary-40);
@@ -854,5 +849,13 @@
     ar-datepicker::part(weekday) {
         color: var(--ar-color-neutral-50);
         font-size: 0.75rem;
+    }
+
+    ar-datepicker::part(day) {
+        font-size: 1rem;
+        color: var(--ar-color-text);
+        border-radius: 0.5rem;
+        background-color: transparent;
+        border-width: 2px;
     }
 }
