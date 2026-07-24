@@ -15,7 +15,8 @@ export default css`
         align-items: center;
         color: var(--ar-tab-color);
         background: var(--ar-tab-bg);
-        padding: var(--ar-tab-padding-y) var(--ar-tab-padding-x);
+        /* a11y-fallback: sans thème, --ar-tab-bg reste transparent même par défaut — le padding est le seul mécanisme séparant visuellement des onglets adjacents ; sans lui les libellés se collent les uns aux autres */
+        padding: var(--ar-tab-padding-y, 1rem) var(--ar-tab-padding-x, 1.5rem);
         border-radius: inherit;
         margin-block-start: calc(-1 * var(--ar-tab-group-border-top-width, 0px));
         margin-block-end: calc(-1 * var(--ar-tab-group-border-bottom-width, 0px));
