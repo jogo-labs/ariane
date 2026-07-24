@@ -161,8 +161,10 @@ littérale assignée à un `--ar-*` dans un `*.styles.ts`, sauf dans le second a
 1. **Mot-clé couleur système CSS4** reconnu — liste blanche fermée dans le script, limitée aux
    mots-clés effectivement utilisés dans ce document plus leurs équivalents directs :
    `Canvas`, `CanvasText`, `ButtonBorder`, `ButtonFace`, `ButtonText`, `Field`, `FieldText`,
-   `GrayText`. La liste s'étend au cas par cas si un futur composant justifie un mot-clé
-   supplémentaire — pas d'ouverture large préventive.
+   `GrayText`, `Highlight`, `HighlightText` (ces deux derniers ajoutés lors de l'audit #129,
+   cf. section « Extension #129 » ci-dessus — sémantique dédiée aux états sélectionné/actif).
+   La liste s'étend au cas par cas si un futur composant justifie un mot-clé supplémentaire —
+   pas d'ouverture large préventive.
 2. **Valeur littérale précédée d'un commentaire au format exact
    `/* a11y-fallback: <raison> */`** sur la ligne immédiatement précédente (même bloc de
    déclarations, une ligne au-dessus de l'assignation `--ar-*: value;`). Le script vérifie la
