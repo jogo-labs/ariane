@@ -147,12 +147,16 @@ export default css`
         cursor: pointer;
         border-radius: var(--ar-datepicker-day-radius);
         background-color: var(--ar-datepicker-day-bg);
-        border: var(--ar-datepicker-day-border-width) solid var(--ar-datepicker-day-border-color);
+        border-style: solid;
+        border-width: var(--ar-datepicker-day-border-width);
+        /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui casse la surcharge border-color de .today ci-dessous */
+        border-color: var(--ar-datepicker-day-border-color, transparent);
     }
 
     [part='day'].today {
         color: var(--ar-datepicker-day-today-color);
-        border-color: var(--ar-datepicker-day-today-border);
+        /* a11y-fallback: garde une distinction visible du reste de la grille sans thème */
+        border-color: var(--ar-datepicker-day-today-border, GrayText);
         background: var(--ar-datepicker-day-today-bg);
     }
 
@@ -162,8 +166,9 @@ export default css`
     }
 
     [part='day']:not([aria-disabled='true']):not(.disabled):hover {
-        background-color: var(--ar-datepicker-day-hover-bg);
-        color: var(--ar-datepicker-day-hover-color);
+        /* a11y-fallback: fond et texte pairés — un fallback de fond seul introduirait une combinaison non testée */
+        background-color: var(--ar-datepicker-day-hover-bg, ButtonFace);
+        color: var(--ar-datepicker-day-hover-color, ButtonText);
     }
 
     /*
@@ -195,8 +200,9 @@ export default css`
     }
 
     [part='day'].selected {
-        background-color: var(--ar-datepicker-day-selected-bg);
-        color: var(--ar-datepicker-day-selected-color);
+        /* a11y-fallback: sinon indiscernable des jours non sélectionnés sans thème */
+        background-color: var(--ar-datepicker-day-selected-bg, Highlight);
+        color: var(--ar-datepicker-day-selected-color, HighlightText);
         border-color: transparent;
     }
 
@@ -206,7 +212,8 @@ export default css`
     }
 
     [part='day'].other-month {
-        color: var(--ar-datepicker-day-other-month-color);
+        /* a11y-fallback: atténuation visible sans thème */
+        color: var(--ar-datepicker-day-other-month-color, GrayText);
     }
 
     [part='day'].disabled,
