@@ -17,7 +17,7 @@
 - Conventional Commits — chaque tâche se termine par un commit séparé.
 - Ne jamais committer `packages/core/dist/`.
 - Vérification par tâche : `npx vitest run datepicker` (depuis `packages/core/`) pour la non-régression comportementale (81 tests attendus), et `npm run build:manifest --workspace=packages/core` (depuis la racine) pour valider la couverture `@cssprop`/`default.css`.
-- Les tâches 1 à 7 modifient les 3 mêmes fichiers (`default.css`, `datepicker.styles.ts`, `datepicker.ts`) dans des zones disjointes — à exécuter dans l'ordre, chaque tâche partant de l'état laissé par la précédente (pas de parallélisation).
+- Les tâches 1 à 9 modifient des zones qui se chevauchent (`default.css` en premier lieu, plus `datepicker.styles.ts`/`datepicker.ts`/`datepicker.test.ts`) — à exécuter dans l'ordre, chaque tâche partant de l'état laissé par la précédente (pas de parallélisation). En particulier, la Task 8 (nesting) doit s'exécuter après les Tasks 1-7 (elle regroupe leurs règles) et avant la Task 9 (le test vérifie la forme imbriquée).
 
 ---
 
@@ -891,13 +891,212 @@ git commit -m "refactor(datepicker): retire le token label-gap, uniquement conso
 
 ---
 
-## Task 8: Met à jour le test obsolète sur les tokens de fond
+## Task 8: Regroupe les règles `::part()` d'`ar-datepicker` en un bloc imbriqué
+
+**Contexte:** Après les Tasks 1 à 7, `default.css` contient 19 règles `ar-datepicker::part(...)` à plat (les 7 nouvelles + les 12 déjà existantes pour `label`/`hint`/`error`/`input`/`trigger`). Pour la lisibilité — même intention que la remarque du mainteneur sur la prolifération de tokens — les regrouper sous un seul bloc `ar-datepicker { &::part(...) { ... } }` via le nesting CSS natif (supporté par tous les navigateurs evergreen depuis 2023 ; le fichier utilise déjà `color-mix()`/`@layer`/`:focus-visible` sans réserve de compatibilité). Le préfixe `&` est obligatoire devant `::part()` : sans lui, le nesting CSS insère un combinateur descendant implicite (`ar-datepicker ::part(x)`, sélecteur différent et non fonctionnel) plutôt que de composer directement (`ar-datepicker::part(x)`).
+
+**Files:**
+
+- Modify: `packages/core/src/styles/themes/default.css`
+
+**Interfaces:** Aucun changement de valeur ni de nom de token — pur regroupement syntaxique. Les 19 règles produisent exactement les mêmes sélecteurs résolus qu'avant.
+
+- [ ] **Step 1: Remplacer la séquence à plat par un bloc imbriqué**
+
+Remplacer l'intégralité de la séquence de règles `ar-datepicker::part(...)` (de la première, `ar-datepicker::part(nav-btn)`, à la dernière, `ar-datepicker::part(trigger):disabled`) par :
+
+```css
+ar-datepicker {
+    &::part(nav-btn) {
+        width: 2rem;
+        height: 2rem;
+        background: transparent;
+        border-width: 0px;
+        color: var(--ar-color-text);
+        border-radius: var(--ar-border-radius-sm);
+    }
+
+    &::part(nav-btn):hover {
+        background: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
+    }
+
+    &::part(nav-btn):active {
+        background: color-mix(in srgb, var(--ar-color-text) 14%, transparent);
+    }
+
+    &::part(nav-btn):focus-visible {
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    &::part(footer-btn) {
+        background: transparent;
+        border-width: 1px;
+        color: var(--ar-color-interactive);
+        border-radius: var(--ar-border-radius-md);
+        padding: 0.375rem 0.75rem;
+    }
+
+    &::part(footer-btn):hover {
+        background: color-mix(in srgb, var(--ar-color-interactive) 10%, transparent);
+        border-color: var(--ar-color-interactive);
+    }
+
+    &::part(footer-btn):active {
+        background: color-mix(in srgb, var(--ar-color-interactive) 18%, transparent);
+    }
+
+    &::part(footer-btn):focus-visible {
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    &::part(header) {
+        font-size: 1rem;
+        margin: 0;
+        padding: 0 0 0.75rem;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    &::part(footer) {
+        margin: 0;
+        padding: 0.75rem 0 0;
+        background: transparent;
+    }
+
+    /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
+    &::part(weekday) {
+        color: var(--ar-color-neutral-50);
+        font-size: 0.75rem;
+    }
+
+    &::part(day) {
+        font-size: 1rem;
+        color: var(--ar-color-text);
+        border-radius: 0.5rem;
+        background-color: transparent;
+        border-width: 2px;
+    }
+
+    &::part(panel) {
+        width: 20rem;
+        padding: 1rem;
+    }
+
+    &::part(label) {
+        font-size: var(--ar-font-size-sm);
+        font-weight: var(--ar-font-weight-medium);
+        color: var(--ar-color-text);
+        margin-bottom: calc(0.5rem - var(--ar-datepicker-gap));
+    }
+
+    &::part(hint) {
+        font-size: var(--ar-font-size-sm);
+        color: var(--ar-color-text-muted);
+    }
+
+    &::part(error) {
+        font-size: var(--ar-font-size-sm);
+        color: var(--ar-datepicker-error-color);
+    }
+
+    &::part(input) {
+        height: var(--ar-button-height);
+        box-sizing: border-box;
+        padding: 0 0.75rem;
+        border: 1px solid var(--ar-color-border);
+        border-right: none;
+        border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
+        background: var(--ar-color-bg);
+        color: var(--ar-color-text);
+        font-size: var(--ar-font-size-md);
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.15s ease;
+    }
+
+    &::part(input):focus-visible {
+        outline: 2px solid var(--ar-focus-ring-color);
+        outline-offset: var(--ar-focus-ring-offset);
+        border-color: var(--ar-color-interactive);
+    }
+
+    &::part(input):read-only {
+        background: var(--ar-color-bg-subtle);
+        cursor: default;
+    }
+
+    &::part(input):disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--ar-color-bg-subtle);
+    }
+
+    &::part(trigger) {
+        width: var(--ar-button-height);
+        height: var(--ar-button-height);
+        background: var(--ar-color-interactive);
+        color: var(--ar-color-text-inverse);
+        border: 1px solid var(--ar-color-interactive);
+        border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
+        cursor: pointer;
+        transition:
+            background 0.15s ease,
+            border-color 0.15s ease;
+    }
+
+    &::part(trigger):hover:not(:disabled) {
+        background: var(--ar-color-interactive-hover);
+        border-color: var(--ar-color-interactive-hover);
+    }
+
+    &::part(trigger):active:not(:disabled) {
+        background: var(--ar-color-interactive-active);
+        border-color: var(--ar-color-interactive-active);
+    }
+
+    &::part(trigger):focus-visible {
+        outline: 2px solid var(--ar-focus-ring-color);
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    &::part(trigger):disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+```
+
+- [ ] **Step 2: Vérifier visuellement qu'aucun sélecteur ne s'est perdu**
+
+Run : `grep -c "&::part(" packages/core/src/styles/themes/default.css`
+Expected: `19` (7 groupes ajoutés en Tasks 1-6 + 12 règles déjà existantes label/hint/error/input×4/trigger×5 — recompter exactement les occurrences avant remplacement avec `grep -c "ar-datepicker::part(" packages/core/src/styles/themes/default.css` pour confirmer que le compte ne change pas).
+
+- [ ] **Step 3: Tests**
+
+Run (depuis `packages/core/`) : `npx vitest run datepicker`
+Expected: 81/81 tests passent (le nesting ne change aucune valeur calculée).
+
+- [ ] **Step 4: Manifest**
+
+Run (depuis la racine) : `npm run build:manifest --workspace=packages/core`
+Expected: aucune erreur (le nesting ne touche à aucun token `:root`, aucun `@cssprop` concerné).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add packages/core/src/styles/themes/default.css
+git commit -m "style(datepicker): regroupe les regles ::part() dans un bloc imbrique (#129)"
+```
+
+---
+
+## Task 9: Met à jour le test obsolète sur les tokens de fond
 
 **Files:**
 
 - Modify: `packages/core/src/components/datepicker/datepicker.test.ts:474-493`
 
-**Contexte:** Ce test vérifie aujourd'hui, par lecture directe du fichier source de `default.css`, que `--ar-datepicker-header-bg`, `-day-bg` et `-footer-bg` existent comme tokens `:root`. Ces 3 tokens ont été retirés dans les Tasks 3 et 5 — le test doit vérifier à la place l'existence des règles `::part()` correspondantes avec une déclaration `background`.
+**Contexte:** Ce test vérifie aujourd'hui, par lecture directe du fichier source de `default.css`, que `--ar-datepicker-header-bg`, `-day-bg` et `-footer-bg` existent comme tokens `:root`. Ces 3 tokens ont été retirés dans les Tasks 3 et 5 — le test doit vérifier à la place l'existence des règles `::part()` correspondantes avec une déclaration `background`. Après la Task 8, ces règles sont imbriquées (`&::part(header)` à l'intérieur d'un bloc `ar-datepicker { ... }`, pas `ar-datepicker::part(header)` à plat) — les regex de vérification ne doivent donc pas présumer du préfixe exact devant `::part(`.
 
 **Interfaces:** Aucune — modification de test uniquement.
 
@@ -946,9 +1145,9 @@ describe('fonds par défaut du calendrier (thème)', () => {
             '../../styles/themes/default.css',
         );
         const themeCss = readFileSync(themePath, 'utf-8');
-        expect(themeCss).toMatch(/ar-datepicker::part\(header\)\s*\{[^}]*background:/);
-        expect(themeCss).toMatch(/ar-datepicker::part\(day\)\s*\{[^}]*background-color:/);
-        expect(themeCss).toMatch(/ar-datepicker::part\(footer\)\s*\{[^}]*background:/);
+        expect(themeCss).toMatch(/::part\(header\)\s*\{[^}]*background:/);
+        expect(themeCss).toMatch(/::part\(day\)\s*\{[^}]*background-color:/);
+        expect(themeCss).toMatch(/::part\(footer\)\s*\{[^}]*background:/);
     });
 });
 ```
@@ -967,7 +1166,7 @@ git commit -m "test(datepicker): adapte le test de fonds par defaut a la migrati
 
 ---
 
-## Task 9: Amendement ADR-005 — critère token scopé vs `::part()`
+## Task 10: Amendement ADR-005 — critère token scopé vs `::part()`
 
 **Files:**
 
@@ -1031,7 +1230,7 @@ git commit -m "docs(adr): amendement ADR-005, critere token scope vs ::part() (#
 
 ## Suite
 
-Une fois les 9 tâches mergées, le fichier `default.css` d'`ar-datepicker` passe de 58 à 23
+Une fois les 10 tâches mergées, le fichier `default.css` d'`ar-datepicker` passe de 58 à 23
 tokens `:root` (-60%), regroupés en 8 nouvelles règles `::part()`. L'issue #129 pourra être
 mise à jour avec ce résultat ; la généralisation aux 5 autres composants scopés par PR #136
 (ou aux 13 jamais audités) reste hors périmètre, à documenter comme piste future si le critère
