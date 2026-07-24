@@ -96,11 +96,9 @@ export default css`
 
     [part='grid'] th {
         text-align: center;
-        font-size: var(--ar-datepicker-weekday-font-size);
         font-weight: normal;
         padding-block: 0.5rem;
         text-transform: uppercase;
-        color: var(--ar-datepicker-weekday-color);
     }
 
     [part='day'] {

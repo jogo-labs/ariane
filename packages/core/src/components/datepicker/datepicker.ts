@@ -33,6 +33,7 @@ import { warn } from '../../utils/warn.js';
  * @csspart next-month - Bouton mois suivant.
  * @csspart next-year  - Bouton année suivante.
  * @csspart grid       - La grille calendrier.
+ * @csspart weekday    - Les cellules d'en-tête de colonne (abréviations de jours).
  * @csspart label      - L'élément label.
  * @csspart hint       - Le texte d'aide sous l'input.
  * @csspart error      - Le message d'erreur sous l'input.
@@ -52,8 +53,6 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
- * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
- * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
  * @cssprop --ar-datepicker-day-font-size - Taille de police des jours.
  * @cssprop --ar-datepicker-day-radius - Border-radius des cellules jour.
@@ -352,7 +351,9 @@ export class ArDatepicker extends LitElement {
                     <tr>
                         ${dayNames.map(
                             ({ abbr, full }) =>
-                                html`<th aria-label=${full} scope="col">${abbr}</th>`,
+                                html`<th part="weekday" aria-label=${full} scope="col">
+                                    ${abbr}
+                                </th>`,
                         )}
                     </tr>
                 </thead>
