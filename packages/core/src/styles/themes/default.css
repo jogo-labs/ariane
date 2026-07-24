@@ -566,25 +566,8 @@
         --ar-datepicker-footer-padding: 0.75rem 0 0;
         --ar-datepicker-footer-bg: transparent;
 
-        --ar-datepicker-footer-btn-bg: transparent;
-        --ar-datepicker-footer-btn-border-width: 1px;
         --ar-datepicker-footer-btn-border-color: var(--ar-color-border);
-        --ar-datepicker-footer-btn-color: var(--ar-color-interactive);
-        --ar-datepicker-footer-btn-radius: var(--ar-border-radius-md);
-        --ar-datepicker-footer-btn-padding: 0.375rem 0.75rem;
-        --ar-datepicker-footer-btn-hover-bg: color-mix(
-            in srgb,
-            var(--ar-color-interactive) 10%,
-            transparent
-        );
-        --ar-datepicker-footer-btn-hover-border-color: var(--ar-color-interactive);
-        --ar-datepicker-footer-btn-active-bg: color-mix(
-            in srgb,
-            var(--ar-color-interactive) 18%,
-            transparent
-        );
         --ar-datepicker-footer-btn-focus-ring-color: var(--ar-focus-ring-color);
-        --ar-datepicker-footer-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
@@ -760,6 +743,27 @@
     }
 
     ar-datepicker::part(nav-btn):focus-visible {
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    ar-datepicker::part(footer-btn) {
+        background: transparent;
+        border-width: 1px;
+        color: var(--ar-color-interactive);
+        border-radius: var(--ar-border-radius-md);
+        padding: 0.375rem 0.75rem;
+    }
+
+    ar-datepicker::part(footer-btn):hover {
+        background: color-mix(in srgb, var(--ar-color-interactive) 10%, transparent);
+        border-color: var(--ar-color-interactive);
+    }
+
+    ar-datepicker::part(footer-btn):active {
+        background: color-mix(in srgb, var(--ar-color-interactive) 18%, transparent);
+    }
+
+    ar-datepicker::part(footer-btn):focus-visible {
         outline-offset: var(--ar-focus-ring-offset);
     }
 

@@ -84,28 +84,13 @@ export default css`
         justify-content: center;
         cursor: pointer;
         font: inherit;
-        padding: var(--ar-datepicker-footer-btn-padding);
-        border-radius: var(--ar-datepicker-footer-btn-radius);
-        background: var(--ar-datepicker-footer-btn-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-footer-btn-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
         border-color: var(--ar-datepicker-footer-btn-border-color, transparent);
-        color: var(--ar-datepicker-footer-btn-color);
-    }
-
-    [part~='footer-btn']:hover {
-        background: var(--ar-datepicker-footer-btn-hover-bg);
-        border-color: var(--ar-datepicker-footer-btn-hover-border-color);
-    }
-
-    [part~='footer-btn']:active {
-        background: var(--ar-datepicker-footer-btn-active-bg);
     }
 
     [part~='footer-btn']:focus-visible {
         outline: 2px solid var(--ar-datepicker-footer-btn-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-datepicker-footer-btn-focus-ring-offset);
     }
 
     [part='grid'] {

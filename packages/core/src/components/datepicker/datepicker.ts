@@ -59,15 +59,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-footer-padding - Padding du footer.
  * @cssprop --ar-datepicker-footer-bg - Fond du footer.
  * @cssprop --ar-datepicker-footer-margin - Margin du footer.
- * @cssprop --ar-datepicker-footer-btn-bg - Fond des boutons du footer.
- * @cssprop --ar-datepicker-footer-btn-border-width - Épaisseur de bordure des boutons footer.
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-color - Couleur texte des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-radius - Border-radius des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-padding - Padding des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-hover-bg - Fond au survol des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-hover-border-color - Couleur de bordure au survol des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-active-bg - Fond à l'état actif des boutons footer.
  * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
  * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
@@ -90,7 +82,6 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-footer-btn-focus-ring-offset - Décalage de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-offset).
  * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
  * @cssprop --ar-panel-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Le popover pilote son fond réel via ce token (panelStyles) ; référencer --ar-color-bg directement casserait ce cutout pour un consommateur ne surchargeant que --ar-panel-bg.
  *
