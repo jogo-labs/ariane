@@ -18,12 +18,12 @@ export default css`
         display: inline-flex;
         position: relative;
         height: 0.5rem;
-        background-color: var(--ar-progressbar-track-color);
+        background-color: var(--ar-progressbar-track-color, ButtonFace);
         border-radius: 50rem;
     }
 
     .progress-bar {
-        background-color: var(--ar-progressbar-fill-color);
+        background-color: var(--ar-progressbar-fill-color, ButtonText);
         border-radius: 50rem;
     }
 

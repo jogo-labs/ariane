@@ -23,12 +23,12 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-hover-bg - Fond au survol.
  * @cssprop --ar-tab-active-color - Couleur du texte quand l'onglet est actif.
  * @cssprop --ar-tab-active-bg - Fond quand l'onglet est actif.
- * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width.
+ * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
  * @cssprop --ar-tab-indicator-color - Couleur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
- * @cssprop --ar-focus-ring-color - Couleur de la bague de focus de l'onglet. Token sémantique global (non scopé à ar-tab).
+ * @cssprop --ar-focus-ring-color - Couleur de la bague de focus de l'onglet. Token sémantique global (non scopé à ar-tab). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *
  * Note d'implémentation : la mise en page de [part='base'] compense la bordure de son parent
  * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width

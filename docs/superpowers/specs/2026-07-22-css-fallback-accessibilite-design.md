@@ -126,6 +126,32 @@ fond des états datepicker (jour sélectionné, aujourd'hui, focus, hover). Le b
 utilisable sans thème), mais son traitement complet nécessite une revue état par état qui
 dépasse le cadre de cette passe ciblée.
 
+### Extension #129 (2026-07-23) — audit du reste des composants
+
+Suite à l'audit dédié annoncé ci-dessus, complété par les décisions prises pendant la revue de #132 :
+
+| Composant                           | Token(s)                                                                                                                                        | Fallback                      | Mécanisme             |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | --------------------- |
+| Bouton partagé (`button.styles.ts`) | `--ar-button-focus-ring-color`, `--ar-color-white`                                                                                              | `ButtonText`, `Canvas`        | Couleur système (A)   |
+| `ar-tab`                            | `--ar-focus-ring-color`                                                                                                                         | `ButtonText`                  | Couleur système (A)   |
+| `ar-tab`                            | `--ar-tab-active-shadow`                                                                                                                        | `inset 0 -2px 0 Highlight`    | Couleur système (A)   |
+| `ar-datepicker`                     | `--ar-focus-ring-color` (nav/footer), `--ar-datepicker-day-focus-ring-color` (jours)                                                            | `ButtonText`                  | Couleur système (A)   |
+| `ar-datepicker`                     | `--ar-datepicker-day-focus-ring-width`                                                                                                          | `2px`                         | Littéral justifié (B) |
+| `ar-datepicker`                     | `--ar-datepicker-day-border-color` (bordure de base, découvert en revue : bug de raccourci `border:` qui rendait aussi "aujourd'hui" inopérant) | `transparent`                 | Littéral justifié (B) |
+| `ar-datepicker`                     | `--ar-datepicker-day-selected-bg` / `-color`                                                                                                    | `Highlight` / `HighlightText` | Couleur système (A)   |
+| `ar-datepicker`                     | `--ar-datepicker-day-today-border`                                                                                                              | `GrayText`                    | Couleur système (A)   |
+| `ar-datepicker`                     | `--ar-datepicker-day-hover-bg` / `-color`                                                                                                       | `ButtonFace` / `ButtonText`   | Couleur système (A)   |
+| `ar-datepicker`                     | `--ar-datepicker-day-other-month-color`                                                                                                         | `GrayText`                    | Couleur système (A)   |
+| `ar-progressbar`                    | `--ar-progressbar-track-color` / `-fill-color`                                                                                                  | `ButtonFace` / `ButtonText`   | Couleur système (A)   |
+| `ar-dialog`                         | `--ar-dialog-bg` / `--ar-dialog-color` (nouveaux tokens scopés, cascade vers `--ar-color-bg`/`--ar-color-text`)                                 | `Canvas` / `CanvasText`       | Couleur système (A)   |
+| `ar-charcounter`                    | `--ar-charcounter-warning-weight` / `-error-weight`                                                                                             | `700`                         | Littéral justifié (B) |
+
+**Extension de la liste blanche** : `Highlight`/`HighlightText` ajoutés — aucun mot-clé existant n'a la sémantique exacte « élément sélectionné/actif » requise pour l'onglet actif et le jour sélectionné du datepicker.
+
+**Exclusions délibérées** : la bordure `ar-tab-group` (cosmétique, pas load-bearing) et le token `--ar-color-bg` de `datepicker.styles.ts:178` (question de justesse de référence, pas de fallback — orthogonale, cf. #127) restent hors périmètre.
+
+**Composants sans candidat** (rendu nu déjà correct, vérifié explicitement) : `alert`, `breadcrumb` (hors bouton partagé), `breadcrumb-item`, `charcounter` (hors warning/error), `collapse`, `dropdown` (déjà fait), `dropdown-item`, `pagination` (hors bouton partagé), `spinner`, `stepper` (hors bouton partagé), `stepper-item`, `table-sort`, `tab-group` (hors exclusion ci-dessus), `tab-panel`, `tooltip` (déjà fait).
+
 ## Garde-fou CI
 
 `packages/core/scripts/validate-no-hardcoded-tokens.js` continue d'interdire toute valeur
@@ -135,8 +161,10 @@ littérale assignée à un `--ar-*` dans un `*.styles.ts`, sauf dans le second a
 1. **Mot-clé couleur système CSS4** reconnu — liste blanche fermée dans le script, limitée aux
    mots-clés effectivement utilisés dans ce document plus leurs équivalents directs :
    `Canvas`, `CanvasText`, `ButtonBorder`, `ButtonFace`, `ButtonText`, `Field`, `FieldText`,
-   `GrayText`. La liste s'étend au cas par cas si un futur composant justifie un mot-clé
-   supplémentaire — pas d'ouverture large préventive.
+   `GrayText`, `Highlight`, `HighlightText` (ces deux derniers ajoutés lors de l'audit #129,
+   cf. section « Extension #129 » ci-dessus — sémantique dédiée aux états sélectionné/actif).
+   La liste s'étend au cas par cas si un futur composant justifie un mot-clé supplémentaire —
+   pas d'ouverture large préventive.
 2. **Valeur littérale précédée d'un commentaire au format exact
    `/* a11y-fallback: <raison> */`** sur la ligne immédiatement précédente (même bloc de
    déclarations, une ligne au-dessus de l'assignation `--ar-*: value;`). Le script vérifie la

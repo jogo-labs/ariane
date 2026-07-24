@@ -74,8 +74,8 @@ export default [
             border: none;
             padding: 0;
             overflow: hidden;
-            background: var(--ar-color-bg);
-            color: var(--ar-color-text);
+            background: var(--ar-dialog-bg, Canvas);
+            color: var(--ar-dialog-color, CanvasText);
             box-shadow: var(--ar-dialog-shadow);
         }
 

@@ -33,6 +33,8 @@ const SYSTEM_COLOR_KEYWORDS = new Set([
     'Field',
     'FieldText',
     'GrayText',
+    'Highlight',
+    'HighlightText',
 ]);
 
 // Fallbacks structurels déjà sanctionnés par CLAUDE.md (section « Philosophie de

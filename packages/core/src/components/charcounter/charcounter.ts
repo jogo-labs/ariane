@@ -31,8 +31,8 @@ function pluralize(count: number, label: string): string {
  * @cssprop --ar-charcounter-warning-color - Couleur état warning.
  * @cssprop --ar-charcounter-error-color - Couleur état error.
  * @cssprop --ar-charcounter-font-size - Taille de police.
- * @cssprop --ar-charcounter-warning-weight - Graisse du texte en état warning.
- * @cssprop --ar-charcounter-error-weight - Graisse du texte en état error.
+ * @cssprop --ar-charcounter-warning-weight - Graisse du texte en état warning. Repli `700` si aucun thème n'est chargé — seul signal garanti d'état si le consommateur n'utilise pas les slots d'icône.
+ * @cssprop --ar-charcounter-error-weight - Graisse du texte en état error. Repli `700` si aucun thème n'est chargé.
  */
 export class ArCharcounter extends LitElement {
     static override styles = [styles];

@@ -12,12 +12,14 @@ export default css`
 
     :host([state='warning']) [part='count'] {
         color: var(--ar-charcounter-warning-color);
-        font-weight: var(--ar-charcounter-warning-weight);
+        /* a11y-fallback: sans thème, la couleur seule (warning/error identiques) ne suffit pas à distinguer les états — la graisse doit rester un signal garanti même sans thème chargé */
+        font-weight: var(--ar-charcounter-warning-weight, 700);
     }
 
     :host([state='error']) [part='count'] {
         color: var(--ar-charcounter-error-color);
-        font-weight: var(--ar-charcounter-error-weight);
+        /* a11y-fallback: sans thème, la couleur seule (warning/error identiques) ne suffit pas à distinguer les états — la graisse doit rester un signal garanti même sans thème chargé */
+        font-weight: var(--ar-charcounter-error-weight, 700);
     }
 
     slot[name='icon-warning'],

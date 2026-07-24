@@ -66,8 +66,8 @@ export default css`
         box-shadow: none;
         border-color: transparent;
         box-shadow:
-            inset 0 0 0 0.125rem var(--ar-button-focus-ring-color),
-            inset 0 0 0 0.25rem var(--ar-color-white);
+            inset 0 0 0 0.125rem var(--ar-button-focus-ring-color, ButtonText),
+            inset 0 0 0 0.25rem var(--ar-color-white, Canvas);
     }
 
     .btn:focus:before {

@@ -91,6 +91,15 @@ describe('findUnjustifiedFallbacks', () => {
         expect(findUnjustifiedFallbacks('panel.styles.ts', source)).toEqual([]);
     });
 
+    it('accepte le mot-clé Highlight (ajouté pour les états sélectionné/actif)', () => {
+        const source = `
+            [part='day'] {
+                background: var(--ar-datepicker-day-selected-bg, Highlight);
+            }
+        `;
+        expect(findUnjustifiedFallbacks('datepicker.styles.ts', source)).toEqual([]);
+    });
+
     it('rejette un mot-clé système avec une casse différente (whitelist stricte)', () => {
         const source = `
             [part='panel'] {
