@@ -79,9 +79,10 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-trigger-bg - Fond du bouton trigger mobile.
  * @cssprop --ar-stepper-trigger-bg-hover - Fond du bouton trigger mobile au survol.
  * @cssprop --ar-stepper-trigger-radius - Border-radius du bouton trigger mobile.
- * @cssprop --ar-color-interactive - Couleur de la puce et de l'anneau de focus du lien d'étape au survol/focus. Token sémantique global (non scopé à ar-stepper).
- * @cssprop --ar-color-text - Couleur du label de l'étape au survol/focus. Token sémantique global (non scopé à ar-stepper).
- * @cssprop --ar-color-text-inverse - Couleur du numéro affiché dans la puce au survol/focus. Token sémantique global (non scopé à ar-stepper).
+ * @cssprop --ar-stepper-link-hover-bullet-color - Couleur de la puce du lien d'étape au survol/focus (cascade vers --ar-color-interactive).
+ * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
+ * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).
+ * @cssprop --ar-stepper-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
  */

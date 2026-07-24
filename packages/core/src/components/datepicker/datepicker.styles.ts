@@ -88,8 +88,8 @@ export default css`
     }
 
     [part~='nav-btn']:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-focus-ring-offset);
+        outline: 2px solid var(--ar-datepicker-nav-btn-focus-ring-color, ButtonText);
+        outline-offset: var(--ar-datepicker-nav-btn-focus-ring-offset);
     }
 
     [part~='footer-btn'] {
@@ -118,8 +118,8 @@ export default css`
     }
 
     [part~='footer-btn']:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-focus-ring-offset);
+        outline: 2px solid var(--ar-datepicker-footer-btn-focus-ring-color, ButtonText);
+        outline-offset: var(--ar-datepicker-footer-btn-focus-ring-offset);
     }
 
     [part='grid'] {
@@ -139,7 +139,7 @@ export default css`
 
     [part='day'] {
         font-size: var(--ar-datepicker-day-font-size);
-        color: var(--ar-color-text);
+        color: var(--ar-datepicker-day-color);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
         width: var(--ar-datepicker-day-size, 2.5rem);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */

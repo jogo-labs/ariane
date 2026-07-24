@@ -98,7 +98,7 @@ export default css`
         background-color: var(--ar-breadcrumb-bullet-color);
         margin: 0 0.75rem;
         flex-shrink: 0;
-        box-shadow: 0 0 0 2px var(--ar-color-bg);
+        box-shadow: 0 0 0 2px var(--ar-breadcrumb-bullet-ring-color);
     }
 
     .breadcrumb-mobile .breadcrumb-item:first-child:before,
@@ -109,7 +109,7 @@ export default css`
     }
 
     .breadcrumb-mobile .breadcrumb-item:last-child:before {
-        background-color: var(--ar-color-interactive);
+        background-color: var(--ar-breadcrumb-active-bullet-color);
     }
 
     .breadcrumb-mobile .breadcrumb-link,

@@ -9,7 +9,7 @@ export default css`
         align-items: center;
         opacity: 1;
         transform: scale(1);
-        color: var(--ar-color-text);
+        color: var(--ar-alert-color);
         padding: var(--ar-alert-padding);
         border-radius: var(--ar-alert-border-radius);
         border-width: var(--ar-alert-border-width);

@@ -50,7 +50,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop --ar-alert-success-border - Bordure de l'alerte "success".
  * @cssprop --ar-alert-success-icon - Couleur de l'icône "success".
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
- * @cssprop --ar-color-text - Couleur du texte de l'alerte. Token sémantique global (non scopé à ar-alert) : le surcharger affecte aussi tous les autres composants qui le consomment directement.
+ * @cssprop --ar-alert-color - Couleur du texte de l'alerte (cascade vers --ar-color-text).
 
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).

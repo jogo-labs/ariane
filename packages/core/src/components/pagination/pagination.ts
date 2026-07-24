@@ -44,7 +44,7 @@ export interface ArPaginationPageChangeDetail {
  * @cssprop --ar-pagination-bg-hover - Fond des boutons prev/next/page au survol.
  * @cssprop --ar-pagination-bg-pressed - Fond des boutons prev/next/page pressés.
  * @cssprop --ar-pagination-bg-focus - Fond des boutons prev/next/page au focus.
- * @cssprop --ar-color-bg - Couleur du fond du numéro de page actif. Token sémantique global (non scopé à ar-pagination).
+ * @cssprop --ar-pagination-active-bg - Couleur du fond du numéro de page actif (cascade vers --ar-color-bg).
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */

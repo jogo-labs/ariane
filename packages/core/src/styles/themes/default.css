@@ -294,6 +294,7 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* alert */
+        --ar-alert-color: var(--ar-color-text);
         --ar-alert-padding: 1rem;
         --ar-alert-border-radius: 0.75rem;
         --ar-alert-border-width: 1px;
@@ -351,6 +352,8 @@
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
+        --ar-breadcrumb-bullet-ring-color: var(--ar-color-bg);
+        --ar-breadcrumb-active-bullet-color: var(--ar-color-interactive);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
         --ar-breadcrumb-panel-bg: var(--ar-panel-bg);
@@ -376,6 +379,10 @@
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
         --ar-stepper-link-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-color: var(--ar-color-text-muted);
+        --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
+        --ar-stepper-link-hover-label-color: var(--ar-color-text);
+        --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
+        --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
         --ar-stepper-active-label-color: var(--ar-color-interactive);
         --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
         --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
@@ -407,6 +414,7 @@
         --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-pagination-active-bg: var(--ar-color-bg);
 
         /* spinner */
         --ar-spinner-stroke-color: currentColor;
@@ -520,6 +528,7 @@
 
         --ar-tab-disabled-opacity: 0.5;
         --ar-tab-focus-ring-offset: -2px;
+        --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
 
         --ar-tab-group-gap: 0;
         --ar-tab-group-border-color: var(--ar-color-border);
@@ -564,6 +573,8 @@
             var(--ar-color-text) 14%,
             transparent
         );
+        --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-datepicker-nav-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         --ar-datepicker-footer-margin: 0;
         --ar-datepicker-footer-padding: 0.75rem 0 0;
@@ -586,6 +597,8 @@
             var(--ar-color-interactive) 18%,
             transparent
         );
+        --ar-datepicker-footer-btn-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-datepicker-footer-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
@@ -593,6 +606,7 @@
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
         --ar-datepicker-day-font-size: 1rem;
+        --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-size: 2.5rem;
         --ar-datepicker-day-radius: 0.5rem;
         --ar-datepicker-day-bg: transparent;
