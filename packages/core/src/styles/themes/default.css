@@ -470,6 +470,8 @@
            sans surcharge globale de --ar-dialog-spacing. */
         --ar-dialog-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 50px -8px rgba(0, 0, 0, 0.2);
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
+        --ar-dialog-bg: var(--ar-color-bg);
+        --ar-dialog-color: var(--ar-color-text);
         --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
         --ar-dialog-close-bg-hover: var(--ar-button-tertiary-bg-hover);
         --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);

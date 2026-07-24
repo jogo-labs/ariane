@@ -80,8 +80,8 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-close-bg-hover - Fond du bouton de fermeture au survol.
  * @cssprop --ar-dialog-close-bg-pressed - Fond du bouton de fermeture pressé.
  * @cssprop --ar-dialog-close-bg-focus - Fond du bouton de fermeture au focus.
- * @cssprop --ar-color-bg - Fond du dialog. Token sémantique global (non scopé à ar-dialog).
- * @cssprop --ar-color-text - Couleur du texte du dialog. Token sémantique global (non scopé à ar-dialog).
+ * @cssprop --ar-dialog-bg - Fond du dialog (cascade vers --ar-color-bg). Repli `Canvas` si aucun thème n'est chargé — sans thème et sans bordure (le dialog natif perd son style UA par défaut), le contenu flotte sinon sans surface visible.
+ * @cssprop --ar-dialog-color - Couleur du texte du dialog (cascade vers --ar-color-text). Repli `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-dialog-border-radius - Border-radius du dialog en mode modal (non-drawer) (cascade vers --ar-border-radius-lg).
  * @cssprop --ar-dialog-title-font-size - Taille de police du titre (h1) (cascade vers --ar-font-size-md).
  * @cssprop --ar-dialog-shake-outline-color - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce` (cascade vers --ar-color-danger-text).
