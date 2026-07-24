@@ -98,7 +98,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation et du footer. Token sémantique global (non scopé à ar-datepicker) — les cellules jour ont leur propre token scopé, --ar-datepicker-day-focus-ring-color. Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-focus-ring-offset - Décalage de l'anneau de focus des boutons de navigation et du footer. Token sémantique global (non scopé à ar-datepicker).
  * @cssprop --ar-color-text - Couleur du texte des cellules jour. Token sémantique global (non scopé à ar-datepicker).
- * @cssprop --ar-color-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Token sémantique global (non scopé à ar-datepicker).
+ * @cssprop --ar-panel-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Le popover pilote son fond réel via ce token (panelStyles) ; référencer --ar-color-bg directement casserait ce cutout pour un consommateur ne surchargeant que --ar-panel-bg.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
