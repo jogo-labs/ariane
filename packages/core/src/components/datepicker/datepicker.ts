@@ -50,15 +50,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-panel-padding - Padding interne du popover (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
- * @cssprop --ar-datepicker-header-font-size - Taille de police de l'en-tête.
- * @cssprop --ar-datepicker-header-padding - Padding de l'en-tête.
- * @cssprop --ar-datepicker-header-margin - Margin de l'en-tête.
- * @cssprop --ar-datepicker-header-radius - Border-radius de l'en-tête.
- * @cssprop --ar-datepicker-header-bg - Fond de l'en-tête.
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
- * @cssprop --ar-datepicker-footer-padding - Padding du footer.
- * @cssprop --ar-datepicker-footer-bg - Fond du footer.
- * @cssprop --ar-datepicker-footer-margin - Margin du footer.
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
  * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
  * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.

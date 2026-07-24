@@ -553,18 +553,8 @@
         --ar-datepicker-panel-max-width: 25rem;
         --ar-datepicker-panel-padding: 1rem;
 
-        --ar-datepicker-header-font-size: 1rem;
-        --ar-datepicker-header-margin: 0;
-        --ar-datepicker-header-padding: 0 0 0.75rem;
-        --ar-datepicker-header-radius: 0;
-        --ar-datepicker-header-bg: transparent;
-
         --ar-datepicker-nav-btn-border-color: transparent;
         --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
-
-        --ar-datepicker-footer-margin: 0;
-        --ar-datepicker-footer-padding: 0.75rem 0 0;
-        --ar-datepicker-footer-bg: transparent;
 
         --ar-datepicker-footer-btn-border-color: var(--ar-color-border);
         --ar-datepicker-footer-btn-focus-ring-color: var(--ar-focus-ring-color);
@@ -765,6 +755,20 @@
 
     ar-datepicker::part(footer-btn):focus-visible {
         outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    ar-datepicker::part(header) {
+        font-size: 1rem;
+        margin: 0;
+        padding: 0 0 0.75rem;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    ar-datepicker::part(footer) {
+        margin: 0;
+        padding: 0.75rem 0 0;
+        background: transparent;
     }
 
     ar-datepicker::part(label) {

@@ -50,11 +50,6 @@ export default css`
         align-items: center;
         justify-content: space-between;
         gap: 0.25rem;
-        font-size: var(--ar-datepicker-header-font-size);
-        margin: var(--ar-datepicker-header-margin);
-        padding: var(--ar-datepicker-header-padding);
-        background: var(--ar-datepicker-header-bg);
-        border-radius: var(--ar-datepicker-header-radius);
     }
 
     [part='header'] span[aria-live] {
@@ -201,8 +196,5 @@ export default css`
         display: flex;
         justify-content: space-between;
         gap: 0.5rem;
-        margin: var(--ar-datepicker-footer-margin);
-        padding: var(--ar-datepicker-footer-padding);
-        background: var(--ar-datepicker-footer-bg);
     }
 `;
