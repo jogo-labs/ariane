@@ -89,8 +89,11 @@ individuellement.
 
 `border-radius`, `box-shadow` et le padding générique restent hors exception (purement
 cosmétiques). Ce critère devient la règle générale de la librairie ; son application immédiate se
-limite aux surfaces flottantes déjà identifiées — l'audit du reste des composants est suivi par
-l'issue #129.
+limite aux surfaces flottantes déjà identifiées. L'audit du reste des composants (issue #129,
+2026-07-23) a étendu la liste blanche des mots-clés couleur système avec `Highlight`/
+`HighlightText` (sémantique dédiée aux états sélectionné/actif) et corrigé des anneaux de focus
+cassés, `ar-progressbar` invisible, `ar-dialog` sans surface visible, l'indicateur d'onglet actif
+et les états de la grille `ar-datepicker`.
 
 Détail complet du raisonnement, du périmètre et des tokens concernés :
 `docs/superpowers/specs/2026-07-22-css-fallback-accessibilite-design.md`.
