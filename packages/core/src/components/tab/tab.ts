@@ -23,7 +23,7 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-hover-bg - Fond au survol.
  * @cssprop --ar-tab-active-color - Couleur du texte quand l'onglet est actif.
  * @cssprop --ar-tab-active-bg - Fond quand l'onglet est actif.
- * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width.
+ * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
  * @cssprop --ar-tab-indicator-color - Couleur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.

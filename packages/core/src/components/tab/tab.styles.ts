@@ -29,7 +29,8 @@ export default css`
     :host([aria-selected='true']) [part='base'] {
         color: var(--ar-tab-active-color);
         background: var(--ar-tab-active-bg);
-        box-shadow: var(--ar-tab-active-shadow);
+        /* a11y-fallback: indicateur d'onglet actif indiscernable sans thème (WCAG 2.4.7) */
+        box-shadow: var(--ar-tab-active-shadow, inset 0 -2px 0 Highlight);
     }
 
     :host([disabled]) {
