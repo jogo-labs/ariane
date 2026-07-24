@@ -42,7 +42,7 @@ export default css`
     }
 
     :host(:focus-visible) {
-        outline: 2px solid var(--ar-focus-ring-color);
+        outline: 2px solid var(--ar-focus-ring-color, ButtonText);
         outline-offset: var(--ar-tab-focus-ring-offset);
     }
 `;

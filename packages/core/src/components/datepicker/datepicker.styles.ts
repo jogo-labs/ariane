@@ -86,7 +86,7 @@ export default css`
     }
 
     [part~='nav-btn']:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color);
+        outline: 2px solid var(--ar-focus-ring-color, ButtonText);
         outline-offset: var(--ar-focus-ring-offset);
     }
 
@@ -114,7 +114,7 @@ export default css`
     }
 
     [part~='footer-btn']:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color);
+        outline: 2px solid var(--ar-focus-ring-color, ButtonText);
         outline-offset: var(--ar-focus-ring-offset);
     }
 
@@ -172,8 +172,10 @@ export default css`
      * contrairement à :focus-visible qui ne s'active pas pour le focus programmatique.
      */
     [part='grid']:focus-within [part='day'][tabindex='0'] {
-        outline: solid var(--ar-datepicker-day-focus-ring-width)
-            var(--ar-datepicker-day-focus-ring-color);
+        outline: solid
+            /* a11y-fallback: WCAG 2.4.7 (Focus Visible) — var() dans un raccourci outline invalide tout le raccourci si non résolu, y compris la largeur */
+            var(--ar-datepicker-day-focus-ring-width, 2px)
+            var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
         border-color: var(--ar-color-bg);
     }
@@ -188,7 +190,7 @@ export default css`
      * Indique quel jour prendra le focus au prochain Tab dans la grille.
      */
     [part='day'][tabindex='0']:not(:focus-visible) {
-        outline: 1px dashed var(--ar-datepicker-day-focus-ring-color);
+        outline: 1px dashed var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
     }
 
