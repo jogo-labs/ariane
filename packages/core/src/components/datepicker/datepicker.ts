@@ -55,14 +55,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-header-margin - Margin de l'en-tête.
  * @cssprop --ar-datepicker-header-radius - Border-radius de l'en-tête.
  * @cssprop --ar-datepicker-header-bg - Fond de l'en-tête.
- * @cssprop --ar-datepicker-nav-btn-size - Taille (width = height) des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-bg - Fond des boutons de navigation.
- * @cssprop --ar-datepicker-nav-btn-border-width - Épaisseur de bordure des boutons nav.
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-color - Couleur texte des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-radius - Border-radius des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-hover-bg - Fond au survol des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-active-bg - Fond à l'état actif des boutons nav.
  * @cssprop --ar-datepicker-footer-padding - Padding du footer.
  * @cssprop --ar-datepicker-footer-bg - Fond du footer.
  * @cssprop --ar-datepicker-footer-margin - Margin du footer.
@@ -96,7 +89,6 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-nav-btn-focus-ring-offset - Décalage de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-offset).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-offset - Décalage de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-offset).
  * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).

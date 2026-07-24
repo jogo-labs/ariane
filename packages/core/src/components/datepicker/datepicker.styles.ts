@@ -66,30 +66,16 @@ export default css`
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: var(--ar-datepicker-nav-btn-size);
         aspect-ratio: 1 / 1;
         cursor: pointer;
         font: inherit;
-        border-radius: var(--ar-datepicker-nav-btn-radius);
-        background: var(--ar-datepicker-nav-btn-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-nav-btn-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
         border-color: var(--ar-datepicker-nav-btn-border-color, transparent);
-        color: var(--ar-datepicker-nav-btn-color);
-    }
-
-    [part~='nav-btn']:hover {
-        background: var(--ar-datepicker-nav-btn-hover-bg);
-    }
-
-    [part~='nav-btn']:active {
-        background: var(--ar-datepicker-nav-btn-active-bg);
     }
 
     [part~='nav-btn']:focus-visible {
         outline: 2px solid var(--ar-datepicker-nav-btn-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-datepicker-nav-btn-focus-ring-offset);
     }
 
     [part~='footer-btn'] {

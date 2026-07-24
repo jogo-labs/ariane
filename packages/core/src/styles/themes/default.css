@@ -559,20 +559,8 @@
         --ar-datepicker-header-radius: 0;
         --ar-datepicker-header-bg: transparent;
 
-        --ar-datepicker-nav-btn-size: 2rem;
-        --ar-datepicker-nav-btn-bg: transparent;
-        --ar-datepicker-nav-btn-border-width: 0px;
         --ar-datepicker-nav-btn-border-color: transparent;
-        --ar-datepicker-nav-btn-color: var(--ar-color-text);
-        --ar-datepicker-nav-btn-radius: var(--ar-border-radius-sm);
-        --ar-datepicker-nav-btn-hover-bg: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
-        --ar-datepicker-nav-btn-active-bg: color-mix(
-            in srgb,
-            var(--ar-color-text) 14%,
-            transparent
-        );
         --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
-        --ar-datepicker-nav-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
         --ar-datepicker-footer-margin: 0;
         --ar-datepicker-footer-padding: 0.75rem 0 0;
@@ -752,6 +740,27 @@
 
             --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
         }
+    }
+
+    ar-datepicker::part(nav-btn) {
+        width: 2rem;
+        height: 2rem;
+        background: transparent;
+        border-width: 0px;
+        color: var(--ar-color-text);
+        border-radius: var(--ar-border-radius-sm);
+    }
+
+    ar-datepicker::part(nav-btn):hover {
+        background: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
+    }
+
+    ar-datepicker::part(nav-btn):active {
+        background: color-mix(in srgb, var(--ar-color-text) 14%, transparent);
+    }
+
+    ar-datepicker::part(nav-btn):focus-visible {
+        outline-offset: var(--ar-focus-ring-offset);
     }
 
     ar-datepicker::part(label) {
