@@ -28,7 +28,7 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
  * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
- * @cssprop --ar-focus-ring-color - Couleur de la bague de focus de l'onglet. Token sémantique global (non scopé à ar-tab). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *
  * Note d'implémentation : la mise en page de [part='base'] compense la bordure de son parent
  * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
