@@ -352,6 +352,8 @@
         --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
+        --ar-breadcrumb-bullet-ring-color: var(--ar-color-bg);
+        --ar-breadcrumb-active-bullet-color: var(--ar-color-interactive);
         --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
         --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
         --ar-breadcrumb-panel-bg: var(--ar-panel-bg);

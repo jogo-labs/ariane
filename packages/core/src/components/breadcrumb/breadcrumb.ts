@@ -53,8 +53,8 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
  * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
  * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
- * @cssprop --ar-color-bg - Couleur du liseré autour des puces de la liste mobile (`box-shadow`). Token sémantique global (non scopé à ar-breadcrumb).
- * @cssprop --ar-color-interactive - Couleur de la puce du dernier élément de la liste mobile (élément actif/courant). Token sémantique global (non scopé à ar-breadcrumb).
+ * @cssprop --ar-breadcrumb-bullet-ring-color - Couleur du liseré autour des puces de la liste mobile (`box-shadow`, cascade vers --ar-color-bg).
+ * @cssprop --ar-breadcrumb-active-bullet-color - Couleur de la puce du dernier élément de la liste mobile (élément actif/courant, cascade vers --ar-color-interactive).
  *
  * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
