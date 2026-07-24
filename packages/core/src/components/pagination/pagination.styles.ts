@@ -64,7 +64,7 @@ export default css`
     .pagination-item.active .btn-tertiary {
         z-index: 3;
         color: var(--ar-pagination-active-color);
-        background-color: var(--ar-color-bg);
+        background-color: var(--ar-pagination-active-bg);
         border: 1px solid var(--ar-pagination-active-color);
         font-weight: 700;
     }
