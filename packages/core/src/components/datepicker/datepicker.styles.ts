@@ -72,8 +72,10 @@ export default css`
         font: inherit;
         border-radius: var(--ar-datepicker-nav-btn-radius);
         background: var(--ar-datepicker-nav-btn-bg);
-        border: var(--ar-datepicker-nav-btn-border-width) solid
-            var(--ar-datepicker-nav-btn-border-color);
+        border-style: solid;
+        border-width: var(--ar-datepicker-nav-btn-border-width);
+        /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
+        border-color: var(--ar-datepicker-nav-btn-border-color, transparent);
         color: var(--ar-datepicker-nav-btn-color);
     }
 
@@ -99,8 +101,10 @@ export default css`
         padding: var(--ar-datepicker-footer-btn-padding);
         border-radius: var(--ar-datepicker-footer-btn-radius);
         background: var(--ar-datepicker-footer-btn-bg);
-        border: var(--ar-datepicker-footer-btn-border-width) solid
-            var(--ar-datepicker-footer-btn-border-color);
+        border-style: solid;
+        border-width: var(--ar-datepicker-footer-btn-border-width);
+        /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
+        border-color: var(--ar-datepicker-footer-btn-border-color, transparent);
         color: var(--ar-datepicker-footer-btn-color);
     }
 
@@ -182,7 +186,7 @@ export default css`
             var(--ar-datepicker-day-focus-ring-width, 2px)
             var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
-        border-color: var(--ar-color-bg);
+        border-color: var(--ar-panel-bg);
     }
 
     [part='grid']:focus-within [part='day'][tabindex='0']:not(.selected) {
