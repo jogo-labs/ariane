@@ -46,9 +46,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-gap - Espacement vertical entre le label, le champ et l'indice.
  * @cssprop --ar-datepicker-label-gap - Marge sous le label (combinée à `--ar-datepicker-gap` via `calc()`).
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
- * @cssprop --ar-datepicker-panel-width - Largeur du popover.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
- * @cssprop --ar-datepicker-panel-padding - Padding interne du popover (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.

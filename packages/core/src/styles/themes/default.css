@@ -545,13 +545,11 @@
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
         --ar-datepicker-error-color: var(--ar-color-danger-text);
 
-        --ar-datepicker-panel-width: 20rem;
-        /* Valeurs propres, volontairement non cascadées depuis --ar-panel-max-width/--ar-panel-padding
-           (bloc partagé dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours
-           nécessité une taille plus généreuse (25rem/1rem) que la valeur par défaut partagée
-           (18rem/0.25rem) — même précédent que --ar-dropdown-min-width. */
+        /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
+           dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
+           taille plus généreuse (25rem) que la valeur par défaut partagée (18rem) — même
+           précédent que --ar-dropdown-min-width. */
         --ar-datepicker-panel-max-width: 25rem;
-        --ar-datepicker-panel-padding: 1rem;
 
         --ar-datepicker-nav-btn-border-color: transparent;
         --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
@@ -705,6 +703,11 @@
 
             --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
         }
+    }
+
+    ar-datepicker::part(panel) {
+        width: 20rem;
+        padding: 1rem;
     }
 
     ar-datepicker::part(nav-btn) {

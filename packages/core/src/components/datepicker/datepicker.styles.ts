@@ -39,10 +39,8 @@ export default css`
     }
 
     [part='panel'] {
-        width: var(--ar-datepicker-panel-width);
         /* a11y-fallback: évite que la grille de ~35 jours s'étale sur toute la largeur de la page sans thème chargé */
         max-width: var(--ar-datepicker-panel-max-width, 25rem);
-        padding: var(--ar-datepicker-panel-padding);
     }
 
     [part='header'] {
