@@ -104,6 +104,23 @@ Classification complète des 58 tokens actuels, par branche :
 **Total : 23 tokens conservés** (15+2+1+1+4) sur 58, soit une réduction d'environ **60%** de
 la surface de tokens `:root` d'`ar-datepicker`.
 
+> **Correction post-implémentation (revue finale de la PR de migration) :** cette
+> classification initiale n'anticipait pas une contrainte technique supplémentaire, trouvée et
+> vérifiée empiriquement (Chromium réel, via Playwright) en revue finale : **une règle
+> `::part()` déclarée dans le thème (feuille de style externe) l'emporte sur une règle interne
+> au shadow DOM du composant ciblant la même propriété, même quand la règle interne a une
+> spécificité CSS plus élevée.** `--ar-datepicker-day-color` et `--ar-datepicker-day-bg`
+> avaient été classés candidats branche 4 (cf. `::part(day)` ci-dessous) — à tort, car les
+> règles d'état internes du composant (`.today`, `.selected`, `:hover`, `.other-month`)
+> surchargent ces deux propriétés par classe CSS, un mécanisme que `::part()` ne peut pas
+> reproduire depuis l'extérieur (pas de chaînage de classe après `::part()`). Les migrer aurait
+> rendu les jours sélectionné/actif/survolé indiscernables des autres — régression WCAG.
+> **Ces deux tokens ont été réintroduits** : le total réel est donc **25 tokens conservés**
+> (33 migrés, pas 35). Détail : `ADR-005`, amendement du 2026-07-24 (section mise à jour).
+> Nouvelle contrainte ajoutée au critère : une propriété surchargée par une règle d'état
+> interne au composant (classe) doit rester un token consommé dans le composant, jamais migrée
+> en `::part()` du thème.
+
 ### Nouvelles règles `::part()` à créer dans `default.css`
 
 Regroupement des 34 tokens confirmés par part, dans le même style que le bloc
@@ -122,10 +139,13 @@ Regroupement des 34 tokens confirmés par part, dans le même style que le bloc
   aujourd'hui **aucun** attribut `part` ; un sélecteur de thème ne peut pas traverser la
   frontière du shadow DOM sans `::part()`, donc un `part="weekday"` doit être ajouté sur le
   `<th>` dans `datepicker.ts`)_ : `color`, `font-size`.
-- **`ar-datepicker::part(day)`** : `background`, `font-size`, `color`, `border-radius`.
-  `border-width`/`border-color` restent pilotés par les tokens conservés (branche 1, cutout
-  de focus). Les propriétés spécifiques à l'état « aujourd'hui »
-  (`day-today-bg`/`day-today-color`) restent des tokens, cf. contrainte dark-mode ci-dessus.
+- **`ar-datepicker::part(day)`** : `font-size`, `border-radius`. `border-width`/`border-color`
+  restent pilotés par les tokens conservés (branche 1, cutout de focus). `color` et
+  `background-color` restent **également** des tokens (`--ar-datepicker-day-color`/`-day-bg`)
+  — cf. correction post-implémentation ci-dessus, ces propriétés sont surchargées par les
+  règles d'état internes du composant. Les propriétés spécifiques à l'état « aujourd'hui »
+  (`day-today-bg`/`day-today-color`) restent aussi des tokens, cf. contrainte dark-mode
+  ci-dessus.
 - **`ar-datepicker::part(panel)`** : `width`, `padding`. `max-width` reste piloté par le
   token conservé (branche 1, fallback WCAG 25rem).
 - **`ar-datepicker::part(label)`** _(règle existante, amendée)_ : `margin-bottom` calculé
@@ -137,8 +157,9 @@ restent inchangés.
 
 ### JSDoc / `@cssprop`
 
-`datepicker.ts` perd les entrées `@cssprop` des 34 tokens retirés (+ `label-gap`, 35 au
-total). Les 23 tokens conservés gardent leur entrée. Aucune régression de couverture
+`datepicker.ts` perd les entrées `@cssprop` des 32 tokens retirés (+ `label-gap`, 33 au
+total — `day-color`/`day-bg` réintroduits en revue finale, cf. correction post-implémentation
+plus haut). Les 25 tokens conservés gardent leur entrée. Aucune régression de couverture
 attendue : `validate-cssprop-defaults.js` ne vérifie qu'une seule direction (tout token
 présent dans `default.css` doit avoir une entrée `@cssprop`) — retirer les deux en même temps
 est sans risque pour `npm run build:manifest`.
@@ -155,7 +176,7 @@ dépendant des tokens candidats à la suppression (`grep` sur `datepicker.*.test
 
 ## Breaking change (assumé, alpha)
 
-Même précédent que PR #136 : un consommateur qui surchargeait un des 35 tokens retirés
+Même précédent que PR #136 : un consommateur qui surchargeait un des 33 tokens retirés
 (ex. `--ar-datepicker-nav-btn-radius`) doit migrer vers une règle `::part()` directe
 (`ar-datepicker::part(nav-btn) { border-radius: ... }`) — mécanisme déjà disponible
 aujourd'hui même pour les composants qui exposent un token (`::part()` n'a jamais été
