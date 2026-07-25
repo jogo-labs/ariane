@@ -369,7 +369,6 @@
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
         --ar-stepper-bullet-radius: 0.75rem;
-        --ar-stepper-trigger-radius: 0.75rem;
         --ar-stepper-link-focus-radius: 0.125rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
@@ -397,8 +396,6 @@
            le panel disclosure du stepper a toujours eu un padding plus généreux que le
            défaut partagé (0.25rem) — même logique que --ar-dropdown-min-width. */
         --ar-stepper-panel-padding: 0.75rem;
-        --ar-stepper-trigger-bg: var(--ar-button-secondary-bg);
-        --ar-stepper-trigger-bg-hover: var(--ar-button-secondary-bg-hover);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -860,6 +857,17 @@
             font-size: 1rem;
             border-radius: 0.5rem;
             border-width: 2px;
+        }
+    }
+
+    ar-stepper {
+        &::part(trigger) {
+            border-radius: 0.75rem;
+            background-color: var(--ar-button-secondary-bg);
+        }
+
+        &::part(trigger):hover {
+            background-color: var(--ar-button-secondary-bg-hover);
         }
     }
 }

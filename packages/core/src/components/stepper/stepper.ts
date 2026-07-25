@@ -76,9 +76,6 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-active-label-color - Couleur du label de l'étape active.
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
- * @cssprop --ar-stepper-trigger-bg - Fond du bouton trigger mobile.
- * @cssprop --ar-stepper-trigger-bg-hover - Fond du bouton trigger mobile au survol.
- * @cssprop --ar-stepper-trigger-radius - Border-radius du bouton trigger mobile.
  * @cssprop --ar-stepper-link-hover-bullet-color - Couleur de la puce du lien d'étape au survol/focus (cascade vers --ar-color-interactive).
  * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).

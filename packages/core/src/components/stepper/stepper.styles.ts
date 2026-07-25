@@ -25,20 +25,9 @@ export default css`
 
     [part='trigger'] {
         padding: 0.5rem 0.75rem;
-        border-radius: var(--ar-stepper-trigger-radius);
         justify-content: space-between;
         line-height: normal;
         text-align: left;
-    }
-
-    /* Tokens scopés au composant — .btn + [part='trigger'] pour dépasser
-     * .btn-secondary dans button.styles.ts, indépendamment de l'ordre des styles. */
-    [part='trigger'].btn.btn-secondary {
-        background-color: var(--ar-stepper-trigger-bg);
-    }
-
-    [part='trigger'].btn.btn-secondary:hover {
-        background-color: var(--ar-stepper-trigger-bg-hover);
     }
 
     [part='panel'] {
