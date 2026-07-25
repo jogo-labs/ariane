@@ -59,6 +59,54 @@ describe('ArStepper', () => {
             `);
             expect(shadow(el).querySelector('[part="nav"]')).not.toBeNull();
         });
+
+        it('rend part="list" sur la liste des étapes', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(shadow(el).querySelector('ol.stepper-list[part="list"]')).not.toBeNull();
+        });
+
+        it('rend part="step" sur un item de premier niveau et part="substep" sur une sous-étape', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a/1">
+                    <ar-stepper-item path="/a" label="Étape A">
+                        <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                        <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                    </ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const topLevel = shadow(el).querySelectorAll('ol.stepper-list > li[part="step"]');
+            expect(topLevel.length).toBeGreaterThan(0);
+            const nested = shadow(el).querySelectorAll('ol.stepper-list li[part="substep"]');
+            expect(nested.length).toBe(2);
+        });
+
+        it('rend part="step-link" sur le lien d\'une étape complétée, jamais sur une étape non cliquable', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const link = shadow(el).querySelector('a.stepper-link');
+            expect(link?.getAttribute('part')).toBe('step-link');
+            const currentItemInner = shadow(el).querySelector('li.active > .stepper-item-inner');
+            expect(currentItemInner?.hasAttribute('part')).toBe(false);
+        });
+
+        it('rend part="bullet" sur la puce de chaque étape', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(shadow(el).querySelector('.stepper-item-bullet[part="bullet"]')).not.toBeNull();
+        });
     });
 
     // ── Propriétés ────────────────────────────────────────────────────────────

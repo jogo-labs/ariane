@@ -32,7 +32,7 @@ function isGroupActive(node: NavigationNode, mode: NavigationMode): boolean {
 
 function renderStepText(label: string, order: number, isSubstep = false): TemplateResult {
     return html`
-        <span class="stepper-item-bullet" aria-hidden="true"></span>
+        <span class="stepper-item-bullet" part="bullet" aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
         <span class="stepper-item-label">${label}</span>
     `;
@@ -56,12 +56,14 @@ function renderSubStep(
     return html`
         <li
             class="stepper-item${isActive ? ' active' : ''}"
+            part="substep"
             aria-current=${isActive ? 'step' : nothing}
         >
             ${isCompleted || isEditMode
                 ? html`
                       <a
                           class="stepper-item-inner stepper-link"
+                          part="step-link"
                           data-substep-order=${order}
                           data-path=${sub.path}
                           href=${sub.href ?? '#'}
@@ -87,19 +89,22 @@ function renderStep(
 ): TemplateResult {
     const order = index + 1;
     const active = isGroupActive(step, mode);
+    const isCurrent = step.state === 'current';
     // Un parent complété dont le groupe est actif ne doit pas être rendu comme lien
     const isCompleted =
         (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !active);
 
     return html`
         <li
-            class="stepper-item${active ? ' active' : ''}"
-            aria-current=${active ? 'step' : nothing}
+            class="stepper-item${isCurrent ? ' active' : ''}"
+            part="step"
+            aria-current=${isCurrent ? 'step' : nothing}
         >
             ${isCompleted
                 ? html`
                       <a
                           class="stepper-item-inner stepper-link"
+                          part="step-link"
                           data-path=${step.path}
                           href=${step.href ?? '#'}
                           @click=${onClickLink}
@@ -132,7 +137,7 @@ function renderStepList(
     onClickLink: (e: MouseEvent) => void,
 ): TemplateResult {
     return html`
-        <ol class="stepper-list list-unstyled ${cssClass}">
+        <ol class="stepper-list list-unstyled ${cssClass}" part="list">
             ${repeat(
                 steps,
                 (step) => step.path,
