@@ -369,13 +369,10 @@
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
         --ar-stepper-bullet-radius: 0.75rem;
-        --ar-stepper-link-focus-radius: 0.125rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
-        --ar-stepper-link-color: var(--ar-color-interactive);
-        --ar-stepper-link-hover-color: var(--ar-color-text-muted);
         --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
@@ -868,6 +865,19 @@
             max-width: var(--ar-panel-max-width);
             border-radius: var(--ar-panel-radius);
             box-shadow: var(--ar-panel-shadow);
+        }
+
+        &::part(step-link) {
+            color: var(--ar-color-interactive);
+        }
+
+        &::part(step-link):hover,
+        &::part(step-link):focus {
+            color: var(--ar-color-text-muted);
+        }
+
+        &::part(step-link):focus {
+            border-radius: 0.125rem;
         }
     }
 }

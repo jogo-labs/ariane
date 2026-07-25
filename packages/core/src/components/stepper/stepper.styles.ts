@@ -76,17 +76,11 @@ export default css`
     }
 
     .stepper-item .stepper-link {
-        color: var(--ar-stepper-link-color);
         text-decoration: none;
     }
 
     .stepper-item .stepper-link .stepper-item-label {
         text-decoration: underline;
-    }
-
-    .stepper-item .stepper-link:focus,
-    .stepper-item .stepper-link:hover {
-        color: var(--ar-stepper-link-hover-color);
     }
 
     .stepper-item .stepper-link:focus:before,
@@ -110,7 +104,6 @@ export default css`
     .stepper-item .stepper-link:focus {
         outline-offset: 4px;
         outline-color: var(--ar-stepper-link-focus-outline-color);
-        border-radius: var(--ar-stepper-link-focus-radius);
     }
 
     .stepper-item.active > .stepper-item-inner {
