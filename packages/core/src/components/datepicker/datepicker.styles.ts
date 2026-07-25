@@ -109,6 +109,8 @@ export default css`
         justify-content: center;
         margin: auto;
         cursor: pointer;
+        color: var(--ar-datepicker-day-color);
+        background-color: var(--ar-datepicker-day-bg);
         border-style: solid;
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui casse la surcharge border-color de .today ci-dessous */
         border-color: var(--ar-datepicker-day-border-color, transparent);

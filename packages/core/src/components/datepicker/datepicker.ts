@@ -52,6 +52,8 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
  * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (préserve l'absence de bordure voulue par défaut ; sans ce repli, une propriété longhand `border-color` isolée dégraderait vers `currentcolor`, une bordure non désirée sur chaque cellule).
+ * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
+ * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
  * @cssprop --ar-datepicker-day-other-month-color - Couleur des jours hors du mois affiché. Repli `GrayText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-today-bg - Fond du jour actuel.
  * @cssprop --ar-datepicker-day-today-color - Couleur texte du jour actuel.

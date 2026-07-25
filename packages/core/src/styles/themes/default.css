@@ -571,6 +571,8 @@
         --ar-datepicker-day-focus-ring-width: 2px;
         --ar-datepicker-day-focus-ring-offset: 0;
         --ar-datepicker-day-border-color: transparent;
+        --ar-datepicker-day-color: var(--ar-color-text);
+        --ar-datepicker-day-bg: transparent;
 
         --ar-datepicker-day-selected-bg: var(--ar-color-primary-40);
         --ar-datepicker-day-selected-color: var(--ar-color-white);
@@ -856,9 +858,7 @@
 
         &::part(day) {
             font-size: 1rem;
-            color: var(--ar-color-text);
             border-radius: 0.5rem;
-            background-color: transparent;
             border-width: 2px;
         }
     }
