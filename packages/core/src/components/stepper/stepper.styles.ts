@@ -127,32 +127,39 @@ export default css`
         background-repeat: repeat-y;
     }
 
-    .stepper-list .stepper-list .stepper-item:after {
-        content: none;
-    }
+    .stepper-list .stepper-list {
+        .stepper-item {
+            &:after {
+                content: none;
+            }
 
-    .stepper-list .stepper-list .stepper-item:before {
-        content: '';
-        display: block;
-        width: 2.25rem;
-        height: var(--ar-stepper-substep-gap);
-        background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
-        background-size: 2px 8px;
-        background-position: center 4px;
-        background-repeat: repeat-y;
-    }
+            &:before {
+                content: '';
+                display: block;
+                width: 2.25rem;
+                height: var(--ar-stepper-substep-gap);
+                background-image: linear-gradient(
+                    var(--ar-stepper-connector-color) 25%,
+                    transparent 0
+                );
+                background-size: 2px 8px;
+                background-position: center 4px;
+                background-repeat: repeat-y;
+            }
+        }
 
-    .stepper-list .stepper-list .stepper-item-bullet {
-        width: 0.75rem;
-        height: 0.75rem;
-        margin-left: 0.75rem;
-        margin-right: 1.25rem;
-        display: block;
-        padding-bottom: 0;
-    }
+        .stepper-item-bullet {
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-left: 0.75rem;
+            margin-right: 1.25rem;
+            display: block;
+            padding-bottom: 0;
 
-    .stepper-list .stepper-list .stepper-item-bullet:before {
-        content: '';
+            &:before {
+                content: '';
+            }
+        }
     }
 
     @media (min-width: 992px) {
@@ -162,29 +169,31 @@ export default css`
         }
     }
 
-    :host([align='right']) .stepper-desktop .stepper-item {
-        align-items: flex-end;
-        text-align: right;
-    }
+    :host([align='right']) .stepper-desktop {
+        .stepper-item {
+            align-items: flex-end;
+            text-align: right;
 
-    :host([align='right']) .stepper-desktop .stepper-item::after {
-        margin-left: auto;
-    }
+            &::after {
+                margin-left: auto;
+            }
+        }
 
-    :host([align='right']) .stepper-desktop .stepper-item-inner {
-        justify-content: flex-end;
-        margin-left: auto;
-        text-align: right;
-    }
+        .stepper-item-inner {
+            justify-content: flex-end;
+            margin-left: auto;
+            text-align: right;
+        }
 
-    :host([align='right']) .stepper-desktop .stepper-item-bullet {
-        order: 2;
-        margin-right: 0;
-        margin-left: 0.5rem;
-    }
+        .stepper-item-bullet {
+            order: 2;
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
 
-    :host([align='right']) .stepper-desktop .stepper-list .stepper-item-bullet {
-        margin-left: 1.25rem;
-        margin-right: 0.75rem;
+        .stepper-list .stepper-item-bullet {
+            margin-left: 1.25rem;
+            margin-right: 0.75rem;
+        }
     }
 `;
