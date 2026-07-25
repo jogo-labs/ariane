@@ -386,16 +386,8 @@
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
-        --ar-stepper-panel-min-width: var(--ar-panel-min-width);
-        --ar-stepper-panel-max-width: var(--ar-panel-max-width);
         --ar-stepper-panel-bg: var(--ar-panel-bg);
         --ar-stepper-panel-border-color: var(--ar-panel-border-color);
-        --ar-stepper-panel-border-radius: var(--ar-panel-radius);
-        --ar-stepper-panel-shadow: var(--ar-panel-shadow);
-        /* Valeur propre (0.75rem), volontairement non cascadée depuis --ar-panel-padding :
-           le panel disclosure du stepper a toujours eu un padding plus généreux que le
-           défaut partagé (0.25rem) — même logique que --ar-dropdown-min-width. */
-        --ar-stepper-panel-padding: 0.75rem;
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -868,6 +860,14 @@
 
         &::part(trigger):hover {
             background-color: var(--ar-button-secondary-bg-hover);
+        }
+
+        &::part(panel) {
+            padding: 0.75rem;
+            min-width: var(--ar-panel-min-width);
+            max-width: var(--ar-panel-max-width);
+            border-radius: var(--ar-panel-radius);
+            box-shadow: var(--ar-panel-shadow);
         }
     }
 }

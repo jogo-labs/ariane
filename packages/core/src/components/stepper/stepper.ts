@@ -52,13 +52,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop --ar-stepper-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop --ar-stepper-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  * @cssprop --ar-stepper-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
  * @cssprop --ar-stepper-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
- * @cssprop --ar-stepper-panel-border-radius - Border-radius du panel mobile (cascade vers --ar-panel-radius).
- * @cssprop --ar-stepper-panel-shadow - Ombre portée du panel mobile (cascade vers --ar-panel-shadow).
- * @cssprop --ar-stepper-panel-padding - Padding interne du panel mobile (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
  * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
  * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.

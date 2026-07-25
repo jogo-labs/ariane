@@ -31,13 +31,8 @@ export default css`
     }
 
     [part='panel'] {
-        padding: var(--ar-stepper-panel-padding);
-        min-width: var(--ar-stepper-panel-min-width);
-        max-width: var(--ar-stepper-panel-max-width);
         background-color: var(--ar-stepper-panel-bg, Canvas);
         border-color: var(--ar-stepper-panel-border-color, ButtonBorder);
-        border-radius: var(--ar-stepper-panel-border-radius);
-        box-shadow: var(--ar-stepper-panel-shadow);
     }
 
     .stepper-list {
