@@ -540,7 +540,6 @@
         --ar-datepicker-distance: var(--ar-anchor-distance);
         --ar-datepicker-offset: var(--ar-anchor-offset);
         --ar-datepicker-gap: 0.35rem;
-        --ar-datepicker-label-gap: 0.5rem;
         /* --ar-color-danger-text (pas red-50 directement) : même convention que
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
         --ar-datepicker-error-color: var(--ar-color-danger-text);
@@ -770,7 +769,7 @@
         font-size: var(--ar-font-size-sm);
         font-weight: var(--ar-font-weight-medium);
         color: var(--ar-color-text);
-        margin-bottom: calc(var(--ar-datepicker-label-gap) - var(--ar-datepicker-gap));
+        margin-bottom: calc(0.5rem - var(--ar-datepicker-gap));
     }
 
     ar-datepicker::part(hint) {
