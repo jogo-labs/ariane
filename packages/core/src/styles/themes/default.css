@@ -368,7 +368,6 @@
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
-        --ar-stepper-bullet-radius: 0.75rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
@@ -878,6 +877,10 @@
 
         &::part(step-link):focus {
             border-radius: 0.125rem;
+        }
+
+        &::part(bullet) {
+            border-radius: 0.75rem;
         }
     }
 }

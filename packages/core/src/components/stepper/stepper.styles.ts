@@ -56,7 +56,6 @@ export default css`
         display: flex;
         flex-shrink: 0;
         justify-content: center;
-        border-radius: var(--ar-stepper-bullet-radius);
         padding-bottom: 0.125rem;
         margin-right: 0.5rem;
         transform: translateY(1px);
