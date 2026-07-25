@@ -89,16 +89,15 @@ function renderStep(
 ): TemplateResult {
     const order = index + 1;
     const active = isGroupActive(step, mode);
-    const isCurrent = step.state === 'current';
     // Un parent complété dont le groupe est actif ne doit pas être rendu comme lien
     const isCompleted =
         (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !active);
 
     return html`
         <li
-            class="stepper-item${isCurrent ? ' active' : ''}"
+            class="stepper-item${active ? ' active' : ''}"
             part="step"
-            aria-current=${isCurrent ? 'step' : nothing}
+            aria-current=${active ? 'step' : nothing}
         >
             ${isCompleted
                 ? html`

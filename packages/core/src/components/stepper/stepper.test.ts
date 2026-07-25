@@ -95,7 +95,7 @@ describe('ArStepper', () => {
             `);
             const link = shadow(el).querySelector('a.stepper-link');
             expect(link?.getAttribute('part')).toBe('step-link');
-            const currentItemInner = shadow(el).querySelector('li.active > .stepper-item-inner');
+            const currentItemInner = shadow(el).querySelector('div.stepper-item-inner');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });
 
