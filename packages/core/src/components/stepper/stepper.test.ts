@@ -84,7 +84,7 @@ describe('ArStepper', () => {
             expect(topLevel.length).toBeGreaterThan(0);
             const nested = shadow(el).querySelectorAll('ol.stepper-list li[part="substep"]');
             expect(nested.length).toBe(2);
-            // Vérify la sous-liste imbriquée a aussi part="list"
+            // Vérifie que la sous-liste imbriquée a aussi part="list"
             const nestedList = shadow(el).querySelector(
                 'li[part="step"] > ol.stepper-list[part="list"]',
             );
