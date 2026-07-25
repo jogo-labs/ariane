@@ -33,6 +33,7 @@ import { warn } from '../../utils/warn.js';
  * @csspart next-month - Bouton mois suivant.
  * @csspart next-year  - Bouton année suivante.
  * @csspart grid       - La grille calendrier.
+ * @csspart weekday    - Les cellules d'en-tête de colonne (abréviations de jours).
  * @csspart label      - L'élément label.
  * @csspart hint       - Le texte d'aide sous l'input.
  * @csspart error      - Le message d'erreur sous l'input.
@@ -43,46 +44,16 @@ import { warn } from '../../utils/warn.js';
  * @csspart close-btn  - Bouton « Fermer ».
  *
  * @cssprop --ar-datepicker-gap - Espacement vertical entre le label, le champ et l'indice.
- * @cssprop --ar-datepicker-label-gap - Marge sous le label (combinée à `--ar-datepicker-gap` via `calc()`).
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
- * @cssprop --ar-datepicker-panel-width - Largeur du popover.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
- * @cssprop --ar-datepicker-panel-padding - Padding interne du popover (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
- * @cssprop --ar-datepicker-header-font-size - Taille de police de l'en-tête.
- * @cssprop --ar-datepicker-header-padding - Padding de l'en-tête.
- * @cssprop --ar-datepicker-header-margin - Margin de l'en-tête.
- * @cssprop --ar-datepicker-header-radius - Border-radius de l'en-tête.
- * @cssprop --ar-datepicker-header-bg - Fond de l'en-tête.
- * @cssprop --ar-datepicker-nav-btn-size - Taille (width = height) des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-bg - Fond des boutons de navigation.
- * @cssprop --ar-datepicker-nav-btn-border-width - Épaisseur de bordure des boutons nav.
  * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-color - Couleur texte des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-radius - Border-radius des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-hover-bg - Fond au survol des boutons nav.
- * @cssprop --ar-datepicker-nav-btn-active-bg - Fond à l'état actif des boutons nav.
- * @cssprop --ar-datepicker-footer-padding - Padding du footer.
- * @cssprop --ar-datepicker-footer-bg - Fond du footer.
- * @cssprop --ar-datepicker-footer-margin - Margin du footer.
- * @cssprop --ar-datepicker-footer-btn-bg - Fond des boutons du footer.
- * @cssprop --ar-datepicker-footer-btn-border-width - Épaisseur de bordure des boutons footer.
  * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-color - Couleur texte des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-radius - Border-radius des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-padding - Padding des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-hover-bg - Fond au survol des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-hover-border-color - Couleur de bordure au survol des boutons footer.
- * @cssprop --ar-datepicker-footer-btn-active-bg - Fond à l'état actif des boutons footer.
- * @cssprop --ar-datepicker-weekday-color - Couleur des abréviations de jours.
- * @cssprop --ar-datepicker-weekday-font-size - Taille de police des abréviations de jours.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
- * @cssprop --ar-datepicker-day-font-size - Taille de police des jours.
- * @cssprop --ar-datepicker-day-radius - Border-radius des cellules jour.
- * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
- * @cssprop --ar-datepicker-day-border-width - Épaisseur de bordure des cellules jour.
  * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (préserve l'absence de bordure voulue par défaut ; sans ce repli, une propriété longhand `border-color` isolée dégraderait vers `currentcolor`, une bordure non désirée sur chaque cellule).
+ * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
+ * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
  * @cssprop --ar-datepicker-day-other-month-color - Couleur des jours hors du mois affiché. Repli `GrayText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-today-bg - Fond du jour actuel.
  * @cssprop --ar-datepicker-day-today-color - Couleur texte du jour actuel.
@@ -96,10 +67,7 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-nav-btn-focus-ring-offset - Décalage de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-offset).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-footer-btn-focus-ring-offset - Décalage de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-offset).
- * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
  * @cssprop --ar-panel-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Le popover pilote son fond réel via ce token (panelStyles) ; référencer --ar-color-bg directement casserait ce cutout pour un consommateur ne surchargeant que --ar-panel-bg.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
@@ -377,7 +345,9 @@ export class ArDatepicker extends LitElement {
                     <tr>
                         ${dayNames.map(
                             ({ abbr, full }) =>
-                                html`<th aria-label=${full} scope="col">${abbr}</th>`,
+                                html`<th part="weekday" aria-label=${full} scope="col">
+                                    ${abbr}
+                                </th>`,
                         )}
                     </tr>
                 </thead>

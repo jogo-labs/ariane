@@ -97,3 +97,56 @@ et les états de la grille `ar-datepicker`.
 
 Détail complet du raisonnement, du périmètre et des tokens concernés :
 `docs/superpowers/specs/2026-07-22-css-fallback-accessibilite-design.md`.
+
+## Amendement (2026-07-24) : critère token scopé vs `::part()`
+
+La généralisation du scoping systématique (issue #129, PR #136) a produit un volume de
+tokens à usage unique difficile à justifier — `ar-datepicker` déclarait 58 tokens `:root`
+dont 65% consommés à un seul endroit. Une variable n'est vraiment utile que si elle est
+réutilisable ; `::part()` offre déjà un point de surcharge gratuit pour toute propriété d'un
+élément interne, sans nécessiter de token dédié.
+
+**Critère retenu**, à appliquer dans l'ordre pour toute propriété CSS consommée via un token
+scopé :
+
+1. Mécanisme WCAG/fonctionnel critique sans thème (fallback déjà requis par l'amendement du
+   2026-07-22) → reste un token, avec son fallback.
+2. Lu en JavaScript (`getComputedStyle`, ex. `AnchoredController`) → reste un token `:root`,
+   `::part()` n'est pas lisible en JS.
+3. Réutilisé ≥ 2 fois dans le `.styles.ts` du composant (vraie valeur DRY) → reste un token.
+4. Sinon (usage unique, propriété d'un élément interne portant un `part`, pas de fallback
+   critique) → la propriété n'est pas déclarée dans le composant ; `default.css` la stylise
+   directement via une règle `::part()`, sans token scopé intermédiaire ni `@cssprop` dédié.
+
+Un token consommé **uniquement** par la propre règle `::part()` de `default.css` (jamais par
+le composant) n'est pas une vraie surface d'API — repli direct sur une valeur littérale dans
+la règle, pas de token `:root`.
+
+**Trois contraintes techniques** limitent la branche 4 : `::part()` ne peut cibler que des
+éléments portant un `part` (jamais `:host`) — une propriété sur `:host` reste nécessairement
+un token quel que soit son usage. Une **valeur dark-mode calibrée indépendamment de son alias
+clair** (pas une simple variance héritée) prime aussi sur le critère « usage unique » — un tel
+token reste en place plutôt que d'être aplati en valeur littérale dans une règle `::part()`,
+ce qui perdrait sa calibration sans dupliquer la règle sous un bloc dark. Enfin, **une
+propriété qu'une règle interne au shadow DOM du composant doit pouvoir surcharger selon un
+état** (classe posée par le composant — `.today`, `.selected`, `:hover`…) doit rester un
+token consommé à l'intérieur du composant, jamais migrée dans une règle `::part()` du thème :
+vérifié empiriquement (Chromium réel, via Playwright) qu'une règle `::part()` déclarée dans la
+feuille de style _externe_ (le thème) l'emporte sur une règle interne au shadow DOM ciblant la
+même propriété, **même quand la règle interne a une spécificité CSS plus élevée**. Concrètement
+sur `ar-datepicker` : `color`/`background-color` de `[part='day']` ont dû rester des tokens
+(`--ar-datepicker-day-color`, `--ar-datepicker-day-bg`) car les règles d'état internes
+(`.today`, `.selected`, `:hover`, `.other-month`) les surchargent — les migrer dans
+`::part(day)` aurait rendu les jours sélectionné/actif/survolé indiscernables des autres
+(régression WCAG), trouvé et corrigé en revue finale de la PR de migration. `font-size`,
+`border-radius` et `border-width` de `[part='day']` n'ont pas ce problème (aucune règle
+interne ne les surcharge) et sont bien restés dans `::part(day)`.
+
+**Application** : `ar-datepicker` (cas d'étude), 33 tokens sur 58 migrés vers 8 nouvelles
+règles `::part()` groupées (`nav-btn`, `footer-btn`, `header`, `footer`, `weekday` — nouveau
+part créé pour l'occasion —, `day`, `panel`, `label` amendée). 25 tokens conservés (23 issus
+du critère initial + 2 réintroduits pour la contrainte de cascade `::part()` ci-dessus).
+Détail complet : `docs/superpowers/specs/2026-07-24-token-vs-part-datepicker-design.md`. Les 5
+autres composants scopés par PR #136 n'ont pas été réaudités sous cet angle — périmètre
+volontairement limité au cas d'étude, à généraliser dans un chantier séparé si le critère
+fait ses preuves.

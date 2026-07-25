@@ -540,74 +540,25 @@
         --ar-datepicker-distance: var(--ar-anchor-distance);
         --ar-datepicker-offset: var(--ar-anchor-offset);
         --ar-datepicker-gap: 0.35rem;
-        --ar-datepicker-label-gap: 0.5rem;
         /* --ar-color-danger-text (pas red-50 directement) : même convention que
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
         --ar-datepicker-error-color: var(--ar-color-danger-text);
 
-        --ar-datepicker-panel-width: 20rem;
-        /* Valeurs propres, volontairement non cascadées depuis --ar-panel-max-width/--ar-panel-padding
-           (bloc partagé dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours
-           nécessité une taille plus généreuse (25rem/1rem) que la valeur par défaut partagée
-           (18rem/0.25rem) — même précédent que --ar-dropdown-min-width. */
+        /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
+           dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
+           taille plus généreuse (25rem) que la valeur par défaut partagée (18rem) — même
+           précédent que --ar-dropdown-min-width. */
         --ar-datepicker-panel-max-width: 25rem;
-        --ar-datepicker-panel-padding: 1rem;
 
-        --ar-datepicker-header-font-size: 1rem;
-        --ar-datepicker-header-margin: 0;
-        --ar-datepicker-header-padding: 0 0 0.75rem;
-        --ar-datepicker-header-radius: 0;
-        --ar-datepicker-header-bg: transparent;
-
-        --ar-datepicker-nav-btn-size: 2rem;
-        --ar-datepicker-nav-btn-bg: transparent;
-        --ar-datepicker-nav-btn-border-width: 0px;
         --ar-datepicker-nav-btn-border-color: transparent;
-        --ar-datepicker-nav-btn-color: var(--ar-color-text);
-        --ar-datepicker-nav-btn-radius: var(--ar-border-radius-sm);
-        --ar-datepicker-nav-btn-hover-bg: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
-        --ar-datepicker-nav-btn-active-bg: color-mix(
-            in srgb,
-            var(--ar-color-text) 14%,
-            transparent
-        );
         --ar-datepicker-nav-btn-focus-ring-color: var(--ar-focus-ring-color);
-        --ar-datepicker-nav-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
-        --ar-datepicker-footer-margin: 0;
-        --ar-datepicker-footer-padding: 0.75rem 0 0;
-        --ar-datepicker-footer-bg: transparent;
-
-        --ar-datepicker-footer-btn-bg: transparent;
-        --ar-datepicker-footer-btn-border-width: 1px;
         --ar-datepicker-footer-btn-border-color: var(--ar-color-border);
-        --ar-datepicker-footer-btn-color: var(--ar-color-interactive);
-        --ar-datepicker-footer-btn-radius: var(--ar-border-radius-md);
-        --ar-datepicker-footer-btn-padding: 0.375rem 0.75rem;
-        --ar-datepicker-footer-btn-hover-bg: color-mix(
-            in srgb,
-            var(--ar-color-interactive) 10%,
-            transparent
-        );
-        --ar-datepicker-footer-btn-hover-border-color: var(--ar-color-interactive);
-        --ar-datepicker-footer-btn-active-bg: color-mix(
-            in srgb,
-            var(--ar-color-interactive) 18%,
-            transparent
-        );
         --ar-datepicker-footer-btn-focus-ring-color: var(--ar-focus-ring-color);
-        --ar-datepicker-footer-btn-focus-ring-offset: var(--ar-focus-ring-offset);
 
-        /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
-        --ar-datepicker-weekday-color: var(--ar-color-neutral-50);
-        --ar-datepicker-weekday-font-size: 0.75rem;
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
-        --ar-datepicker-day-font-size: 1rem;
-        --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-size: 2.5rem;
-        --ar-datepicker-day-radius: 0.5rem;
-        --ar-datepicker-day-bg: transparent;
 
         --ar-datepicker-day-today-color: var(--ar-color-primary-40);
         --ar-datepicker-day-today-border: var(--ar-color-primary-50);
@@ -619,8 +570,9 @@
         --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
         --ar-datepicker-day-focus-ring-width: 2px;
         --ar-datepicker-day-focus-ring-offset: 0;
-        --ar-datepicker-day-border-width: 2px;
         --ar-datepicker-day-border-color: transparent;
+        --ar-datepicker-day-color: var(--ar-color-text);
+        --ar-datepicker-day-bg: transparent;
 
         --ar-datepicker-day-selected-bg: var(--ar-color-primary-40);
         --ar-datepicker-day-selected-color: var(--ar-color-white);
@@ -754,85 +706,160 @@
         }
     }
 
-    ar-datepicker::part(label) {
-        font-size: var(--ar-font-size-sm);
-        font-weight: var(--ar-font-weight-medium);
-        color: var(--ar-color-text);
-        margin-bottom: calc(var(--ar-datepicker-label-gap) - var(--ar-datepicker-gap));
-    }
+    ar-datepicker {
+        &::part(panel) {
+            width: 20rem;
+            padding: 1rem;
+        }
 
-    ar-datepicker::part(hint) {
-        font-size: var(--ar-font-size-sm);
-        color: var(--ar-color-text-muted);
-    }
+        &::part(nav-btn) {
+            width: 2rem;
+            height: 2rem;
+            background: transparent;
+            border-width: 0px;
+            color: var(--ar-color-text);
+            border-radius: var(--ar-border-radius-sm);
+        }
 
-    ar-datepicker::part(error) {
-        font-size: var(--ar-font-size-sm);
-        color: var(--ar-datepicker-error-color);
-    }
+        &::part(nav-btn):hover {
+            background: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
+        }
 
-    ar-datepicker::part(input) {
-        height: var(--ar-button-height);
-        box-sizing: border-box;
-        padding: 0 0.75rem;
-        border: 1px solid var(--ar-color-border);
-        border-right: none;
-        border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
-        background: var(--ar-color-bg);
-        color: var(--ar-color-text);
-        font-size: var(--ar-font-size-md);
-        font-family: inherit;
-        outline: none;
-        transition: border-color 0.15s ease;
-    }
+        &::part(nav-btn):active {
+            background: color-mix(in srgb, var(--ar-color-text) 14%, transparent);
+        }
 
-    ar-datepicker::part(input):focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color);
-        outline-offset: var(--ar-focus-ring-offset);
-        border-color: var(--ar-color-interactive);
-    }
+        &::part(nav-btn):focus-visible {
+            outline-offset: var(--ar-focus-ring-offset);
+        }
 
-    ar-datepicker::part(input):read-only {
-        background: var(--ar-color-bg-subtle);
-        cursor: default;
-    }
+        &::part(footer-btn) {
+            background: transparent;
+            border-width: 1px;
+            color: var(--ar-color-interactive);
+            border-radius: var(--ar-border-radius-md);
+            padding: 0.375rem 0.75rem;
+        }
 
-    ar-datepicker::part(input):disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background: var(--ar-color-bg-subtle);
-    }
+        &::part(footer-btn):hover {
+            background: color-mix(in srgb, var(--ar-color-interactive) 10%, transparent);
+            border-color: var(--ar-color-interactive);
+        }
 
-    ar-datepicker::part(trigger) {
-        width: var(--ar-button-height);
-        height: var(--ar-button-height);
-        background: var(--ar-color-interactive);
-        color: var(--ar-color-text-inverse);
-        border: 1px solid var(--ar-color-interactive);
-        border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
-        cursor: pointer;
-        transition:
-            background 0.15s ease,
-            border-color 0.15s ease;
-    }
+        &::part(footer-btn):active {
+            background: color-mix(in srgb, var(--ar-color-interactive) 18%, transparent);
+        }
 
-    ar-datepicker::part(trigger):hover:not(:disabled) {
-        background: var(--ar-color-interactive-hover);
-        border-color: var(--ar-color-interactive-hover);
-    }
+        &::part(footer-btn):focus-visible {
+            outline-offset: var(--ar-focus-ring-offset);
+        }
 
-    ar-datepicker::part(trigger):active:not(:disabled) {
-        background: var(--ar-color-interactive-active);
-        border-color: var(--ar-color-interactive-active);
-    }
+        &::part(header) {
+            font-size: 1rem;
+            margin: 0;
+            padding: 0 0 0.75rem;
+            border-radius: 0;
+            background: transparent;
+        }
 
-    ar-datepicker::part(trigger):focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color);
-        outline-offset: var(--ar-focus-ring-offset);
-    }
+        &::part(footer) {
+            margin: 0;
+            padding: 0.75rem 0 0;
+            background: transparent;
+        }
 
-    ar-datepicker::part(trigger):disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+        &::part(label) {
+            font-size: var(--ar-font-size-sm);
+            font-weight: var(--ar-font-weight-medium);
+            color: var(--ar-color-text);
+            margin-bottom: calc(0.5rem - var(--ar-datepicker-gap));
+        }
+
+        &::part(hint) {
+            font-size: var(--ar-font-size-sm);
+            color: var(--ar-color-text-muted);
+        }
+
+        &::part(error) {
+            font-size: var(--ar-font-size-sm);
+            color: var(--ar-datepicker-error-color);
+        }
+
+        &::part(input) {
+            height: var(--ar-button-height);
+            box-sizing: border-box;
+            padding: 0 0.75rem;
+            border: 1px solid var(--ar-color-border);
+            border-right: none;
+            border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
+            background: var(--ar-color-bg);
+            color: var(--ar-color-text);
+            font-size: var(--ar-font-size-md);
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        &::part(input):focus-visible {
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+            border-color: var(--ar-color-interactive);
+        }
+
+        &::part(input):read-only {
+            background: var(--ar-color-bg-subtle);
+            cursor: default;
+        }
+
+        &::part(input):disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--ar-color-bg-subtle);
+        }
+
+        &::part(trigger) {
+            width: var(--ar-button-height);
+            height: var(--ar-button-height);
+            background: var(--ar-color-interactive);
+            color: var(--ar-color-text-inverse);
+            border: 1px solid var(--ar-color-interactive);
+            border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
+            cursor: pointer;
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease;
+        }
+
+        &::part(trigger):hover:not(:disabled) {
+            background: var(--ar-color-interactive-hover);
+            border-color: var(--ar-color-interactive-hover);
+        }
+
+        &::part(trigger):active:not(:disabled) {
+            background: var(--ar-color-interactive-active);
+            border-color: var(--ar-color-interactive-active);
+        }
+
+        &::part(trigger):focus-visible {
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(trigger):disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
+        &::part(weekday) {
+            color: var(--ar-color-neutral-50);
+            font-size: 0.75rem;
+        }
+
+        &::part(day) {
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            border-width: 2px;
+        }
     }
 }

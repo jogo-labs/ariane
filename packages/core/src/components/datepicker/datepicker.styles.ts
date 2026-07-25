@@ -39,10 +39,8 @@ export default css`
     }
 
     [part='panel'] {
-        width: var(--ar-datepicker-panel-width);
         /* a11y-fallback: évite que la grille de ~35 jours s'étale sur toute la largeur de la page sans thème chargé */
         max-width: var(--ar-datepicker-panel-max-width, 25rem);
-        padding: var(--ar-datepicker-panel-padding);
     }
 
     [part='header'] {
@@ -50,11 +48,6 @@ export default css`
         align-items: center;
         justify-content: space-between;
         gap: 0.25rem;
-        font-size: var(--ar-datepicker-header-font-size);
-        margin: var(--ar-datepicker-header-margin);
-        padding: var(--ar-datepicker-header-padding);
-        background: var(--ar-datepicker-header-bg);
-        border-radius: var(--ar-datepicker-header-radius);
     }
 
     [part='header'] span[aria-live] {
@@ -66,30 +59,16 @@ export default css`
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: var(--ar-datepicker-nav-btn-size);
         aspect-ratio: 1 / 1;
         cursor: pointer;
         font: inherit;
-        border-radius: var(--ar-datepicker-nav-btn-radius);
-        background: var(--ar-datepicker-nav-btn-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-nav-btn-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
         border-color: var(--ar-datepicker-nav-btn-border-color, transparent);
-        color: var(--ar-datepicker-nav-btn-color);
-    }
-
-    [part~='nav-btn']:hover {
-        background: var(--ar-datepicker-nav-btn-hover-bg);
-    }
-
-    [part~='nav-btn']:active {
-        background: var(--ar-datepicker-nav-btn-active-bg);
     }
 
     [part~='nav-btn']:focus-visible {
         outline: 2px solid var(--ar-datepicker-nav-btn-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-datepicker-nav-btn-focus-ring-offset);
     }
 
     [part~='footer-btn'] {
@@ -98,28 +77,13 @@ export default css`
         justify-content: center;
         cursor: pointer;
         font: inherit;
-        padding: var(--ar-datepicker-footer-btn-padding);
-        border-radius: var(--ar-datepicker-footer-btn-radius);
-        background: var(--ar-datepicker-footer-btn-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-footer-btn-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
         border-color: var(--ar-datepicker-footer-btn-border-color, transparent);
-        color: var(--ar-datepicker-footer-btn-color);
-    }
-
-    [part~='footer-btn']:hover {
-        background: var(--ar-datepicker-footer-btn-hover-bg);
-        border-color: var(--ar-datepicker-footer-btn-hover-border-color);
-    }
-
-    [part~='footer-btn']:active {
-        background: var(--ar-datepicker-footer-btn-active-bg);
     }
 
     [part~='footer-btn']:focus-visible {
         outline: 2px solid var(--ar-datepicker-footer-btn-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-datepicker-footer-btn-focus-ring-offset);
     }
 
     [part='grid'] {
@@ -130,16 +94,12 @@ export default css`
 
     [part='grid'] th {
         text-align: center;
-        font-size: var(--ar-datepicker-weekday-font-size);
         font-weight: normal;
         padding-block: 0.5rem;
         text-transform: uppercase;
-        color: var(--ar-datepicker-weekday-color);
     }
 
     [part='day'] {
-        font-size: var(--ar-datepicker-day-font-size);
-        color: var(--ar-datepicker-day-color);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
         width: var(--ar-datepicker-day-size, 2.5rem);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
@@ -149,10 +109,9 @@ export default css`
         justify-content: center;
         margin: auto;
         cursor: pointer;
-        border-radius: var(--ar-datepicker-day-radius);
+        color: var(--ar-datepicker-day-color);
         background-color: var(--ar-datepicker-day-bg);
         border-style: solid;
-        border-width: var(--ar-datepicker-day-border-width);
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui casse la surcharge border-color de .today ci-dessous */
         border-color: var(--ar-datepicker-day-border-color, transparent);
     }
@@ -230,8 +189,5 @@ export default css`
         display: flex;
         justify-content: space-between;
         gap: 0.5rem;
-        margin: var(--ar-datepicker-footer-margin);
-        padding: var(--ar-datepicker-footer-padding);
-        background: var(--ar-datepicker-footer-bg);
     }
 `;

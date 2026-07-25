@@ -472,7 +472,7 @@ describe('ArDatepicker', () => {
     });
 
     describe('fonds par défaut du calendrier (thème)', () => {
-        it('default.css définit --ar-datepicker-header-bg, -day-bg et -footer-bg', async () => {
+        it("default.css définit un background pour ::part(header)/::part(footer), et les tokens color/background-color de la cellule jour (pas ::part(day) : un ::part() de l'outer stylesheet du thème l'emporterait sur les surcharges d'état .today/.selected/:hover du composant, cf #129)", async () => {
             // Lecture directe du fichier source : le thème n'est pas chargé dans
             // l'environnement de test (happy-dom), voir vitest.config.ts.
             // `new URL(relative, import.meta.url)` est évité car happy-dom remplace le
@@ -486,9 +486,18 @@ describe('ArDatepicker', () => {
                 '../../styles/themes/default.css',
             );
             const themeCss = readFileSync(themePath, 'utf-8');
-            expect(themeCss).toMatch(/--ar-datepicker-header-bg:/);
+            // Regex agnostiques du préfixe de sélecteur (flat `ar-datepicker::part(...)`
+            // ou nesting CSS `&::part(...)`) et de la valeur exacte — seule la présence
+            // de la déclaration `background:`/`background-color:` est vérifiée.
+            expect(themeCss).toMatch(/::part\(header\)\s*{[^}]*background:/);
+            expect(themeCss).toMatch(/::part\(footer\)\s*{[^}]*background:/);
+            // color/background-color de la cellule jour ne doivent PAS être dans
+            // ::part(day) (voir explication ci-dessus) : ils sont pilotés par des
+            // tokens que le composant consomme lui-même, dans son propre shadow tree.
+            expect(themeCss).not.toMatch(/::part\(day\)\s*{[^}]*background-color:/);
+            expect(themeCss).not.toMatch(/::part\(day\)\s*{[^}]*\bcolor:/);
+            expect(themeCss).toMatch(/--ar-datepicker-day-color:/);
             expect(themeCss).toMatch(/--ar-datepicker-day-bg:/);
-            expect(themeCss).toMatch(/--ar-datepicker-footer-bg:/);
         });
     });
 });
