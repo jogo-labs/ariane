@@ -169,6 +169,15 @@ seules les trois contraintes suivantes restent des exclusions réelles.
    dans `tab.styles.ts` pour compenser visuellement la bordure du groupe parent) doit rester un
    token pour que les deux composants restent synchronisés — cas de réutilisation plus fort que
    le critère 3 (qui ne regarde que le même fichier).
+5. **État posé sur un `part` ancêtre, ciblant un `part` descendant différent** (ex.
+   `[part='step-link']:hover [part='bullet']`) → doit rester un token consommé à
+   l'intérieur du composant, même raisonnement que la contrainte 2 mais sur deux éléments
+   distincts plutôt qu'un seul. Vérifié empiriquement (Chromium réel, Playwright) sur
+   `ar-stepper` : une règle externe `::part(bullet)` neutralise totalement la règle interne
+   ancêtre→descendant, y compris au survol — le descendant reste figé sur la valeur externe
+   même quand l'ancêtre est survolé. Concrètement : `--ar-stepper-bullet-hover-bg`,
+   `--ar-stepper-link-hover-bullet-color`, `--ar-stepper-link-hover-bullet-text-color` et
+   `--ar-stepper-link-hover-label-color` restent des tokens pour cette raison.
 
 **`:host` n'est plus une exclusion en soi** (correction du 2026-07-25 ci-dessus) — une
 propriété sur `:host` suit le même critère que les autres, migrée vers une règle externe
@@ -191,3 +200,10 @@ datepicker). Constat structurel notable sur `stepper` : la majorité de ses ~31 
 périmètre de la branche 4 faute de `part` sur les éléments de la liste d'étapes — exposer de
 nouveaux parts est un préalable nécessaire à toute réduction sur ce composant, pas seulement un
 choix de confort. Migration en cours, par lots, sur `dev`.
+
+**Lot 1 — `ar-stepper` (2026-07-25)** : 12 tokens sur ~30 migrés vers 4 règles `::part()`
+groupées (`trigger`, `panel`, `step-link`, `bullet` — 4 nouveaux `part` créés, dont 3
+comblaient un écart JSDoc/code préexistant). 18 tokens conservés (fallback WCAG, lecture JS,
+pseudo-éléments non ciblables, état interne, et le nouveau garde-fou hover ancêtre→descendant
+ci-dessus). Détail complet :
+`docs/superpowers/specs/2026-07-25-stepper-token-vs-part-design.md`.
