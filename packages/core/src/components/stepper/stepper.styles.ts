@@ -5,14 +5,6 @@ export default css`
         display: none !important;
     }
 
-    ol {
-        margin-top: 0;
-    }
-
-    ol ol {
-        margin-bottom: 0;
-    }
-
     .stepper-dropdown {
         position: relative;
         display: flex;
@@ -36,6 +28,7 @@ export default css`
     }
 
     .stepper-list {
+        margin: 0;
         counter-reset: step;
     }
 
@@ -76,33 +69,32 @@ export default css`
 
     .stepper-item .stepper-link {
         text-decoration: none;
-    }
 
-    .stepper-item .stepper-link .stepper-item-label {
-        text-decoration: underline;
-    }
+        .stepper-item-label {
+            text-decoration: underline;
+        }
 
-    .stepper-item .stepper-link:focus:before,
-    .stepper-item .stepper-link:hover:before {
-        background-color: var(--ar-stepper-link-hover-bullet-color);
-    }
+        &:is(:focus, :hover) {
+            &:before {
+                background-color: var(--ar-stepper-link-hover-bullet-color);
+            }
 
-    .stepper-item .stepper-link:focus .stepper-item-label,
-    .stepper-item .stepper-link:hover .stepper-item-label {
-        text-decoration: none;
-        color: var(--ar-stepper-link-hover-label-color);
-    }
+            .stepper-item-label {
+                text-decoration: none;
+                color: var(--ar-stepper-link-hover-label-color);
+            }
 
-    .stepper-item .stepper-link:focus .stepper-item-bullet,
-    .stepper-item .stepper-link:hover .stepper-item-bullet {
-        color: var(--ar-stepper-link-hover-bullet-text-color);
-        background-color: var(--ar-stepper-bullet-hover-bg);
-        box-shadow: none;
-    }
+            .stepper-item-bullet {
+                color: var(--ar-stepper-link-hover-bullet-text-color);
+                background-color: var(--ar-stepper-bullet-hover-bg);
+                box-shadow: none;
+            }
+        }
 
-    .stepper-item .stepper-link:focus {
-        outline-offset: 4px;
-        outline-color: var(--ar-stepper-link-focus-outline-color);
+        &:focus {
+            outline-offset: 4px;
+            outline-color: var(--ar-stepper-link-focus-outline-color);
+        }
     }
 
     .stepper-item.active > .stepper-item-inner {
@@ -124,11 +116,6 @@ export default css`
     .stepper-link .stepper-item-bullet {
         color: var(--ar-stepper-bullet-color);
         background-color: var(--ar-stepper-bullet-bg);
-    }
-
-    .stepper-list.stepper-desktop,
-    .stepper-list.stepper-mobile {
-        margin-bottom: 0;
     }
 
     .stepper-list .stepper-item:after {
