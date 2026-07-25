@@ -44,7 +44,7 @@ export interface ArStepperStepChangeDetail {
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
  * @csspart nav          - L'élément `<nav>` englobant.
- * @csspart list         - La liste des étapes (desktop).
+ * @csspart list         - La liste des étapes.
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
