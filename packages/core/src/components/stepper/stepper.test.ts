@@ -108,9 +108,27 @@ describe('ArStepper', () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
             expect(shadow(el).querySelector('.stepper-item-bullet[part="bullet"]')).not.toBeNull();
+        });
+
+        it('rend le part d\'état "bullet-active" uniquement sur la puce de l\'étape active', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const steps = shadow(el).querySelectorAll('ol.stepper-list > li[part="step"]');
+            expect(steps.length).toBe(2);
+
+            const bulletA = requireQuery<HTMLElement>(steps[0]!, '.stepper-item-bullet');
+            expect(bulletA.getAttribute('part')).toBe('bullet bullet-active');
+
+            const bulletB = requireQuery<HTMLElement>(steps[1]!, '.stepper-item-bullet');
+            expect(bulletB.getAttribute('part')).toBe('bullet');
         });
     });
 

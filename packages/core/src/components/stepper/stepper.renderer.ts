@@ -30,9 +30,15 @@ function isGroupActive(node: NavigationNode, mode: NavigationMode): boolean {
     );
 }
 
-function renderStepText(label: string, order: number, isSubstep = false): TemplateResult {
+function renderStepText(
+    label: string,
+    order: number,
+    isActive: boolean,
+    isSubstep = false,
+): TemplateResult {
+    const bulletPart = isActive ? 'bullet bullet-active' : 'bullet';
     return html`
-        <span class="stepper-item-bullet" part="bullet" aria-hidden="true"></span>
+        <span class="stepper-item-bullet" part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
         <span class="stepper-item-label">${label}</span>
     `;
@@ -69,12 +75,12 @@ function renderSubStep(
                           href=${sub.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(sub.label, order, true)}
+                          ${renderStepText(sub.label, order, isActive, true)}
                       </a>
                   `
                 : html`
                       <div class="stepper-item-inner">
-                          ${renderStepText(sub.label, order, true)}
+                          ${renderStepText(sub.label, order, isActive, true)}
                       </div>
                   `}
         </li>
@@ -108,11 +114,13 @@ function renderStep(
                           href=${step.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(step.label, order)}
+                          ${renderStepText(step.label, order, active)}
                       </a>
                   `
                 : html`
-                      <div class="stepper-item-inner">${renderStepText(step.label, order)}</div>
+                      <div class="stepper-item-inner">
+                          ${renderStepText(step.label, order, active)}
+                      </div>
                   `}
             ${(active || mode === 'edit') && step.children.length
                 ? html`
