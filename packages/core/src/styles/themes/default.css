@@ -718,6 +718,12 @@
             outline-offset: var(--ar-focus-ring-offset);
         }
 
+        &::part(footer) {
+            margin: 0;
+            padding: 0.75rem 0 0;
+            background: transparent;
+        }
+
         &::part(footer-btn) {
             background: transparent;
             border-width: 1px;
@@ -744,12 +750,6 @@
             margin: 0;
             padding: 0 0 0.75rem;
             border-radius: 0;
-            background: transparent;
-        }
-
-        &::part(footer) {
-            margin: 0;
-            padding: 0.75rem 0 0;
             background: transparent;
         }
 
