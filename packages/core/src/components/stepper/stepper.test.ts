@@ -99,7 +99,10 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
             const link = shadow(el).querySelector('a.stepper-link');
-            expect(link?.getAttribute('part')).toBe('step-link');
+            // En mode edit, isGroupActive() rend "active" toujours vrai pour un step top-level
+            // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
+            // step-link--current — cf. le test dédié plus bas pour la variante "inactive".
+            expect(link?.getAttribute('part')).toContain('step-link');
             const currentItemInner = shadow(el).querySelector('div.stepper-item-inner');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });
@@ -114,7 +117,7 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('.stepper-item-bullet[part="bullet"]')).not.toBeNull();
         });
 
-        it('rend le part d\'état "bullet-active" uniquement sur la puce de l\'étape active', async () => {
+        it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape active', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -125,10 +128,52 @@ describe('ArStepper', () => {
             expect(steps.length).toBe(2);
 
             const bulletA = requireQuery<HTMLElement>(steps[0]!, '.stepper-item-bullet');
-            expect(bulletA.getAttribute('part')).toBe('bullet bullet-active');
+            expect(bulletA.getAttribute('part')).toBe('bullet bullet--current');
 
             const bulletB = requireQuery<HTMLElement>(steps[1]!, '.stepper-item-bullet');
             expect(bulletB.getAttribute('part')).toBe('bullet');
+        });
+
+        it('rend le part d\'état "step-link--current" sur le lien de la sous-étape active en mode edit', async () => {
+            // Au niveau top-level, isGroupActive() rend "active" toujours vrai en mode edit
+            // (tous les groupes sont navigables) : impossible d'y observer un lien "actif" vs
+            // "non actif" côte à côte. Au niveau sous-étape, sub.state === 'current' est un
+            // état littéral par sous-étape : c'est le seul niveau où deux liens rendus
+            // simultanément peuvent différer sur ce part d'état — exactement le scénario visé
+            // par le correctif (plusieurs liens actifs simultanément en mode edit).
+            const el = await fixtureWithItems(`
+                        <ar-stepper current-path="/a/2" mode="edit">
+                            <ar-stepper-item path="/a" label="Étape A">
+                                <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                                <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                            </ar-stepper-item>
+                        </ar-stepper>
+                    `);
+            const links = shadow(el).querySelectorAll('li[part~="substep"] a.stepper-link');
+            expect(links.length).toBe(2);
+
+            const link1 = [...links].find((l) => l.getAttribute('data-path') === '/a/1');
+            const link2 = [...links].find((l) => l.getAttribute('data-path') === '/a/2');
+            expect(link1?.getAttribute('part')).toBe('step-link');
+            expect(link2?.getAttribute('part')).toBe('step-link step-link--current');
+        });
+
+        it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape active', async () => {
+            const el = await fixtureWithItems(`
+                        <ar-stepper current-path="/a/1">
+                            <ar-stepper-item path="/a" label="Étape A">
+                                <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                                <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                            </ar-stepper-item>
+                        </ar-stepper>
+                    `);
+            const substepBullets = shadow(el).querySelectorAll(
+                'li[part~="substep"] .stepper-item-bullet',
+            );
+            expect(substepBullets.length).toBe(2);
+            const [bullet1, bullet2] = substepBullets;
+            expect(bullet1?.getAttribute('part')).toBe('bullet bullet--current');
+            expect(bullet2?.getAttribute('part')).toBe('bullet');
         });
     });
 

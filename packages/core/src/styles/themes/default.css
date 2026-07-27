@@ -877,11 +877,15 @@
             border-radius: 0.125rem;
         }
 
+        &::part(step-link--current) {
+            color: var(--ar-color-interactive);
+        }
+
         &::part(bullet) {
             border-radius: 0.75rem;
         }
 
-        &::part(bullet-active) {
+        &::part(bullet--current) {
             background-color: var(--ar-color-interactive);
             color: var(--ar-color-text-inverse);
             box-shadow: none;

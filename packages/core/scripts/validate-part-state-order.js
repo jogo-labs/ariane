@@ -1,14 +1,15 @@
 /**
- * Détecte un ::part(x) de base déclaré après son ::part(x-état) correspondant dans
+ * Détecte un ::part(x) de base déclaré après son ::part(x--état) correspondant dans
  * default.css — les règles ::part() de même spécificité se départagent par ordre de
  * déclaration (la dernière l'emporte), donc une base après sa variante d'état ferait
  * perdre la base au profit de l'état, y compris hors contexte actif.
  *
- * Heuristique : un nom de part B est considéré variante d'état d'un nom A (déclaré
- * dans le même bloc de composant) si B commence par `${A}-`. Limite connue : un part
- * non lié nommé `<A>-<suffixe>` (ex. `step`/`step-link`) serait à tort considéré comme
- * variante si les deux étaient un jour stylés dans le même bloc default.css — cas rare,
- * à corriger au cas par cas si rencontré (renommage ou réordonnancement).
+ * Convention : un nom de part B est une variante d'état d'un nom A (déclaré dans le même
+ * bloc de composant) si B commence par `${A}--` (double tiret, convention BEM). Le double
+ * tiret distingue syntaxiquement un part d'état de tout autre part partageant un préfixe à
+ * simple tiret (ex. `step`/`step-link` ne sont pas liés, alors que `bullet`/`bullet--current`
+ * le sont) — élimine la classe de faux positifs trouvée avec un délimiteur simple tiret
+ * (`footer`/`footer-btn` sur ar-datepicker).
  *
  * Utilisé par `cem.config.js` (hook `packageLinkPhase`) pour faire échouer
  * `npm run build:manifest` en cas de détection — cf.
@@ -88,7 +89,7 @@ export function findPartStateOrderErrors(filePath, source) {
         for (const stateName of names) {
             for (const baseName of names) {
                 if (baseName === stateName) continue;
-                if (!stateName.startsWith(`${baseName}-`)) continue;
+                if (!stateName.startsWith(`${baseName}--`)) continue;
                 const baseLine = /** @type {number} */ (occurrences.get(baseName));
                 const stateLine = /** @type {number} */ (occurrences.get(stateName));
                 if (stateLine < baseLine) {

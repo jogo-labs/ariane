@@ -5,7 +5,7 @@ describe('findPartStateOrderErrors', () => {
     it("détecte une règle d'état déclarée avant sa base", () => {
         const source = `
             ar-test {
-                &::part(bullet-active) {
+                &::part(bullet--current) {
                     background-color: red;
                 }
 
@@ -16,7 +16,7 @@ describe('findPartStateOrderErrors', () => {
         `;
         const errors = findPartStateOrderErrors('default.css', source);
         expect(errors).toHaveLength(1);
-        expect(errors[0]).toContain('bullet-active');
+        expect(errors[0]).toContain('bullet--current');
         expect(errors[0]).toContain('bullet');
     });
 
@@ -27,7 +27,7 @@ describe('findPartStateOrderErrors', () => {
                     border-radius: 0.75rem;
                 }
 
-                &::part(bullet-active) {
+                &::part(bullet--current) {
                     background-color: red;
                 }
             }
@@ -53,7 +53,7 @@ describe('findPartStateOrderErrors', () => {
     it('traite chaque bloc de composant indépendamment', () => {
         const source = `
             ar-one {
-                &::part(bullet-active) {
+                &::part(bullet--current) {
                     background-color: red;
                 }
                 &::part(bullet) {
@@ -65,7 +65,7 @@ describe('findPartStateOrderErrors', () => {
                 &::part(bullet) {
                     border-radius: 0.5rem;
                 }
-                &::part(bullet-active) {
+                &::part(bullet--current) {
                     background-color: blue;
                 }
             }
@@ -78,7 +78,7 @@ describe('findPartStateOrderErrors', () => {
     it('rapporte le bon numéro de ligne', () => {
         const source = [
             'ar-test {',
-            '    &::part(bullet-active) {',
+            '    &::part(bullet--current) {',
             '        background-color: red;',
             '    }',
             '',
@@ -89,5 +89,20 @@ describe('findPartStateOrderErrors', () => {
         ].join('\n');
         const errors = findPartStateOrderErrors('default.css', source);
         expect(errors[0]).toContain(':2');
+    });
+
+    it('ignore une paire à simple tiret qui ressemblerait à une relation base/état (ex. step/step-link)', () => {
+        const source = `
+            ar-test {
+                &::part(step-link) {
+                    color: blue;
+                }
+
+                &::part(step) {
+                    color: red;
+                }
+            }
+        `;
+        expect(findPartStateOrderErrors('default.css', source)).toEqual([]);
     });
 });

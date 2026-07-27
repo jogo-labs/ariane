@@ -30,13 +30,18 @@ function isGroupActive(node: NavigationNode, mode: NavigationMode): boolean {
     );
 }
 
+/** Compose la valeur `part=` d'un élément avec sa variante d'état "current" (convention BEM `--`). */
+function withCurrentPart(base: string, isCurrent: boolean): string {
+    return isCurrent ? `${base} ${base}--current` : base;
+}
+
 function renderStepText(
     label: string,
     order: number,
     isActive: boolean,
     isSubstep = false,
 ): TemplateResult {
-    const bulletPart = isActive ? 'bullet bullet-active' : 'bullet';
+    const bulletPart = withCurrentPart('bullet', isActive);
     return html`
         <span class="stepper-item-bullet" part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
@@ -69,7 +74,7 @@ function renderSubStep(
                 ? html`
                       <a
                           class="stepper-item-inner stepper-link"
-                          part="step-link"
+                          part=${withCurrentPart('step-link', isActive)}
                           data-substep-order=${order}
                           data-path=${sub.path}
                           href=${sub.href ?? '#'}
@@ -109,7 +114,7 @@ function renderStep(
                 ? html`
                       <a
                           class="stepper-item-inner stepper-link"
-                          part="step-link"
+                          part=${withCurrentPart('step-link', active)}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
                           @click=${onClickLink}

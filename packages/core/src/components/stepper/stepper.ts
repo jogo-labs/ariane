@@ -49,8 +49,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
  * @csspart bullet       - La puce numérotée d'une étape.
- * @csspart bullet-active - La puce numérotée de l'étape active (variante d'état de `bullet`).
- * @csspart dropdown     - Le conteneur dropdown.
+ * @csspart bullet--current - La puce numérotée de l'étape active (variante d'état de `bullet`).
+ * @csspart step-link--current - Le lien de l'étape active (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
@@ -64,7 +64,7 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
  * @cssprop --ar-stepper-bullet-hover-bg - Fond de la puce au survol.
  * @cssprop --ar-stepper-label-color - Couleur des labels des étapes inactives.
- * @cssprop --ar-stepper-active-label-color - Couleur du label de l'étape active.
+ * @cssprop --ar-stepper-active-label-color - Couleur du label de l'étape active rendue comme élément non cliquable (sans lien).
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
  * @cssprop --ar-stepper-link-hover-bullet-color - Couleur de la puce du lien d'étape au survol/focus (cascade vers --ar-color-interactive).
