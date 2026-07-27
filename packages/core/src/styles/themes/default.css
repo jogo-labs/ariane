@@ -856,6 +856,17 @@
             background-color: var(--ar-button-secondary-bg-hover);
         }
 
+        &::part(trigger):active:not(:disabled) {
+            background-color: var(--ar-color-neutral-30);
+            color: var(--ar-color-white);
+        }
+
+        &::part(trigger):focus-visible {
+            background-color: var(--ar-button-secondary-bg-hover);
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
         &::part(panel) {
             padding: 0.75rem;
             min-width: var(--ar-panel-min-width);
