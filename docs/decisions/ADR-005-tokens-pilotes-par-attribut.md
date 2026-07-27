@@ -134,7 +134,7 @@ composant continue de déclarer une valeur sur `:host`** — le même mécanisme
 style externe l'emporte sur la règle interne » s'applique, que la cible soit un `[part]` via
 `::part()` ou l'hôte lui-même via son nom de tag (l'hôte reste un élément du light DOM,
 atteignable sans traverser de frontière shadow). **`:host` n'exclut donc plus la branche 4** —
-seules les trois contraintes suivantes restent des exclusions réelles.
+seules les contraintes suivantes restent des exclusions réelles.
 
 **Contraintes techniques** qui limitent la branche 4 :
 
@@ -159,7 +159,10 @@ seules les trois contraintes suivantes restent des exclusions réelles.
    **natives** (`:hover`, `:focus-visible`, `:active`, `:disabled`…) ne sont pas concernées —
    elles composent normalement avec `::part()`/le tag externe (`ar-x:hover::part(y)`,
    `ar-x:hover { ... }`), seul un état exprimé par une classe/attribut **posé par le
-   composant** pose problème.
+   composant** pose problème. **Amendée le 2026-07-27** : quand l'élément concerné porte déjà
+   un `part`, cette contrainte est remplacée par le pattern « part d'état » (convention `--`,
+   cf. amendement dédié en fin de fichier) — elle ne s'applique plus telle quelle que si
+   l'élément ne porte aucun `part`.
 3. **`::part()` ne peut jamais cibler un pseudo-élément** (`::before`/`::after`) d'un élément
    `part` — `::part(x)::before` n'est pas un sélecteur CSS valide. Un token qui pilote un
    pseudo-élément décoratif reste nécessairement un token, quel que soit son usage (trouvé sur
@@ -208,15 +211,30 @@ pseudo-éléments non ciblables, état interne, et le nouveau garde-fou hover an
 ci-dessus). Détail complet :
 `docs/superpowers/specs/2026-07-25-stepper-token-vs-part-design.md`.
 
-## Amendement (2026-07-27) : parts d'état, remplacement partiel de la contrainte 2
+## Amendement (2026-07-27) : parts d'état (convention BEM `--`), remplacement partiel de la contrainte 2
 
-La contrainte 2 (état interne sur le même élément → reste token) est remplacée par un nouveau
-pattern : exposer l'état lui-même comme un `part` supplémentaire sur le même élément
-(`part="<élément> <élément>-<état>"`, ex. `part="bullet bullet-active"`), ciblable par le
-thème via `::part(<élément>-<état>)`. Vérifié empiriquement (Chromium réel, Playwright) : une
-règle externe `::part(x-état)` déclarée après `::part(x)` l'emporte sur `background-color`
-sans affecter `color` (piloté uniquement par la règle de base), et neutralise totalement une
-règle interne à spécificité supérieure ciblant la même propriété — cf. détail complet
+La contrainte 2 ci-dessus (état interne sur le même élément → reste token) est **remplacée**
+pour tout élément qui porte déjà un `part` : au lieu de garder la propriété en token interne,
+l'état lui-même devient un `part` supplémentaire sur le même élément, nommé
+`<élément>--<état>` (double tiret, convention BEM — ex. `part="bullet bullet--current"`),
+ciblable par le thème via `::part(<élément>--<état>)`.
+
+**Pourquoi un double tiret et pas un simple tiret** : la première version de cet amendement
+utilisait un simple tiret (`bullet-active`). Un garde-fou d'ordre (voir ci-dessous) a immédiatement
+produit un faux positif sur `ar-datepicker` : `footer-btn` a été confondu avec une variante
+d'état de `footer` par simple préfixe, alors que ce sont deux éléments sans rapport. Le double
+tiret distingue syntaxiquement un part d'état de tout autre part dont le nom partage un
+préfixe (`step` / `step-link` ne sont _pas_ liés — un seul tiret — alors que `bullet` /
+`bullet--current` le sont), éliminant cette classe de faux positifs plutôt que de la
+contourner au cas par cas.
+
+**Mécanique vérifiée empiriquement** (Chromium réel, Playwright) : une règle externe
+`::part(x--état)` déclarée après `::part(x)` l'emporte sur toute propriété qu'elle déclare,
+sans affecter les propriétés que seule `::part(x)` pilote, et neutralise totalement une règle
+interne ciblant la même propriété — **par déclaration directe l'emportant sur l'héritage ou
+sur une règle interne, jamais par un calcul de spécificité entre les deux règles `::part()`**.
+Entre deux règles externes de même spécificité, c'est l'ordre de déclaration qui départage
+(cf. garde-fou ci-dessous). Détail complet :
 `docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md`.
 
 **La contrainte 5 (état posé sur un `part` ancêtre, ciblant un `part` descendant différent)
@@ -227,15 +245,28 @@ permanente d'ADR-005.
 **Nouveau garde-fou d'ordre** : les règles `::part()` de même spécificité se départagent par
 ordre de déclaration dans `default.css` — une règle de base doit toujours précéder ses parts
 d'état dans le fichier. Vérifié automatiquement par
-`packages/core/scripts/validate-part-state-order.js`, branché dans `cem.config.js`.
+`packages/core/scripts/validate-part-state-order.js` (heuristique fondée sur le délimiteur
+`--`), branché dans `cem.config.js`.
+
+**Terminologie** : le terme retenu pour l'état est `current` (`bullet--current`,
+`step-link--current`) — et non `active`, déjà pris par la pseudo-classe CSS `:active`, ni
+`selected`, réutilisé par `ar-datepicker` pour un concept différent (une date choisie par
+clic, alors que l'étape courante du stepper résulte de la navigation, pas d'une sélection).
+Cohérent avec `aria-current="step"`, déjà posé par le composant sur le même élément.
 
 **Application — `ar-stepper` (2026-07-27)** : `--ar-stepper-active-bullet-bg` et
-`--ar-stepper-active-bullet-color` migrés vers `::part(bullet-active)` (nouveau part d'état).
-`--ar-stepper-active-label-color`, bien qu'a priori candidat au même traitement, **reste un
-token** : une analyse de spécificité a montré qu'en mode `edit`, une sous-étape active est
-toujours rendue comme un lien (`renderSubStep` ignore l'état actif dans son choix `<a>`/`<div>`,
-contrairement à `renderStep`), donc atteignable par la règle de survol ancêtre→descendant
-(`.stepper-link:hover .stepper-item-label`, spécificité `(0,4,0)`) qui l'emporte aujourd'hui sur
-`active-label-color` (`(0,3,0)`). Migrer ce token aurait inversé ce résultat (l'externe
-l'emporte toujours). Reclassé sous la contrainte 5, au même titre que `--ar-stepper-label-color`
-(base).
+`--ar-stepper-active-bullet-color` migrés vers `::part(bullet--current)` (nouveau part
+d'état). Un second cas, plus profond que prévu, a été trouvé en revue finale de branche : la
+couleur du lien d'étape active (`--ar-stepper-active-label-color`) était déjà rendue inerte par
+le lot 1 pour toute étape active **rendue comme lien** — pas seulement au survol comme
+initialement supposé, mais au repos aussi. En cause : le lot 1 a migré
+`--ar-stepper-link-color` vers `::part(step-link)`, qui cible le **même élément** que
+`.stepper-item.active > .stepper-item-inner` ; une règle externe l'emportant toujours sur une
+règle interne (contrainte 2), la couleur active du lien était déjà silencieusement remplacée
+par la couleur de lien de base dès qu'une étape active était rendue comme lien — cas fréquent
+en mode `edit`, où la quasi-totalité des étapes sont simultanément actives et rendues comme
+liens. Corrigé en exposant `part="step-link step-link--current"` sur le lien actif et une
+règle `::part(step-link--current) { color: var(--ar-color-interactive); }` déclarée après
+`::part(step-link)`. `--ar-stepper-active-label-color` reste un token, mais désormais
+correctement scopé à son seul cas d'usage réel restant : l'étape active rendue comme élément
+non cliquable (`<div>`, sans `part`), pour laquelle il n'existe pas d'autre point d'extension.
