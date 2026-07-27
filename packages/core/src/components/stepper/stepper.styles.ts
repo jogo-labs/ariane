@@ -54,6 +54,10 @@ export default css`
         transform: translateY(1px);
         box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
         background-color: transparent;
+        /* Empêche le soulignement de ::part(step-link) de peindre à travers ce
+         * flex-item (le conteneur <a> est en inline-flex, sans cette règle le trait
+         * traverse aussi le chiffre du compteur). */
+        text-decoration: none;
     }
 
     .stepper-item-bullet:before {
@@ -67,20 +71,13 @@ export default css`
         align-items: flex-start;
     }
 
-    .stepper-item .stepper-link {
-        text-decoration: none;
-
-        .stepper-item-label {
-            text-decoration: underline;
-        }
-
+    .stepper-link {
         &:is(:focus, :hover) {
             &:before {
                 background-color: var(--ar-stepper-link-hover-bullet-color);
             }
 
             .stepper-item-label {
-                text-decoration: none;
                 color: var(--ar-stepper-link-hover-label-color);
             }
 

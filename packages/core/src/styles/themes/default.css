@@ -877,11 +877,13 @@
 
         &::part(step-link) {
             color: var(--ar-color-interactive);
+            text-decoration: underline;
         }
 
         &::part(step-link):hover,
         &::part(step-link):focus {
             color: var(--ar-color-text-muted);
+            text-decoration: none;
         }
 
         &::part(step-link):focus {
