@@ -10,7 +10,7 @@ export default css`
         display: flex;
     }
 
-    .stepper-dropdown .btn-content {
+    .btn-content {
         margin-right: 1rem;
         gap: 0.25rem;
     }
@@ -94,7 +94,7 @@ export default css`
         }
     }
 
-    .stepper-item.active > .stepper-item-inner {
+    .active > .stepper-item-inner {
         color: var(--ar-stepper-active-label-color);
         font-weight: 700;
     }
@@ -109,7 +109,7 @@ export default css`
         background-color: var(--ar-stepper-bullet-bg);
     }
 
-    .stepper-list .stepper-item:after {
+    .stepper-item:after {
         width: 2.25rem;
         height: var(--ar-stepper-gap);
         background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
