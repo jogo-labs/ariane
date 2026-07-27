@@ -129,7 +129,7 @@ function renderStep(
                   `}
             ${(active || mode === 'edit') && step.children.length
                 ? html`
-                      <ol class="list-unstyled" part="list">
+                      <ol class="list-unstyled" part="list list--substep">
                           ${step.children.map((sub, i) => renderSubStep(sub, i, mode, onClickLink))}
                       </ol>
                   `

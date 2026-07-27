@@ -154,7 +154,7 @@ describe('autoloader — préfixe configurable', () => {
         // avec l'ancien `.closest('ar-stepper-item')` hardcodé), "A" et "B" deviennent tous
         // les deux des racines indépendantes et cette structure imbriquée n'apparaît jamais.
         const nestedSubstep = stepper.shadowRoot?.querySelector(
-            'li.stepper-item [part="list"] li.stepper-item',
+            'li.stepper-item [part~="list"] li.stepper-item',
         );
         expect(nestedSubstep).not.toBeNull();
     });

@@ -84,9 +84,9 @@ describe('ArStepper', () => {
             expect(topLevel.length).toBeGreaterThan(0);
             const nested = shadow(el).querySelectorAll('[part="list"] li[part="substep"]');
             expect(nested.length).toBe(2);
-            // Vérifie que la sous-liste imbriquée a aussi part="list"
-            const nestedList = shadow(el).querySelector('li[part="step"] > [part="list"]');
-            expect(nestedList).not.toBeNull();
+            // Vérifie que la sous-liste imbriquée porte bien part="list list--substep"
+            const nestedList = shadow(el).querySelector('li[part="step"] > [part~="list"]');
+            expect(nestedList?.getAttribute('part')).toBe('list list--substep');
         });
 
         it('rend part="step-link" sur le lien d\'une étape complétée, jamais sur une étape non cliquable', async () => {

@@ -118,7 +118,7 @@ export default css`
         background-repeat: repeat-y;
     }
 
-    [part='list'] [part='list'] {
+    [part~='list--substep'] {
         .stepper-item {
             &:after {
                 content: none;
@@ -153,11 +153,9 @@ export default css`
         }
     }
 
-    @media (min-width: 992px) {
-        .stepper-desktop {
-            display: flex !important;
-            flex-flow: column !important;
-        }
+    .stepper-desktop {
+        display: flex;
+        flex-flow: column;
     }
 
     :host([align='right']) .stepper-desktop {
@@ -182,7 +180,7 @@ export default css`
             margin-left: 0.5rem;
         }
 
-        [part='list'] [part~='bullet'] {
+        [part~='list--substep'] [part~='bullet'] {
             margin-left: 1.25rem;
             margin-right: 0.75rem;
         }

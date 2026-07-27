@@ -45,6 +45,7 @@ export interface ArStepperStepChangeDetail {
  *
  * @csspart nav          - L'élément `<nav>` englobant.
  * @csspart list         - La liste des étapes.
+ * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
