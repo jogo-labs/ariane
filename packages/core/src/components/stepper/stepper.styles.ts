@@ -71,7 +71,7 @@ export default css`
         align-items: flex-start;
     }
 
-    .stepper-link {
+    [part~='step-link'] {
         &:is(:focus, :hover) {
             &:before {
                 background-color: var(--ar-stepper-link-hover-bullet-color);
@@ -104,7 +104,7 @@ export default css`
         display: block;
     }
 
-    .stepper-link .stepper-item-bullet {
+    [part~='step-link'] .stepper-item-bullet {
         color: var(--ar-stepper-bullet-color);
         background-color: var(--ar-stepper-bullet-bg);
     }

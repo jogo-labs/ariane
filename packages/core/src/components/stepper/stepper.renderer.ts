@@ -73,7 +73,7 @@ function renderSubStep(
             ${isCompleted || isEditMode
                 ? html`
                       <a
-                          class="stepper-item-inner stepper-link"
+                          class="stepper-item-inner"
                           part=${withCurrentPart('step-link', isActive)}
                           data-substep-order=${order}
                           data-path=${sub.path}
@@ -113,7 +113,7 @@ function renderStep(
             ${isCompleted
                 ? html`
                       <a
-                          class="stepper-item-inner stepper-link"
+                          class="stepper-item-inner"
                           part=${withCurrentPart('step-link', active)}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
@@ -198,7 +198,7 @@ export function renderMobile(
                 </span>
             </button>
 
-            <div id="stepper-dropdown-menu" part="panel" class="stepper-dropdown-panel">
+            <div id="stepper-dropdown-menu" part="panel">
                 ${renderStepList(steps, 'stepper-mobile', mode, onClickLink)}
             </div>
         </div>

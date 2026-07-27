@@ -307,12 +307,7 @@ export class ArStepper extends LitElement {
                   this.onClickLink,
               );
 
-        return html` <nav
-            part="nav"
-            class="stepper-nav"
-            role="navigation"
-            aria-labelledby="label-nav"
-        >
+        return html` <nav part="nav" role="navigation" aria-labelledby="label-nav">
             <p id="label-nav" class="sr-only">Étapes du formulaire</p>
             ${content}
             <slot></slot>

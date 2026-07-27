@@ -98,7 +98,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const link = shadow(el).querySelector('a.stepper-link');
+            const link = shadow(el).querySelector('a[part~="step-link"]');
             // En mode edit, isGroupActive() rend "active" toujours vrai pour un step top-level
             // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
             // step-link--current — cf. le test dédié plus bas pour la variante "inactive".
@@ -149,7 +149,7 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const links = shadow(el).querySelectorAll('li[part~="substep"] a.stepper-link');
+            const links = shadow(el).querySelectorAll('li[part~="substep"] a[part~="step-link"]');
             expect(links.length).toBe(2);
 
             const link1 = [...links].find((l) => l.getAttribute('data-path') === '/a/1');
@@ -254,7 +254,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
             if (link) {
                 link.click();
                 expect(handler).toHaveBeenCalledOnce();
@@ -276,7 +276,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('step-changed', handler);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
             if (link) {
                 link.click();
                 expect(handler).not.toHaveBeenCalled();
@@ -295,7 +295,7 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
             expect(link).not.toBeNull();
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
@@ -315,7 +315,7 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
             expect(link).not.toBeNull();
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
@@ -333,7 +333,7 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a.stepper-link');
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
             expect(link).not.toBeNull();
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
