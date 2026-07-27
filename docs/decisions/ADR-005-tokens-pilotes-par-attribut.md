@@ -207,3 +207,35 @@ comblaient un écart JSDoc/code préexistant). 18 tokens conservés (fallback WC
 pseudo-éléments non ciblables, état interne, et le nouveau garde-fou hover ancêtre→descendant
 ci-dessus). Détail complet :
 `docs/superpowers/specs/2026-07-25-stepper-token-vs-part-design.md`.
+
+## Amendement (2026-07-27) : parts d'état, remplacement partiel de la contrainte 2
+
+La contrainte 2 (état interne sur le même élément → reste token) est remplacée par un nouveau
+pattern : exposer l'état lui-même comme un `part` supplémentaire sur le même élément
+(`part="<élément> <élément>-<état>"`, ex. `part="bullet bullet-active"`), ciblable par le
+thème via `::part(<élément>-<état>)`. Vérifié empiriquement (Chromium réel, Playwright) : une
+règle externe `::part(x-état)` déclarée après `::part(x)` l'emporte sur `background-color`
+sans affecter `color` (piloté uniquement par la règle de base), et neutralise totalement une
+règle interne à spécificité supérieure ciblant la même propriété — cf. détail complet
+`docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md`.
+
+**La contrainte 5 (état posé sur un `part` ancêtre, ciblant un `part` descendant différent)
+n'est pas concernée par ce remplacement** — vérifié empiriquement que `:has()` ne permet pas de
+répliquer un hover d'ancêtre sur un part différent sans JS dédié. Elle reste une exception
+permanente d'ADR-005.
+
+**Nouveau garde-fou d'ordre** : les règles `::part()` de même spécificité se départagent par
+ordre de déclaration dans `default.css` — une règle de base doit toujours précéder ses parts
+d'état dans le fichier. Vérifié automatiquement par
+`packages/core/scripts/validate-part-state-order.js`, branché dans `cem.config.js`.
+
+**Application — `ar-stepper` (2026-07-27)** : `--ar-stepper-active-bullet-bg` et
+`--ar-stepper-active-bullet-color` migrés vers `::part(bullet-active)` (nouveau part d'état).
+`--ar-stepper-active-label-color`, bien qu'a priori candidat au même traitement, **reste un
+token** : une analyse de spécificité a montré qu'en mode `edit`, une sous-étape active est
+toujours rendue comme un lien (`renderSubStep` ignore l'état actif dans son choix `<a>`/`<div>`,
+contrairement à `renderStep`), donc atteignable par la règle de survol ancêtre→descendant
+(`.stepper-link:hover .stepper-item-label`, spécificité `(0,4,0)`) qui l'emporte aujourd'hui sur
+`active-label-color` (`(0,3,0)`). Migrer ce token aurait inversé ce résultat (l'externe
+l'emporte toujours). Reclassé sous la contrainte 5, au même titre que `--ar-stepper-label-color`
+(base).
