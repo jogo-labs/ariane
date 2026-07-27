@@ -27,7 +27,7 @@ export default css`
         border-color: var(--ar-stepper-panel-border-color, ButtonBorder);
     }
 
-    .stepper-list {
+    [part='list'] {
         margin: 0;
         counter-reset: step;
     }
@@ -37,13 +37,13 @@ export default css`
         counter-increment: step;
     }
 
-    .stepper-item-bullet,
+    [part~='bullet'],
     .stepper-item-inner {
         align-items: center;
         color: var(--ar-stepper-label-color);
     }
 
-    .stepper-item-bullet {
+    [part~='bullet'] {
         width: 2.25rem;
         height: 2.25rem;
         display: flex;
@@ -60,7 +60,7 @@ export default css`
         text-decoration: none;
     }
 
-    .stepper-item-bullet:before {
+    [part~='bullet']:before {
         content: counter(step);
     }
 
@@ -81,7 +81,7 @@ export default css`
                 color: var(--ar-stepper-link-hover-label-color);
             }
 
-            .stepper-item-bullet {
+            [part~='bullet'] {
                 color: var(--ar-stepper-link-hover-bullet-text-color);
                 background-color: var(--ar-stepper-bullet-hover-bg);
                 box-shadow: none;
@@ -104,7 +104,7 @@ export default css`
         display: block;
     }
 
-    [part~='step-link'] .stepper-item-bullet {
+    [part~='step-link'] [part~='bullet'] {
         color: var(--ar-stepper-bullet-color);
         background-color: var(--ar-stepper-bullet-bg);
     }
@@ -118,7 +118,7 @@ export default css`
         background-repeat: repeat-y;
     }
 
-    .stepper-list .stepper-list {
+    [part='list'] [part='list'] {
         .stepper-item {
             &:after {
                 content: none;
@@ -139,7 +139,7 @@ export default css`
             }
         }
 
-        .stepper-item-bullet {
+        [part~='bullet'] {
             width: 0.75rem;
             height: 0.75rem;
             margin-left: 0.75rem;
@@ -176,13 +176,13 @@ export default css`
             text-align: right;
         }
 
-        .stepper-item-bullet {
+        [part~='bullet'] {
             order: 2;
             margin-right: 0;
             margin-left: 0.5rem;
         }
 
-        .stepper-list .stepper-item-bullet {
+        [part='list'] [part~='bullet'] {
             margin-left: 1.25rem;
             margin-right: 0.75rem;
         }

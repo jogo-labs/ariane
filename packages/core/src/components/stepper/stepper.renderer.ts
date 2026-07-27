@@ -43,7 +43,7 @@ function renderStepText(
 ): TemplateResult {
     const bulletPart = withCurrentPart('bullet', isActive);
     return html`
-        <span class="stepper-item-bullet" part=${bulletPart} aria-hidden="true"></span>
+        <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
         <span class="stepper-item-label">${label}</span>
     `;
@@ -129,7 +129,7 @@ function renderStep(
                   `}
             ${(active || mode === 'edit') && step.children.length
                 ? html`
-                      <ol class="list-unstyled stepper-list" part="list">
+                      <ol class="list-unstyled" part="list">
                           ${step.children.map((sub, i) => renderSubStep(sub, i, mode, onClickLink))}
                       </ol>
                   `
@@ -149,7 +149,7 @@ function renderStepList(
     onClickLink: (e: MouseEvent) => void,
 ): TemplateResult {
     return html`
-        <ol class="stepper-list list-unstyled ${cssClass}" part="list">
+        <ol class="list-unstyled ${cssClass}" part="list">
             ${repeat(
                 steps,
                 (step) => step.path,

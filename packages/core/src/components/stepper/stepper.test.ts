@@ -67,7 +67,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(shadow(el).querySelector('ol.stepper-list[part="list"]')).not.toBeNull();
+            expect(shadow(el).querySelector('[part="list"]')).not.toBeNull();
         });
 
         it('rend part="step" sur un item de premier niveau et part="substep" sur une sous-étape', async () => {
@@ -80,14 +80,12 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const topLevel = shadow(el).querySelectorAll('ol.stepper-list > li[part="step"]');
+            const topLevel = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
             expect(topLevel.length).toBeGreaterThan(0);
-            const nested = shadow(el).querySelectorAll('ol.stepper-list li[part="substep"]');
+            const nested = shadow(el).querySelectorAll('[part="list"] li[part="substep"]');
             expect(nested.length).toBe(2);
             // Vérifie que la sous-liste imbriquée a aussi part="list"
-            const nestedList = shadow(el).querySelector(
-                'li[part="step"] > ol.stepper-list[part="list"]',
-            );
+            const nestedList = shadow(el).querySelector('li[part="step"] > [part="list"]');
             expect(nestedList).not.toBeNull();
         });
 
@@ -114,7 +112,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(shadow(el).querySelector('.stepper-item-bullet[part="bullet"]')).not.toBeNull();
+            expect(shadow(el).querySelector('[part="bullet"]')).not.toBeNull();
         });
 
         it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape active', async () => {
@@ -124,13 +122,13 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const steps = shadow(el).querySelectorAll('ol.stepper-list > li[part="step"]');
+            const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
             expect(steps.length).toBe(2);
 
-            const bulletA = requireQuery<HTMLElement>(steps[0]!, '.stepper-item-bullet');
+            const bulletA = requireQuery<HTMLElement>(steps[0]!, '[part~="bullet"]');
             expect(bulletA.getAttribute('part')).toBe('bullet bullet--current');
 
-            const bulletB = requireQuery<HTMLElement>(steps[1]!, '.stepper-item-bullet');
+            const bulletB = requireQuery<HTMLElement>(steps[1]!, '[part~="bullet"]');
             expect(bulletB.getAttribute('part')).toBe('bullet');
         });
 
@@ -168,7 +166,7 @@ describe('ArStepper', () => {
                         </ar-stepper>
                     `);
             const substepBullets = shadow(el).querySelectorAll(
-                'li[part~="substep"] .stepper-item-bullet',
+                'li[part~="substep"] [part~="bullet"]',
             );
             expect(substepBullets.length).toBe(2);
             const [bullet1, bullet2] = substepBullets;
