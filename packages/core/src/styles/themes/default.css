@@ -377,8 +377,6 @@
         --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
         --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
         --ar-stepper-active-label-color: var(--ar-color-interactive);
-        --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
-        --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
@@ -881,6 +879,12 @@
 
         &::part(bullet) {
             border-radius: 0.75rem;
+        }
+
+        &::part(bullet-active) {
+            background-color: var(--ar-color-interactive);
+            color: var(--ar-color-text-inverse);
+            box-shadow: none;
         }
     }
 }

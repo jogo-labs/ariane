@@ -102,12 +102,6 @@ export default css`
         font-weight: 700;
     }
 
-    .stepper-item.active > .stepper-item-inner .stepper-item-bullet {
-        color: var(--ar-stepper-active-bullet-color);
-        background-color: var(--ar-stepper-active-bullet-bg);
-        box-shadow: none;
-    }
-
     .stepper-item:not(:last-child):after {
         content: '';
         display: block;

@@ -49,6 +49,7 @@ export interface ArStepperStepChangeDetail {
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
  * @csspart bullet       - La puce numérotée d'une étape.
+ * @csspart bullet-active - La puce numérotée de l'étape active (variante d'état de `bullet`).
  * @csspart dropdown     - Le conteneur dropdown.
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
@@ -58,8 +59,6 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
  * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
  * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.
- * @cssprop --ar-stepper-active-bullet-bg - Fond de la puce de l'étape active.
- * @cssprop --ar-stepper-active-bullet-color - Couleur du numéro dans la puce active.
  * @cssprop --ar-stepper-bullet-bg - Fond des puces des étapes visitables.
  * @cssprop --ar-stepper-bullet-color - Couleur du numéro dans les puces visitables.
  * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
