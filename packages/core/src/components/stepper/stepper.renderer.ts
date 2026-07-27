@@ -73,7 +73,7 @@ function renderSubStep(
             ${isCompleted || isEditMode
                 ? html`
                       <a
-                          class="stepper-item-inner"
+                          class="stepper-item-header"
                           part=${withCurrentPart('step-link', isActive)}
                           data-substep-order=${order}
                           data-path=${sub.path}
@@ -84,7 +84,7 @@ function renderSubStep(
                       </a>
                   `
                 : html`
-                      <div class="stepper-item-inner">
+                      <div class="stepper-item-header">
                           ${renderStepText(sub.label, order, isActive, true)}
                       </div>
                   `}
@@ -113,7 +113,7 @@ function renderStep(
             ${isCompleted
                 ? html`
                       <a
-                          class="stepper-item-inner"
+                          class="stepper-item-header"
                           part=${withCurrentPart('step-link', active)}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
@@ -123,7 +123,7 @@ function renderStep(
                       </a>
                   `
                 : html`
-                      <div class="stepper-item-inner">
+                      <div class="stepper-item-header">
                           ${renderStepText(step.label, order, active)}
                       </div>
                   `}

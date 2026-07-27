@@ -101,7 +101,7 @@ describe('ArStepper', () => {
             // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
             // step-link--current — cf. le test dédié plus bas pour la variante "inactive".
             expect(link?.getAttribute('part')).toContain('step-link');
-            const currentItemInner = shadow(el).querySelector('div.stepper-item-inner');
+            const currentItemInner = shadow(el).querySelector('div.stepper-item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });
 

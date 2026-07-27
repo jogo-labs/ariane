@@ -32,13 +32,13 @@ export default css`
         counter-reset: step;
     }
 
-    .stepper-item-inner {
+    .stepper-item-header {
         display: inline-flex;
         counter-increment: step;
     }
 
     [part~='bullet'],
-    .stepper-item-inner {
+    .stepper-item-header {
         align-items: center;
         color: var(--ar-stepper-label-color);
     }
@@ -94,12 +94,12 @@ export default css`
         }
     }
 
-    .active > .stepper-item-inner {
+    .active > .stepper-item-header {
         color: var(--ar-stepper-active-label-color);
         font-weight: 700;
     }
 
-    .stepper-item:not(:last-child):after {
+    [part='step']:not(:last-child):after {
         content: '';
         display: block;
     }
@@ -109,7 +109,7 @@ export default css`
         background-color: var(--ar-stepper-bullet-bg);
     }
 
-    .stepper-item:after {
+    [part='step']:after {
         width: 2.25rem;
         height: var(--ar-stepper-gap);
         background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
@@ -118,38 +118,29 @@ export default css`
         background-repeat: repeat-y;
     }
 
-    [part~='list--substep'] {
-        .stepper-item {
-            &:after {
-                content: none;
-            }
-
-            &:before {
-                content: '';
-                display: block;
-                width: 2.25rem;
-                height: var(--ar-stepper-substep-gap);
-                background-image: linear-gradient(
-                    var(--ar-stepper-connector-color) 25%,
-                    transparent 0
-                );
-                background-size: 2px 8px;
-                background-position: center 4px;
-                background-repeat: repeat-y;
-            }
-        }
-
-        [part~='bullet'] {
-            width: 0.75rem;
-            height: 0.75rem;
-            margin-left: 0.75rem;
-            margin-right: 1.25rem;
+    [part='substep'] {
+        &:before {
+            content: '';
             display: block;
-            padding-bottom: 0;
+            width: 2.25rem;
+            height: var(--ar-stepper-substep-gap);
+            background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
+            background-size: 2px 8px;
+            background-position: center 4px;
+            background-repeat: repeat-y;
+        }
+    }
 
-            &:before {
-                content: '';
-            }
+    [part='substep'] [part~='bullet'] {
+        width: 0.75rem;
+        height: 0.75rem;
+        margin-left: 0.75rem;
+        margin-right: 1.25rem;
+        display: block;
+        padding-bottom: 0;
+
+        &:before {
+            content: '';
         }
     }
 
@@ -168,7 +159,7 @@ export default css`
             }
         }
 
-        .stepper-item-inner {
+        .stepper-item-header {
             justify-content: flex-end;
             margin-left: auto;
             text-align: right;
@@ -180,7 +171,7 @@ export default css`
             margin-left: 0.5rem;
         }
 
-        [part~='list--substep'] [part~='bullet'] {
+        [part='substep'] [part~='bullet'] {
             margin-left: 1.25rem;
             margin-right: 0.75rem;
         }
