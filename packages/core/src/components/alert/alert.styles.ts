@@ -47,8 +47,6 @@ export default css`
     }
 
     :host([hiding]) {
-        opacity: 0;
-        transform: scale(0.75);
         transition:
             opacity var(--ar-alert-hide-transition-duration),
             transform var(--ar-alert-hide-transition-duration);
