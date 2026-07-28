@@ -317,10 +317,16 @@ valeurs littérales jamais externalisées) :
   `::part(header)`/`::part(footer)` déjà existantes ; le reste (`display`, `align-items`,
   `justify-content`) reste interne, structurel.
 
-`--ar-datepicker-gap` renommé `--ar-datepicker-field-gap` (nom trop générique, ne disait pas à
-quoi il s'appliquait) — **reste un token**, réutilisé à la fois par le `:host` (gap du composant)
-et par une règle déjà externe (`::part(label) { margin-bottom: calc(0.5rem -
-var(--ar-datepicker-field-gap)) }`) : une vraie réutilisation DRY au sens de la contrainte 3,
-même si les deux consommations ne sont pas dans le même fichier `.styles.ts` (l'une est dans
-`default.css` lui-même) — un cas que le critère initial (« réutilisé ≥2× dans le `.styles.ts`
-du composant ») ne couvrait pas littéralement, mais où l'esprit DRY s'applique clairement.
+**Correction (même jour)** : `--ar-datepicker-gap` avait d'abord été conservé comme token (sous
+le nom `--ar-datepicker-field-gap`), au motif d'une réutilisation DRY entre le `gap` du `:host`
+et un `calc()` déjà présent dans la règle `::part(label)` de `default.css`
+(`margin-bottom: calc(0.5rem - var(--ar-datepicker-field-gap))`). Revu à la remarque du
+mainteneur : cette « réutilisation » n'est pas une exigence du composant (qui n'a besoin de la
+valeur qu'à un seul endroit, le `gap` du `:host`) mais un choix d'auteur propre à `default.css`
+— un thème est un exemple de personnalisation, pas une spécification que le composant doit
+servir. Rien n'empêche un autre thème de faire le même calcul avec sa propre variable locale ;
+le composant n'a pas à garantir qu'ajuster une valeur en rééquilibre une autre dans un thème
+donné. **`--ar-datepicker-gap` migré** : `ar-datepicker { gap: 0.35rem; }` en littéral (branche
+4, ciblant le tag pour une propriété `:host`), et le `calc()` du label remplacé par sa valeur
+précalculée (`margin-bottom: 0.15rem;`) avec un commentaire documentant le couplage — plus de
+token, plus de garde-fou technique, juste une note pour un futur mainteneur de `default.css`.

@@ -522,7 +522,6 @@
 
         --ar-datepicker-distance: var(--ar-anchor-distance);
         --ar-datepicker-offset: var(--ar-anchor-offset);
-        --ar-datepicker-field-gap: 0.35rem;
         /* --ar-color-danger-text (pas red-50 directement) : même convention que
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
         --ar-datepicker-error-color: var(--ar-color-danger-text);
@@ -690,6 +689,8 @@
     }
 
     ar-datepicker {
+        gap: 0.35rem;
+
         &::part(panel) {
             width: 20rem;
             padding: 1rem;
@@ -757,7 +758,10 @@
             font-size: var(--ar-font-size-sm);
             font-weight: var(--ar-font-weight-medium);
             color: var(--ar-color-text);
-            margin-bottom: calc(0.5rem - var(--ar-datepicker-field-gap));
+            /* Complète le gap du :host (0.35rem) pour un espacement visuel total de
+             * 0.5rem sous le label. Couplé à la valeur de `gap` ci-dessus — recalculer
+             * si l'une des deux change. */
+            margin-bottom: 0.15rem;
         }
 
         &::part(hint) {

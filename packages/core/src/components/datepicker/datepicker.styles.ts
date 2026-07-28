@@ -4,7 +4,6 @@ export default css`
     :host {
         display: flex;
         flex-direction: column;
-        gap: var(--ar-datepicker-field-gap);
     }
 
     p {
