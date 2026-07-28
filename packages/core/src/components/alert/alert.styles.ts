@@ -70,8 +70,10 @@ export default css`
         display: flex;
         align-items: center;
         justify-content: center;
-        width: var(--ar-alert-close-size);
-        height: var(--ar-alert-close-size);
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+        width: var(--ar-alert-close-size, 2rem);
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+        height: var(--ar-alert-close-size, 2rem);
         padding: 0;
         border: none;
         background-color: var(--ar-alert-close-bg);
