@@ -4,8 +4,6 @@ export default css`
     :host {
         display: flex;
         box-sizing: border-box;
-        column-gap: 0.75rem;
-        position: relative;
         align-items: center;
         opacity: 1;
         transform: scale(1);

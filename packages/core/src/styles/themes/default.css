@@ -919,6 +919,7 @@
         border-radius: 0.75rem;
         border-width: 1px;
         border-style: solid;
+        column-gap: 0.75rem;
 
         &::part(close) {
             border-radius: 7px;
