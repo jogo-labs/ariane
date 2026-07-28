@@ -374,12 +374,21 @@ variant, probable exigence WCAG 2.4.7). `font-size` de `[part='icon']` migré ve
 par la contrainte 6 — même garde `prefers-reduced-motion` que `close-transition-duration`).
 Les valeurs finales de l'état `[hiding]` (`opacity: 0`/`transform: scale(0.75)`) migrées vers
 `ar-alert[hiding] { }` — **nouveau cas vérifié empiriquement** : un sélecteur d'attribut
-externe sur le tag suit le cascade CSS normal face à une règle `:host` interne
-inconditionnelle (contrairement à `::part()`/tag non conditionné, qui l'emporte toujours),
-et n'interfère pas avec la garde reduced-motion tant que la propriété `transition`
-elle-même reste interne. `position: relative` mort sur `:host` retiré (aucun descendant n'en
-dépendait). Trou de documentation préexistant comblé : `@csspart icon-svg` (SVG de l'icône de
-variant, jamais documenté depuis l'origine du composant).
+externe conditionné sur le même attribut qu'une règle `:host` interne l'emporte
+purement et simplement sur cette dernière, exactement le même mécanisme « l'externe
+l'emporte toujours » que `::part()` ou une règle de tag non conditionnée — ce n'est pas le
+cascade CSS normal (spécificité/ordre) qui joue ici. Cette migration reste sûre non pas parce
+que le cascade se comporte normalement, mais parce que la règle externe ne matche que
+conditionnellement (absente quand l'attribut est absent) et parce que la propriété
+`transition` elle-même reste interne, ce qui préserve la garde reduced-motion. `position:
+relative` mort sur `:host` retiré (aucun descendant n'en dépendait). Trou de documentation
+préexistant comblé : `@csspart icon-svg` (SVG de l'icône de variant, jamais documenté depuis
+l'origine du composant). **Leçon généralisable** : externaliser les valeurs d'état final
+animées d'un élément implique que la logique de complétion propre au composant (tout ce qui
+dépend de `transitionend`) ne peut plus supposer qu'une transition aura toujours lieu — elle
+doit se prémunir contre une durée calculée nulle (absence de thème chargé), comme le fait déjà
+`ar-collapse` via `_shouldAnimate()`. `ar-alert` a été corrigé dans le même esprit après cette
+migration (garde JS `_shouldAnimate()` avant `_hide()`, cf. issue #129).
 
 **Clarification de la contrainte 2 (même jour)** : la vérification de cette deuxième passe a
 mis au jour une régression réelle sur le bouton de fermeture d'`ar-alert`. La tâche 3 avait

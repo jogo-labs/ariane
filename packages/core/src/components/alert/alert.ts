@@ -164,10 +164,17 @@ export class ArAlert extends LitElement {
         return this.nextFocus !== undefined && this.nextFocus?.replaceAll(' ', '') !== '';
     }
 
+    private _shouldAnimate(): boolean {
+        // transitionend ne se déclenche pas si duration=0s (défaut headless sans thème).
+        // On vérifie la durée calculée pour éviter que la fermeture reste bloquée indéfiniment.
+        const d = parseFloat(getComputedStyle(this).transitionDuration) || 0;
+        return !prefersReducedMotion() && d > 0;
+    }
+
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        if (prefersReducedMotion()) {
+        if (!this._shouldAnimate()) {
             this._finishHide();
         }
     };
