@@ -43,6 +43,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop --ar-alert-success-border - Bordure de l'alerte "success".
  * @cssprop --ar-alert-success-icon - Couleur de l'icône "success".
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
+ * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
  * @cssprop --ar-alert-color - Couleur du texte de l'alerte (cascade vers --ar-color-text).
 
  *

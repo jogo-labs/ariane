@@ -50,8 +50,8 @@ export default css`
         opacity: 0;
         transform: scale(0.75);
         transition:
-            opacity 0.33s,
-            transform 0.33s;
+            opacity var(--ar-alert-hide-transition-duration),
+            transform var(--ar-alert-hide-transition-duration);
     }
 
     @media (prefers-reduced-motion: reduce) {

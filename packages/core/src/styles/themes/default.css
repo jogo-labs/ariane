@@ -307,6 +307,7 @@
         --ar-alert-success-border: var(--ar-color-success-bg);
         --ar-alert-success-icon: var(--ar-color-success-text);
         --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
+        --ar-alert-hide-transition-duration: 0.33s;
 
         /* button */
         --ar-button-bg: var(--ar-color-interactive);
