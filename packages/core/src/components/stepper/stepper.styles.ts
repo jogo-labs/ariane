@@ -5,157 +5,111 @@ export default css`
         display: none !important;
     }
 
-    ol {
-        margin-top: 0;
-    }
-
-    ol ol {
-        margin-bottom: 0;
-    }
-
-    .stepper-dropdown {
+    .dropdown {
         position: relative;
         display: flex;
     }
 
-    .stepper-dropdown .btn-content {
+    .btn-content {
         margin-right: 1rem;
         gap: 0.25rem;
     }
 
     [part='trigger'] {
         padding: 0.5rem 0.75rem;
-        border-radius: var(--ar-stepper-trigger-radius);
         justify-content: space-between;
         line-height: normal;
         text-align: left;
     }
 
-    /* Tokens scopés au composant — .btn + [part='trigger'] pour dépasser
-     * .btn-secondary dans button.styles.ts, indépendamment de l'ordre des styles. */
-    [part='trigger'].btn.btn-secondary {
-        background-color: var(--ar-stepper-trigger-bg);
-    }
-
-    [part='trigger'].btn.btn-secondary:hover {
-        background-color: var(--ar-stepper-trigger-bg-hover);
-    }
-
     [part='panel'] {
-        padding: var(--ar-stepper-panel-padding);
-        min-width: var(--ar-stepper-panel-min-width);
-        max-width: var(--ar-stepper-panel-max-width);
         background-color: var(--ar-stepper-panel-bg, Canvas);
         border-color: var(--ar-stepper-panel-border-color, ButtonBorder);
-        border-radius: var(--ar-stepper-panel-border-radius);
-        box-shadow: var(--ar-stepper-panel-shadow);
     }
 
-    .stepper-list {
+    [part='list'] {
+        margin: 0;
         counter-reset: step;
     }
 
-    .stepper-item-inner {
+    .item-header {
         display: inline-flex;
         counter-increment: step;
     }
 
-    .stepper-item-bullet,
-    .stepper-item-inner {
+    [part~='bullet'],
+    .item-header {
         align-items: center;
         color: var(--ar-stepper-label-color);
     }
 
-    .stepper-item-bullet {
+    [part~='bullet'] {
         width: 2.25rem;
         height: 2.25rem;
         display: flex;
         flex-shrink: 0;
         justify-content: center;
-        border-radius: var(--ar-stepper-bullet-radius);
         padding-bottom: 0.125rem;
         margin-right: 0.5rem;
         transform: translateY(1px);
         box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
         background-color: transparent;
+        /* Empêche le soulignement de ::part(step-link) de peindre à travers ce
+         * flex-item (le conteneur <a> est en inline-flex, sans cette règle le trait
+         * traverse aussi le chiffre du compteur). */
+        text-decoration: none;
     }
 
-    .stepper-item-bullet:before {
+    [part~='bullet']:before {
         content: counter(step);
     }
 
-    .stepper-item {
+    .item {
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .stepper-item .stepper-link {
-        color: var(--ar-stepper-link-color);
-        text-decoration: none;
+    [part~='step-link'] {
+        &:is(:focus, :hover) {
+            &:before {
+                background-color: var(--ar-stepper-link-hover-bullet-color);
+            }
+
+            .item-label {
+                color: var(--ar-stepper-link-hover-label-color);
+            }
+
+            [part~='bullet'] {
+                color: var(--ar-stepper-link-hover-bullet-text-color);
+                background-color: var(--ar-stepper-bullet-hover-bg);
+                box-shadow: none;
+            }
+        }
+
+        &:focus {
+            outline-offset: 4px;
+            outline-color: var(--ar-stepper-link-focus-outline-color);
+        }
     }
 
-    .stepper-item .stepper-link .stepper-item-label {
-        text-decoration: underline;
-    }
-
-    .stepper-item .stepper-link:focus,
-    .stepper-item .stepper-link:hover {
-        color: var(--ar-stepper-link-hover-color);
-    }
-
-    .stepper-item .stepper-link:focus:before,
-    .stepper-item .stepper-link:hover:before {
-        background-color: var(--ar-stepper-link-hover-bullet-color);
-    }
-
-    .stepper-item .stepper-link:focus .stepper-item-label,
-    .stepper-item .stepper-link:hover .stepper-item-label {
-        text-decoration: none;
-        color: var(--ar-stepper-link-hover-label-color);
-    }
-
-    .stepper-item .stepper-link:focus .stepper-item-bullet,
-    .stepper-item .stepper-link:hover .stepper-item-bullet {
-        color: var(--ar-stepper-link-hover-bullet-text-color);
-        background-color: var(--ar-stepper-bullet-hover-bg);
-        box-shadow: none;
-    }
-
-    .stepper-item .stepper-link:focus {
-        outline-offset: 4px;
-        outline-color: var(--ar-stepper-link-focus-outline-color);
-        border-radius: var(--ar-stepper-link-focus-radius);
-    }
-
-    .stepper-item.active > .stepper-item-inner {
-        color: var(--ar-stepper-active-label-color);
+    .current > .item-header {
+        color: var(--ar-stepper-current-header-color);
         font-weight: 700;
     }
 
-    .stepper-item.active > .stepper-item-inner .stepper-item-bullet {
-        color: var(--ar-stepper-active-bullet-color);
-        background-color: var(--ar-stepper-active-bullet-bg);
-        box-shadow: none;
-    }
-
-    .stepper-item:not(:last-child):after {
+    [part='step']:not(:last-child):after {
         content: '';
         display: block;
     }
 
-    .stepper-link .stepper-item-bullet {
+    [part~='step-link'] [part~='bullet'] {
         color: var(--ar-stepper-bullet-color);
         background-color: var(--ar-stepper-bullet-bg);
     }
 
-    .stepper-list.stepper-desktop,
-    .stepper-list.stepper-mobile {
-        margin-bottom: 0;
-    }
-
-    .stepper-list .stepper-item:after {
+    [part='step']:after {
         width: 2.25rem;
         height: var(--ar-stepper-gap);
         background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
@@ -164,64 +118,62 @@ export default css`
         background-repeat: repeat-y;
     }
 
-    .stepper-list .stepper-list .stepper-item:after {
-        content: none;
+    [part='substep'] {
+        &:before {
+            content: '';
+            display: block;
+            width: 2.25rem;
+            height: var(--ar-stepper-substep-gap);
+            background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
+            background-size: 2px 8px;
+            background-position: center 4px;
+            background-repeat: repeat-y;
+        }
     }
 
-    .stepper-list .stepper-list .stepper-item:before {
-        content: '';
-        display: block;
-        width: 2.25rem;
-        height: var(--ar-stepper-substep-gap);
-        background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
-        background-size: 2px 8px;
-        background-position: center 4px;
-        background-repeat: repeat-y;
-    }
-
-    .stepper-list .stepper-list .stepper-item-bullet {
+    [part='substep'] [part~='bullet'] {
         width: 0.75rem;
         height: 0.75rem;
         margin-left: 0.75rem;
         margin-right: 1.25rem;
         display: block;
         padding-bottom: 0;
-    }
 
-    .stepper-list .stepper-list .stepper-item-bullet:before {
-        content: '';
-    }
-
-    @media (min-width: 992px) {
-        .stepper-desktop {
-            display: flex !important;
-            flex-flow: column !important;
+        &:before {
+            content: '';
         }
     }
 
-    :host([align='right']) .stepper-desktop .stepper-item {
-        align-items: flex-end;
-        text-align: right;
+    .desktop {
+        display: flex;
+        flex-flow: column;
     }
 
-    :host([align='right']) .stepper-desktop .stepper-item::after {
-        margin-left: auto;
-    }
+    :host([align='right']) .desktop {
+        .item {
+            align-items: flex-end;
+            text-align: right;
 
-    :host([align='right']) .stepper-desktop .stepper-item-inner {
-        justify-content: flex-end;
-        margin-left: auto;
-        text-align: right;
-    }
+            &::after {
+                margin-left: auto;
+            }
+        }
 
-    :host([align='right']) .stepper-desktop .stepper-item-bullet {
-        order: 2;
-        margin-right: 0;
-        margin-left: 0.5rem;
-    }
+        .item-header {
+            justify-content: flex-end;
+            margin-left: auto;
+            text-align: right;
+        }
 
-    :host([align='right']) .stepper-desktop .stepper-list .stepper-item-bullet {
-        margin-left: 1.25rem;
-        margin-right: 0.75rem;
+        [part~='bullet'] {
+            order: 2;
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+
+        [part='substep'] [part~='bullet'] {
+            margin-left: 1.25rem;
+            margin-right: 0.75rem;
+        }
     }
 `;

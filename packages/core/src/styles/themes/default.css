@@ -368,37 +368,20 @@
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
-        --ar-stepper-bullet-radius: 0.75rem;
-        --ar-stepper-trigger-radius: 0.75rem;
-        --ar-stepper-link-focus-radius: 0.125rem;
         --ar-stepper-bullet-color: var(--ar-color-interactive);
         --ar-stepper-bullet-bg: var(--ar-color-primary-80);
         --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
-        --ar-stepper-link-color: var(--ar-color-interactive);
-        --ar-stepper-link-hover-color: var(--ar-color-text-muted);
         --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
         --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
-        --ar-stepper-active-label-color: var(--ar-color-interactive);
-        --ar-stepper-active-bullet-color: var(--ar-color-text-inverse);
-        --ar-stepper-active-bullet-bg: var(--ar-color-interactive);
+        --ar-stepper-current-header-color: var(--ar-color-interactive);
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
-        --ar-stepper-panel-min-width: var(--ar-panel-min-width);
-        --ar-stepper-panel-max-width: var(--ar-panel-max-width);
         --ar-stepper-panel-bg: var(--ar-panel-bg);
         --ar-stepper-panel-border-color: var(--ar-panel-border-color);
-        --ar-stepper-panel-border-radius: var(--ar-panel-radius);
-        --ar-stepper-panel-shadow: var(--ar-panel-shadow);
-        /* Valeur propre (0.75rem), volontairement non cascadée depuis --ar-panel-padding :
-           le panel disclosure du stepper a toujours eu un padding plus généreux que le
-           défaut partagé (0.25rem) — même logique que --ar-dropdown-min-width. */
-        --ar-stepper-panel-padding: 0.75rem;
-        --ar-stepper-trigger-bg: var(--ar-button-secondary-bg);
-        --ar-stepper-trigger-bg-hover: var(--ar-button-secondary-bg-hover);
 
         /* progressbar */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
@@ -733,6 +716,12 @@
             outline-offset: var(--ar-focus-ring-offset);
         }
 
+        &::part(footer) {
+            margin: 0;
+            padding: 0.75rem 0 0;
+            background: transparent;
+        }
+
         &::part(footer-btn) {
             background: transparent;
             border-width: 1px;
@@ -759,12 +748,6 @@
             margin: 0;
             padding: 0 0 0.75rem;
             border-radius: 0;
-            background: transparent;
-        }
-
-        &::part(footer) {
-            margin: 0;
-            padding: 0.75rem 0 0;
             background: transparent;
         }
 
@@ -860,6 +843,65 @@
             font-size: 1rem;
             border-radius: 0.5rem;
             border-width: 2px;
+        }
+    }
+
+    ar-stepper {
+        &::part(trigger) {
+            border-radius: 0.75rem;
+            background-color: var(--ar-button-secondary-bg);
+        }
+
+        &::part(trigger):hover {
+            background-color: var(--ar-button-secondary-bg-hover);
+        }
+
+        &::part(trigger):active:not(:disabled) {
+            background-color: var(--ar-color-neutral-30);
+            color: var(--ar-color-white);
+        }
+
+        &::part(trigger):focus-visible {
+            background-color: var(--ar-button-secondary-bg-hover);
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(panel) {
+            padding: 0.75rem;
+            min-width: var(--ar-panel-min-width);
+            max-width: var(--ar-panel-max-width);
+            border-radius: var(--ar-panel-radius);
+            box-shadow: var(--ar-panel-shadow);
+        }
+
+        &::part(step-link) {
+            color: var(--ar-color-interactive);
+            text-decoration: underline;
+        }
+
+        &::part(step-link):hover,
+        &::part(step-link):focus {
+            color: var(--ar-color-text-muted);
+            text-decoration: none;
+        }
+
+        &::part(step-link):focus {
+            border-radius: 0.125rem;
+        }
+
+        &::part(step-link--current) {
+            color: var(--ar-color-interactive);
+        }
+
+        &::part(bullet) {
+            border-radius: 0.75rem;
+        }
+
+        &::part(bullet--current) {
+            background-color: var(--ar-color-interactive);
+            color: var(--ar-color-text-inverse);
+            box-shadow: none;
         }
     }
 }

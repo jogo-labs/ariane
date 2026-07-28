@@ -21,6 +21,7 @@ import {
     findStylesFiles,
     findUnjustifiedFallbacks,
 } from './scripts/validate-no-hardcoded-tokens.js';
+import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -207,10 +208,19 @@ export default {
                     findUnjustifiedFallbacks(filePath, readFileSync(filePath, 'utf-8')),
                 );
 
+                // Valide que toute règle ::part(x) de base précède ses parts d'état
+                // (::part(x-état)) dans default.css — cf.
+                // docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md
+                const partStateOrderErrors = findPartStateOrderErrors(
+                    'src/styles/themes/default.css',
+                    themeCss,
+                );
+
                 const allErrors = [
                     ...cssPropCoverageErrors,
                     ...hardcodedErrors,
                     ...unjustifiedFallbackErrors,
+                    ...partStateOrderErrors,
                 ];
                 if (allErrors.length > 0) {
                     const coverageErrorsMsg =
@@ -225,8 +235,12 @@ export default {
                         unjustifiedFallbackErrors.length > 0
                             ? `\n  fallback(s) non justifié(s) :\n${unjustifiedFallbackErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
+                    const partStateOrderErrorsMsg =
+                        partStateOrderErrors.length > 0
+                            ? `\n  ordre part d'état invalide :\n${partStateOrderErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}${partStateOrderErrorsMsg}`,
                     );
                 }
             },

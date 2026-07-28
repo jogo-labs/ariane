@@ -95,7 +95,10 @@ pseudo-élément)** :
 **Garde-fou état interne — valeur réécrite par la classe `.active`** :
 
 - `--ar-stepper-active-bullet-bg`, `--ar-stepper-active-bullet-color`,
-  `--ar-stepper-active-label-color`.
+  `--ar-stepper-active-label-color`. **Périmé — cf. amendement ADR-005 du 2026-07-27** : les 2
+  premiers ont depuis migré vers `::part(bullet--current)`, et `--ar-stepper-active-label-color`
+  a été re-scopé (un nouveau part `step-link--current` couvre désormais le cas lien, le token ne
+  reste que pour le cas `<div>` non cliquable).
 - `--ar-stepper-bullet-bg`, `--ar-stepper-bullet-color` (valeur de base réécrite à la fois par
   `.active` et par le hover ancêtre — deux sources d'override).
 - `--ar-stepper-bullet-border-color` (pilote un `box-shadow` inset réécrit à `none` par

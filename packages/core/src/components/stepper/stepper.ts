@@ -44,41 +44,30 @@ export interface ArStepperStepChangeDetail {
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
  * @csspart nav          - L'élément `<nav>` englobant.
- * @csspart list         - La liste des étapes (desktop).
+ * @csspart list         - La liste des étapes.
+ * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
- * @csspart dropdown     - Le conteneur dropdown.
+ * @csspart bullet       - La puce numérotée d'une étape.
+ * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
+ * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
- * @cssprop --ar-stepper-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop --ar-stepper-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
  * @cssprop --ar-stepper-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
  * @cssprop --ar-stepper-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
- * @cssprop --ar-stepper-panel-border-radius - Border-radius du panel mobile (cascade vers --ar-panel-radius).
- * @cssprop --ar-stepper-panel-shadow - Ombre portée du panel mobile (cascade vers --ar-panel-shadow).
- * @cssprop --ar-stepper-panel-padding - Padding interne du panel mobile (valeur propre, non cascadée depuis --ar-panel-padding).
  * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
  * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
  * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.
- * @cssprop --ar-stepper-active-bullet-bg - Fond de la puce de l'étape active.
- * @cssprop --ar-stepper-active-bullet-color - Couleur du numéro dans la puce active.
  * @cssprop --ar-stepper-bullet-bg - Fond des puces des étapes visitables.
  * @cssprop --ar-stepper-bullet-color - Couleur du numéro dans les puces visitables.
  * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
  * @cssprop --ar-stepper-bullet-hover-bg - Fond de la puce au survol.
- * @cssprop --ar-stepper-link-color - Couleur du texte du lien.
- * @cssprop --ar-stepper-link-hover-color - Couleur du texte du lien au survol.
- * @cssprop --ar-stepper-bullet-radius - Border-radius de la puce.
- * @cssprop --ar-stepper-link-focus-radius - Border-radius de l'anneau de focus du lien.
- * @cssprop --ar-stepper-label-color - Couleur des labels des étapes inactives.
- * @cssprop --ar-stepper-active-label-color - Couleur du label de l'étape active.
+ * @cssprop --ar-stepper-label-color - Couleur des labels des étapes non courantes.
+ * @cssprop --ar-stepper-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
- * @cssprop --ar-stepper-trigger-bg - Fond du bouton trigger mobile.
- * @cssprop --ar-stepper-trigger-bg-hover - Fond du bouton trigger mobile au survol.
- * @cssprop --ar-stepper-trigger-radius - Border-radius du bouton trigger mobile.
  * @cssprop --ar-stepper-link-hover-bullet-color - Couleur de la puce du lien d'étape au survol/focus (cascade vers --ar-color-interactive).
  * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).
@@ -319,12 +308,7 @@ export class ArStepper extends LitElement {
                   this.onClickLink,
               );
 
-        return html` <nav
-            part="nav"
-            class="stepper-nav"
-            role="navigation"
-            aria-labelledby="label-nav"
-        >
+        return html` <nav part="nav" role="navigation" aria-labelledby="label-nav">
             <p id="label-nav" class="sr-only">Étapes du formulaire</p>
             ${content}
             <slot></slot>
