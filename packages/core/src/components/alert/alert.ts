@@ -186,6 +186,9 @@ export class ArAlert extends LitElement {
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
     private _finishHide = (): void => {
         if (!this.canBeHidden || !this.hiding) return;
+        // Idempotent : le thème anime opacity ET transform, donc `transitionend` se déclenche
+        // deux fois (une par propriété) — sans ce reset, le second appel repasserait la garde.
+        this.hiding = false;
 
         this.dispatchEvent(new CustomEvent('ar-alert-close', { bubbles: true, composed: true }));
         this.remove();

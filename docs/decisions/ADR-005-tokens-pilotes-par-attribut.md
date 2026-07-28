@@ -401,7 +401,11 @@ de sortie ne se déclenchait plus du tout en pratique (mesuré à ~3ms au lieu d
 conditionnée par l'attribut que la garde vient elle-même de poser — la garde doit donc attendre
 que la réflexion ait eu lieu (`await this.updateComplete`) avant de lire `getComputedStyle`,
 sans quoi une transition pilotée par attribut n'a jamais la chance de matcher avant d'être
-évaluée.
+évaluée. Cette réparation ayant rendu le chemin animé de nouveau atteignable en usage réel, une
+revue a également relevé et corrigé un bug d'idempotence préexistant dans `_finishHide` : le
+thème animant `opacity` et `transform` simultanément, `transitionend` se déclenche deux fois (une
+par propriété) — sans reset de `hiding` dans `_finishHide`, le second appel repassait la garde et
+ré-émettait `ar-alert-close` / redonnait le focus une seconde fois.
 
 **Clarification de la contrainte 2 (même jour)** : la vérification de cette deuxième passe a
 mis au jour une régression réelle sur le bouton de fermeture d'`ar-alert`. La tâche 3 avait

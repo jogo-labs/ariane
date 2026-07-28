@@ -205,6 +205,10 @@ describe('ArAlert', () => {
     describe('fermeture', () => {
         it('un clic sur close passe hiding à true', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Force une durée de transition non nulle (simule un thème chargé) : sans thème,
+            // _shouldAnimate() renvoie false et _finishHide() s'exécute de façon synchrone,
+            // ce qui repasserait hiding à false avant même l'assertion ci-dessous.
+            el.style.transitionDuration = '0.3s';
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
             // hiding est un protected property — on y accède via cast
@@ -213,6 +217,9 @@ describe('ArAlert', () => {
 
         it('hiding=true applique l\'attribut "hiding" sur le host', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Cf. commentaire ci-dessus : durée de transition non nulle requise pour que
+            // hiding reste true (chemin asynchrone) au moment de l'assertion.
+            el.style.transitionDuration = '0.3s';
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
             expect(el.hasAttribute('hiding')).toBe(true);
@@ -235,6 +242,27 @@ describe('ArAlert', () => {
             expect(handler).not.toHaveBeenCalled();
 
             // Simule la fin de la transition CSS (transitionend)
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('ignore un second transitionend dans la même tâche (thème anime opacity ET transform)', async () => {
+            // Régression #129 : le thème déclenche la transition sur deux propriétés
+            // simultanément (opacity + transform). Par spec, `transitionend` se déclenche
+            // une fois PAR PROPRIÉTÉ transitionnée — donc deux fois de suite ici. Sans reset
+            // de `hiding` dans `_finishHide`, le second appel repasserait la garde et
+            // ré-émettrait ar-alert-close / redonnerait le focus une seconde fois.
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.style.transitionDuration = '0.3s';
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+
+            (requirePart(el, 'close') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+
+            // Simule les deux transitionend (opacity, puis transform) dans la même tâche.
+            el.dispatchEvent(new Event('transitionend'));
             el.dispatchEvent(new Event('transitionend'));
 
             expect(handler).toHaveBeenCalledOnce();
