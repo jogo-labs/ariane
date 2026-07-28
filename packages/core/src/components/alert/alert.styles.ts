@@ -74,20 +74,14 @@ export default css`
         height: var(--ar-alert-close-size, 2rem);
         padding: 0;
         border: none;
-        background-color: var(--ar-alert-close-bg);
         color: currentColor;
         cursor: pointer;
-        opacity: 0.75;
         transition:
             opacity var(--ar-alert-close-transition-duration),
             background-color var(--ar-alert-close-transition-duration);
-        position: relative;
-        top: -0.2rem;
-        right: -0.2rem;
 
         &:hover {
             opacity: 1;
-            background-color: var(--ar-alert-close-hover-bg);
         }
 
         &:focus-visible {
