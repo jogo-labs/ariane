@@ -72,6 +72,11 @@ export default css`
         height: var(--ar-alert-close-size, 2rem);
         padding: 0;
         border: none;
+        /* Reset structurel : sans cette déclaration, en l'absence de thème, aucune règle
+         * ne pilote plus background-color depuis la migration vers ::part(close) — le
+         * bouton hérite alors du chrome natif du navigateur (souvent gris clair opaque),
+         * qui peut entrer en conflit avec la couleur héritée de l'icône (currentColor). */
+        background-color: transparent;
         color: currentColor;
         cursor: pointer;
         transition:
