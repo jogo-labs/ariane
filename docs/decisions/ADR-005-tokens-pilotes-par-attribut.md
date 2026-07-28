@@ -270,3 +270,57 @@ règle `::part(step-link--current) { color: var(--ar-color-interactive); }` déc
 `::part(step-link)`. `--ar-stepper-active-label-color` reste un token, mais désormais
 correctement scopé à son seul cas d'usage réel restant : l'étape active rendue comme élément
 non cliquable (`<div>`, sans `part`), pour laquelle il n'existe pas d'autre point d'extension.
+
+## Amendement (2026-07-27) : le pattern part d'état ne débloque pas les tokens calibrés en dark mode
+
+**Application — `ar-datepicker` (2026-07-27)**, deuxième composant traité après `ar-stepper`.
+Constat en creusant les candidats identifiés dans l'audit du 2026-07-25 (`day-color`, `day-bg`,
+et la famille `day-*` en général) : **la contrainte 1 (calibration dark-mode indépendante)
+prime sur le pattern part d'état**, même quand ce dernier résoudrait par ailleurs le problème
+d'état interne. Sur `ar-datepicker`, `--ar-datepicker-day-today-color`,
+`--ar-datepicker-day-hover-bg`/`-color`, `--ar-datepicker-day-selected-bg`/`-color` et
+`--ar-datepicker-input-error-border-color` sont tous redéclarés indépendamment sous
+`:root[data-theme='dark']`/`@media (prefers-color-scheme: dark)` — migrer leur règle vers un
+`::part()` externe littéral leur ferait perdre cette calibration, sauf à dupliquer la règle
+sous les blocs dark (option déjà écartée par la contrainte 1 elle-même, pour ne pas introduire
+de duplication à maintenir manuellement).
+
+Plus profond que la contrainte 1 seule : sur `[part='day']`, la base (`day-color`/`day-bg`,
+elle-même non calibrée dark) est surchargée par **quatre états combinables indépendamment**
+(`.today`, `.selected`, `.other-month`, `:hover`), départagés par un ordre de cascade interne
+précis (ex. une cellule à la fois `.selected` et `.other-month` — cas réel et atteignable,
+un jour sélectionné réapparaissant en case grisée d'un mois adjacent). Migrer la base seule
+casserait ces surcharges (règle externe > toute règle interne, quel que soit l'état) ; migrer
+la base _et_ tous les états ensemble nécessiterait de dupliquer chaque état sous les blocs
+dark — la même limite que ci-dessus, à une échelle plus large. **Conclusion : toute la famille
+`day-*` reste interne**, y compris `day-color`/`day-bg`, alors qu'ils auraient été candidats
+sous le seul critère « état interne » sans la contrainte dark-mode.
+
+**Principe retenu pour trancher ce type de cas** (formulé par le mainteneur) : le thème pilote
+les aspects visuels (couleur, fond, bordure) de façon simple via les tokens internes, y compris
+leur déclinaison dark/light. Un consommateur qui a besoin d'aller plus loin dispose déjà des
+`part` exportés (`day`, `weekday`, `header`, `footer`…) pour surcharger directement — mais s'il
+choisit de surcharger un aspect gouverné par un token interne (donc de le contourner), il prend
+la responsabilité de gérer lui-même la cohérence dark/light de sa surcharge. Le thème n'a pas à
+prévoir une règle externe pour chaque combinaison possible.
+
+**Application concrète** : seules 3 valeurs, jamais bloquées par la contrainte dark-mode ni par
+un état interne concurrent, ont été trouvées migrables — toutes trois jamais tokenisées avant
+(oubliées de l'audit initial du 2026-07-25, qui n'examinait que les tokens déjà nommés, pas les
+valeurs littérales jamais externalisées) :
+
+- `[part='weekday']` : `text-align`, `font-weight`, `padding-block`, `text-transform` — règle
+  interne entièrement supprimée (plus rien à styliser en interne sur cet élément), migrée dans
+  `::part(weekday)` déjà existant. Le sélecteur interne redondant `[part='grid'] th` (le `<th>`
+  porte déjà `part='weekday'` directement) disparaît avec elle.
+- `[part='header']`/`[part='footer']` : `gap` (0.25rem / 0.5rem), migré dans les règles
+  `::part(header)`/`::part(footer)` déjà existantes ; le reste (`display`, `align-items`,
+  `justify-content`) reste interne, structurel.
+
+`--ar-datepicker-gap` renommé `--ar-datepicker-field-gap` (nom trop générique, ne disait pas à
+quoi il s'appliquait) — **reste un token**, réutilisé à la fois par le `:host` (gap du composant)
+et par une règle déjà externe (`::part(label) { margin-bottom: calc(0.5rem -
+var(--ar-datepicker-field-gap)) }`) : une vraie réutilisation DRY au sens de la contrainte 3,
+même si les deux consommations ne sont pas dans le même fichier `.styles.ts` (l'une est dans
+`default.css` lui-même) — un cas que le critère initial (« réutilisé ≥2× dans le `.styles.ts`
+du composant ») ne couvrait pas littéralement, mais où l'esprit DRY s'applique clairement.

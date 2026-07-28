@@ -4,7 +4,7 @@ export default css`
     :host {
         display: flex;
         flex-direction: column;
-        gap: var(--ar-datepicker-gap);
+        gap: var(--ar-datepicker-field-gap);
     }
 
     p {
@@ -47,7 +47,6 @@ export default css`
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.25rem;
     }
 
     [part='header'] span[aria-live] {
@@ -90,13 +89,6 @@ export default css`
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-    }
-
-    [part='grid'] th {
-        text-align: center;
-        font-weight: normal;
-        padding-block: 0.5rem;
-        text-transform: uppercase;
     }
 
     [part='day'] {
@@ -188,6 +180,5 @@ export default css`
     [part='footer'] {
         display: flex;
         justify-content: space-between;
-        gap: 0.5rem;
     }
 `;
