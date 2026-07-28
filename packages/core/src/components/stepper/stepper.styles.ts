@@ -94,8 +94,8 @@ export default css`
         }
     }
 
-    .active > .stepper-item-header {
-        color: var(--ar-stepper-active-label-color);
+    .current > .stepper-item-header {
+        color: var(--ar-stepper-current-header-color);
         font-weight: 700;
     }
 

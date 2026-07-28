@@ -376,7 +376,7 @@
         --ar-stepper-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
         --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
-        --ar-stepper-active-label-color: var(--ar-color-interactive);
+        --ar-stepper-current-header-color: var(--ar-color-interactive);
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);

@@ -19,10 +19,10 @@ export interface MobileRenderContext {
 /* SHARED HELPERS                                   */
 /* ------------------------------------------------ */
 
-// Un parent est "actif" si lui-même OU l'un de ses enfants est current.
+// Un groupe est "courant" si lui-même OU l'un de ses enfants l'est.
 // Le state engine aplatit les noeuds en DFS et marque le parent 'completed'
 // dès qu'un enfant est current → on ne peut pas se fier uniquement à step.state.
-function isGroupActive(node: NavigationNode, mode: NavigationMode): boolean {
+function isGroupCurrent(node: NavigationNode, mode: NavigationMode): boolean {
     return (
         node.state === 'current' ||
         mode === 'edit' ||
@@ -38,10 +38,10 @@ function withCurrentPart(base: string, isCurrent: boolean): string {
 function renderStepText(
     label: string,
     order: number,
-    isActive: boolean,
+    isCurrent: boolean,
     isSubstep = false,
 ): TemplateResult {
-    const bulletPart = withCurrentPart('bullet', isActive);
+    const bulletPart = withCurrentPart('bullet', isCurrent);
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
@@ -60,32 +60,32 @@ function renderSubStep(
     onClickLink: (e: MouseEvent) => void,
 ): TemplateResult {
     const order = index + 1;
-    const isActive = sub.state === 'current';
+    const isCurrent = sub.state === 'current';
     const isCompleted = sub.state === 'completed';
     const isEditMode = mode === 'edit';
 
     return html`
         <li
-            class="stepper-item${isActive ? ' active' : ''}"
+            class="stepper-item${isCurrent ? ' current' : ''}"
             part="substep"
-            aria-current=${isActive ? 'step' : nothing}
+            aria-current=${isCurrent ? 'step' : nothing}
         >
             ${isCompleted || isEditMode
                 ? html`
                       <a
                           class="stepper-item-header"
-                          part=${withCurrentPart('step-link', isActive)}
+                          part=${withCurrentPart('step-link', isCurrent)}
                           data-substep-order=${order}
                           data-path=${sub.path}
                           href=${sub.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(sub.label, order, isActive, true)}
+                          ${renderStepText(sub.label, order, isCurrent, true)}
                       </a>
                   `
                 : html`
                       <div class="stepper-item-header">
-                          ${renderStepText(sub.label, order, isActive, true)}
+                          ${renderStepText(sub.label, order, isCurrent, true)}
                       </div>
                   `}
         </li>
@@ -99,35 +99,35 @@ function renderStep(
     onClickLink: (e: MouseEvent) => void,
 ): TemplateResult {
     const order = index + 1;
-    const active = isGroupActive(step, mode);
-    // Un parent complété dont le groupe est actif ne doit pas être rendu comme lien
+    const isCurrent = isGroupCurrent(step, mode);
+    // Un parent complété dont le groupe est courant ne doit pas être rendu comme lien
     const isCompleted =
-        (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !active);
+        (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !isCurrent);
 
     return html`
         <li
-            class="stepper-item${active ? ' active' : ''}"
+            class="stepper-item${isCurrent ? ' current' : ''}"
             part="step"
-            aria-current=${active ? 'step' : nothing}
+            aria-current=${isCurrent ? 'step' : nothing}
         >
             ${isCompleted
                 ? html`
                       <a
                           class="stepper-item-header"
-                          part=${withCurrentPart('step-link', active)}
+                          part=${withCurrentPart('step-link', isCurrent)}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(step.label, order, active)}
+                          ${renderStepText(step.label, order, isCurrent)}
                       </a>
                   `
                 : html`
                       <div class="stepper-item-header">
-                          ${renderStepText(step.label, order, active)}
+                          ${renderStepText(step.label, order, isCurrent)}
                       </div>
                   `}
-            ${(active || mode === 'edit') && step.children.length
+            ${(isCurrent || mode === 'edit') && step.children.length
                 ? html`
                       <ol class="list-unstyled" part="list list--substep">
                           ${step.children.map((sub, i) => renderSubStep(sub, i, mode, onClickLink))}

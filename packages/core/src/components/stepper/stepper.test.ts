@@ -97,9 +97,9 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
             const link = shadow(el).querySelector('a[part~="step-link"]');
-            // En mode edit, isGroupActive() rend "active" toujours vrai pour un step top-level
+            // En mode edit, isGroupCurrent() rend "isCurrent" toujours vrai pour un step top-level
             // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
-            // step-link--current — cf. le test dédié plus bas pour la variante "inactive".
+            // step-link--current — cf. le test dédié plus bas pour la variante "non courante".
             expect(link?.getAttribute('part')).toContain('step-link');
             const currentItemInner = shadow(el).querySelector('div.stepper-item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
@@ -115,7 +115,7 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('[part="bullet"]')).not.toBeNull();
         });
 
-        it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape active', async () => {
+        it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape courante', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -132,13 +132,13 @@ describe('ArStepper', () => {
             expect(bulletB.getAttribute('part')).toBe('bullet');
         });
 
-        it('rend le part d\'état "step-link--current" sur le lien de la sous-étape active en mode edit', async () => {
-            // Au niveau top-level, isGroupActive() rend "active" toujours vrai en mode edit
-            // (tous les groupes sont navigables) : impossible d'y observer un lien "actif" vs
-            // "non actif" côte à côte. Au niveau sous-étape, sub.state === 'current' est un
+        it('rend le part d\'état "step-link--current" sur le lien de la sous-étape courante en mode edit', async () => {
+            // Au niveau top-level, isGroupCurrent() rend "isCurrent" toujours vrai en mode edit
+            // (tous les groupes sont navigables) : impossible d'y observer un lien "courant" vs
+            // "non courant" côte à côte. Au niveau sous-étape, sub.state === 'current' est un
             // état littéral par sous-étape : c'est le seul niveau où deux liens rendus
             // simultanément peuvent différer sur ce part d'état — exactement le scénario visé
-            // par le correctif (plusieurs liens actifs simultanément en mode edit).
+            // par le correctif (plusieurs liens courants simultanément en mode edit).
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/2" mode="edit">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -156,7 +156,7 @@ describe('ArStepper', () => {
             expect(link2?.getAttribute('part')).toBe('step-link step-link--current');
         });
 
-        it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape active', async () => {
+        it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/1">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -345,7 +345,7 @@ describe('ArStepper', () => {
     // ── Mise à jour de currentPath ─────────────────────────────────────────────
 
     describe('mise à jour de currentPath', () => {
-        it("met à jour l'état actif quand currentPath change", async () => {
+        it("met à jour l'état courant quand currentPath change", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -357,8 +357,8 @@ describe('ArStepper', () => {
             await waitForUpdate(el);
 
             const items = shadow(el).querySelectorAll('li.stepper-item');
-            expect(items[0]?.classList.contains('active')).toBe(false);
-            expect(items[1]?.classList.contains('active')).toBe(true);
+            expect(items[0]?.classList.contains('current')).toBe(false);
+            expect(items[1]?.classList.contains('current')).toBe(true);
         });
     });
 
