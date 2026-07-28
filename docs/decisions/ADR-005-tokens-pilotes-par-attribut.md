@@ -359,3 +359,45 @@ ci-dessus). Les 12 tokens sémantiques (fond/bordure/icône des 4 variants) rest
 hors périmètre de cette migration (fallback WCAG de contraste + calibration dark-mode
 indépendante sur les bordures). Détail complet :
 `docs/superpowers/plans/2026-07-28-alert-token-vs-part-129.md`.
+
+**Deuxième passe (même jour)** : audit élargi aux valeurs jamais tokenisées et à une
+recatégorisation. `column-gap` du `:host` (jamais tokenisé) migré en littéral dans
+`ar-alert { }`. `--ar-alert-close-bg`/`--ar-alert-close-hover-bg` — laissés tokens par erreur
+de catégorisation lors de la première passe (supposés sémantiques comme les couleurs de
+variant, sans revérifier les critères) — migrés en littéral dans `ar-alert::part(close)`/
+`::part(close):hover`, même pattern que `nav-btn`/`footer-btn` de `ar-datepicker`. `opacity`/
+`position`/`top`/`right` de `[part='close']` migrés de la même façon ; `:focus-visible`
+(`outline: currentColor`) reste interne (contraste du focus ring contre les 4 fonds de
+variant, probable exigence WCAG 2.4.7). `font-size` de `[part='icon']` migré vers
+`::part(icon)`. La durée d'animation de sortie (`0.33s`, jamais tokenisée) devient
+`--ar-alert-hide-transition-duration`, consommée en interne uniquement (bloquée en externe
+par la contrainte 6 — même garde `prefers-reduced-motion` que `close-transition-duration`).
+Les valeurs finales de l'état `[hiding]` (`opacity: 0`/`transform: scale(0.75)`) migrées vers
+`ar-alert[hiding] { }` — **nouveau cas vérifié empiriquement** : un sélecteur d'attribut
+externe sur le tag suit le cascade CSS normal face à une règle `:host` interne
+inconditionnelle (contrairement à `::part()`/tag non conditionné, qui l'emporte toujours),
+et n'interfère pas avec la garde reduced-motion tant que la propriété `transition`
+elle-même reste interne. `position: relative` mort sur `:host` retiré (aucun descendant n'en
+dépendait). Trou de documentation préexistant comblé : `@csspart icon-svg` (SVG de l'icône de
+variant, jamais documenté depuis l'origine du composant).
+
+**Clarification de la contrainte 2 (même jour)** : la vérification de cette deuxième passe a
+mis au jour une régression réelle sur le bouton de fermeture d'`ar-alert`. La tâche 3 avait
+migré la valeur au repos `opacity: 0.75` vers une règle externe (`ar-alert::part(close)`),
+mais laissé inchangées en interne les règles `&:hover { opacity: 1; }` et
+`&:focus-visible { opacity: 1; ... }` — cassant le hover/focus (opacity bloquée à 0.75),
+confirmé par Playwright. Corrigé en externalisant aussi la gestion hover/focus de l'opacité
+(`&::part(close):hover`/`&::part(close):focus-visible` dans le thème), ne laissant en interne
+que `outline`/`outline-offset` (critique pour l'accessibilité). Le texte de la contrainte 2
+dit que les pseudo-classes natives (`:hover`, `:focus-visible`, etc.) « composent normalement »
+avec une règle externe `::part()`/tag, ce qui peut se lire à tort comme « toujours sûr de
+laisser une règle de pseudo-classe native en interne ». Ce cas prouve cette lecture fausse :
+ce n'est sûr que lorsque la règle de la pseudo-classe elle-même, pour cette même propriété,
+est **aussi** externe. Si le base d'une propriété est migré en externe mais qu'une surcharge
+de pseudo-classe native pour cette même propriété reste interne, le base externe défait quand
+même la surcharge interne (même mécanisme « l'externe l'emporte toujours » que le cas de l'état
+posé par le composant dans la contrainte 2 d'origine) — l'exemption des pseudo-classes natives
+s'applique à la façon dont elles composent avec un base externe (par exemple
+`ar-x:hover { color: red }` se combine sans problème avec une règle de base externe séparée),
+pas au fait de laisser une surcharge d'état seule en interne une fois que son base a quitté le
+composant.
