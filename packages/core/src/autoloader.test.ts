@@ -148,14 +148,12 @@ describe('autoloader — préfixe configurable', () => {
         await tick();
 
         // Preuve que le lien parent/enfant a bien été reconstruit sous le préfixe custom :
-        // l'item "B" n'est rendu comme sous-étape imbriquée (un <li class="stepper-item">
+        // l'item "B" n'est rendu comme sous-étape imbriquée (un <li class="item">
         // dans le <ol part="list"> DU <li> de "A") QUE si buildFromItems() a réussi
         // à retrouver le parent de "B" via closestInstanceOf(). Si ce lookup échoue (comme
         // avec l'ancien `.closest('ar-stepper-item')` hardcodé), "A" et "B" deviennent tous
         // les deux des racines indépendantes et cette structure imbriquée n'apparaît jamais.
-        const nestedSubstep = stepper.shadowRoot?.querySelector(
-            'li.stepper-item [part~="list"] li.stepper-item',
-        );
+        const nestedSubstep = stepper.shadowRoot?.querySelector('li.item [part~="list"] li.item');
         expect(nestedSubstep).not.toBeNull();
     });
 });

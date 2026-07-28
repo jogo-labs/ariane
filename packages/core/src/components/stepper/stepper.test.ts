@@ -101,7 +101,7 @@ describe('ArStepper', () => {
             // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
             // step-link--current — cf. le test dédié plus bas pour la variante "non courante".
             expect(link?.getAttribute('part')).toContain('step-link');
-            const currentItemInner = shadow(el).querySelector('div.stepper-item-header');
+            const currentItemInner = shadow(el).querySelector('div.item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });
 
@@ -219,7 +219,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/c" label="Étape C"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const items = shadow(el).querySelectorAll('li.stepper-item');
+            const items = shadow(el).querySelectorAll('li.item');
             expect(items.length).toBe(3);
         });
 
@@ -356,7 +356,7 @@ describe('ArStepper', () => {
             el.currentPath = '/b';
             await waitForUpdate(el);
 
-            const items = shadow(el).querySelectorAll('li.stepper-item');
+            const items = shadow(el).querySelectorAll('li.item');
             expect(items[0]?.classList.contains('current')).toBe(false);
             expect(items[1]?.classList.contains('current')).toBe(true);
         });
@@ -523,8 +523,8 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
-            expect(shadow(el).querySelector('.stepper-desktop')).toBeNull();
+            expect(shadow(el).querySelector('.dropdown')).not.toBeNull();
+            expect(shadow(el).querySelector('.desktop')).toBeNull();
         });
 
         it('sans desktop-target + viewport desktop : rendu liste desktop sans téléportation', async () => {
@@ -541,8 +541,8 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            expect(shadow(el).querySelector('.stepper-desktop')).not.toBeNull();
-            expect(shadow(el).querySelector('.stepper-dropdown')).toBeNull();
+            expect(shadow(el).querySelector('.desktop')).not.toBeNull();
+            expect(shadow(el).querySelector('.dropdown')).toBeNull();
             // Pas de téléportation : reste dans document.body (où fixture() l'a inséré)
             expect(el.parentElement).toBe(document.body);
         });
@@ -565,8 +565,8 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
-            expect(shadow(el).querySelector('.stepper-desktop')).toBeNull();
+            expect(shadow(el).querySelector('.dropdown')).not.toBeNull();
+            expect(shadow(el).querySelector('.desktop')).toBeNull();
         });
 
         it('avec desktop-target + viewport desktop : rend la liste desktop', async () => {
@@ -587,8 +587,8 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            expect(shadow(el).querySelector('.stepper-desktop')).not.toBeNull();
-            expect(shadow(el).querySelector('.stepper-dropdown')).toBeNull();
+            expect(shadow(el).querySelector('.desktop')).not.toBeNull();
+            expect(shadow(el).querySelector('.dropdown')).toBeNull();
         });
 
         it('réinsère le composant à sa position d’origine quand le viewport repasse en mobile', async () => {
@@ -634,7 +634,7 @@ describe('ArStepper', () => {
 
             expect(el.parentElement).toBe(container);
             expect(marker.nextElementSibling).toBe(el);
-            expect(shadow(el).querySelector('.stepper-dropdown')).not.toBeNull();
+            expect(shadow(el).querySelector('.dropdown')).not.toBeNull();
         });
     });
 

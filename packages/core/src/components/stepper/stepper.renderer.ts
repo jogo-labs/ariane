@@ -45,7 +45,7 @@ function renderStepText(
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
-        <span class="stepper-item-label">${label}</span>
+        <span class="item-label">${label}</span>
     `;
 }
 
@@ -66,14 +66,14 @@ function renderSubStep(
 
     return html`
         <li
-            class="stepper-item${isCurrent ? ' current' : ''}"
+            class="item${isCurrent ? ' current' : ''}"
             part="substep"
             aria-current=${isCurrent ? 'step' : nothing}
         >
             ${isCompleted || isEditMode
                 ? html`
                       <a
-                          class="stepper-item-header"
+                          class="item-header"
                           part=${withCurrentPart('step-link', isCurrent)}
                           data-substep-order=${order}
                           data-path=${sub.path}
@@ -84,7 +84,7 @@ function renderSubStep(
                       </a>
                   `
                 : html`
-                      <div class="stepper-item-header">
+                      <div class="item-header">
                           ${renderStepText(sub.label, order, isCurrent, true)}
                       </div>
                   `}
@@ -106,14 +106,14 @@ function renderStep(
 
     return html`
         <li
-            class="stepper-item${isCurrent ? ' current' : ''}"
+            class="item${isCurrent ? ' current' : ''}"
             part="step"
             aria-current=${isCurrent ? 'step' : nothing}
         >
             ${isCompleted
                 ? html`
                       <a
-                          class="stepper-item-header"
+                          class="item-header"
                           part=${withCurrentPart('step-link', isCurrent)}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
@@ -123,9 +123,7 @@ function renderStep(
                       </a>
                   `
                 : html`
-                      <div class="stepper-item-header">
-                          ${renderStepText(step.label, order, isCurrent)}
-                      </div>
+                      <div class="item-header">${renderStepText(step.label, order, isCurrent)}</div>
                   `}
             ${(isCurrent || mode === 'edit') && step.children.length
                 ? html`
@@ -168,7 +166,7 @@ export function renderDesktop(
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
 ): TemplateResult {
-    return renderStepList(steps, 'stepper-desktop', mode, onClickLink);
+    return renderStepList(steps, 'desktop', mode, onClickLink);
 }
 
 /* ------------------------------------------------ */
@@ -184,7 +182,7 @@ export function renderMobile(
     const subLabel = ctx.currentSubStepLabel ? ` | ${ctx.currentSubStepLabel}` : '';
 
     return html`
-        <div class="stepper-dropdown">
+        <div class="dropdown">
             <button
                 type="button"
                 part="trigger"
@@ -199,7 +197,7 @@ export function renderMobile(
             </button>
 
             <div id="stepper-dropdown-menu" part="panel">
-                ${renderStepList(steps, 'stepper-mobile', mode, onClickLink)}
+                ${renderStepList(steps, 'mobile', mode, onClickLink)}
             </div>
         </div>
     `;

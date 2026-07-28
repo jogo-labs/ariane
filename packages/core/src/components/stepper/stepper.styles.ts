@@ -5,7 +5,7 @@ export default css`
         display: none !important;
     }
 
-    .stepper-dropdown {
+    .dropdown {
         position: relative;
         display: flex;
     }
@@ -32,13 +32,13 @@ export default css`
         counter-reset: step;
     }
 
-    .stepper-item-header {
+    .item-header {
         display: inline-flex;
         counter-increment: step;
     }
 
     [part~='bullet'],
-    .stepper-item-header {
+    .item-header {
         align-items: center;
         color: var(--ar-stepper-label-color);
     }
@@ -64,7 +64,7 @@ export default css`
         content: counter(step);
     }
 
-    .stepper-item {
+    .item {
         position: relative;
         display: flex;
         flex-direction: column;
@@ -77,7 +77,7 @@ export default css`
                 background-color: var(--ar-stepper-link-hover-bullet-color);
             }
 
-            .stepper-item-label {
+            .item-label {
                 color: var(--ar-stepper-link-hover-label-color);
             }
 
@@ -94,7 +94,7 @@ export default css`
         }
     }
 
-    .current > .stepper-item-header {
+    .current > .item-header {
         color: var(--ar-stepper-current-header-color);
         font-weight: 700;
     }
@@ -144,13 +144,13 @@ export default css`
         }
     }
 
-    .stepper-desktop {
+    .desktop {
         display: flex;
         flex-flow: column;
     }
 
-    :host([align='right']) .stepper-desktop {
-        .stepper-item {
+    :host([align='right']) .desktop {
+        .item {
             align-items: flex-end;
             text-align: right;
 
@@ -159,7 +159,7 @@ export default css`
             }
         }
 
-        .stepper-item-header {
+        .item-header {
             justify-content: flex-end;
             margin-left: auto;
             text-align: right;
