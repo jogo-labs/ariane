@@ -922,6 +922,7 @@
 
         &::part(close) {
             border-radius: 7px;
+            color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
             opacity: 0.75;
             position: relative;
