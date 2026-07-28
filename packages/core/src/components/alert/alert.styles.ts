@@ -78,12 +78,7 @@ export default css`
             opacity var(--ar-alert-close-transition-duration),
             background-color var(--ar-alert-close-transition-duration);
 
-        &:hover {
-            opacity: 1;
-        }
-
         &:focus-visible {
-            opacity: 1;
             outline: 2px solid currentColor;
             outline-offset: 2px;
         }

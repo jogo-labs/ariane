@@ -931,6 +931,11 @@
 
         &::part(close):hover {
             background-color: color-mix(in srgb, currentColor 20%, transparent);
+            opacity: 1;
+        }
+
+        &::part(close):focus-visible {
+            opacity: 1;
         }
 
         &::part(icon) {
