@@ -26,6 +26,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @slot close-icon   - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
  *
  * @csspart icon      - Le conteneur de l'icône de variant.
+ * @csspart icon-svg  - Le SVG de l'icône de variant par défaut (absent si le slot `icon` est utilisé).
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
