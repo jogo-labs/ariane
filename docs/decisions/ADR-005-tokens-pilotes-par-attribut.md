@@ -390,6 +390,19 @@ doit se prémunir contre une durée calculée nulle (absence de thème chargé),
 `ar-collapse` via `_shouldAnimate()`. `ar-alert` a été corrigé dans le même esprit après cette
 migration (garde JS `_shouldAnimate()` avant `_hide()`, cf. issue #129).
 
+**Correctif du correctif (même jour)** : la garde `_shouldAnimate()` ci-dessus lisait
+`getComputedStyle(this).transitionDuration` juste après avoir posé `this.hiding = true`, de
+façon synchrone. Or Lit ne reflète une propriété `@property({ reflect: true })` vers son
+attribut qu'au tour de microtâche suivant (dans `update()`), pas au moment du setter — donc
+l'attribut `hiding` n'existait pas encore dans le DOM au moment de la lecture, `:host([hiding])`
+ne matchait jamais, et la transition restait mesurée à `0s` **même thème chargé** : l'animation
+de sortie ne se déclenchait plus du tout en pratique (mesuré à ~3ms au lieu de ~330ms). Contrairement à
+`ar-collapse`, dont la transition est inconditionnelle sur `:host`, celle d'`ar-alert` est
+conditionnée par l'attribut que la garde vient elle-même de poser — la garde doit donc attendre
+que la réflexion ait eu lieu (`await this.updateComplete`) avant de lire `getComputedStyle`,
+sans quoi une transition pilotée par attribut n'a jamais la chance de matcher avant d'être
+évaluée.
+
 **Clarification de la contrainte 2 (même jour)** : la vérification de cette deuxième passe a
 mis au jour une régression réelle sur le bouton de fermeture d'`ar-alert`. La tâche 3 avait
 migré la valeur au repos `opacity: 0.75` vers une règle externe (`ar-alert::part(close)`),

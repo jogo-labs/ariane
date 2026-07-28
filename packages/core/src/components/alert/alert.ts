@@ -174,9 +174,13 @@ export class ArAlert extends LitElement {
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        if (!this._shouldAnimate()) {
-            this._finishHide();
-        }
+        // La reflection de l'attribut `hiding` par Lit n'est pas synchrone : on attend
+        // updateComplete pour que `:host([hiding])` ait pu matcher avant de mesurer la durée.
+        void this.updateComplete.then(() => {
+            if (!this._shouldAnimate()) {
+                this._finishHide();
+            }
+        });
     };
 
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
