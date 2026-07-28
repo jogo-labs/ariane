@@ -74,7 +74,6 @@ export default css`
         height: var(--ar-alert-close-size);
         padding: 0;
         border: none;
-        border-radius: var(--ar-alert-close-radius);
         background-color: var(--ar-alert-close-bg);
         color: currentColor;
         cursor: pointer;

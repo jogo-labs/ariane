@@ -294,7 +294,6 @@
         /* alert */
         --ar-alert-color: var(--ar-color-text);
         --ar-alert-close-size: 2rem;
-        --ar-alert-close-radius: 7px;
         --ar-alert-close-bg: color-mix(in srgb, currentColor 8%, transparent);
         --ar-alert-close-hover-bg: color-mix(in srgb, currentColor 20%, transparent);
         --ar-alert-info-bg: var(--ar-color-info-bg);
@@ -920,5 +919,9 @@
         border-radius: 0.75rem;
         border-width: 1px;
         border-style: solid;
+
+        &::part(close) {
+            border-radius: 7px;
+        }
     }
 }
