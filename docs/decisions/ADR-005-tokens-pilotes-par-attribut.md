@@ -326,7 +326,12 @@ valeur qu'à un seul endroit, le `gap` du `:host`) mais un choix d'auteur propre
 — un thème est un exemple de personnalisation, pas une spécification que le composant doit
 servir. Rien n'empêche un autre thème de faire le même calcul avec sa propre variable locale ;
 le composant n'a pas à garantir qu'ajuster une valeur en rééquilibre une autre dans un thème
-donné. **`--ar-datepicker-gap` migré** : `ar-datepicker { gap: 0.35rem; }` en littéral (branche
-4, ciblant le tag pour une propriété `:host`), et le `calc()` du label remplacé par sa valeur
-précalculée (`margin-bottom: 0.15rem;`) avec un commentaire documentant le couplage — plus de
-token, plus de garde-fou technique, juste une note pour un futur mainteneur de `default.css`.
+donné. **`--ar-datepicker-gap` migré**, sans devenir un token public : `ar-datepicker { }`
+déclare une variable **locale à ce bloc thème** (`--field-gap: 0.35rem;`, pas de préfixe
+`--ar-datepicker-*`), consommée à la fois par `gap` et par le `calc()` de `::part(label)`.
+Vérifié empiriquement (Playwright) que cette variable s'hérite normalement à travers la
+frontière shadow DOM jusqu'à l'élément `[part='label']` interne — même mécanisme que n'importe
+quel `var(--ar-*)` consommé dans une règle `::part()`. Le couplage reste garanti
+techniquement (pas qu'un commentaire), sans figurer dans l'API publique du composant ni dans sa
+documentation `@cssprop` — et sert au passage d'exemple concret pour un thème qui voudrait
+reproduire la même technique avec sa propre variable.
