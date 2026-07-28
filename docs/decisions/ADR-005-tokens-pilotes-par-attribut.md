@@ -129,7 +129,8 @@ propriété sur `:host` de la branche 4, au motif que « `::part()` ne peut cibl
 éléments portant un `part`, jamais `:host` ». C'est vrai mais insuffisant — vérifié
 empiriquement (Chromium réel, Playwright) qu'une règle de thème ciblant le tag directement
 (`ar-alert { border-radius: 2rem; }`, sans `::part()`) l'emporte elle aussi sur la règle
-`:host { border-radius: var(--ar-alert-border-radius); }` interne au composant, **même si le
+`:host { border-radius: var(--ar-alert-border-radius); }` (depuis migré — cf. « Application —
+`ar-alert` » ci-dessous) interne au composant, **même si le
 composant continue de déclarer une valeur sur `:host`** — le même mécanisme « la feuille de
 style externe l'emporte sur la règle interne » s'applique, que la cible soit un `[part]` via
 `::part()` ou l'hôte lui-même via son nom de tag (l'hôte reste un élément du light DOM,
@@ -181,6 +182,15 @@ seules les contraintes suivantes restent des exclusions réelles.
    même quand l'ancêtre est survolé. Concrètement : `--ar-stepper-bullet-hover-bg`,
    `--ar-stepper-link-hover-bullet-color`, `--ar-stepper-link-hover-bullet-text-color` et
    `--ar-stepper-link-hover-label-color` restent des tokens pour cette raison.
+6. **Propriété annulée par une garde interne sous `@media` (ex. `prefers-reduced-motion:
+reduce`)** → doit rester un token consommé à l'intérieur du composant, même raisonnement
+   que la contrainte 2 mais pour une règle interne conditionnée par un media query plutôt
+   qu'un état posé par le composant. Vérifié empiriquement (Chromium réel, Playwright) sur
+   `ar-alert` : une règle externe `::part(close) { transition: ... }` déclarée dans le thème
+   l'emporte sur la garde interne `@media (prefers-reduced-motion: reduce) { [part='close']
+{ transition: none; } }`, même quand le media query correspond — la transition externe
+   reste active, ce qui casserait l'accessibilité motion. `--ar-alert-close-transition-duration`
+   reste un token pour cette raison (en plus d'être réutilisé 2× dans le composant, critère 3).
 
 **`:host` n'est plus une exclusion en soi** (correction du 2026-07-25 ci-dessus) — une
 propriété sur `:host` suit le même critère que les autres, migrée vers une règle externe
@@ -335,3 +345,85 @@ quel `var(--ar-*)` consommé dans une règle `::part()`. Le couplage reste garan
 techniquement (pas qu'un commentaire), sans figurer dans l'API publique du composant ni dans sa
 documentation `@cssprop` — et sert au passage d'exemple concret pour un thème qui voudrait
 reproduire la même technique avec sa propre variable.
+
+**Application — `ar-alert` (2026-07-28)**, troisième composant traité (lot 3a, `ar-dialog`
+reste à traiter séparément). 5 tokens migrés : `--ar-alert-padding`, `--ar-alert-border-radius`,
+`--ar-alert-border-width`, `--ar-alert-border-style` (propriétés `:host`, migrées vers une
+règle `ar-alert { }` ciblant directement le tag) et `--ar-alert-close-radius` (migré vers
+`ar-alert::part(close)`). `--ar-alert-close-size` reste un token (réutilisé 2× dans le
+composant pour `width`/`height`, critère 3) mais gagne un fallback WCAG 2.5.8 manquant
+(`var(--ar-alert-close-size, 2rem)`), sur le modèle de `--ar-datepicker-day-size`.
+`--ar-alert-close-transition-duration` reste un token — nouvelle contrainte 6 découverte à
+cette occasion (garde `prefers-reduced-motion` défaite par une règle externe, cf.
+ci-dessus). Les 12 tokens sémantiques (fond/bordure/icône des 4 variants) restent tokens,
+hors périmètre de cette migration (fallback WCAG de contraste + calibration dark-mode
+indépendante sur les bordures). Détail complet :
+`docs/superpowers/plans/2026-07-28-alert-token-vs-part-129.md`.
+
+**Deuxième passe (même jour)** : audit élargi aux valeurs jamais tokenisées et à une
+recatégorisation. `column-gap` du `:host` (jamais tokenisé) migré en littéral dans
+`ar-alert { }`. `--ar-alert-close-bg`/`--ar-alert-close-hover-bg` — laissés tokens par erreur
+de catégorisation lors de la première passe (supposés sémantiques comme les couleurs de
+variant, sans revérifier les critères) — migrés en littéral dans `ar-alert::part(close)`/
+`::part(close):hover`, même pattern que `nav-btn`/`footer-btn` de `ar-datepicker`. `opacity`/
+`position`/`top`/`right` de `[part='close']` migrés de la même façon ; `:focus-visible`
+(`outline: currentColor`) reste interne (contraste du focus ring contre les 4 fonds de
+variant, probable exigence WCAG 2.4.7). `font-size` de `[part='icon']` migré vers
+`::part(icon)`. La durée d'animation de sortie (`0.33s`, jamais tokenisée) devient
+`--ar-alert-hide-transition-duration`, consommée en interne uniquement (bloquée en externe
+par la contrainte 6 — même garde `prefers-reduced-motion` que `close-transition-duration`).
+Les valeurs finales de l'état `[hiding]` (`opacity: 0`/`transform: scale(0.75)`) migrées vers
+`ar-alert[hiding] { }` — **nouveau cas vérifié empiriquement** : un sélecteur d'attribut
+externe conditionné sur le même attribut qu'une règle `:host` interne l'emporte
+purement et simplement sur cette dernière, exactement le même mécanisme « l'externe
+l'emporte toujours » que `::part()` ou une règle de tag non conditionnée — ce n'est pas le
+cascade CSS normal (spécificité/ordre) qui joue ici. Cette migration reste sûre non pas parce
+que le cascade se comporte normalement, mais parce que la règle externe ne matche que
+conditionnellement (absente quand l'attribut est absent) et parce que la propriété
+`transition` elle-même reste interne, ce qui préserve la garde reduced-motion. `position:
+relative` mort sur `:host` retiré (aucun descendant n'en dépendait). Trou de documentation
+préexistant comblé : `@csspart icon-svg` (SVG de l'icône de variant, jamais documenté depuis
+l'origine du composant). **Leçon généralisable** : externaliser les valeurs d'état final
+animées d'un élément implique que la logique de complétion propre au composant (tout ce qui
+dépend de `transitionend`) ne peut plus supposer qu'une transition aura toujours lieu — elle
+doit se prémunir contre une durée calculée nulle (absence de thème chargé), comme le fait déjà
+`ar-collapse` via `_shouldAnimate()`. `ar-alert` a été corrigé dans le même esprit après cette
+migration (garde JS `_shouldAnimate()` avant `_hide()`, cf. issue #129).
+
+**Correctif du correctif (même jour)** : la garde `_shouldAnimate()` ci-dessus lisait
+`getComputedStyle(this).transitionDuration` juste après avoir posé `this.hiding = true`, de
+façon synchrone. Or Lit ne reflète une propriété `@property({ reflect: true })` vers son
+attribut qu'au tour de microtâche suivant (dans `update()`), pas au moment du setter — donc
+l'attribut `hiding` n'existait pas encore dans le DOM au moment de la lecture, `:host([hiding])`
+ne matchait jamais, et la transition restait mesurée à `0s` **même thème chargé** : l'animation
+de sortie ne se déclenchait plus du tout en pratique (mesuré à ~3ms au lieu de ~330ms). Contrairement à
+`ar-collapse`, dont la transition est inconditionnelle sur `:host`, celle d'`ar-alert` est
+conditionnée par l'attribut que la garde vient elle-même de poser — la garde doit donc attendre
+que la réflexion ait eu lieu (`await this.updateComplete`) avant de lire `getComputedStyle`,
+sans quoi une transition pilotée par attribut n'a jamais la chance de matcher avant d'être
+évaluée. Cette réparation ayant rendu le chemin animé de nouveau atteignable en usage réel, une
+revue a également relevé et corrigé un bug d'idempotence préexistant dans `_finishHide` : le
+thème animant `opacity` et `transform` simultanément, `transitionend` se déclenche deux fois (une
+par propriété) — sans reset de `hiding` dans `_finishHide`, le second appel repassait la garde et
+ré-émettait `ar-alert-close` / redonnait le focus une seconde fois.
+
+**Clarification de la contrainte 2 (même jour)** : la vérification de cette deuxième passe a
+mis au jour une régression réelle sur le bouton de fermeture d'`ar-alert`. La tâche 3 avait
+migré la valeur au repos `opacity: 0.75` vers une règle externe (`ar-alert::part(close)`),
+mais laissé inchangées en interne les règles `&:hover { opacity: 1; }` et
+`&:focus-visible { opacity: 1; ... }` — cassant le hover/focus (opacity bloquée à 0.75),
+confirmé par Playwright. Corrigé en externalisant aussi la gestion hover/focus de l'opacité
+(`&::part(close):hover`/`&::part(close):focus-visible` dans le thème), ne laissant en interne
+que `outline`/`outline-offset` (critique pour l'accessibilité). Le texte de la contrainte 2
+dit que les pseudo-classes natives (`:hover`, `:focus-visible`, etc.) « composent normalement »
+avec une règle externe `::part()`/tag, ce qui peut se lire à tort comme « toujours sûr de
+laisser une règle de pseudo-classe native en interne ». Ce cas prouve cette lecture fausse :
+ce n'est sûr que lorsque la règle de la pseudo-classe elle-même, pour cette même propriété,
+est **aussi** externe. Si le base d'une propriété est migré en externe mais qu'une surcharge
+de pseudo-classe native pour cette même propriété reste interne, le base externe défait quand
+même la surcharge interne (même mécanisme « l'externe l'emporte toujours » que le cas de l'état
+posé par le composant dans la contrainte 2 d'origine) — l'exemption des pseudo-classes natives
+s'applique à la façon dont elles composent avec un base externe (par exemple
+`ar-x:hover { color: red }` se combine sans problème avec une règle de base externe séparée),
+pas au fait de laisser une surcharge d'état seule en interne une fois que son base a quitté le
+composant.

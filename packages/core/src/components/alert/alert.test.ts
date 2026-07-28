@@ -205,6 +205,10 @@ describe('ArAlert', () => {
     describe('fermeture', () => {
         it('un clic sur close passe hiding à true', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Force une durée de transition non nulle (simule un thème chargé) : sans thème,
+            // _shouldAnimate() renvoie false et _finishHide() s'exécute de façon synchrone,
+            // ce qui repasserait hiding à false avant même l'assertion ci-dessous.
+            el.style.transitionDuration = '0.3s';
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
             // hiding est un protected property — on y accède via cast
@@ -213,13 +217,20 @@ describe('ArAlert', () => {
 
         it('hiding=true applique l\'attribut "hiding" sur le host', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Cf. commentaire ci-dessus : durée de transition non nulle requise pour que
+            // hiding reste true (chemin asynchrone) au moment de l'assertion.
+            el.style.transitionDuration = '0.3s';
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
             expect(el.hasAttribute('hiding')).toBe(true);
         });
 
-        it('émet ar-alert-close après transitionend quand hiding=true', async () => {
+        it('émet ar-alert-close après transitionend quand hiding=true (thème avec transition réelle)', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Force une durée de transition non nulle (simule un thème chargé) pour exercer
+            // le chemin asynchrone : sans ça, _shouldAnimate() renverrait false en happy-dom
+            // (aucune feuille de style chargée) et la fermeture serait synchrone.
+            el.style.transitionDuration = '0.3s';
             const handler = vi.fn();
             el.addEventListener('ar-alert-close', handler);
 
@@ -227,10 +238,59 @@ describe('ArAlert', () => {
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
+            // La fermeture attend bien la transition : rien n'est émis avant transitionend.
+            expect(handler).not.toHaveBeenCalled();
+
             // Simule la fin de la transition CSS (transitionend)
             el.dispatchEvent(new Event('transitionend'));
 
             expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('ignore un second transitionend dans la même tâche (thème anime opacity ET transform)', async () => {
+            // Régression #129 : le thème déclenche la transition sur deux propriétés
+            // simultanément (opacity + transform). Par spec, `transitionend` se déclenche
+            // une fois PAR PROPRIÉTÉ transitionnée — donc deux fois de suite ici. Sans reset
+            // de `hiding` dans `_finishHide`, le second appel repasserait la garde et
+            // ré-émettrait ar-alert-close / redonnerait le focus une seconde fois.
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.style.transitionDuration = '0.3s';
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+
+            (requirePart(el, 'close') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+
+            // Simule les deux transitionend (opacity, puis transform) dans la même tâche.
+            el.dispatchEvent(new Event('transitionend'));
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it("ferme instantanément (sans transitionend) quand aucun thème n'est chargé (durée de transition à 0)", async () => {
+            // Régression #129 : si default.css n'est pas chargé, la transition CSS externalisée
+            // (opacity/transform) ne s'applique jamais et la durée calculée reste à 0 — sans
+            // garde JS, transitionend ne se déclencherait jamais et l'alerte resterait bloquée.
+            const target = document.createElement('button');
+            target.id = 'btn-retour-sans-theme';
+            document.body.appendChild(target);
+
+            el = await fixture('<ar-alert next-focus="btn-retour-sans-theme"></ar-alert>');
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+
+            // Aucun style inline, aucune feuille de thème chargée en environnement de test :
+            // getComputedStyle(el).transitionDuration vaut '' (→ 0) en happy-dom par défaut.
+            (requirePart(el, 'close') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+
+            // La fermeture doit être synchrone : pas de transitionend nécessaire.
+            expect(handler).toHaveBeenCalledOnce();
+            expect(el.isConnected).toBe(false);
+            expect(document.activeElement).toBe(target);
+
+            target.remove();
         });
 
         it("n'émet pas ar-alert-close si hiding=false au transitionend", async () => {
@@ -266,9 +326,10 @@ describe('ArAlert', () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-alert next-focus="id-inexistant"></ar-alert>');
 
+            // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
+            // synchroniquement au clic — pas besoin de simuler transitionend.
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            el.dispatchEvent(new Event('transitionend'));
 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy.mock.calls[0][0]).toContain('id-inexistant');
@@ -283,9 +344,10 @@ describe('ArAlert', () => {
 
             el = await fixture('<ar-alert next-focus="btn-retour-focus"></ar-alert>');
 
+            // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
+            // synchroniquement au clic — pas besoin de simuler transitionend.
             (requirePart(el, 'close') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            el.dispatchEvent(new Event('transitionend'));
 
             expect(document.activeElement).toBe(target);
 

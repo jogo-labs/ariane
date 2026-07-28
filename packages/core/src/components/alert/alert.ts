@@ -26,17 +26,11 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @slot close-icon   - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
  *
  * @csspart icon      - Le conteneur de l'icône de variant.
+ * @csspart icon-svg  - Le SVG de l'icône de variant par défaut (absent si le slot `icon` est utilisé).
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
- * @cssprop --ar-alert-border-radius - Arrondi des alertes.
- * @cssprop --ar-alert-padding - Marge interne des alertes.
- * @cssprop --ar-alert-border-width - Epaisseur des bordures.
- * @cssprop --ar-alert-border-style - Style des bordures.
  * @cssprop --ar-alert-close-size - Taille (width/height) du bouton de fermeture.
- * @cssprop --ar-alert-close-radius - Arrondi du bouton de fermeture.
- * @cssprop --ar-alert-close-bg - Fond du bouton de fermeture au repos.
- * @cssprop --ar-alert-close-hover-bg - Fond du bouton de fermeture au survol.
  * @cssprop --ar-alert-info-bg - Fond de l'alerte "info".
  * @cssprop --ar-alert-info-border - Bordure de l'alerte "info".
  * @cssprop --ar-alert-info-icon - Couleur de l'icône "info".
@@ -50,6 +44,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop --ar-alert-success-border - Bordure de l'alerte "success".
  * @cssprop --ar-alert-success-icon - Couleur de l'icône "success".
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
+ * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
  * @cssprop --ar-alert-color - Couleur du texte de l'alerte (cascade vers --ar-color-text).
 
  *
@@ -169,17 +164,31 @@ export class ArAlert extends LitElement {
         return this.nextFocus !== undefined && this.nextFocus?.replaceAll(' ', '') !== '';
     }
 
+    private _shouldAnimate(): boolean {
+        // transitionend ne se déclenche pas si duration=0s (défaut headless sans thème).
+        // On vérifie la durée calculée pour éviter que la fermeture reste bloquée indéfiniment.
+        const d = parseFloat(getComputedStyle(this).transitionDuration) || 0;
+        return !prefersReducedMotion() && d > 0;
+    }
+
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        if (prefersReducedMotion()) {
-            this._finishHide();
-        }
+        // La reflection de l'attribut `hiding` par Lit n'est pas synchrone : on attend
+        // updateComplete pour que `:host([hiding])` ait pu matcher avant de mesurer la durée.
+        void this.updateComplete.then(() => {
+            if (!this._shouldAnimate()) {
+                this._finishHide();
+            }
+        });
     };
 
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
     private _finishHide = (): void => {
         if (!this.canBeHidden || !this.hiding) return;
+        // Idempotent : le thème anime opacity ET transform, donc `transitionend` se déclenche
+        // deux fois (une par propriété) — sans ce reset, le second appel repasserait la garde.
+        this.hiding = false;
 
         this.dispatchEvent(new CustomEvent('ar-alert-close', { bubbles: true, composed: true }));
         this.remove();
