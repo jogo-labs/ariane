@@ -159,13 +159,13 @@ this.dispatchEvent(
 
 ### Nommage — cohérence stricte
 
-| Élément          | Convention                | Exemple              |
-| ---------------- | ------------------------- | -------------------- |
-| Tag HTML         | `ar-<name>`               | `ar-alert`           |
-| Classe           | `Ar<Name>`                | `ArAlert`            |
-| Événements       | `ar-<event>`              | `ar-alert-close`     |
-| CSS custom props | `--ar-<composant>-<prop>` | `--ar-alert-padding` |
-| CSS parts        | `part="base"`             | `part="label"`       |
+| Élément          | Convention                | Exemple                 |
+| ---------------- | ------------------------- | ----------------------- |
+| Tag HTML         | `ar-<name>`               | `ar-alert`              |
+| Classe           | `Ar<Name>`                | `ArAlert`               |
+| Événements       | `ar-<event>`              | `ar-alert-close`        |
+| CSS custom props | `--ar-<composant>-<prop>` | `--ar-alert-close-size` |
+| CSS parts        | `part="base"`             | `part="label"`          |
 
 ### Thémabilité
 
@@ -173,8 +173,8 @@ Les aspects visuels sont exposés via CSS custom properties. Les utilisateurs pe
 
 ```css
 ar-alert {
-    --ar-alert-border-radius: 0.5rem;
-    --ar-alert-padding: 0.75rem;
+    --ar-alert-close-size: 2.5rem;
+    --ar-alert-info-bg: #e0f2fe;
 }
 ```
 

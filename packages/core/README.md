@@ -75,8 +75,8 @@ Chaque composant expose des **CSS Custom Properties** pour la personnalisation s
 ```css
 /* Exemple : personnaliser ar-alert */
 ar-alert {
-    --ar-alert-border-radius: 0.5rem;
-    --ar-alert-padding: 0.75rem;
+    --ar-alert-close-size: 2.5rem;
+    --ar-alert-info-bg: #e0f2fe;
 }
 ```
 

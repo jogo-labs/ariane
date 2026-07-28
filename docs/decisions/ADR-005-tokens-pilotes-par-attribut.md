@@ -129,7 +129,8 @@ propriété sur `:host` de la branche 4, au motif que « `::part()` ne peut cibl
 éléments portant un `part`, jamais `:host` ». C'est vrai mais insuffisant — vérifié
 empiriquement (Chromium réel, Playwright) qu'une règle de thème ciblant le tag directement
 (`ar-alert { border-radius: 2rem; }`, sans `::part()`) l'emporte elle aussi sur la règle
-`:host { border-radius: var(--ar-alert-border-radius); }` interne au composant, **même si le
+`:host { border-radius: var(--ar-alert-border-radius); }` (depuis migré — cf. « Application —
+`ar-alert` » ci-dessous) interne au composant, **même si le
 composant continue de déclarer une valeur sur `:host`** — le même mécanisme « la feuille de
 style externe l'emporte sur la règle interne » s'applique, que la cible soit un `[part]` via
 `::part()` ou l'hôte lui-même via son nom de tag (l'hôte reste un élément du light DOM,
@@ -181,6 +182,15 @@ seules les contraintes suivantes restent des exclusions réelles.
    même quand l'ancêtre est survolé. Concrètement : `--ar-stepper-bullet-hover-bg`,
    `--ar-stepper-link-hover-bullet-color`, `--ar-stepper-link-hover-bullet-text-color` et
    `--ar-stepper-link-hover-label-color` restent des tokens pour cette raison.
+6. **Propriété annulée par une garde interne sous `@media` (ex. `prefers-reduced-motion:
+reduce`)** → doit rester un token consommé à l'intérieur du composant, même raisonnement
+   que la contrainte 2 mais pour une règle interne conditionnée par un media query plutôt
+   qu'un état posé par le composant. Vérifié empiriquement (Chromium réel, Playwright) sur
+   `ar-alert` : une règle externe `::part(close) { transition: ... }` déclarée dans le thème
+   l'emporte sur la garde interne `@media (prefers-reduced-motion: reduce) { [part='close']
+{ transition: none; } }`, même quand le media query correspond — la transition externe
+   reste active, ce qui casserait l'accessibilité motion. `--ar-alert-close-transition-duration`
+   reste un token pour cette raison (en plus d'être réutilisé 2× dans le composant, critère 3).
 
 **`:host` n'est plus une exclusion en soi** (correction du 2026-07-25 ci-dessus) — une
 propriété sur `:host` suit le même critère que les autres, migrée vers une règle externe
@@ -335,3 +345,17 @@ quel `var(--ar-*)` consommé dans une règle `::part()`. Le couplage reste garan
 techniquement (pas qu'un commentaire), sans figurer dans l'API publique du composant ni dans sa
 documentation `@cssprop` — et sert au passage d'exemple concret pour un thème qui voudrait
 reproduire la même technique avec sa propre variable.
+
+**Application — `ar-alert` (2026-07-28)**, troisième composant traité (lot 3a, `ar-dialog`
+reste à traiter séparément). 5 tokens migrés : `--ar-alert-padding`, `--ar-alert-border-radius`,
+`--ar-alert-border-width`, `--ar-alert-border-style` (propriétés `:host`, migrées vers une
+règle `ar-alert { }` ciblant directement le tag) et `--ar-alert-close-radius` (migré vers
+`ar-alert::part(close)`). `--ar-alert-close-size` reste un token (réutilisé 2× dans le
+composant pour `width`/`height`, critère 3) mais gagne un fallback WCAG 2.5.8 manquant
+(`var(--ar-alert-close-size, 2rem)`), sur le modèle de `--ar-datepicker-day-size`.
+`--ar-alert-close-transition-duration` reste un token — nouvelle contrainte 6 découverte à
+cette occasion (garde `prefers-reduced-motion` défaite par une règle externe, cf.
+ci-dessus). Les 12 tokens sémantiques (fond/bordure/icône des 4 variants) restent tokens,
+hors périmètre de cette migration (fallback WCAG de contraste + calibration dark-mode
+indépendante sur les bordures). Détail complet :
+`docs/superpowers/plans/2026-07-28-alert-token-vs-part-129.md`.
