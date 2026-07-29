@@ -126,7 +126,9 @@ export class ArAlert extends LitElement {
     };
 
     protected _defaultIcon(): TemplateResult {
-        const path = ArAlert._ICON_PATHS[this.variant ?? ArAlert.DEFAULT_VARIANT];
+        const path = (ArAlert._ICON_PATHS as Record<string, string>)[
+            this.variant ?? ArAlert.DEFAULT_VARIANT
+        ];
         return html` <svg
             aria-hidden="true"
             part="icon-svg"
