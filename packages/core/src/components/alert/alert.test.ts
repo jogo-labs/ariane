@@ -76,9 +76,9 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="success" donne role="alert" au host', async () => {
+        it('variant="success" donne role="status" au host', async () => {
             el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('status');
         });
 
         it('variant="info" donne role="status" au host', async () => {
@@ -86,9 +86,13 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('status');
         });
 
+        it('un variant custom inconnu donne role="status" (défaut sûr)', async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
         it('without-notification supprime le role du host', async () => {
             el = await fixture('<ar-alert without-notification></ar-alert>');
-            // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
             expect(el.hasAttribute('role')).toBe(false);
         });
     });

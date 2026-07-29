@@ -80,7 +80,7 @@ export class ArAlert extends LitElement {
      * @attr variant
      */
     @property({ reflect: true, type: String })
-    variant: 'success' | 'warning' | 'error' | 'info' = 'error';
+    variant: ArAlertVariant | (string & {}) = 'error';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
@@ -98,13 +98,24 @@ export class ArAlert extends LitElement {
 
     override updated(changed: Map<string, unknown>) {
         if (changed.has('variant') || changed.has('withoutNotification')) {
-            if (this.withoutNotification) {
-                this.removeAttribute('role');
-                return;
-            }
-            this.role = this.variant === 'info' ? 'status' : 'alert';
+            this._updateRole();
         }
     }
+
+    private _updateRole(): void {
+        if (this.withoutNotification) {
+            this.removeAttribute('role');
+            return;
+        }
+        this.role = ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status';
+    }
+
+    private static readonly _ROLE_BY_VARIANT: Record<string, 'alert' | 'status'> = {
+        error: 'alert',
+        warning: 'alert',
+        success: 'status',
+        info: 'status',
+    };
 
     private static readonly _ICON_PATHS: Record<ArAlertVariant, string> = {
         success: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
