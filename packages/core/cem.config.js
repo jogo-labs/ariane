@@ -131,7 +131,10 @@ export default {
                     for (const decl of mod.declarations ?? []) {
                         if (!decl.attributes) continue;
                         decl.attributes = decl.attributes.map((attr) => {
-                            const t = attr.type?.text ?? '';
+                            const t = (attr.type?.text ?? '').replace(
+                                /\s*\|\s*\(string\s*&\s*\{\}\)\s*$/,
+                                '',
+                            );
                             if (typeAliasMap.has(t)) {
                                 return { ...attr, type: { text: typeAliasMap.get(t) } };
                             }
@@ -152,7 +155,10 @@ export default {
                             }
 
                             // Résoudre les aliases de type avant le check isStringUnion
-                            let typeText = member.type?.text ?? '';
+                            let typeText = (member.type?.text ?? '').replace(
+                                /\s*\|\s*\(string\s*&\s*\{\}\)\s*$/,
+                                '',
+                            );
                             if (typeAliasMap.has(typeText)) {
                                 member = { ...member, type: { text: typeAliasMap.get(typeText) } };
                                 typeText = member.type.text;
