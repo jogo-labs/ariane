@@ -30,16 +30,13 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @csspart body      - Le conteneur du titre et du contenu.
  * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
  *
+ * @cssprop --ar-alert-bg - Fond de l'alerte.
+ * @cssprop --ar-alert-border - Bordure de l'alerte.
+ * @cssprop --ar-alert-icon - Couleur de l'icône de variant.
+ * @cssprop --ar-alert-color - Couleur du texte de l'alerte.
  * @cssprop --ar-alert-close-size - Taille (width/height) du bouton de fermeture.
- * @cssprop --ar-alert-bg - Fond de l'alerte. Valeur définie par `default.css` selon `variant`
- *   (`ar-alert[variant='...']`) pour les 4 presets connus ; à définir soi-même pour un variant
- *   custom.
- * @cssprop --ar-alert-border - Bordure de l'alerte. Même mécanisme que `--ar-alert-bg`.
- * @cssprop --ar-alert-icon - Couleur de l'icône de variant. Même mécanisme que `--ar-alert-bg`.
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
  * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
- * @cssprop --ar-alert-color - Couleur du texte de l'alerte (cascade vers --ar-color-text).
-
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
