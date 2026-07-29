@@ -87,11 +87,19 @@ l'override reste disponible pour la minorité de cas qui en a réellement besoin
 `withoutNotification` n'est pas modifié : il continue à supprimer entièrement l'attribut `role`,
 prioritaire sur `urgent` et sur la table.
 
-**Nuance d'implémentation** : `urgent` n'est pas réfléchi comme attribut booléen classique (la
-réflexion Lit standard ne distingue pas "non défini" de "false" côté attribut DOM, seule la
-valeur de la propriété JS le permet). La logique de rôle lit `this.urgent` (valeur JS,
-potentiellement `undefined`), pas la présence de l'attribut — cohérent avec l'usage de
-`exactOptionalPropertyTypes` déjà en place sur le projet.
+**Nuance d'implémentation — sémantique de présence, asymétrie assumée** : `urgent` est un
+booléen Lit standard, sans valeur par défaut sur le champ de classe (`urgent?: boolean;`, pas de
+`= false`). Ça donne exactement la même convention que `without-notification` : la seule
+présence de l'attribut (`<ar-alert urgent>`, pas besoin de `="true"`) force `role="alert"` ; en
+son absence, la propriété JS reste `undefined` et retombe sur `ROLE_BY_VARIANT` — elle n'est
+jamais forcée à `false`.
+
+Limite assumée : la convention HTML "attribut booléen" ne permet pas d'encoder un `false`
+explicite via le markup (`urgent="false"` serait traité comme présent donc `true`, comme
+n'importe quel attribut booléen HTML). Forcer explicitement `role="status"` sur un variant dont
+le défaut de la table est `alert` (ex. `variant="error"`) n'est donc possible que par affectation
+JS (`el.urgent = false`), pas via un attribut posé dans le markup. Asymétrie jugée acceptable —
+cas rare, et cohérente avec le comportement déjà en place pour `without-notification`.
 
 ### 3. Tokens CSS : 3 génériques au lieu de 12 nommés
 
