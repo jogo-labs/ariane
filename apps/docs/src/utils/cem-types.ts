@@ -131,6 +131,7 @@ export function hasUndefined(typeText: string): boolean {
 /** Supprime les guillemets encadrant les string literals TypeScript (`'foo'` → `foo`). */
 function stripQuotes(val: string | undefined): string | undefined {
     if (!val) return val;
+    if (val === 'undefined') return undefined;
     return val.replace(/^(['"`])(.*)\1$/, '$2');
 }
 
@@ -157,7 +158,7 @@ export function buildControls(members: CemMember[]): CemControl[] {
                 default: stripQuotes(m.default),
                 controlType: stringUnion
                     ? ('select' as const)
-                    : typeText === 'boolean'
+                    : typeText === 'boolean' || typeText === 'boolean | undefined'
                       ? ('checkbox' as const)
                       : typeText === 'number' || typeText === 'number | undefined'
                         ? ('number' as const)

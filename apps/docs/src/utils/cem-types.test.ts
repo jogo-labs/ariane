@@ -157,4 +157,22 @@ describe('buildControls', () => {
         const members = [makeField({ kind: 'method' })];
         expect(buildControls(members)).toHaveLength(0);
     });
+
+    it('convertit la chaîne "undefined" en valeur undefined', () => {
+        const members = [makeField({ default: 'undefined' })];
+        const controls = buildControls(members);
+        expect(controls[0].default).toBeUndefined();
+    });
+
+    it('préserve les valeurs par défaut quoted', () => {
+        const members = [makeField({ default: "'right'" })];
+        const controls = buildControls(members);
+        expect(controls[0].default).toBe('right');
+    });
+
+    it('préserve les valeurs par défaut quoted avec guillemets doubles', () => {
+        const members = [makeField({ default: '"center"' })];
+        const controls = buildControls(members);
+        expect(controls[0].default).toBe('center');
+    });
 });

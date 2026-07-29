@@ -8,42 +8,8 @@ export default css`
         opacity: 1;
         transform: scale(1);
         color: var(--ar-alert-color);
-    }
-
-    :host([variant='info']) {
-        background-color: var(--ar-alert-info-bg);
-        border-color: var(--ar-alert-info-border);
-
-        [part='icon'] {
-            color: var(--ar-alert-info-icon);
-        }
-    }
-
-    :host([variant='error']) {
-        background-color: var(--ar-alert-error-bg);
-        border-color: var(--ar-alert-error-border);
-
-        [part='icon'] {
-            color: var(--ar-alert-error-icon);
-        }
-    }
-
-    :host([variant='warning']) {
-        background-color: var(--ar-alert-warning-bg);
-        border-color: var(--ar-alert-warning-border);
-
-        [part='icon'] {
-            color: var(--ar-alert-warning-icon);
-        }
-    }
-
-    :host([variant='success']) {
-        background-color: var(--ar-alert-success-bg);
-        border-color: var(--ar-alert-success-border);
-
-        [part='icon'] {
-            color: var(--ar-alert-success-icon);
-        }
+        background-color: var(--ar-alert-bg);
+        border-color: var(--ar-alert-border);
     }
 
     :host([hiding]) {
@@ -90,6 +56,7 @@ export default css`
     }
 
     [part='icon'] {
+        color: var(--ar-alert-icon);
         flex: 0 0 auto;
         display: flex;
         align-items: center;

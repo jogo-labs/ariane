@@ -76,9 +76,9 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="success" donne role="alert" au host', async () => {
+        it('variant="success" donne role="status" au host', async () => {
             el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('status');
         });
 
         it('variant="info" donne role="status" au host', async () => {
@@ -86,10 +86,121 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('status');
         });
 
+        it('un variant custom inconnu donne role="status" (défaut sûr)', async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
         it('without-notification supprime le role du host', async () => {
             el = await fixture('<ar-alert without-notification></ar-alert>');
-            // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
             expect(el.hasAttribute('role')).toBe(false);
+        });
+    });
+
+    // ── Prop urgent (override du rôle) ──────────────────────────────────────
+
+    describe('prop urgent', () => {
+        it('urgent est undefined par défaut', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            expect(el.urgent).toBeUndefined();
+        });
+
+        it('la seule présence de l\'attribut urgent force role="alert"', async () => {
+            el = await fixture('<ar-alert variant="success" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent en absence ne force pas role="status" (retombe sur la table)', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent=false (JS) force role="status" même sur un variant "error"', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            el.urgent = false;
+            await waitForUpdate(el);
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
+        it("urgent est prioritaire sur withoutNotification=false mais pas l'inverse", async () => {
+            el = await fixture(
+                '<ar-alert variant="success" urgent without-notification></ar-alert>',
+            );
+            expect(el.hasAttribute('role')).toBe(false);
+        });
+
+        it("removeAttribute('urgent') retombe sur undefined (pas sur false)", async () => {
+            el = await fixture('<ar-alert variant="error" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+            el.removeAttribute('urgent');
+            await waitForUpdate(el);
+            expect(el.urgent).toBeUndefined();
+            expect(el.getAttribute('role')).toBe('alert'); // retombe sur la table (error -> alert), pas force à status
+        });
+    });
+
+    // ── Avertissement role manuel ─────────────────────────────────────────────
+
+    describe('avertissement role manuel', () => {
+        it('avertit si role est posé manuellement dans le markup initial', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="error"></ar-alert>');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit pas si role n'est pas posé dans le markup initial", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert></ar-alert>');
+                // Le warning pour variant custom ne doit pas être appelé (pas de variant custom)
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it('role posé manuellement est bien écrasé par la logique interne malgré le warning', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="info"></ar-alert>');
+                expect(el.getAttribute('role')).toBe('status');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit qu'une seule fois, même si variant change ensuite", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner"></ar-alert>');
+                expect(spy).toHaveBeenCalledOnce();
+                spy.mockClear();
+
+                el.variant = 'info';
+                await waitForUpdate(el);
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("l'avertissement n'empêche pas la fermeture du role par withoutNotification", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" without-notification></ar-alert>');
+                expect(el.hasAttribute('role')).toBe(false);
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
         });
     });
 
@@ -137,6 +248,36 @@ describe('ArAlert', () => {
             const assigned = slotEl.assignedElements();
             expect(assigned).toHaveLength(1);
             expect((assigned[0] as HTMLElement).dataset.custom).toBe('true');
+        });
+
+        it("n'affiche pas d'icône par défaut pour un variant custom inconnu", async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(requireShadow(el).querySelector('slot[name="icon"] svg')).toBeNull();
+        });
+
+        it('logue un avertissement pour un variant custom inconnu', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('promo'));
+            spy.mockRestore();
+        });
+
+        it("n'avertit pas pour un variant connu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('n\'avertit pas pour un variant custom si slot="icon" est fourni', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture(`
+                <ar-alert variant="promo">
+                    <svg slot="icon" aria-hidden="true"></svg>
+                </ar-alert>
+            `);
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
         });
     });
 
@@ -197,6 +338,23 @@ describe('ArAlert', () => {
         it('est false si next-focus ne contient que des espaces', async () => {
             el = await fixture('<ar-alert next-focus="   "></ar-alert>');
             expect(el.canBeHidden).toBe(false);
+        });
+
+        it('redevient false après retrait de next-focus (attribut supprimé, pas juste vidé)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(el.canBeHidden).toBe(true);
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            expect(el.nextFocus).toBeNull();
+            expect(el.canBeHidden).toBe(false);
+        });
+
+        it('ne plante pas si on ferme après que next-focus a été retiré (nextFocus null)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            // canBeHidden est false donc le bouton close n'est pas rendu — pas d'appel possible à _hide()
+            expect(getPart(el, 'close')).toBeNull();
         });
     });
 
