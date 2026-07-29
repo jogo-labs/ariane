@@ -252,12 +252,16 @@
         /* États — tokens d'usage (light mode) */
         --ar-color-success-bg: var(--ar-color-success-95);
         --ar-color-success-text: var(--ar-color-success-40);
+        --ar-color-success-border: var(--ar-color-success-90);
         --ar-color-warning-bg: var(--ar-color-warning-95);
         --ar-color-warning-text: var(--ar-color-warning-40);
+        --ar-color-warning-border: var(--ar-color-warning-90);
         --ar-color-danger-bg: var(--ar-color-danger-95);
         --ar-color-danger-text: var(--ar-color-danger-40);
+        --ar-color-danger-border: var(--ar-color-danger-90);
         --ar-color-info-bg: var(--ar-color-info-95);
         --ar-color-info-text: var(--ar-color-info-40);
+        --ar-color-info-border: var(--ar-color-info-90);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * 4. TOKENS GLOBAUX — TYPOGRAPHIE
@@ -299,28 +303,30 @@
     }
 
     /* alert — presets par variant */
-    ar-alert[variant='info'] {
-        --ar-alert-bg: var(--ar-color-info-bg);
-        --ar-alert-border: var(--ar-color-info-bg);
-        --ar-alert-icon: var(--ar-color-info-text);
-    }
+    ar-alert {
+        &[variant='info'] {
+            --ar-alert-bg: var(--ar-color-info-bg);
+            --ar-alert-border: var(--ar-color-info-border);
+            --ar-alert-icon: var(--ar-color-info-text);
+        }
 
-    ar-alert[variant='warning'] {
-        --ar-alert-bg: var(--ar-color-warning-bg);
-        --ar-alert-border: var(--ar-color-warning-bg);
-        --ar-alert-icon: var(--ar-color-warning-text);
-    }
+        &[variant='warning'] {
+            --ar-alert-bg: var(--ar-color-warning-bg);
+            --ar-alert-border: var(--ar-color-warning-border);
+            --ar-alert-icon: var(--ar-color-warning-text);
+        }
 
-    ar-alert[variant='error'] {
-        --ar-alert-bg: var(--ar-color-danger-bg);
-        --ar-alert-border: var(--ar-color-danger-bg);
-        --ar-alert-icon: var(--ar-color-danger-text);
-    }
+        &[variant='error'] {
+            --ar-alert-bg: var(--ar-color-danger-bg);
+            --ar-alert-border: var(--ar-color-danger-border);
+            --ar-alert-icon: var(--ar-color-danger-text);
+        }
 
-    ar-alert[variant='success'] {
-        --ar-alert-bg: var(--ar-color-success-bg);
-        --ar-alert-border: var(--ar-color-success-bg);
-        --ar-alert-icon: var(--ar-color-success-text);
+        &[variant='success'] {
+            --ar-alert-bg: var(--ar-color-success-bg);
+            --ar-alert-border: var(--ar-color-success-border);
+            --ar-alert-icon: var(--ar-color-success-text);
+        }
     }
 
     :root {
@@ -595,12 +601,16 @@
         /* États — bg sombre, texte clair */
         --ar-color-success-bg: var(--ar-color-success-10);
         --ar-color-success-text: var(--ar-color-success-70);
+        --ar-color-success-border: var(--ar-color-success-40);
         --ar-color-warning-bg: var(--ar-color-warning-10);
         --ar-color-warning-text: var(--ar-color-warning-70);
+        --ar-color-warning-border: var(--ar-color-warning-40);
         --ar-color-danger-bg: var(--ar-color-danger-10);
         --ar-color-danger-text: var(--ar-color-danger-70);
+        --ar-color-danger-border: var(--ar-color-danger-40);
         --ar-color-info-bg: var(--ar-color-info-10);
         --ar-color-info-text: var(--ar-color-info-70);
+        --ar-color-info-border: var(--ar-color-info-40);
 
         /* Button — surfaces adaptées au fond sombre */
         --ar-button-secondary-bg: var(--ar-color-neutral-30);
@@ -611,10 +621,6 @@
         --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
         --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
-
-        /* Alert : ces surcharges de bordure dark mode nécessitent un sélecteur d'attribut,
-           déplacées hors de ce bloc — voir les 4 règles `ar-alert[variant='...']` dupliquées
-           sous [data-theme='dark'] plus bas dans ce fichier. */
 
         /* Tooltip — fond clair sur fond de page sombre */
         --ar-tooltip-bg: var(--ar-color-neutral-80);
@@ -632,19 +638,6 @@
         --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
 
         --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
-    }
-
-    :root[data-theme='dark'] ar-alert[variant='info'] {
-        --ar-alert-border: var(--ar-color-info-40);
-    }
-    :root[data-theme='dark'] ar-alert[variant='warning'] {
-        --ar-alert-border: var(--ar-color-warning-40);
-    }
-    :root[data-theme='dark'] ar-alert[variant='error'] {
-        --ar-alert-border: var(--ar-color-danger-40);
-    }
-    :root[data-theme='dark'] ar-alert[variant='success'] {
-        --ar-alert-border: var(--ar-color-success-40);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -666,12 +659,16 @@
             /* États — bg sombre, texte clair */
             --ar-color-success-bg: var(--ar-color-success-10);
             --ar-color-success-text: var(--ar-color-success-70);
+            --ar-color-success-border: var(--ar-color-success-40);
             --ar-color-warning-bg: var(--ar-color-warning-10);
             --ar-color-warning-text: var(--ar-color-warning-70);
+            --ar-color-warning-border: var(--ar-color-warning-40);
             --ar-color-danger-bg: var(--ar-color-danger-10);
             --ar-color-danger-text: var(--ar-color-danger-70);
+            --ar-color-danger-border: var(--ar-color-danger-40);
             --ar-color-info-bg: var(--ar-color-info-10);
             --ar-color-info-text: var(--ar-color-info-70);
+            --ar-color-info-border: var(--ar-color-info-40);
 
             /* Button — surfaces adaptées au fond sombre */
             --ar-button-secondary-bg: var(--ar-color-neutral-30);
@@ -703,19 +700,6 @@
             --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
 
             --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
-        }
-
-        :root:not([data-theme='light']) ar-alert[variant='info'] {
-            --ar-alert-border: var(--ar-color-info-40);
-        }
-        :root:not([data-theme='light']) ar-alert[variant='warning'] {
-            --ar-alert-border: var(--ar-color-warning-40);
-        }
-        :root:not([data-theme='light']) ar-alert[variant='error'] {
-            --ar-alert-border: var(--ar-color-danger-40);
-        }
-        :root:not([data-theme='light']) ar-alert[variant='success'] {
-            --ar-alert-border: var(--ar-color-success-40);
         }
     }
 
@@ -979,10 +963,9 @@
         &::part(icon) {
             font-size: 1.5em;
         }
-    }
-
-    ar-alert[hiding] {
-        opacity: 0;
-        transform: scale(0.75);
+        &[hiding] {
+            opacity: 0;
+            transform: scale(0.75);
+        }
     }
 }
