@@ -274,6 +274,23 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert next-focus="   "></ar-alert>');
             expect(el.canBeHidden).toBe(false);
         });
+
+        it('redevient false après retrait de next-focus (attribut supprimé, pas juste vidé)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(el.canBeHidden).toBe(true);
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            expect(el.nextFocus).toBeNull();
+            expect(el.canBeHidden).toBe(false);
+        });
+
+        it('ne plante pas si on ferme après que next-focus a été retiré (nextFocus null)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            // canBeHidden est false donc le bouton close n'est pas rendu — pas d'appel possible à _hide()
+            expect(getPart(el, 'close')).toBeNull();
+        });
     });
 
     // ── Fermeture ─────────────────────────────────────────────────────────────

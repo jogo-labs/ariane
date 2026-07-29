@@ -195,7 +195,7 @@ export class ArAlert extends LitElement {
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */
     get canBeHidden(): boolean {
-        return this.nextFocus !== undefined && this.nextFocus?.replaceAll(' ', '') !== '';
+        return this.nextFocus != null && this.nextFocus.replaceAll(' ', '') !== '';
     }
 
     private _shouldAnimate(): boolean {
