@@ -108,7 +108,11 @@ export class ArAlert extends LitElement {
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             this._updateRole();
         }
-        if (changed.has('variant') && !(this.variant in ArAlert._ICON_PATHS)) {
+        if (
+            changed.has('variant') &&
+            !(this.variant in ArAlert._ICON_PATHS) &&
+            !this.querySelector('[slot="icon"]')
+        ) {
             warn(
                 'ar-alert',
                 `variant="${this.variant}" n'a pas d'icône par défaut, fournissez un contenu via slot="icon".`,

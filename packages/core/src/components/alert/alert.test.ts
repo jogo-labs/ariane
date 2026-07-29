@@ -203,6 +203,17 @@ describe('ArAlert', () => {
             expect(spy).not.toHaveBeenCalled();
             spy.mockRestore();
         });
+
+        it('n\'avertit pas pour un variant custom si slot="icon" est fourni', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture(`
+                <ar-alert variant="promo">
+                    <svg slot="icon" aria-hidden="true"></svg>
+                </ar-alert>
+            `);
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     // ── Bouton close ──────────────────────────────────────────────────────────
