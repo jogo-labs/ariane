@@ -294,21 +294,36 @@
         /* alert */
         --ar-alert-color: var(--ar-color-text);
         --ar-alert-close-size: 2rem;
-        --ar-alert-info-bg: var(--ar-color-info-bg);
-        --ar-alert-info-border: var(--ar-color-info-bg);
-        --ar-alert-info-icon: var(--ar-color-info-text);
-        --ar-alert-warning-bg: var(--ar-color-warning-bg);
-        --ar-alert-warning-border: var(--ar-color-warning-bg);
-        --ar-alert-warning-icon: var(--ar-color-warning-text);
-        --ar-alert-error-bg: var(--ar-color-danger-bg);
-        --ar-alert-error-border: var(--ar-color-danger-bg);
-        --ar-alert-error-icon: var(--ar-color-danger-text);
-        --ar-alert-success-bg: var(--ar-color-success-bg);
-        --ar-alert-success-border: var(--ar-color-success-bg);
-        --ar-alert-success-icon: var(--ar-color-success-text);
         --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
         --ar-alert-hide-transition-duration: 0.33s;
+        /* alert — presets par variant */
+    }
 
+    ar-alert[variant='info'] {
+        --ar-alert-bg: var(--ar-color-info-bg);
+        --ar-alert-border: var(--ar-color-info-bg);
+        --ar-alert-icon: var(--ar-color-info-text);
+    }
+
+    ar-alert[variant='warning'] {
+        --ar-alert-bg: var(--ar-color-warning-bg);
+        --ar-alert-border: var(--ar-color-warning-bg);
+        --ar-alert-icon: var(--ar-color-warning-text);
+    }
+
+    ar-alert[variant='error'] {
+        --ar-alert-bg: var(--ar-color-danger-bg);
+        --ar-alert-border: var(--ar-color-danger-bg);
+        --ar-alert-icon: var(--ar-color-danger-text);
+    }
+
+    ar-alert[variant='success'] {
+        --ar-alert-bg: var(--ar-color-success-bg);
+        --ar-alert-border: var(--ar-color-success-bg);
+        --ar-alert-icon: var(--ar-color-success-text);
+    }
+
+    :root {
         /* button */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
@@ -597,11 +612,9 @@
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
         --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
-        /* Alert */
-        --ar-alert-info-border: var(--ar-color-info-40);
-        --ar-alert-warning-border: var(--ar-color-warning-40);
-        --ar-alert-error-border: var(--ar-color-danger-40);
-        --ar-alert-success-border: var(--ar-color-success-40);
+        /* Alert : ces surcharges de bordure dark mode nécessitent un sélecteur d'attribut,
+           déplacées hors de ce bloc — voir les 4 règles `ar-alert[variant='...']` dupliquées
+           sous [data-theme='dark'] plus bas dans ce fichier. */
 
         /* Tooltip — fond clair sur fond de page sombre */
         --ar-tooltip-bg: var(--ar-color-neutral-80);
@@ -619,6 +632,19 @@
         --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
 
         --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
+    }
+
+    :root[data-theme='dark'] ar-alert[variant='info'] {
+        --ar-alert-border: var(--ar-color-info-40);
+    }
+    :root[data-theme='dark'] ar-alert[variant='warning'] {
+        --ar-alert-border: var(--ar-color-warning-40);
+    }
+    :root[data-theme='dark'] ar-alert[variant='error'] {
+        --ar-alert-border: var(--ar-color-danger-40);
+    }
+    :root[data-theme='dark'] ar-alert[variant='success'] {
+        --ar-alert-border: var(--ar-color-success-40);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -657,11 +683,9 @@
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
             --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
-            /* Alert */
-            --ar-alert-info-border: var(--ar-color-info-40);
-            --ar-alert-warning-border: var(--ar-color-warning-40);
-            --ar-alert-error-border: var(--ar-color-danger-40);
-            --ar-alert-success-border: var(--ar-color-success-40);
+            /* Alert : ces surcharges de bordure dark mode nécessitent un sélecteur d'attribut,
+               déplacées hors de ce bloc — voir les 4 règles `ar-alert[variant='...']` juste
+               après la fermeture de ce sélecteur. */
 
             /* Tooltip — fond clair sur fond de page sombre */
             --ar-tooltip-bg: var(--ar-color-neutral-80);
@@ -679,6 +703,19 @@
             --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
 
             --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
+        }
+
+        :root:not([data-theme='light']) ar-alert[variant='info'] {
+            --ar-alert-border: var(--ar-color-info-40);
+        }
+        :root:not([data-theme='light']) ar-alert[variant='warning'] {
+            --ar-alert-border: var(--ar-color-warning-40);
+        }
+        :root:not([data-theme='light']) ar-alert[variant='error'] {
+            --ar-alert-border: var(--ar-color-danger-40);
+        }
+        :root:not([data-theme='light']) ar-alert[variant='success'] {
+            --ar-alert-border: var(--ar-color-success-40);
         }
     }
 
