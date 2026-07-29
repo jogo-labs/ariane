@@ -75,7 +75,12 @@ export class ArAlert extends LitElement {
      * @attr urgent
      * @default undefined
      */
-    @property({ type: Boolean })
+    @property({
+        converter: {
+            fromAttribute: (value: string | null): boolean | undefined =>
+                value === null ? undefined : true,
+        },
+    })
     urgent?: boolean;
 
     /**

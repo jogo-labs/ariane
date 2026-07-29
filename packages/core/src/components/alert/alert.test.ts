@@ -128,6 +128,15 @@ describe('ArAlert', () => {
             );
             expect(el.hasAttribute('role')).toBe(false);
         });
+
+        it("removeAttribute('urgent') retombe sur undefined (pas sur false)", async () => {
+            el = await fixture('<ar-alert variant="error" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+            el.removeAttribute('urgent');
+            await waitForUpdate(el);
+            expect(el.urgent).toBeUndefined();
+            expect(el.getAttribute('role')).toBe('alert'); // retombe sur la table (error -> alert), pas force à status
+        });
     });
 
     // ── Icône ─────────────────────────────────────────────────────────────────
