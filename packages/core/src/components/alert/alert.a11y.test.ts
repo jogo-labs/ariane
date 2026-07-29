@@ -11,7 +11,7 @@ import './index.js';
 describe('ar-alert — accessibilité', () => {
     it('version "info" est accessible', async () => {
         const el = await fixture(html`
-            <ar-alert version="info">
+            <ar-alert variant="info">
                 <span slot="title">Information importante</span>
                 <span slot="content">Voici un message informatif.</span>
             </ar-alert>
@@ -21,7 +21,7 @@ describe('ar-alert — accessibilité', () => {
 
     it('version "success" est accessible', async () => {
         const el = await fixture(html`
-            <ar-alert version="success">
+            <ar-alert variant="success">
                 <span slot="title">Succès</span>
                 <span slot="content">L'opération a réussi.</span>
             </ar-alert>
@@ -31,7 +31,7 @@ describe('ar-alert — accessibilité', () => {
 
     it('version "warning" est accessible', async () => {
         const el = await fixture(html`
-            <ar-alert version="warning">
+            <ar-alert variant="warning">
                 <span slot="title">Attention</span>
                 <span slot="content">Vérifiez vos informations.</span>
             </ar-alert>
@@ -41,7 +41,7 @@ describe('ar-alert — accessibilité', () => {
 
     it('version "error" est accessible', async () => {
         const el = await fixture(html`
-            <ar-alert version="error">
+            <ar-alert variant="error">
                 <span slot="title">Erreur</span>
                 <span slot="content">Une erreur s'est produite.</span>
             </ar-alert>
@@ -53,7 +53,7 @@ describe('ar-alert — accessibilité', () => {
         const container = await fixture(html`
             <div>
                 <button id="focus-target">Retour</button>
-                <ar-alert version="warning" next-focus="focus-target">
+                <ar-alert variant="warning" next-focus="focus-target">
                     <span slot="title">Attention</span>
                     <span slot="content">Vérifiez vos informations.</span>
                 </ar-alert>
