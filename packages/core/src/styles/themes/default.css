@@ -292,45 +292,34 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * 6. TOKENS COMPOSANTS
-         * Enrichis au fur et à mesure de la migration.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* alert */
-        --ar-alert-color: var(--ar-color-text);
-        --ar-alert-close-size: 2rem;
-        --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
-        --ar-alert-hide-transition-duration: 0.33s;
-    }
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Panel
+         * Partagé - dropdown, breadcrumb, stepper
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+        --ar-panel-show-duration: 0.2s;
 
-    /* alert — presets par variant */
-    ar-alert {
-        &[variant='info'] {
-            --ar-alert-bg: var(--ar-color-info-bg);
-            --ar-alert-border: var(--ar-color-info-border);
-            --ar-alert-icon: var(--ar-color-info-text);
-        }
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Anchor
+         * Partagé — positionnement des composants ancrés / popovers)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* anchor ( */
+        --ar-anchor-distance: 4px;
+        --ar-anchor-offset: 0px;
 
-        &[variant='warning'] {
-            --ar-alert-bg: var(--ar-color-warning-bg);
-            --ar-alert-border: var(--ar-color-warning-border);
-            --ar-alert-icon: var(--ar-color-warning-text);
-        }
-
-        &[variant='error'] {
-            --ar-alert-bg: var(--ar-color-danger-bg);
-            --ar-alert-border: var(--ar-color-danger-border);
-            --ar-alert-icon: var(--ar-color-danger-text);
-        }
-
-        &[variant='success'] {
-            --ar-alert-bg: var(--ar-color-success-bg);
-            --ar-alert-border: var(--ar-color-success-border);
-            --ar-alert-icon: var(--ar-color-success-text);
-        }
-    }
-
-    :root {
-        /* button */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Button
+         * Partagé - breadcrumb, dialog, pagination
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
         --ar-button-color: var(--ar-color-text-inverse);
@@ -358,7 +347,18 @@
         --ar-button-ratio-square-width: 2.5rem;
         --ar-button-transition-duration: 0.15s;
 
-        /* breadcrumb */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Alert
+         * Voir les règles complémentaires pour les variants ci-dessous
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-alert-color: var(--ar-color-text);
+        --ar-alert-close-size: 2rem;
+        --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
+        --ar-alert-hide-transition-duration: 0.33s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Breadcrumb
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
         --ar-breadcrumb-offset: var(--ar-anchor-offset);
         --ar-breadcrumb-color: var(--ar-color-text);
@@ -379,7 +379,9 @@
         --ar-breadcrumb-toggle-bg-pressed: var(--ar-button-tertiary-bg-active);
         --ar-breadcrumb-toggle-bg-focus: var(--ar-button-tertiary-bg-focus);
 
-        /* stepper */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Stepper
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
@@ -398,12 +400,16 @@
         --ar-stepper-panel-bg: var(--ar-panel-bg);
         --ar-stepper-panel-border-color: var(--ar-panel-border-color);
 
-        /* progressbar */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Progressbar
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
         --ar-progressbar-fill-color: var(--ar-color-interactive);
         --ar-progressbar-percent-color: var(--ar-color-text-muted);
 
-        /* pagination */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Pagination
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-pagination-active-color: var(--ar-color-interactive);
         --ar-pagination-color: var(--ar-color-text);
         --ar-pagination-bg: var(--ar-button-tertiary-bg);
@@ -412,10 +418,14 @@
         --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
         --ar-pagination-active-bg: var(--ar-color-bg);
 
-        /* spinner */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Spinner
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-spinner-stroke-color: currentColor;
 
-        /* tooltip */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tooltip
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-tooltip-distance: 10px;
         --ar-tooltip-offset: var(--ar-anchor-offset);
         --ar-tooltip-bg: var(--ar-color-neutral-20);
@@ -427,22 +437,9 @@
         --ar-tooltip-arrow-size: 6px;
         --ar-tooltip-show-duration: var(--ar-panel-show-duration);
 
-        /* panel (shared — dropdown, breadcrumb, stepper) */
-        --ar-panel-bg: var(--ar-color-bg);
-        --ar-panel-text: var(--ar-color-text);
-        --ar-panel-border-color: var(--ar-color-border);
-        --ar-panel-radius: var(--ar-border-radius-md);
-        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
-        --ar-panel-padding: 0.25rem;
-        --ar-panel-min-width: 18rem;
-        --ar-panel-max-width: 18rem;
-        --ar-panel-show-duration: 0.2s;
-
-        /* anchor (partagé — positionnement des composants ancrés / popovers) */
-        --ar-anchor-distance: 4px;
-        --ar-anchor-offset: 0px;
-
-        /* dropdown */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dropdown
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-dropdown-distance: var(--ar-anchor-distance);
         --ar-dropdown-offset: var(--ar-anchor-offset);
         --ar-dropdown-bg: var(--ar-panel-bg);
@@ -457,7 +454,9 @@
         --ar-dropdown-min-width: 10rem;
         --ar-dropdown-max-width: var(--ar-panel-max-width);
 
-        /* dialog */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dialog
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-dialog-width-sm: 360px;
         --ar-dialog-width-md: 500px;
         --ar-dialog-width-lg: 800px;
@@ -484,11 +483,15 @@
         --ar-dialog-title-font-size: var(--ar-font-size-md);
         --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
 
-        /* collapse */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Collapse
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-collapse-duration: 0s;
         --ar-collapse-easing: ease;
 
-        /* charcounter */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Charcounter
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-charcounter-color: var(--ar-color-text-muted);
         --ar-charcounter-font-size: 0.875rem;
         --ar-charcounter-warning-color: var(--ar-color-warning-text);
@@ -496,7 +499,9 @@
         --ar-charcounter-error-color: var(--ar-color-danger-text);
         --ar-charcounter-error-weight: 700;
 
-        /* table-sort */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tablesort
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-table-sort-gap: 0.375rem;
         --ar-table-sort-indicator-gap: 3px;
         --ar-table-sort-indicator-size: 0.65rem;
@@ -504,7 +509,9 @@
         --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
         --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted, #9ca3af);
 
-        /* tab */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tab
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-tab-color: var(--ar-color-text-muted);
         --ar-tab-bg: transparent;
         --ar-tab-padding-x: 1.5rem;
@@ -532,7 +539,7 @@
         --ar-tab-group-border-bottom-width: 1px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * ar-datepicker
+         * Datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         --ar-datepicker-distance: var(--ar-anchor-distance);
@@ -583,6 +590,7 @@
      * Les composants héritent automatiquement.
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
+    /* Thème dark actif manuellement */
     :root[data-theme='dark'] {
         /* Surface */
         --ar-color-text: var(--ar-color-neutral-95);
@@ -640,6 +648,7 @@
         --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
     }
 
+    /* Thème dark activé automatiquement par les préférence utilisateur */
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
             /* Surface */
@@ -680,10 +689,6 @@
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
             --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
-            /* Alert : ces surcharges de bordure dark mode nécessitent un sélecteur d'attribut,
-               déplacées hors de ce bloc — voir les 4 règles `ar-alert[variant='...']` juste
-               après la fermeture de ce sélecteur. */
-
             /* Tooltip — fond clair sur fond de page sombre */
             --ar-tooltip-bg: var(--ar-color-neutral-80);
             --ar-tooltip-color: var(--ar-color-neutral-10);
@@ -703,6 +708,11 @@
         }
     }
 
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * THÈME COMPOSANTS
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* Datepicker */
     ar-datepicker {
         /* Variable locale à ce bloc thème, pas un token public du composant (pas de
          * préfixe --ar-datepicker-*) : couple gap et margin-bottom de ::part(label)
@@ -875,6 +885,7 @@
         }
     }
 
+    /* Stepper */
     ar-stepper {
         &::part(trigger) {
             border-radius: 0.75rem;
@@ -934,6 +945,7 @@
         }
     }
 
+    /* Alert */
     ar-alert {
         padding: 1rem;
         border-radius: 0.75rem;
@@ -941,6 +953,7 @@
         border-style: solid;
         column-gap: 0.75rem;
 
+        /* Customisation */
         &::part(close) {
             border-radius: 7px;
             color: currentColor;
@@ -966,6 +979,31 @@
         &[hiding] {
             opacity: 0;
             transform: scale(0.75);
+        }
+
+        /* presets par variant */
+        &[variant='info'] {
+            --ar-alert-bg: var(--ar-color-info-bg);
+            --ar-alert-border: var(--ar-color-info-border);
+            --ar-alert-icon: var(--ar-color-info-text);
+        }
+
+        &[variant='warning'] {
+            --ar-alert-bg: var(--ar-color-warning-bg);
+            --ar-alert-border: var(--ar-color-warning-border);
+            --ar-alert-icon: var(--ar-color-warning-text);
+        }
+
+        &[variant='error'] {
+            --ar-alert-bg: var(--ar-color-danger-bg);
+            --ar-alert-border: var(--ar-color-danger-border);
+            --ar-alert-icon: var(--ar-color-danger-text);
+        }
+
+        &[variant='success'] {
+            --ar-alert-bg: var(--ar-color-success-bg);
+            --ar-alert-border: var(--ar-color-success-border);
+            --ar-alert-icon: var(--ar-color-success-text);
         }
     }
 }
