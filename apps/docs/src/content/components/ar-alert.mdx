@@ -41,17 +41,24 @@ import WcagRef from '../../components/WcagRef.astro';
 ### Pris en charge automatiquement
 
 - `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) posé sur
-  l'hôte selon le variant — `info` → `status`, tous les autres → `alert` — conforme
+  l'hôte selon `variant` — `error`/`warning` → `alert`, `success`/`info` → `status`, tout
+  variant custom non reconnu → `status` (défaut sûr) — conforme
     <WcagRef
         criterion="4.1.3"
         summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus."
     />
+- La prop `urgent` permet de forcer ce niveau indépendamment de `variant` : sa seule
+  présence (`<ar-alert urgent>`, pas besoin de `="true"`) force `role="alert"`. Elle
+  n'est jamais forcée par son absence — sans elle, le rôle retombe sur la déduction
+  ci-dessus.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
   est portée par le `role`, pas par l'icône.
-- Une icône par défaut est fournie pour chaque variant. Elle peut être remplacée via le
-  slot `icon`, mais il est déconseillé de la supprimer : elle constitue un repère visuel
-  non colorimétrique, important pour les utilisateurs daltoniens ou en environnement à
-  faible contraste.
+- Une icône par défaut est fournie pour les 4 variants connus (`error`, `warning`,
+  `success`, `info`). Elle peut être remplacée via le slot `icon`, mais il est
+  déconseillé de la supprimer : elle constitue un repère visuel non colorimétrique,
+  important pour les utilisateurs daltoniens ou en environnement à faible contraste. Un
+  `variant` custom non reconnu par le composant n'affiche aucune icône par défaut (un
+  avertissement en console le rappelle en dev) — fournissez `slot="icon"` dans ce cas.
 - Le focus est reporté sur l'élément cible (`next-focus`) à la fermeture — l'utilisateur
   clavier ne se retrouve pas désorienté.
 
@@ -63,6 +70,11 @@ import WcagRef from '../../components/WcagRef.astro';
 - **Niveau de sévérité cohérent.** `error` pour les erreurs bloquantes, `warning` pour
   les situations qui méritent attention sans bloquer, `success` pour les confirmations,
   `info` pour les informations neutres.
+- **Styliser un `variant` custom.** Au-delà des 4 presets fournis par `default.css`
+  (`error`/`warning`/`success`/`info`), tout autre `variant` doit définir lui-même
+  `--ar-alert-bg`, `--ar-alert-border` et `--ar-alert-icon` (ex.
+  `ar-alert[variant='promo'] { --ar-alert-bg: ...; }`) et fournir une icône via
+  `slot="icon"`.
 - **`next-focus` obligatoire sur les alertes dismissibles.** Un bouton de fermeture sans
   destination de focus laisse l'utilisateur clavier sans repère.
 
