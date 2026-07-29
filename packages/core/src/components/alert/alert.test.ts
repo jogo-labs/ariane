@@ -97,6 +97,39 @@ describe('ArAlert', () => {
         });
     });
 
+    // ── Prop urgent (override du rôle) ──────────────────────────────────────
+
+    describe('prop urgent', () => {
+        it('urgent est undefined par défaut', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            expect(el.urgent).toBeUndefined();
+        });
+
+        it('la seule présence de l\'attribut urgent force role="alert"', async () => {
+            el = await fixture('<ar-alert variant="success" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent en absence ne force pas role="status" (retombe sur la table)', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent=false (JS) force role="status" même sur un variant "error"', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            el.urgent = false;
+            await waitForUpdate(el);
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
+        it("urgent est prioritaire sur withoutNotification=false mais pas l'inverse", async () => {
+            el = await fixture(
+                '<ar-alert variant="success" urgent without-notification></ar-alert>',
+            );
+            expect(el.hasAttribute('role')).toBe(false);
+        });
+    });
+
     // ── Icône ─────────────────────────────────────────────────────────────────
 
     describe('icône', () => {

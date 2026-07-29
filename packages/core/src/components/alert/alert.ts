@@ -76,6 +76,16 @@ export class ArAlert extends LitElement {
     withoutNotification = false;
 
     /**
+     * Force le niveau d'urgence ARIA indépendamment de `variant` : `role="alert"` si présent,
+     * sinon déduit de `variant` via une table de correspondance interne (`error`/`warning` →
+     * `alert`, `success`/`info` → `status`, tout autre variant → `status`).
+     * @attr urgent
+     * @default undefined
+     */
+    @property({ type: Boolean })
+    urgent?: boolean;
+
+    /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
      * @attr variant
      */
@@ -97,7 +107,7 @@ export class ArAlert extends LitElement {
     }
 
     override updated(changed: Map<string, unknown>) {
-        if (changed.has('variant') || changed.has('withoutNotification')) {
+        if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             this._updateRole();
         }
     }
@@ -105,6 +115,10 @@ export class ArAlert extends LitElement {
     private _updateRole(): void {
         if (this.withoutNotification) {
             this.removeAttribute('role');
+            return;
+        }
+        if (this.urgent !== undefined) {
+            this.role = this.urgent ? 'alert' : 'status';
             return;
         }
         this.role = ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status';
