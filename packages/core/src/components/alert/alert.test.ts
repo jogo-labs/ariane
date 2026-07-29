@@ -139,6 +139,71 @@ describe('ArAlert', () => {
         });
     });
 
+    // ── Avertissement role manuel ─────────────────────────────────────────────
+
+    describe('avertissement role manuel', () => {
+        it('avertit si role est posé manuellement dans le markup initial', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="error"></ar-alert>');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit pas si role n'est pas posé dans le markup initial", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert></ar-alert>');
+                // Le warning pour variant custom ne doit pas être appelé (pas de variant custom)
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it('role posé manuellement est bien écrasé par la logique interne malgré le warning', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="info"></ar-alert>');
+                expect(el.getAttribute('role')).toBe('status');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit qu'une seule fois, même si variant change ensuite", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner"></ar-alert>');
+                expect(spy).toHaveBeenCalledOnce();
+                spy.mockClear();
+
+                el.variant = 'info';
+                await waitForUpdate(el);
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("l'avertissement n'empêche pas la fermeture du role par withoutNotification", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" without-notification></ar-alert>');
+                expect(el.hasAttribute('role')).toBe(false);
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+    });
+
     // ── Icône ─────────────────────────────────────────────────────────────────
 
     describe('icône', () => {

@@ -98,14 +98,32 @@ export class ArAlert extends LitElement {
     @property({ reflect: true, type: Boolean })
     protected hiding: boolean = false;
 
+    /**
+     * Indique si `role` a été posé manuellement dans le markup initial.
+     * Utilisé pour n'avertir qu'une seule fois que le composant va écraser cet attribut.
+     */
+    private _hadAuthoredRole: boolean | undefined = undefined;
+
     constructor() {
         super();
         // Lance la suppression du DOM à la fin de l'animation de fermeture
         this.addEventListener('transitionend', this._finishHide);
     }
 
+    override firstUpdated(): void {
+        // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
+        this._hadAuthoredRole = this.hasAttribute('role');
+    }
+
     override updated(changed: Map<string, unknown>) {
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
+            if (this._hadAuthoredRole === true) {
+                warn(
+                    'ar-alert',
+                    `role="${this.getAttribute('role')}" posé manuellement sera écrasé par le composant — utilisez la prop 'urgent' pour contrôler le niveau ARIA.`,
+                );
+                this._hadAuthoredRole = false;
+            }
             this._updateRole();
         }
         if (
