@@ -110,6 +110,12 @@ export class ArAlert extends LitElement {
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             this._updateRole();
         }
+        if (changed.has('variant') && !(this.variant in ArAlert._ICON_PATHS)) {
+            warn(
+                'ar-alert',
+                `variant="${this.variant}" n'a pas d'icône par défaut, fournissez un contenu via slot="icon".`,
+            );
+        }
     }
 
     private _updateRole(): void {
@@ -139,10 +145,9 @@ export class ArAlert extends LitElement {
         error: 'M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z',
     };
 
-    protected _defaultIcon(): TemplateResult {
-        const path = (ArAlert._ICON_PATHS as Record<string, string>)[
-            this.variant ?? ArAlert.DEFAULT_VARIANT
-        ];
+    protected _defaultIcon(): TemplateResult | typeof nothing {
+        const path = (ArAlert._ICON_PATHS as Record<string, string>)[this.variant];
+        if (path === undefined) return nothing;
         return html` <svg
             aria-hidden="true"
             part="icon-svg"

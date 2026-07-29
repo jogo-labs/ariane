@@ -175,6 +175,25 @@ describe('ArAlert', () => {
             expect(assigned).toHaveLength(1);
             expect((assigned[0] as HTMLElement).dataset.custom).toBe('true');
         });
+
+        it("n'affiche pas d'icône par défaut pour un variant custom inconnu", async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(requireShadow(el).querySelector('slot[name="icon"] svg')).toBeNull();
+        });
+
+        it('logue un avertissement pour un variant custom inconnu', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('promo'));
+            spy.mockRestore();
+        });
+
+        it("n'avertit pas pour un variant connu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     // ── Bouton close ──────────────────────────────────────────────────────────
