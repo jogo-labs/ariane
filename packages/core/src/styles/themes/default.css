@@ -296,9 +296,9 @@
         --ar-alert-close-size: 2rem;
         --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
         --ar-alert-hide-transition-duration: 0.33s;
-        /* alert — presets par variant */
     }
 
+    /* alert — presets par variant */
     ar-alert[variant='info'] {
         --ar-alert-bg: var(--ar-color-info-bg);
         --ar-alert-border: var(--ar-color-info-bg);
