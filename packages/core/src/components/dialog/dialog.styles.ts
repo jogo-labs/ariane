@@ -168,11 +168,25 @@ export default [
             color: inherit;
         }
 
-        button {
-            flex-shrink: 0;
+        [part='close'] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             align-self: flex-start;
-            /* @EvolutionDesign: taille forcée à 40×40 en attendant la migration vers la nouvelle charte */
-            min-height: 2.5rem;
+            flex-shrink: 0;
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            width: var(--ar-dialog-close-size, 2.5rem);
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            height: var(--ar-dialog-close-size, 2.5rem);
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            transition: background-color var(--ar-dialog-close-transition-duration);
+        }
+
+        [part='close']:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
         }
 
         svg {
@@ -203,29 +217,6 @@ export default [
             flex-shrink: 0;
         }
 
-        /* ── Bouton de fermeture (tokens scopés au composant) ────────────────────
-         * Sélecteurs volontairement plus spécifiques que .btn-tertiary dans
-         * button.styles.ts (ajout de [part='close'].btn) pour gagner la cascade
-         * indépendamment de l'ordre des styles. */
-
-        [part='close'].btn.btn-tertiary {
-            background-color: var(--ar-dialog-close-bg);
-        }
-
-        [part='close'].btn.btn-tertiary:hover {
-            background-color: var(--ar-dialog-close-bg-hover);
-        }
-
-        [part='close'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
-                [aria-disabled='true']
-            ):active {
-            background-color: var(--ar-dialog-close-bg-pressed);
-        }
-
-        [part='close'].btn.btn-tertiary:focus {
-            background-color: var(--ar-dialog-close-bg-focus);
-        }
-
         /* ── Shake (fermeture bloquée) ────────────────────────────────────────── */
 
         dialog.shake {
@@ -236,7 +227,8 @@ export default [
 
         @media (prefers-reduced-motion: reduce) {
             dialog,
-            dialog::backdrop {
+            dialog::backdrop,
+            [part='close'] {
                 animation: none !important;
                 transition: none !important;
             }

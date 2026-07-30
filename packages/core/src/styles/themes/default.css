@@ -475,10 +475,8 @@
         --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
         --ar-dialog-bg: var(--ar-color-bg);
         --ar-dialog-color: var(--ar-color-text);
-        --ar-dialog-close-bg: var(--ar-button-tertiary-bg);
-        --ar-dialog-close-bg-hover: var(--ar-button-tertiary-bg-hover);
-        --ar-dialog-close-bg-pressed: var(--ar-button-tertiary-bg-active);
-        --ar-dialog-close-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-dialog-close-size: 2.5rem;
+        --ar-dialog-close-transition-duration: var(--ar-button-transition-duration);
         --ar-dialog-border-radius: var(--ar-border-radius-lg);
         --ar-dialog-title-font-size: var(--ar-font-size-md);
         --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
@@ -1004,6 +1002,17 @@
             --ar-alert-bg: var(--ar-color-success-bg);
             --ar-alert-border: var(--ar-color-success-border);
             --ar-alert-icon: var(--ar-color-success-text);
+        }
+    }
+
+    ar-dialog {
+        &::part(close) {
+            color: currentColor;
+            background-color: color-mix(in srgb, currentColor 8%, transparent);
+        }
+
+        &::part(close):hover {
+            background-color: color-mix(in srgb, currentColor 20%, transparent);
         }
     }
 }

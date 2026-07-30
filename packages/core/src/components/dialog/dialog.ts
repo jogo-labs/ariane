@@ -9,7 +9,6 @@ import {
 import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './dialog.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
@@ -54,6 +53,7 @@ if (typeof document !== 'undefined') {
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire.
  * @slot - Contenu principal du dialog.
  * @slot footer - Actions du dialog (boutons). Absent du DOM si non fourni.
+ * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
  *
  * @csspart dialog - L'élément <dialog> racine.
  * @csspart header - L'en-tête contenant le titre et le bouton de fermeture.
@@ -76,10 +76,8 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop --ar-dialog-shadow - Ombre portée du dialog.
  * @cssprop --ar-dialog-backdrop - Couleur de fond du voile derrière le dialog (mode modal).
- * @cssprop --ar-dialog-close-bg - Fond du bouton de fermeture.
- * @cssprop --ar-dialog-close-bg-hover - Fond du bouton de fermeture au survol.
- * @cssprop --ar-dialog-close-bg-pressed - Fond du bouton de fermeture pressé.
- * @cssprop --ar-dialog-close-bg-focus - Fond du bouton de fermeture au focus.
+ * @cssprop --ar-dialog-close-size - Taille (width/height) du bouton de fermeture.
+ * @cssprop --ar-dialog-close-transition-duration - Durée de la transition (background-color) du bouton de fermeture au survol.
  * @cssprop --ar-dialog-bg - Fond du dialog (cascade vers --ar-color-bg). Repli `Canvas` si aucun thème n'est chargé — sans thème et sans bordure (le dialog natif perd son style UA par défaut), le contenu flotte sinon sans surface visible.
  * @cssprop --ar-dialog-color - Couleur du texte du dialog (cascade vers --ar-color-text). Repli `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-dialog-border-radius - Border-radius du dialog en mode modal (non-drawer) (cascade vers --ar-border-radius-lg).
@@ -98,7 +96,7 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
 export class ArDialog extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, buttonStyles, styles];
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     // ── Public properties ──────────────────────────────────────────────────────
 
@@ -264,26 +262,23 @@ export class ArDialog extends LitElement {
                             ? html`<slot name="label"></slot>`
                             : headingLabel}
                     </h1>
-                    <button
-                        part="close"
-                        type="button"
-                        class="btn btn-tertiary btn-ratio-square"
-                        data-ar-dismiss
-                    >
-                        <svg
-                            aria-hidden="true"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18 18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                        <span class="btn-content sr-only">${this.closeLabel}</span>
+                    <button part="close" type="button" data-ar-dismiss>
+                        <slot name="close-icon">
+                            <svg
+                                aria-hidden="true"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M6 18 18 6M6 6l12 12"
+                                ></path>
+                            </svg>
+                        </slot>
+                        <span class="sr-only">${this.closeLabel}</span>
                     </button>
                 </header>
                 <div part="body" id="dialog-body">
