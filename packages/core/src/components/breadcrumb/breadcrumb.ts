@@ -13,7 +13,6 @@ import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
@@ -29,32 +28,30 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * "Retour".
  *
  * @csspart nav        - L'élément `<nav>` englobant.
- * @csspart list       - L'élément `<ol>` de la liste des liens (desktop).
+ * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
+ * @csspart list--desktop - La liste desktop (variante d'état de `list`).
+ * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
  * @csspart item       - Chaque `<li>` de la liste.
  * @csspart link       - Les `<a>` de navigation.
  * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
+ * @csspart separator  - Le séparateur entre deux items (desktop uniquement, absent avant le premier item).
+ * @csspart bullet     - La puce d'un item (mobile uniquement).
+ * @csspart bullet--current - La puce de l'élément courant (variante d'état de `bullet`).
+ * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
- * @cssprop --ar-breadcrumb-color - Couleur du texte (labels et lien actif). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
- * @cssprop --ar-breadcrumb-separator-color - Couleur du séparateur entre les items (desktop).
- * @cssprop --ar-breadcrumb-bullet-color - Couleur des puces de la liste mobile.
- * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
- * @cssprop --ar-breadcrumb-panel-min-width - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop --ar-breadcrumb-panel-max-width - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
- * @cssprop --ar-breadcrumb-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
- * @cssprop --ar-breadcrumb-panel-border-radius - Border-radius du panel mobile (cascade vers --ar-panel-radius).
- * @cssprop --ar-breadcrumb-panel-shadow - Ombre portée du panel mobile (cascade vers --ar-panel-shadow).
- * @cssprop --ar-breadcrumb-panel-padding - Padding interne du panel mobile (cascade vers --ar-panel-padding).
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
+ * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
+ * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
+ * @cssprop --ar-breadcrumb-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-breadcrumb-toggle-bg - Fond du bouton retour/trigger mobile.
  * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
  * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
  * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
- * @cssprop --ar-breadcrumb-bullet-ring-color - Couleur du liseré autour des puces de la liste mobile (`box-shadow`, cascade vers --ar-color-bg).
- * @cssprop --ar-breadcrumb-active-bullet-color - Couleur de la puce du dernier élément de la liste mobile (élément actif/courant, cascade vers --ar-color-interactive).
+ * @cssprop --ar-breadcrumb-toggle-min-size - Taille minimale (largeur/hauteur) du bouton retour/trigger mobile, repli WCAG 2.5.8 si aucun thème n'est chargé.
+ * @cssprop --ar-breadcrumb-toggle-transition-duration - Durée de la transition (background-color) des boutons retour/trigger mobile.
  *
  * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
@@ -64,13 +61,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  */
 export class ArBreadcrumb extends LitElement {
-    static override styles: CSSResultGroup = [
-        utilitiesStyles,
-        resetStyles,
-        panelStyles,
-        buttonStyles,
-        styles,
-    ];
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, panelStyles, styles];
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
@@ -176,50 +167,43 @@ export class ArBreadcrumb extends LitElement {
 
         const listTemplates: TemplateResult[] = items.map((item, index) => {
             const isCurrent = index === items.length - 1;
-            return html` <li
-                part="item"
-                class="breadcrumb-item${isCurrent ? ' active' : ''}"
-                .ariaCurrent="${isCurrent ? 'page' : nothing}"
-            >
+            const decoration = this.isMobile
+                ? html`<span
+                      part="bullet${isCurrent ? ' bullet--current' : ''}"
+                      aria-hidden="true"
+                  ></span>`
+                : index > 0
+                  ? html`<span part="separator" aria-hidden="true"></span>`
+                  : nothing;
+
+            return html` <li part="item" .ariaCurrent="${isCurrent ? 'page' : nothing}">
+                ${decoration}
                 ${isCurrent
-                    ? html`<span part="current" class="breadcrumb-text">${item.label}</span>`
-                    : html`<a part="link" class="breadcrumb-link" href="${item.href}"
-                          >${item.label}</a
-                      >`}
+                    ? html`<span part="current">${item.label}</span>`
+                    : html`<a part="link" href="${item.href}">${item.label}</a>`}
             </li>`;
         });
 
         return html`
-            <nav
-                part="nav"
-                class="breadcrumb-container"
-                role="navigation"
-                aria-labelledby="breadcrumb-label"
-            >
+            <nav part="nav" role="navigation" aria-labelledby="breadcrumb-label">
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
-                    ? html`<div class="breadcrumb-dropdown">
-                          <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
+                    ? html`<div class="dropdown">
+                          <a part="home" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
                               <span class="btn-content">${items[0]?.label}</span>
                           </a>
-                          <button
-                              @click=${this._handleTriggerClick}
-                              type="button"
-                              part="trigger"
-                              class="btn btn-tertiary btn-ratio-square"
-                              id="breadcrumb-dropdown"
-                          >
+                          <button @click=${this._handleTriggerClick} type="button" part="trigger">
                               <span aria-hidden="true" class="icon icon-more">v</span>
                               <span class="btn-content sr-only">Afficher le fil d'ariane</span>
                           </button>
                           <div part="panel" popover="auto" tabindex="-1">
-                              <ol class="breadcrumb breadcrumb-mobile">
+                              <ol part="list list--mobile">
                                   ${listTemplates.slice(1)}
                               </ol>
                           </div>
                       </div>`
-                    : html`<ol part="list" class="breadcrumb breadcrumb-desktop">
+                    : html`<ol part="list list--desktop">
                           ${listTemplates}
                       </ol>`}
             </nav>
