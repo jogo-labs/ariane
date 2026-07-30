@@ -995,14 +995,14 @@
     }
 
     ar-dialog {
-        &:not([mode='drawer'])::part(dialog) {
-            border-radius: var(--ar-border-radius-lg);
-        }
-
         &::part(dialog) {
             box-shadow:
                 0 4px 6px -1px rgba(0, 0, 0, 0.1),
                 0 20px 50px -8px rgba(0, 0, 0, 0.2);
+        }
+
+        &:not([mode='drawer'])::part(dialog) {
+            border-radius: var(--ar-border-radius-lg);
         }
 
         &::part(close) {

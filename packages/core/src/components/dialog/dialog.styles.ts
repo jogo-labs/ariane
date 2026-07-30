@@ -54,8 +54,12 @@ export default [
             overflow: hidden;
             background: var(--ar-dialog-bg, Canvas);
             color: var(--ar-dialog-color, CanvasText);
-            /* Mobile-first : plein écran par défaut, commun aux deux modes. */
-            width: 100vw;
+            /* Mobile-first : plein écran par défaut, commun aux deux modes. 100% (pas
+               100vw) pour résoudre contre le containing block du <dialog> plutôt que le
+               viewport brut — évite un débordement horizontal de la largeur de la
+               gouttière de scrollbar sur les plateformes où elle occupe un espace de
+               layout. */
+            width: 100%;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
@@ -94,7 +98,10 @@ export default [
 
         @media (min-width: 576px) {
             :host([mode='drawer']) dialog {
-                width: min(var(--ar-dialog-width), 100vw);
+                /* 100% (pas 100vw) : même raison que la largeur mobile-first ci-dessus —
+                   évite de dépasser la largeur visible sur les plateformes où la
+                   scrollbar occupe un espace de layout. */
+                width: min(var(--ar-dialog-width), 100%);
             }
         }
 
