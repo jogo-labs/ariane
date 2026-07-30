@@ -78,15 +78,26 @@ export default [
             background: var(--ar-dialog-bg, Canvas);
             color: var(--ar-dialog-color, CanvasText);
             box-shadow: var(--ar-dialog-shadow);
+            /* Mobile-first : plein écran par défaut, commun aux deux modes. */
+            width: 100vw;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
             border-radius: var(--ar-dialog-border-radius);
-            /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
-            width: min(var(--ar-dialog-width), calc(100vw - 2rem));
-            max-height: min(90vh, calc(100dvh - 2rem));
+            max-height: 100dvh;
+        }
+
+        @media (min-width: 576px) {
+            :host(:not([mode='drawer'])) dialog {
+                /* max-width artificiel : au-delà du mobile, la modale ne prend jamais toute la
+                   largeur — utile pour les paliers lg/xl sur les viewports moyens (tablette
+                   portrait, fenêtre desktop réduite) où le token de taille dépasse le viewport ;
+                   sans effet pratique sur sm/md, déjà plus étroits que calc(100vw - 2rem) à 576px. */
+                width: min(var(--ar-dialog-width), calc(100vw - 2rem));
+                max-height: min(90vh, calc(100dvh - 2rem));
+            }
         }
 
         :host(:not([mode='drawer'])) dialog.opening {
@@ -100,12 +111,16 @@ export default [
         /* ── Drawer ───────────────────────────────────────────────────────────── */
 
         :host([mode='drawer']) dialog {
-            /* Sur petit écran, le drawer peut occuper 100% de la largeur */
-            width: min(var(--ar-dialog-width), 100vw);
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
             margin: 0;
+        }
+
+        @media (min-width: 576px) {
+            :host([mode='drawer']) dialog {
+                width: min(var(--ar-dialog-width), 100vw);
+            }
         }
 
         /* Placement droite (défaut du composant) */
