@@ -60,6 +60,10 @@ export default [
                gouttière de scrollbar sur les plateformes où elle occupe un espace de
                layout. */
             width: 100%;
+            /* max-width: override le défaut UA qui plafonne à calc(100% - 6px - 2em) —
+               même raison que l'override de max-height plus bas, sinon la largeur
+               plein écran ci-dessus reste invisiblement bridée par ce défaut natif. */
+            max-width: 100%;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
