@@ -77,7 +77,6 @@ export default [
             overflow: hidden;
             background: var(--ar-dialog-bg, Canvas);
             color: var(--ar-dialog-color, CanvasText);
-            box-shadow: var(--ar-dialog-shadow);
             /* Mobile-first : plein écran par défaut, commun aux deux modes. */
             width: 100vw;
         }

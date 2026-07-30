@@ -74,7 +74,6 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
  * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
- * @cssprop --ar-dialog-shadow - Ombre portée du dialog.
  * @cssprop --ar-dialog-backdrop - Couleur de fond du voile derrière le dialog (mode modal).
  * @cssprop --ar-dialog-close-size - Taille (width/height) du bouton de fermeture.
  * @cssprop --ar-dialog-close-transition-duration - Durée de la transition (background-color) du bouton de fermeture au survol.
