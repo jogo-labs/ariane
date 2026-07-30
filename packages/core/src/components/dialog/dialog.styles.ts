@@ -153,8 +153,6 @@ export default [
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.75rem;
-            padding: 1.25rem 1.25rem 0;
             flex-shrink: 0;
         }
 
@@ -206,8 +204,6 @@ export default [
             align-items: center;
             justify-content: flex-end;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            padding: 0 1.25rem 1.25rem;
             flex-shrink: 0;
         }
 

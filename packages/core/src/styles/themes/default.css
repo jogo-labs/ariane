@@ -1025,5 +1025,15 @@
         &::part(title) {
             font-size: var(--ar-font-size-md);
         }
+
+        &::part(header) {
+            gap: 0.75rem;
+            padding: 1.25rem 1.25rem 0;
+        }
+
+        &::part(footer) {
+            gap: 0.75rem;
+            padding: 0 1.25rem 1.25rem;
+        }
     }
 }
