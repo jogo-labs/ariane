@@ -9,45 +9,23 @@ export default [
         :host {
             display: block;
 
-            /* Taille modale par défaut (md). Surchargeable par --ar-dialog-width sur l'instance. */
-            --ar-dialog-width: var(--ar-dialog-width-md);
+            /* Taille par défaut (repli fonctionnel sans thème) — les paliers sm/lg/xl sont
+               une taxonomie fournie par default.css, pas une exigence du composant. */
+            /* functional-default: largeur modale non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 500px;
         }
 
-        /* Tailles modal */
-        :host([size='sm']) {
-            --ar-dialog-width: var(--ar-dialog-width-sm);
-        }
-        :host([size='md']) {
-            --ar-dialog-width: var(--ar-dialog-width-md);
-        }
-        :host([size='lg']) {
-            --ar-dialog-width: var(--ar-dialog-width-lg);
-        }
-        :host([size='xl']) {
-            --ar-dialog-width: var(--ar-dialog-width-xl);
-        }
-
-        /* Tailles drawer — ont priorité sur les valeurs modal via la spécificité */
+        /* Taille par défaut du drawer — a priorité sur la valeur modal via la spécificité */
         :host([mode='drawer']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
-        }
-        :host([mode='drawer'][size='sm']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-sm);
-        }
-        :host([mode='drawer'][size='md']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
-        }
-        :host([mode='drawer'][size='lg']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-lg);
-        }
-        :host([mode='drawer'][size='xl']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-xl);
+            /* functional-default: largeur drawer non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 720px;
         }
 
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
 
         dialog::backdrop {
-            background: var(--ar-dialog-backdrop);
+            /* a11y-fallback: sans thème chargé, le backdrop serait transparent (défaut UA de ::backdrop) — perte de l'indication visuelle de modalité */
+            background: var(--ar-dialog-backdrop, rgba(0, 0, 0, 0.5));
             opacity: 0;
             transition: opacity 0.25s ease;
         }
@@ -76,14 +54,20 @@ export default [
             overflow: hidden;
             background: var(--ar-dialog-bg, Canvas);
             color: var(--ar-dialog-color, CanvasText);
-            box-shadow: var(--ar-dialog-shadow);
+            /* max-width: override le défaut UA qui plafonne à calc(100% - 6px - 2em) —
+               même raison que l'override de max-height plus bas. Posé ici (commun aux deux
+               modes) car chaque mode a sa propre logique de width ci-dessous, mais tous
+               deux ont besoin de désactiver ce plafond natif pour que leur propre valeur
+               s'applique sans interférence. */
+            max-width: 100%;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            border-radius: var(--ar-dialog-border-radius);
-            /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
+            /* Marge latérale conservée à toutes les tailles d'écran, y compris mobile :
+               un modal flotte au centre de la page (contrairement au drawer, ancré à un
+               bord) — un plein écran collé aux bords rend mal visuellement dans ce cas. */
             width: min(var(--ar-dialog-width), calc(100vw - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
         }
@@ -99,8 +83,12 @@ export default [
         /* ── Drawer ───────────────────────────────────────────────────────────── */
 
         :host([mode='drawer']) dialog {
-            /* Sur petit écran, le drawer peut occuper 100% de la largeur */
-            width: min(var(--ar-dialog-width), 100vw);
+            /* min() encode nativement le mobile-first, sans media query : quand
+               --ar-dialog-width dépasse 100% (petit écran), le drawer occupe toute la
+               largeur (ancré à un bord, le plein écran y reste cohérent contrairement au
+               modal) ; au-delà, il est contraint à sa taille de palier. Le calcul est
+               déjà continu et réactif au redimensionnement, pas besoin de palier fixe. */
+            width: min(var(--ar-dialog-width), 100%);
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
@@ -139,24 +127,32 @@ export default [
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.75rem;
-            padding: 1.25rem 1.25rem 0;
             flex-shrink: 0;
         }
 
         h1 {
             margin: 0;
-            font-size: var(--ar-dialog-title-font-size);
-            font-weight: 600;
-            line-height: 1.4;
-            color: inherit;
         }
 
-        button {
-            flex-shrink: 0;
+        [part='close'] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             align-self: flex-start;
-            /* @EvolutionDesign: taille forcée à 40×40 en attendant la migration vers la nouvelle charte */
-            min-height: 2.5rem;
+            flex-shrink: 0;
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            width: var(--ar-dialog-close-size, 2.5rem);
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            height: var(--ar-dialog-close-size, 2.5rem);
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            transition: background-color var(--ar-dialog-close-transition-duration);
+        }
+
+        [part='close']:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
         }
 
         svg {
@@ -182,32 +178,7 @@ export default [
             align-items: center;
             justify-content: flex-end;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            padding: 0 1.25rem 1.25rem;
             flex-shrink: 0;
-        }
-
-        /* ── Bouton de fermeture (tokens scopés au composant) ────────────────────
-         * Sélecteurs volontairement plus spécifiques que .btn-tertiary dans
-         * button.styles.ts (ajout de [part='close'].btn) pour gagner la cascade
-         * indépendamment de l'ordre des styles. */
-
-        [part='close'].btn.btn-tertiary {
-            background-color: var(--ar-dialog-close-bg);
-        }
-
-        [part='close'].btn.btn-tertiary:hover {
-            background-color: var(--ar-dialog-close-bg-hover);
-        }
-
-        [part='close'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
-                [aria-disabled='true']
-            ):active {
-            background-color: var(--ar-dialog-close-bg-pressed);
-        }
-
-        [part='close'].btn.btn-tertiary:focus {
-            background-color: var(--ar-dialog-close-bg-focus);
         }
 
         /* ── Shake (fermeture bloquée) ────────────────────────────────────────── */
@@ -220,7 +191,8 @@ export default [
 
         @media (prefers-reduced-motion: reduce) {
             dialog,
-            dialog::backdrop {
+            dialog::backdrop,
+            [part='close'] {
                 animation: none !important;
                 transition: none !important;
             }

@@ -427,3 +427,51 @@ s'applique à la façon dont elles composent avec un base externe (par exemple
 `ar-x:hover { color: red }` se combine sans problème avec une règle de base externe séparée),
 pas au fait de laisser une surcharge d'état seule en interne une fois que son base a quitté le
 composant.
+
+## Amendement (2026-07-29) : externalisation de la taxonomie `size` (lot 3b, #129)
+
+La section « Exception assumée : l'attribut `size` » ci-dessus est dépassée. À la lumière du
+découplage variant/role d'`ar-alert` (PR #143) et de l'application stricte du critère
+crucial-vs-cosmétique sur `ar-dialog` (lot 3b, #129), la même incohérence a été relevée :
+il n'y a pas de raison de traiter la taxonomie de tailles d'`ar-dialog` différemment de la
+taxonomie de couleurs d'`ar-alert`.
+
+Nuance par rapport à `variant` (qui est purement cosmétique) : la largeur d'un dialog est
+fonctionnelle — un dialog sans aucune contrainte de largeur peut casser le layout. Le composant
+garde donc **une seule valeur littérale de repli par mode** (`500px` modal, `720px` drawer,
+directement sur `--ar-dialog-width`, sans intermédiaire de token), tandis que les paliers nommés
+(`sm`/`lg`/`xl`) et leurs variantes drawer deviennent une opinion du thème (`default.css`),
+exactement comme les 4 presets de `variant` sur `ar-alert`. Sans thème, `size="sm"` n'a plus
+d'effet visible — symétrique avec `variant="warning"` sur `ar-alert` aujourd'hui, ce n'est plus
+un cas isolé.
+
+**Nouveau marqueur `functional-default`** : cette seule valeur littérale par mode reste, par
+construction, une assignation `--ar-*: <valeur littérale>;` dans `dialog.styles.ts` — exactement
+ce que le garde-fou `validate-no-hardcoded-tokens.js` (section « Décision » ci-dessus) est censé
+interdire. Plutôt qu'élargir la portée de `a11y-fallback` (qui documente un _fallback en
+consommation_, `var(--token, valeur)`, pas une _assignation_), un second marqueur dédié est
+introduit : `/* functional-default: <raison> */`, sur la ligne immédiatement précédente
+l'assignation, format vérifié automatiquement par `findHardcodedTokenAssignments` (même
+mécanique que `a11y-fallback` — un commentaire au format exact, pas une simple tolérance de tout
+commentaire). Il autorise une assignation `--ar-*: <valeur littérale>;` quand, et seulement
+quand, l'absence de toute valeur casserait fonctionnellement le composant en l'absence de thème
+(layout qui explose, comportement cassé) — jamais pour une préférence purement cosmétique, qui
+reste interdite sans exception. La différence avec `a11y-fallback` : ce dernier justifie une
+valeur de repli _dans un `var(--token, repli)`_, consommée en cascade avec le token — le token
+existe toujours et peut être surchargé normalement ; `functional-default` justifie une valeur
+posée directement sur le token lui-même (pas de `var()` en jeu), typiquement parce qu'aucun
+niveau supérieur ne fournit de valeur par défaut sans thème. `--ar-dialog-width` (`500px` modal,
+`720px` drawer) est le premier et seul cas à ce jour ; comme pour `a11y-fallback`, ce marqueur
+n'est pas une invitation à recoder en dur — il documente une exception vérifiée, pas un
+raccourci.
+
+**Portée de cet amendement sur les sections antérieures du document** : au-delà de la section
+« Exception assumée : l'attribut `size` » (explicitement déclarée dépassée ci-dessus), cet
+amendement rend également caduques : l'exemple `--ar-dialog-width-sm` de la section « Décision »
+(qui illustrait le pattern « chaque état a son propre token `default.css` » — ce pattern reste
+valide en général, mais n'est plus illustré par `--ar-dialog-width-sm`, qui n'existe plus) et la
+puce de « Conséquences » mentionnant « les 8 variantes de `--ar-dialog-width` (`sm`/`md`/`lg`/`xl`
+× `modal`/`drawer`) sourcées depuis `default.css` » — ces 8 tokens intermédiaires ont disparu,
+remplacés par les presets `ar-dialog[size='...']`/`ar-dialog[mode='drawer'][size='...']`
+directement dans le thème (cf. `default.css`) et la valeur de repli unique par mode portée par
+`functional-default` ci-dessus.

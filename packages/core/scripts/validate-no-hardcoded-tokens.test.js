@@ -37,7 +37,7 @@ describe('findHardcodedTokenAssignments', () => {
     it("n'agit pas sur une référence var()", () => {
         const source = `
             :host {
-                --ar-dialog-width: var(--ar-dialog-width-md);
+                --ar-dialog-width: var(--ar-dialog-shadow);
             }
         `;
         expect(findHardcodedTokenAssignments('dialog.styles.ts', source)).toEqual([]);
@@ -47,7 +47,7 @@ describe('findHardcodedTokenAssignments', () => {
         const source = `
             /* Surchargeable par --ar-dialog-width: 500px si besoin. */
             :host {
-                --ar-dialog-width: var(--ar-dialog-width-md);
+                --ar-dialog-width: var(--ar-dialog-shadow);
             }
         `;
         expect(findHardcodedTokenAssignments('dialog.styles.ts', source)).toEqual([]);
@@ -69,6 +69,41 @@ describe('findHardcodedTokenAssignments', () => {
             }
         `;
         expect(findHardcodedTokenAssignments('dialog.styles.ts', source)).toHaveLength(2);
+    });
+
+    it('accepte une assignation littérale précédée du commentaire functional-default correctement formé', () => {
+        const source = [
+            ':host {',
+            '    /* functional-default: largeur non contrainte casserait le layout sans thème */',
+            '    --ar-dialog-width: 500px;',
+            '}',
+        ].join('\n');
+        expect(findHardcodedTokenAssignments('dialog.styles.ts', source)).toEqual([]);
+    });
+
+    it('rejette une assignation littérale dont le commentaire est hors format (espace au lieu du deux-points)', () => {
+        const source = [
+            ':host {',
+            '    /* functional default: largeur non contrainte casserait le layout sans thème */',
+            '    --ar-dialog-width: 500px;',
+            '}',
+        ].join('\n');
+        const errors = findHardcodedTokenAssignments('dialog.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('--ar-dialog-width');
+    });
+
+    it("rejette une assignation littérale dont le commentaire n'est pas sur la ligne immédiatement précédente", () => {
+        const source = [
+            ':host {',
+            '    /* functional-default: largeur non contrainte casserait le layout sans thème */',
+            '',
+            '    --ar-dialog-width: 500px;',
+            '}',
+        ].join('\n');
+        const errors = findHardcodedTokenAssignments('dialog.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('--ar-dialog-width');
     });
 });
 
