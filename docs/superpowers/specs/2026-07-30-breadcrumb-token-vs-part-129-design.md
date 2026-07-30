@@ -49,19 +49,31 @@ strictement redondante — même nettoyage que celui mené sur `ar-stepper` (lot
 | `<ol class="breadcrumb breadcrumb-mobile">`         | `<ol part="list list--mobile">` (voir section 2)                                                                                                                                        |
 | `<a part="link" class="breadcrumb-link">`           | `<a part="link">` — règle stylée via `[part='link']`                                                                                                                                    |
 | `<span part="current" class="breadcrumb-text">`     | `<span part="current">` — règle stylée via `[part='current']`                                                                                                                           |
-| `<li part="item" class="breadcrumb-item[ active]">` | `<li part="item[ item--current]">` (voir ci-dessous)                                                                                                                                    |
+| `<li part="item" class="breadcrumb-item[ active]">` | `<li part="item">` (voir ci-dessous, `.active` disparaît sans remplacement sur cet élément)                                                                                             |
 | `<div class="breadcrumb-dropdown">`                 | `<div class="dropdown">` — wrapper structurel sans valeur de style pilotée, pas de `part` nécessaire, préfixe retiré (même sort que `.stepper-dropdown` → `.dropdown` sur `ar-stepper`) |
 
-**`.active` → part d'état `item--current`** : `li` porte déjà `part="item"`. Suivant la
-convention BEM `--` déjà établie (ADR-005, amendement 2026-07-27) et la terminologie retenue par
-la librairie (« current », jamais « active », cohérent avec `aria-current="page"` déjà posé sur
-le même élément), la classe `.active` devient un second `part` : `part="item item--current"`.
-Seul `font-weight: 700` était piloté par cette classe (la redondance de `color` identifiée dans
-l'audit initial disparaît avec la classe elle-même) — migré vers `default.css`,
-`ar-breadcrumb::part(item--current) { font-weight: 700; }`, littéral (branche 4, usage unique,
-pas de fallback critique).
+**`.active` retirée — bug de cascade découvert, pas juste une redondance.**
+`.breadcrumb-item.active { color: ...; font-weight: 700; }` cible le `<li>`. `color` est
+redondant (déjà identifié : `color: inherit` sur l'enfant laisse remonter la valeur de l'ancêtre,
+donc ce doublon n'a pas d'effet visuel). `font-weight: 700` est différent : l'enfant
+`.breadcrumb-text` déclare sa **propre valeur littérale** `font-weight: 400` — en CSS, une
+déclaration directe sur un élément l'emporte toujours sur l'héritage, quelle que soit la
+spécificité comparée entre les deux règles (qui portent d'ailleurs sur des éléments différents,
+li vs span). Résultat : `font-weight: 700` n'a **jamais** été visuellement appliqué depuis
+l'origine du composant — l'élément courant n'a jamais été distinct par la graisse, seule sa
+couleur (héritée, identique aux autres) et `aria-current="page"` le signalent.
 
-Aucun changement visuel attendu pour ce point — vérification de non-régression en implémentation.
+**Décision du mainteneur : corriger le bug plutôt que documenter la disparition d'un no-op.**
+Pas besoin de créer un `item--current` (part d'état sur `item`) pour ça : `part="current"` sur le
+`<span>` désigne déjà, par construction, exclusivement l'élément courant (seul le dernier item
+est jamais rendu comme `current` plutôt que `link`). `font-weight: 700` migre directement sur ce
+part existant : `ar-breadcrumb::part(current) { font-weight: 700; }`, littéral (branche 4, usage
+unique, pas de fallback critique). **Premier changement visuel réel de ce lot** (contrairement à
+tout le reste de la section 1) — à vérifier visuellement avant de merger, comme tout changement
+de rendu.
+
+Aucun changement visuel attendu pour ce point, à l'exception du fix `font-weight` ci-dessus —
+vérification de non-régression (et du nouveau rendu gras) en implémentation.
 
 ## 2. `part="list"` commun + variantes `list--desktop`/`list--mobile` — débloque `--ar-breadcrumb-color`
 
@@ -135,10 +147,14 @@ Chaque `<li part="item">` du mode mobile reçoit un premier enfant
 de la liste tronquée, déjà `item--current`) reçoit en plus le part d'état :
 `part="bullet bullet--current"` — même convention exacte que `ar-stepper`.
 
-- Règle de base `::part(bullet)` : taille `0.375rem`, couleur `bullet-color`, `box-shadow` avec
-  `bullet-ring-color`.
+- Taille (`width`/`height`/`margin`) reste interne (littérale, structurelle) — même précédent que
+  `ar-stepper` (`[part~='bullet']` y garde `width`/`height` en dur dans `stepper.styles.ts`,
+  seules forme/couleur sont externalisées). `::part(bullet)` (thème) ne pilote que
+  `border-radius`, `background-color` (`bullet-color`) et `box-shadow` (`bullet-ring-color`).
 - `::part(bullet--current)` (déclarée après, garde-fou d'ordre déjà en place via
-  `validate-part-state-order.js`) : taille `0.625rem`, couleur `active-bullet-color`.
+  `validate-part-state-order.js`) : `background-color` (`active-bullet-color`) uniquement — le
+  `box-shadow` de la règle de base continue de s'appliquer (composition normale, seule la
+  propriété redéclarée est reprise).
 - La règle `:first-child:before` d'origine (grosse puce sur le premier élément visible, jugée
   incohérente en section « Puce mobile agrandie » de la version précédente de cette spec) **n'a
   plus de raison d'exister** : avec la conversion en part d'état, seul `item--current` (l'élément
@@ -228,11 +244,13 @@ préfixe `--ar-breadcrumb-*`.
 
 - CSS mort/redondant retiré, classes internes `.breadcrumb-*` remplacées par des sélecteurs
   `[part=...]` partout où un `part` existe déjà ou est créé pour l'occasion.
-- Nouveaux `part`/parts d'état : `bullet`/`bullet--current`, `separator`, `item--current`,
+- Nouveaux `part`/parts d'état : `bullet`/`bullet--current`, `separator`,
   `list--desktop`/`list--mobile` (en plus de `list` commun), `home`. Le connecteur pointillé
   mobile reste un `::before` interne, pas de `part` créé pour lui.
 - Bug de la grosse puce mal alignée (première passe de cette spec) résolu structurellement par la
   conversion en part d'état, pas par un simple retrait de règle.
+- Bug de cascade `font-weight` sur l'élément courant (jamais appliqué depuis l'origine) corrigé —
+  premier changement de rendu visuel réel du lot, migré directement sur `::part(current)`.
 - Boutons mobile entièrement découplés de `button.styles.ts`.
 - 10 tokens supprimés sur 19, le reste conservé pour des raisons techniques vérifiées (lecture
   JS, fallback a11y, réutilisation, pseudo-élément décoratif sans gain de conversion identifié).
