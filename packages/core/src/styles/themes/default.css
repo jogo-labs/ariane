@@ -942,7 +942,7 @@
 
         /* Customisation */
         &::part(close) {
-            border-radius: 7px;
+            border-radius: var(--ar-border-radius-md);
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
             opacity: 0.75;
@@ -1006,7 +1006,7 @@
         }
 
         &::part(close) {
-            border-radius: 7px;
+            border-radius: var(--ar-border-radius-md);
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
         }
