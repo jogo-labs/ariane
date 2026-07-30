@@ -6,120 +6,51 @@ export default css`
         box-sizing: border-box;
     }
 
-    /* ── Base ────────────────────────────────────────────────── */
+    /* ── Nav / item ──────────────────────────────────────────── */
 
-    .breadcrumb-container {
+    [part='nav'] {
         padding-right: 0.25rem;
     }
 
-    .breadcrumb {
-        margin: 0;
-        padding: 0;
-        border-radius: 0;
-        background-color: transparent;
-        color: var(--ar-breadcrumb-color);
+    [part='item'] {
+        display: flex;
+        align-items: center;
     }
 
-    .breadcrumb-link {
-        text-decoration: underline;
-    }
-
-    .breadcrumb-link:hover {
-        color: inherit;
-    }
-
-    .breadcrumb-text,
-    .breadcrumb-link,
-    .breadcrumb-link:visited {
+    [part='link'],
+    [part='current'] {
         display: inline-flex;
         align-items: center;
         color: inherit;
         background-color: inherit;
-        font-weight: 400;
     }
 
-    .breadcrumb-text .icon:first-child,
-    .breadcrumb-link .icon:first-child,
-    .breadcrumb-link:visited .icon:first-child {
-        margin-right: 0.5rem;
-    }
+    /* ── Layout desktop ──────────────────────────────────────── */
 
-    .breadcrumb-item {
-        display: flex;
-        align-items: center;
-    }
-
-    .breadcrumb-item.active {
-        color: var(--ar-breadcrumb-color);
-        font-weight: 700;
-    }
-
-    /* ── Desktop layout ──────────────────────────────────────── */
-
-    .breadcrumb-desktop {
+    [part~='list--desktop'] {
         display: flex;
         flex-flow: row wrap;
     }
 
-    .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item {
-        padding: 0;
-    }
-
-    .breadcrumb-desktop .breadcrumb-item + .breadcrumb-item:before {
-        content: '';
+    [part='separator'] {
+        display: inline-block;
+        flex-shrink: 0;
         margin: 0.125rem 0.5rem 0;
-        padding: 0;
-        background-color: var(--ar-breadcrumb-separator-color);
         height: 65%;
         width: 1px;
         transform: rotate(15deg);
         transform-origin: center;
     }
 
-    /* ── Mobile layout ───────────────────────────────────────── */
+    /* ── Layout mobile ───────────────────────────────────────── */
 
-    .breadcrumb-mobile {
-        flex-direction: column;
-        margin: 0;
-    }
-
-    .breadcrumb-mobile,
-    .breadcrumb-mobile .breadcrumb-item {
-        position: relative;
-        padding: 0;
-    }
-
-    .breadcrumb-mobile .breadcrumb-item:before {
-        content: '';
-        padding: 0;
-        border-radius: 100rem;
-        width: 0.375rem;
-        height: 0.375rem;
-        background-color: var(--ar-breadcrumb-bullet-color);
-        margin: 0 0.75rem;
-        flex-shrink: 0;
-        box-shadow: 0 0 0 2px var(--ar-breadcrumb-bullet-ring-color);
-    }
-
-    .breadcrumb-mobile .breadcrumb-item:first-child:before,
-    .breadcrumb-mobile .breadcrumb-item:last-child:before {
-        width: 0.625rem;
-        height: 0.625rem;
-        margin: 0 0.625rem;
-    }
-
-    .breadcrumb-mobile .breadcrumb-item:last-child:before {
-        background-color: var(--ar-breadcrumb-active-bullet-color);
-    }
-
-    .breadcrumb-mobile .breadcrumb-link,
-    .breadcrumb-mobile .breadcrumb-text {
+    [part~='list--mobile'] {
         display: flex;
-        flex-grow: 1;
-        padding: 0.5rem 0.25rem;
+        flex-direction: column;
+        position: relative;
     }
 
-    .breadcrumb-mobile:before {
+    [part~='list--mobile']:before {
         content: '';
         display: block;
         position: absolute;
@@ -136,9 +67,28 @@ export default css`
         background-repeat: repeat-y;
     }
 
+    [part~='bullet'] {
+        flex-shrink: 0;
+        width: 0.375rem;
+        height: 0.375rem;
+        margin: 0 0.75rem;
+    }
+
+    [part~='bullet--current'] {
+        width: 0.625rem;
+        height: 0.625rem;
+        margin: 0 0.625rem;
+    }
+
+    [part~='list--mobile'] [part='link'],
+    [part~='list--mobile'] [part='current'] {
+        flex-grow: 1;
+        padding: 0.5rem 0.25rem;
+    }
+
     /* ── Wrapper dropdown mobile ────────────────────────────── */
 
-    .breadcrumb-dropdown {
+    .dropdown {
         display: inline-flex;
         position: relative;
     }
@@ -146,39 +96,66 @@ export default css`
     /* ── Panel flottant mobile ───────────────────────────────── */
 
     [part='panel'] {
-        min-width: var(--ar-breadcrumb-panel-min-width);
-        max-width: var(--ar-breadcrumb-panel-max-width);
         background-color: var(--ar-breadcrumb-panel-bg, Canvas);
         border-color: var(--ar-breadcrumb-panel-border-color, ButtonBorder);
-        border-radius: var(--ar-breadcrumb-panel-border-radius);
-        box-shadow: var(--ar-breadcrumb-panel-shadow);
-        padding: var(--ar-breadcrumb-panel-padding);
     }
 
-    /* ── Boutons trigger/home mobile (tokens scopés au composant) ──────────
-     * #mobile-home-btn gagne la cascade par spécificité d'ID. [part='trigger']
-     * reçoit .btn + l'attribut pour dépasser .btn-tertiary dans
-     * button.styles.ts, indépendamment de l'ordre des styles. */
+    /* ── Boutons home/trigger mobile (découplés de button.styles.ts) ────── */
 
-    #mobile-home-btn,
-    [part='trigger'].btn.btn-tertiary {
+    [part='home'],
+    [part='trigger'] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
         background-color: var(--ar-breadcrumb-toggle-bg);
+        transition: background-color var(--ar-breadcrumb-toggle-transition-duration);
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+        min-height: var(--ar-breadcrumb-toggle-min-size, 2.5rem);
     }
 
-    #mobile-home-btn:hover,
-    [part='trigger'].btn.btn-tertiary:hover {
+    [part='home']:hover,
+    [part='trigger']:hover {
         background-color: var(--ar-breadcrumb-toggle-bg-hover);
     }
 
-    #mobile-home-btn:not(:disabled):not(.disabled):not([aria-disabled='true']):active,
-    [part='trigger'].btn.btn-tertiary:not(:disabled):not(.disabled):not(
-            [aria-disabled='true']
-        ):active {
+    [part='home']:active,
+    [part='trigger']:active {
         background-color: var(--ar-breadcrumb-toggle-bg-pressed);
     }
 
-    #mobile-home-btn:focus,
-    [part='trigger'].btn.btn-tertiary:focus {
+    [part='home']:focus,
+    [part='trigger']:focus {
         background-color: var(--ar-breadcrumb-toggle-bg-focus);
+    }
+
+    [part='home']:focus-visible,
+    [part='trigger']:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [part='home'],
+        [part='trigger'] {
+            transition: none;
+        }
+    }
+
+    [part='trigger'] {
+        padding: 0;
+        aspect-ratio: 1 / 1;
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+        min-width: var(--ar-breadcrumb-toggle-min-size, 2.5rem);
+    }
+
+    [part='home'] .icon,
+    [part='trigger'] .icon {
+        flex-shrink: 0;
+    }
+
+    [part='home'] .icon:first-child {
+        margin-right: 0.375rem;
     }
 `;
