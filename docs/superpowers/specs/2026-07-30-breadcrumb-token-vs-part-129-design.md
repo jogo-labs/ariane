@@ -35,8 +35,8 @@ la fois) aux sélecteurs déclarés :
 - **`.breadcrumb-desktop .breadcrumb-item + .breadcrumb-item { padding: 0; }`** — supprimée,
   aucune autre règle ne donne de padding à un `<li>` (valeur native déjà 0).
 - **`padding: 0`/`position: relative` sur les items mobiles** — supprimés. `position: relative`
-  n'a plus de raison d'être une fois la puce transformée en vrai élément (section 3) : plus rien
-  n'y est positionné en absolu.
+  n'a jamais été nécessaire sur l'item lui-même (rien n'y est positionné en absolu, seul l'`<ol>`
+  parent en a besoin pour son connecteur pointillé — qui reste un `::before`, cf. section 3.3).
 
 **Chaque élément qui porte déjà un `part` perd sa classe `.breadcrumb-*` dédiée**, devenue
 strictement redondante — même nettoyage que celui mené sur `ar-stepper` (lot 1, classes
@@ -96,10 +96,11 @@ deviennent une opinion de thème unique sur `::part(list)`, cosmétiques et sans
 
 `[part~='list--desktop']`/`[part~='list--mobile']` gardent en interne uniquement ce qui est
 structurel (jamais une question de thème) : `display: flex; flex-flow: row wrap;` pour le
-desktop, `display: flex; flex-direction: column;` pour le mobile — ce ne sont pas des valeurs de
-design, elles ne migrent pas.
+desktop, `display: flex; flex-direction: column;` + `position: relative` pour le mobile (nécessaire
+au positionnement absolu du connecteur pointillé, cf. section 3.3, qui reste un `::before` de
+cet élément) — ce ne sont pas des valeurs de design, elles ne migrent pas.
 
-## 3. Puces mobiles, séparateur desktop, connecteur pointillé — pseudo-éléments → vrais éléments `part`
+## 3. Puce mobile et séparateur desktop — pseudo-éléments → vrais éléments `part`
 
 **Constat initial :** 5 tokens (`separator-color`, `bullet-color`, `bullet-ring-color`,
 `mobile-separator-color`, `active-bullet-color`) restaient bloqués par la contrainte 3 de
@@ -108,10 +109,24 @@ pseudo-éléments décoratifs.
 
 **Révision (demande explicite du mainteneur — appliquer partout où c'est possible la logique
 « un blocage structurel n'est pas définitif, on peut ajouter ce qu'il faut pour débloquer », déjà
-pratiquée sur `ar-stepper`/`ar-datepicker` en créant de nouveaux `part`) :** rien n'empêche de
-remplacer un pseudo-élément purement décoratif par un vrai élément DOM (`<span aria-hidden="true">`),
-qui peut porter un `part`. Les trois pseudo-éléments de `ar-breadcrumb` sont tous décoratifs (aucun
-contenu informatif, aucune interaction) → candidats sûrs à cette conversion.
+pratiquée sur `ar-stepper`/`ar-datepicker` en créant de nouveaux `part`), puis nuancée après
+discussion :** un pseudo-élément décoratif est structurellement **impossible à exposer par erreur**
+à l'arbre d'accessibilité — aucune vigilance requise, contrairement à un vrai `<span>` qui dépend
+d'un `aria-hidden="true"` posé et maintenu correctement. La contrainte 3 de l'ADR-005 n'est
+d'ailleurs pas formulée comme un oubli à corriger : c'est une exception délibérément permanente,
+au même rang que « lu en JS » ou « réutilisé inter-composants ». La convertir en vrai élément ne
+se justifie donc que si le gain dépasse la simple réduction du nombre de tokens — typiquement
+quand un thème pourrait vouloir aller au-delà de la couleur (forme, bordure, contenu).
+
+C'est le cas pour la **puce** (un consommateur peut vouloir une puce carrée, une icône, une
+bordure — un token ne pourra jamais couvrir ça) et, dans une moindre mesure, le **séparateur**.
+Ce n'est pas le cas pour le **connecteur pointillé mobile** : personne ne restyle la forme d'une
+ligne pointillée, seule sa couleur est un point de personnalisation plausible, ce qu'un token fait
+très bien — et le convertir aurait exigé de le sortir de l'`<ol>` (un `<span>` n'est pas un enfant
+valide d'une liste, pas plus qu'un pseudo-élément ne peut porter un `part`) et de le repositionner
+en absolu par rapport à `[part='panel']` au lieu de l'`<ol>` lui-même, la plus grosse surface de
+régression visuelle de tout ce lot pour un bénéfice quasi nul. **Le connecteur reste un
+`::before`, `--ar-breadcrumb-mobile-separator-color` reste un token** (cf. section 3.3).
 
 ### 3.1 Puce mobile → `part="bullet"` / `part="bullet bullet--current"`
 
@@ -144,33 +159,19 @@ inséré en premier enfant du `<li part="item">` (avant le lien). Rendu conditio
 `::part(separator)` reprend `margin`, `height: 65%`, `width: 1px`, `transform: rotate(15deg)`,
 `background-color`. `--ar-breadcrumb-separator-color` **migré en branche 4**.
 
-### 3.3 Connecteur pointillé mobile → `part="connector"`
+### 3.3 Connecteur pointillé mobile — reste un `::before`, reste un token
 
-L'ancien `.breadcrumb-mobile:before` (pseudo-élément de l'`<ol>` lui-même, positionné en absolu
-sur toute la hauteur de la liste) devient un `<span part="connector" aria-hidden="true"></span>`,
-**frère de l'`<ol>`** à l'intérieur de `[part='panel']` (un pseudo-élément ne peut pas être un
-enfant direct d'un `<ol>` sans casser la sémantique de liste — un `<span>` non plus, d'où le
-déplacement en dehors du `<ol>`) :
-
-```html
-<div part="panel" popover="auto" tabindex="-1">
-    <span part="connector" aria-hidden="true"></span>
-    <ol part="list list--mobile">
-        ...
-    </ol>
-</div>
-```
-
-`[part='panel']` a déjà `position: absolute` (`panel.styles.ts`, positionnement du popover) —
-ancêtre positionné disponible sans changement supplémentaire, le connecteur s'y positionne en
-absolu exactement comme avant (`top`/`bottom`/`left`/`background-image` en dégradé pointillé
-inchangés). `--ar-breadcrumb-mobile-separator-color` **migré en branche 4**
-(`ar-breadcrumb::part(connector) { background-image: linear-gradient(var(--couleur-littérale) 25%, transparent 0); ... }`).
+**Inchangé** par rapport au CSS actuel : `[part~='list--mobile']:before` (renommé depuis
+`.breadcrumb-mobile:before`, même sélecteur logique), positionné en absolu sur toute la hauteur de
+la liste (`position: relative` déplacée sur `[part~='list--mobile']`, cf. section 2).
+`--ar-breadcrumb-mobile-separator-color` **reste un token** — bloqué par la contrainte 3 de
+l'ADR-005, décision assumée plutôt que contournée (cf. discussion ci-dessus).
 
 ### Résultat section 3
 
-Les 5 tokens précédemment bloqués par la contrainte 3 sont **tous débloqués** et migrés en
-branche 4 — aucun ne reste un token `default.css`.
+4 des 5 tokens précédemment bloqués par la contrainte 3 sont débloqués et migrés en branche 4
+(`separator-color`, `bullet-color`, `bullet-ring-color`, `active-bullet-color`).
+`--ar-breadcrumb-mobile-separator-color` reste un token, seule exception assumée de ce lot.
 
 ## 4. Boutons mobile (`home`/`trigger`) découplés de `button.styles.ts`
 
@@ -212,25 +213,29 @@ refonte du bouton close d'`ar-dialog`/`ar-alert` (lots 3a/3b).
     - `panel-min-width`, `panel-max-width`, `panel-border-radius`, `panel-shadow`,
       `panel-padding` → migrés vers `::part(panel)`, sans token scopé.
 - **4 tokens `--ar-breadcrumb-toggle-bg*`** — conservés, redéfinis (section 4).
+- **`--ar-breadcrumb-mobile-separator-color`** — reste un token (contrainte 3 de l'ADR-005,
+  connecteur pointillé laissé en `::before`, cf. section 3.3).
 
-**Tout le reste** (`color`, `separator-color`, `bullet-color`, `bullet-ring-color`,
-`mobile-separator-color`, `active-bullet-color`) est désormais migré en branche 4 grâce aux
-sections 2 et 3. Sur 19 tokens `default.css` initiaux : 2 restent tels quels (distance/offset),
-2 restent avec fallback a11y (panel bg/border), 4 sont conservés mais redéfinis (toggle-bg), 11
-sont supprimés (5 panel + color + 5 famille pseudo-éléments), remplacés par des règles `::part()`
-littérales ou des tokens de thème sans préfixe `--ar-breadcrumb-*`.
+**Le reste** (`color`, `separator-color`, `bullet-color`, `bullet-ring-color`,
+`active-bullet-color`) est migré en branche 4 grâce aux sections 2 et 3. Sur 19 tokens
+`default.css` initiaux : 2 restent tels quels (distance/offset), 2 restent avec fallback a11y
+(panel bg/border), 4 sont conservés mais redéfinis (toggle-bg), 1 reste pour la contrainte 3
+(mobile-separator-color) — soit **9 tokens conservés, 10 supprimés** (5 panel + color + 4 famille
+puce/séparateur), remplacés par des règles `::part()` littérales ou des tokens de thème sans
+préfixe `--ar-breadcrumb-*`.
 
 ## Résultat attendu
 
 - CSS mort/redondant retiré, classes internes `.breadcrumb-*` remplacées par des sélecteurs
   `[part=...]` partout où un `part` existe déjà ou est créé pour l'occasion.
-- 4 nouveaux `part`/parts d'état : `bullet`/`bullet--current`, `separator`, `connector`,
-  `item--current`, `list--desktop`/`list--mobile` (en plus de `list` commun), `home`.
+- Nouveaux `part`/parts d'état : `bullet`/`bullet--current`, `separator`, `item--current`,
+  `list--desktop`/`list--mobile` (en plus de `list` commun), `home`. Le connecteur pointillé
+  mobile reste un `::before` interne, pas de `part` créé pour lui.
 - Bug de la grosse puce mal alignée (première passe de cette spec) résolu structurellement par la
   conversion en part d'état, pas par un simple retrait de règle.
 - Boutons mobile entièrement découplés de `button.styles.ts`.
-- 11 tokens supprimés sur 19, le reste conservé pour des raisons techniques vérifiées (lecture
-  JS, fallback a11y, réutilisation).
+- 10 tokens supprimés sur 19, le reste conservé pour des raisons techniques vérifiées (lecture
+  JS, fallback a11y, réutilisation, pseudo-élément décoratif sans gain de conversion identifié).
 
 ## Hors scope
 
