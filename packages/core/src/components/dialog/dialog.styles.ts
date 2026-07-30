@@ -83,23 +83,16 @@ export default [
         /* ── Drawer ───────────────────────────────────────────────────────────── */
 
         :host([mode='drawer']) dialog {
-            /* Mobile-first : plein écran par défaut. Contrairement au modal, le drawer est
-               ancré à un bord de l'écran — le plein écran reste cohérent visuellement, pas
-               besoin d'y conserver de marge latérale. */
-            width: 100%;
+            /* min() encode nativement le mobile-first, sans media query : quand
+               --ar-dialog-width dépasse 100% (petit écran), le drawer occupe toute la
+               largeur (ancré à un bord, le plein écran y reste cohérent contrairement au
+               modal) ; au-delà, il est contraint à sa taille de palier. Le calcul est
+               déjà continu et réactif au redimensionnement, pas besoin de palier fixe. */
+            width: min(var(--ar-dialog-width), 100%);
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
             margin: 0;
-        }
-
-        @media (min-width: 576px) {
-            :host([mode='drawer']) dialog {
-                /* 100% (pas 100vw) : même raison que la largeur mobile-first ci-dessus —
-                   évite de dépasser la largeur visible sur les plateformes où la
-                   scrollbar occupe un espace de layout. */
-                width: min(var(--ar-dialog-width), 100%);
-            }
         }
 
         /* Placement droite (défaut du composant) */
