@@ -54,33 +54,22 @@ export default [
             overflow: hidden;
             background: var(--ar-dialog-bg, Canvas);
             color: var(--ar-dialog-color, CanvasText);
-            /* Mobile-first : plein écran par défaut, commun aux deux modes. 100% (pas
-               100vw) pour résoudre contre le containing block du <dialog> plutôt que le
-               viewport brut — évite un débordement horizontal de la largeur de la
-               gouttière de scrollbar sur les plateformes où elle occupe un espace de
-               layout. */
-            width: 100%;
             /* max-width: override le défaut UA qui plafonne à calc(100% - 6px - 2em) —
-               même raison que l'override de max-height plus bas, sinon la largeur
-               plein écran ci-dessus reste invisiblement bridée par ce défaut natif. */
+               même raison que l'override de max-height plus bas. Posé ici (commun aux deux
+               modes) car chaque mode a sa propre logique de width ci-dessous, mais tous
+               deux ont besoin de désactiver ce plafond natif pour que leur propre valeur
+               s'applique sans interférence. */
             max-width: 100%;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            max-height: 100dvh;
-        }
-
-        @media (min-width: 576px) {
-            :host(:not([mode='drawer'])) dialog {
-                /* max-width artificiel : au-delà du mobile, la modale ne prend jamais toute la
-                   largeur — utile pour les paliers lg/xl sur les viewports moyens (tablette
-                   portrait, fenêtre desktop réduite) où le token de taille dépasse le viewport ;
-                   sans effet pratique sur sm/md, déjà plus étroits que calc(100vw - 2rem) à 576px. */
-                width: min(var(--ar-dialog-width), calc(100vw - 2rem));
-                max-height: min(90vh, calc(100dvh - 2rem));
-            }
+            /* Marge latérale conservée à toutes les tailles d'écran, y compris mobile :
+               un modal flotte au centre de la page (contrairement au drawer, ancré à un
+               bord) — un plein écran collé aux bords rend mal visuellement dans ce cas. */
+            width: min(var(--ar-dialog-width), calc(100vw - 2rem));
+            max-height: min(90vh, calc(100dvh - 2rem));
         }
 
         :host(:not([mode='drawer'])) dialog.opening {
@@ -94,6 +83,10 @@ export default [
         /* ── Drawer ───────────────────────────────────────────────────────────── */
 
         :host([mode='drawer']) dialog {
+            /* Mobile-first : plein écran par défaut. Contrairement au modal, le drawer est
+               ancré à un bord de l'écran — le plein écran reste cohérent visuellement, pas
+               besoin d'y conserver de marge latérale. */
+            width: 100%;
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
