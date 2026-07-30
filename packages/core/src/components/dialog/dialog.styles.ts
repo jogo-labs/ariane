@@ -160,10 +160,6 @@ export default [
 
         h1 {
             margin: 0;
-            font-size: var(--ar-dialog-title-font-size);
-            font-weight: 600;
-            line-height: 1.4;
-            color: inherit;
         }
 
         [part='close'] {

@@ -476,7 +476,6 @@
         --ar-dialog-color: var(--ar-color-text);
         --ar-dialog-close-size: 2.5rem;
         --ar-dialog-close-transition-duration: var(--ar-button-transition-duration);
-        --ar-dialog-title-font-size: var(--ar-font-size-md);
         --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1021,6 +1020,10 @@
 
         &::part(close):hover {
             background-color: color-mix(in srgb, currentColor 20%, transparent);
+        }
+
+        &::part(title) {
+            font-size: var(--ar-font-size-md);
         }
     }
 }
