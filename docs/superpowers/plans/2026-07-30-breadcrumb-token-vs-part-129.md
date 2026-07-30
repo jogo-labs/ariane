@@ -109,6 +109,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
  * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
  * @cssprop --ar-breadcrumb-toggle-min-size - Taille minimale (largeur/hauteur) du bouton retour/trigger mobile, repli WCAG 2.5.8 si aucun thème n'est chargé.
+ * @cssprop --ar-breadcrumb-toggle-transition-duration - Durée de la transition (background-color) des boutons retour/trigger mobile.
  *
  * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
