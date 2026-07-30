@@ -477,7 +477,6 @@
         --ar-dialog-color: var(--ar-color-text);
         --ar-dialog-close-size: 2.5rem;
         --ar-dialog-close-transition-duration: var(--ar-button-transition-duration);
-        --ar-dialog-border-radius: var(--ar-border-radius-lg);
         --ar-dialog-title-font-size: var(--ar-font-size-md);
         --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
 
@@ -1006,6 +1005,10 @@
     }
 
     ar-dialog {
+        &:not([mode='drawer'])::part(dialog) {
+            border-radius: var(--ar-border-radius-lg);
+        }
+
         &::part(close) {
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);

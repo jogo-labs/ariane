@@ -85,7 +85,6 @@ export default [
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            border-radius: var(--ar-dialog-border-radius);
             max-height: 100dvh;
         }
 
