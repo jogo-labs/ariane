@@ -427,3 +427,20 @@ s'applique à la façon dont elles composent avec un base externe (par exemple
 `ar-x:hover { color: red }` se combine sans problème avec une règle de base externe séparée),
 pas au fait de laisser une surcharge d'état seule en interne une fois que son base a quitté le
 composant.
+
+## Amendement (2026-07-29) : externalisation de la taxonomie `size` (lot 3b, #129)
+
+La section « Exception assumée : l'attribut `size` » ci-dessus est dépassée. À la lumière du
+découplage variant/role d'`ar-alert` (PR #143) et de l'application stricte du critère
+crucial-vs-cosmétique sur `ar-dialog` (lot 3b, #129), la même incohérence a été relevée :
+il n'y a pas de raison de traiter la taxonomie de tailles d'`ar-dialog` différemment de la
+taxonomie de couleurs d'`ar-alert`.
+
+Nuance par rapport à `variant` (qui est purement cosmétique) : la largeur d'un dialog est
+fonctionnelle — un dialog sans aucune contrainte de largeur peut casser le layout. Le composant
+garde donc **une seule valeur littérale de repli par mode** (`500px` modal, `720px` drawer,
+directement sur `--ar-dialog-width`, sans intermédiaire de token), tandis que les paliers nommés
+(`sm`/`lg`/`xl`) et leurs variantes drawer deviennent une opinion du thème (`default.css`),
+exactement comme les 4 presets de `variant` sur `ar-alert`. Sans thème, `size="sm"` n'a plus
+d'effet visible — symétrique avec `variant="warning"` sur `ar-alert` aujourd'hui, ce n'est plus
+un cas isolé.

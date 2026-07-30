@@ -623,13 +623,28 @@ describe('ArDialog', () => {
             presetStyle?.remove();
         });
 
-        it('la sélection de taille pilote --ar-dialog-width', async () => {
-            // happy-dom ne charge pas default.css : on simule les tokens de préréglage
-            // que le thème fournit normalement, pour vérifier que la résolution en
-            // cascade fonctionne réellement (et pas seulement que la chaîne var()
-            // est présente dans le CSS du composant).
+        it('sans thème, --ar-dialog-width vaut le repli littéral du composant (500px, mode modal)', async () => {
+            el = await fixture('<ar-dialog size="sm"></ar-dialog>');
+
+            // La taxonomie sm/lg/xl est désormais une opinion du thème (default.css) —
+            // sans thème chargé, size="sm" n'a plus d'effet, seul le repli littéral du
+            // composant s'applique (cf. ADR-005, amendement 2026-07-29, #129 lot 3b).
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('500px');
+        });
+
+        it('sans thème, le mode drawer pilote --ar-dialog-width vers son propre repli littéral (720px)', async () => {
+            el = await fixture('<ar-dialog mode="drawer" size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('720px');
+        });
+
+        it('quand le thème fournit la taxonomie de taille, la règle externe pilote --ar-dialog-width', async () => {
+            // happy-dom ne charge pas default.css : on simule la règle d'attribut que
+            // le thème fournit normalement dans le bloc ar-dialog { &[size='sm'] { ... } },
+            // pour vérifier que la cascade externe l'emporte réellement (et pas
+            // seulement que le composant expose --ar-dialog-width).
             presetStyle = document.createElement('style');
-            presetStyle.textContent = ':root { --ar-dialog-width-sm: 360px; }';
+            presetStyle.textContent = "ar-dialog[size='sm'] { --ar-dialog-width: 360px; }";
             document.head.appendChild(presetStyle);
 
             el = await fixture('<ar-dialog size="sm"></ar-dialog>');
@@ -637,9 +652,10 @@ describe('ArDialog', () => {
             expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('360px');
         });
 
-        it('le mode drawer pilote --ar-dialog-width via son propre préréglage', async () => {
+        it('quand le thème fournit la taxonomie de taille du drawer, la règle externe pilote --ar-dialog-width', async () => {
             presetStyle = document.createElement('style');
-            presetStyle.textContent = ':root { --ar-dialog-drawer-width-sm: 280px; }';
+            presetStyle.textContent =
+                "ar-dialog[mode='drawer'][size='sm'] { --ar-dialog-width: 280px; }";
             document.head.appendChild(presetStyle);
 
             el = await fixture('<ar-dialog mode="drawer" size="sm"></ar-dialog>');

@@ -9,39 +9,16 @@ export default [
         :host {
             display: block;
 
-            /* Taille modale par défaut (md). Surchargeable par --ar-dialog-width sur l'instance. */
-            --ar-dialog-width: var(--ar-dialog-width-md);
+            /* Taille par défaut (repli fonctionnel sans thème) — les paliers sm/lg/xl sont
+               une taxonomie fournie par default.css, pas une exigence du composant. */
+            /* functional-default: largeur modale non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 500px;
         }
 
-        /* Tailles modal */
-        :host([size='sm']) {
-            --ar-dialog-width: var(--ar-dialog-width-sm);
-        }
-        :host([size='md']) {
-            --ar-dialog-width: var(--ar-dialog-width-md);
-        }
-        :host([size='lg']) {
-            --ar-dialog-width: var(--ar-dialog-width-lg);
-        }
-        :host([size='xl']) {
-            --ar-dialog-width: var(--ar-dialog-width-xl);
-        }
-
-        /* Tailles drawer — ont priorité sur les valeurs modal via la spécificité */
+        /* Taille par défaut du drawer — a priorité sur la valeur modal via la spécificité */
         :host([mode='drawer']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
-        }
-        :host([mode='drawer'][size='sm']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-sm);
-        }
-        :host([mode='drawer'][size='md']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-md);
-        }
-        :host([mode='drawer'][size='lg']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-lg);
-        }
-        :host([mode='drawer'][size='xl']) {
-            --ar-dialog-width: var(--ar-dialog-drawer-width-xl);
+            /* functional-default: largeur drawer non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 720px;
         }
 
         /* ── Backdrop ─────────────────────────────────────────────────────────── */

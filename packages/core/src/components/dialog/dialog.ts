@@ -63,14 +63,6 @@ if (typeof document !== 'undefined') {
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
  * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
- * @cssprop --ar-dialog-width-sm - Largeur du dialog modal, taille `sm`.
- * @cssprop --ar-dialog-width-md - Largeur du dialog modal, taille `md`.
- * @cssprop --ar-dialog-width-lg - Largeur du dialog modal, taille `lg`.
- * @cssprop --ar-dialog-width-xl - Largeur du dialog modal, taille `xl`.
- * @cssprop --ar-dialog-drawer-width-sm - Largeur du drawer, taille `sm`.
- * @cssprop --ar-dialog-drawer-width-md - Largeur du drawer, taille `md`.
- * @cssprop --ar-dialog-drawer-width-lg - Largeur du drawer, taille `lg`.
- * @cssprop --ar-dialog-drawer-width-xl - Largeur du drawer, taille `xl`.
  * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
  * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
@@ -141,8 +133,9 @@ export class ArDialog extends LitElement {
     placement: 'left' | 'right' = 'right';
 
     /**
-     * Taille du dialog. Les valeurs correspondent à des largeurs CSS prédéfinies.
-     * Utilisez `--ar-dialog-width` pour une valeur personnalisée.
+     * Taille du dialog. Les paliers `sm`/`lg`/`xl` sont définis par le thème —
+     * sans thème chargé, seule la taille par défaut du composant s'applique.
+     * Utilisez `--ar-dialog-width` pour une valeur personnalisée, indépendamment du thème.
      *
      * @attr size
      * @default 'md'

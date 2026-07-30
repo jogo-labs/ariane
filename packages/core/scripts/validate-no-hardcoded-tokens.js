@@ -44,6 +44,18 @@ const SYSTEM_COLOR_KEYWORDS = new Set([
 // commentaire a11y-fallback.
 const STRUCTURAL_LITERAL_KEYWORDS = new Set(['0px']);
 
+// Commentaire de justification requis, sur la ligne immédiatement précédente,
+// pour autoriser une assignation littérale documentée comme repli fonctionnel
+// (pas une simple valeur de design) — même principe que le marqueur
+// a11y-fallback ci-dessous, appliqué ici côté assignation plutôt que
+// consommation. Cf. ADR-005, amendement 2026-07-29 (#129, lot 3b) :
+// `--ar-dialog-width` garde une seule valeur littérale de repli par mode
+// (`500px` modal, `720px` drawer) directement dans `dialog.styles.ts`, la
+// largeur d'un dialog étant fonctionnelle (casse le layout sans contrainte)
+// et non purement cosmétique — contrairement aux paliers nommés sm/lg/xl,
+// qui restent une opinion du thème dans `default.css`.
+const FUNCTIONAL_DEFAULT_COMMENT_RE = /^\s*\/\* functional-default: .+ \*\/\s*$/;
+
 // Un fallback qui est lui-même une référence nue à un autre token --ar-* (sans son
 // propre fallback) n'est pas une valeur de design codée en dur — c'est une cascade
 // token-à-token déjà légitime dans le modèle actuel (ex. dialog.styles.ts:174-175,
@@ -83,12 +95,17 @@ export function findHardcodedTokenAssignments(filePath, source) {
     const withoutComments = source.replace(/\/\*[\s\S]*?\*\//g, (comment) =>
         comment.replace(/[^\n]/g, ' '),
     );
+    const rawLines = source.split('\n');
 
     const errors = [];
     HARDCODED_ASSIGNMENT_RE.lastIndex = 0;
     let match;
     while ((match = HARDCODED_ASSIGNMENT_RE.exec(withoutComments)) !== null) {
         const line = withoutComments.slice(0, match.index).split('\n').length;
+
+        const precedingLine = rawLines[line - 2] ?? '';
+        if (FUNCTIONAL_DEFAULT_COMMENT_RE.test(precedingLine)) continue;
+
         errors.push(
             `${filePath}:${line} — ${match[1]} codé en dur, doit référencer un token default.css via var()`,
         );

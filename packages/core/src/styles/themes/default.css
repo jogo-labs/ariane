@@ -457,14 +457,6 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Dialog
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-dialog-width-sm: 360px;
-        --ar-dialog-width-md: 500px;
-        --ar-dialog-width-lg: 800px;
-        --ar-dialog-width-xl: 1140px;
-        --ar-dialog-drawer-width-sm: 360px;
-        --ar-dialog-drawer-width-md: 720px;
-        --ar-dialog-drawer-width-lg: 960px;
-        --ar-dialog-drawer-width-xl: 1440px;
         --ar-dialog-spacing: 1.25rem;
         /* --ar-dialog-spacing-block / --ar-dialog-spacing-inline : points d'extension
            optionnels, consommés avec fallback dans dialog.styles.ts (padding-block/-inline
@@ -1034,6 +1026,26 @@
         &::part(footer) {
             gap: 0.75rem;
             padding: 0 1.25rem 1.25rem;
+        }
+
+        &[size='sm'] {
+            --ar-dialog-width: 360px;
+        }
+        &[size='lg'] {
+            --ar-dialog-width: 800px;
+        }
+        &[size='xl'] {
+            --ar-dialog-width: 1140px;
+        }
+
+        &[mode='drawer'][size='sm'] {
+            --ar-dialog-width: 360px;
+        }
+        &[mode='drawer'][size='lg'] {
+            --ar-dialog-width: 960px;
+        }
+        &[mode='drawer'][size='xl'] {
+            --ar-dialog-width: 1440px;
         }
     }
 }
