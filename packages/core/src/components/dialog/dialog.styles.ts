@@ -47,7 +47,8 @@ export default [
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
 
         dialog::backdrop {
-            background: var(--ar-dialog-backdrop);
+            /* a11y-fallback: sans thème chargé, le backdrop serait transparent (défaut UA de ::backdrop) — perte de l'indication visuelle de modalité */
+            background: var(--ar-dialog-backdrop, rgba(0, 0, 0, 0.5));
             opacity: 0;
             transition: opacity 0.25s ease;
         }
