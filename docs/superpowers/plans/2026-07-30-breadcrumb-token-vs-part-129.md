@@ -1034,11 +1034,9 @@ localement pour garantir la lisibilité :
 ```
 ````
 
-````
-
 par :
 
-```mdx
+````mdx
 ### Sur un fond sombre ponctuel
 
 La couleur du texte du fil d'ariane suit `--ar-color-text` par défaut (le thème s'inverse déjà
@@ -1050,8 +1048,7 @@ automatiquement avec `[data-theme="dark"]`). Si le breadcrumb est posé sur un f
 .hero ar-breadcrumb::part(list) {
     color: white;
 }
-````
-
+```
 ````
 
 - [ ] **Step 2: Vérifier que le build de doc régénère la page sans erreur**
@@ -1064,7 +1061,7 @@ Expected: succès, aucune erreur de build MDX/Astro.
 ```bash
 git add apps/docs/src/content/components/ar-breadcrumb.mdx
 git commit -m "docs(breadcrumb): met à jour l'exemple fond sombre — ::part(list) remplace --ar-breadcrumb-color"
-````
+```
 
 ---
 
