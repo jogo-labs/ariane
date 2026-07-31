@@ -41,6 +41,9 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
+ * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
+ * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
+ *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
  * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
@@ -160,6 +163,26 @@ export class ArBreadcrumb extends LitElement {
     // Render
     // ---------------------------------------------------------------------------
 
+    private _defaultHomeIcon(): TemplateResult {
+        return html`<svg
+            aria-hidden="true"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"></path>
+        </svg>`;
+    }
+
+    private _defaultTriggerIcon(): TemplateResult {
+        return html`<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="5" cy="12" r="1.75"></circle>
+            <circle cx="12" cy="12" r="1.75"></circle>
+            <circle cx="19" cy="12" r="1.75"></circle>
+        </svg>`;
+    }
+
     override render(): TemplateResult | void {
         const items = this._orderedItems;
 
@@ -190,11 +213,11 @@ export class ArBreadcrumb extends LitElement {
                 ${this.isMobile
                     ? html`<div class="dropdown">
                           <a part="home" href="${items[0]?.href}">
-                              <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
+                              <slot name="home-icon">${this._defaultHomeIcon()}</slot>
                               <span>${items[0]?.label}</span>
                           </a>
                           <button @click=${this._handleTriggerClick} type="button" part="trigger">
-                              <span aria-hidden="true" class="icon icon-more">v</span>
+                              <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
                               <span class="sr-only">Afficher le fil d'ariane</span>
                           </button>
                           <div part="panel" popover="auto" tabindex="-1">

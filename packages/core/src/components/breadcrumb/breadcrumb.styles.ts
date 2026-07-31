@@ -112,12 +112,19 @@ export default css`
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 0.375rem;
         border: none;
         cursor: pointer;
         background-color: var(--ar-breadcrumb-toggle-bg);
         transition: background-color var(--ar-breadcrumb-toggle-transition-duration);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
         min-height: var(--ar-breadcrumb-toggle-min-size, 2.5rem);
+    }
+
+    svg {
+        height: 1.25em;
+        overflow: visible;
+        width: auto;
     }
 
     [part='home']:hover,
@@ -153,14 +160,5 @@ export default css`
         aspect-ratio: 1 / 1;
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
         min-width: var(--ar-breadcrumb-toggle-min-size, 2.5rem);
-    }
-
-    [part='home'] .icon,
-    [part='trigger'] .icon {
-        flex-shrink: 0;
-    }
-
-    [part='home'] .icon:first-child {
-        margin-right: 0.375rem;
     }
 `;

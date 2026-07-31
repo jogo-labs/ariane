@@ -1098,6 +1098,10 @@
             text-decoration: none;
         }
 
+        &::part(trigger) {
+            margin-left: 0.5rem;
+        }
+
         &::part(panel) {
             min-width: var(--ar-panel-min-width);
             max-width: var(--ar-panel-max-width);
