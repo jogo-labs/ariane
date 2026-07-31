@@ -436,16 +436,7 @@
         --ar-dropdown-distance: var(--ar-anchor-distance);
         --ar-dropdown-offset: var(--ar-anchor-offset);
         --ar-dropdown-bg: var(--ar-panel-bg);
-        --ar-dropdown-color: var(--ar-panel-text);
         --ar-dropdown-border-color: var(--ar-panel-border-color);
-        --ar-dropdown-border-radius: var(--ar-panel-radius);
-        --ar-dropdown-shadow: var(--ar-panel-shadow);
-        --ar-dropdown-padding: var(--ar-panel-padding);
-        /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
-           dropdown reste lisible plus étroit qu'un panel de disclosure générique (breadcrumb,
-           stepper). */
-        --ar-dropdown-min-width: 10rem;
-        --ar-dropdown-max-width: var(--ar-panel-max-width);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Dialog
@@ -531,7 +522,7 @@
         /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
            dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
            taille plus généreuse (25rem) que la valeur par défaut partagée (18rem) — même
-           précédent que --ar-dropdown-min-width. */
+           précédent que le min-width littéral d'ar-dropdown::part(panel) (10rem, cf. plus bas). */
         --ar-datepicker-panel-max-width: 25rem;
 
         --ar-datepicker-nav-btn-border-color: transparent;
@@ -1109,6 +1100,19 @@
             border-radius: var(--ar-panel-radius);
             box-shadow: var(--ar-panel-shadow);
             padding: var(--ar-panel-padding);
+        }
+    }
+
+    ar-dropdown {
+        &::part(panel) {
+            border-radius: var(--ar-panel-radius);
+            box-shadow: var(--ar-panel-shadow);
+            padding: var(--ar-panel-padding);
+            /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
+               dropdown reste lisible plus étroit qu'un panel de disclosure générique
+               (breadcrumb, stepper). */
+            min-width: 10rem;
+            max-width: var(--ar-panel-max-width);
         }
     }
 }

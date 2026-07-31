@@ -525,3 +525,33 @@ bg/border-color pour le fallback a11y, 4 tokens toggle-bg redéfinis, mobile-sep
 bloqué par la contrainte 3 — pseudo-élément non converti —, 2 nouveaux tokens a11y/motion) ; 10
 supprimés (5 panel cosmétiques + color + bullet-color + bullet-ring-color + active-bullet-color +
 separator-color), remplacés par des règles `::part()` littérales dans le thème.
+
+## Application — `ar-dropdown` (lot 5, 2026-07-31)
+
+Premier des 3 composants restants du lot (`dropdown`, `pagination`, `tooltip`), traité seul.
+Contrairement à `ar-breadcrumb`, le CSS d'`ar-dropdown` n'est pas hérité d'un import externe :
+travail interne (PR #62), sans dette de provenance à auditer en préalable.
+
+**Nouveau précédent établi par ce lot, absent de l'ADR jusqu'ici** : `--ar-dropdown-color` a été
+supprimé sans migration — pas transformé en règle `::part()`. Le token dupliquait, sans jamais
+diverger en pratique, un fallback déjà posé par la feuille de style partagée `panel.styles.ts`
+(`color: var(--ar-panel-text, CanvasText)` sur `[part='panel']`, consommée par
+`ar-dropdown`/`ar-breadcrumb`/`ar-stepper`). `ar-breadcrumb` et `ar-stepper` n'avaient d'ailleurs
+jamais eu ce token dédié — `ar-dropdown` était l'exception, désormais alignée sur les deux autres.
+Règle générale qui s'en dégage : quand un token duplique un fallback déjà garanti par une feuille
+de style partagée que le composant consomme, sans jamais diverger en pratique, il est supprimé
+plutôt que migré — aucune règle `::part()` de remplacement n'est nécessaire, la feuille partagée
+suffit à couvrir le cas headless.
+
+Les 5 autres tokens migrés (`border-radius`, `shadow`, `padding`, `max-width`, `min-width`)
+suivent le schéma déjà établi lot 4 : règle `ar-dropdown { &::part(panel) {...} }` dans
+`default.css`, `min-width: 10rem` porté en littéral avec son commentaire justificatif conservé
+(valeur volontairement non cascadée depuis `--ar-panel-min-width` : un menu dropdown reste plus
+étroit qu'un panel générique).
+
+**Résultat** : 10 tokens `default.css` initiaux → 4 restants (`distance`/`offset` lus en JS par
+`AnchoredController`, `bg`/`border-color` pour le fallback a11y système `Canvas`/`ButtonBorder`) ;
+6 supprimés (`color` sans remplaçant + 5 migrés vers `::part(panel)`).
+
+Détail complet : `docs/superpowers/specs/2026-07-31-dropdown-token-vs-part-129-design.md` et
+`docs/superpowers/plans/2026-07-31-dropdown-token-vs-part-129.md`.
