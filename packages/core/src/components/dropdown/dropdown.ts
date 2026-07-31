@@ -29,7 +29,7 @@ export type ArDropdownPlacement =
  * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
- * @csspart panel - Le panel flottant. Personnalisable via `::part(panel)` (color, border-radius, box-shadow, padding, min-width, max-width).
+ * @csspart panel - Le panel flottant. Le thème par défaut pilote `border-radius`, `box-shadow`, `padding`, `min-width` et `max-width` via `ar-dropdown::part(panel)` ; `background-color`, `border-color` et `color` restent eux aussi overridables via `::part(panel)` par un consommateur, mais ne sont pas redéfinis par le thème par défaut.
  *
  * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
  * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
