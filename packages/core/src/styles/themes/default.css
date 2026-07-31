@@ -1093,14 +1093,10 @@
 
     ar-dropdown {
         &::part(panel) {
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
-            padding: var(--ar-panel-padding);
             /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
                dropdown reste lisible plus étroit qu'un panel de disclosure générique
                (breadcrumb, stepper). */
             min-width: 10rem;
-            max-width: var(--ar-panel-max-width);
         }
     }
 }
