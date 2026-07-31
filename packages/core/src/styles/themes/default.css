@@ -1089,14 +1089,6 @@
         &::part(trigger) {
             margin-left: 0.5rem;
         }
-
-        &::part(panel) {
-            min-width: var(--ar-panel-min-width);
-            max-width: var(--ar-panel-max-width);
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
-            padding: var(--ar-panel-padding);
-        }
     }
 
     ar-dropdown {
