@@ -288,6 +288,7 @@
         --ar-border-radius-sm: 0.25rem;
         --ar-border-radius-md: 0.375rem;
         --ar-border-radius-lg: 0.5rem;
+        --ar-border-radius-xl: 0.75rem;
         --ar-border-radius-full: 9999px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -361,23 +362,15 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
         --ar-breadcrumb-offset: var(--ar-anchor-offset);
-        --ar-breadcrumb-color: var(--ar-color-text);
-        --ar-breadcrumb-separator-color: var(--ar-color-neutral-80);
-        --ar-breadcrumb-bullet-color: var(--ar-color-neutral-80);
         --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
-        --ar-breadcrumb-bullet-ring-color: var(--ar-color-bg);
-        --ar-breadcrumb-active-bullet-color: var(--ar-color-interactive);
-        --ar-breadcrumb-panel-min-width: var(--ar-panel-min-width);
-        --ar-breadcrumb-panel-max-width: var(--ar-panel-max-width);
         --ar-breadcrumb-panel-bg: var(--ar-panel-bg);
         --ar-breadcrumb-panel-border-color: var(--ar-panel-border-color);
-        --ar-breadcrumb-panel-border-radius: var(--ar-panel-radius);
-        --ar-breadcrumb-panel-shadow: var(--ar-panel-shadow);
-        --ar-breadcrumb-panel-padding: var(--ar-panel-padding);
-        --ar-breadcrumb-toggle-bg: var(--ar-button-tertiary-bg);
-        --ar-breadcrumb-toggle-bg-hover: var(--ar-button-tertiary-bg-hover);
-        --ar-breadcrumb-toggle-bg-pressed: var(--ar-button-tertiary-bg-active);
-        --ar-breadcrumb-toggle-bg-focus: var(--ar-button-tertiary-bg-focus);
+        --ar-breadcrumb-toggle-bg: rgba(26, 26, 26, 0.05);
+        --ar-breadcrumb-toggle-bg-hover: rgba(18, 20, 55, 0.7);
+        --ar-breadcrumb-toggle-bg-pressed: rgba(18, 20, 55, 0.8);
+        --ar-breadcrumb-toggle-bg-focus: rgba(26, 26, 26, 0.05);
+        --ar-breadcrumb-toggle-min-size: 2.5rem;
+        --ar-breadcrumb-toggle-transition-duration: 0.15s;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Stepper
@@ -617,6 +610,12 @@
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
         --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
+        /* Breadcrumb — surfaces adaptées au fond sombre */
+        --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
+        --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
+        --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
+        --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
+
         /* Tooltip — fond clair sur fond de page sombre */
         --ar-tooltip-bg: var(--ar-color-neutral-80);
         --ar-tooltip-color: var(--ar-color-neutral-10);
@@ -675,6 +674,12 @@
             --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
             --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
+
+            /* Breadcrumb — surfaces adaptées au fond sombre */
+            --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
+            --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
+            --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
+            --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
 
             /* Tooltip — fond clair sur fond de page sombre */
             --ar-tooltip-bg: var(--ar-color-neutral-80);
@@ -867,7 +872,7 @@
 
         &::part(day) {
             font-size: 1rem;
-            border-radius: 0.5rem;
+            border-radius: var(--ar-border-radius-lg);
             border-width: 2px;
         }
     }
@@ -875,7 +880,7 @@
     /* Stepper */
     ar-stepper {
         &::part(trigger) {
-            border-radius: 0.75rem;
+            border-radius: var(--ar-border-radius-xl);
             background-color: var(--ar-button-secondary-bg);
         }
 
@@ -922,7 +927,7 @@
         }
 
         &::part(bullet) {
-            border-radius: 0.75rem;
+            border-radius: var(--ar-border-radius-xl);
         }
 
         &::part(bullet--current) {
@@ -935,7 +940,7 @@
     /* Alert */
     ar-alert {
         padding: 1rem;
-        border-radius: 0.75rem;
+        border-radius: var(--ar-border-radius-xl);
         border-width: 1px;
         border-style: solid;
         column-gap: 0.75rem;
@@ -1047,6 +1052,63 @@
         }
         &[mode='drawer'][size='xl'] {
             --ar-dialog-width: 1440px;
+        }
+    }
+
+    ar-breadcrumb {
+        &::part(list) {
+            color: var(--ar-color-text);
+        }
+
+        &::part(current) {
+            font-weight: 700;
+        }
+
+        &::part(separator) {
+            background-color: var(--ar-color-neutral-80);
+        }
+
+        &::part(bullet) {
+            border-radius: var(--ar-border-radius-full);
+            background-color: var(--ar-color-neutral-80);
+            box-shadow: 0 0 0 2px var(--ar-color-bg);
+        }
+
+        &::part(bullet--current) {
+            background-color: var(--ar-color-interactive);
+        }
+
+        &::part(home),
+        &::part(trigger) {
+            border-radius: var(--ar-border-radius-xl);
+            font-size: var(--ar-font-size-md);
+            line-height: 1;
+            font-weight: 500;
+            color: var(--ar-color-text);
+        }
+
+        &::part(home):hover,
+        &::part(trigger):hover,
+        &::part(home):active,
+        &::part(trigger):active {
+            color: var(--ar-color-white);
+        }
+
+        &::part(home) {
+            padding: 0 1rem;
+            text-decoration: none;
+        }
+
+        &::part(trigger) {
+            margin-left: 0.5rem;
+        }
+
+        &::part(panel) {
+            min-width: var(--ar-panel-min-width);
+            max-width: var(--ar-panel-max-width);
+            border-radius: var(--ar-panel-radius);
+            box-shadow: var(--ar-panel-shadow);
+            padding: var(--ar-panel-padding);
         }
     }
 }

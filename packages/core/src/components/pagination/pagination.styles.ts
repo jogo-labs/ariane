@@ -41,7 +41,8 @@ export default css`
      * --ar-pagination-active-color ci-dessous. --ar-pagination-color et
      * --ar-pagination-bg permettent de rendre la pagination lisible sur un
      * fond sombre ponctuel, indépendamment du thème global (ex-variant="dark",
-     * retiré au profit de tokens purs — cf. --ar-breadcrumb-color). */
+     * retiré au profit de tokens purs, sur le même principe que les tokens de
+     * couleur exposés par d'autres composants). */
 
     .pagination a.btn.btn-tertiary {
         color: var(--ar-pagination-color);

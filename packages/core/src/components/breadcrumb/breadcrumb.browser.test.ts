@@ -5,8 +5,8 @@ import '../breadcrumb-item/index.js';
 import type { ArBreadcrumb } from './breadcrumb.js';
 
 function getBtn(el: ArBreadcrumb): HTMLButtonElement {
-    const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('#breadcrumb-dropdown');
-    if (!btn) throw new Error('#breadcrumb-dropdown introuvable');
+    const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
+    if (!btn) throw new Error('[part="trigger"] introuvable');
     return btn;
 }
 
@@ -112,6 +112,22 @@ describe('ar-breadcrumb — browser', () => {
             expect(computed.borderTopColor).to.not.equal('');
             expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
             expect(computed.borderTopWidth).to.equal('1px');
+        });
+
+        it('le bouton home a une taille de cible tactile même sans default.css', async () => {
+            el = await mobileBreadcrumb();
+            const home = el.shadowRoot?.querySelector<HTMLElement>('[part="home"]');
+            if (!home) throw new Error('[part="home"] introuvable');
+            const computed = getComputedStyle(home);
+            expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
+        });
+
+        it('le bouton trigger a une taille de cible tactile même sans default.css', async () => {
+            el = await mobileBreadcrumb();
+            const trigger = getBtn(el);
+            const computed = getComputedStyle(trigger);
+            expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
+            expect(parseFloat(computed.minWidth)).to.be.greaterThan(0);
         });
     });
 });

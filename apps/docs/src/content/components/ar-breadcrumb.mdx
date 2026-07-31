@@ -65,13 +65,15 @@ Ces événements se déclenchent à chaque changement d'état du dropdown : clic
 
 ### Sur un fond sombre ponctuel
 
-`--ar-breadcrumb-color` hérite du token sémantique `--ar-color-text`, qui s'inverse déjà
-automatiquement avec `[data-theme="dark"]`. Si le breadcrumb est posé sur un fond sombre
-**indépendamment du thème global** (bannière, section à fond coloré...), surchargez le token
-localement pour garantir la lisibilité :
+La couleur du texte du fil d'ariane suit `--ar-color-text` par défaut (le thème s'inverse déjà
+automatiquement avec `[data-theme="dark"]`). Si le breadcrumb est posé sur un fond sombre
+**indépendamment du thème global** (bannière, section à fond coloré...), surchargez
+`::part(list)` et `::part(home)` localement pour garantir la lisibilité (le bouton "Retour"
+mobile tire sa couleur de texte de `::part(home)`, pas de `::part(list)`) :
 
 ```css
-.hero ar-breadcrumb {
-    --ar-breadcrumb-color: white;
+.hero ar-breadcrumb::part(list),
+.hero ar-breadcrumb::part(home) {
+    color: white;
 }
 ```

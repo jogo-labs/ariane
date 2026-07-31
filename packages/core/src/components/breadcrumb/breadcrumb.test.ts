@@ -71,14 +71,41 @@ describe('ArBreadcrumb', () => {
             ArBreadcrumb.mobileQuery = mockMediaQuery(false);
         });
 
-        it('affiche une liste desktop (ol.breadcrumb-desktop)', async () => {
+        it("affiche une liste desktop (part='list list--desktop')", async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getShadow(el).querySelector('ol.breadcrumb-desktop')).not.toBeNull();
+            const list = getShadow(el).querySelector('[part~="list--desktop"]');
+            expect(list).not.toBeNull();
+            expect(list?.tagName.toLowerCase()).toBe('ol');
+        });
+
+        it("n'affiche pas de séparateur avant le premier item", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const items = getShadow(el).querySelectorAll('[part="item"]');
+            expect(items[0]?.querySelector('[part="separator"]')).toBeNull();
+        });
+
+        it('affiche un séparateur avant chaque item sauf le premier', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const items = getShadow(el).querySelectorAll('[part="item"]');
+            expect(items[1]?.querySelector('[part="separator"]')).not.toBeNull();
+            expect(items[2]?.querySelector('[part="separator"]')).not.toBeNull();
         });
 
         it('ne rend pas de dropdown en mode desktop', async () => {
@@ -181,35 +208,71 @@ describe('ArBreadcrumb', () => {
             expect(getPart(el, 'trigger')).not.toBeNull();
         });
 
-        it('ne rend pas de ol.breadcrumb-desktop en mode mobile', async () => {
+        it("ne rend pas de part='list--desktop' en mode mobile", async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getShadow(el).querySelector('ol.breadcrumb-desktop')).toBeNull();
+            expect(getShadow(el).querySelector('[part~="list--desktop"]')).toBeNull();
         });
 
-        it('affiche le bouton dropdown avec id="breadcrumb-dropdown"', async () => {
+        it("affiche la liste mobile (part='list list--mobile')", async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getShadow(el).querySelector('#breadcrumb-dropdown')).not.toBeNull();
+            expect(getShadow(el).querySelector('[part~="list--mobile"]')).not.toBeNull();
         });
 
-        it('affiche le lien "retour" pointant vers le premier item', async () => {
+        it("affiche le bouton dropdown avec part='trigger'", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(getPart(el, 'trigger')).not.toBeNull();
+        });
+
+        it('affiche le lien "retour" (part="home") pointant vers le premier item', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const homeBtn = getShadow(el).querySelector('#mobile-home-btn');
+            const homeBtn = getPart(el, 'home');
             expect(homeBtn?.getAttribute('href')).toBe('/accueil');
+        });
+
+        it("chaque item mobile a un part='bullet'", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            // listTemplates.slice(1) : "Accueil" n'est pas dans la liste mobile, il reste 2 puces
+            const bullets = getShadow(el).querySelectorAll('[part~="bullet"]');
+            expect(bullets.length).toBe(2);
+        });
+
+        it("seul l'item courant a le part d'état 'bullet--current'", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const bullets = getShadow(el).querySelectorAll('[part~="bullet"]');
+            expect(bullets[0]?.getAttribute('part')).toBe('bullet');
+            expect(bullets[1]?.getAttribute('part')).toBe('bullet bullet--current');
         });
     });
 
@@ -231,7 +294,7 @@ describe('ArBreadcrumb', () => {
             const handler = vi.fn();
             el.addEventListener('ar-breadcrumb-show', handler);
 
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -251,7 +314,7 @@ describe('ArBreadcrumb', () => {
             el.addEventListener('ar-breadcrumb-show', showHandler);
             el.addEventListener('ar-breadcrumb-hide', hideHandler);
 
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
             btn.click();
@@ -281,7 +344,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             mockPopoverPanel(el);
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -314,7 +377,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             mockPopoverPanel(el);
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -342,7 +405,7 @@ describe('ArBreadcrumb', () => {
             });
             el.addEventListener('ar-breadcrumb-shown', shownHandler);
 
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await shownPromise;
 
@@ -362,7 +425,7 @@ describe('ArBreadcrumb', () => {
             mockPopoverPanel(el);
             el.addEventListener('ar-breadcrumb-show', (e) => e.preventDefault());
 
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -377,7 +440,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             mockPopoverPanel(el);
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -418,7 +481,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             mockPopoverPanel(el);
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
 
@@ -464,7 +527,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             mockPopoverPanel(el);
-            const btn = getShadow(el).querySelector('#breadcrumb-dropdown') as HTMLButtonElement;
+            const btn = getShadow(el).querySelector('[part="trigger"]') as HTMLButtonElement;
             btn.click();
             await waitForUpdate(el);
             el.addEventListener('ar-breadcrumb-hide', (e) => e.preventDefault());
