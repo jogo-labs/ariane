@@ -475,3 +475,49 @@ puce de « Conséquences » mentionnant « les 8 variantes de `--ar-dialog-width
 remplacés par les presets `ar-dialog[size='...']`/`ar-dialog[mode='drawer'][size='...']`
 directement dans le thème (cf. `default.css`) et la valeur de repli unique par mode portée par
 `functional-default` ci-dessus.
+
+## Application — `ar-breadcrumb` (lot 4, 2026-07-30)
+
+Premier des 4 composants du lot 4 (`breadcrumb`, `dropdown`, `pagination`, `tooltip`). Précédé
+d'un audit du CSS hérité (import d'un autre projet) : icône morte jamais rendue, plusieurs
+redondances (`margin`/`padding` dupliqués entre `.breadcrumb`/`.breadcrumb-mobile`), et un vrai
+bug de cascade trouvé — `font-weight: 700` sur l'élément courant n'avait jamais été appliqué
+(l'enfant `.breadcrumb-text` déclarait sa propre valeur littérale `font-weight: 400`, qui bloque
+l'héritage indépendamment de la spécificité comparée entre les deux règles). Corrigé en migrant
+directement sur `::part(current)`, plutôt que documenté comme CSS mort — premier changement de
+rendu visuel réel de ce lot.
+
+**Nouveau principe appliqué à ce lot** : un blocage structurel (pas de `part` disponible, ou
+propriété portée par un pseudo-élément) n'est pas une fin de non-recevoir définitive — ajouter le
+`part` manquant, ou remplacer un pseudo-élément purement décoratif par un vrai élément
+`aria-hidden`, est envisageable au cas par cas. Nuance retenue : la conversion pseudo-élément →
+élément réel n'est justifiée que si le gain dépasse la seule réduction du nombre de tokens
+(typiquement, un thème pourrait vouloir aller au-delà de la couleur — forme, bordure, contenu).
+Appliqué à la puce mobile et au séparateur desktop (gain réel : forme personnalisable) ; **pas**
+au connecteur pointillé mobile (seule sa couleur est un point de personnalisation plausible, un
+token suffit — converti aurait exigé de le sortir de l'`<ol>`, la plus grosse surface de
+régression visuelle du lot pour un bénéfice quasi nul).
+
+`part="list"` commun aux deux `<ol>` (desktop/mobile, jamais coexistants dans le DOM) + variantes
+`list--desktop`/`list--mobile` (même convention BEM `--` que les parts d'état) débloque
+`--ar-breadcrumb-color`, auparavant bloqué car seul le desktop exposait un `part` dédié.
+
+Boutons mobile (`home`/`trigger`) entièrement découplés de `button.styles.ts` : les 4 tokens
+`--ar-breadcrumb-toggle-bg*` étaient de purs alias 1:1 vers `--ar-button-tertiary-*`, réappliqués
+par une règle interne dédiée — redondance garantie par construction. Plutôt que de les supprimer
+pour laisser `.btn-tertiary` gouverner seul, `ar-breadcrumb` s'affranchit de `button.styles.ts`
+(jugé peu compatible avec l'esprit headless à terme, réflexion séparée) : mêmes 4 tokens
+conservés mais redéfinis en valeurs littérales indépendantes, structure et focus (`outline:
+2px solid currentColor`, sans token) réimplémentés en propre sur le modèle du bouton close
+d'`ar-alert`/`ar-dialog`. `border-radius` et toute la typographie migrés en littéral dans le
+thème (branche 4, aucune référence à un token `--ar-button-*`, indépendance totale demandée par
+le mainteneur). Nouveau fallback WCAG 2.5.8 ajouté (`--ar-breadcrumb-toggle-min-size`, absent de
+`button.styles.ts` lui-même) — trou d'accessibilité préexistant, corrigé localement à l'occasion
+du découplage plutôt que reproduit. Nouveau token `--ar-breadcrumb-toggle-transition-duration`
+gardé interne (contrainte 6 : garde `prefers-reduced-motion` défaite par une règle externe).
+
+**Résultat** : 19 tokens `default.css` initiaux → 11 restants (distance/offset lus en JS, panel
+bg/border-color pour le fallback a11y, 4 tokens toggle-bg redéfinis, mobile-separator-color
+bloqué par la contrainte 3 — pseudo-élément non converti —, 2 nouveaux tokens a11y/motion) ; 10
+supprimés (5 panel cosmétiques + color + bullet-color + bullet-ring-color + active-bullet-color +
+separator-color), remplacés par des règles `::part()` littérales dans le thème.
