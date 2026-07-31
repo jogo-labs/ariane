@@ -1080,7 +1080,7 @@
 
         &::part(home),
         &::part(trigger) {
-            border-radius: 0.75rem;
+            border-radius: var(--ar-border-radius-xl);
             font-size: var(--ar-font-size-md);
             line-height: 1;
             font-weight: 500;
