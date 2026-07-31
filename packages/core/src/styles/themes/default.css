@@ -1071,6 +1071,7 @@
             font-size: var(--ar-font-size-md);
             line-height: 1;
             font-weight: 500;
+            color: var(--ar-color-text);
         }
 
         &::part(home) {
