@@ -297,7 +297,7 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Panel
-         * Partagé - dropdown, breadcrumb, stepper
+         * Partagé - dropdown, breadcrumb, stepper, datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-panel-bg: var(--ar-color-bg);
         --ar-panel-text: var(--ar-color-text);
