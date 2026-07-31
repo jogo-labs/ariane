@@ -288,6 +288,7 @@
         --ar-border-radius-sm: 0.25rem;
         --ar-border-radius-md: 0.375rem;
         --ar-border-radius-lg: 0.5rem;
+        --ar-border-radius-xl: 0.75rem;
         --ar-border-radius-full: 9999px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -871,7 +872,7 @@
 
         &::part(day) {
             font-size: 1rem;
-            border-radius: 0.5rem;
+            border-radius: var(--ar-border-radius-lg);
             border-width: 2px;
         }
     }
@@ -879,7 +880,7 @@
     /* Stepper */
     ar-stepper {
         &::part(trigger) {
-            border-radius: 0.75rem;
+            border-radius: var(--ar-border-radius-xl);
             background-color: var(--ar-button-secondary-bg);
         }
 
@@ -926,7 +927,7 @@
         }
 
         &::part(bullet) {
-            border-radius: 0.75rem;
+            border-radius: var(--ar-border-radius-xl);
         }
 
         &::part(bullet--current) {
@@ -939,7 +940,7 @@
     /* Alert */
     ar-alert {
         padding: 1rem;
-        border-radius: 0.75rem;
+        border-radius: var(--ar-border-radius-xl);
         border-width: 1px;
         border-style: solid;
         column-gap: 0.75rem;
@@ -1068,7 +1069,7 @@
         }
 
         &::part(bullet) {
-            border-radius: 50%;
+            border-radius: var(--ar-border-radius-full);
             background-color: var(--ar-color-neutral-80);
             box-shadow: 0 0 0 2px var(--ar-color-bg);
         }
