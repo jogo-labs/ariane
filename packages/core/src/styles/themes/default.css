@@ -892,10 +892,6 @@
 
         &::part(panel) {
             padding: 0.75rem;
-            min-width: var(--ar-panel-min-width);
-            max-width: var(--ar-panel-max-width);
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
         }
 
         &::part(step-link) {
