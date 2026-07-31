@@ -191,11 +191,11 @@ export class ArBreadcrumb extends LitElement {
                     ? html`<div class="dropdown">
                           <a part="home" href="${items[0]?.href}">
                               <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
-                              <span class="btn-content">${items[0]?.label}</span>
+                              <span>${items[0]?.label}</span>
                           </a>
                           <button @click=${this._handleTriggerClick} type="button" part="trigger">
                               <span aria-hidden="true" class="icon icon-more">v</span>
-                              <span class="btn-content sr-only">Afficher le fil d'ariane</span>
+                              <span class="sr-only">Afficher le fil d'ariane</span>
                           </button>
                           <div part="panel" popover="auto" tabindex="-1">
                               <ol part="list list--mobile">

@@ -27,6 +27,11 @@ export default css`
 
     /* ── Layout desktop ──────────────────────────────────────── */
 
+    [part~='list'] {
+        margin: 0;
+        padding: 0;
+    }
+
     [part~='list--desktop'] {
         display: flex;
         flex-flow: row wrap;

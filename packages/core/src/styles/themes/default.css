@@ -609,6 +609,12 @@
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
         --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
+        /* Breadcrumb — surfaces adaptées au fond sombre */
+        --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
+        --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
+        --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
+        --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
+
         /* Tooltip — fond clair sur fond de page sombre */
         --ar-tooltip-bg: var(--ar-color-neutral-80);
         --ar-tooltip-color: var(--ar-color-neutral-10);
@@ -667,6 +673,12 @@
             --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
             --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
+
+            /* Breadcrumb — surfaces adaptées au fond sombre */
+            --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
+            --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
+            --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
+            --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
 
             /* Tooltip — fond clair sur fond de page sombre */
             --ar-tooltip-bg: var(--ar-color-neutral-80);
@@ -1072,6 +1084,13 @@
             line-height: 1;
             font-weight: 500;
             color: var(--ar-color-text);
+        }
+
+        &::part(home):hover,
+        &::part(trigger):hover,
+        &::part(home):active,
+        &::part(trigger):active {
+            color: var(--ar-color-white);
         }
 
         &::part(home) {

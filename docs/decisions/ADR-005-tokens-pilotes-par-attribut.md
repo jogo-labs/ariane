@@ -515,6 +515,10 @@ le mainteneur). Nouveau fallback WCAG 2.5.8 ajouté (`--ar-breadcrumb-toggle-min
 `button.styles.ts` lui-même) — trou d'accessibilité préexistant, corrigé localement à l'occasion
 du découplage plutôt que reproduit. Nouveau token `--ar-breadcrumb-toggle-transition-duration`
 gardé interne (contrainte 6 : garde `prefers-reduced-motion` défaite par une règle externe).
+Simplification assumée : l'ancien `.btn-tertiary:active` partagé portait aussi `border-color` et un
+`box-shadow: inset ...` (ombre d'appui), et `:focus` un `border-color` — aucun des trois n'est
+reproduit dans le style bespoke `home`/`trigger` (seuls `background-color`/`color` par état, plus
+`:focus-visible` en `outline`), pour éviter de réimporter la complexité qu'on venait de découpler.
 
 **Résultat** : 19 tokens `default.css` initiaux → 11 restants (distance/offset lus en JS, panel
 bg/border-color pour le fallback a11y, 4 tokens toggle-bg redéfinis, mobile-separator-color
