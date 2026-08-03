@@ -10,6 +10,7 @@ import { warn } from '../../utils/warn.js';
 
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
+ * @display demo
  *
  * @slot label       - Contenu riche du label (remplace le prop `label`).
  * @slot after-label - Éléments après le label (bouton d'aide, tooltip…).
