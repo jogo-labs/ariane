@@ -555,3 +555,33 @@ suivent le schéma déjà établi lot 4 : règle `ar-dropdown { &::part(panel) {
 
 Détail complet : `docs/superpowers/specs/2026-07-31-dropdown-token-vs-part-129-design.md` et
 `docs/superpowers/plans/2026-07-31-dropdown-token-vs-part-129.md`.
+
+## Nettoyage transverse — non-redondance thème vs feuille de style partagée (2026-07-31)
+
+Trouvé en clôturant le lot 5 (`ar-dropdown`, #129) : 3 des 4 composants consommant la feuille de
+style partagée `panel.styles.ts` (`ar-stepper`, `ar-breadcrumb`, `ar-dropdown` — le 4ᵉ,
+`ar-datepicker`, était déjà conforme sans décision consciente) redéclaraient dans leur bloc de
+thème `default.css` des propriétés dont la valeur ne divergeait jamais du token générique
+`--ar-panel-*` déjà fourni par la base partagée. Une règle externe `ar-<composant>::part(panel)`
+l'emporte toujours sur la règle interne du shadow DOM indépendamment de la spécificité comparée
+(déclarations normales — l'inverse s'applique avec `!important`) — si elle redéclare exactement
+la même valeur, la retirer ne change rien au résultat calculé.
+
+**Règle générale retenue** : une feuille de style partagée entre plusieurs composants (consommée
+via `static override styles`) est la source canonique pour toute propriété qui ne fait que
+consommer un token générique sans jamais diverger. Un bloc de thème `::part(...)` par composant
+ne doit redéclarer une propriété que si sa valeur diverge réellement du générique pour ce
+composant précis (ex. `ar-stepper::part(panel) { padding: 0.75rem; }`, `ar-dropdown::part(panel)
+{ min-width: 10rem; }` — les deux seules divergences réelles retrouvées) — jamais pour répéter la
+même valeur. Applicable à toute future feuille de style partagée entre composants du projet
+(`button.styles.ts`, `resetStyles`, `utilitiesStyles` — non audités à cette occasion, hors
+scope).
+
+Effet de bord à noter : l'ajout de `min-width: var(--ar-panel-min-width);` à la base de
+`panel.styles.ts` s'applique aux 4 consommateurs de cette feuille partagée, y compris
+`ar-datepicker` qui n'avait jamais eu de `min-width` auparavant. Sous le thème par défaut c'est
+inerte — `ar-datepicker::part(panel)` fixe `width: 20rem` dans `default.css` et
+`max-width: 25rem` dans `datepicker.styles.ts`, tous deux supérieurs à
+`--ar-panel-min-width: 18rem` — mais c'est désormais un point de couplage réel entre le token
+générique `--ar-panel-min-width` et la largeur du calendrier, à garder en tête si ce token est
+modifié par un thème personnalisé.

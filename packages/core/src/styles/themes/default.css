@@ -297,7 +297,7 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Panel
-         * Partagé - dropdown, breadcrumb, stepper
+         * Partagé - dropdown, breadcrumb, stepper, datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-panel-bg: var(--ar-color-bg);
         --ar-panel-text: var(--ar-color-text);
@@ -892,10 +892,6 @@
 
         &::part(panel) {
             padding: 0.75rem;
-            min-width: var(--ar-panel-min-width);
-            max-width: var(--ar-panel-max-width);
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
         }
 
         &::part(step-link) {
@@ -1093,26 +1089,14 @@
         &::part(trigger) {
             margin-left: 0.5rem;
         }
-
-        &::part(panel) {
-            min-width: var(--ar-panel-min-width);
-            max-width: var(--ar-panel-max-width);
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
-            padding: var(--ar-panel-padding);
-        }
     }
 
     ar-dropdown {
         &::part(panel) {
-            border-radius: var(--ar-panel-radius);
-            box-shadow: var(--ar-panel-shadow);
-            padding: var(--ar-panel-padding);
             /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
                dropdown reste lisible plus étroit qu'un panel de disclosure générique
                (breadcrumb, stepper). */
             min-width: 10rem;
-            max-width: var(--ar-panel-max-width);
         }
     }
 }
