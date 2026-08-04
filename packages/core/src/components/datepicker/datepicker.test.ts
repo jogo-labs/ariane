@@ -330,8 +330,8 @@ describe('ArDatepicker', () => {
             );
             el.open = true;
             await waitForUpdate(el);
-            const todayBtn = getPart(el, 'footer-btn today-btn');
-            const closeBtn = getPart(el, 'footer-btn close-btn');
+            const todayBtn = getPart(el, 'today-btn');
+            const closeBtn = getPart(el, 'close-btn');
             expect(todayBtn?.textContent?.trim()).toBe('Today');
             expect(todayBtn?.getAttribute('aria-label')).toBe('Today');
             expect(closeBtn?.textContent?.trim()).toBe('Close');
@@ -366,7 +366,7 @@ describe('ArDatepicker', () => {
             `);
             el.open = true;
             await waitForUpdate(el);
-            const closeBtn = getPart(el, 'footer-btn close-btn');
+            const closeBtn = getPart(el, 'close-btn');
             expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
         });
     });

@@ -1118,6 +1118,17 @@
             background-color: var(--ar-button-tertiary-bg-focus);
         }
 
+        /* Spécificité égale aux variantes :hover/:active/:focus ci-dessus (pseudo-élément +
+           pseudo-classe) requise pour gagner la cascade : ::part(nav-btn--disabled) seul
+           (spécificité pseudo-élément uniquement) perdrait face à ::part(prev):hover malgré
+           un ordre de déclaration ultérieur. */
+        &::part(nav-btn--disabled),
+        &::part(nav-btn--disabled):hover,
+        &::part(nav-btn--disabled):active,
+        &::part(nav-btn--disabled):focus {
+            background-color: var(--ar-pagination-bg);
+        }
+
         &::part(current) {
             background-color: var(--ar-color-bg);
             color: var(--ar-color-interactive);

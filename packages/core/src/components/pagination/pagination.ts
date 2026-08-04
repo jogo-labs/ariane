@@ -32,16 +32,18 @@ export interface ArPaginationPageChangeDetail {
  * @csspart nav      - L'élément `<nav>` englobant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
  * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
+ * @csspart item--current - Le `<li>` de la page courante (variante d'état de `item`).
  * @csspart link     - Les `<a>` cliquables de chaque page. Personnalisable via `::part(link)` (fond, couleur, bordure, survol/pressé/focus).
  * @csspart current  - Le `<span>` de la page courante (non cliquable). Personnalisable via `::part(current)` (fond, couleur, bordure, épaisseur de trait).
  * @csspart prev     - Le bouton "Page précédente". Porte aussi le part combiné `nav-btn`, partagé avec `next`.
  * @csspart next     - Le bouton "Page suivante". Porte aussi le part combiné `nav-btn`, partagé avec `prev`.
  * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
+ * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
  *
  * @cssprop --ar-pagination-color - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
- * @cssprop --ar-pagination-btn-size - Taille minimale des boutons/pages (fallback WCAG 2.5.8 : `2.5rem` si aucun thème n'est chargé).
+ * @cssprop --ar-pagination-btn-size - Taille minimale des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
@@ -101,7 +103,7 @@ export class ArPagination extends LitElement {
             <ul part="list" @click=${this._onPageChange}>
                 <li part="item">
                     <a
-                        part="prev nav-btn"
+                        part="prev nav-btn${isPreviousDisabled ? ' nav-btn--disabled' : ''}"
                         href="javascript:;"
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
@@ -126,7 +128,7 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="next nav-btn"
+                        part="next nav-btn${isNextDisabled ? ' nav-btn--disabled' : ''}"
                         href="javascript:;"
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}

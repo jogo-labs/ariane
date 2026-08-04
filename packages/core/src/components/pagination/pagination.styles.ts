@@ -15,6 +15,11 @@ export default css`
         list-style: none;
     }
 
+    [part='item'] {
+        display: flex;
+        align-items: center;
+    }
+
     [part~='prev'],
     [part~='next'],
     [part='link'],
@@ -62,8 +67,8 @@ export default css`
         margin: 0 0.125rem;
     }
 
-    @media (max-width: 640px) {
-        [part='item']:nth-child(n + 3):nth-last-child(n + 3):not([part~='item--current']):not(
+    @media screen and (max-width: 640px) {
+        [part~='item']:nth-child(n + 3):nth-last-child(n + 3):not([part~='item--current']):not(
                 [aria-hidden='true']
             ) {
             display: none;

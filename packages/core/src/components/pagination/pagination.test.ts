@@ -3,6 +3,16 @@ import { ArPagination, type ArPaginationPageChangeDetail } from './pagination.js
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './index.js';
 
+/**
+ * Vérifie qu'un token est présent dans l'attribut `part` d'un élément, sans dépendre
+ * de l'ordre de sérialisation. `Element.part` (DOMTokenList) n'est pas supporté par
+ * happy-dom (environnement Vitest de ce projet) : on retombe donc sur un split de
+ * l'attribut plutôt que sur `.part.contains()`.
+ */
+function partContains(el: Element, token: string): boolean {
+    return (el.getAttribute('part') ?? '').split(/\s+/).includes(token);
+}
+
 describe('ArPagination', () => {
     let el: ArPagination;
 
@@ -36,8 +46,10 @@ describe('ArPagination', () => {
         });
 
         it('contient un part="prev nav-btn" et part="next nav-btn"', () => {
-            expect(requirePart(el, 'prev').getAttribute('part')).toBe('prev nav-btn');
-            expect(requirePart(el, 'next').getAttribute('part')).toBe('next nav-btn');
+            expect(partContains(requirePart(el, 'prev'), 'prev')).toBe(true);
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'next')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-btn')).toBe(true);
         });
     });
 
@@ -180,6 +192,28 @@ describe('ArPagination', () => {
             );
             expect(nonCurrent.length).toBeGreaterThan(0);
             nonCurrent.forEach((item) => expect(item.getAttribute('part')).toBe('item'));
+        });
+    });
+
+    describe("part d'état nav-btn--disabled", () => {
+        it('prev porte le part nav-btn--disabled en page 1', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(true);
+        });
+
+        it('prev ne porte pas nav-btn--disabled quand current > 1', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(false);
+        });
+
+        it('next porte le part nav-btn--disabled en dernière page', async () => {
+            el = await fixture('<ar-pagination current="5" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(true);
+        });
+
+        it('next ne porte pas nav-btn--disabled avant la dernière page', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(false);
         });
     });
 
