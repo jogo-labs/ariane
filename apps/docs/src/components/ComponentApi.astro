@@ -6,7 +6,7 @@
  * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
-import { type CemDeclaration } from '../utils/cem-types.ts';
+import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 
 interface Props {
@@ -15,9 +15,7 @@ interface Props {
 
 const { component } = Astro.props;
 
-const publicMethods = (component.members ?? []).filter(
-    (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
-);
+const publicMethods = getPublicMethods(component);
 
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
@@ -150,74 +148,61 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
         </section>
     )}
 
-    {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
-    {panelProps.length > 0 && (
-        <section>
-            <h4 id="api-panel-tokens" class="subsection-title">Tokens du panel partagé</h4>
-            <p class="hint">
-                Ce composant utilise un panel flottant partagé avec d'autres composants de la
-                librairie. Deux techniques de personnalisation sont possibles : redéfinir un ou
-                plusieurs tokens ci-dessous, scopés à ce composant uniquement (n'affecte pas les
-                autres consommateurs du panel partagé), ou surcharger n'importe quelle propriété
-                CSS via <code>::part(panel)</code>, sans passer par les tokens — utile pour une
-                propriété que le thème par défaut ne tokenise pas, ou pour un changement plus
-                large que ce que les tokens exposent. Certains composants exposent aussi leur
-                propre token plus spécifique qui prend le pas sur le token générique du panel
-                (par exemple <code>--ar-dropdown-bg</code>, <code>--ar-breadcrumb-panel-bg</code>
-                ou <code>--ar-stepper-panel-bg</code> pour le fond) — dans ce cas, utilisez ce
-                token spécifique, ou passez par la technique 2.
-            </p>
-            <div class="token-example">
-                <p class="code-caption">Technique 1 — token scopé au composant :</p>
-                <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
-            </div>
-            <div class="token-example">
-                <p class="code-caption">Technique 2 — <code>::part(panel)</code> :</p>
-                <pre><code class="language-css">{`${component.tagName}::part(panel) {\n    background-color: #fff;\n}`}</code></pre>
-            </div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {panelProps.map((prop) => (
-                            <tr>
-                                <td><code>{prop.name}</code></td>
-                                <td>{prop.description ?? ''}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )}
-
     {/* ── CSS Custom Properties propres au composant ── */}
-    {ownProps.length > 0 && (
+    {(ownProps.length > 0 || panelProps.length > 0) && (
         <section>
             <h4 id="api-css-props" class="subsection-title">CSS Custom Properties</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ownProps.map((prop) => (
+            {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
+            {panelProps.length > 0 && (
+                <p>
+                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br>
+                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composants comme ci-dessous.
+                </p>
+                <div class="token-example">
+                    <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
+                </div>
+                <div class="table-wrap panel-tokens-table">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><code>{prop.name}</code></td>
-                                <td>{prop.description ?? ''}</td>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Description</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {panelProps.map((prop) => (
+                                <tr>
+                                    <td><code>{prop.name}</code></td>
+                                    <td>{prop.description ?? ''}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {(panelProps.length > 0 && ownProps.length > 0) && (
+                <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
+            )}
+            {ownProps.length > 0 && (
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ownProps.map((prop) => (
+                                <tr>
+                                    <td><code>{prop.name}</code></td>
+                                    <td>{prop.description ?? ''}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </section>
     )}
 
@@ -266,6 +251,14 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 
     .token-example {
         margin-bottom: 1rem;
+    }
+
+    .panel-tokens-table {
+        margin-bottom: 1.875rem;
+    }
+
+    .own-props-intro {
+        margin-top: 1.875rem;
     }
 
     .code-caption {
