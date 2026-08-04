@@ -131,12 +131,13 @@ export default css`
      * contrairement à :focus-visible qui ne s'active pas pour le focus programmatique.
      */
     [part='grid']:focus-within [part='day'][tabindex='0'] {
-        outline: solid
-            /* a11y-fallback: WCAG 2.4.7 (Focus Visible) — var() dans un raccourci outline invalide tout le raccourci si non résolu, y compris la largeur */
-            var(--ar-datepicker-day-focus-ring-width, 2px)
-            var(--ar-datepicker-day-focus-ring-color, ButtonText);
+        outline-style: solid;
+        /* a11y-fallback: WCAG 2.4.7 (Focus Visible) */
+        outline-width: var(--ar-datepicker-day-focus-ring-width, 2px);
+        outline-color: var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
-        border-color: var(--ar-panel-bg);
+        /* a11y-fallback: transparent par défaut — l'anneau de focus (WCAG 2.4.7) reste garanti indépendamment par --ar-datepicker-day-focus-ring-* */
+        border-color: var(--ar-datepicker-day-focus-border-color, transparent);
     }
 
     [part='grid']:focus-within [part='day'][tabindex='0']:not(.selected) {
