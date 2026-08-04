@@ -53,6 +53,41 @@ describe('ArPagination', () => {
         });
     });
 
+    // ── Slots d'icônes prev/next ─────────────────────────────────────────────
+
+    describe('slots prev-icon / next-icon', () => {
+        beforeEach(async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+        });
+
+        it('contient un slot nommé "prev-icon" et "next-icon"', () => {
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelector('slot[name="prev-icon"]')).not.toBeNull();
+            expect(shadow.querySelector('slot[name="next-icon"]')).not.toBeNull();
+        });
+
+        it('rend un svg par défaut, décoratif (aria-hidden), dans chaque slot', () => {
+            const shadow = el.shadowRoot as ShadowRoot;
+            const prevSvg = shadow.querySelector('slot[name="prev-icon"] svg');
+            const nextSvg = shadow.querySelector('slot[name="next-icon"] svg');
+            expect(prevSvg).not.toBeNull();
+            expect(nextSvg).not.toBeNull();
+            expect(prevSvg?.getAttribute('aria-hidden')).toBe('true');
+            expect(nextSvg?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('un slot prev-icon custom remplace le svg par défaut', async () => {
+            el = await fixture(
+                '<ar-pagination><svg slot="prev-icon" data-custom="true" aria-hidden="true"></svg></ar-pagination>',
+            );
+            const shadow = el.shadowRoot as ShadowRoot;
+            const slotEl = shadow.querySelector('slot[name="prev-icon"]') as HTMLSlotElement;
+            const assigned = slotEl.assignedElements();
+            expect(assigned.length).toBe(1);
+            expect(assigned[0]?.getAttribute('data-custom')).toBe('true');
+        });
+    });
+
     // ── Valeurs par défaut ────────────────────────────────────────────────────
 
     describe('valeurs par défaut', () => {

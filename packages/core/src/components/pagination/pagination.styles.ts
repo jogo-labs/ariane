@@ -47,6 +47,12 @@ export default css`
         min-width: var(--ar-pagination-btn-size, 2.5rem);
     }
 
+    svg {
+        height: 1.25em;
+        overflow: visible;
+        width: auto;
+    }
+
     [part~='prev']:focus-visible,
     [part~='next']:focus-visible,
     [part='link']:focus-visible {

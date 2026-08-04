@@ -41,6 +41,9 @@ export interface ArPaginationPageChangeDetail {
  * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
  *
+ * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
+ * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
+ *
  * @cssprop --ar-pagination-color - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
  * @cssprop --ar-pagination-btn-size - Taille minimale des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
@@ -85,6 +88,30 @@ export class ArPagination extends LitElement {
         }
     }
 
+    private _defaultPrevIcon(): TemplateResult {
+        return html`<svg
+            aria-hidden="true"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"></path>
+        </svg>`;
+    }
+
+    private _defaultNextIcon(): TemplateResult {
+        return html`<svg
+            aria-hidden="true"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"></path>
+        </svg>`;
+    }
+
     override render(): TemplateResult {
         // Garde défensive : total/current invalides sont déjà signalés par warn() dans
         // updated(), mais render() doit rester fonctionnel — sans ce clamp, un total
@@ -108,7 +135,7 @@ export class ArPagination extends LitElement {
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
                     >
-                        <span aria-hidden="true">&lt;</span>
+                        <slot name="prev-icon">${this._defaultPrevIcon()}</slot>
                         <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
                     </a>
                 </li>
@@ -133,7 +160,7 @@ export class ArPagination extends LitElement {
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
                     >
-                        <span aria-hidden="true">&gt;</span>
+                        <slot name="next-icon">${this._defaultNextIcon()}</slot>
                         <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
                     </a>
                 </li>
