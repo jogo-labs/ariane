@@ -106,6 +106,13 @@ export function getCustomElements(manifest: unknown): CemDeclaration[] {
         .filter((d) => d.kind === 'class' && d.customElement === true);
 }
 
+/** Méthodes publiques d'un composant — exclut les membres privés/protégés et les non-méthodes. */
+export function getPublicMethods(component: CemDeclaration): CemMember[] {
+    return (component.members ?? []).filter(
+        (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
+    );
+}
+
 // ─── Helpers détection des contrôles playground ───────────────────────────────
 
 /** Retourne true si le type CEM est une union de string literals : 'a' | 'b' | … */

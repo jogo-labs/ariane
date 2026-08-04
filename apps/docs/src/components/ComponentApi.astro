@@ -6,7 +6,7 @@
  * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
-import { type CemDeclaration } from '../utils/cem-types.ts';
+import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 
 interface Props {
@@ -15,9 +15,10 @@ interface Props {
 
 const { component } = Astro.props;
 
-const publicMethods = (component.members ?? []).filter(
-    (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
-);
+const publicMethods = getPublicMethods(component);
+
+const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
+const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
 ---
 
 <div class="component-api">
@@ -147,28 +148,61 @@ const publicMethods = (component.members ?? []).filter(
         </section>
     )}
 
-    {/* ── CSS Custom Properties ── */}
-    {component.cssProperties && component.cssProperties.length > 0 && (
+    {/* ── CSS Custom Properties propres au composant ── */}
+    {(ownProps.length > 0 || panelProps.length > 0) && (
         <section>
             <h4 id="api-css-props" class="subsection-title">CSS Custom Properties</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {component.cssProperties.map((prop) => (
+            {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
+            {panelProps.length > 0 && (
+                <p>
+                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br>
+                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composants comme ci-dessous.
+                </p>
+                <div class="token-example">
+                    <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
+                </div>
+                <div class="table-wrap panel-tokens-table">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><code>{prop.name}</code></td>
-                                <td>{prop.description ?? ''}</td>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Description</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {panelProps.map((prop) => (
+                                <tr>
+                                    <td><code>{prop.name}</code></td>
+                                    <td>{prop.description ?? ''}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {(panelProps.length > 0 && ownProps.length > 0) && (
+                <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
+            )}
+            {ownProps.length > 0 && (
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ownProps.map((prop) => (
+                                <tr>
+                                    <td><code>{prop.name}</code></td>
+                                    <td>{prop.description ?? ''}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </section>
     )}
 
@@ -213,5 +247,36 @@ const publicMethods = (component.members ?? []).filter(
         font-size:     0.875rem;
         color:         var(--doc-text-muted);
         margin-bottom: 0.75rem;
+    }
+
+    .token-example {
+        margin-bottom: 1rem;
+    }
+
+    .panel-tokens-table {
+        margin-bottom: 1.875rem;
+    }
+
+    .own-props-intro {
+        margin-top: 1.875rem;
+    }
+
+    .token-example pre {
+        margin:         0;
+        padding:        1rem 1.25rem;
+        overflow-x:     auto;
+        border-radius:  0.5rem;
+        font-family:    'Fira Code', 'Cascadia Code', monospace;
+        font-size:      0.8rem;
+        line-height:    1.6;
+        background:     var(--doc-code-block-bg);
+    }
+
+    .token-example pre code {
+        font-family: inherit;
+        font-size:   inherit;
+        padding:     0;
+        background:  transparent;
+        color:       #cdd6f4;
     }
 </style>

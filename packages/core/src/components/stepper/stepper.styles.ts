@@ -22,11 +22,6 @@ export default css`
         text-align: left;
     }
 
-    [part='panel'] {
-        background-color: var(--ar-stepper-panel-bg, Canvas);
-        border-color: var(--ar-stepper-panel-border-color, ButtonBorder);
-    }
-
     [part='list'] {
         margin: 0;
         counter-reset: step;

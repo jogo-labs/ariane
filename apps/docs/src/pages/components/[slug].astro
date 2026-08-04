@@ -8,7 +8,12 @@ import NarrativeHeading from '../../components/NarrativeHeading.astro';
 import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 import manifest from '@cem';
 import { getSlug } from '../../utils/tag-name.ts';
-import { type CemDeclaration, getCustomElements, buildControls } from '../../utils/cem-types.ts';
+import {
+    type CemDeclaration,
+    getCustomElements,
+    getPublicMethods,
+    buildControls,
+} from '../../utils/cem-types.ts';
 
 type MdxEntry = Awaited<ReturnType<typeof getCollection<'components'>>>[number];
 
@@ -61,6 +66,33 @@ const playgroundHtml = rawPlaygroundHtml
 
 const controls = buildControls(component.members ?? []);
 
+// ─── Sous-sections de la Référence API ─────────────────────────────────────────
+//
+// Chaque entrée reflète exactement la condition d'affichage de la section
+// correspondante dans ComponentApi.astro — une section absente (ex. pas de slot)
+// ne doit pas apparaître dans la TOC.
+
+const apiTocEntries = [
+    component.attributes && component.attributes.length > 0
+        ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
+        : null,
+    component.events && component.events.length > 0
+        ? { id: 'api-evenements', label: 'Événements', level: 2 as const }
+        : null,
+    getPublicMethods(component).length > 0
+        ? { id: 'api-methodes', label: 'Méthodes', level: 2 as const }
+        : null,
+    component.cssParts && component.cssParts.length > 0
+        ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
+        : null,
+    component.cssProperties && component.cssProperties.length > 0
+        ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
+        : null,
+    component.slots && component.slots.length > 0
+        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
+        : null,
+].filter((entry) => entry !== null);
+
 // ─── TOC ──────────────────────────────────────────────────────────────────────
 //
 // Les h2 du MDX sont automatiquement injectés en tête de TOC.
@@ -93,6 +125,7 @@ const tocEntries = [
         ? [{ id: 'playground', label: 'Playground', level: 1 as const }]
         : []),
     { id: 'reference-api', label: 'Référence API', level: 1 as const },
+    ...apiTocEntries,
 ];
 ---
 

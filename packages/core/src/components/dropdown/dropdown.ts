@@ -29,12 +29,19 @@ export type ArDropdownPlacement =
  * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
- * @csspart panel - Le panel flottant. Le thème par défaut pilote `border-radius`, `box-shadow`, `padding`, `min-width` et `max-width` via `ar-dropdown::part(panel)` ; `background-color`, `border-color` et `color` restent eux aussi overridables via `::part(panel)` par un consommateur, mais ne sont pas redéfinis par le thème par défaut.
+ * @csspart panel - Le panel flottant.
  *
- * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
- * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-dropdown-distance - Espacement entre le trigger et le panel (axe principal).
  * @cssprop --ar-dropdown-offset - Décalage latéral du panel (axe transversal).
+ * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-radius - Rayon de bordure du panel partagé.
+ * @cssprop --ar-panel-shadow - Ombre portée du panel partagé.
+ * @cssprop --ar-panel-padding - Espacement interne du panel partagé.
+ * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
+ * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
+ * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
  * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
