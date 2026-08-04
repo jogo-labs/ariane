@@ -22,31 +22,38 @@ export default css`
 
     [part~='prev'],
     [part~='next'],
-    [part='link'],
-    [part='current'] {
+    [part~='link'],
+    [part~='current'],
+    [part~='ellipsis'] {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin: 0 0.125rem;
-        padding: 0 0.75rem;
-        text-decoration: none;
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
         min-height: var(--ar-pagination-btn-size, 2.5rem);
-        transition:
-            background-color 0.15s,
-            color 0.15s,
-            border-color 0.15s;
+        /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
+        min-width: var(--ar-pagination-btn-size, 2.5rem);
     }
 
     [part~='prev'],
     [part~='next'],
-    [part~='ellipsis'],
-    [part~='current'],
     [part~='link'] {
-        aspect-ratio: 1/1;
-        padding: 0;
-        /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
-        min-width: var(--ar-pagination-btn-size, 2.5rem);
+        text-decoration: none;
+        transition:
+            background-color var(--ar-pagination-transition-duration),
+            color var(--ar-pagination-transition-duration);
+
+        &:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [part~='prev'],
+        [part~='next'],
+        [part~='link'] {
+            transition: none;
+        }
     }
 
     svg {
@@ -55,22 +62,8 @@ export default css`
         width: auto;
     }
 
-    [part~='prev']:focus-visible,
-    [part~='next']:focus-visible,
-    [part='link']:focus-visible {
-        outline: 2px solid currentColor;
-        outline-offset: 2px;
-    }
-
     [part~='nav-btn--disabled'] {
         cursor: not-allowed;
-    }
-
-    [part='ellipsis'] {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 0.125rem;
     }
 
     @media screen and (max-width: 640px) {

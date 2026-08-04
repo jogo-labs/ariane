@@ -44,7 +44,8 @@ export interface ArPaginationPageChangeDetail {
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
  *
- * @cssprop --ar-pagination-btn-size - Taille minimale des boutons/pages, lue directement par le composant (repli interne `2.5rem`, WCAG 2.5.8).
+ * @cssprop --ar-pagination-btn-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
+ * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */

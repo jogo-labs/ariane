@@ -400,6 +400,7 @@
          * Pagination
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-pagination-btn-size: 2.5rem;
+        --ar-pagination-transition-duration: var(--ar-button-transition-duration);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Spinner
@@ -1090,6 +1091,10 @@
     }
 
     ar-pagination {
+        &::part(list) {
+            column-gap: 0.25rem;
+        }
+
         &::part(link),
         &::part(prev),
         &::part(next) {
@@ -1146,6 +1151,12 @@
         &::part(ellipsis) {
             color: var(--ar-color-text-muted);
             cursor: default;
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(ellipsis) {
+            padding: 0 0.75rem;
         }
     }
 }
