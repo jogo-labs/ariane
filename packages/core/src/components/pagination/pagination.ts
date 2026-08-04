@@ -31,19 +31,17 @@ export interface ArPaginationPageChangeDetail {
  *
  * @csspart nav      - L'élément `<nav>` englobant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
- * @csspart item     - Chaque `<li>` de la liste.
- * @csspart link     - Les `<a>` cliquables de chaque page.
- * @csspart current  - Le `<span>` de la page courante (non cliquable).
- * @csspart prev     - Le bouton "Page précédente".
- * @csspart next     - Le bouton "Page suivante".
+ * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
+ * @csspart link     - Les `<a>` cliquables de chaque page. Personnalisable via `::part(link)` (fond, couleur, bordure, survol/pressé/focus).
+ * @csspart current  - Le `<span>` de la page courante (non cliquable). Personnalisable via `::part(current)` (fond, couleur, bordure, épaisseur de trait).
+ * @csspart prev     - Le bouton "Page précédente". Porte aussi le part combiné `nav-btn`, partagé avec `next`.
+ * @csspart next     - Le bouton "Page suivante". Porte aussi le part combiné `nav-btn`, partagé avec `prev`.
+ * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
+ * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
  *
- * @cssprop --ar-pagination-active-color - Couleur de la page active (texte + bordure).
  * @cssprop --ar-pagination-color - Couleur du texte des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
- * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs).
- * @cssprop --ar-pagination-bg-hover - Fond des boutons prev/next/page au survol.
- * @cssprop --ar-pagination-bg-pressed - Fond des boutons prev/next/page pressés.
- * @cssprop --ar-pagination-bg-focus - Fond des boutons prev/next/page au focus.
- * @cssprop --ar-pagination-active-bg - Couleur du fond du numéro de page actif (cascade vers --ar-color-bg).
+ * @cssprop --ar-pagination-bg - Fond des boutons prev/next/page (non actifs). À surcharger localement pour un fond sombre ponctuel, indépendamment du thème global.
+ * @cssprop --ar-pagination-btn-size - Taille minimale des boutons/pages (fallback WCAG 2.5.8 : `2.5rem` si aucun thème n'est chargé).
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
