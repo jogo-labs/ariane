@@ -10,7 +10,6 @@ import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './stepper.styles.js';
 
@@ -79,17 +78,14 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
  * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
+ * @cssprop --ar-stepper-toggle-bg - Fond du bouton d'ouverture du panel mobile.
+ * @cssprop --ar-stepper-toggle-transition-duration - Durée de la transition de fond du bouton d'ouverture (respecte `prefers-reduced-motion`).
+ * @cssprop --ar-stepper-toggle-min-size - Taille de cible minimale du bouton d'ouverture (WCAG 2.5.8).
  *
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
  */
 export class ArStepper extends LitElement {
-    static override styles: CSSResultGroup = [
-        resetStyles,
-        utilitiesStyles,
-        buttonStyles,
-        panelStyles,
-        styles,
-    ];
+    static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
 
     /**
      * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
