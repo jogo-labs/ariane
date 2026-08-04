@@ -880,6 +880,7 @@
 
         &::part(trigger):hover {
             background-color: var(--ar-stepper-toggle-bg-hover);
+            color: var(--ar-stepper-toggle-color-pressed);
         }
 
         &::part(trigger):active:not(:disabled) {
@@ -889,6 +890,7 @@
 
         &::part(trigger):focus-visible {
             background-color: var(--ar-stepper-toggle-bg-hover);
+            color: var(--ar-stepper-toggle-color-pressed);
             outline: 2px solid var(--ar-focus-ring-color);
             outline-offset: var(--ar-focus-ring-offset);
         }
