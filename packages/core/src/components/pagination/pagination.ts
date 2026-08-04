@@ -3,7 +3,6 @@ import { property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './pagination.styles.js';
 import { _calculatePages, _clamp } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
@@ -49,7 +48,7 @@ export interface ArPaginationPageChangeDetail {
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
  */
 export class ArPagination extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, buttonStyles, styles];
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     static readonly DEFAULT_CURRENT: number = 1;
     static readonly DEFAULT_TOTAL: number = 5;
@@ -101,16 +100,15 @@ export class ArPagination extends LitElement {
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
-            <ul part="list" class="pagination" @click=${this._onPageChange}>
-                <li part="item" class="pagination-item">
+            <ul part="list" @click=${this._onPageChange}>
+                <li part="item">
                     <a
-                        part="prev"
-                        class="btn btn-tertiary btn-ratio-square"
+                        part="prev nav-btn"
                         href="javascript:;"
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
                     >
-                        <span aria-hidden="true" class="icon icon-chevron-l">&lt;</span>
+                        <span aria-hidden="true">&lt;</span>
                         <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
                     </a>
                 </li>
@@ -121,22 +119,21 @@ export class ArPagination extends LitElement {
                     (page) => {
                         // -1 et -2 sont des sentinelles représentant les ellipses
                         return page === -1 || page === -2
-                            ? html` <li part="item" class="pagination-item" aria-hidden="true">
-                                  <span class="btn btn-tertiary">...</span>
+                            ? html` <li part="item" aria-hidden="true">
+                                  <span part="ellipsis">...</span>
                               </li>`
                             : this.renderPage(page, page === current);
                     },
                 )}
 
-                <li part="item" class="pagination-item">
+                <li part="item">
                     <a
-                        part="next"
-                        class="btn btn-tertiary btn-ratio-square"
+                        part="next nav-btn"
                         href="javascript:;"
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
                     >
-                        <span aria-hidden="true" class="icon icon-chevron-r">&gt;</span>
+                        <span aria-hidden="true">&gt;</span>
                         <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
                     </a>
                 </li>
@@ -146,7 +143,7 @@ export class ArPagination extends LitElement {
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
     protected renderPage(page: number, active: boolean): TemplateResult {
-        return html` <li part="item" class="pagination-item${active ? ' active' : ''}">
+        return html` <li part="item${active ? ' item--current' : ''}">
             ${this.renderPageLink(page, active)}
         </li>`;
     }
@@ -154,21 +151,11 @@ export class ArPagination extends LitElement {
     /** Génère le lien ou le span (si page active) d'une page */
     protected renderPageLink(page: number, active: boolean): TemplateResult {
         if (active) {
-            return html` <span
-                part="current"
-                aria-current="true"
-                class="btn btn-tertiary"
-                data-ar-pagination-page="${page}"
-            >
+            return html` <span part="current" aria-current="true" data-ar-pagination-page="${page}">
                 ${this.renderPageLabel(page)}
             </span>`;
         }
-        return html` <a
-            part="link"
-            class="btn btn-tertiary"
-            data-ar-pagination-page="${page}"
-            href="javascript:;"
-        >
+        return html` <a part="link" data-ar-pagination-page="${page}" href="javascript:;">
             ${this.renderPageLabel(page)}
         </a>`;
     }
