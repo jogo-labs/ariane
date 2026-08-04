@@ -34,6 +34,11 @@ describe('ArPagination', () => {
         it('contient un part="next"', () => {
             expect(getPart(el, 'next')).not.toBeNull();
         });
+
+        it('contient un part="prev nav-btn" et part="next nav-btn"', () => {
+            expect(requirePart(el, 'prev').getAttribute('part')).toBe('prev nav-btn');
+            expect(requirePart(el, 'next').getAttribute('part')).toBe('next nav-btn');
+        });
     });
 
     // ── Valeurs par défaut ────────────────────────────────────────────────────
@@ -108,7 +113,10 @@ describe('ArPagination', () => {
 
         it('la page active a aria-current="true"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
-            expect(requirePart(el, 'current').getAttribute('aria-current')).toBe('true');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const current = shadow.querySelector('[part="current"]') as Element;
+            expect(current).not.toBeNull();
+            expect(current.getAttribute('aria-current')).toBe('true');
         });
     });
 
@@ -146,12 +154,32 @@ describe('ArPagination', () => {
             expect(links.length).toBe(4);
         });
 
-        it('ellipses présentes si total >= 10 et current éloigné des bords', async () => {
+        it('ellipses présentes si total >= 10 et current éloigné des bords, avec part="ellipsis"', async () => {
             el = await fixture('<ar-pagination current="6" total="15"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            // Les ellipses ont aria-hidden="true"
-            const ellipses = shadow.querySelectorAll('[aria-hidden="true"]');
+            const ellipses = shadow.querySelectorAll('[part="ellipsis"]');
             expect(ellipses.length).toBeGreaterThanOrEqual(2);
+        });
+    });
+
+    describe("part d'état item--current", () => {
+        it('le <li> de la page active porte part="item item--current"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const currentLi = shadow.querySelector('[part~="item--current"]') as Element;
+            expect(currentLi).not.toBeNull();
+            expect(currentLi.getAttribute('part')).toBe('item item--current');
+        });
+
+        it('les <li> non actifs ne portent que part="item"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const items = Array.from(shadow.querySelectorAll('[part~="item"]'));
+            const nonCurrent = items.filter(
+                (item) => !item.getAttribute('part')?.includes('item--current'),
+            );
+            expect(nonCurrent.length).toBeGreaterThan(0);
+            nonCurrent.forEach((item) => expect(item.getAttribute('part')).toBe('item'));
         });
     });
 
@@ -373,8 +401,8 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination total="-3"></ar-pagination>');
             expect(el.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
 
-            const prevLabel = el.shadowRoot?.querySelector('[part="prev"] .sr-only')?.textContent;
-            const nextLabel = el.shadowRoot?.querySelector('[part="next"] .sr-only')?.textContent;
+            const prevLabel = el.shadowRoot?.querySelector('[part~="prev"] .sr-only')?.textContent;
+            const nextLabel = el.shadowRoot?.querySelector('[part~="next"] .sr-only')?.textContent;
             expect(prevLabel).not.toMatch(/-\d/);
             expect(nextLabel).not.toMatch(/-\d/);
         });

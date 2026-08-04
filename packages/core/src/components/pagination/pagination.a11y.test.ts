@@ -23,10 +23,8 @@ describe('ar-pagination — accessibilité', () => {
         await expect(el).to.be.accessible();
     });
 
-    it('variante "dark" est accessible', async () => {
-        const el = await fixture(
-            html`<ar-pagination current="2" total="5" variant="dark"></ar-pagination>`,
-        );
+    it('avec ellipses (total élevé) est accessible', async () => {
+        const el = await fixture(html`<ar-pagination current="8" total="20"></ar-pagination>`);
         await expect(el).to.be.accessible();
     });
 });
