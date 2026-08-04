@@ -93,7 +93,7 @@ describe('ar-stepper — browser', () => {
 
             // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
             // valeurs viennent uniquement du fallback système CSS4 posé dans
-            // stepper.styles.ts, pas d'un thème.
+            // panel.styles.ts, pas d'un thème.
             expect(computed.backgroundColor).to.not.equal('');
             expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
             expect(computed.borderTopColor).to.not.equal('');
