@@ -3,6 +3,16 @@ import { ArPagination, type ArPaginationPageChangeDetail } from './pagination.js
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './index.js';
 
+/**
+ * Vérifie qu'un token est présent dans l'attribut `part` d'un élément, sans dépendre
+ * de l'ordre de sérialisation. `Element.part` (DOMTokenList) n'est pas supporté par
+ * happy-dom (environnement Vitest de ce projet) : on retombe donc sur un split de
+ * l'attribut plutôt que sur `.part.contains()`.
+ */
+function partContains(el: Element, token: string): boolean {
+    return (el.getAttribute('part') ?? '').split(/\s+/).includes(token);
+}
+
 describe('ArPagination', () => {
     let el: ArPagination;
 
@@ -33,6 +43,48 @@ describe('ArPagination', () => {
 
         it('contient un part="next"', () => {
             expect(getPart(el, 'next')).not.toBeNull();
+        });
+
+        it('contient un part="prev nav-btn" et part="next nav-btn"', () => {
+            expect(partContains(requirePart(el, 'prev'), 'prev')).toBe(true);
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'next')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-btn')).toBe(true);
+        });
+    });
+
+    // ── Slots d'icônes prev/next ─────────────────────────────────────────────
+
+    describe('slots prev-icon / next-icon', () => {
+        beforeEach(async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+        });
+
+        it('contient un slot nommé "prev-icon" et "next-icon"', () => {
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelector('slot[name="prev-icon"]')).not.toBeNull();
+            expect(shadow.querySelector('slot[name="next-icon"]')).not.toBeNull();
+        });
+
+        it('rend un svg par défaut, décoratif (aria-hidden), dans chaque slot', () => {
+            const shadow = el.shadowRoot as ShadowRoot;
+            const prevSvg = shadow.querySelector('slot[name="prev-icon"] svg');
+            const nextSvg = shadow.querySelector('slot[name="next-icon"] svg');
+            expect(prevSvg).not.toBeNull();
+            expect(nextSvg).not.toBeNull();
+            expect(prevSvg?.getAttribute('aria-hidden')).toBe('true');
+            expect(nextSvg?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('un slot prev-icon custom remplace le svg par défaut', async () => {
+            el = await fixture(
+                '<ar-pagination><svg slot="prev-icon" data-custom="true" aria-hidden="true"></svg></ar-pagination>',
+            );
+            const shadow = el.shadowRoot as ShadowRoot;
+            const slotEl = shadow.querySelector('slot[name="prev-icon"]') as HTMLSlotElement;
+            const assigned = slotEl.assignedElements();
+            expect(assigned.length).toBe(1);
+            expect(assigned[0]?.getAttribute('data-custom')).toBe('true');
         });
     });
 
@@ -108,7 +160,10 @@ describe('ArPagination', () => {
 
         it('la page active a aria-current="true"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
-            expect(requirePart(el, 'current').getAttribute('aria-current')).toBe('true');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const current = shadow.querySelector('[part="current"]') as Element;
+            expect(current).not.toBeNull();
+            expect(current.getAttribute('aria-current')).toBe('true');
         });
     });
 
@@ -146,12 +201,54 @@ describe('ArPagination', () => {
             expect(links.length).toBe(4);
         });
 
-        it('ellipses présentes si total >= 10 et current éloigné des bords', async () => {
+        it('ellipses présentes si total >= 10 et current éloigné des bords, avec part="ellipsis"', async () => {
             el = await fixture('<ar-pagination current="6" total="15"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            // Les ellipses ont aria-hidden="true"
-            const ellipses = shadow.querySelectorAll('[aria-hidden="true"]');
+            const ellipses = shadow.querySelectorAll('[part="ellipsis"]');
             expect(ellipses.length).toBeGreaterThanOrEqual(2);
+        });
+    });
+
+    describe("part d'état item--current", () => {
+        it('le <li> de la page active porte part="item item--current"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const currentLi = shadow.querySelector('[part~="item--current"]') as Element;
+            expect(currentLi).not.toBeNull();
+            expect(currentLi.getAttribute('part')).toBe('item item--current');
+        });
+
+        it('les <li> non actifs ne portent que part="item"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const items = Array.from(shadow.querySelectorAll('[part~="item"]'));
+            const nonCurrent = items.filter(
+                (item) => !item.getAttribute('part')?.includes('item--current'),
+            );
+            expect(nonCurrent.length).toBeGreaterThan(0);
+            nonCurrent.forEach((item) => expect(item.getAttribute('part')).toBe('item'));
+        });
+    });
+
+    describe("part d'état nav-btn--disabled", () => {
+        it('prev porte le part nav-btn--disabled en page 1', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(true);
+        });
+
+        it('prev ne porte pas nav-btn--disabled quand current > 1', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(false);
+        });
+
+        it('next porte le part nav-btn--disabled en dernière page', async () => {
+            el = await fixture('<ar-pagination current="5" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(true);
+        });
+
+        it('next ne porte pas nav-btn--disabled avant la dernière page', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(false);
         });
     });
 
@@ -373,8 +470,8 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination total="-3"></ar-pagination>');
             expect(el.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
 
-            const prevLabel = el.shadowRoot?.querySelector('[part="prev"] .sr-only')?.textContent;
-            const nextLabel = el.shadowRoot?.querySelector('[part="next"] .sr-only')?.textContent;
+            const prevLabel = el.shadowRoot?.querySelector('[part~="prev"] .sr-only')?.textContent;
+            const nextLabel = el.shadowRoot?.querySelector('[part~="next"] .sr-only')?.textContent;
             expect(prevLabel).not.toMatch(/-\d/);
             expect(nextLabel).not.toMatch(/-\d/);
         });

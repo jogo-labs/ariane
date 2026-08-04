@@ -319,7 +319,7 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Button
-         * Partagé - breadcrumb, dialog, pagination
+         * Partagé - stepper
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
@@ -399,13 +399,8 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Pagination
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-pagination-active-color: var(--ar-color-interactive);
-        --ar-pagination-color: var(--ar-color-text);
-        --ar-pagination-bg: var(--ar-button-tertiary-bg);
-        --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
-        --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
-        --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
-        --ar-pagination-active-bg: var(--ar-color-bg);
+        --ar-pagination-btn-size: 2.5rem;
+        --ar-pagination-transition-duration: var(--ar-button-transition-duration);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Spinner
@@ -1092,6 +1087,76 @@
                dropdown reste lisible plus étroit qu'un panel de disclosure générique
                (breadcrumb, stepper). */
             min-width: 10rem;
+        }
+    }
+
+    ar-pagination {
+        &::part(list) {
+            column-gap: 0.25rem;
+        }
+
+        &::part(link),
+        &::part(prev),
+        &::part(next) {
+            background-color: var(--ar-button-tertiary-bg);
+            color: var(--ar-color-text);
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(prev),
+        &::part(next) {
+            border-radius: var(--ar-border-radius-xl);
+        }
+
+        &::part(link):hover,
+        &::part(prev):hover,
+        &::part(next):hover {
+            background-color: var(--ar-button-tertiary-bg-hover);
+            color: var(--ar-color-white);
+        }
+
+        &::part(link):active,
+        &::part(prev):active,
+        &::part(next):active {
+            background-color: var(--ar-button-tertiary-bg-active);
+            color: var(--ar-color-white);
+        }
+
+        &::part(link):focus,
+        &::part(prev):focus,
+        &::part(next):focus {
+            background-color: var(--ar-button-tertiary-bg-focus);
+        }
+
+        /* Spécificité égale aux variantes :hover/:active/:focus ci-dessus (pseudo-élément +
+           pseudo-classe) requise pour gagner la cascade : ::part(nav-btn--disabled) seul
+           (spécificité pseudo-élément uniquement) perdrait face à ::part(prev):hover malgré
+           un ordre de déclaration ultérieur. */
+        &::part(nav-btn--disabled),
+        &::part(nav-btn--disabled):hover,
+        &::part(nav-btn--disabled):active,
+        &::part(nav-btn--disabled):focus {
+            background-color: var(--ar-button-disabled-bg);
+            color: var(--ar-button-disabled-color);
+        }
+
+        &::part(current) {
+            background-color: var(--ar-color-bg);
+            color: var(--ar-color-interactive);
+            border: 1px solid var(--ar-color-interactive);
+            font-weight: 700;
+        }
+
+        &::part(ellipsis) {
+            color: var(--ar-color-text-muted);
+            cursor: default;
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(ellipsis) {
+            padding: 0 0.75rem;
         }
     }
 }
