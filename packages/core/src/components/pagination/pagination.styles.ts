@@ -29,7 +29,6 @@ export default css`
         justify-content: center;
         margin: 0 0.125rem;
         padding: 0 0.75rem;
-        border: 1px solid transparent;
         text-decoration: none;
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
         min-height: var(--ar-pagination-btn-size, 2.5rem);
@@ -40,7 +39,10 @@ export default css`
     }
 
     [part~='prev'],
-    [part~='next'] {
+    [part~='next'],
+    [part~='ellipsis'],
+    [part~='current'],
+    [part~='link'] {
         aspect-ratio: 1/1;
         padding: 0;
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
@@ -60,9 +62,7 @@ export default css`
         outline-offset: 2px;
     }
 
-    [part~='prev'][aria-disabled='true'],
-    [part~='next'][aria-disabled='true'] {
-        opacity: 0.5;
+    [part~='nav-btn--disabled'] {
         cursor: not-allowed;
     }
 

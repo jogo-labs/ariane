@@ -399,8 +399,6 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Pagination
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-pagination-color: var(--ar-color-text);
-        --ar-pagination-bg: var(--ar-button-tertiary-bg);
         --ar-pagination-btn-size: 2.5rem;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1095,21 +1093,29 @@
         &::part(link),
         &::part(prev),
         &::part(next) {
-            border-radius: 0.75rem;
-            background-color: var(--ar-pagination-bg);
-            color: var(--ar-pagination-color);
+            background-color: var(--ar-button-tertiary-bg);
+            color: var(--ar-color-text);
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(prev),
+        &::part(next) {
+            border-radius: var(--ar-border-radius-xl);
         }
 
         &::part(link):hover,
         &::part(prev):hover,
         &::part(next):hover {
             background-color: var(--ar-button-tertiary-bg-hover);
+            color: var(--ar-color-white);
         }
 
         &::part(link):active,
         &::part(prev):active,
         &::part(next):active {
             background-color: var(--ar-button-tertiary-bg-active);
+            color: var(--ar-color-white);
         }
 
         &::part(link):focus,
@@ -1126,13 +1132,14 @@
         &::part(nav-btn--disabled):hover,
         &::part(nav-btn--disabled):active,
         &::part(nav-btn--disabled):focus {
-            background-color: var(--ar-pagination-bg);
+            background-color: var(--ar-button-disabled-bg);
+            color: var(--ar-button-disabled-color);
         }
 
         &::part(current) {
             background-color: var(--ar-color-bg);
             color: var(--ar-color-interactive);
-            border-color: var(--ar-color-interactive);
+            border: 1px solid var(--ar-color-interactive);
             font-weight: 700;
         }
 
