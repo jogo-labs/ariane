@@ -60,14 +60,12 @@ export default css`
         align-items: center;
         justify-content: center;
         margin: 0 0.125rem;
-        /* a11y-fallback: sans thème chargé, l'ellipse perdrait l'alignement vertical avec les items interactifs adjacents (WCAG 2.5.8) */
-        min-height: var(--ar-pagination-btn-size, 2.5rem);
     }
 
-    @media only screen and (max-width: 640px) {
-        [part='item']:not([part~='item--current']):not([aria-hidden='true']):not(:first-child):not(
-                :last-child
-            ):not(:nth-child(2)):not(:nth-last-child(2)) {
+    @media (max-width: 640px) {
+        [part='item']:nth-child(n + 3):nth-last-child(n + 3):not([part~='item--current']):not(
+                [aria-hidden='true']
+            ) {
             display: none;
         }
     }
