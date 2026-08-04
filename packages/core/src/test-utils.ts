@@ -58,7 +58,7 @@ export async function waitForUpdate(el: Element): Promise<void> {
  * Pour les assertions positives avec chaînage, préférer `requirePart`.
  */
 export function getPart(el: Element, part: string): Element | null {
-    return el.shadowRoot?.querySelector(`[part="${part}"]`) ?? null;
+    return el.shadowRoot?.querySelector(`[part~="${part}"]`) ?? null;
 }
 
 /**
@@ -79,7 +79,7 @@ export function requireShadow(el: Element): ShadowRoot {
 }
 
 export function requirePart(el: Element, part: string): Element {
-    const found = el.shadowRoot?.querySelector(`[part="${part}"]`);
+    const found = el.shadowRoot?.querySelector(`[part~="${part}"]`);
     if (!found)
         throw new Error(`Part "${part}" not found in shadow DOM of <${el.tagName.toLowerCase()}>`);
     return found;
