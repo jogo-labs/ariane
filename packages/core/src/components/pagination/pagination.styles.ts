@@ -15,8 +15,8 @@ export default css`
         list-style: none;
     }
 
-    [part='prev'],
-    [part='next'],
+    [part~='prev'],
+    [part~='next'],
     [part='link'],
     [part='current'] {
         display: inline-flex;
@@ -34,23 +34,23 @@ export default css`
             border-color 0.15s;
     }
 
-    [part='prev'],
-    [part='next'] {
+    [part~='prev'],
+    [part~='next'] {
         aspect-ratio: 1/1;
         padding: 0;
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
         min-width: var(--ar-pagination-btn-size, 2.5rem);
     }
 
-    [part='prev']:focus-visible,
-    [part='next']:focus-visible,
+    [part~='prev']:focus-visible,
+    [part~='next']:focus-visible,
     [part='link']:focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 2px;
     }
 
-    [part='prev'][aria-disabled='true'],
-    [part='next'][aria-disabled='true'] {
+    [part~='prev'][aria-disabled='true'],
+    [part~='next'][aria-disabled='true'] {
         opacity: 0.5;
         cursor: not-allowed;
     }
