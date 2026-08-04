@@ -3,6 +3,10 @@
 **Date :** 2026-08-03
 **Statut :** Brouillon — à valider avant plan
 
+**Amendement (commit `efda33b`)** : la « Technique 2 » (`::part(panel)`) décrite ci-dessous a été
+retirée lors d'une réécriture manuelle du rendu — cette section documente désormais uniquement la
+surcharge de token scopée. Conservé ci-dessous pour l'historique de la décision initiale.
+
 ## Contexte
 
 `packages/core/src/styles/shared/panel.styles.ts` est une feuille de style partagée, importée via
