@@ -389,10 +389,6 @@
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
         --ar-stepper-toggle-bg: var(--ar-color-white);
-        --ar-stepper-toggle-bg-hover: var(--ar-color-neutral-40);
-        --ar-stepper-toggle-bg-pressed: var(--ar-color-neutral-30);
-        --ar-stepper-toggle-color: var(--ar-color-text);
-        --ar-stepper-toggle-color-pressed: var(--ar-color-white);
         --ar-stepper-toggle-transition-duration: 0.15s;
         --ar-stepper-toggle-min-size: 2.5rem;
 
@@ -875,22 +871,22 @@
     ar-stepper {
         &::part(trigger) {
             border-radius: var(--ar-border-radius-xl);
-            color: var(--ar-stepper-toggle-color);
+            color: var(--ar-color-text);
         }
 
         &::part(trigger):hover {
-            background-color: var(--ar-stepper-toggle-bg-hover);
-            color: var(--ar-stepper-toggle-color-pressed);
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
         }
 
         &::part(trigger):active:not(:disabled) {
-            background-color: var(--ar-stepper-toggle-bg-pressed);
-            color: var(--ar-stepper-toggle-color-pressed);
+            background-color: var(--ar-color-neutral-30);
+            color: var(--ar-color-white);
         }
 
         &::part(trigger):focus-visible {
-            background-color: var(--ar-stepper-toggle-bg-hover);
-            color: var(--ar-stepper-toggle-color-pressed);
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
             outline: 2px solid var(--ar-focus-ring-color);
             outline-offset: var(--ar-focus-ring-offset);
         }
