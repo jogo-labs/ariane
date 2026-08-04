@@ -60,6 +60,7 @@ export default css`
         align-items: center;
         justify-content: center;
         margin: 0 0.125rem;
+        /* a11y-fallback: sans thème chargé, l'ellipse perdrait l'alignement vertical avec les items interactifs adjacents (WCAG 2.5.8) */
         min-height: var(--ar-pagination-btn-size, 2.5rem);
     }
 
