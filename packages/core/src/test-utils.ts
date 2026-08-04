@@ -62,21 +62,14 @@ export async function waitForUpdate(el: Element): Promise<void> {
  * sur les espaces. Chercher un token court qui est aussi le suffixe d'un autre part
  * de l'arbre (ex. `"current"` alors que `"item--current"` existe) peut donc donner
  * un faux positif dans les tests, alors qu'un vrai navigateur ne matcherait pas.
- * Toujours passer un seul token exact, jamais une chaîne à espaces (voir bug corrigé
- * dans pagination.test.ts / datepicker.test.ts sur cette branche).
+ * Toujours passer un seul token exact, jamais une chaîne à espaces (un appel
+ * multi-mots ne matche jamais rien selon la spec `~=`, mais peut passer à tort
+ * sous happy-dom).
  */
 export function getPart(el: Element, part: string): Element | null {
     return el.shadowRoot?.querySelector(`[part~="${part}"]`) ?? null;
 }
 
-/**
- * Retourne un élément du Shadow DOM ciblé par son attribut `part="…"`.
- * Lance une erreur de test si le part est absent.
- *
- * Utiliser quand le part est censé exister et qu'on veut enchaîner des
- * appels dessus (`.getAttribute`, `.classList`, `.click()`, etc.)
- * sans avoir à gérer le cas `null` dans chaque assertion.
- */
 /**
  * Retourne le shadowRoot d'un élément.
  * Lance une erreur de test si le shadowRoot est absent.
@@ -86,6 +79,16 @@ export function requireShadow(el: Element): ShadowRoot {
     return el.shadowRoot;
 }
 
+/**
+ * Retourne un élément du Shadow DOM ciblé par son attribut `part="…"`.
+ * Lance une erreur de test si le part est absent.
+ *
+ * Utiliser quand le part est censé exister et qu'on veut enchaîner des
+ * appels dessus (`.getAttribute`, `.classList`, `.click()`, etc.)
+ * sans avoir à gérer le cas `null` dans chaque assertion.
+ *
+ * ⚠️ Même mise en garde `~=`/happy-dom que `getPart` — toujours un seul token exact.
+ */
 export function requirePart(el: Element, part: string): Element {
     const found = el.shadowRoot?.querySelector(`[part~="${part}"]`);
     if (!found)

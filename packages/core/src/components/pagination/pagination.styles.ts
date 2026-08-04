@@ -15,7 +15,7 @@ export default css`
         list-style: none;
     }
 
-    [part='item'] {
+    [part~='item'] {
         display: flex;
         align-items: center;
     }
