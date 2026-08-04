@@ -31,8 +31,6 @@ export type ArDropdownPlacement =
  *
  * @csspart panel - Le panel flottant. Le thème par défaut pilote `border-radius`, `box-shadow`, `padding`, `min-width` et `max-width` via `ar-dropdown::part(panel)` ; `background-color`, `border-color` et `color` restent eux aussi overridables via `::part(panel)` par un consommateur, mais ne sont pas redéfinis par le thème par défaut.
  *
- * @cssprop --ar-dropdown-bg - Fond du panel (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
- * @cssprop --ar-dropdown-border-color - Bordure (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-dropdown-distance - Espacement entre le trigger et le panel (axe principal).
  * @cssprop --ar-dropdown-offset - Décalage latéral du panel (axe transversal).
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.

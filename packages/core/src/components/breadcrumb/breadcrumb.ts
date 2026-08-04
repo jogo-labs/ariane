@@ -47,8 +47,6 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
  * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
- * @cssprop --ar-breadcrumb-panel-bg - Fond du panel mobile (cascade vers --ar-panel-bg, repli système `Canvas` si aucun thème n'est chargé).
- * @cssprop --ar-breadcrumb-panel-border-color - Couleur de bordure du panel mobile (cascade vers --ar-panel-border-color, repli système `ButtonBorder` si aucun thème n'est chargé).
  * @cssprop --ar-breadcrumb-toggle-bg - Fond du bouton retour/trigger mobile.
  * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
  * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
