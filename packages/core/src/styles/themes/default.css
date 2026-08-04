@@ -319,7 +319,7 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Button
-         * Partagé - breadcrumb, dialog, pagination
+         * Partagé - stepper
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
@@ -399,13 +399,9 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Pagination
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-pagination-active-color: var(--ar-color-interactive);
         --ar-pagination-color: var(--ar-color-text);
         --ar-pagination-bg: var(--ar-button-tertiary-bg);
-        --ar-pagination-bg-hover: var(--ar-button-tertiary-bg-hover);
-        --ar-pagination-bg-pressed: var(--ar-button-tertiary-bg-active);
-        --ar-pagination-bg-focus: var(--ar-button-tertiary-bg-focus);
-        --ar-pagination-active-bg: var(--ar-color-bg);
+        --ar-pagination-btn-size: 2.5rem;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Spinner
@@ -1092,6 +1088,46 @@
                dropdown reste lisible plus étroit qu'un panel de disclosure générique
                (breadcrumb, stepper). */
             min-width: 10rem;
+        }
+    }
+
+    ar-pagination {
+        &::part(link),
+        &::part(prev),
+        &::part(next) {
+            border-radius: 0.75rem;
+            background-color: var(--ar-pagination-bg);
+            color: var(--ar-pagination-color);
+        }
+
+        &::part(link):hover,
+        &::part(prev):hover,
+        &::part(next):hover {
+            background-color: var(--ar-button-tertiary-bg-hover);
+        }
+
+        &::part(link):active,
+        &::part(prev):active,
+        &::part(next):active {
+            background-color: var(--ar-button-tertiary-bg-active);
+        }
+
+        &::part(link):focus,
+        &::part(prev):focus,
+        &::part(next):focus {
+            background-color: var(--ar-button-tertiary-bg-focus);
+        }
+
+        &::part(current) {
+            background-color: var(--ar-color-bg);
+            color: var(--ar-color-interactive);
+            border-color: var(--ar-color-interactive);
+            font-weight: 700;
+        }
+
+        &::part(ellipsis) {
+            color: var(--ar-color-text-muted);
+            cursor: default;
         }
     }
 }
