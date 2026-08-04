@@ -126,6 +126,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 - **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
 - **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. **Le texte du hint par défaut ne suit pas `locale`** (contrairement aux noms de mois/jours) : dans une interface non francophone, fournir un slot `hint` traduit.
 - **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
+- **Focus des jours** : l'indicateur de focus visible sur la grille (<WcagRef criterion="2.4.7" summary="Focus Visible : le composant recevant le focus clavier doit être visuellement identifiable." />) est porté par `--ar-datepicker-day-focus-ring-color`/`-width`/`-offset`, avec leurs propres replis. `--ar-datepicker-day-focus-border-color` est un token distinct, purement cosmétique — il ne garantit rien à lui seul. Un consommateur qui personnalise l'apparence du focus sans conserver l'anneau (en s'appuyant uniquement sur cette bordure) est responsable du contraste de son propre design.
 
 ## Utilisation
 
