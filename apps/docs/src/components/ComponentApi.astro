@@ -18,6 +18,9 @@ const { component } = Astro.props;
 const publicMethods = (component.members ?? []).filter(
     (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
 );
+
+const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
+const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
 ---
 
 <div class="component-api">
@@ -147,8 +150,50 @@ const publicMethods = (component.members ?? []).filter(
         </section>
     )}
 
-    {/* ── CSS Custom Properties ── */}
-    {component.cssProperties && component.cssProperties.length > 0 && (
+    {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
+    {panelProps.length > 0 && (
+        <section>
+            <h4 id="api-panel-tokens" class="subsection-title">Tokens du panel partagé</h4>
+            <p class="hint">
+                Ce composant utilise un panel flottant partagé avec d'autres composants de la
+                librairie. Deux techniques de personnalisation sont possibles : redéfinir un ou
+                plusieurs tokens ci-dessous, scopés à ce composant uniquement (n'affecte pas les
+                autres consommateurs du panel partagé), ou surcharger n'importe quelle propriété
+                CSS via <code>::part(panel)</code>, sans passer par les tokens — utile pour une
+                propriété que le thème par défaut ne tokenise pas, ou pour un changement plus
+                large que ce que les tokens exposent.
+            </p>
+            <div class="code-block">
+                <p class="code-caption">Technique 1 — token scopé au composant :</p>
+                <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-bg: #fff;\n}`}</code></pre>
+            </div>
+            <div class="code-block">
+                <p class="code-caption">Technique 2 — <code>::part(panel)</code> :</p>
+                <pre><code class="language-css">{`${component.tagName}::part(panel) {\n    background-color: #fff;\n}`}</code></pre>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {panelProps.map((prop) => (
+                            <tr>
+                                <td><code>{prop.name}</code></td>
+                                <td>{prop.description ?? ''}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    )}
+
+    {/* ── CSS Custom Properties propres au composant ── */}
+    {ownProps.length > 0 && (
         <section>
             <h4 id="api-css-props" class="subsection-title">CSS Custom Properties</h4>
             <div class="table-wrap">
@@ -160,7 +205,7 @@ const publicMethods = (component.members ?? []).filter(
                         </tr>
                     </thead>
                     <tbody>
-                        {component.cssProperties.map((prop) => (
+                        {ownProps.map((prop) => (
                             <tr>
                                 <td><code>{prop.name}</code></td>
                                 <td>{prop.description ?? ''}</td>
@@ -213,5 +258,34 @@ const publicMethods = (component.members ?? []).filter(
         font-size:     0.875rem;
         color:         var(--doc-text-muted);
         margin-bottom: 0.75rem;
+    }
+
+    .code-block {
+        margin-bottom: 1rem;
+    }
+
+    .code-caption {
+        font-size:     0.875rem;
+        color:         var(--doc-text-muted);
+        margin-bottom: 0.375rem;
+    }
+
+    .code-block pre {
+        margin:         0;
+        padding:        1rem 1.25rem;
+        overflow-x:     auto;
+        border-radius:  0.5rem;
+        font-family:    'Fira Code', 'Cascadia Code', monospace;
+        font-size:      0.8rem;
+        line-height:    1.6;
+        background:     var(--doc-code-block-bg);
+    }
+
+    .code-block pre code {
+        font-family: inherit;
+        font-size:   inherit;
+        padding:     0;
+        background:  transparent;
+        color:       #cdd6f4;
     }
 </style>
