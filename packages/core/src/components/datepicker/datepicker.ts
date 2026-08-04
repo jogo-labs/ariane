@@ -63,12 +63,12 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-day-focus-ring-color - Couleur du focus ring des jours. Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-day-focus-ring-width - Épaisseur du focus ring des jours.
  * @cssprop --ar-datepicker-day-focus-ring-offset - Décalage du focus ring des jours.
+ * @cssprop --ar-datepicker-day-focus-border-color - Couleur de bordure de la cellule jour en focus (roving tabindex). Repli transparent si aucun thème n'est chargé. Purement cosmétique : l'indicateur de focus visible (WCAG 2.4.7) reste garanti indépendamment par --ar-datepicker-day-focus-ring-color/-width/-offset. Dans le thème fourni, reprend --ar-panel-bg pour fondre la bordure dans le fond du panel ; un consommateur qui s'appuierait uniquement sur cette bordure (sans l'anneau) pour son propre design de focus est responsable du contraste WCAG 2.4.7.
  * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné. Repli `Highlight` si aucun thème n'est chargé (sinon indiscernable des jours non sélectionnés).
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-panel-bg - Couleur de bordure de la cellule jour focusée dans la grille (contraste avec l'anneau de focus). Le popover pilote son fond réel via ce token (panelStyles) ; référencer --ar-color-bg directement casserait ce cutout pour un consommateur ne surchargeant que --ar-panel-bg.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).

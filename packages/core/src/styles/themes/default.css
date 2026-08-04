@@ -545,6 +545,7 @@
         --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
         --ar-datepicker-day-focus-ring-width: 2px;
         --ar-datepicker-day-focus-ring-offset: 0;
+        --ar-datepicker-day-focus-border-color: var(--ar-panel-bg);
         --ar-datepicker-day-border-color: transparent;
         --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-bg: transparent;
