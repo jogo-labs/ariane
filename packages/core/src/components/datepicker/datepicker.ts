@@ -69,6 +69,15 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-radius - Rayon de bordure du panel partagé.
+ * @cssprop --ar-panel-shadow - Ombre portée du panel partagé.
+ * @cssprop --ar-panel-padding - Espacement interne du panel partagé.
+ * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
+ * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
+ * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
