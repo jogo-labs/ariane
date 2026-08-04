@@ -98,13 +98,6 @@ export default css`
         position: relative;
     }
 
-    /* ── Panel flottant mobile ───────────────────────────────── */
-
-    [part='panel'] {
-        background-color: var(--ar-breadcrumb-panel-bg, Canvas);
-        border-color: var(--ar-breadcrumb-panel-border-color, ButtonBorder);
-    }
-
     /* ── Boutons home/trigger mobile (découplés de button.styles.ts) ────── */
 
     [part='home'],
