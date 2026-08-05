@@ -6,7 +6,7 @@
  *   - API Popover native (showPopover / hidePopover / :popover-open)
  *   - Chargement initial en mode mobile (régression : attach différé)
  */
-import { fixture, html, expect, aTimeout } from '@open-wc/testing';
+import { fixture, html, expect, aTimeout, elementUpdated } from '@open-wc/testing';
 import type { ArStepper } from './stepper.js';
 import './index.js';
 import '../stepper-item/index.js';
@@ -99,6 +99,39 @@ describe('ar-stepper — browser', () => {
             expect(computed.borderTopColor).to.not.equal('');
             expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
             expect(computed.borderTopWidth).to.equal('1px');
+        });
+    });
+
+    describe('focus après activation (#154)', () => {
+        it('focalise le nouvel élément courant quand le consommateur répond à ar-stepper-step-change', async () => {
+            // desktop-from="0" force le mode desktop : évite le chemin mobile (attach du
+            // popover de navigation), qui ré-exécute `void this.updateComplete.then(...)`
+            // sur chaque cycle tant que le dropdown n'est pas attaché — un pattern
+            // réentrant équivalent à celui corrigé pour le focus (#154), non lié au
+            // scénario testé ici. Le forcer en desktop isole le comportement vérifié.
+            el = await fixture<ArStepper>(html`
+                <ar-stepper current-path="/b" desktop-from="0">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await elementUpdated(el);
+            await elementUpdated(el);
+
+            el.addEventListener('ar-stepper-step-change', (event: Event) => {
+                el.currentPath = (event as CustomEvent<{ path: string }>).detail.path;
+            });
+
+            const shadowRoot = el.shadowRoot as ShadowRoot;
+            const linkA = shadowRoot.querySelector('a[data-path="/a"]') as HTMLElement;
+            linkA.focus();
+            linkA.click();
+            await elementUpdated(el);
+
+            const newCurrent = shadowRoot.querySelector('[data-path="/a"]') as HTMLElement;
+            expect(newCurrent.tagName.toLowerCase()).to.equal('div');
+            expect(shadowRoot.activeElement).to.equal(newCurrent);
+            expect(newCurrent.matches(':focus-visible')).to.equal(true);
         });
     });
 });
