@@ -89,11 +89,11 @@ export default css`
                 box-shadow: none;
             }
         }
+    }
 
-        &:focus {
-            outline-offset: 4px;
-            outline-color: var(--ar-stepper-link-focus-outline-color);
-        }
+    .item-header:focus-visible {
+        outline-offset: 4px;
+        outline-color: var(--ar-stepper-link-focus-outline-color);
     }
 
     .current > .item-header {

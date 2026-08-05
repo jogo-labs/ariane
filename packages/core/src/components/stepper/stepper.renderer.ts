@@ -84,7 +84,7 @@ function renderSubStep(
                       </a>
                   `
                 : html`
-                      <div class="item-header">
+                      <div class="item-header" data-path=${sub.path} tabindex="-1">
                           ${renderStepText(sub.label, order, isCurrent, true)}
                       </div>
                   `}
@@ -123,7 +123,9 @@ function renderStep(
                       </a>
                   `
                 : html`
-                      <div class="item-header">${renderStepText(step.label, order, isCurrent)}</div>
+                      <div class="item-header" data-path=${step.path} tabindex="-1">
+                          ${renderStepText(step.label, order, isCurrent)}
+                      </div>
                   `}
             ${(isCurrent || mode === 'edit') && step.children.length
                 ? html`

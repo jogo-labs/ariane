@@ -155,6 +155,7 @@ export class ArStepper extends LitElement {
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
     private _dropdownAttached = false;
+    private _pendingFocusPath: string | undefined;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -254,6 +255,12 @@ export class ArStepper extends LitElement {
                 });
             }
         }
+        if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
+            this.shadowRoot
+                ?.querySelector<HTMLElement>(`[data-path="${this._pendingFocusPath}"]`)
+                ?.focus();
+        }
+        this._pendingFocusPath = undefined;
     }
 
     private _attachDropdown(): boolean {
@@ -452,6 +459,8 @@ export class ArStepper extends LitElement {
         const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
         if (!path) return;
 
+        this._pendingFocusPath = path;
+
         const node = this.navigation.tree
             .flatMap((s) => [s, ...s.children])
             .find((s) => s.path === path);
@@ -470,6 +479,13 @@ export class ArStepper extends LitElement {
         this.dispatchEvent(
             new CustomEvent('ar-stepper-step-change', { bubbles: true, composed: true, detail }),
         );
+
+        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
+        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
+        // fenêtre "un seul cycle" même si le consommateur ignore l'event. Placé après le
+        // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
+        // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
+        this.requestUpdate();
 
         announceA11y(node?.label ?? path, 'polite');
     };

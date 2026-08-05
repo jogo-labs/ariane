@@ -362,6 +362,117 @@ describe('ArStepper', () => {
         });
     });
 
+    // ── Focus après activation (#154) ───────────────────────────────────────
+
+    describe("focus après activation d'un lien", () => {
+        it("porte data-path sur le <div> de remplacement de l'étape courante", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const currentHeader = requireQuery<HTMLDivElement>(
+                shadow(el),
+                'li.item.current > .item-header',
+            );
+            expect(currentHeader.tagName.toLowerCase()).toBe('div');
+            expect(currentHeader.getAttribute('data-path')).toBe('/b');
+        });
+
+        it("focalise le <div> de l'étape cliquée quand le consommateur répond en mettant à jour currentPath", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            linkA.click();
+
+            // Le composant est contrôlé : le consommateur répond à l'event en réassignant
+            // currentPath (pattern déjà utilisé par les tests existants du fichier).
+            el.currentPath = '/a';
+            await waitForUpdate(el);
+
+            const newCurrentHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a"]');
+            expect(newCurrentHeader?.tagName.toLowerCase()).toBe('div');
+            expect(shadow(el).activeElement).toBe(newCurrentHeader);
+            expect(newCurrentHeader?.getAttribute('tabindex')).toBe('-1');
+        });
+
+        it('ne vole pas le focus si currentPath change sans rapport avec le dernier clic (ex. scroll-follow)', async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/a" follow-scroll>
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            // Simule un changement de currentPath déclenché par le scroll-follow, sans clic
+            // préalable sur aucun lien.
+            el.currentPath = '/b';
+            await waitForUpdate(el);
+
+            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/b"]'));
+        });
+
+        it("n'affecte plus le focus au cycle de rendu suivant un clic (fenêtre bornée à un seul cycle)", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/c">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                        <ar-stepper-item path="/c" label="Étape C"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            linkA.click();
+
+            // Le consommateur ignore l'event (currentPath ne change pas tout de suite) puis,
+            // un cycle plus tard, une cause sans rapport (scroll-follow) amène sur /a.
+            await waitForUpdate(el);
+            el.currentPath = '/a';
+            await waitForUpdate(el);
+
+            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/a"]'));
+        });
+
+        it('focalise le <div> de la SOUS-étape cliquée, pas celui du step parent (les deux deviennent .item.current simultanément via isGroupCurrent())', async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/a/2">
+                        <ar-stepper-item path="/a" label="Étape A">
+                            <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                            <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                        </ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            // /a/1 est complétée (avant la sous-étape courante /a/2) : rendue comme lien cliquable.
+            const linkSub1 = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a/1"]');
+            linkSub1.click();
+
+            // Le consommateur répond en mettant à jour currentPath vers la sous-étape cliquée.
+            el.currentPath = '/a/1';
+            await waitForUpdate(el);
+
+            // isGroupCurrent() fait que le step parent /a ET la sous-étape /a/1 sont
+            // simultanément .item.current — un sélecteur par classe seule matcherait les deux.
+            const currentItems = shadow(el).querySelectorAll('li.item.current');
+            expect(currentItems.length).toBe(2);
+
+            const subStepHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a/1"]');
+            expect(subStepHeader?.tagName.toLowerCase()).toBe('div');
+            expect(shadow(el).activeElement).toBe(subStepHeader);
+
+            const parentHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a"]');
+            expect(shadow(el).activeElement).not.toBe(parentHeader);
+        });
+    });
+
     // ── Téléportation ─────────────────────────────────────────────────────────
 
     describe('téléportation', () => {

@@ -6,6 +6,7 @@ import resetStyles from '../../styles/components/reset.styles.js';
 import styles from './pagination.styles.js';
 import { _calculatePages, _clamp } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
+import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
@@ -177,7 +178,12 @@ export class ArPagination extends LitElement {
     /** Génère le lien ou le span (si page active) d'une page */
     protected renderPageLink(page: number, active: boolean): TemplateResult {
         if (active) {
-            return html` <span part="current" aria-current="true" data-ar-pagination-page="${page}">
+            return html` <span
+                part="current"
+                tabindex="-1"
+                aria-current="true"
+                data-ar-pagination-page="${page}"
+            >
                 ${this.renderPageLabel(page)}
             </span>`;
         }
@@ -215,6 +221,7 @@ export class ArPagination extends LitElement {
         this.current = parseInt(page);
         this._emit({ from, to: this.current });
         this._announcePageChange();
+        void focusAfterUpdate(this, '[part~="current"]');
     }
 
     private _emit(detail: ArPaginationPageChangeDetail): void {
