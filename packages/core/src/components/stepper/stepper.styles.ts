@@ -16,6 +16,7 @@ export default css`
     }
 
     [part='trigger'] {
+        font: inherit;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -24,9 +25,11 @@ export default css`
         text-align: left;
         border: none;
         cursor: pointer;
-        font: inherit;
         background-color: var(--ar-stepper-toggle-bg);
-        transition: background-color var(--ar-stepper-toggle-transition-duration);
+        transition:
+            background-color var(--ar-stepper-toggle-transition-duration),
+            color var(--ar-stepper-toggle-transition-duration),
+            border-color var(--ar-stepper-toggle-transition-duration);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
         min-height: var(--ar-stepper-toggle-min-size, 2.5rem);
     }

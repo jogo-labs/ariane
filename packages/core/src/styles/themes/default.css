@@ -871,6 +871,8 @@
     ar-stepper {
         &::part(trigger) {
             border-radius: var(--ar-border-radius-xl);
+            border: 1px solid var(--ar-color-neutral-40);
+            font-weight: 500;
             color: var(--ar-color-text);
         }
 
@@ -881,6 +883,7 @@
 
         &::part(trigger):active:not(:disabled) {
             background-color: var(--ar-color-neutral-30);
+            border-color: transparent;
             color: var(--ar-color-white);
         }
 
