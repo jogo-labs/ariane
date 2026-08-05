@@ -15,7 +15,6 @@ import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
-import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
@@ -257,7 +256,9 @@ export class ArStepper extends LitElement {
             }
         }
         if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
-            void focusAfterUpdate(this, `[data-path="${this._pendingFocusPath}"]`);
+            this.shadowRoot
+                ?.querySelector<HTMLElement>(`[data-path="${this._pendingFocusPath}"]`)
+                ?.focus();
         }
         this._pendingFocusPath = undefined;
     }
