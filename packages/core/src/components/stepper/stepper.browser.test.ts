@@ -103,7 +103,13 @@ describe('ar-stepper — browser', () => {
     });
 
     describe('focus après activation (#154)', () => {
-        it('focalise le nouvel élément courant quand le consommateur répond à ar-stepper-step-change', async () => {
+        // Vérifie que le focus atterrit sur le nouvel élément data-path courant et que
+        // :focus-visible matche après un focus() + click() programmatiques, quand le
+        // consommateur répond à ar-stepper-step-change. Ne vérifie PAS l'ordre de
+        // tabulation réel ni la distinction clavier/souris — nécessiterait
+        // @web/test-runner-commands (sendKeys/sendMouse), non installé, hors scope de ce
+        // correctif.
+        it('focalise le nouvel élément data-path courant et :focus-visible matche après activation', async () => {
             // desktop-from="0" force le mode desktop : évite le chemin mobile (attach du
             // popover de navigation), qui ré-exécute `void this.updateComplete.then(...)`
             // sur chaque cycle tant que le dropdown n'est pas attaché — un pattern

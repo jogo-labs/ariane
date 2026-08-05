@@ -3,7 +3,7 @@
  * pagination.browser.test.ts
  *
  * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
- *   - Continuité du focus clavier après activation d'un lien de page (#154),
+ *   - Focus + :focus-visible après activation d'un lien de page (#154),
  *     vérifiable uniquement avec un vrai `:focus-visible` (absent de happy-dom).
  */
 import { fixture, html, expect, elementUpdated } from '@open-wc/testing';
@@ -11,7 +11,12 @@ import './index.js';
 
 describe('ar-pagination — browser', () => {
     describe('focus après activation (#154)', () => {
-        it("un Tab après activation clavier d'un lien de page continue depuis le nouvel élément courant", async () => {
+        // Vérifie que le focus atterrit sur le nouvel élément part="current" et que
+        // :focus-visible matche après un focus() + click() programmatiques. Ne vérifie PAS
+        // l'ordre de tabulation réel ni la distinction clavier/souris — nécessiterait
+        // @web/test-runner-commands (sendKeys/sendMouse), non installé, hors scope de ce
+        // correctif.
+        it('focalise le nouvel élément part="current" et :focus-visible matche après activation', async () => {
             const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
             const shadowRoot = el.shadowRoot as ShadowRoot;
             const pageLink = shadowRoot.querySelector(

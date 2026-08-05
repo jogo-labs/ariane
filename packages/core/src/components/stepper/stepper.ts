@@ -460,10 +460,6 @@ export class ArStepper extends LitElement {
         if (!path) return;
 
         this._pendingFocusPath = path;
-        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
-        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
-        // fenêtre "un seul cycle" même si le consommateur ignore l'event.
-        this.requestUpdate();
 
         const node = this.navigation.tree
             .flatMap((s) => [s, ...s.children])
@@ -483,6 +479,13 @@ export class ArStepper extends LitElement {
         this.dispatchEvent(
             new CustomEvent('ar-stepper-step-change', { bubbles: true, composed: true, detail }),
         );
+
+        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
+        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
+        // fenêtre "un seul cycle" même si le consommateur ignore l'event. Placé après le
+        // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
+        // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
+        this.requestUpdate();
 
         announceA11y(node?.label ?? path, 'polite');
     };

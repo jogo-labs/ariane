@@ -180,7 +180,7 @@ export class ArPagination extends LitElement {
         if (active) {
             return html` <span
                 part="current"
-                tabindex=${'-1'}
+                tabindex="-1"
                 aria-current="true"
                 data-ar-pagination-page="${page}"
             >

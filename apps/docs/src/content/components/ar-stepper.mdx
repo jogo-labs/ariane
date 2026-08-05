@@ -89,6 +89,11 @@ import WcagRef from '../../components/WcagRef.astro';
 - **Les items sans `href` ne sont pas des liens.** Un item sans destination est rendu comme
   un élément non interactif — ne pas en faire la cible de `current-path` si l'utilisateur
   doit pouvoir y naviguer.
+- **Mettre à jour `current-path` de façon synchrone (ou quasi-synchrone) dans le handler de
+  `ar-stepper-step-change`.** Le focus n'est restauré sur la nouvelle étape courante que si
+  cette mise à jour arrive dans le même tick microtask que l'event (cas des frameworks
+  synchrones ou quasi-synchrones, ex. `nextTick` de Vue) — sinon le focus n'est pas restauré,
+  silencieusement.
 
 ## Comportement responsive
 
