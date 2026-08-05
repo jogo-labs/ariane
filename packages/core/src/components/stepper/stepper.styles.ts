@@ -10,22 +10,11 @@ export default css`
         display: flex;
     }
 
-    .btn-content {
-        margin-right: 1rem;
-        gap: 0.25rem;
-    }
-
     [part='trigger'] {
-        font: inherit;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem 0.75rem;
+        align-items: flex-start;
+        flex-direction: column;
         line-height: normal;
-        text-align: left;
-        border: none;
-        cursor: pointer;
-        background-color: var(--ar-stepper-toggle-bg);
         transition:
             background-color var(--ar-stepper-toggle-transition-duration),
             color var(--ar-stepper-toggle-transition-duration),

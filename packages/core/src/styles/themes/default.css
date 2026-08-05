@@ -388,7 +388,6 @@
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
-        --ar-stepper-toggle-bg: var(--ar-color-white);
         --ar-stepper-toggle-transition-duration: 0.15s;
         --ar-stepper-toggle-min-size: 2.5rem;
 
@@ -594,9 +593,6 @@
         --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
         --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
 
-        /* Stepper — surface adaptée au fond sombre */
-        --ar-stepper-toggle-bg: var(--ar-color-neutral-30);
-
         /* Breadcrumb — surfaces adaptées au fond sombre */
         --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
         --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
@@ -661,9 +657,6 @@
             --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
             --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
             --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
-
-            /* Stepper — surface adaptée au fond sombre */
-            --ar-stepper-toggle-bg: var(--ar-color-neutral-30);
 
             /* Breadcrumb — surfaces adaptées au fond sombre */
             --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
@@ -872,8 +865,11 @@
         &::part(trigger) {
             border-radius: var(--ar-border-radius-xl);
             border: 1px solid var(--ar-color-neutral-40);
+            padding: 0.5rem 0.75rem;
             font-weight: 500;
             color: var(--ar-color-text);
+            gap: 0.25rem;
+            background-color: var(--ar-color-bg-subtle);
         }
 
         &::part(trigger):hover {

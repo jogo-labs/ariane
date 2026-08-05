@@ -189,10 +189,8 @@ export function renderMobile(
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span class="btn-content d-inline-flex flex-column">
-                    <span> Étape ${ctx.currentStepIndex + 1} / ${steps.length} (en cours) </span>
-                    <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
-                </span>
+                <span> Étape ${ctx.currentStepIndex + 1} / ${steps.length} (en cours) </span>
+                <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
             </button>
 
             <div id="stepper-dropdown-menu" part="panel">
