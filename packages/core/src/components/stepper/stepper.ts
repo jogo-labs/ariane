@@ -155,7 +155,7 @@ export class ArStepper extends LitElement {
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
     private _dropdownAttached = false;
-    private _pendingFocusPath?: string;
+    private _pendingFocusPath: string | undefined;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
