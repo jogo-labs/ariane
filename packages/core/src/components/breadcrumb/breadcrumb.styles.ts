@@ -120,6 +120,18 @@ export default css`
         width: auto;
     }
 
+    /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
+       qu'un état combiné (ex. clic — hover + focus simultanés) retienne toujours le fond de
+       l'état le plus fort visuellement plutôt qu'un fond issu d'une autre origine de valeur qui
+       pourrait entrer en collision avec la couleur pilotée par :hover (cf. #157). */
+
+    [part='home']:focus-visible,
+    [part='trigger']:focus-visible {
+        background-color: var(--ar-breadcrumb-toggle-bg-focus);
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
+
     [part='home']:hover,
     [part='trigger']:hover {
         background-color: var(--ar-breadcrumb-toggle-bg-hover);
@@ -128,17 +140,6 @@ export default css`
     [part='home']:active,
     [part='trigger']:active {
         background-color: var(--ar-breadcrumb-toggle-bg-pressed);
-    }
-
-    [part='home']:focus,
-    [part='trigger']:focus {
-        background-color: var(--ar-breadcrumb-toggle-bg-focus);
-    }
-
-    [part='home']:focus-visible,
-    [part='trigger']:focus-visible {
-        outline: 2px solid currentColor;
-        outline-offset: 2px;
     }
 
     @media (prefers-reduced-motion: reduce) {
