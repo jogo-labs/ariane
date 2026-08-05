@@ -388,6 +388,8 @@
         --ar-stepper-gap: 1.5rem;
         --ar-stepper-substep-gap: 1rem;
         --ar-stepper-connector-color: var(--ar-color-neutral-80);
+        --ar-stepper-toggle-transition-duration: 0.15s;
+        --ar-stepper-toggle-min-size: 2.5rem;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Progressbar
@@ -862,20 +864,28 @@
     ar-stepper {
         &::part(trigger) {
             border-radius: var(--ar-border-radius-xl);
-            background-color: var(--ar-button-secondary-bg);
+            border: 1px solid var(--ar-color-neutral-40);
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+            color: var(--ar-color-text);
+            gap: 0.25rem;
+            background-color: var(--ar-color-bg-subtle);
         }
 
         &::part(trigger):hover {
-            background-color: var(--ar-button-secondary-bg-hover);
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
         }
 
         &::part(trigger):active:not(:disabled) {
             background-color: var(--ar-color-neutral-30);
+            border-color: transparent;
             color: var(--ar-color-white);
         }
 
         &::part(trigger):focus-visible {
-            background-color: var(--ar-button-secondary-bg-hover);
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
             outline: 2px solid var(--ar-focus-ring-color);
             outline-offset: var(--ar-focus-ring-offset);
         }

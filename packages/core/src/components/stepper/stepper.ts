@@ -10,7 +10,6 @@ import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './stepper.styles.js';
 
@@ -70,6 +69,8 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).
  * @cssprop --ar-stepper-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
+ * @cssprop --ar-stepper-toggle-transition-duration - Durée de la transition de fond du bouton d'ouverture (respecte `prefers-reduced-motion`).
+ * @cssprop --ar-stepper-toggle-min-size - Taille de cible minimale du bouton d'ouverture (WCAG 2.5.8).
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
  * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
@@ -83,13 +84,7 @@ export interface ArStepperStepChangeDetail {
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
  */
 export class ArStepper extends LitElement {
-    static override styles: CSSResultGroup = [
-        resetStyles,
-        utilitiesStyles,
-        buttonStyles,
-        panelStyles,
-        styles,
-    ];
+    static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
 
     /**
      * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.

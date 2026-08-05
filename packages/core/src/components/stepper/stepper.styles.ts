@@ -10,16 +10,23 @@ export default css`
         display: flex;
     }
 
-    .btn-content {
-        margin-right: 1rem;
-        gap: 0.25rem;
+    [part='trigger'] {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        line-height: normal;
+        transition:
+            background-color var(--ar-stepper-toggle-transition-duration),
+            color var(--ar-stepper-toggle-transition-duration),
+            border-color var(--ar-stepper-toggle-transition-duration);
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+        min-height: var(--ar-stepper-toggle-min-size, 2.5rem);
     }
 
-    [part='trigger'] {
-        padding: 0.5rem 0.75rem;
-        justify-content: space-between;
-        line-height: normal;
-        text-align: left;
+    @media (prefers-reduced-motion: reduce) {
+        [part='trigger'] {
+            transition: none;
+        }
     }
 
     [part='list'] {
