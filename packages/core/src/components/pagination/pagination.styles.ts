@@ -41,7 +41,12 @@ export default css`
         transition:
             background-color var(--ar-pagination-transition-duration),
             color var(--ar-pagination-transition-duration);
+    }
 
+    [part~='prev'],
+    [part~='next'],
+    [part~='link'],
+    [part~='current'] {
         &:focus-visible {
             outline: 2px solid currentColor;
             outline-offset: 2px;

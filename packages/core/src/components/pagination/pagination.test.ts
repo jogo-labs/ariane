@@ -291,6 +291,34 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
             expect(el.current).toBe(3);
         });
+
+        it('un clic sur un lien de page focalise le nouvel élément part="current"', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            pageLink.click();
+            await waitForUpdate(el);
+
+            const current = shadow.querySelector('[part~="current"]') as HTMLElement;
+            expect(shadow.activeElement).toBe(current);
+        });
+
+        it('le nouvel élément part="current" porte tabindex="-1"', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const current = shadow.querySelector('[part="current"]') as HTMLElement;
+            expect(current.getAttribute('tabindex')).toBe('-1');
+        });
+
+        it("un clic sur prev/next ne modifie pas le focus (l'élément cliqué reste focalisable)", async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            const nextBtn = requirePart(el, 'next') as HTMLElement;
+            nextBtn.focus();
+            nextBtn.click();
+            await waitForUpdate(el);
+
+            expect(el.shadowRoot?.activeElement).toBe(nextBtn);
+        });
     });
 
     // ── Événement ar-pagination-page-change ──────────────────────────────────
