@@ -106,30 +106,31 @@ Ajouter `:focus-visible` sur les éléments concernés, cohérent avec le style 
 - `pagination.styles.ts` : `[part~='current']:focus-visible` — même déclaration que
   `[part~='link']:focus-visible` (ligne 45-48 actuelle), `outline: 2px solid currentColor;
 outline-offset: 2px;`.
-- `stepper.styles.ts` : `<a class="item-header" part="step-link">` et `<div class="item-header">`
-  portent tous les deux `class="item-header"` (`stepper.renderer.ts`, les deux branches du
-  ternaire `isCompleted ? html\`<a class="item-header" ...>\` : html\`<div class="item-header">\``)
-— `.item-header`est donc déjà un sur-ensemble de`[part~='step-link']`pour cette règle
-précise, un seul sélecteur suffit. Remplacer le`&:focus { outline-offset: 4px; outline-color:
-  var(--ar-stepper-link-focus-outline-color); }`actuellement imbriqué dans`[part~='step-link']
-  { }` (lignes 93-96) par une règle top-level partagée :
+- `stepper.styles.ts` : le `<a>` (`class="item-header" part="step-link"`) et le `<div>` de
+  remplacement (`class="item-header"`) portent tous les deux `class="item-header"` (les deux
+  branches du ternaire dans `stepper.renderer.ts`) — `.item-header` est donc déjà un
+  sur-ensemble de `[part~='step-link']` pour cette règle précise, un seul sélecteur suffit. Sortir
+  le `&:focus { outline-offset: 4px; outline-color: var(--ar-stepper-link-focus-outline-color); }`
+  actuellement imbriqué dans `[part~='step-link'] { }` (lignes 93-96) en une règle top-level
+  partagée :
 
-        ```css
-        .item-header:focus-visible {
-            outline-offset: 4px;
-            outline-color: var(--ar-stepper-link-focus-outline-color);
-        }
-        ```
+    ```css
+    .item-header:focus-visible {
+        outline-offset: 4px;
+        outline-color: var(--ar-stepper-link-focus-outline-color);
+    }
+    ```
 
-        Le reste du bloc `[part~='step-link'] { &:is(:focus, :hover) { ... } }` (recoloriage
-        puce/label) reste inchangé et scopé au seul `<a>` — volontairement **pas** étendu à
-        `.item-header`, pour ne pas donner un signal visuel « interactif » (recoloriage au survol
-        souris) à l'étape courante non cliquable.
-        Effet de bord assumé : le vrai lien `<a part="step-link">` passe de `:focus` à
-        `:focus-visible` pour cette règle — comportement plus cohérent avec le reste de la librairie
-        (`[part~='link']:focus-visible` de pagination) : l'anneau ne s'affiche plus après un clic
-        souris sur un lien d'étape, seulement au clavier. Aucun test existant ne dépend de `:focus` sur
-        `step-link`, pas de régression attendue.
+    Le reste du bloc `[part~='step-link'] { &:is(:focus, :hover) { ... } }` (recoloriage
+    puce/label) reste inchangé et scopé au seul `<a>` — volontairement **pas** étendu à
+    `.item-header`, pour ne pas donner un signal visuel « interactif » (recoloriage au survol
+    souris) à l'étape courante non cliquable.
+
+    Effet de bord assumé : le vrai lien `<a part="step-link">` passe de `:focus` à `:focus-visible`
+    pour cette règle — comportement plus cohérent avec le reste de la librairie
+    (`[part~='link']:focus-visible` de pagination) : l'anneau ne s'affiche plus après un clic souris
+    sur un lien d'étape, seulement au clavier. Aucun test existant ne dépend de `:focus` sur
+    `step-link`, pas de régression attendue.
 
 ## Tests
 
