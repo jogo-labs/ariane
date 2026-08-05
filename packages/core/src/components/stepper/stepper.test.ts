@@ -362,6 +362,85 @@ describe('ArStepper', () => {
         });
     });
 
+    // ── Focus après activation (#154) ───────────────────────────────────────
+
+    describe("focus après activation d'un lien", () => {
+        it("porte data-path sur le <div> de remplacement de l'étape courante", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const currentHeader = requireQuery<HTMLDivElement>(
+                shadow(el),
+                'li.item.current > .item-header',
+            );
+            expect(currentHeader.tagName.toLowerCase()).toBe('div');
+            expect(currentHeader.getAttribute('data-path')).toBe('/b');
+        });
+
+        it("focalise le <div> de l'étape cliquée quand le consommateur répond en mettant à jour currentPath", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            linkA.click();
+
+            // Le composant est contrôlé : le consommateur répond à l'event en réassignant
+            // currentPath (pattern déjà utilisé par les tests existants du fichier).
+            el.currentPath = '/a';
+            await waitForUpdate(el);
+
+            const newCurrentHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a"]');
+            expect(newCurrentHeader?.tagName.toLowerCase()).toBe('div');
+            expect(shadow(el).activeElement).toBe(newCurrentHeader);
+            expect(newCurrentHeader?.getAttribute('tabindex')).toBe('-1');
+        });
+
+        it('ne vole pas le focus si currentPath change sans rapport avec le dernier clic (ex. scroll-follow)', async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/a" follow-scroll>
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            // Simule un changement de currentPath déclenché par le scroll-follow, sans clic
+            // préalable sur aucun lien.
+            el.currentPath = '/b';
+            await waitForUpdate(el);
+
+            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/b"]'));
+        });
+
+        it("n'affecte plus le focus au cycle de rendu suivant un clic (fenêtre bornée à un seul cycle)", async () => {
+            const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/c">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                        <ar-stepper-item path="/c" label="Étape C"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            linkA.click();
+
+            // Le consommateur ignore l'event (currentPath ne change pas tout de suite) puis,
+            // un cycle plus tard, une cause sans rapport (scroll-follow) amène sur /a.
+            await waitForUpdate(el);
+            el.currentPath = '/a';
+            await waitForUpdate(el);
+
+            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/a"]'));
+        });
+    });
+
     // ── Téléportation ─────────────────────────────────────────────────────────
 
     describe('téléportation', () => {

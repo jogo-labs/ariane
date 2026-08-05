@@ -15,6 +15,7 @@ import styles from './stepper.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
+import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
@@ -155,6 +156,7 @@ export class ArStepper extends LitElement {
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
     private _dropdownAttached = false;
+    private _pendingFocusPath?: string;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -254,6 +256,10 @@ export class ArStepper extends LitElement {
                 });
             }
         }
+        if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
+            void focusAfterUpdate(this, `[data-path="${this._pendingFocusPath}"]`);
+        }
+        this._pendingFocusPath = undefined;
     }
 
     private _attachDropdown(): boolean {
@@ -451,6 +457,12 @@ export class ArStepper extends LitElement {
     private onClickLink = (event: MouseEvent): void => {
         const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
         if (!path) return;
+
+        this._pendingFocusPath = path;
+        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
+        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
+        // fenêtre "un seul cycle" même si le consommateur ignore l'event.
+        this.requestUpdate();
 
         const node = this.navigation.tree
             .flatMap((s) => [s, ...s.children])
