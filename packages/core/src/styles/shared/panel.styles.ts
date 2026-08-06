@@ -27,7 +27,8 @@ const panelBaseStyles = css`
         box-shadow: var(--ar-panel-shadow);
         padding: var(--ar-panel-padding);
         min-width: var(--ar-panel-min-width);
-        max-width: var(--ar-panel-max-width);
+        /* a11y-fallback: évite un débordement horizontal (WCAG 1.4.10 Reflow) sur un viewport étroit si aucun thème n'est chargé — 18rem correspond à --ar-panel-max-width par défaut, calc(100vw - 2rem) borne la largeur sur mobile */
+        max-width: var(--ar-panel-max-width, min(18rem, calc(100vw - 2rem)));
     }
 
     [part='panel']:not(:popover-open) {
