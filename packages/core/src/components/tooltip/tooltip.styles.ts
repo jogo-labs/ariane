@@ -14,8 +14,6 @@ const tooltipStyles = css`
 
         /* Box model */
         box-sizing: border-box;
-        padding: var(--ar-tooltip-padding);
-        max-width: var(--ar-tooltip-max-width);
 
         /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
         overflow: visible;
@@ -24,9 +22,6 @@ const tooltipStyles = css`
         background-color: var(--ar-tooltip-bg, Canvas);
         color: var(--ar-tooltip-color, CanvasText);
         border: none;
-        border-radius: var(--ar-tooltip-border-radius);
-        font-size: var(--ar-tooltip-font-size);
-        line-height: 1.4;
         word-break: break-word;
     }
 
