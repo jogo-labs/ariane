@@ -416,10 +416,6 @@
         --ar-tooltip-offset: var(--ar-anchor-offset);
         --ar-tooltip-bg: var(--ar-color-neutral-20);
         --ar-tooltip-color: var(--ar-color-white);
-        --ar-tooltip-border-radius: var(--ar-border-radius-sm);
-        --ar-tooltip-font-size: 0.8125rem;
-        --ar-tooltip-padding: 0.375rem 0.625rem;
-        --ar-tooltip-max-width: 18rem;
         --ar-tooltip-arrow-size: 6px;
         --ar-tooltip-show-duration: var(--ar-panel-show-duration);
 
@@ -1167,6 +1163,16 @@
         &::part(current),
         &::part(ellipsis) {
             padding: 0 0.75rem;
+        }
+    }
+
+    ar-tooltip {
+        &::part(bubble) {
+            border-radius: var(--ar-border-radius-sm);
+            font-size: 0.8125rem;
+            padding: 0.375rem 0.625rem;
+            max-width: 18rem;
+            line-height: 1.4;
         }
     }
 }

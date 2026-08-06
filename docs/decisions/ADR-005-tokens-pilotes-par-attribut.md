@@ -476,6 +476,46 @@ remplacés par les presets `ar-dialog[size='...']`/`ar-dialog[mode='drawer'][siz
 directement dans le thème (cf. `default.css`) et la valeur de repli unique par mode portée par
 `functional-default` ci-dessus.
 
+## Amendement (2026-08-05) : `!important` comme verrou contre la surcharge consommateur
+
+Réflexion ouverte à l'occasion de l'audit qualité `ar-tooltip` (préparation du dernier lot #129),
+en marge de la migration elle-même : jusqu'où la librairie doit-elle garder la maîtrise d'une
+propriété interne, et avec quel mécanisme ?
+
+**Constat** : le mécanisme « l'externe l'emporte toujours » documenté dans tout ce chantier
+(amendements du 2026-07-25 et suivants) n'est vrai que pour les déclarations normales. Vérifié
+par la spécification CSS Cascade (relayée par CSS Shadow Parts Module Level 1) : pour les
+déclarations `!important`, l'ordre s'inverse — une règle `!important` posée dans la feuille de
+style interne du composant (shadow tree) l'emporte sur une règle externe `::part()`, **même si
+celle-ci est elle-même `!important`**. C'est donc le seul levier technique qui verrouille
+réellement une propriété contre toute surcharge consommateur ; l'absence de `part`/token ne fait
+que rendre la surcharge malcommode (une propriété posée sur un élément qui porte déjà un `part`
+reste atteignable via `::part()`, y compris les resets structurels jamais documentés en
+`@cssprop`, ex. `overflow`/`position`/`border` sur `[part='bubble']` d'`ar-tooltip`).
+
+**Décision** : ne pas recourir à `!important` par défaut. Ariane se définit dans CLAUDE.md comme
+une fondation headless, pas un design system — la posture par défaut reste permissive, un
+consommateur doit pouvoir tout casser visuellement s'il le souhaite. `!important` est réservé aux
+cas où une surcharge externe casserait un **contrat fonctionnel** du composant, pas une
+préférence esthétique :
+
+- positionnement dont dépend un controller JS (`AnchoredController`/`TooltipController`, calculs
+  Floating UI) ;
+- garantie WCAG explicite déjà couverte par ce document (fallback de contraste de l'amendement
+  du 2026-07-22, garde `prefers-reduced-motion` de la contrainte 6 de l'amendement du 2026-07-24).
+
+Une dégradation purement visuelle (bordure, radius, padding, typographie) n'est jamais une raison
+suffisante — cohérent avec le rejet déjà exprimé de `!important` comme mécanisme de mutualisation
+de la garde `prefers-reduced-motion` (issue #155, écarté comme « changement de mécanisme » par
+rapport au pattern « externe > interne » déjà établi).
+
+**Trade-off assumé, pas corrigé** : les resets structurels posés sur un élément qui porte un
+`part` (ex. `overflow: visible`, `position`/`inset`/`margin`, `border: none` sur
+`[part='bubble']` d'`ar-tooltip`) restent techniquement atteignables via `::part()` sans qu'aucun
+verrou ne les protège — situation partagée par tous les composants déjà migrés dans ce chantier,
+pas spécifique à `ar-tooltip`. Accepté comme trade-off du modèle headless plutôt que traité au cas
+par cas ; à reconsidérer seulement si une régression réelle est signalée (constat, pas hypothèse).
+
 ## Application — `ar-breadcrumb` (lot 4, 2026-07-30)
 
 Premier des 4 composants du lot 4 (`breadcrumb`, `dropdown`, `pagination`, `tooltip`). Précédé

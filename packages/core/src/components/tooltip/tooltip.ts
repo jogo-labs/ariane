@@ -29,15 +29,11 @@ export type ArTooltipPlacement =
  *
  * @slot - Texte du tooltip.
  *
- * @csspart bubble - Le panel flottant.
+ * @csspart bubble - Le panel flottant (radius, padding, taille de police, largeur maximale et interligne pilotables via `::part(bubble)`).
  * @csspart arrow  - Le caret directionnel.
  *
  * @cssprop --ar-tooltip-bg - Fond de la bulle (repli système `Canvas` si aucun thème n'est chargé).
  * @cssprop --ar-tooltip-color - Couleur du texte (repli système `CanvasText` si aucun thème n'est chargé).
- * @cssprop --ar-tooltip-border-radius - Arrondi.
- * @cssprop --ar-tooltip-padding - Marge interne.
- * @cssprop --ar-tooltip-font-size - Taille de police.
- * @cssprop --ar-tooltip-max-width - Largeur maximale.
  * @cssprop --ar-tooltip-arrow-size - Taille du caret.
  * @cssprop --ar-tooltip-show-duration - Durée de l'animation d'apparition de la bulle (cascade vers --ar-panel-show-duration).
  * @cssprop --ar-tooltip-distance - Espacement entre le trigger et la bulle.

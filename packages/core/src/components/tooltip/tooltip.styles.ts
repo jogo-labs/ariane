@@ -14,8 +14,12 @@ const tooltipStyles = css`
 
         /* Box model */
         box-sizing: border-box;
-        padding: var(--ar-tooltip-padding);
-        max-width: var(--ar-tooltip-max-width);
+
+        /* a11y-fallback: évite un débordement horizontal (WCAG 1.4.10 Reflow) sur un viewport
+           étroit si aucun thème n'est chargé — 18rem correspond à la valeur par défaut du
+           thème (max-width externe via ::part() prend le dessus une fois chargé),
+           calc(100vw - 2rem) borne la largeur sur mobile */
+        max-width: min(18rem, calc(100vw - 2rem));
 
         /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
         overflow: visible;
@@ -24,9 +28,6 @@ const tooltipStyles = css`
         background-color: var(--ar-tooltip-bg, Canvas);
         color: var(--ar-tooltip-color, CanvasText);
         border: none;
-        border-radius: var(--ar-tooltip-border-radius);
-        font-size: var(--ar-tooltip-font-size);
-        line-height: 1.4;
         word-break: break-word;
     }
 
