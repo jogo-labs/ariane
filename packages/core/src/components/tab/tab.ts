@@ -36,8 +36,7 @@ export class ArTab extends LitElement {
 
     /**
      * Vrai quand l'onglet est actif (sélectionné).
-     * Piloté par ar-tab-group — ne pas modifier directement.
-     * @ignore
+     * @readonly Piloté par ar-tab-group — ne pas modifier directement.
      */
     @property({ reflect: true, type: Boolean }) active = false;
 
