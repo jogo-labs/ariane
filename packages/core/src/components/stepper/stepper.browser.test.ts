@@ -178,4 +178,43 @@ describe('ar-stepper — browser', () => {
             expect(style.marginLeft).to.equal('20px');
         });
     });
+
+    describe('reverse-align × dir', () => {
+        async function desktopStepper(reverseAlign: boolean, dir?: 'rtl'): Promise<ArStepper> {
+            const stepper = await fixture<ArStepper>(html`
+                <ar-stepper
+                    current-path="/step2"
+                    desktop-from="0"
+                    ?reverse-align=${reverseAlign}
+                    dir=${dir ?? 'ltr'}
+                >
+                    <ar-stepper-item label="Étape 1" href="/step1"></ar-stepper-item>
+                    <ar-stepper-item label="Étape 2" href="/step2"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await aTimeout(50);
+            return stepper;
+        }
+
+        it('sans reverse-align, en LTR : la puce garde order initial (0)', async () => {
+            el = await desktopStepper(false);
+            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            if (!bullet) throw new Error('[part~="bullet"] introuvable');
+            expect(getComputedStyle(bullet).order).to.equal('0');
+        });
+
+        it('avec reverse-align, en LTR : la puce passe en fin de ligne (order 2)', async () => {
+            el = await desktopStepper(true);
+            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            if (!bullet) throw new Error('[part~="bullet"] introuvable');
+            expect(getComputedStyle(bullet).order).to.equal('2');
+        });
+
+        it('avec reverse-align, en RTL : la puce passe aussi en fin de ligne (order 2) — effet composable avec dir', async () => {
+            el = await desktopStepper(true, 'rtl');
+            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            if (!bullet) throw new Error('[part~="bullet"] introuvable');
+            expect(getComputedStyle(bullet).order).to.equal('2');
+        });
+    });
 });

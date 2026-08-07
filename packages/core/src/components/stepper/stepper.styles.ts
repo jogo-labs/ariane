@@ -151,31 +151,31 @@ export default css`
         flex-flow: column;
     }
 
-    :host([align='right']) .desktop {
+    :host([reverse-align]) .desktop {
         .item {
             align-items: flex-end;
-            text-align: right;
+            text-align: end;
 
             &::after {
-                margin-left: auto;
+                margin-inline-start: auto;
             }
         }
 
         .item-header {
             justify-content: flex-end;
-            margin-left: auto;
-            text-align: right;
+            margin-inline-start: auto;
+            text-align: end;
         }
 
         [part~='bullet'] {
             order: 2;
-            margin-right: 0;
-            margin-left: 0.5rem;
+            margin-inline-end: 0;
+            margin-inline-start: 0.5rem;
         }
 
         [part='substep'] [part~='bullet'] {
-            margin-left: 1.25rem;
-            margin-right: 0.75rem;
+            margin-inline-start: 1.25rem;
+            margin-inline-end: 0.75rem;
         }
     }
 `;

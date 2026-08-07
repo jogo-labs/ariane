@@ -606,16 +606,16 @@ describe('ArStepper', () => {
 
     // ── Alignement ────────────────────────────────────────────────────────────
 
-    describe('align', () => {
-        it('vaut "left" par défaut', async () => {
+    describe('reverse-align', () => {
+        it('vaut false par défaut', async () => {
             const el = await fixture<ArStepper>(`<ar-stepper></ar-stepper>`);
-            expect(el.align).toBe('left');
+            expect(el.reverseAlign).toBe(false);
         });
 
         it('est réfléchi comme attribut HTML', async () => {
-            const el = await fixture<ArStepper>(`<ar-stepper align="right"></ar-stepper>`);
-            expect(el.getAttribute('align')).toBe('right');
-            expect(el.align).toBe('right');
+            const el = await fixture<ArStepper>(`<ar-stepper reverse-align></ar-stepper>`);
+            expect(el.hasAttribute('reverse-align')).toBe(true);
+            expect(el.reverseAlign).toBe(true);
         });
     });
 
