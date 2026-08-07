@@ -9,7 +9,7 @@ export default css`
     /* ── Nav / item ──────────────────────────────────────────── */
 
     [part='nav'] {
-        padding-right: 0.25rem;
+        padding-inline-end: 0.25rem;
     }
 
     [part='item'] {
@@ -62,7 +62,7 @@ export default css`
         width: 1.875rem;
         top: 1.5rem;
         bottom: 1.5rem;
-        left: 0;
+        inset-inline-start: 0;
         background-image: linear-gradient(
             var(--ar-breadcrumb-mobile-separator-color) 25%,
             transparent 0

@@ -154,4 +154,21 @@ describe('ar-breadcrumb — browser', () => {
             expect(getComputedStyle(trigger).backgroundColor).to.equal('rgb(3, 3, 3)');
         });
     });
+
+    describe('propriétés logiques (RTL)', () => {
+        it('[part="nav"] utilise padding-inline-end plutôt que padding-right', async () => {
+            el = await fixture<ArBreadcrumb>(html`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item current label="Page"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            await el.updateComplete;
+            const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+            if (!nav) throw new Error('[part="nav"] introuvable');
+            const style = getComputedStyle(nav);
+            expect(style.paddingInlineEnd).to.equal('4px');
+            expect(style.paddingLeft).to.equal('0px');
+        });
+    });
 });
