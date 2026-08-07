@@ -4,7 +4,7 @@ export default css`
     :host {
         display: block;
         box-sizing: border-box;
-        /* a11y-fallback: sans plafond, .progress-label peut s'étirer sur un conteneur très large et éloigner visuellement le pourcentage de son label (lien a11y label/valeur) */
+        /* a11y-fallback: sans plafond, [part='label'] peut s'étirer sur un conteneur très large et éloigner visuellement le pourcentage de son label (lien a11y label/valeur) */
         max-width: var(--ar-progressbar-max-width, 500px);
     }
 
