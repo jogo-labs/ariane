@@ -46,11 +46,11 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
-    - name: align-right
-      label: Alignement droite
-      description: Le stepper peut être aligné à droite en mode desktop via l'attribut align.
+    - name: reverse-align
+      label: Alignement inversé
+      description: Inverse l'alignement de la liste d'étapes en mode desktop.
       html: |
-          <ar-stepper current-path="etape-1-2" align="right">
+          <ar-stepper current-path="etape-1-2" reverse-align>
             <!-- Étape 1 -->
             <ar-stepper-item path="etape-1" label="Mes informations" href="#">
                 <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
