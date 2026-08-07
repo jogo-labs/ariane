@@ -5,19 +5,12 @@ export default css`
         display: inline-block;
     }
 
-    [part='count'] {
-        color: var(--ar-charcounter-color);
-        font-size: var(--ar-charcounter-font-size);
-    }
-
-    :host([state='warning']) [part='count'] {
-        color: var(--ar-charcounter-warning-color);
+    [part~='count--warning'] {
         /* a11y-fallback: sans thème, la couleur seule (warning/error identiques) ne suffit pas à distinguer les états — la graisse doit rester un signal garanti même sans thème chargé */
         font-weight: var(--ar-charcounter-warning-weight, 700);
     }
 
-    :host([state='error']) [part='count'] {
-        color: var(--ar-charcounter-error-color);
+    [part~='count--error'] {
         /* a11y-fallback: sans thème, la couleur seule (warning/error identiques) ne suffit pas à distinguer les états — la graisse doit rester un signal garanti même sans thème chargé */
         font-weight: var(--ar-charcounter-error-weight, 700);
     }

@@ -1,7 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
-import utilitiesStyles from '../../styles/utilities.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
 import '../tooltip/index.js';
@@ -51,16 +50,14 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  * @display demo
  *
  * Placer à l'intérieur d'un `<th>`. Le composant met à jour `aria-sort` et `scope="col"` sur
- * le `<th>` ancêtre. Le consommateur appelle `confirm()` après un tri réussi ou `reject()` en
- * cas d'échec.
+ * le `<th>` ancêtre. Appeler `confirm()` après un tri réussi, ou `reject()` en cas d'échec.
  *
  * @slot - Libellé de la colonne.
  *
  * @csspart button    - Le bouton déclencheur.
+ * @csspart button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `button`).
  * @csspart indicator - L'icône de direction de tri.
  *
- * @cssprop --ar-table-sort-gap - Espacement label / indicateur.
- * @cssprop --ar-table-sort-indicator-gap - Espacement entre les icônes indicateurs asc / desc.
  * @cssprop --ar-table-sort-indicator-size - Taille de l'icône indicateur asc / desc.
  * @cssprop --ar-table-sort-indicator-color - Couleur état neutre.
  * @cssprop --ar-table-sort-indicator-active-color - Couleur état actif (asc/desc).
@@ -69,7 +66,7 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  * @event {CustomEvent<{ type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
  */
 export class ArTableSort extends LitElement {
-    static override styles = [utilitiesStyles, styles];
+    static override styles = [styles];
 
     /** Type de tri — influe sur les labels accessibles. */
     @property({ reflect: true }) type: TableSortType = 'alpha';
@@ -175,7 +172,7 @@ export class ArTableSort extends LitElement {
         const label = getActionLabel(this.type, this.order, this.pending);
         return html`
             <button
-                part="button"
+                part="button${this.pending ? ' button--pending' : ''}"
                 type="button"
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}

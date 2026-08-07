@@ -625,3 +625,165 @@ inerte — `ar-datepicker::part(panel)` fixe `width: 20rem` dans `default.css` e
 `--ar-panel-min-width: 18rem` — mais c'est désormais un point de couplage réel entre le token
 générique `--ar-panel-min-width` et la largeur du calendrier, à garder en tête si ce token est
 modifié par un thème personnalisé.
+
+## Application — lot 8 (2026-08-06)
+
+Dernier lot du chantier #129 : `ar-table-sort`, `ar-charcounter`, `ar-progressbar`,
+`ar-tab-group`, `ar-tab`, `ar-collapse`. Périmètre initial : `table-sort`, `charcounter`, `progressbar`,
+`tab-group`, `collapse` — les 5 candidats les plus légers identifiés par l'audit du
+2026-07-25. `ar-tab` a été ajouté en cours de route, hors périmètre nommé, à la demande du
+mainteneur : il partage deux tokens de bordure avec `ar-tab-group` (voir plus bas), et s'est
+révélé de loin le composant le plus dense en décisions du lot. L'ensemble a fait l'objet d'une
+revue finale sur toute la branche, avec une vague de correctifs groupée plutôt qu'un correctif
+par composant.
+
+**`ar-table-sort`** : 2 tokens migrés — `gap` vers `::part(button)`, `indicator-gap` vers
+`::part(indicator)`. Nouveau part d'état `button--pending` ajouté pour la règle `cursor: wait` —
+état jusque-là purement interne, reconnu à la revue comme éligible au pattern part d'état
+puisque l'élément portait déjà un `part` (réapplication du pattern établi le 2026-07-27, pas un
+nouveau mécanisme). 4 tokens restent internes : 1 réutilisé ≥ 3 fois dans la feuille de style
+(critère 3), 3 bloqués parce qu'ils ciblent les pseudo-éléments `::before`/`::after` de
+`[part='indicator']` — un pseudo-élément reste inatteignable depuis une règle `::part()`
+externe, quel que soit l'élément qui le porte (contrainte 3). **Bug trouvé en revue finale,
+corrigé** : la feuille de style du composant lui-même contenait des sélecteurs en correspondance
+exacte (`[part='button']`) qui ont cessé silencieusement de matcher dès que `button--pending` a
+fait de `part` une valeur à deux jetons — exactement la même classe de bug que celle trouvée
+indépendamment sur `ar-tab` dans ce même lot (voir plus bas), le même jour, sur deux composants
+différents. Corrigé en `[part~='button']`, conforme au précédent déjà établi sur `ar-pagination`
+(`[part~='item--current']`). À retenir comme risque récurrent : chaque nouveau part d'état ajouté
+sur un élément qui portait déjà un `part` doit s'accompagner d'un audit des sélecteurs internes
+en correspondance exacte visant ce même `part`.
+
+**`ar-charcounter`** : `color`/`font-size` migrés vers `::part(count)`. Deux nouveaux parts
+d'état, `count--warning`/`count--error`, pour les couleurs d'état — `[part='count']` portait déjà
+un `part`, le pattern établi lot 1 s'applique donc directement, sans mécanisme nouveau. Les deux
+tokens `-weight` (déjà munis d'un repli `a11y-fallback`) restent internes selon le critère 1
+(repli critique WCAG), mais leur règle interne a été **retargetée** de
+`:host([state='warning']) [part='count']` vers `[part~='count--warning']` — dès lors que le
+`part` lui-même porte déjà l'état, conditionner en plus sur l'attribut d'hôte devient redondant
+(deux signaux pour un seul état, synchronisés seulement par convention, pas par construction).
+**Raffinement nouveau et généralisable** : une fois qu'un part d'état existe pour un élément,
+toute règle interne restante concernant ce même élément doit se brancher directement sur le
+token part d'état plutôt que sur l'attribut d'hôte déclencheur.
+
+**`ar-progressbar`** : audit préalable a trouvé des classes CSS héritées
+(`.progressbar-container` et consorts) entièrement redondantes avec les attributs `part` déjà
+posés dans le template — même dette de double nomenclature que celle déjà nettoyée sur
+`ar-stepper`/`ar-breadcrumb` ; supprimées. `percent-color` + 3 littéraux jamais tokenisés
+(`border-radius`, `row-gap`, `column-gap`) migrés vers un nouveau bloc de thème `ar-progressbar
+{ }`. `track-color`/`fill-color` restent internes (repli WCAG 1.4.11, critère 1, préexistant).
+**Décision de largeur, à documenter comme nuance nouvelle du mécanisme `functional-default`** :
+`min-width: 200px` a été simplement supprimé (mobile-first — `display: block` remplit déjà 100 %
+du parent, aucun plancher n'est nécessaire). `max-width: 500px` n'a **pas** été traité en
+`functional-default` (ce mécanisme — un littéral posé directement sur le token à l'intérieur du
+composant, en contournant `:root` — existe spécifiquement pour `--ar-dialog-width`, qui a besoin
+de plusieurs replis littéraux différents selon l'attribut `size`/`mode` ; un seul
+`var(--token, littéral)` ne peut pas exprimer cette variance). `ar-progressbar` n'a pas
+d'attribut pilotant une telle variance, le mécanisme `a11y-fallback` ordinaire (un token `:root`
+normal, consommé avec un repli littéral dans le composant, toujours surchargeable via `:root`
+comme n'importe quel autre token) suffisait donc. À noter explicitement dans l'ADR :
+`functional-default` est réservé à la variance de repli par défaut pilotée par un attribut, pas
+simplement à « une dimension qui serait moche sans plafond » — sans quoi le choix entre les deux
+mécanismes pourrait sembler arbitraire.
+
+**`ar-tab-group`** : 1 token migré (`gap`) vers `::part(base)`. `border-*-width`/`border-color`
+restent internes — réutilisation inter-composants (`tab.styles.ts` lit les deux tokens de largeur
+de bordure via `calc()` pour compenser sa propre marge contre la bordure du parent, contrainte 4)
+combinée à une réutilisation interne (`border-color` utilisé 2 fois dans la même feuille, critère
+3).
+
+**`ar-tab` — le composant le plus dense du lot, hors périmètre initial.** Ajouté en cours de
+route car étroitement couplé à `ar-tab-group` via les tokens de bordure partagés ci-dessus.
+
+_Choix de conception, à documenter comme précédent en soi_ : plutôt que de faire observer à
+`ar-tab` son propre attribut `aria-selected` posé de l'extérieur via `attributeChangedCallback`
+(première piste envisagée, écartée), une véritable propriété réactive Lit `active`
+(`@property({ reflect: true, type: Boolean })`) a été ajoutée, positionnée par
+`ar-tab-group._syncAll()` par simple affectation de propriété (`tab.active = isActive`), en
+plus — et sans changement — du `tab.setAttribute('aria-selected', ...)` déjà existant. La
+sémantique ARIA reste la responsabilité d'`ar-tab-group` (inchangée) ; seul le signal d'état
+purement stylistique devient une propriété réactive de premier ordre, nommée `active` pour suivre
+la convention de l'écosystème (`sl-tab` de WebAwesome). **Nouveau précédent pour ce chantier** :
+quand un composant doit réagir à un état posé sur lui depuis l'extérieur par un parent qui
+orchestre plusieurs enfants (ex. une tablist), préférer une vraie `@property` affectée en JS à
+une plomberie d'observation d'attribut — plus simple, la réactivité de Lit fait le reste.
+
+_Note de nommage_ : `active` a été délibérément préféré à la terminologie `current` établie le
+2026-07-27 pour stepper/breadcrumb, précisément parce qu'`ar-tab` porte déjà un attribut ARIA
+littéral, `aria-selected`, qu'il reflète — `current` reste réservé aux composants pilotés par la
+navigation plutôt que par une sélection ARIA explicite. Le part d'état lui-même reste nommé
+`base--selected` (pas `base--active`), pour éviter l'ambiguïté déjà documentée entre
+`::part(x--active)` et la pseudo-classe `:active`. Autrement dit : la propriété s'appelle
+`active`, le part d'état `--selected` — un niveau d'indirection délibéré, à signaler
+explicitement car il pourrait à première vue ressembler à une incohérence.
+
+_Tokens_ : `border-radius`/`font-weight` (posés sur `:host`) migrés vers une règle de thème plate
+`ar-tab { }`. `color`/`bg` migrés vers `::part(base)` ; la surcharge `:hover` (une pseudo-classe
+native) migrée avec eux vers `ar-tab:hover:not([disabled]):not([active])::part(base)` — ne
+compose sans risque avec une base externe que parce que la surcharge hover de la même propriété
+est, elle aussi, externe (nuance déjà établie sur le bouton de fermeture d'`ar-alert`,
+2026-07-28 — réapplication, pas un nouveau mécanisme). `active-color`/`active-bg` migrés vers le
+nouveau part d'état `::part(base--selected)`. L'`opacity` de l'état désactivé migrée vers une
+règle externe sur attribut, `ar-tab[disabled] { opacity: ...; }` (un sélecteur d'attribut externe
+sur la balise l'emporte sur une règle interne `:host([attr])` — précédent `ar-alert[hiding]` déjà
+établi le 2026-07-28, réapplication).
+
+_Nettoyage_ : `--ar-tab-indicator-color`/`--ar-tab-indicator-width` étaient documentés en
+`@cssprop` mais jamais consommés via `var()` dans `tab.styles.ts` lui-même — utilisés seulement
+dans `default.css` pour composer `--ar-tab-active-shadow`. Même raisonnement que le nettoyage
+`ar-pagination` (lot 6) : ce n'est pas une vraie surface d'API du composant, seulement un détail
+d'implémentation du thème par défaut. Supprimés comme tokens publics, valeurs réinjectées
+directement dans la composition de `--ar-tab-active-shadow`. **Le même raisonnement a été
+réappliqué une seconde fois, trouvé en revue finale** : `--ar-tab-disabled-opacity` n'était lui
+non plus consommé nulle part ailleurs que dans la règle `ar-tab[disabled] { }` qui le déclarait —
+inliné en littéral (`opacity: 0.5`) pour la même raison, après confirmation du mainteneur que le
+précédent devait s'appliquer de façon cohérente plutôt qu'au coup par coup.
+
+_Vrai bug d'accessibilité trouvé et corrigé_ : `--ar-tab-focus-ring-offset` n'avait aucun repli
+dans son appel `var()`, alors que sa valeur négative a un rôle fonctionnel réel (empêcher l'anneau
+de focus d'être rogné par le conteneur `overflow-x: auto` d'`ar-tab-group` — WCAG 2.4.7). Corrigé
+avec `var(--ar-tab-focus-ring-offset, -2px)` et le commentaire `a11y-fallback` requis.
+
+_Deux régressions réelles trouvées seulement en revue, pas par l'implémenteur_ — à signaler comme
+leçon pour les prochains lots : **(a)** la même classe de bug `[part=]` exact-match vs
+multi-jetons que sur `ar-table-sort` ci-dessus — dès que `render()` a commencé à émettre
+`part="base base--selected"` pour l'onglet actif, les sélecteurs internes en correspondance
+exacte (`[part='base']`, et la règle `box-shadow` de l'indicateur actif WCAG 2.4.7) ont cessé
+silencieusement de matcher, faisant disparaître à la fois la mise en page de l'onglet actif et son
+indicateur ; corrigé en `[part~='base']`/`[part~='base--selected']`, conforme au précédent
+`ar-pagination` (`[part~='item--current']`) déjà présent dans la base de code pour ce scénario
+exact. **(b)** lors d'une passe de correction de tests sans rapport, un échec de garde-fou sur le
+repli tout juste ajouté de `focus-ring-offset` a été « corrigé » en supprimant purement le repli
+plutôt qu'en ajoutant le commentaire requis — reverti silencieusement le correctif a11y ; trouvé
+par le contrôleur en comparant l'annonce de l'implémenteur au commit réel, corrigé proprement.
+**Cette seconde anecdote mérite sa propre note généralisable** : quand un garde-fou
+`build:manifest`/CI échoue, le correctif doit traiter la raison de la plainte du garde-fou
+(généralement un commentaire manquant), jamais simplement supprimer l'élément que le garde-fou
+examine — supprimer un repli pour faire taire un garde-fou de format de repli est presque
+toujours exactement l'inverse de ce qu'il fallait faire.
+
+_Documentation_ : `apps/docs/src/content/components/ar-tab-group.mdx` contenait 5 extraits
+d'exemple vivants référençant des tokens supprimés par ce lot (`--ar-tab-active-color`,
+`--ar-tab-hover-bg`, `--ar-tab-indicator-color`, `--ar-tab-active-bg`,
+`--ar-tab-border-radius`) — corrigés vers la nouvelle API (tokens génériques là où l'ancien token
+n'était qu'un alias, `::part(base--selected)` pour la surcharge de fond supprimée, une propriété
+`border-radius` littérale pour le token de radius supprimé). À noter : les extraits d'exemple des
+fichiers `apps/docs/*.mdx` sont un vrai consommateur des tokens de composants et doivent être
+balayés pour obsolescence chaque fois qu'un token est supprimé — première fois que ce point est
+trouvé et corrigé dans le cadre de la migration elle-même plutôt que laissé en dérive.
+
+**`ar-collapse`** : 0 candidat. `--ar-collapse-duration` est lu en JS via
+`getComputedStyle(this._panel).transitionDuration` dans `_shouldAnimate()` — critère 2 (lecture
+JS), verrouillé interne sans condition. `--ar-collapse-easing` est consommé dans le **même**
+raccourci `transition` que `duration` — un raccourci CSS ne pouvant pas être moitié interne,
+moitié externe, et `duration` devant rester interne, `easing` est entraîné avec lui (pas bloqué
+par ses propres critères, mais par l'indivisibilité avec une propriété qui l'est). **Nuance
+nouvelle et généralisable pour la liste des contraintes** : un token peut être bloqué non
+seulement par ses propres critères, mais aussi en partageant une déclaration raccourcie
+indivisible avec un autre token, lui, bloqué.
+
+**Couverture de tests** : la revue finale a aussi ajouté des tests de non-régression pour
+`ar-tab.active` (valeur par défaut, réflexion, émission dans `part`), le part d'état
+`button--pending` d'`ar-table-sort`, et les parts d'état `count--warning`/`count--error`
+d'`ar-charcounter` — à mentionner car ce chantier n'avait pas jusqu'ici explicitement signalé la
+couverture de tests des parts d'état comme faisant partie de sa mémoire institutionnelle.

@@ -396,7 +396,7 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-progressbar-track-color: var(--ar-color-bg-subtle);
         --ar-progressbar-fill-color: var(--ar-color-interactive);
-        --ar-progressbar-percent-color: var(--ar-color-text-muted);
+        --ar-progressbar-max-width: 500px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Pagination
@@ -450,18 +450,12 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Charcounter
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-charcounter-color: var(--ar-color-text-muted);
-        --ar-charcounter-font-size: 0.875rem;
-        --ar-charcounter-warning-color: var(--ar-color-warning-text);
         --ar-charcounter-warning-weight: 600;
-        --ar-charcounter-error-color: var(--ar-color-danger-text);
         --ar-charcounter-error-weight: 700;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Tablesort
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-table-sort-gap: 0.375rem;
-        --ar-table-sort-indicator-gap: 3px;
         --ar-table-sort-indicator-size: 0.65rem;
         --ar-table-sort-indicator-color: var(--ar-color-text-muted, #9ca3af);
         --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
@@ -470,28 +464,14 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Tab
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-tab-color: var(--ar-color-text-muted);
-        --ar-tab-bg: transparent;
         --ar-tab-padding-x: 1.5rem;
         --ar-tab-padding-y: 1rem;
-        --ar-tab-border-radius: 0;
-        --ar-tab-font-weight: var(--ar-font-weight-normal);
 
-        --ar-tab-hover-color: var(--ar-color-text);
-        --ar-tab-hover-bg: var(--ar-color-bg-subtle);
+        --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-interactive);
 
-        --ar-tab-active-color: var(--ar-color-interactive);
-        --ar-tab-active-bg: transparent;
-        --ar-tab-indicator-color: var(--ar-color-interactive);
-        --ar-tab-indicator-width: 2px;
-        --ar-tab-active-shadow: inset 0 calc(-1 * var(--ar-tab-indicator-width)) 0
-            var(--ar-tab-indicator-color);
-
-        --ar-tab-disabled-opacity: 0.5;
         --ar-tab-focus-ring-offset: -2px;
         --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
 
-        --ar-tab-group-gap: 0;
         --ar-tab-group-border-color: var(--ar-color-border);
         --ar-tab-group-border-top-width: 0;
         --ar-tab-group-border-bottom-width: 1px;
@@ -1174,5 +1154,83 @@
             max-width: 18rem;
             line-height: 1.4;
         }
+    }
+
+    ar-table-sort {
+        &::part(button) {
+            gap: 0.375rem;
+        }
+
+        &::part(button--pending) {
+            cursor: wait;
+        }
+
+        &::part(indicator) {
+            gap: 3px;
+        }
+    }
+
+    ar-charcounter {
+        &::part(count) {
+            color: var(--ar-color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        &::part(count--warning) {
+            color: var(--ar-color-warning-text);
+        }
+
+        &::part(count--error) {
+            color: var(--ar-color-danger-text);
+        }
+    }
+
+    ar-progressbar {
+        &::part(container) {
+            row-gap: 0.75rem;
+        }
+
+        &::part(label) {
+            column-gap: 2rem;
+        }
+
+        &::part(percent) {
+            color: var(--ar-color-text-muted);
+        }
+
+        &::part(track),
+        &::part(bar) {
+            border-radius: 50rem;
+        }
+    }
+
+    ar-tab-group {
+        &::part(base) {
+            gap: 0;
+        }
+    }
+
+    ar-tab {
+        border-radius: 0;
+        font-weight: var(--ar-font-weight-normal);
+
+        &::part(base) {
+            color: var(--ar-color-text-muted);
+            background: transparent;
+        }
+
+        &::part(base--selected) {
+            color: var(--ar-color-interactive);
+            background: transparent;
+        }
+
+        &:hover:not([disabled]):not([active])::part(base) {
+            color: var(--ar-color-text);
+            background: var(--ar-color-bg-subtle);
+        }
+    }
+
+    ar-tab[disabled] {
+        opacity: 0.5;
     }
 }

@@ -6,10 +6,9 @@ export default css`
         align-items: center;
     }
 
-    [part='button'] {
+    [part~='button'] {
         display: inline-flex;
         align-items: center;
-        gap: var(--ar-table-sort-gap);
         background: none;
         border: none;
         padding: 0;
@@ -19,14 +18,10 @@ export default css`
         text-align: inherit;
     }
 
-    [part='button']:focus-visible {
+    [part~='button']:focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 2px;
         border-radius: 2px;
-    }
-
-    [part='button'][aria-disabled='true'] {
-        cursor: wait;
     }
 
     /* ── Indicateur ↑↓ ──────────────────────────────────────────── */
@@ -35,7 +30,6 @@ export default css`
         display: inline-flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--ar-table-sort-indicator-gap);
         width: var(--ar-table-sort-indicator-size);
         flex-shrink: 0;
     }

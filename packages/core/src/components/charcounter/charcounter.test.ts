@@ -256,6 +256,22 @@ describe('ArCharcounter', () => {
             expect(el.getAttribute('state')).toBe('error');
         });
 
+        it('émet part="count count--warning" en état warning', async () => {
+            el = await setupWithCount(180, 200, 20);
+            expect(getPart(el, 'count--warning')).not.toBeNull();
+        });
+
+        it('émet part="count count--error" en état error', async () => {
+            el = await setupWithCount(201, 200, 20);
+            expect(getPart(el, 'count--error')).not.toBeNull();
+        });
+
+        it("n'émet ni count--warning ni count--error en état normal", async () => {
+            el = await setupWithCount(0, 200, 20);
+            expect(getPart(el, 'count--warning')).toBeNull();
+            expect(getPart(el, 'count--error')).toBeNull();
+        });
+
         it('affiche remaining négatif en état error', async () => {
             el = await setupWithCount(205, 200, 20);
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('-5');

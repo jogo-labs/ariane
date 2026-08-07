@@ -3,39 +3,35 @@ import { css } from 'lit';
 export default css`
     :host {
         display: block;
-        max-width: 500px;
-        min-width: 200px;
         box-sizing: border-box;
+        /* a11y-fallback: sans plafond, [part='label'] peut s'étirer sur un conteneur très large et éloigner visuellement le pourcentage de son label (lien a11y label/valeur) */
+        max-width: var(--ar-progressbar-max-width, 500px);
     }
 
-    .progressbar-container {
+    [part='container'] {
         display: flex;
         flex-direction: column;
-        row-gap: 0.75rem;
     }
 
-    .progress {
+    [part='track'] {
         display: inline-flex;
         position: relative;
         height: 0.5rem;
         background-color: var(--ar-progressbar-track-color, ButtonFace);
-        border-radius: 50rem;
     }
 
-    .progress-bar {
+    [part='bar'] {
         background-color: var(--ar-progressbar-fill-color, ButtonText);
-        border-radius: 50rem;
     }
 
-    .progress-label {
+    [part='label'] {
         display: inline-flex;
         justify-content: space-between;
         flex-wrap: nowrap;
-        column-gap: 2rem;
         margin: 0;
     }
 
-    .progress-label .content-label {
+    [part='label-text'] {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
@@ -46,14 +42,13 @@ export default css`
     }
 
     @media (min-width: 576px) {
-        .progress-label .content-label {
+        [part='label-text'] {
             -webkit-line-clamp: none;
             line-clamp: none;
         }
     }
 
-    .progress-label .progress-percent {
-        color: var(--ar-progressbar-percent-color);
+    [part='percent'] {
         flex-shrink: 0;
     }
 `;

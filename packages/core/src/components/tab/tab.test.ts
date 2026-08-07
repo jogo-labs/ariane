@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fixture, waitForUpdate } from '../../test-utils.js';
+import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
 import type { ArTab } from './tab.js';
 import './index.js';
 
@@ -24,6 +24,32 @@ describe('ArTab', () => {
         it('disabled vaut false', async () => {
             el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
             expect(el.disabled).toBe(false);
+        });
+
+        it('active vaut false', async () => {
+            el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
+            expect(el.active).toBe(false);
+        });
+    });
+
+    describe('active', () => {
+        it('reflète active en attribut', async () => {
+            el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
+            el.active = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('active')).toBe(true);
+        });
+
+        it('émet part="base" quand active est false', async () => {
+            el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
+            expect(getPart(el, 'base--selected')).toBeNull();
+        });
+
+        it('émet part="base base--selected" quand active est true', async () => {
+            el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
+            el.active = true;
+            await waitForUpdate(el);
+            expect(getPart(el, 'base--selected')).not.toBeNull();
         });
     });
 

@@ -11,26 +11,16 @@ import styles from './tab.styles.js';
  *
  * @slot - Libellé de l'onglet.
  *
- * @csspart base - Wrapper du slot — couleur, fond, padding, box-shadow actif.
+ * @csspart base - Wrapper du slot — padding, box-shadow actif.
+ * @csspart base--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `base`, propriété `active` pilotée par ar-tab-group).
  *
- * @cssprop --ar-tab-color - Couleur du texte (état par défaut).
- * @cssprop --ar-tab-bg - Fond (état par défaut).
  * @cssprop --ar-tab-padding-x - Padding horizontal.
  * @cssprop --ar-tab-padding-y - Padding vertical.
- * @cssprop --ar-tab-border-radius - Rayon de bordure (utile pour le style pill).
- * @cssprop --ar-tab-font-weight - Graisse du texte.
- * @cssprop --ar-tab-hover-color - Couleur du texte au survol.
- * @cssprop --ar-tab-hover-bg - Fond au survol.
- * @cssprop --ar-tab-active-color - Couleur du texte quand l'onglet est actif.
- * @cssprop --ar-tab-active-bg - Fond quand l'onglet est actif.
- * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
- * @cssprop --ar-tab-indicator-color - Couleur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
- * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
- * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
- * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
+ * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
+ * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *
- * Note d'implémentation : la mise en page de [part='base'] compense la bordure de son parent
+ * Note d'implémentation : la mise en page de [part~='base'] compense la bordure de son parent
  * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
  * (déclarés et documentés sur ar-tab-group, cf. tab-group.ts) — pas des tokens propres à ar-tab.
  * Le fallback 0px est structurel (évite un décalage visuel si ar-tab est utilisé hors d'un
@@ -44,6 +34,12 @@ export class ArTab extends LitElement {
 
     /** Désactive l'onglet — non sélectionnable, ignoré au clavier. */
     @property({ reflect: true, type: Boolean }) disabled = false;
+
+    /**
+     * Vrai quand l'onglet est actif (sélectionné).
+     * @readonly Piloté par ar-tab-group — ne pas modifier directement.
+     */
+    @property({ reflect: true, type: Boolean }) active = false;
 
     _registry?: TabGroupRegistry | undefined;
 
@@ -86,6 +82,6 @@ export class ArTab extends LitElement {
     };
 
     override render() {
-        return html`<div part="base"><slot></slot></div>`;
+        return html`<div part="base${this.active ? ' base--selected' : ''}"><slot></slot></div>`;
     }
 }

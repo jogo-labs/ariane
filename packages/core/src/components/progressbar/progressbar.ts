@@ -1,7 +1,6 @@
 import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import utilitiesStyles from '../../styles/utilities.styles.js';
 import { warn } from '../../utils/warn.js';
 import styles from './progressbar.styles.js';
 
@@ -29,10 +28,10 @@ export class ArProgressbarConfig {
  *
  * @cssprop --ar-progressbar-track-color - Couleur du rail (fond). Repli `ButtonFace` si aucun thème n'est chargé (WCAG 1.4.11).
  * @cssprop --ar-progressbar-fill-color - Couleur de la progression. Repli `ButtonText` si aucun thème n'est chargé (WCAG 1.4.11) — distinct de `ButtonFace` pour garder rail et remplissage contrastés entre eux.
- * @cssprop --ar-progressbar-percent-color - Couleur du texte du pourcentage.
+ * @cssprop --ar-progressbar-max-width - Largeur maximale du composant. Repli `500px` si aucun thème n'est chargé — sans plafond, le pourcentage peut s'éloigner visuellement de son label sur un conteneur très large.
  */
 export class ArProgressbar extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, styles];
+    static override styles: CSSResultGroup = [styles];
 
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
@@ -58,17 +57,16 @@ export class ArProgressbar extends LitElement {
         // Clamp défensif : même si la propriété est bornée, une valeur HTML arbitraire peut passer
         const percentValue = Math.max(0, Math.min(100, this.percent));
 
-        return html` <div part="container" class="progressbar-container">
-            <p part="label" id="progressbar-label" class="progress-label">
-                <span part="label-text" class="content-label">
+        return html` <div part="container">
+            <p part="label" id="progressbar-label">
+                <span part="label-text">
                     <slot></slot>
                 </span>
-                <strong part="percent" class="progress-percent">${percentValue}%</strong>
+                <strong part="percent">${percentValue}%</strong>
             </p>
-            <div part="track" class="progress d-inline-flex">
+            <div part="track">
                 <div
                     part="bar"
-                    class="progress-bar"
                     style=${styleMap({ width: percentValue + '%' })}
                     role="progressbar"
                     aria-labelledby="progressbar-label"

@@ -8,7 +8,6 @@ export default css`
     [part='base'] {
         display: flex;
         flex-direction: column;
-        gap: var(--ar-tab-group-gap);
     }
 
     [part='nav'] {

@@ -20,7 +20,6 @@ import styles from './tab-group.styles.js';
  * Les classes `has-overflow-start` et `has-overflow-end` sont ajoutées automatiquement sur l'hôte
  * quand le contenu de la tablist déborde à gauche ou à droite.
  *
- * @cssprop --ar-tab-group-gap - Espacement entre tablist et panels.
  * @cssprop --ar-tab-group-border-top-width - Épaisseur du trait séparateur en haut de la la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-bottom-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-color - Couleur du trait séparateur sous la tablist.
@@ -157,6 +156,7 @@ export class ArTabGroup extends LitElement {
             tab.id = `${pfx}-tab-${tab.panel}`;
             tab.setAttribute('aria-controls', `${pfx}-panel-${tab.panel}`);
             tab.setAttribute('aria-selected', String(isActive));
+            tab.active = isActive;
             tab.setAttribute('tabindex', isActive ? '0' : '-1');
             if (tab.disabled) {
                 tab.setAttribute('aria-disabled', 'true');
