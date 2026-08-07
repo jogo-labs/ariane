@@ -52,7 +52,7 @@ export default css`
         flex-shrink: 0;
         justify-content: center;
         padding-bottom: 0.125rem;
-        margin-right: 0.5rem;
+        margin-inline-end: 0.5rem;
         transform: translateY(1px);
         box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
         background-color: transparent;
@@ -136,8 +136,8 @@ export default css`
     [part='substep'] [part~='bullet'] {
         width: 0.75rem;
         height: 0.75rem;
-        margin-left: 0.75rem;
-        margin-right: 1.25rem;
+        margin-inline-start: 0.75rem;
+        margin-inline-end: 1.25rem;
         display: block;
         padding-bottom: 0;
 

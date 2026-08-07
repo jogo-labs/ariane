@@ -140,4 +140,42 @@ describe('ar-stepper — browser', () => {
             expect(newCurrent.matches(':focus-visible')).to.equal(true);
         });
     });
+
+    describe('propriétés logiques par défaut (RTL)', () => {
+        async function desktopStepper(dir: 'ltr' | 'rtl' = 'ltr'): Promise<ArStepper> {
+            const stepper = await fixture<ArStepper>(html`
+                <ar-stepper current-path="/step2" desktop-from="0" dir=${dir}>
+                    <ar-stepper-item label="Étape 1" href="/step1">
+                        <ar-stepper-item label="Sous-étape 1" href="/step1-1"></ar-stepper-item>
+                    </ar-stepper-item>
+                    <ar-stepper-item label="Étape 2" href="/step2"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await aTimeout(50);
+            return stepper;
+        }
+
+        // Un test purement LTR ne distingue pas margin-inline-end de margin-right (même
+        // résultat calculé dans les deux cas) — la comparaison passe par dir="rtl", où seule
+        // une propriété logique bascule physiquement de côté.
+        it('la puce utilise margin-inline-end : bascule à gauche sous dir="rtl"', async () => {
+            el = await desktopStepper('rtl');
+            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            if (!bullet) throw new Error('[part~="bullet"] introuvable');
+            const style = getComputedStyle(bullet);
+            expect(style.marginLeft).to.equal('8px');
+            expect(style.marginRight).to.equal('0px');
+        });
+
+        it('la puce de sous-étape utilise margin-inline-start/end : bascule sous dir="rtl"', async () => {
+            el = await desktopStepper('rtl');
+            const subBullet = el.shadowRoot?.querySelector<HTMLElement>(
+                "[part='substep'] [part~='bullet']",
+            );
+            if (!subBullet) throw new Error("[part='substep'] [part~='bullet'] introuvable");
+            const style = getComputedStyle(subBullet);
+            expect(style.marginRight).to.equal('12px');
+            expect(style.marginLeft).to.equal('20px');
+        });
+    });
 });
