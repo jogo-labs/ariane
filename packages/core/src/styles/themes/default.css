@@ -469,7 +469,6 @@
 
         --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-interactive);
 
-        --ar-tab-disabled-opacity: 0.5;
         --ar-tab-focus-ring-offset: -2px;
         --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
 
@@ -1232,6 +1231,6 @@
     }
 
     ar-tab[disabled] {
-        opacity: var(--ar-tab-disabled-opacity);
+        opacity: 0.5;
     }
 }

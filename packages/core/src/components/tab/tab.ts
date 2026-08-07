@@ -16,7 +16,6 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-padding-x - Padding horizontal.
  * @cssprop --ar-tab-padding-y - Padding vertical.
  * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
- * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *

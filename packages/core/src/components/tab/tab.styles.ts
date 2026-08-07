@@ -8,10 +8,10 @@ export default css`
         user-select: none;
     }
 
-    [part='base'] {
+    [part~='base'] {
         display: flex;
         align-items: center;
-        /* a11y-fallback: sans thème, --ar-tab-bg reste transparent même par défaut — le padding est le seul mécanisme séparant visuellement des onglets adjacents ; sans lui les libellés se collent les uns aux autres */
+        /* a11y-fallback: sans thème, le fond de l'onglet reste transparent par défaut (couleur/fond posés par le thème via ::part()) — le padding est le seul mécanisme séparant visuellement des onglets adjacents ; sans lui les libellés se collent les uns aux autres */
         padding: var(--ar-tab-padding-y, 1rem) var(--ar-tab-padding-x, 1.5rem);
         border-radius: inherit;
         margin-block-start: calc(-1 * var(--ar-tab-group-border-top-width, 0px));
@@ -22,7 +22,7 @@ export default css`
         cursor: default;
     }
 
-    :host([active]) [part='base'] {
+    [part~='base--selected'] {
         /* a11y-fallback: indicateur d'onglet actif indiscernable sans thème (WCAG 2.4.7) */
         box-shadow: var(--ar-tab-active-shadow, inset 0 -2px 0 Highlight);
     }
