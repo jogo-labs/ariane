@@ -33,6 +33,7 @@ export default css`
 
     :host(:focus-visible) {
         outline: 2px solid var(--ar-tab-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-tab-focus-ring-offset);
+        /* a11y-fallback: anneau de focus potentiellement rogné par le conteneur overflow-x: auto de ar-tab-group sans thème (WCAG 2.4.7) */
+        outline-offset: var(--ar-tab-focus-ring-offset, -2px);
     }
 `;
