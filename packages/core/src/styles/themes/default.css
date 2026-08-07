@@ -450,11 +450,7 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Charcounter
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-charcounter-color: var(--ar-color-text-muted);
-        --ar-charcounter-font-size: 0.875rem;
-        --ar-charcounter-warning-color: var(--ar-color-warning-text);
         --ar-charcounter-warning-weight: 600;
-        --ar-charcounter-error-color: var(--ar-color-danger-text);
         --ar-charcounter-error-weight: 700;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1185,6 +1181,21 @@
 
         &::part(indicator) {
             gap: 3px;
+        }
+    }
+
+    ar-charcounter {
+        &::part(count) {
+            color: var(--ar-color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        &::part(count--warning) {
+            color: var(--ar-color-warning-text);
+        }
+
+        &::part(count--error) {
+            color: var(--ar-color-danger-text);
         }
     }
 }

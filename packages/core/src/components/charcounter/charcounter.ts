@@ -23,15 +23,11 @@ function pluralize(count: number, label: string): string {
  * @slot icon-error   - Icône affichée en état error.
  *
  * @csspart container - L'élément racine.
- * @csspart count     - Le bloc chiffre + label.
+ * @csspart count     - Le bloc chiffre + label. `count--warning`/`count--error` en état warning/error.
  * @csspart remaining - Le chiffre des caractères restants.
  * @csspart label     - Le texte après le chiffre (ex: "restants").
  *
- * @cssprop --ar-charcounter-color - Couleur état normal.
- * @cssprop --ar-charcounter-warning-color - Couleur état warning.
- * @cssprop --ar-charcounter-error-color - Couleur état error.
- * @cssprop --ar-charcounter-font-size - Taille de police.
- * @cssprop --ar-charcounter-warning-weight - Graisse du texte en état warning. Repli `700` si aucun thème n'est chargé — seul signal garanti d'état si le consommateur n'utilise pas les slots d'icône.
+ * @cssprop --ar-charcounter-warning-weight - Graisse du texte en état warning. Repli `700` si aucun thème n'est chargé — seul signal garanti d'état en l'absence des slots d'icône.
  * @cssprop --ar-charcounter-error-weight - Graisse du texte en état error. Repli `700` si aucun thème n'est chargé.
  */
 export class ArCharcounter extends LitElement {
@@ -234,7 +230,7 @@ export class ArCharcounter extends LitElement {
             <span part="container">
                 <slot name="icon-warning"></slot>
                 <slot name="icon-error"></slot>
-                <span part="count">
+                <span part="count${this._state !== 'normal' ? ` count--${this._state}` : ''}">
                     <span part="remaining">${remaining}</span>
                     <span part="label"> ${pluralize(remaining, this.label)}</span>
                 </span>
