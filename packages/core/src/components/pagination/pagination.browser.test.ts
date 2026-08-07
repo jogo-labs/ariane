@@ -5,6 +5,7 @@
  * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
  *   - Focus + :focus-visible après activation d'un lien de page (#154),
  *     vérifiable uniquement avec un vrai `:focus-visible` (absent de happy-dom).
+ *   - Propriétés CSS logiques (RTL).
  */
 import { fixture, html, expect, elementUpdated } from '@open-wc/testing';
 import './index.js';
@@ -46,12 +47,11 @@ describe('ar-pagination — browser', () => {
             const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
             const sheet = [...(el.shadowRoot?.adoptedStyleSheets ?? [])];
             const cssText = sheet.flatMap((s) => [...s.cssRules]).map((r) => r.cssText);
-            const listRule = cssText.find(
-                (rule) => rule.includes('[part') && rule.includes('list'),
-            );
+            const listRule = cssText.find((rule) => rule.includes('[part="list"]'));
             if (!listRule) {
-                console.log('Available CSS rules:', cssText);
-                throw new Error('[part="list"] rule not found in CSS');
+                throw new Error(
+                    `[part="list"] rule not found in CSS. Available rules: ${cssText.join(', ')}`,
+                );
             }
             expect(listRule).to.include('padding-inline-start');
             expect(listRule).to.not.include('padding-left');

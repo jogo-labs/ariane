@@ -136,9 +136,10 @@ export class ArStepper extends LitElement {
      * Inverse l'alignement de la liste d'étapes en mode desktop. Sans effet en mode
      * mobile (dropdown).
      * @attr reverse-align
+     * @default false
      */
     @property({ attribute: 'reverse-align', reflect: true, type: Boolean })
-    reverseAlign = false;
+    reverseAlign: boolean = false;
 
     @state()
     private _currentStepIndex = 0;
