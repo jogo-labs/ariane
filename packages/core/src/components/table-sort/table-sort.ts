@@ -54,7 +54,8 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  *
  * @slot - Libellé de la colonne.
  *
- * @csspart button    - Le bouton déclencheur. `button--pending` pendant l'attente de confirmation.
+ * @csspart button    - Le bouton déclencheur.
+ * @csspart button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `button`).
  * @csspart indicator - L'icône de direction de tri.
  *
  * @cssprop --ar-table-sort-indicator-size - Taille de l'icône indicateur asc / desc.

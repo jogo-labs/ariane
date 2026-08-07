@@ -11,7 +11,8 @@ import styles from './tab.styles.js';
  *
  * @slot - Libellé de l'onglet.
  *
- * @csspart base - Wrapper du slot — padding, box-shadow actif. `base--selected` quand l'onglet est actif (propriété `active`, pilotée par ar-tab-group).
+ * @csspart base - Wrapper du slot — padding, box-shadow actif.
+ * @csspart base--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `base`, propriété `active` pilotée par ar-tab-group).
  *
  * @cssprop --ar-tab-padding-x - Padding horizontal.
  * @cssprop --ar-tab-padding-y - Padding vertical.
@@ -19,7 +20,7 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *
- * Note d'implémentation : la mise en page de [part='base'] compense la bordure de son parent
+ * Note d'implémentation : la mise en page de [part~='base'] compense la bordure de son parent
  * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
  * (déclarés et documentés sur ar-tab-group, cf. tab-group.ts) — pas des tokens propres à ar-tab.
  * Le fallback 0px est structurel (évite un décalage visuel si ar-tab est utilisé hors d'un
