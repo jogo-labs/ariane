@@ -14,7 +14,7 @@ export default css`
     }
 
     .list-unstyled {
-        padding-left: 0;
+        padding-inline-start: 0;
         list-style: none;
     }
 

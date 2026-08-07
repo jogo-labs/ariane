@@ -10,7 +10,7 @@ export default css`
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        padding-left: 0;
+        padding-inline-start: 0;
         margin-bottom: 0;
         list-style: none;
     }

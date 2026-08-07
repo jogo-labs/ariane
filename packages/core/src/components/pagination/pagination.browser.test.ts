@@ -5,6 +5,7 @@
  * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
  *   - Focus + :focus-visible après activation d'un lien de page (#154),
  *     vérifiable uniquement avec un vrai `:focus-visible` (absent de happy-dom).
+ *   - Propriétés CSS logiques (RTL).
  */
 import { fixture, html, expect, elementUpdated } from '@open-wc/testing';
 import './index.js';
@@ -30,6 +31,30 @@ describe('ar-pagination — browser', () => {
             const current = shadowRoot.querySelector('[part~="current"]') as HTMLElement;
             expect(shadowRoot.activeElement).to.equal(current);
             expect(current.matches(':focus-visible')).to.equal(true);
+        });
+    });
+
+    describe('propriétés logiques (RTL)', () => {
+        it('[part="list"] utilise padding-inline-start plutôt que padding-left', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+            if (!list) throw new Error('[part="list"] introuvable');
+            const style = getComputedStyle(list);
+            expect(style.paddingInlineStart).to.equal('0px');
+        });
+
+        it('la règle CSS source déclare padding-inline-start, pas padding-left', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const sheet = [...(el.shadowRoot?.adoptedStyleSheets ?? [])];
+            const cssText = sheet.flatMap((s) => [...s.cssRules]).map((r) => r.cssText);
+            const listRule = cssText.find((rule) => rule.includes('[part="list"]'));
+            if (!listRule) {
+                throw new Error(
+                    `[part="list"] rule not found in CSS. Available rules: ${cssText.join(', ')}`,
+                );
+            }
+            expect(listRule).to.include('padding-inline-start');
+            expect(listRule).to.not.include('padding-left');
         });
     });
 });
