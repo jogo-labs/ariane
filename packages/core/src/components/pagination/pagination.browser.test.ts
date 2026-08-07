@@ -32,4 +32,29 @@ describe('ar-pagination — browser', () => {
             expect(current.matches(':focus-visible')).to.equal(true);
         });
     });
+
+    describe('propriétés logiques (RTL)', () => {
+        it('[part="list"] utilise padding-inline-start plutôt que padding-left', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+            if (!list) throw new Error('[part="list"] introuvable');
+            const style = getComputedStyle(list);
+            expect(style.paddingInlineStart).to.equal('0px');
+        });
+
+        it('la règle CSS source déclare padding-inline-start, pas padding-left', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const sheet = [...(el.shadowRoot?.adoptedStyleSheets ?? [])];
+            const cssText = sheet.flatMap((s) => [...s.cssRules]).map((r) => r.cssText);
+            const listRule = cssText.find(
+                (rule) => rule.includes('[part') && rule.includes('list'),
+            );
+            if (!listRule) {
+                console.log('Available CSS rules:', cssText);
+                throw new Error('[part="list"] rule not found in CSS');
+            }
+            expect(listRule).to.include('padding-inline-start');
+            expect(listRule).to.not.include('padding-left');
+        });
+    });
 });
