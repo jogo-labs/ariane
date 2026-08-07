@@ -102,7 +102,7 @@ describe('ar-table-sort — accessibilité', () => {
             el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.click();
             await el.updateComplete;
             expect(
-                el.shadowRoot!.querySelector('[part="button"]')!.getAttribute('aria-disabled'),
+                el.shadowRoot!.querySelector('[part~="button"]')!.getAttribute('aria-disabled'),
             ).to.equal('true');
         });
     });

@@ -190,7 +190,7 @@ describe('ArTableSort', () => {
             el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.click();
             await waitForUpdate(el);
             expect(
-                el.shadowRoot!.querySelector('[part="button"]')!.getAttribute('aria-disabled'),
+                el.shadowRoot!.querySelector('[part~="button"]')!.getAttribute('aria-disabled'),
             ).toBe('true');
         });
     });

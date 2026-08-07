@@ -33,6 +33,6 @@ export default css`
 
     :host(:focus-visible) {
         outline: 2px solid var(--ar-tab-focus-ring-color, ButtonText);
-        outline-offset: var(--ar-tab-focus-ring-offset, -2px);
+        outline-offset: var(--ar-tab-focus-ring-offset);
     }
 `;

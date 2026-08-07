@@ -4,7 +4,7 @@ import type { ArTableSort } from './table-sort.js';
 import './index.js';
 
 function btn(el: ArTableSort): HTMLButtonElement {
-    const b = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="button"]');
+    const b = el.shadowRoot?.querySelector<HTMLButtonElement>('[part~="button"]');
     if (!b) throw new Error('part="button" introuvable');
     return b;
 }
