@@ -156,19 +156,22 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('propriétés logiques (RTL)', () => {
-        it('[part="nav"] utilise padding-inline-end plutôt que padding-right', async () => {
+        it('[part="nav"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
             el = await fixture<ArBreadcrumb>(html`
-                <ar-breadcrumb>
+                <ar-breadcrumb dir="rtl">
                     <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>
                     <ar-breadcrumb-item current label="Page"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            await el.updateComplete;
             const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
             if (!nav) throw new Error('[part="nav"] introuvable');
             const style = getComputedStyle(nav);
-            expect(style.paddingInlineEnd).to.equal('4px');
-            expect(style.paddingLeft).to.equal('0px');
+            // padding-inline-end sous dir="rtl" se résout physiquement à GAUCHE — un
+            // padding-right physique resterait à droite quel que soit dir. Seule une
+            // propriété logique peut produire ce résultat ; un test purement en LTR ne
+            // distingue pas logique/physique (les deux donnent le même résultat en LTR).
+            expect(style.paddingLeft).to.equal('4px');
+            expect(style.paddingRight).to.equal('0px');
         });
     });
 });
