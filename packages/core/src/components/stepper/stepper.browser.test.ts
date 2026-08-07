@@ -183,12 +183,12 @@ describe('ar-stepper — browser', () => {
         // padding-left: 0, une propriété physique qui ne résout pas le padding-inline-start
         // de 40px imposé par l'UA stylesheet sur <ol> sous dir="rtl" (indent fantôme côté
         // start/droite). Le fix passe .list-unstyled en padding-inline-start: 0.
-        it('la liste (.list-unstyled) n\'a pas de padding fantôme côté physique gauche sous dir="rtl"', async () => {
+        it('la liste (.list-unstyled) n\'a pas de padding fantôme côté start (droite) sous dir="rtl"', async () => {
             el = await desktopStepper('rtl');
             const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
             if (!list) throw new Error('[part="list"] introuvable');
             const style = getComputedStyle(list);
-            expect(style.paddingLeft).to.equal('0px');
+            expect(style.paddingRight).to.equal('0px');
         });
     });
 
