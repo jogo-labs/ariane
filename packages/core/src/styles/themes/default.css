@@ -485,7 +485,6 @@
         --ar-tab-focus-ring-offset: -2px;
         --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
 
-        --ar-tab-group-gap: 0;
         --ar-tab-group-border-color: var(--ar-color-border);
         --ar-tab-group-border-top-width: 0;
         --ar-tab-group-border-bottom-width: 1px;
@@ -1215,6 +1214,12 @@
         &::part(track),
         &::part(bar) {
             border-radius: 50rem;
+        }
+    }
+
+    ar-tab-group {
+        &::part(base) {
+            gap: 0;
         }
     }
 }
