@@ -1,7 +1,6 @@
 import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import utilitiesStyles from '../../styles/utilities.styles.js';
 import { warn } from '../../utils/warn.js';
 import styles from './progressbar.styles.js';
 
@@ -32,7 +31,7 @@ export class ArProgressbarConfig {
  * @cssprop --ar-progressbar-max-width - Largeur maximale du composant. Repli `500px` si aucun thème n'est chargé — sans plafond, le pourcentage peut s'éloigner visuellement de son label sur un conteneur très large.
  */
 export class ArProgressbar extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, styles];
+    static override styles: CSSResultGroup = [styles];
 
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
