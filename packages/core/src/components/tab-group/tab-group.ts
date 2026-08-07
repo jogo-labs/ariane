@@ -156,6 +156,7 @@ export class ArTabGroup extends LitElement {
             tab.id = `${pfx}-tab-${tab.panel}`;
             tab.setAttribute('aria-controls', `${pfx}-panel-${tab.panel}`);
             tab.setAttribute('aria-selected', String(isActive));
+            tab.active = isActive;
             tab.setAttribute('tabindex', isActive ? '0' : '-1');
             if (tab.disabled) {
                 tab.setAttribute('aria-disabled', 'true');
