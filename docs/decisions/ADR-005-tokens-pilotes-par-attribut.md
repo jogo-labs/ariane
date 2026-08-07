@@ -626,11 +626,10 @@ inerte — `ar-datepicker::part(panel)` fixe `width: 20rem` dans `default.css` e
 générique `--ar-panel-min-width` et la largeur du calendrier, à garder en tête si ce token est
 modifié par un thème personnalisé.
 
-## Application — lot 8 : `ar-table-sort`, `ar-charcounter`, `ar-progressbar`, `ar-tab-group`,
+## Application — lot 8 (2026-08-06)
 
-`ar-tab`, `ar-collapse` (2026-08-06)
-
-Dernier lot du chantier #129. Périmètre initial : `table-sort`, `charcounter`, `progressbar`,
+Dernier lot du chantier #129 : `ar-table-sort`, `ar-charcounter`, `ar-progressbar`,
+`ar-tab-group`, `ar-tab`, `ar-collapse`. Périmètre initial : `table-sort`, `charcounter`, `progressbar`,
 `tab-group`, `collapse` — les 5 candidats les plus légers identifiés par l'audit du
 2026-07-25. `ar-tab` a été ajouté en cours de route, hors périmètre nommé, à la demande du
 mainteneur : il partage deux tokens de bordure avec `ar-tab-group` (voir plus bas), et s'est
