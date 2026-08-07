@@ -62,9 +62,9 @@ Ajouter dans `packages/core/src/components/breadcrumb/breadcrumb.browser.test.ts
 
 ```ts
 describe('propriétés logiques (RTL)', () => {
-    it('[part="nav"] utilise padding-inline-end plutôt que padding-right', async () => {
+    it('[part="nav"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
         el = await fixture<ArBreadcrumb>(html`
-            <ar-breadcrumb>
+            <ar-breadcrumb dir="rtl">
                 <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>
                 <ar-breadcrumb-item current label="Page"></ar-breadcrumb-item>
             </ar-breadcrumb>
@@ -72,7 +72,11 @@ describe('propriétés logiques (RTL)', () => {
         const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
         if (!nav) throw new Error('[part="nav"] introuvable');
         const style = getComputedStyle(nav);
-        expect(style.paddingInlineEnd).to.equal('4px');
+        // padding-inline-end sous dir="rtl" se résout physiquement à GAUCHE — un
+        // padding-right physique resterait à droite quel que soit dir. Seule une
+        // propriété logique peut produire ce résultat ; un test purement en LTR ne
+        // distingue pas logique/physique (les deux donnent le même résultat en LTR).
+        expect(style.paddingLeft).to.equal('4px');
         expect(style.paddingRight).to.equal('0px');
     });
 });
@@ -86,7 +90,7 @@ Run: `cd /Users/jon/Code/Active_projects/ariane && npm run test:all -- --group b
 
 (Si ce script n'existe pas tel quel, utiliser la commande WTR standard du projet : `npx wtr --group breadcrumb` depuis `packages/core`, ou consulter `package.json` racine pour le script exact `test:all`.)
 
-Expected: FAIL — `paddingInlineEnd` est `'0px'` et `paddingRight` est `'4px'` (comportement actuel physique).
+Expected: FAIL — avec `padding-right` physique actuel, `paddingLeft` vaut `'0px'` sous `dir="rtl"` (le padding ne bascule pas de côté).
 
 - [ ] **Step 3: Migrer les propriétés physiques vers logiques**
 
@@ -241,9 +245,9 @@ Ajouter dans `packages/core/src/components/stepper/stepper.browser.test.ts` (nou
 
 ```ts
 describe('propriétés logiques par défaut (RTL)', () => {
-    async function desktopStepper(): Promise<ArStepper> {
+    async function desktopStepper(dir: 'ltr' | 'rtl' = 'ltr'): Promise<ArStepper> {
         const stepper = await fixture<ArStepper>(html`
-            <ar-stepper current-path="/step2" desktop-from="0">
+            <ar-stepper current-path="/step2" desktop-from="0" dir=${dir}>
                 <ar-stepper-item label="Étape 1" href="/step1">
                     <ar-stepper-item label="Sous-étape 1" href="/step1-1"></ar-stepper-item>
                 </ar-stepper-item>
@@ -254,26 +258,27 @@ describe('propriétés logiques par défaut (RTL)', () => {
         return stepper;
     }
 
-    it('la puce utilise margin-inline-end plutôt que margin-right', async () => {
-        el = await desktopStepper();
+    // Un test purement LTR ne distingue pas margin-inline-end de margin-right (même
+    // résultat calculé dans les deux cas) — la comparaison passe par dir="rtl", où seule
+    // une propriété logique bascule physiquement de côté.
+    it('la puce utilise margin-inline-end : bascule à gauche sous dir="rtl"', async () => {
+        el = await desktopStepper('rtl');
         const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
         if (!bullet) throw new Error('[part~="bullet"] introuvable');
         const style = getComputedStyle(bullet);
-        expect(style.marginInlineEnd).to.equal('8px');
+        expect(style.marginLeft).to.equal('8px');
         expect(style.marginRight).to.equal('0px');
     });
 
-    it('la puce de sous-étape utilise margin-inline-start/end plutôt que margin-left/right', async () => {
-        el = await desktopStepper();
+    it('la puce de sous-étape utilise margin-inline-start/end : bascule sous dir="rtl"', async () => {
+        el = await desktopStepper('rtl');
         const subBullet = el.shadowRoot?.querySelector<HTMLElement>(
             "[part='substep'] [part~='bullet']",
         );
         if (!subBullet) throw new Error("[part='substep'] [part~='bullet'] introuvable");
         const style = getComputedStyle(subBullet);
-        expect(style.marginInlineStart).to.equal('12px');
-        expect(style.marginInlineEnd).to.equal('20px');
-        expect(style.marginLeft).to.equal('0px');
-        expect(style.marginRight).to.equal('0px');
+        expect(style.marginRight).to.equal('12px');
+        expect(style.marginLeft).to.equal('20px');
     });
 });
 ```
@@ -282,7 +287,7 @@ describe('propriétés logiques par défaut (RTL)', () => {
 
 Run: `cd /Users/jon/Code/Active_projects/ariane && npm run test:all -- --group stepper`
 
-Expected: FAIL — actuellement `marginRight` vaut `8px`/`20px` et `marginInlineEnd` vaut `0px`.
+Expected: FAIL — avec `margin-right`/`margin-left` physiques actuels, les marges ne basculent pas de côté sous `dir="rtl"` (`marginLeft` reste `0px` sur la puce principale, `marginRight`/`marginLeft` de la sous-puce restent inversés par rapport à l'attendu).
 
 - [ ] **Step 3: Migrer les propriétés physiques vers logiques**
 
