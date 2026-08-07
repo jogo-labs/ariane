@@ -460,8 +460,6 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Tablesort
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-table-sort-gap: 0.375rem;
-        --ar-table-sort-indicator-gap: 3px;
         --ar-table-sort-indicator-size: 0.65rem;
         --ar-table-sort-indicator-color: var(--ar-color-text-muted, #9ca3af);
         --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
@@ -1173,6 +1171,20 @@
             padding: 0.375rem 0.625rem;
             max-width: 18rem;
             line-height: 1.4;
+        }
+    }
+
+    ar-table-sort {
+        &::part(button) {
+            gap: 0.375rem;
+        }
+
+        &::part(button--pending) {
+            cursor: wait;
+        }
+
+        &::part(indicator) {
+            gap: 3px;
         }
     }
 }

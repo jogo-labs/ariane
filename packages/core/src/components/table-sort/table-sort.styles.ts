@@ -9,7 +9,6 @@ export default css`
     [part='button'] {
         display: inline-flex;
         align-items: center;
-        gap: var(--ar-table-sort-gap);
         background: none;
         border: none;
         padding: 0;
@@ -25,17 +24,12 @@ export default css`
         border-radius: 2px;
     }
 
-    [part='button'][aria-disabled='true'] {
-        cursor: wait;
-    }
-
     /* ── Indicateur ↑↓ ──────────────────────────────────────────── */
 
     [part='indicator'] {
         display: inline-flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--ar-table-sort-indicator-gap);
         width: var(--ar-table-sort-indicator-size);
         flex-shrink: 0;
     }

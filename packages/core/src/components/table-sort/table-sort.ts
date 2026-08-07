@@ -51,16 +51,13 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  * @display demo
  *
  * Placer à l'intérieur d'un `<th>`. Le composant met à jour `aria-sort` et `scope="col"` sur
- * le `<th>` ancêtre. Le consommateur appelle `confirm()` après un tri réussi ou `reject()` en
- * cas d'échec.
+ * le `<th>` ancêtre. Appeler `confirm()` après un tri réussi, ou `reject()` en cas d'échec.
  *
  * @slot - Libellé de la colonne.
  *
- * @csspart button    - Le bouton déclencheur.
+ * @csspart button    - Le bouton déclencheur. `button--pending` pendant l'attente de confirmation.
  * @csspart indicator - L'icône de direction de tri.
  *
- * @cssprop --ar-table-sort-gap - Espacement label / indicateur.
- * @cssprop --ar-table-sort-indicator-gap - Espacement entre les icônes indicateurs asc / desc.
  * @cssprop --ar-table-sort-indicator-size - Taille de l'icône indicateur asc / desc.
  * @cssprop --ar-table-sort-indicator-color - Couleur état neutre.
  * @cssprop --ar-table-sort-indicator-active-color - Couleur état actif (asc/desc).
@@ -175,7 +172,7 @@ export class ArTableSort extends LitElement {
         const label = getActionLabel(this.type, this.order, this.pending);
         return html`
             <button
-                part="button"
+                part="button${this.pending ? ' button--pending' : ''}"
                 type="button"
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
