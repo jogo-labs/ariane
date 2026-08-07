@@ -759,8 +759,9 @@
             box-sizing: border-box;
             padding: 0 0.75rem;
             border: 1px solid var(--ar-color-border);
-            border-right: none;
-            border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
+            border-inline-end: none;
+            border-start-start-radius: var(--ar-border-radius-md);
+            border-end-start-radius: var(--ar-border-radius-md);
             background: var(--ar-color-bg);
             color: var(--ar-color-text);
             font-size: var(--ar-font-size-md);
@@ -792,7 +793,8 @@
             background: var(--ar-color-interactive);
             color: var(--ar-color-text-inverse);
             border: 1px solid var(--ar-color-interactive);
-            border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
+            border-start-end-radius: var(--ar-border-radius-md);
+            border-end-end-radius: var(--ar-border-radius-md);
             cursor: pointer;
             transition:
                 background 0.15s ease,
@@ -916,7 +918,7 @@
             opacity: 0.75;
             position: relative;
             top: -0.2rem;
-            right: -0.2rem;
+            inset-inline-end: -0.2rem;
         }
 
         &::part(close):hover {
@@ -1063,7 +1065,7 @@
         }
 
         &::part(trigger) {
-            margin-left: 0.5rem;
+            margin-inline-start: 0.5rem;
         }
     }
 
