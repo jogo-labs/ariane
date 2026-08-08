@@ -75,8 +75,15 @@ export class ArPagination extends LitElement {
     @state() private _budget?: number;
     private _resizeObserver?: ResizeObserver;
     private _itemWidth = 0;
+    private _initialized = false;
+
+    override connectedCallback(): void {
+        super.connectedCallback();
+        if (this._initialized) this._setupResizeObserver();
+    }
 
     override firstUpdated(): void {
+        this._initialized = true;
         this._setupResizeObserver();
     }
 
@@ -86,6 +93,7 @@ export class ArPagination extends LitElement {
     }
 
     private _setupResizeObserver(): void {
+        this._resizeObserver?.disconnect();
         const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
         if (!nav) return;
         this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
