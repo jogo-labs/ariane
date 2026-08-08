@@ -6,6 +6,13 @@ export default css`
         align-items: center;
     }
 
+    /* Réinitialise le poids hérité du <th> (bold par défaut UA) pour le tooltip interne
+       uniquement — un reset sur :host affecterait aussi le libellé de colonne slotté
+       (même parent DOM réel que le tooltip pour l'héritage CSS, cf. #168). */
+    ar-tooltip {
+        font-weight: normal;
+    }
+
     [part~='button'] {
         display: inline-flex;
         align-items: center;
