@@ -124,4 +124,25 @@ describe('ar-table-sort — browser', () => {
             expect(th.getAttribute('aria-sort')).to.equal('none');
         });
     });
+
+    // ── font-weight du tooltip interne (régression #168) ────────────────────
+
+    describe('font-weight du tooltip interne', () => {
+        it("le tooltip n'hérite pas du bold par défaut d'un <th>, le libellé de colonne si", async () => {
+            const th = await fixture<HTMLTableCellElement>(
+                html`<th>
+                    <ar-table-sort><span id="label">Nom</span></ar-table-sort>
+                </th>`,
+            );
+            const el = th.querySelector<ArTableSort>('ar-table-sort')!;
+            await el.updateComplete;
+
+            const label = th.querySelector<HTMLElement>('#label')!;
+            expect(getComputedStyle(label).fontWeight).to.equal('700');
+
+            const tooltip = el.shadowRoot?.querySelector('ar-tooltip');
+            if (!tooltip) throw new Error('ar-tooltip introuvable');
+            expect(getComputedStyle(tooltip).fontWeight).to.equal('400');
+        });
+    });
 });
