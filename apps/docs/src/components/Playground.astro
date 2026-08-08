@@ -21,6 +21,11 @@ interface Variant {
     html:         string;
 }
 
+interface RelatedTokens {
+    component:   string;
+    description: string;
+}
+
 interface Props {
     variants:       Variant[];
     tagName:        string;
@@ -29,6 +34,7 @@ interface Props {
     playgroundHtml: string;
     controls:       CemControl[];
     component:      CemDeclaration;
+    relatedTokens?: RelatedTokens[];
 }
 
 const {
@@ -39,6 +45,7 @@ const {
     playgroundHtml,
     controls,
     component,
+    relatedTokens = [],
 } = Astro.props;
 
 const showPlayground = displayMode === 'demo';
@@ -164,7 +171,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Référence API ── */}
 <section id="reference-api">
     <h3 class="section-title">Référence API</h3>
-    <ComponentApi component={component} />
+    <ComponentApi component={component} relatedTokens={relatedTokens} />
 </section>
 
 <style>

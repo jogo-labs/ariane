@@ -40,11 +40,12 @@ const { component, mdx } = Astro.props as {
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
 
-const variants    = mdx?.data.variants ?? [];
-const pageTitle   = mdx?.data.title ?? component.name;
-const pageDesc    = mdx?.data.description ?? component.summary;
-const displayMode = component['x-display'] ?? 'demo';
-const parentTag   = component['x-parent'];
+const variants      = mdx?.data.variants ?? [];
+const pageTitle     = mdx?.data.title ?? component.name;
+const pageDesc      = mdx?.data.description ?? component.summary;
+const displayMode   = component['x-display'] ?? 'demo';
+const parentTag     = component['x-parent'];
+const relatedTokens = mdx?.data.relatedTokens ?? [];
 
 // ─── HTML initial du playground ───────────────────────────────────────────────
 
@@ -179,6 +180,7 @@ const tocEntries = [
             playgroundHtml={playgroundHtml}
             controls={controls}
             component={component}
+            relatedTokens={relatedTokens}
         />
     </div>
 

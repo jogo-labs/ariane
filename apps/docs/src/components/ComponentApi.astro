@@ -8,12 +8,19 @@
  */
 import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
+import { getSlug } from '../utils/tag-name.ts';
 
-interface Props {
-    component: CemDeclaration;
+interface RelatedTokens {
+    component:   string;
+    description: string;
 }
 
-const { component } = Astro.props;
+interface Props {
+    component:      CemDeclaration;
+    relatedTokens?: RelatedTokens[];
+}
+
+const { component, relatedTokens = [] } = Astro.props;
 
 const publicMethods = getPublicMethods(component);
 
@@ -149,7 +156,7 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
     )}
 
     {/* ── CSS Custom Properties propres au composant ── */}
-    {(ownProps.length > 0 || panelProps.length > 0) && (
+    {(ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0) && (
         <section>
             <h4 id="api-css-props" class="subsection-title">CSS Custom Properties</h4>
             {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
@@ -201,6 +208,20 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+            {/* ── Tokens d'un composant imbriqué en interne (ex. tooltip dans table-sort) ── */}
+            {relatedTokens.length > 0 && (
+                <div class="related-tokens">
+                    {relatedTokens.map((rt) => (
+                        <p class="related-tokens-note">
+                            {rt.description}{' '}
+                            <a href={`/components/${getSlug(rt.component)}`}>
+                                Voir les tokens de <code>{rt.component}</code>
+                            </a>
+                            .
+                        </p>
+                    ))}
                 </div>
             )}
         </section>
@@ -259,6 +280,19 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 
     .own-props-intro {
         margin-top: 1.875rem;
+    }
+
+    .related-tokens {
+        margin-top: 1.875rem;
+    }
+
+    .related-tokens-note {
+        font-size: 0.875rem;
+        color: var(--doc-text-muted);
+    }
+
+    .related-tokens-note a {
+        color: var(--doc-accent);
     }
 
     .token-example pre {

@@ -18,6 +18,19 @@ const variantSchema = z.object({
 });
 
 /**
+ * Note pointant vers les CSS Custom Properties d'un autre composant, applicables à
+ * celui-ci — cas d'un composant qui en imbrique un autre themable dans son propre
+ * shadow root (ex. ar-table-sort → ar-tooltip). Affichée dans la section CSS Custom
+ * Properties de la page, sous la table des tokens propres au composant.
+ */
+const relatedTokensSchema = z.object({
+    /** Tag du composant dont les tokens s'appliquent (ex: ar-tooltip) */
+    component: z.string(),
+    /** Explique pourquoi/comment ces tokens s'appliquent ici. Le lien vers la doc du composant est ajouté automatiquement. */
+    description: z.string(),
+});
+
+/**
  * Collection "components" — un fichier MDX par composant.
  * Le frontmatter définit les métadonnées et les variantes pré-configurées.
  */
@@ -36,6 +49,8 @@ const components = defineCollection({
         // variants: z.array(variantSchema).default([]),
         // coerce : si le champ est absent ou null dans le MDX, on force un array vide
         variants: z.preprocess((val) => (Array.isArray(val) ? val : []), z.array(variantSchema)),
+        /** Tokens d'autres composants applicables ici (composant imbriqué en interne) */
+        relatedTokens: z.array(relatedTokensSchema).optional(),
     }),
 });
 
