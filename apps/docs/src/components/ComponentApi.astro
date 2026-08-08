@@ -292,11 +292,15 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
     .related-tokens-note {
         margin: 0;
         font-size: 0.875rem;
-        color: var(--doc-text-muted);
+        /* Pas de couleur explicite : hérite de --ar-alert-color posé par ar-alert sur
+           :host — ar-alert calcule déjà un contraste correct contre son propre fond de
+           variante (info/warning/...), un remplacement fixe ici casserait ce contrat
+           pour tout variant dont le fond diffère de la couleur muette de la doc. */
     }
 
     .related-tokens-note a {
-        color: var(--doc-accent);
+        color: inherit;
+        text-decoration: underline;
     }
 
     .token-example pre {
