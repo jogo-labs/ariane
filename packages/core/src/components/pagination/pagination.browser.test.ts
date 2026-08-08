@@ -128,9 +128,15 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             const shadow = el.shadowRoot as ShadowRoot;
-            const status = shadow.querySelector('[part~="page-status"]');
+            const status = shadow.querySelector('[part~="page-status"]') as HTMLElement;
             expect(status).to.not.equal(null);
             expect(status?.textContent?.trim()).to.equal('Page 8 sur 15');
+
+            // `textContent` seul ne détecterait pas une régression où les espaces entre les
+            // mots disparaissent visuellement (chaque run devenant un flex item anonyme
+            // distinct sous [part~='item'] { display: flex }) : `innerText` reflète le rendu
+            // réel (layout appliqué), contrairement à `textContent` qui lit l'arbre DOM brut.
+            expect(status.innerText.trim()).to.match(/^Page\s+8\s+sur\s+15$/);
         });
 
         it('prev/next restent cliquables au palier texte', async () => {
@@ -156,6 +162,82 @@ describe('ar-pagination — browser', () => {
             const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
             if (!list) throw new Error('[part="list"] introuvable');
             expect(getComputedStyle(list).flexWrap).to.equal('nowrap');
+        });
+    });
+
+    describe('invariant anti-débordement avec le thème par défaut (#152, Finding Critical #1/#3)', () => {
+        async function waitForResize(): Promise<void> {
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+
+        // Reproduit les règles pertinentes de packages/core/src/styles/themes/default.css pour
+        // ar-pagination (column-gap sur [part='list'], padding sur link/current/ellipsis) sans
+        // charger le thème complet : ce sont précisément les règles non budgétées par
+        // `_recalculateBudget` avant le fix (Finding Critical #1), à l'origine d'un débordement
+        // horizontal mesuré jusqu'à 61px. `--ar-pagination-btn-size` n'a pas besoin d'être
+        // redéclaré ici : le composant a déjà un repli interne à 2.5rem, valeur identique à
+        // celle du thème par défaut.
+        let themeStyle: HTMLStyleElement;
+
+        beforeEach(() => {
+            themeStyle = document.createElement('style');
+            themeStyle.textContent = `
+                ar-pagination::part(list) { column-gap: 0.25rem; }
+                ar-pagination::part(link),
+                ar-pagination::part(current),
+                ar-pagination::part(ellipsis) { padding: 0 0.75rem; }
+            `;
+            document.head.appendChild(themeStyle);
+        });
+
+        afterEach(() => {
+            themeStyle.remove();
+        });
+
+        it('list.scrollWidth ne dépasse jamais list.clientWidth sur un balayage de largeurs (total=15)', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 700px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            for (const width of [280, 360, 440, 480, 700]) {
+                wrapper.style.width = `${width}px`;
+                await waitForResize();
+
+                const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+                if (!list) throw new Error('[part="list"] introuvable');
+                // Tolérance de 1px pour les arrondis sous-pixel de layout.
+                expect(list.scrollWidth, `débordement à ${width}px`).to.be.at.most(
+                    list.clientWidth + 1,
+                );
+            }
+        });
+
+        it('list.scrollWidth ne dépasse jamais list.clientWidth avec un total à 3 chiffres (total=999)', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 700px;">
+                    <ar-pagination current="500" total="999"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            for (const width of [280, 360, 440, 480, 700]) {
+                wrapper.style.width = `${width}px`;
+                await waitForResize();
+
+                const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+                if (!list) throw new Error('[part="list"] introuvable');
+                expect(list.scrollWidth, `débordement à ${width}px`).to.be.at.most(
+                    list.clientWidth + 1,
+                );
+            }
         });
     });
 });
