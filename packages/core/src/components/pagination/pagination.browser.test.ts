@@ -136,7 +136,10 @@ describe('ar-pagination — browser', () => {
             // mots disparaissent visuellement (chaque run devenant un flex item anonyme
             // distinct sous [part~='item'] { display: flex }) : `innerText` reflète le rendu
             // réel (layout appliqué), contrairement à `textContent` qui lit l'arbre DOM brut.
-            expect(status.innerText.trim()).to.match(/^Page\s+8\s+sur\s+15$/);
+            // Égalité stricte (pas une regex `\s+`) : `\s` matche aussi les retours à la ligne
+            // qu'`innerText` insère entre flex items séparés, ce qui laisserait passer un
+            // ancien balisage buggé (ex. "Page\n8\nsur\n15") sans jamais échouer.
+            expect(status.innerText.trim()).to.equal('Page 8 sur 15');
         });
 
         it('prev/next restent cliquables au palier texte', async () => {
@@ -162,6 +165,54 @@ describe('ar-pagination — browser', () => {
             const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
             if (!list) throw new Error('[part="list"] introuvable');
             expect(getComputedStyle(list).flexWrap).to.equal('nowrap');
+        });
+
+        it("ne reste pas bloqué au palier texte après un changement d'ordre de grandeur de total suivi d'un réélargissement", async () => {
+            // Régression : `total` qui change d'ordre de grandeur (9 → 10, 99 → 100, ...)
+            // pendant que le composant est déjà au palier texte marquait `_itemWidth` comme à
+            // remesurer, mais aucun item numérique n'est rendu à ce palier — sans item à
+            // mesurer, `_recalculateBudget` ne recalculait plus jamais `_budget`, bloquant le
+            // composant sur "Page X sur Y" même après un réélargissement massif du conteneur.
+            const wrapper = await fixture(
+                html`<div style="width: 700px;">
+                    <ar-pagination current="100" total="200"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+
+            // 1. Conteneur large → numéros affichés, `_itemWidth` mesuré normalement.
+            expect(
+                shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
+            ).to.be.greaterThan(0);
+
+            // 2. Rétrécir jusqu'au palier texte.
+            wrapper.style.width = '90px';
+            await waitForResize();
+            expect(shadow.querySelector('[part~="page-status"]')).to.not.equal(null);
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+
+            // 3. Changer `total` (et `current`, pour rester valide) d'ordre de grandeur pendant
+            //    que le composant est au palier texte (déclenche l'invalidation de
+            //    `_itemWidth`) — toujours aucun item numérique disponible pour remesurer
+            //    immédiatement.
+            (el as unknown as { total: number; current: number }).total = 15;
+            (el as unknown as { total: number; current: number }).current = 8;
+            await elementUpdated(el);
+            await waitForResize();
+
+            // 4. Réélargir le conteneur → les numéros doivent réapparaître normalement, pas
+            //    rester bloqués sur "Page X sur Y".
+            wrapper.style.width = '700px';
+            await waitForResize();
+
+            expect(shadow.querySelector('[part~="page-status"]')).to.equal(null);
+            expect(
+                shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
+            ).to.be.greaterThan(0);
         });
     });
 
