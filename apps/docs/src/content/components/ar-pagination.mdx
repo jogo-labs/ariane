@@ -50,10 +50,17 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ## Comportement responsive
 
-En dessous de **640px**, le composant réduit automatiquement le nombre de pages affichées :
+Le composant mesure sa propre largeur (pas celle du viewport) et réduit progressivement le
+nombre de numéros affichés pour toujours tenir sur une ligne — aucune configuration nécessaire :
 
-- Seules les pages **précédente**, **active**, **suivante** et les deux voisines directes restent visibles.
-- Les autres pages sont masquées — aucune configuration nécessaire.
+- **Largeur confortable** : tous les numéros de page, comme aujourd'hui.
+- **Largeur réduite** : les pages voisines de la page active diminuent progressivement (jusqu'à
+  ne plus afficher que la page active elle-même, entourée d'ellipses).
+- **Largeur extrême** : les numéros de page sont remplacés par un texte "Page X sur Y". Les
+  boutons précédent/suivant restent toujours affichés et fonctionnels.
+
+Le composant peut être placé dans un conteneur étroit (ex. barre latérale) sur un écran large : le
+comportement suit la largeur du conteneur, pas celle de l'écran.
 
 ## Utilisation
 
