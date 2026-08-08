@@ -8,7 +8,7 @@ export default css`
 
     [part='list'] {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: center;
         padding-inline-start: 0;
         margin-bottom: 0;
@@ -71,11 +71,7 @@ export default css`
         cursor: not-allowed;
     }
 
-    @media screen and (max-width: 640px) {
-        [part~='item']:nth-child(n + 3):nth-last-child(n + 3):not([part~='item--current']):not(
-                [aria-hidden='true']
-            ) {
-            display: none;
-        }
+    [part~='page-status'] {
+        white-space: nowrap;
     }
 `;
