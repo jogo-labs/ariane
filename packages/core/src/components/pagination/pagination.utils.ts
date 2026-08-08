@@ -46,11 +46,16 @@ function _pagesWithSiblings(current: number, total: number, siblingCount: number
     const showLeftEllipsis = left > 3;
     const showRightEllipsis = right < total - 2;
 
-    if (!showLeftEllipsis) {
+    if (!showLeftEllipsis && !showRightEllipsis) {
+        // Les deux fenêtres se rejoignent : la plage couvre tout [2, total-1] sans troncature,
+        // sinon les deux `if` s'écrasent silencieusement l'un l'autre et une page disparaît
+        // sans marqueur d'ellipse pour signaler la troncature.
+        left = 2;
+        right = total - 1;
+    } else if (!showLeftEllipsis) {
         left = 2;
         right = Math.min(windowSize, total - 1);
-    }
-    if (!showRightEllipsis) {
+    } else if (!showRightEllipsis) {
         right = total - 1;
         left = Math.max(total - windowSize + 1, 2);
     }

@@ -62,8 +62,26 @@ describe('_calculatePages', () => {
             expect(_calculatePages(1, 5, 3)).toEqual([1, -2, 5]);
         });
 
-        it("budget partiellement restreint : tronque avant d'atteindre le plancher", () => {
-            expect(_calculatePages(3, 5, 4)).toEqual([1, 3, 4, 5]);
+        it('budget insuffisant pour couvrir [2, total-1] sans ellipse : retombe au plancher (régression, ex-bug de trou invisible)', () => {
+            // Avant le correctif de _pagesWithSiblings, cette assertion attendait [1, 3, 4, 5] :
+            // la page 2 disparaissait silencieusement, sans marqueur d'ellipse. C'était la même
+            // classe de bug que la régression `_calculatePages(5, 9, 8)` ci-dessous — ce test
+            // encodait le bug plutôt que le documenter comme plancher légitime.
+            expect(_calculatePages(3, 5, 4)).toEqual([1, -1, 3, -2, 5]);
+        });
+    });
+
+    describe('régression : les deux fenêtres (gauche/droite) se rejoignent sans ellipse', () => {
+        it('ni ellipse ni page manquante quand showLeftEllipsis et showRightEllipsis sont tous deux faux', () => {
+            const result = _calculatePages(5, 9, 8);
+            // Aucune page entre 1 et total ne doit être absente sans marqueur d'ellipse (-1/-2).
+            const numbered = result.filter((p) => p > 0);
+            for (let p = 1; p <= 9; p++) {
+                expect(numbered.includes(p) || result.includes(-1) || result.includes(-2)).toBe(
+                    true,
+                );
+            }
+            expect(result).toEqual([1, -1, 4, 5, 6, -2, 9]);
         });
     });
 });
