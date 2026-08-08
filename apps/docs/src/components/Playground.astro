@@ -511,4 +511,15 @@ const showPlayground = displayMode === 'demo';
         border-top: 1px solid var(--ar-color-border, #e5e7eb);
         margin:     0.25rem 0;
     }
+
+    /*
+     * .preview est un flex container : sur l'axe principal (horizontal), les enfants se
+     * dimensionnent selon leur contenu par défaut, pas selon la largeur disponible. Un
+     * composant `display: block` qui mesure sa propre largeur pour adapter son rendu
+     * (ar-pagination, ResizeObserver) se retrouve donc contraint à la largeur de son
+     * contenu au lieu de la largeur réelle du preview.
+     */
+    .preview :global(ar-pagination) {
+        flex: 1 1 100%;
+    }
 </style>
