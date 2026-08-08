@@ -57,4 +57,101 @@ describe('ar-pagination — browser', () => {
             expect(listRule).to.not.include('padding-left');
         });
     });
+
+    describe('masquage responsive progressif (#152)', () => {
+        async function waitForResize(): Promise<void> {
+            // Laisse le temps au ResizeObserver de déclencher son callback et à Lit de re-render.
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+
+        it('affiche la liste complète des numéros dans un conteneur large', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 900px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            // 900px mesuré en Chromium (btn-size fallback headless 2.5rem = 40px, aucun thème
+            // chargé dans ce test) suffit à afficher les 15 pages sans troncature : le budget
+            // calculé par le ResizeObserver dépasse `total`, donc `_calculatePages` renvoie la
+            // liste complète (cf. `_calculatePages`, branche `total <= effectiveBudget`).
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(
+                15,
+            );
+        });
+
+        it('réduit le nombre de pages affichées quand le conteneur est rétréci', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 900px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            // 400px mesuré empiriquement : budget suffisant pour rester au-dessus du plancher
+            // texte (5 slots, `current` non en bord) mais insuffisant pour les 15 pages —
+            // produit une liste tronquée avec ellipses, contrairement à 260px (cf. test
+            // suivant) qui passe déjà sous le plancher.
+            wrapper.style.width = '400px';
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const numericCount = shadow.querySelectorAll(
+                '[part~="link"], [part~="current"]',
+            ).length;
+            expect(numericCount).to.be.greaterThan(0);
+            expect(numericCount).to.be.lessThan(15);
+        });
+
+        it('bascule sur le palier texte "Page X sur Y" à largeur extrême', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 900px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            wrapper.style.width = '90px';
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const status = shadow.querySelector('[part~="page-status"]');
+            expect(status).to.not.equal(null);
+            expect(status?.textContent?.trim()).to.equal('Page 8 sur 15');
+        });
+
+        it('prev/next restent cliquables au palier texte', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 90px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const next = shadow.querySelector('[part~="next"]') as HTMLElement;
+            next.click();
+            await elementUpdated(el);
+
+            expect((el as unknown as { current: number }).current).to.equal(9);
+        });
+
+        it("[part='list'] ne wrap plus (flex-wrap: nowrap)", async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+            if (!list) throw new Error('[part="list"] introuvable');
+            expect(getComputedStyle(list).flexWrap).to.equal('nowrap');
+        });
+    });
 });
