@@ -212,17 +212,14 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
             )}
             {/* ── Tokens d'un composant imbriqué en interne (ex. tooltip dans table-sort) ── */}
             {relatedTokens.length > 0 && (
-                <div class="related-tokens">
+                <ar-alert class="related-tokens" variant="info" without-notification>
                     {relatedTokens.map((rt) => (
                         <p class="related-tokens-note">
-                            {rt.description}{' '}
-                            <a href={`/components/${getSlug(rt.component)}`}>
-                                Voir les tokens de <code>{rt.component}</code>
-                            </a>
-                            .
+                            {rt.description}{' '}<br>
+                            <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
                         </p>
                     ))}
-                </div>
+                </ar-alert>
             )}
         </section>
     )}
@@ -282,11 +279,18 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
         margin-top: 1.875rem;
     }
 
-    .related-tokens {
+    ar-alert.related-tokens {
         margin-top: 1.875rem;
+
+        &::part(body) {
+            display: flex;
+            flex-direction: column;
+            row-gap: 0.5rem;
+        }
     }
 
     .related-tokens-note {
+        margin: 0;
         font-size: 0.875rem;
         color: var(--doc-text-muted);
     }
