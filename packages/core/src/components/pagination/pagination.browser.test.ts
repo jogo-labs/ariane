@@ -106,8 +106,12 @@ describe('ar-pagination — browser', () => {
             const numericCount = shadow.querySelectorAll(
                 '[part~="link"], [part~="current"]',
             ).length;
-            expect(numericCount).to.be.greaterThan(0);
-            expect(numericCount).to.be.lessThan(15);
+            // Valeur exacte mesurée empiriquement à 400px avec le repli headless figé
+            // (`--ar-pagination-btn-size` = 2.5rem = 40px, aucune police variable dans WTR) :
+            // déterministe. Une régression dans `_pagesWithSiblings` (ex. `siblingCount` qui ne
+            // retire qu'une page, 14 au lieu de 5) passerait inaperçue avec une simple borne
+            // `lessThan(15)` — l'égalité stricte est nécessaire pour couvrir ce cas.
+            expect(numericCount).to.equal(5);
         });
 
         it('bascule sur le palier texte "Page X sur Y" à largeur extrême', async () => {
