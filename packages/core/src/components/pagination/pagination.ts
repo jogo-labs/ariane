@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, type CSSResultGroup, html } from 'lit';
-import { property } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -72,6 +72,47 @@ export class ArPagination extends LitElement {
     @property({ reflect: true, type: Number, useDefault: true })
     total: number = ArPagination.DEFAULT_TOTAL;
 
+    @state() private _budget?: number;
+    private _resizeObserver?: ResizeObserver;
+    private _itemWidth = 0;
+
+    override firstUpdated(): void {
+        this._setupResizeObserver();
+    }
+
+    override disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this._resizeObserver?.disconnect();
+    }
+
+    private _setupResizeObserver(): void {
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        if (!nav) return;
+        this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
+        this._resizeObserver.observe(nav);
+    }
+
+    private _recalculateBudget(): void {
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        const prev = this.shadowRoot?.querySelector<HTMLElement>('[part~="prev"]');
+        const next = this.shadowRoot?.querySelector<HTMLElement>('[part~="next"]');
+        const item = this.shadowRoot?.querySelector<HTMLElement>(
+            '[part~="link"], [part~="current"]',
+        );
+        if (!nav || !prev || !next) return;
+
+        if (!this._itemWidth && item) {
+            this._itemWidth = item.getBoundingClientRect().width;
+        }
+        if (!this._itemWidth) return;
+
+        const available =
+            nav.getBoundingClientRect().width -
+            prev.getBoundingClientRect().width -
+            next.getBoundingClientRect().width;
+        this._budget = Math.max(Math.floor(available / this._itemWidth), 0);
+    }
+
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('total') && this.total < 1) {
             warn('ar-pagination', `total doit être ≥ 1. Valeur reçue : ${this.total}.`);
@@ -141,7 +182,7 @@ export class ArPagination extends LitElement {
                 </li>
 
                 ${repeat(
-                    _calculatePages(current, total),
+                    _calculatePages(current, total, this._budget),
                     (page) => page,
                     (page) => {
                         // -1 et -2 sont des sentinelles représentant les ellipses
