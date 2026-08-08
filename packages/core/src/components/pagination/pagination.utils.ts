@@ -68,7 +68,13 @@ function _pagesWithSiblings(current: number, total: number, siblingCount: number
     return pages;
 }
 
-/** Plancher algorithmique : boundary(s) + current, avec ellipses si nécessaire. 3 ou 5 slots. */
+/**
+ * Plancher algorithmique : boundary(s) + current, avec ellipses si nécessaire. 3 ou 5 slots.
+ *
+ * Précondition implicite non vérifiée : `total >= 3`. En dessous, le résultat n'est pas
+ * garanti — actuellement inatteignable en pratique car `_calculatePages` retourne toujours
+ * plus tôt (`total <= effectiveBudget`) pour `total <= 2`.
+ */
 function _minimalPages(current: number, total: number): number[] {
     if (current <= 1) return [1, -2, total];
     if (current >= total) return [1, -1, total];

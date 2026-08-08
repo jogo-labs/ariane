@@ -75,9 +75,10 @@ export class ArPagination extends LitElement {
     total: number = ArPagination.DEFAULT_TOTAL;
 
     @state() private _budget?: number;
-    private _resizeObserver?: ResizeObserver;
+    private _resizeObserver?: ResizeObserver | undefined;
     private _itemWidth = 0;
     private _initialized = false;
+    private _prevTotalDigits = 0;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -87,6 +88,16 @@ export class ArPagination extends LitElement {
     override firstUpdated(): void {
         this._initialized = true;
         this._setupResizeObserver();
+        // Une police web chargée après le premier paint peut changer la largeur mesurée des
+        // items (ex. police variable, chargement asynchrone) : force une remesure une fois
+        // les polices prêtes. `document.fonts` est absent de certains environnements de test
+        // (happy-dom) — garde défensive.
+        if (document.fonts) {
+            void document.fonts.ready.then(() => {
+                this._itemWidth = 0;
+                this._recalculateBudget();
+            });
+        }
     }
 
     override disconnectedCallback(): void {
@@ -104,23 +115,38 @@ export class ArPagination extends LitElement {
 
     private _recalculateBudget(): void {
         const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        const list = this.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
         const prev = this.shadowRoot?.querySelector<HTMLElement>('[part~="prev"]');
         const next = this.shadowRoot?.querySelector<HTMLElement>('[part~="next"]');
-        const item = this.shadowRoot?.querySelector<HTMLElement>(
+        const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
             '[part~="link"], [part~="current"]',
         );
-        if (!nav || !prev || !next) return;
+        if (!nav || !list || !prev || !next) return;
 
-        if (!this._itemWidth && item) {
-            this._itemWidth = item.getBoundingClientRect().width;
+        if (!this._itemWidth && items && items.length > 0) {
+            // Le plus large des items actuellement rendus, pas le premier : un item à 2-3
+            // chiffres est plus large qu'un item à 1 chiffre, et figer la mesure sur le
+            // premier item rendu sous-estime systématiquement la largeur réelle.
+            this._itemWidth = Math.max(
+                ...Array.from(items).map((el) => el.getBoundingClientRect().width),
+            );
         }
         if (!this._itemWidth) return;
 
+        // `column-gap` posé par le thème sur [part='list'] n'est pas inclus dans la largeur
+        // des items ni de nav/prev/next : chaque slot numérique coûte `itemWidth + gap`, et un
+        // gap de marge est retranché pour la jonction avec prev/next.
+        const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
         const available =
             nav.getBoundingClientRect().width -
             prev.getBoundingClientRect().width -
-            next.getBoundingClientRect().width;
-        this._budget = Math.max(Math.floor(available / this._itemWidth), 0);
+            next.getBoundingClientRect().width -
+            gap;
+        const budget = Math.floor(available / (this._itemWidth + gap));
+        // Marge de sécurité d'un slot pour absorber les imprécisions de mesure résiduelles
+        // (arrondis sous-pixel, variations de police) — filet de sécurité peu coûteux contre
+        // un débordement horizontal.
+        this._budget = Math.max(budget - 1, 0);
     }
 
     override updated(changed: Map<string, unknown>): void {
@@ -136,6 +162,17 @@ export class ArPagination extends LitElement {
                     `current (${this.current}) est supérieur à total (${this.total}).`,
                 );
             }
+        }
+        if (changed.has('total')) {
+            const digits = String(Math.max(this.total, 1)).length;
+            if (this._prevTotalDigits && digits !== this._prevTotalDigits) {
+                // Le nombre de chiffres du total a changé (ex. 9 → 10, 99 → 100) : la largeur
+                // d'item mesurée précédemment (figée sur l'ancien total) n'est plus fiable —
+                // force une remesure avant le prochain calcul de budget.
+                this._itemWidth = 0;
+                this._recalculateBudget();
+            }
+            this._prevTotalDigits = digits;
         }
     }
 
@@ -195,11 +232,7 @@ export class ArPagination extends LitElement {
                 </li>
 
                 ${useTextMode
-                    ? html`<li part="item page-status">
-                          <span class="sr-only">Page </span>${current}<span aria-hidden="true"
-                              >&#32;sur&#32;</span
-                          >${total}
-                      </li>`
+                    ? html`<li part="item page-status">Page ${current} sur ${total}</li>`
                     : repeat(
                           _calculatePages(current, total, this._budget),
                           (page) => page,
