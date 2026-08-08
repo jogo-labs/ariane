@@ -214,6 +214,49 @@ describe('ArPagination', () => {
         });
     });
 
+    // ── Palier texte (budget très restreint) ─────────────────────────────────
+
+    describe('palier texte sous le plancher', () => {
+        it('bascule sur un texte "Page X sur Y" quand _budget est sous le plancher', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const status = shadow.querySelector('[part~="page-status"]');
+            expect(status).not.toBeNull();
+            expect(status?.textContent?.trim()).toBe('Page 3 sur 15');
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
+        });
+
+        it('prev/next restent affichés et fonctionnels en palier texte', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'prev')).not.toBeNull();
+            expect(getPart(el, 'next')).not.toBeNull();
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(el.current).toBe(4);
+        });
+
+        it('ne bascule pas en palier texte si _budget est au-dessus du plancher', async () => {
+            el = await fixture('<ar-pagination current="8" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 5;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelector('[part~="page-status"]')).toBeNull();
+        });
+    });
+
     describe("part d'état item--current", () => {
         it('le <li> de la page active porte part="item item--current"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');

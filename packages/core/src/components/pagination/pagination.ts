@@ -41,6 +41,8 @@ export interface ArPaginationPageChangeDetail {
  * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
  * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
+ * @csspart page-status - Le `<li>` du texte "Page X sur Y" affiché à la place de la liste de
+ *   pages quand l'espace disponible ne permet plus d'afficher de numéros (palier minimal).
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -173,6 +175,9 @@ export class ArPagination extends LitElement {
         const isPreviousDisabled = current <= 1;
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
+        const isEdgeCurrent = current <= 1 || current >= total;
+        const floorSlots = isEdgeCurrent ? 3 : 5;
+        const useTextMode = this._budget !== undefined && this._budget < floorSlots;
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
@@ -189,18 +194,24 @@ export class ArPagination extends LitElement {
                     </a>
                 </li>
 
-                ${repeat(
-                    _calculatePages(current, total, this._budget),
-                    (page) => page,
-                    (page) => {
-                        // -1 et -2 sont des sentinelles représentant les ellipses
-                        return page === -1 || page === -2
-                            ? html` <li part="item" aria-hidden="true">
-                                  <span part="ellipsis">...</span>
-                              </li>`
-                            : this.renderPage(page, page === current);
-                    },
-                )}
+                ${useTextMode
+                    ? html`<li part="item page-status">
+                          <span class="sr-only">Page </span>${current}<span aria-hidden="true"
+                              >&#32;sur&#32;</span
+                          >${total}
+                      </li>`
+                    : repeat(
+                          _calculatePages(current, total, this._budget),
+                          (page) => page,
+                          (page) => {
+                              // -1 et -2 sont des sentinelles représentant les ellipses
+                              return page === -1 || page === -2
+                                  ? html` <li part="item" aria-hidden="true">
+                                        <span part="ellipsis">...</span>
+                                    </li>`
+                                  : this.renderPage(page, page === current);
+                          },
+                      )}
 
                 <li part="item">
                     <a
