@@ -79,6 +79,12 @@ export class ArPagination extends LitElement {
     private _itemWidth = 0;
     private _initialized = false;
     private _prevTotalDigits = 0;
+    // Une remesure est due (changement d'ordre de grandeur de `total`, `fonts.ready`) mais ne
+    // peut être effectuée que si au moins un item numérique est actuellement rendu. Au palier
+    // texte, aucun item n'est disponible : `_itemWidth` doit alors être conservé tel quel (voir
+    // `_recalculateBudget`) plutôt que d'être remis à 0, sous peine de bloquer définitivement le
+    // composant en palier texte (plus aucune mesure exploitable pour recalculer `_budget`).
+    private _needsRemeasure = false;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -94,7 +100,7 @@ export class ArPagination extends LitElement {
         // (happy-dom) — garde défensive.
         if (document.fonts) {
             void document.fonts.ready.then(() => {
-                this._itemWidth = 0;
+                this._needsRemeasure = true;
                 this._recalculateBudget();
             });
         }
@@ -123,14 +129,19 @@ export class ArPagination extends LitElement {
         );
         if (!nav || !list || !prev || !next) return;
 
-        if (!this._itemWidth && items && items.length > 0) {
+        if ((this._needsRemeasure || !this._itemWidth) && items && items.length > 0) {
             // Le plus large des items actuellement rendus, pas le premier : un item à 2-3
             // chiffres est plus large qu'un item à 1 chiffre, et figer la mesure sur le
             // premier item rendu sous-estime systématiquement la largeur réelle.
             this._itemWidth = Math.max(
                 ...Array.from(items).map((el) => el.getBoundingClientRect().width),
             );
+            this._needsRemeasure = false;
         }
+        // Si une remesure est due mais qu'aucun item numérique n'est actuellement rendu (palier
+        // texte), on continue avec la dernière valeur connue de `_itemWidth` plutôt que de
+        // bloquer : le composant doit rester réactif au resize, la remesure aura lieu dès qu'un
+        // item numérique redevient disponible (voir commentaire sur `_needsRemeasure`).
         if (!this._itemWidth) return;
 
         // `column-gap` posé par le thème sur [part='list'] n'est pas inclus dans la largeur
@@ -168,8 +179,11 @@ export class ArPagination extends LitElement {
             if (this._prevTotalDigits && digits !== this._prevTotalDigits) {
                 // Le nombre de chiffres du total a changé (ex. 9 → 10, 99 → 100) : la largeur
                 // d'item mesurée précédemment (figée sur l'ancien total) n'est plus fiable —
-                // force une remesure avant le prochain calcul de budget.
-                this._itemWidth = 0;
+                // marque une remesure comme due avant le prochain calcul de budget. La remesure
+                // effective n'a lieu que si un item numérique est rendu (cf. `_needsRemeasure`) ;
+                // sinon la dernière valeur connue de `_itemWidth` reste utilisée pour ne pas
+                // bloquer le composant au palier texte.
+                this._needsRemeasure = true;
                 this._recalculateBudget();
             }
             this._prevTotalDigits = digits;
