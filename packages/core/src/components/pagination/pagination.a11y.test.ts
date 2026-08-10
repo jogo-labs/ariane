@@ -27,4 +27,14 @@ describe('ar-pagination — accessibilité', () => {
         const el = await fixture(html`<ar-pagination current="8" total="20"></ar-pagination>`);
         await expect(el).to.be.accessible();
     });
+
+    it('palier select (largeur insuffisante) est accessible', async () => {
+        const el = await fixture(html`<ar-pagination current="8" total="20"></ar-pagination>`);
+        // Force le palier select sans dépendre d'un ResizeObserver réel en test — même technique
+        // que pagination.browser.test.ts pour simuler un budget mesuré très restreint.
+        (el as unknown as { _budget: number })._budget = 2;
+        (el as unknown as { requestUpdate: () => void }).requestUpdate();
+        await (el as unknown as { updateComplete: Promise<boolean> }).updateComplete;
+        await expect(el).to.be.accessible();
+    });
 });

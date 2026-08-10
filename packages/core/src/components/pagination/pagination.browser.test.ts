@@ -247,6 +247,26 @@ describe('ar-pagination — browser', () => {
         });
     });
 
+    describe('labels accessibles enrichis (total dans le contexte)', () => {
+        it('le sr-only d\'un lien de page se lit "Page X sur Y" en layout réel (innerText)', async () => {
+            const el = await fixture(html`<ar-pagination current="3" total="12"></ar-pagination>`);
+            const link = el.shadowRoot?.querySelector(
+                '[data-ar-pagination-page="4"]',
+            ) as HTMLElement;
+            const srOnly = link.querySelector('.sr-only') as HTMLElement;
+            // `innerText` (pas `textContent`) : reflète le rendu réel appliqué par le layout,
+            // seul moyen fiable de détecter une régression du bug historique #152 ("8sur15") où
+            // plusieurs bindings adjacents dans un conteneur flex perdaient leurs espaces.
+            expect(srOnly.innerText.trim()).to.equal('Page 4 sur 12');
+        });
+
+        it('la page active porte aria-current="page"', async () => {
+            const el = await fixture(html`<ar-pagination current="3" total="12"></ar-pagination>`);
+            const current = el.shadowRoot?.querySelector('[part="current"]') as HTMLElement;
+            expect(current.getAttribute('aria-current')).to.equal('page');
+        });
+    });
+
     describe('invariant anti-débordement avec le thème par défaut (#152, Finding Critical #1/#3)', () => {
         async function waitForResize(): Promise<void> {
             await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
