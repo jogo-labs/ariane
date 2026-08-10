@@ -5,8 +5,6 @@ import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
 import styles from './pagination.styles.js';
 import { _calculatePages, _clamp } from './pagination.utils.js';
-import { announceA11y } from '../../a11y/announce-a11y.js';
-import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
@@ -377,26 +375,24 @@ export class ArPagination extends LitElement {
         const select = event.target as HTMLSelectElement;
         const page = parseInt(select.value, 10);
         if (Number.isNaN(page) || page === this.current) return;
-        const from = this.current;
-        this.current = page;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        if (!this._requestPageChange(page)) {
+            // Annulé : le <select> a déjà muté nativement sa `.value` avant que ce
+            // handler ne
+            // s'exécute. Puisque `current` ne change pas, aucun cycle de rendu ne
+            // redéclenchera
+            // le sync existant dans updated() — revert explicite nécessaire ici.
+            select.value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
+        }
     }
 
     private _onPreviousPage(): void {
         if (this.current <= 1) return;
-        const from = this.current;
-        this.current = this.current - 1;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        this._requestPageChange(this.current - 1);
     }
 
     private _onNextPage(): void {
         if (this.current >= this.total) return;
-        const from = this.current;
-        this.current = this.current + 1;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        this._requestPageChange(this.current + 1);
     }
 
     private _onPageChange(event: MouseEvent): void {
@@ -405,24 +401,25 @@ export class ArPagination extends LitElement {
         );
         const page = link?.dataset['arPaginationPage'];
         if (!link || !page) return;
-        const from = this.current;
-        this.current = parseInt(page);
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
-        void focusAfterUpdate(this, '[part~="current"]');
+        this._requestPageChange(parseInt(page));
     }
 
-    private _emit(detail: ArPaginationPageChangeDetail): void {
-        this.dispatchEvent(
+    /**
+     * Dispatch l'intention de changement de page, sans muter `current` : c'est au
+     * consommateur de le réassigner en réponse à cet event pour que le changement
+     * prenne effet (modèle contrôlé, cf. ar-stepper.currentPath).
+     * @returns `false` si `preventDefault()` a été appelé sur l'event (valeur native de
+     *   `dispatchEvent` pour un event cancelable).
+     */
+    private _requestPageChange(to: number): boolean {
+        const from = this.current;
+        return this.dispatchEvent(
             new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-change', {
                 bubbles: true,
                 composed: true,
-                detail,
+                cancelable: true,
+                detail: { from, to },
             }),
         );
-    }
-
-    private _announcePageChange(): void {
-        announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
     }
 }

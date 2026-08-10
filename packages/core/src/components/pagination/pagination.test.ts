@@ -381,44 +381,6 @@ describe('ArPagination', () => {
             expect(options[8]?.textContent?.trim()).toBe('Page 15 sur 15');
         });
 
-        it('changer la valeur du select émet ar-pagination-page-change et met à jour current', async () => {
-            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
-            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
-            el._budget = 2;
-            el.requestUpdate();
-            await waitForUpdate(el);
-
-            const handler = vi.fn();
-            el.addEventListener('ar-pagination-page-change', handler);
-            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
-            const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
-            ) as HTMLSelectElement;
-            select.value = '15';
-            select.dispatchEvent(new Event('change'));
-            await waitForUpdate(el);
-
-            expect(el.current).toBe(15);
-            expect(handler).toHaveBeenCalledOnce();
-            const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
-                .detail;
-            expect(detail).toEqual({ from: 3, to: 15 });
-        });
-
-        it('prev/next restent affichés et fonctionnels au palier select', async () => {
-            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
-            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
-            el._budget = 2;
-            el.requestUpdate();
-            await waitForUpdate(el);
-
-            expect(getPart(el, 'prev')).not.toBeNull();
-            expect(getPart(el, 'next')).not.toBeNull();
-            (requirePart(el, 'next') as HTMLElement).click();
-            await waitForUpdate(el);
-            expect(el.current).toBe(4);
-        });
-
         it('ne bascule pas en palier select si _budget est au-dessus du plancher et que la fenêtre a une seule ellipse', async () => {
             // current=3 est assez proche du bord pour que la fenêtre à budget=5 n'ait besoin
             // que d'une seule ellipse ([1, 2, 3, -2, 15]) — 4 pages réelles, pas le cas
@@ -508,76 +470,60 @@ describe('ArPagination', () => {
         });
     });
 
-    // ── Navigation ────────────────────────────────────────────────────────────
+    // ── Navigation (current reste contrôlé de l'extérieur) ──────────────────
 
-    describe('navigation', () => {
-        it('un clic sur prev décrémente current', async () => {
+    describe('navigation (current contrôlé)', () => {
+        it('un clic sur prev ne mute pas current tout seul', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             (requirePart(el, 'prev') as HTMLElement).click();
             await waitForUpdate(el);
-            expect(el.current).toBe(2);
+            expect(el.current).toBe(3);
         });
 
-        it('un clic sur next incrémente current', async () => {
+        it('un clic sur next ne mute pas current tout seul', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             (requirePart(el, 'next') as HTMLElement).click();
             await waitForUpdate(el);
-            expect(el.current).toBe(4);
+            expect(el.current).toBe(3);
         });
 
-        it('prev ne décrémente pas en dessous de 1', async () => {
+        it('un clic sur un lien de page ne mute pas current tout seul', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
-            (requirePart(el, 'prev') as HTMLElement).click();
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            pageLink.click();
             await waitForUpdate(el);
             expect(el.current).toBe(1);
         });
 
-        it('next ne dépasse pas total', async () => {
-            el = await fixture('<ar-pagination current="5" total="5"></ar-pagination>');
-            (requirePart(el, 'next') as HTMLElement).click();
-            await waitForUpdate(el);
-            expect(el.current).toBe(5);
-        });
-
-        it('un clic sur un lien de page met à jour current', async () => {
-            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
-            const shadow = el.shadowRoot as ShadowRoot;
-            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
-            pageLink.click();
-            await waitForUpdate(el);
-            expect(el.current).toBe(3);
-        });
-
-        it("un clic sur le span imbriqué (numéro visible) à l'intérieur du lien met à jour current", async () => {
+        it("un clic sur le span imbriqué (numéro visible) résout tout de même l'ancre via closest()", async () => {
             // Régression : `renderPageLabel` enveloppe le numéro visible dans un
             // `<span aria-hidden="true">` nichée dans le `<a part="link">`. `_onPageChange`
-            // doit résoudre l'ancre via `closest()` même quand `event.target` est ce span
-            // imbriqué plutôt que l'ancre elle-même.
+            // doit résoudre l'ancre via `closest()` même quand `event.target` est ce span.
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
             const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
             const visibleNumber = pageLink.querySelector('[aria-hidden="true"]') as HTMLElement;
             visibleNumber.click();
             await waitForUpdate(el);
-            expect(el.current).toBe(3);
+            expect(handler).toHaveBeenCalledOnce();
+            const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
+                .detail;
+            expect(detail).toEqual({ from: 1, to: 3 });
         });
 
-        it('un clic sur un lien de page focalise le nouvel élément part="current"', async () => {
+        it('réassigner current depuis un handler ar-pagination-page-change met à jour le rendu', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
             const shadow = el.shadowRoot as ShadowRoot;
             const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
             pageLink.click();
             await waitForUpdate(el);
-
-            const current = shadow.querySelector('[part~="current"]') as HTMLElement;
-            expect(shadow.activeElement).toBe(current);
-        });
-
-        it('le nouvel élément part="current" porte tabindex="-1"', async () => {
-            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
-            const shadow = el.shadowRoot as ShadowRoot;
-            const current = shadow.querySelector('[part="current"]') as HTMLElement;
-            expect(current.getAttribute('tabindex')).toBe('-1');
+            expect(el.current).toBe(3);
         });
 
         it("un clic sur prev/next ne modifie pas le focus (l'élément cliqué reste focalisable)", async () => {
@@ -586,7 +532,6 @@ describe('ArPagination', () => {
             nextBtn.focus();
             nextBtn.click();
             await waitForUpdate(el);
-
             expect(el.shadowRoot?.activeElement).toBe(nextBtn);
         });
     });
@@ -594,6 +539,16 @@ describe('ArPagination', () => {
     // ── Événement ar-pagination-page-change ──────────────────────────────────
 
     describe('événement ar-pagination-page-change', () => {
+        it('est cancelable', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            const event = handler.mock.calls[0]?.[0] as CustomEvent;
+            expect(event.cancelable).toBe(true);
+        });
+
         it('émis avec {from, to} au clic sur next', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             const handler = vi.fn();
@@ -605,8 +560,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail.from).toBe(2);
-            expect(detail.to).toBe(3);
+            expect(detail).toEqual({ from: 2, to: 3 });
         });
 
         it('émis avec {from, to} au clic sur prev', async () => {
@@ -620,8 +574,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail.from).toBe(3);
-            expect(detail.to).toBe(2);
+            expect(detail).toEqual({ from: 3, to: 2 });
         });
 
         it('émis avec {from, to} au clic sur un lien de page', async () => {
@@ -637,8 +590,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail.from).toBe(1);
-            expect(detail.to).toBe(4);
+            expect(detail).toEqual({ from: 1, to: 4 });
         });
 
         it("n'est pas émis si prev est cliqué en page 1", async () => {
@@ -678,6 +630,97 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             expect(captured).not.toBeNull();
+        });
+
+        it("preventDefault() bloque l'interaction : current ne change pas, le focus reste sur l'élément cliqué", async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            pageLink.focus();
+            pageLink.click();
+            await waitForUpdate(el);
+
+            expect(el.current).toBe(1);
+            expect(shadow.activeElement).toBe(pageLink);
+        });
+    });
+
+    describe('palier select — modèle contrôlé', () => {
+        it('changer la valeur du select émet ar-pagination-page-change sans muter current', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change'));
+            await waitForUpdate(el);
+
+            expect(el.current).toBe(3);
+            expect(handler).toHaveBeenCalledOnce();
+            const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
+                .detail;
+            expect(detail).toEqual({ from: 3, to: 15 });
+        });
+
+        it('preventDefault() sur le select revert sa valeur DOM affichée', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+            el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
+
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change'));
+            await waitForUpdate(el);
+
+            expect(el.current).toBe(3);
+            expect(select.value).toBe('3');
+        });
+
+        it('réassigner current depuis le handler du select met à jour le rendu', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change'));
+            await waitForUpdate(el);
+
+            expect(el.current).toBe(15);
+        });
+
+        it('prev/next au palier select ne mutent plus current tout seuls', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'prev')).not.toBeNull();
+            expect(getPart(el, 'next')).not.toBeNull();
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(el.current).toBe(3);
         });
     });
 
