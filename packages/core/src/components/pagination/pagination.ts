@@ -5,6 +5,8 @@ import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
 import styles from './pagination.styles.js';
 import { _calculatePages, _clamp } from './pagination.utils.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
+import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
@@ -51,7 +53,13 @@ export interface ArPaginationPageChangeDetail {
  * @cssprop --ar-pagination-btn-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
- * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
+ * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
+ *   changement de page, à chaque interaction (clic page, précédent, suivant, sélection dans le
+ *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
+ *   change pas. Contient `from` et `to`.
+ * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
+ *   `current` a réellement changé (réassignation externe suite à la confirmation du
+ *   consommateur, ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
  */
 export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
@@ -86,6 +94,10 @@ export class ArPagination extends LitElement {
     // `_recalculateBudget`) plutôt que d'être remis à 0, sous peine de bloquer définitivement le
     // composant en palier texte (plus aucune mesure exploitable pour recalculer `_budget`).
     private _needsRemeasure = false;
+    // Distingue le tout premier cycle updated() (où `current` "change" par rapport à sa
+    // valeur pré-upgrade non définie) des transitions réelles ultérieures — sans ce flag,
+    // ar-pagination-page-changed/l'annonce/le focus se déclencheraient au montage initial.
+    private _hasRenderedOnce = false;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -194,6 +206,16 @@ export class ArPagination extends LitElement {
             const value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
             if (select.value !== value) select.value = value;
         }
+        if (this._hasRenderedOnce && changed.has('current')) {
+            const from = changed.get('current') as number;
+            const to = this.current;
+            if (from !== to) {
+                this._emitChanged({ from, to });
+                this._announcePageChange();
+                void focusAfterUpdate(this, '[part~="current"]');
+            }
+        }
+        this._hasRenderedOnce = true;
     }
 
     private _defaultPrevIcon(): TemplateResult {
@@ -421,5 +443,19 @@ export class ArPagination extends LitElement {
                 detail: { from, to },
             }),
         );
+    }
+
+    private _emitChanged(detail: ArPaginationPageChangeDetail): void {
+        this.dispatchEvent(
+            new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-changed', {
+                bubbles: true,
+                composed: true,
+                detail,
+            }),
+        );
+    }
+
+    private _announcePageChange(): void {
+        announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
     }
 }

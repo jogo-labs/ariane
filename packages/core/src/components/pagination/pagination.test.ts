@@ -726,13 +726,37 @@ describe('ArPagination', () => {
 
     // ── Annonces a11y ─────────────────────────────────────────────────────────
 
+    // ── Annonces a11y (après confirmation externe de current) ───────────────
+
     describe('annonces a11y', () => {
+        // D'autres describes plus haut dans ce fichier réassignent aussi `current` en réponse
+        // à `ar-pagination-page-change`, ce qui déclenche désormais `_announcePageChange()`
+        // (Task 3) — leur écriture asynchrone (setTimeout 50ms dans announceA11y) peut
+        // atterrir dans la région live partagée après leur propre test. `beforeEach` purge
+        // ce résidu avant chaque assertion de ce describe, en plus de l'`afterEach` qui
+        // nettoie sa propre pollution.
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
         afterEach(() => {
             document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
         });
 
-        it('un clic sur prev annonce "Page N-1 sur M"', async () => {
+        it("n'annonce rien tant que current n'est pas confirmé par le consommateur", async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            (requirePart(el, 'prev') as HTMLElement).click();
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
+            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+        });
+
+        it('un clic sur prev confirmé annonce "Page N-1 sur M"', async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
             (requirePart(el, 'prev') as HTMLElement).click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
@@ -742,8 +766,11 @@ describe('ArPagination', () => {
             );
         });
 
-        it('un clic sur next annonce "Page N+1 sur M"', async () => {
+        it('un clic sur next confirmé annonce "Page N+1 sur M"', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
             (requirePart(el, 'next') as HTMLElement).click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
@@ -753,8 +780,11 @@ describe('ArPagination', () => {
             );
         });
 
-        it('un clic direct sur un numéro de page annonce "Page N sur M"', async () => {
+        it('un clic direct sur un numéro de page confirmé annonce "Page N sur M"', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
             const shadow = el.shadowRoot as ShadowRoot;
             const pageLink = shadow.querySelector('[data-ar-pagination-page="4"]') as HTMLElement;
             pageLink.click();
@@ -764,6 +794,61 @@ describe('ArPagination', () => {
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
                 'Page 4 sur 5',
             );
+        });
+    });
+
+    describe('événement ar-pagination-page-changed', () => {
+        it("n'est pas émis tant que current n'a pas réellement changé", async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-changed', handler);
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(handler).not.toHaveBeenCalled();
+        });
+
+        it('est émis avec {from, to}, non cancelable, quand current change (réassignation externe)', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-changed', handler);
+            el.current = 3;
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+            const event = handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>;
+            expect(event.cancelable).toBe(false);
+            expect(event.detail).toEqual({ from: 1, to: 3 });
+        });
+
+        it("n'est pas émis au premier rendu", async () => {
+            const handler = vi.fn();
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-changed', handler);
+            await waitForUpdate(el);
+            expect(handler).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('focus après confirmation externe', () => {
+        it('focalise le nouvel élément part="current" une fois current réassigné en réponse à page-change', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            pageLink.click();
+            await waitForUpdate(el);
+
+            const current = shadow.querySelector('[part~="current"]') as HTMLElement;
+            expect(shadow.activeElement).toBe(current);
+        });
+
+        it('le nouvel élément part="current" porte tabindex="-1"', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const current = shadow.querySelector('[part="current"]') as HTMLElement;
+            expect(current.getAttribute('tabindex')).toBe('-1');
         });
     });
 
