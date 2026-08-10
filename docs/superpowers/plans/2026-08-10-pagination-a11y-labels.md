@@ -13,8 +13,7 @@ affiché (`<span aria-hidden="true">`, numéro seul) au lieu de préfixer le num
 texte sr-only partiel. Le nom du landmark (`<p id="ar-pagination">`) devient dynamique.
 
 **Tech Stack:** Lit 3 + TypeScript, Vitest (happy-dom) pour les tests unitaires, `@web/test-runner`
-
-- Playwright/Chromium pour les tests navigateur et axe-core.
+et Playwright/Chromium pour les tests navigateur et axe-core.
 
 ## Global Constraints
 
