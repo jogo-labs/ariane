@@ -805,33 +805,16 @@ Remplacer les lignes 62-75 (section `## Utilisation` complète) par :
 ````mdx
 ## Utilisation
 
-### `current` est piloté par vous, pas par le composant
-
-`ar-pagination` ne met plus à jour `current` tout seul au clic — c'est à vous de le faire, une
-fois que le contenu de la nouvelle page est prêt à être affiché. Deux événements :
-
-- **`ar-pagination-page-change`** — émis _avant_ tout changement, à chaque interaction (clic
-  page, précédent, suivant, `<select>` mobile). Annulable via `preventDefault()`. `detail: {
-from, to }`.
-- **`ar-pagination-page-changed`** — émis _après_, quand `current` a réellement changé (dès que
-  vous le réassignez). `detail: { from, to }`.
+`current` est piloté depuis l'extérieur : `ar-pagination` émet `ar-pagination-page-change`
+(annulable) avant chaque changement, puis `ar-pagination-page-changed` une fois `current`
+effectivement mis à jour. `detail` contient `{ from, to }` dans les deux cas.
 
 ```js
-const pagination = document.querySelector('ar-pagination');
-
-pagination.addEventListener('ar-pagination-page-change', (e) => {
-    const { from, to } = e.detail;
-    console.log(`Page ${from} → ${to}`);
-    // Charger les données de la page `to`, puis confirmer :
-    pagination.current = to;
+document.addEventListener('ar-pagination-page-change', (e) => {
+    /* Mettez à jour le contenu de la page, puis la page active du composant */
+    e.target.current = e.detail.to;
 });
 ```
-````
-
-Sans cette réassignation, le clic reste sans effet visuel — volontaire : si le chargement de la
-page `to` échoue, la pagination ne doit pas afficher un état qui ne correspond pas au contenu
-réellement visible.
-
 ````
 
 - [ ] **Step 2: Enrichir "À votre charge"**
@@ -839,11 +822,11 @@ réellement visible.
 Dans la section `### À votre charge` (lignes 48-54), ajouter une puce après celle sur `current`/`total` :
 
 ```mdx
-- **Mettre à jour `current` de façon synchrone (ou quasi-synchrone) dans le handler de
-  `ar-pagination-page-change`.** Le focus n'est restauré sur le nouvel élément `part="current"`
-  et l'annonce aria-live n'a lieu que si `current` a effectivement changé au moment du prochain
-  cycle de rendu.
-````
+- **`current` ne change que si vous le réassignez.** Le focus et l'annonce aria-live suivent
+  cette réassignation — mettez `current` à jour de façon synchrone (ou quasi-synchrone) dans le
+  handler de `ar-pagination-page-change` pour qu'ils restent cohérents avec l'action de
+  l'utilisateur.
+```
 
 - [ ] **Step 3: Ajouter le script de simulation à la dernière variante**
 
@@ -856,19 +839,18 @@ Dans le frontmatter, remplacer le bloc de la variante `20-pages-end` (lignes 21-
   html: |
       <ar-pagination current="18" total="20"></ar-pagination>
       <script>
-          document.querySelectorAll('ar-pagination').forEach((el) => {
-              el.addEventListener('ar-pagination-page-change', (e) => {
-                  el.current = e.detail.to;
-              });
+          document.addEventListener('ar-pagination-page-change', (e) => {
+              if (e.target.matches('ar-pagination')) e.target.current = e.detail.to;
           });
       </script>
 ```
 
-Ce script s'exécute une seule fois au chargement de la page (SSR via `Fragment set:html` dans
-`Playground.astro`, pas d'injection `innerHTML` — le `<script>` est donc exécuté normalement par
-le navigateur) et couvre, via `querySelectorAll`, les 4 variantes de démo ainsi que l'instance du
-playground interactif plus bas sur la page : `el.current = e.detail.to` simule un consommateur
-qui confirme immédiatement, exactement le pattern enseigné dans l'exemple de code ci-dessus.
+Même snippet que l'exemple de la section "Utilisation" (un seul listener délégué sur `document`,
+pas un par instance) — la garde `e.target.matches('ar-pagination')` évite de réagir à un autre
+composant qui bullerait le même nom d'event sur la page. Ce script s'exécute une seule fois au
+chargement (SSR via `Fragment set:html` dans `Playground.astro`, pas d'injection `innerHTML` — le
+`<script>` est donc exécuté normalement par le navigateur) et couvre nativement, par délégation,
+les 4 variantes de démo ainsi que l'instance du playground interactif plus bas sur la page.
 
 - [ ] **Step 4: Vérifier visuellement dans le navigateur**
 

@@ -73,10 +73,10 @@ page (vérifié : ce n'est pas une injection `innerHTML` côté client, donc pas
 l'inertie des scripts injectés dynamiquement).
 
 Un seul `<script>` ajouté une fois (dans le `html:` de la dernière variante) écoute
-`ar-pagination-page-change` sur toutes les instances `ar-pagination` de la page et fait
-`el.current = e.detail.to` — simule un consommateur qui confirme immédiatement, exactement le
-pattern enseigné dans l'exemple de code de la section "Utilisation". Un seul script couvre les 4
-variantes + la démo playground du bas (délégation `querySelectorAll`).
+`ar-pagination-page-change` par délégation sur `document` et fait `e.target.current =
+e.detail.to` — exactement le snippet montré dans l'exemple dédié de la section "Utilisation" (un
+seul listener document-level, pas de `querySelectorAll` par élément). Couvre nativement les 4
+variantes + la démo playground du bas, y compris les instances ajoutées dynamiquement.
 
 `ar-stepper.mdx` a le même trou (démos non câblées, `ar-stepper-step-change` déjà un modèle
 contrôlé sans simulation live) — **hors scope de #161**, noté comme suivi séparé.
