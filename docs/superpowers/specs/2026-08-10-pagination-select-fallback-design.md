@@ -180,3 +180,21 @@ au budget **actuel** (§2 ci-dessus, décision initiale) produisait deux effets 
   budget de 3-4 slots, recréant le bug de débordement corrigé lors de la review finale du
   2026-08-07). Conséquence acceptée : les pages en bord basculent en select légèrement plus tôt
   qu'avant (à une largeur où 3 boutons tiendraient encore).
+
+### Amendement 2 (2026-08-10, second retour terrain) : bascule anticipée si la fenêtre a 2 ellipses
+
+Constat complémentaire : même avec `floorSlots = 5`, une position `current` loin des deux bords
+(ex. `current = 8, total = 15`) peut faire retomber `_calculatePages` sur sa fenêtre minimale
+`[1, -1, current, -2, total]` dès que le budget touche exactement 5 — 5 slots dont 2 ellipses
+purement décoratives, pour seulement **3 pages réellement cliquables**. Le budget brut suffit
+techniquement à afficher cette fenêtre, mais le select (une fois fermé, plus étroit que n'importe
+quelle fenêtre de boutons, et peuplé de la richesse desktop depuis l'amendement précédent) offre
+alors nettement plus de valeur pour le même espace.
+
+**Décision** : en plus du critère `_budget < floorSlots`, on bascule aussi en mode select dès que
+la fenêtre obtenue via `_calculatePages(current, total, this._budget)` contient exactement 5
+éléments avec les deux sentinelles d'ellipse (`-1` et `-2`) présentes — indépendamment du budget
+brut. Repli strictement plus sûr que les boutons qu'il remplace (un `<select>` fermé est plus
+étroit que la fenêtre à 5 slots qu'il aurait fallu rendre), donc aucun nouveau risque de
+débordement. `pages` est calculé une seule fois dans `render()` et réutilisé à la fois pour cette
+détection et pour le rendu des boutons numérotés (`repeat`) quand on reste en mode boutons.

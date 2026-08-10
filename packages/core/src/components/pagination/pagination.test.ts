@@ -365,8 +365,11 @@ describe('ArPagination', () => {
             expect(el.current).toBe(4);
         });
 
-        it('ne bascule pas en palier select si _budget est au-dessus du plancher', async () => {
-            el = await fixture('<ar-pagination current="8" total="15"></ar-pagination>');
+        it('ne bascule pas en palier select si _budget est au-dessus du plancher et que la fenêtre a une seule ellipse', async () => {
+            // current=3 est assez proche du bord pour que la fenêtre à budget=5 n'ait besoin
+            // que d'une seule ellipse ([1, 2, 3, -2, 15]) — 4 pages réelles, pas le cas
+            // problématique des 2 ellipses ci-dessous.
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
             // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
             el._budget = 5;
             el.requestUpdate();
@@ -374,6 +377,22 @@ describe('ArPagination', () => {
 
             const shadow = el.shadowRoot as ShadowRoot;
             expect(shadow.querySelector('[part~="select"]')).toBeNull();
+        });
+
+        it('bascule en palier select si le budget suffirait techniquement mais la fenêtre obtenue a 2 ellipses (seulement 3 pages réelles)', async () => {
+            // current=8, total=15, loin des deux bords : à budget=5, _calculatePages retombe sur
+            // sa fenêtre minimale [1, -1, 8, -2, 15] — 2 ellipses pour seulement 3 pages
+            // cliquables. Le select devient préférable même si les 5 slots tiendraient.
+            el = await fixture('<ar-pagination current="8" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 5;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            expect(shadow.querySelector('[part="select"]')).not.toBeNull();
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
         });
 
         it('le plancher est identique en bord de liste et en position intermédiaire (pas de dépendance à la position de current)', async () => {

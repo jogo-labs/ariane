@@ -243,7 +243,22 @@ export class ArPagination extends LitElement {
         // donc aucun risque de débordement (contrairement à forcer 3, qui ferait tenter un rendu
         // à 5 items dans un budget de 3-4 slots).
         const floorSlots = 5;
-        const useSelectMode = this._budget !== undefined && this._budget < floorSlots;
+        // Calculé une seule fois : réutilisé pour la décision de mode ci-dessous ET pour le
+        // rendu des boutons numérotés (repeat) si on reste en mode boutons.
+        const pages = _calculatePages(current, total, this._budget);
+        // Cas particulier : à budget=5 exactement (position non-bord, loin des deux extrémités),
+        // `_calculatePages` retombe sur sa fenêtre minimale [1, -1, current, -2, total] — 5 slots
+        // dont 2 ellipses purement décoratives, pour seulement 3 pages réellement cliquables.
+        // Le select offre alors plus de valeur pour le même espace (jusqu'à 9 pages réelles,
+        // cf. `renderPageSelect`) : basculer vers lui même si le budget brut suffirait
+        // techniquement à afficher cette fenêtre. Repli strictement plus sûr que les boutons
+        // qu'il remplace (un `<select>` fermé est plus étroit que la fenêtre à 5 slots qu'il
+        // aurait fallu rendre), donc aucun risque de débordement supplémentaire.
+        const isMinimalWindowWithDoubleEllipsis =
+            pages.length === 5 && pages.includes(-1) && pages.includes(-2);
+        const useSelectMode =
+            this._budget !== undefined &&
+            (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
@@ -263,7 +278,7 @@ export class ArPagination extends LitElement {
                 ${useSelectMode
                     ? this.renderPageSelect(current, total)
                     : repeat(
-                          _calculatePages(current, total, this._budget),
+                          pages,
                           (page) => page,
                           (page) => {
                               // -1 et -2 sont des sentinelles représentant les ellipses
