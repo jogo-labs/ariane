@@ -72,8 +72,4 @@ export default css`
     [part~='nav-btn--disabled'] {
         cursor: not-allowed;
     }
-
-    [part~='select'] {
-        appearance: none;
-    }
 `;

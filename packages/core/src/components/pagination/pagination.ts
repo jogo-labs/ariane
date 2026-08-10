@@ -45,7 +45,7 @@ export interface ArPaginationPageChangeDetail {
  *   de la liste de pages quand l'espace disponible ne permet plus d'afficher de numéros (palier
  *   minimal).
  * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
- *   (apparence, flèche custom via `appearance: none` posé en structurel).
+ *   (apparence). Conserve l'apparence native du navigateur (flèche incluse) par défaut.
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -191,6 +191,11 @@ export class ArPagination extends LitElement {
             }
             this._prevTotalDigits = digits;
         }
+        const select = this.shadowRoot?.querySelector<HTMLSelectElement>('[part~="select"]');
+        if (select) {
+            const value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
+            if (select.value !== value) select.value = value;
+        }
     }
 
     private _defaultPrevIcon(): TemplateResult {
@@ -317,7 +322,6 @@ export class ArPagination extends LitElement {
             <select
                 part="select"
                 aria-labelledby="ar-pagination-select-label"
-                .value=${String(current)}
                 @change=${this._onSelectChange}
             >
                 ${_calculatePages(current, total, this._budget).map((page) =>

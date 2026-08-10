@@ -159,6 +159,10 @@ describe('ar-pagination — browser', () => {
             await elementUpdated(el);
 
             expect((el as unknown as { current: number }).current).to.equal(15);
+            expect(select.selectedIndex).to.not.equal(-1);
+            expect(select.options[select.selectedIndex]?.textContent?.trim()).to.equal(
+                'Page 15 sur 15',
+            );
         });
 
         it('prev/next restent cliquables au palier select', async () => {
@@ -177,6 +181,12 @@ describe('ar-pagination — browser', () => {
             await elementUpdated(el);
 
             expect((el as unknown as { current: number }).current).to.equal(9);
+
+            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            expect(select.selectedIndex).to.not.equal(-1);
+            expect(select.options[select.selectedIndex]?.textContent?.trim()).to.equal(
+                'Page 9 sur 15',
+            );
         });
 
         it("[part='list'] ne wrap plus (flex-wrap: nowrap)", async () => {
