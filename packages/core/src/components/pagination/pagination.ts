@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, type CSSResultGroup, html } from 'lit';
-import { property } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -41,6 +41,11 @@ export interface ArPaginationPageChangeDetail {
  * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
  * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
+ * @csspart page-select - Le `<li>` englobant le `<select>` de saut de page, affiché à la place
+ *   de la liste de pages quand l'espace disponible ne permet plus d'afficher de numéros (palier
+ *   minimal).
+ * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
+ *   (apparence). Conserve l'apparence native du navigateur (flèche incluse) par défaut.
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -72,6 +77,92 @@ export class ArPagination extends LitElement {
     @property({ reflect: true, type: Number, useDefault: true })
     total: number = ArPagination.DEFAULT_TOTAL;
 
+    @state() private _budget?: number;
+    private _resizeObserver?: ResizeObserver | undefined;
+    private _itemWidth = 0;
+    private _initialized = false;
+    private _prevTotalDigits = 0;
+    // Une remesure est due (changement d'ordre de grandeur de `total`, `fonts.ready`) mais ne
+    // peut être effectuée que si au moins un item numérique est actuellement rendu. Au palier
+    // texte, aucun item n'est disponible : `_itemWidth` doit alors être conservé tel quel (voir
+    // `_recalculateBudget`) plutôt que d'être remis à 0, sous peine de bloquer définitivement le
+    // composant en palier texte (plus aucune mesure exploitable pour recalculer `_budget`).
+    private _needsRemeasure = false;
+
+    override connectedCallback(): void {
+        super.connectedCallback();
+        if (this._initialized) this._setupResizeObserver();
+    }
+
+    override firstUpdated(): void {
+        this._initialized = true;
+        this._setupResizeObserver();
+        // Une police web chargée après le premier paint peut changer la largeur mesurée des
+        // items (ex. police variable, chargement asynchrone) : force une remesure une fois
+        // les polices prêtes. `document.fonts` est absent de certains environnements de test
+        // (happy-dom) — garde défensive.
+        if (document.fonts) {
+            void document.fonts.ready.then(() => {
+                this._needsRemeasure = true;
+                this._recalculateBudget();
+            });
+        }
+    }
+
+    override disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this._resizeObserver?.disconnect();
+    }
+
+    private _setupResizeObserver(): void {
+        this._resizeObserver?.disconnect();
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        if (!nav) return;
+        this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
+        this._resizeObserver.observe(nav);
+    }
+
+    private _recalculateBudget(): void {
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        const list = this.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+        const prev = this.shadowRoot?.querySelector<HTMLElement>('[part~="prev"]');
+        const next = this.shadowRoot?.querySelector<HTMLElement>('[part~="next"]');
+        const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
+            '[part~="link"], [part~="current"]',
+        );
+        if (!nav || !list || !prev || !next) return;
+
+        if ((this._needsRemeasure || !this._itemWidth) && items && items.length > 0) {
+            // Le plus large des items actuellement rendus, pas le premier : un item à 2-3
+            // chiffres est plus large qu'un item à 1 chiffre, et figer la mesure sur le
+            // premier item rendu sous-estime systématiquement la largeur réelle.
+            this._itemWidth = Math.max(
+                ...Array.from(items).map((el) => el.getBoundingClientRect().width),
+            );
+            this._needsRemeasure = false;
+        }
+        // Si une remesure est due mais qu'aucun item numérique n'est actuellement rendu (palier
+        // texte), on continue avec la dernière valeur connue de `_itemWidth` plutôt que de
+        // bloquer : le composant doit rester réactif au resize, la remesure aura lieu dès qu'un
+        // item numérique redevient disponible (voir commentaire sur `_needsRemeasure`).
+        if (!this._itemWidth) return;
+
+        // `column-gap` posé par le thème sur [part='list'] n'est pas inclus dans la largeur
+        // des items ni de nav/prev/next : chaque slot numérique coûte `itemWidth + gap`, et un
+        // gap de marge est retranché pour la jonction avec prev/next.
+        const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+        const available =
+            nav.getBoundingClientRect().width -
+            prev.getBoundingClientRect().width -
+            next.getBoundingClientRect().width -
+            gap;
+        const budget = Math.floor(available / (this._itemWidth + gap));
+        // Marge de sécurité d'un slot pour absorber les imprécisions de mesure résiduelles
+        // (arrondis sous-pixel, variations de police) — filet de sécurité peu coûteux contre
+        // un débordement horizontal.
+        this._budget = Math.max(budget - 1, 0);
+    }
+
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('total') && this.total < 1) {
             warn('ar-pagination', `total doit être ≥ 1. Valeur reçue : ${this.total}.`);
@@ -85,6 +176,25 @@ export class ArPagination extends LitElement {
                     `current (${this.current}) est supérieur à total (${this.total}).`,
                 );
             }
+        }
+        if (changed.has('total')) {
+            const digits = String(Math.max(this.total, 1)).length;
+            if (this._prevTotalDigits && digits !== this._prevTotalDigits) {
+                // Le nombre de chiffres du total a changé (ex. 9 → 10, 99 → 100) : la largeur
+                // d'item mesurée précédemment (figée sur l'ancien total) n'est plus fiable —
+                // marque une remesure comme due avant le prochain calcul de budget. La remesure
+                // effective n'a lieu que si un item numérique est rendu (cf. `_needsRemeasure`) ;
+                // sinon la dernière valeur connue de `_itemWidth` reste utilisée pour ne pas
+                // bloquer le composant au palier texte.
+                this._needsRemeasure = true;
+                this._recalculateBudget();
+            }
+            this._prevTotalDigits = digits;
+        }
+        const select = this.shadowRoot?.querySelector<HTMLSelectElement>('[part~="select"]');
+        if (select) {
+            const value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
+            if (select.value !== value) select.value = value;
         }
     }
 
@@ -124,9 +234,34 @@ export class ArPagination extends LitElement {
         const isPreviousDisabled = current <= 1;
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
+        // Plancher uniforme (5, le plus grand des deux planchers algorithmiques de
+        // `_calculatePages`) plutôt que 3 en bord de liste / 5 sinon : sinon, à largeur égale,
+        // la bascule vers le select dépendrait de la position de `current` (une page en bord
+        // resterait en boutons plus longtemps qu'une page intermédiaire) — incohérent du point
+        // de vue de l'utilisateur, qui ne doit pas voir un mode différent selon la page active
+        // sans changement de largeur. 5 est sûr : c'est déjà le plancher réel en position non-bord,
+        // donc aucun risque de débordement (contrairement à forcer 3, qui ferait tenter un rendu
+        // à 5 items dans un budget de 3-4 slots).
+        const floorSlots = 5;
+        // Calculé une seule fois : réutilisé pour la décision de mode ci-dessous ET pour le
+        // rendu des boutons numérotés (repeat) si on reste en mode boutons.
+        const pages = _calculatePages(current, total, this._budget);
+        // Cas particulier : à budget=5 exactement (position non-bord, loin des deux extrémités),
+        // `_calculatePages` retombe sur sa fenêtre minimale [1, -1, current, -2, total] — 5 slots
+        // dont 2 ellipses purement décoratives, pour seulement 3 pages réellement cliquables.
+        // Le select offre alors plus de valeur pour le même espace (jusqu'à 9 pages réelles,
+        // cf. `renderPageSelect`) : basculer vers lui même si le budget brut suffirait
+        // techniquement à afficher cette fenêtre. Repli strictement plus sûr que les boutons
+        // qu'il remplace (un `<select>` fermé est plus étroit que la fenêtre à 5 slots qu'il
+        // aurait fallu rendre), donc aucun risque de débordement supplémentaire.
+        const isMinimalWindowWithDoubleEllipsis =
+            pages.length === 5 && pages.includes(-1) && pages.includes(-2);
+        const useSelectMode =
+            this._budget !== undefined &&
+            (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
-            <p id="ar-pagination" class="sr-only">Pagination</p>
+            <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
             <ul part="list" @click=${this._onPageChange}>
                 <li part="item">
                     <a
@@ -136,22 +271,26 @@ export class ArPagination extends LitElement {
                         @click=${this._onPreviousPage}
                     >
                         <slot name="prev-icon">${this._defaultPrevIcon()}</slot>
-                        <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
+                        <span class="sr-only"
+                            >Page précédente (page ${previousPageNumber} sur ${total})</span
+                        >
                     </a>
                 </li>
 
-                ${repeat(
-                    _calculatePages(current, total),
-                    (page) => page,
-                    (page) => {
-                        // -1 et -2 sont des sentinelles représentant les ellipses
-                        return page === -1 || page === -2
-                            ? html` <li part="item" aria-hidden="true">
-                                  <span part="ellipsis">...</span>
-                              </li>`
-                            : this.renderPage(page, page === current);
-                    },
-                )}
+                ${useSelectMode
+                    ? this.renderPageSelect(current, total)
+                    : repeat(
+                          pages,
+                          (page) => page,
+                          (page) => {
+                              // -1 et -2 sont des sentinelles représentant les ellipses
+                              return page === -1 || page === -2
+                                  ? html` <li part="item" aria-hidden="true">
+                                        <span part="ellipsis">...</span>
+                                    </li>`
+                                  : this.renderPage(page, page === current, total);
+                          },
+                      )}
 
                 <li part="item">
                     <a
@@ -161,7 +300,9 @@ export class ArPagination extends LitElement {
                         @click=${this._onNextPage}
                     >
                         <slot name="next-icon">${this._defaultNextIcon()}</slot>
-                        <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
+                        <span class="sr-only"
+                            >Page suivante (page ${nextPageNumber} sur ${total})</span
+                        >
                     </a>
                 </li>
             </ul>
@@ -169,32 +310,77 @@ export class ArPagination extends LitElement {
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
-    protected renderPage(page: number, active: boolean): TemplateResult {
+    protected renderPage(page: number, active: boolean, total: number): TemplateResult {
         return html` <li part="item${active ? ' item--current' : ''}">
-            ${this.renderPageLink(page, active)}
+            ${this.renderPageLink(page, active, total)}
         </li>`;
     }
 
     /** Génère le lien ou le span (si page active) d'une page */
-    protected renderPageLink(page: number, active: boolean): TemplateResult {
+    protected renderPageLink(page: number, active: boolean, total: number): TemplateResult {
         if (active) {
             return html` <span
                 part="current"
                 tabindex="-1"
-                aria-current="true"
+                aria-current="page"
                 data-ar-pagination-page="${page}"
             >
-                ${this.renderPageLabel(page)}
+                ${this.renderPageLabel(page, total)}
             </span>`;
         }
         return html` <a part="link" data-ar-pagination-page="${page}" href="javascript:;">
-            ${this.renderPageLabel(page)}
+            ${this.renderPageLabel(page, total)}
         </a>`;
     }
 
-    /** Génère le label d'une page avec texte sr-only pour les lecteurs d'écran */
-    protected renderPageLabel(page: number): TemplateResult {
-        return html`<span class="sr-only">Page&nbsp;</span>${page}`;
+    /**
+     * Génère le label d'une page : texte complet ("Page X sur Y") lu par les lecteurs d'écran,
+     * numéro seul affiché — les deux `<span>` doivent rester adjacents sans texte/espace entre
+     * eux (voir garde globale sur les bindings adjacents dans un conteneur flex).
+     */
+    protected renderPageLabel(page: number, total: number): TemplateResult {
+        return html`<span class="sr-only">Page ${page} sur ${total}</span
+            ><span aria-hidden="true">${page}</span>`;
+    }
+
+    /**
+     * Génère le `<li>` du select de saut de page, affiché à la place de la liste de pages au
+     * palier minimal (largeur insuffisante pour la fenêtre de boutons la plus réduite).
+     *
+     * Peuplé sans le `_budget` courant (donc avec le plancher de largeur confortable de
+     * `_calculatePages`, jusqu'à 9 slots) plutôt qu'avec la fenêtre déjà réduite par la largeur
+     * réelle : contrairement aux boutons, le `<select>` reste compact quel que soit le nombre
+     * d'options qu'il contient une fois fermé — rien n'empêche de lui donner accès au même choix
+     * de pages qu'à largeur confortable. Le mobile n'est ainsi jamais moins capable que le
+     * desktop, seulement rendu différemment.
+     */
+    protected renderPageSelect(current: number, total: number): TemplateResult {
+        return html`<li part="item page-select">
+            <span class="sr-only" id="ar-pagination-select-label">Aller à la page</span>
+            <select
+                part="select"
+                aria-labelledby="ar-pagination-select-label"
+                @change=${this._onSelectChange}
+            >
+                ${_calculatePages(current, total).map((page) =>
+                    page === -1 || page === -2
+                        ? html`<option disabled value="">…</option>`
+                        : html`<option value=${page} ?selected=${page === current}>
+                              Page ${page} sur ${total}
+                          </option>`,
+                )}
+            </select>
+        </li>`;
+    }
+
+    private _onSelectChange(event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        const page = parseInt(select.value, 10);
+        if (Number.isNaN(page) || page === this.current) return;
+        const from = this.current;
+        this.current = page;
+        this._emit({ from, to: this.current });
+        this._announcePageChange();
     }
 
     private _onPreviousPage(): void {
@@ -214,9 +400,11 @@ export class ArPagination extends LitElement {
     }
 
     private _onPageChange(event: MouseEvent): void {
-        const target = event.target as HTMLElement;
-        const page = target.dataset['arPaginationPage'];
-        if (target.tagName !== 'A' || !page) return;
+        const link = (event.target as HTMLElement).closest<HTMLAnchorElement>(
+            'a[data-ar-pagination-page]',
+        );
+        const page = link?.dataset['arPaginationPage'];
+        if (!link || !page) return;
         const from = this.current;
         this.current = parseInt(page);
         this._emit({ from, to: this.current });

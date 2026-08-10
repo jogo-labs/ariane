@@ -8,7 +8,7 @@ export default css`
 
     [part='list'] {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: center;
         padding-inline-start: 0;
         margin-bottom: 0;
@@ -24,6 +24,7 @@ export default css`
     [part~='next'],
     [part~='link'],
     [part~='current'],
+    [part~='select'],
     [part~='ellipsis'] {
         display: inline-flex;
         align-items: center;
@@ -38,15 +39,28 @@ export default css`
     [part~='next'],
     [part~='link'] {
         text-decoration: none;
-        transition:
-            background-color var(--ar-pagination-transition-duration),
-            color var(--ar-pagination-transition-duration);
     }
 
     [part~='prev'],
     [part~='next'],
     [part~='link'],
-    [part~='current'] {
+    [part~='select'] {
+        transition:
+            background-color var(--ar-pagination-transition-duration),
+            color var(--ar-pagination-transition-duration);
+    }
+
+    [part~='select'] {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    [part~='prev'],
+    [part~='next'],
+    [part~='link'],
+    [part~='current'],
+    [part~='select'] {
         &:focus-visible {
             outline: 2px solid currentColor;
             outline-offset: 2px;
@@ -56,7 +70,8 @@ export default css`
     @media (prefers-reduced-motion: reduce) {
         [part~='prev'],
         [part~='next'],
-        [part~='link'] {
+        [part~='link'],
+        [part~='select'] {
             transition: none;
         }
     }
@@ -69,13 +84,5 @@ export default css`
 
     [part~='nav-btn--disabled'] {
         cursor: not-allowed;
-    }
-
-    @media screen and (max-width: 640px) {
-        [part~='item']:nth-child(n + 3):nth-last-child(n + 3):not([part~='item--current']):not(
-                [aria-hidden='true']
-            ) {
-            display: none;
-        }
     }
 `;
