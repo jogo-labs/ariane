@@ -31,13 +31,18 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-- `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
-  par les lecteurs d'écran comme zone de navigation.
+- `role="navigation"` et `aria-labelledby` posés sur le conteneur, dont le nom inclut la position
+  courante ("Pagination, page 4 sur 12") — repérable immédiatement en navigation par régions,
+  sans avoir à explorer les liens pour savoir où on en est.
 - Les boutons "précédent" et "suivant" ont `aria-disabled` synchronisé avec leur état désactivé —
     <WcagRef
         criterion="4.1.2"
         summary="Name, Role, Value : tout composant UI doit exposer son nom, rôle et valeur (états inclus) aux technologies d'assistance."
     />
+- Chaque lien de page et les boutons "précédent"/"suivant" indiquent le nombre total de pages
+  ("Page 4 sur 12") — la position dans la liste (début, milieu, fin) est compréhensible en
+  navigation clavier/lecteur d'écran, sans avoir à deviner si une page est la dernière.
+- La page active porte `aria-current="page"`.
 - Les séparateurs et points de suspension sont masqués aux lecteurs d'écran (`aria-hidden`).
 
 ### À votre charge
