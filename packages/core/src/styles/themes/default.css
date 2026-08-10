@@ -1097,40 +1097,73 @@
         &::part(link),
         &::part(current),
         &::part(prev),
-        &::part(next) {
+        &::part(next),
+        &::part(select) {
             border-radius: var(--ar-border-radius-xl);
+        }
+
+        /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
+           qu'un état combiné (ex. clic — hover + focus simultanés) retienne toujours le fond de
+           l'état le plus fort visuellement plutôt qu'un fond issu d'une autre origine de valeur
+           qui pourrait entrer en collision avec la couleur pilotée par :hover — même schéma que
+           le correctif ar-breadcrumb (#157, `:focus` déclaré après `:hover` y avait produit une
+           icône blanche sur fond quasi blanc). `:focus-visible` (pas `:focus`) évite en plus que
+           ce fond s'applique sur un simple clic souris, réservé au cas clavier/programmatique. */
+        &::part(link):focus-visible,
+        &::part(prev):focus-visible,
+        &::part(next):focus-visible,
+        &::part(select):focus-visible {
+            background-color: var(--ar-button-tertiary-bg-focus);
         }
 
         &::part(link):hover,
         &::part(prev):hover,
-        &::part(next):hover {
+        &::part(next):hover,
+        &::part(select):hover {
             background-color: var(--ar-button-tertiary-bg-hover);
             color: var(--ar-color-white);
         }
 
         &::part(link):active,
         &::part(prev):active,
-        &::part(next):active {
+        &::part(next):active,
+        &::part(select):active {
             background-color: var(--ar-button-tertiary-bg-active);
             color: var(--ar-color-white);
         }
 
-        &::part(link):focus,
-        &::part(prev):focus,
-        &::part(next):focus {
-            background-color: var(--ar-button-tertiary-bg-focus);
-        }
-
-        /* Spécificité égale aux variantes :hover/:active/:focus ci-dessus (pseudo-élément +
-           pseudo-classe) requise pour gagner la cascade : ::part(nav-btn--disabled) seul
+        /* Spécificité égale aux variantes :focus-visible/:hover/:active ci-dessus (pseudo-élément
+           + pseudo-classe) requise pour gagner la cascade : ::part(nav-btn--disabled) seul
            (spécificité pseudo-élément uniquement) perdrait face à ::part(prev):hover malgré
            un ordre de déclaration ultérieur. */
         &::part(nav-btn--disabled),
         &::part(nav-btn--disabled):hover,
         &::part(nav-btn--disabled):active,
-        &::part(nav-btn--disabled):focus {
+        &::part(nav-btn--disabled):focus-visible {
             background-color: var(--ar-button-disabled-bg);
             color: var(--ar-button-disabled-color);
+        }
+
+        /* Flèche custom en `currentColor` (gradients, pas une image figée) : s'adapte
+           automatiquement à chaque état (couleur de texte blanche au survol/pressé ci-dessus)
+           sans dupliquer une image par état, et fonctionne à l'identique sur tous les
+           navigateurs — contrairement à `::before`/`::after` sur `<select>`, peu fiable
+           cross-browser (Safari/Firefox ne les rendent pas systématiquement sur les contrôles de
+           formulaire). `appearance: none` est posé en structurel dans `pagination.styles.ts`.
+           Positionnement en propriétés physiques (`right`), pas logiques : limite connue et
+           acceptée pour un premier jet, à revisiter si un besoin RTL réel émerge. */
+        &::part(select) {
+            background-color: var(--ar-button-tertiary-bg);
+            color: var(--ar-color-text);
+            padding: 0 1.75rem 0 0.75rem;
+            background-image:
+                linear-gradient(45deg, transparent 50%, currentColor 50%),
+                linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position:
+                calc(100% - 1.1rem) center,
+                calc(100% - 0.75rem) center;
+            background-size: 0.35rem 0.35rem;
+            background-repeat: no-repeat;
         }
 
         &::part(current) {

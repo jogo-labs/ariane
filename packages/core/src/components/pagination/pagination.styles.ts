@@ -39,9 +39,21 @@ export default css`
     [part~='next'],
     [part~='link'] {
         text-decoration: none;
+    }
+
+    [part~='prev'],
+    [part~='next'],
+    [part~='link'],
+    [part~='select'] {
         transition:
             background-color var(--ar-pagination-transition-duration),
             color var(--ar-pagination-transition-duration);
+    }
+
+    [part~='select'] {
+        appearance: none;
+        border: none;
+        cursor: pointer;
     }
 
     [part~='prev'],
@@ -58,7 +70,8 @@ export default css`
     @media (prefers-reduced-motion: reduce) {
         [part~='prev'],
         [part~='next'],
-        [part~='link'] {
+        [part~='link'],
+        [part~='select'] {
             transition: none;
         }
     }
