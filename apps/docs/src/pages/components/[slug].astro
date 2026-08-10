@@ -46,6 +46,7 @@ const pageDesc      = mdx?.data.description ?? component.summary;
 const displayMode   = component['x-display'] ?? 'demo';
 const parentTag     = component['x-parent'];
 const relatedTokens = mdx?.data.relatedTokens ?? [];
+const pageScript = mdx?.data.pageScript;
 
 // ─── HTML initial du playground ───────────────────────────────────────────────
 
@@ -182,6 +183,7 @@ const tocEntries = [
             component={component}
             relatedTokens={relatedTokens}
         />
+        {pageScript && <Fragment set:html={pageScript} />}
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />

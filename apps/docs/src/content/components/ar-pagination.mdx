@@ -23,12 +23,13 @@ variants:
       description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
-          <script>
-              document.addEventListener('ar-pagination-page-change', (e) => {
-                  /* Mettez à jour le contenu de la page, puis la page active du composant */
-                  e.target.current = e.detail.to;
-              });
-          </script>
+pageScript: |
+    <script>
+        document.addEventListener('ar-pagination-page-change', (e) => {
+            /* Mettez à jour le contenu de la page, puis la page active du composant */
+            e.target.current = e.detail.to;
+        });
+    </script>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
