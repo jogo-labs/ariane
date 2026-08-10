@@ -79,11 +79,12 @@ accessible d'une option sont donc nécessairement identiques ; aucune compressio
 possible à l'intérieur des `<option>` (contrairement aux `<span class="sr-only">` déjà utilisés
 ailleurs dans le composant, sur des éléments DOM normaux).
 
-Si la vérification empirique montre un débordement, le repli se fait donc directement vers un
-label d'option court (`${n}`) accompagné d'un total en texte statique **sibling** du `<select>`
-(élément DOM normal, hors du contrôle) — c'est à ce niveau, et uniquement à ce niveau, qu'une
-compression visuel/SR différenciée est possible si l'espace reste serré : `/` visible
-(`aria-hidden`) + "sur" en `sr-only`, et en dernier recours "Page" également en `sr-only`.
+Si la vérification empirique montre un débordement, le repli se fait sans ajouter d'élément
+sibling — le `<select>` reste seul : les options passent à un label court (`${n}`), et le
+`<select>` porte un `aria-label` dynamique combinant nom et valeur courante
+(ex. `"Aller à la page, page 2 sur 20"`, recalculé à chaque changement de `current`), à la place du
+`aria-labelledby` statique décrit en §3. Le texte visuel affiché dans le déclencheur fermé reste
+court (`"2"`), seul le nom accessible porte l'information complète.
 
 Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options "Page 1 sur 20" ·
 … · "Page 10 sur 20" · … · "Page 20 sur 20" — le jeu de pages est identique à ce que produirait un
@@ -96,9 +97,13 @@ desktop très réduit avec le même budget, seul le label change.
   (`{ from, to }`), `announceA11y`. Pas de gestion de focus additionnelle : le focus natif reste
   sur le `<select>` après sélection (contrairement au clic sur un lien, qui déplace le focus vers
   `[part~="current"]` via `focusAfterUpdate`).
-- Nom accessible : `<span class="sr-only">` + `aria-labelledby`, cohérent avec le pattern déjà
-  utilisé pour prev/next (`<span class="sr-only">Page précédente…</span>`), plutôt qu'un
-  `aria-label` en dur.
+- Nom accessible (cas par défaut, label complet dans les options) : `<span class="sr-only">` +
+  `aria-labelledby`, cohérent avec le pattern déjà utilisé pour prev/next
+  (`<span class="sr-only">Page précédente…</span>`) — la valeur (page courante) est déjà portée
+  par le texte de l'option sélectionnée, pas besoin de la dupliquer dans le nom.
+- Nom accessible (repli, labels d'option courts) : `aria-label` dynamique sur le `<select>`
+  combinant nom et valeur (§2), remplace le `aria-labelledby` ci-dessus dans ce cas — un élément
+  ne peut porter les deux sans que `aria-labelledby` ne l'emporte silencieusement.
 - Les `<option disabled>` (ellipses) sont nativement ignorées par la navigation clavier et les
   lecteurs d'écran — comportement natif du `<select>`, aucun code custom requis.
 
@@ -134,8 +139,8 @@ troisième point ("Largeur extrême : … remplacés par un texte") est réécri
   budget réel mesuré (pas seulement en test headless/jsdom), et que le style natif + custom du
   `<select>` se comporte correctement dans un vrai rendu navigateur. Vérifier en particulier que le
   déclencheur fermé avec label complet ("Page 20 sur 20", le cas le plus large) ne déborde pas à
-  320-375px à côté de prev/next — sinon appliquer le repli décrit en §2 (label court + total en
-  texte sibling) avant de figer le plan d'implémentation.
+  320-375px à côté de prev/next — sinon appliquer le repli décrit en §2 (label court + `aria-label`
+  dynamique, sans élément sibling) avant de figer le plan d'implémentation.
 
 ## Hors scope
 
