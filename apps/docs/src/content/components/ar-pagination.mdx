@@ -55,23 +55,9 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ## Comportement responsive
 
-Le composant mesure sa propre largeur (pas celle du viewport) et réduit progressivement le
-nombre de numéros affichés pour toujours tenir sur une ligne — aucune configuration nécessaire :
-
-- **Largeur confortable** : tous les numéros de page, comme aujourd'hui.
-- **Largeur réduite** : les pages voisines de la page active diminuent progressivement. La
-  première et la dernière page restent toujours visibles aux côtés de la page active, même à
-  budget réduit — pour préserver le contexte de navigation — jusqu'au palier texte ci-dessous.
-- **Largeur extrême** : les numéros de page sont remplacés par un `<select>` de saut de page,
-  peuplé du même jeu de pages qu'à largeur confortable (pas une fenêtre réduite à la largeur
-  actuelle) — le mobile n'est jamais moins capable que le desktop, seulement rendu différemment.
-  Les ellipses y apparaissent comme options désactivées. Sélectionner une page dans cette liste
-  déclenche le même changement de page qu'un clic sur un numéro (le focus reste toutefois sur le
-  `<select>`, contrairement à un clic sur un lien qui le déplace vers la page active). Les boutons
-  précédent/suivant restent toujours affichés et fonctionnels.
-
-Le composant peut être placé dans un conteneur étroit (ex. barre latérale) sur un écran large : le
-comportement suit la largeur du conteneur, pas celle de l'écran.
+Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
+Lorsque l'espace disponible n'est plus jugé suffisant, les numéros de page sont remplacés par un `<select>` de saut de page,
+peuplé du même jeu de pages qu'à largeur confortable.
 
 ## Utilisation
 
