@@ -56,7 +56,7 @@ export interface ArPaginationPageChangeDetail {
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
  *   changement de page, à chaque interaction (clic page, précédent, suivant, sélection dans le
  *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
- *   change pas. Contient `from` et `to`.
+ *   change pas. Contient `from` et `to`. @cancelable
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
  *   `current` a réellement changé (réassignation externe suite à la confirmation du
  *   consommateur, ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
@@ -98,6 +98,11 @@ export class ArPagination extends LitElement {
     // valeur pré-upgrade non définie) des transitions réelles ultérieures — sans ce flag,
     // ar-pagination-page-changed/l'annonce/le focus se déclencheraient au montage initial.
     private _hasRenderedOnce = false;
+    // Cible du transfert de focus après confirmation — posé uniquement par _onPageChange
+    // (clic sur un numéro de page), jamais par prev/next/select : reproduit le
+    // comportement d'avant #161, où seul ce chemin déplaçait le focus. Consommé au
+    // prochain updated() si current le confirme, sinon expire (fenêtre d'un seul cycle).
+    private _pendingFocusPage: number | undefined;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -212,10 +217,13 @@ export class ArPagination extends LitElement {
             if (from !== to) {
                 this._emitChanged({ from, to });
                 this._announcePageChange();
-                void focusAfterUpdate(this, '[part~="current"]');
+                if (this.current === this._pendingFocusPage) {
+                    void focusAfterUpdate(this, '[part~="current"]');
+                }
             }
         }
         this._hasRenderedOnce = true;
+        this._pendingFocusPage = undefined;
     }
 
     private _defaultPrevIcon(): TemplateResult {
@@ -398,11 +406,9 @@ export class ArPagination extends LitElement {
         const page = parseInt(select.value, 10);
         if (Number.isNaN(page) || page === this.current) return;
         if (!this._requestPageChange(page)) {
-            // Annulé : le <select> a déjà muté nativement sa `.value` avant que ce
-            // handler ne
-            // s'exécute. Puisque `current` ne change pas, aucun cycle de rendu ne
-            // redéclenchera
-            // le sync existant dans updated() — revert explicite nécessaire ici.
+            // Annulé : le <select> a déjà muté nativement sa .value avant que ce handler ne
+            // s'exécute. Puisque current ne change pas, aucun cycle de rendu ne
+            // redéclenchera le sync existant dans updated() — revert explicite nécessaire ici.
             select.value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
         }
     }
@@ -423,7 +429,9 @@ export class ArPagination extends LitElement {
         );
         const page = link?.dataset['arPaginationPage'];
         if (!link || !page) return;
-        this._requestPageChange(parseInt(page));
+        const to = parseInt(page);
+        this._pendingFocusPage = to;
+        this._requestPageChange(to);
     }
 
     /**

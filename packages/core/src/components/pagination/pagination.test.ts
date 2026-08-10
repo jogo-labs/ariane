@@ -534,6 +534,19 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
             expect(el.shadowRoot?.activeElement).toBe(nextBtn);
         });
+
+        it("un clic sur next confirmé ne déplace pas non plus le focus (garde d'origine)", async () => {
+            el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            const nextBtn = requirePart(el, 'next') as HTMLElement;
+            nextBtn.focus();
+            nextBtn.click();
+            await waitForUpdate(el);
+            expect(el.current).toBe(4);
+            expect(el.shadowRoot?.activeElement).toBe(nextBtn);
+        });
     });
 
     // ── Événement ar-pagination-page-change ──────────────────────────────────
@@ -723,8 +736,6 @@ describe('ArPagination', () => {
             expect(el.current).toBe(3);
         });
     });
-
-    // ── Annonces a11y ─────────────────────────────────────────────────────────
 
     // ── Annonces a11y (après confirmation externe de current) ───────────────
 
