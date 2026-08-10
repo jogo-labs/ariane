@@ -158,12 +158,12 @@ describe('ArPagination', () => {
             expect(requirePart(el, 'next').getAttribute('aria-disabled')).toBe('false');
         });
 
-        it('la page active a aria-current="true"', async () => {
+        it('la page active a aria-current="page"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
             const current = shadow.querySelector('[part="current"]') as Element;
             expect(current).not.toBeNull();
-            expect(current.getAttribute('aria-current')).toBe('true');
+            expect(current.getAttribute('aria-current')).toBe('page');
         });
     });
 
@@ -211,6 +211,60 @@ describe('ArPagination', () => {
             const shadow = el.shadowRoot as ShadowRoot;
             const ellipses = shadow.querySelectorAll('[part="ellipsis"]');
             expect(ellipses.length).toBeGreaterThanOrEqual(2);
+        });
+    });
+
+    // ── Labels accessibles enrichis ──────────────────────────────────────────
+
+    describe('labels accessibles enrichis (total dans le contexte)', () => {
+        it('le sr-only d\'un lien de page inclut le total ("Page X sur Y")', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const link = shadow.querySelector('[data-ar-pagination-page="4"]') as Element;
+            const srOnly = link.querySelector('.sr-only');
+            expect(srOnly?.textContent).toBe('Page 4 sur 12');
+        });
+
+        it("le span aria-hidden d'un lien de page ne contient que le numéro (rendu visuel inchangé)", async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const link = shadow.querySelector('[data-ar-pagination-page="4"]') as Element;
+            const visible = link.querySelector('[aria-hidden="true"]');
+            expect(visible?.textContent).toBe('4');
+        });
+
+        it('le sr-only de la page active inclut le total ("Page X sur Y")', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const current = shadow.querySelector('[part="current"]') as Element;
+            const srOnly = current.querySelector('.sr-only');
+            expect(srOnly?.textContent).toBe('Page 3 sur 12');
+        });
+
+        it('le sr-only de "précédent" inclut le total', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const srOnly = requirePart(el, 'prev').querySelector('.sr-only');
+            expect(srOnly?.textContent).toBe('Page précédente (page 2 sur 12)');
+        });
+
+        it('le sr-only de "suivant" inclut le total', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const srOnly = requirePart(el, 'next').querySelector('.sr-only');
+            expect(srOnly?.textContent).toBe('Page suivante (page 4 sur 12)');
+        });
+
+        it('le nom du landmark (aria-labelledby) reflète current/total', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            const label = (el.shadowRoot as ShadowRoot).getElementById('ar-pagination');
+            expect(label?.textContent).toBe('Pagination, page 3 sur 12');
+        });
+
+        it('le nom du landmark se met à jour après un changement de page', async () => {
+            el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
+            el.current = 4;
+            await waitForUpdate(el);
+            const label = (el.shadowRoot as ShadowRoot).getElementById('ar-pagination');
+            expect(label?.textContent).toBe('Pagination, page 4 sur 12');
         });
     });
 

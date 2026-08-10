@@ -261,7 +261,7 @@ export class ArPagination extends LitElement {
             (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
-            <p id="ar-pagination" class="sr-only">Pagination</p>
+            <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
             <ul part="list" @click=${this._onPageChange}>
                 <li part="item">
                     <a
@@ -271,7 +271,9 @@ export class ArPagination extends LitElement {
                         @click=${this._onPreviousPage}
                     >
                         <slot name="prev-icon">${this._defaultPrevIcon()}</slot>
-                        <span class="sr-only">Page précédente (page ${previousPageNumber})</span>
+                        <span class="sr-only"
+                            >Page précédente (page ${previousPageNumber} sur ${total})</span
+                        >
                     </a>
                 </li>
 
@@ -286,7 +288,7 @@ export class ArPagination extends LitElement {
                                   ? html` <li part="item" aria-hidden="true">
                                         <span part="ellipsis">...</span>
                                     </li>`
-                                  : this.renderPage(page, page === current);
+                                  : this.renderPage(page, page === current, total);
                           },
                       )}
 
@@ -298,7 +300,9 @@ export class ArPagination extends LitElement {
                         @click=${this._onNextPage}
                     >
                         <slot name="next-icon">${this._defaultNextIcon()}</slot>
-                        <span class="sr-only">Page suivante (page ${nextPageNumber})</span>
+                        <span class="sr-only"
+                            >Page suivante (page ${nextPageNumber} sur ${total})</span
+                        >
                     </a>
                 </li>
             </ul>
@@ -306,32 +310,37 @@ export class ArPagination extends LitElement {
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
-    protected renderPage(page: number, active: boolean): TemplateResult {
+    protected renderPage(page: number, active: boolean, total: number): TemplateResult {
         return html` <li part="item${active ? ' item--current' : ''}">
-            ${this.renderPageLink(page, active)}
+            ${this.renderPageLink(page, active, total)}
         </li>`;
     }
 
     /** Génère le lien ou le span (si page active) d'une page */
-    protected renderPageLink(page: number, active: boolean): TemplateResult {
+    protected renderPageLink(page: number, active: boolean, total: number): TemplateResult {
         if (active) {
             return html` <span
                 part="current"
                 tabindex="-1"
-                aria-current="true"
+                aria-current="page"
                 data-ar-pagination-page="${page}"
             >
-                ${this.renderPageLabel(page)}
+                ${this.renderPageLabel(page, total)}
             </span>`;
         }
         return html` <a part="link" data-ar-pagination-page="${page}" href="javascript:;">
-            ${this.renderPageLabel(page)}
+            ${this.renderPageLabel(page, total)}
         </a>`;
     }
 
-    /** Génère le label d'une page avec texte sr-only pour les lecteurs d'écran */
-    protected renderPageLabel(page: number): TemplateResult {
-        return html`<span class="sr-only">Page&nbsp;</span>${page}`;
+    /**
+     * Génère le label d'une page : texte complet ("Page X sur Y") lu par les lecteurs d'écran,
+     * numéro seul affiché — les deux `<span>` doivent rester adjacents sans texte/espace entre
+     * eux (voir garde globale sur les bindings adjacents dans un conteneur flex).
+     */
+    protected renderPageLabel(page: number, total: number): TemplateResult {
+        return html`<span class="sr-only">Page ${page} sur ${total}</span
+            ><span aria-hidden="true">${page}</span>`;
     }
 
     /**
