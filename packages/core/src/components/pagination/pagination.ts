@@ -234,8 +234,15 @@ export class ArPagination extends LitElement {
         const isPreviousDisabled = current <= 1;
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
-        const isEdgeCurrent = current <= 1 || current >= total;
-        const floorSlots = isEdgeCurrent ? 3 : 5;
+        // Plancher uniforme (5, le plus grand des deux planchers algorithmiques de
+        // `_calculatePages`) plutôt que 3 en bord de liste / 5 sinon : sinon, à largeur égale,
+        // la bascule vers le select dépendrait de la position de `current` (une page en bord
+        // resterait en boutons plus longtemps qu'une page intermédiaire) — incohérent du point
+        // de vue de l'utilisateur, qui ne doit pas voir un mode différent selon la page active
+        // sans changement de largeur. 5 est sûr : c'est déjà le plancher réel en position non-bord,
+        // donc aucun risque de débordement (contrairement à forcer 3, qui ferait tenter un rendu
+        // à 5 items dans un budget de 3-4 slots).
+        const floorSlots = 5;
         const useSelectMode = this._budget !== undefined && this._budget < floorSlots;
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
@@ -315,6 +322,13 @@ export class ArPagination extends LitElement {
     /**
      * Génère le `<li>` du select de saut de page, affiché à la place de la liste de pages au
      * palier minimal (largeur insuffisante pour la fenêtre de boutons la plus réduite).
+     *
+     * Peuplé sans le `_budget` courant (donc avec le plancher de largeur confortable de
+     * `_calculatePages`, jusqu'à 9 slots) plutôt qu'avec la fenêtre déjà réduite par la largeur
+     * réelle : contrairement aux boutons, le `<select>` reste compact quel que soit le nombre
+     * d'options qu'il contient une fois fermé — rien n'empêche de lui donner accès au même choix
+     * de pages qu'à largeur confortable. Le mobile n'est ainsi jamais moins capable que le
+     * desktop, seulement rendu différemment.
      */
     protected renderPageSelect(current: number, total: number): TemplateResult {
         return html`<li part="item page-select">
@@ -324,7 +338,7 @@ export class ArPagination extends LitElement {
                 aria-labelledby="ar-pagination-select-label"
                 @change=${this._onSelectChange}
             >
-                ${_calculatePages(current, total, this._budget).map((page) =>
+                ${_calculatePages(current, total).map((page) =>
                     page === -1 || page === -2
                         ? html`<option disabled value="">…</option>`
                         : html`<option value=${page} ?selected=${page === current}>

@@ -235,7 +235,7 @@ describe('ArPagination', () => {
             expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
         });
 
-        it('peuple le select avec les mêmes pages que _calculatePages au plancher (première/dernière page, fenêtre minimale, ellipses en disabled)', async () => {
+        it("peuple le select avec le même jeu de pages qu'à largeur confortable, pas la fenêtre réduite au budget actuel", async () => {
             el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
             // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
             el._budget = 2;
@@ -247,10 +247,32 @@ describe('ArPagination', () => {
                 '[part="select"]',
             ) as HTMLSelectElement;
             const options = Array.from(select.querySelectorAll('option'));
-            // _calculatePages(3, 15, 2) retombe sur _minimalPages(3, 15) = [1, -1, 3, -2, 15]
-            expect(options).toHaveLength(5);
-            expect(options.map((o) => o.disabled)).toEqual([false, true, false, true, false]);
-            expect(options.map((o) => o.value)).toEqual(['1', '', '3', '', '15']);
+            // _calculatePages(3, 15) SANS budget (donc budget par défaut 9) = [1, 2, 3, 4, 5, 6, 7, -2, 15]
+            // — pas _minimalPages(3, 15) : le select ne doit pas être moins capable que le
+            // desktop à largeur confortable, même si le conteneur réel est très étroit.
+            expect(options).toHaveLength(9);
+            expect(options.map((o) => o.disabled)).toEqual([
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false,
+            ]);
+            expect(options.map((o) => o.value)).toEqual([
+                '1',
+                '2',
+                '3',
+                '4',
+                '5',
+                '6',
+                '7',
+                '',
+                '15',
+            ]);
             // Attribut `selected` (pas la propriété IDL `.selected`) : happy-dom ne recalcule pas
             // correctement la "selectedness" d'un <select> au fil de l'insertion incrémentale de
             // ses <option> (bug reproduit indépendamment de ce composant, y compris sans binding
@@ -259,6 +281,33 @@ describe('ArPagination', () => {
             // `?selected`, ce qu'un vrai navigateur traduirait correctement en `.selected === true`.
             expect(options[2]?.hasAttribute('selected')).toBe(true);
             expect(options.filter((o) => o.hasAttribute('selected'))).toHaveLength(1);
+        });
+
+        it('le contenu du select ne dépend pas de _budget (toujours le jeu à largeur confortable)', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 0;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            const options = Array.from(select.querySelectorAll('option'));
+            // Même jeu de 9 options qu'avec _budget = 2 ci-dessus : le contenu du select ne varie
+            // pas avec la largeur réelle, seul le déclenchement du palier select en dépend.
+            expect(options).toHaveLength(9);
+            expect(options.map((o) => o.value)).toEqual([
+                '1',
+                '2',
+                '3',
+                '4',
+                '5',
+                '6',
+                '7',
+                '',
+                '15',
+            ]);
         });
 
         it('le label de chaque option contient "Page X sur Y"', async () => {
@@ -275,7 +324,7 @@ describe('ArPagination', () => {
             const options = Array.from(select.querySelectorAll('option'));
             expect(options[0]?.textContent?.trim()).toBe('Page 1 sur 15');
             expect(options[2]?.textContent?.trim()).toBe('Page 3 sur 15');
-            expect(options[4]?.textContent?.trim()).toBe('Page 15 sur 15');
+            expect(options[8]?.textContent?.trim()).toBe('Page 15 sur 15');
         });
 
         it('changer la valeur du select émet ar-pagination-page-change et met à jour current', async () => {
@@ -325,6 +374,21 @@ describe('ArPagination', () => {
 
             const shadow = el.shadowRoot as ShadowRoot;
             expect(shadow.querySelector('[part~="select"]')).toBeNull();
+        });
+
+        it('le plancher est identique en bord de liste et en position intermédiaire (pas de dépendance à la position de current)', async () => {
+            // Avant uniformisation, current en bord (1 ou total) avait un plancher de 3, contre
+            // 5 en position intermédiaire — à budget égal (4 ici), une page en bord restait donc
+            // en boutons pendant qu'une page intermédiaire basculait déjà en select. Le plancher
+            // uniforme (5) élimine cette dépendance à la position.
+            el = await fixture('<ar-pagination current="1" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 4;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            expect((el.shadowRoot as ShadowRoot).querySelector('[part="select"]')).not.toBeNull();
         });
     });
 

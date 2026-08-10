@@ -133,13 +133,15 @@ describe('ar-pagination — browser', () => {
             expect(select.tagName.toLowerCase()).to.equal('select');
             expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
 
-            // _calculatePages(8, 15, budget-plancher) → _minimalPages(8, 15) = [1, -1, 8, -2, 15]
+            // _calculatePages(8, 15) SANS budget (donc budget par défaut 9, pas la fenêtre
+            // réduite au budget réel de la largeur actuelle) = [1, -1, 6, 7, 8, 9, 10, -2, 15] —
+            // le select doit rester aussi riche qu'à largeur confortable.
             const options = Array.from(select.querySelectorAll('option'));
-            expect(options).to.have.lengthOf(5);
-            expect(options[2]?.selected).to.equal(true);
-            expect(options[2]?.textContent?.trim()).to.equal('Page 8 sur 15');
+            expect(options).to.have.lengthOf(9);
+            expect(options[4]?.selected).to.equal(true);
+            expect(options[4]?.textContent?.trim()).to.equal('Page 8 sur 15');
             expect(options[1]?.disabled).to.equal(true);
-            expect(options[3]?.disabled).to.equal(true);
+            expect(options[7]?.disabled).to.equal(true);
         });
 
         it('sélectionner une option du select change la page', async () => {

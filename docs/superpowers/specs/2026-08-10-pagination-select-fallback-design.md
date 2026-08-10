@@ -146,8 +146,37 @@ troisième point ("Largeur extrême : … remplacés par un texte") est réécri
 
 - Peupler le `<select>` avec la liste complète 1..total (redondant avec l'objectif de réduction
   visuelle ; le picker natif deviendrait long sans bénéfice par rapport à la fenêtre réduite).
+  Toujours hors scope après l'amendement ci-dessous : le jeu à largeur confortable reste
+  lui-même une fenêtre réduite par `_calculatePages` (jusqu'à 9 slots), pas la liste 1..total.
 - Mesure dédiée de la largeur du `<select>` pour un repli prev/next-seul en dessous — cas non
   observé aux largeurs réelles ciblées, à reconsidérer seulement si un usage réel le montre
   nécessaire.
 - Support de tailles d'item hétérogènes entre les numéros de page (hérité de la spec du
   2026-08-07, toujours hors scope ici).
+
+## Amendement (2026-08-10, post-implémentation)
+
+Constaté en testant localement la version livrée : peupler le `<select>` avec la fenêtre réduite
+au budget **actuel** (§2 ci-dessus, décision initiale) produisait deux effets non désirés :
+
+1. **Le mobile restait moins capable que le desktop** à largeur extrême — seule la fenêtre
+   minimale (première/dernière page, page active) était accessible, alors que le `<select>`, une
+   fois fermé, reste compact quel que soit son nombre d'options.
+2. **Le seuil de bascule dépendait de la position de `current`** — `floorSlots` valait 3 en bord
+   de liste (`current` = 1 ou `total`) et 5 sinon (hérité du plancher algorithmique naturel de
+   `_calculatePages`/`_minimalPages`, cf. spec du 2026-08-07). À largeur égale, une page en bord
+   restait donc plus longtemps en boutons numérotés qu'une page intermédiaire — un changement de
+   mode visible en changeant seulement de page active, sans changement de largeur.
+
+**Décisions révisées :**
+
+- Le `<select>` est peuplé via `_calculatePages(current, total)` **sans** `this._budget` (donc
+  avec le budget par défaut de la fonction, jusqu'à 9 slots) plutôt qu'avec la fenêtre réduite à
+  la largeur réelle. Le contenu du select ne varie donc plus avec `_budget` — seul le
+  déclenchement du palier select en dépend toujours.
+- `floorSlots` est fixé uniformément à **5** (au lieu de 3 en bord / 5 sinon). Sûr par
+  construction : 5 est déjà le plancher réel en position non-bord, donc aucun risque de
+  débordement (contrairement à uniformiser vers 3, qui ferait tenter un rendu à 5 items dans un
+  budget de 3-4 slots, recréant le bug de débordement corrigé lors de la review finale du
+  2026-08-07). Conséquence acceptée : les pages en bord basculent en select légèrement plus tôt
+  qu'avant (à une largeur où 3 boutons tiendraient encore).

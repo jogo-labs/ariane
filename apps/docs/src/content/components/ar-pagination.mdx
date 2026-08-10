@@ -58,10 +58,12 @@ nombre de numéros affichés pour toujours tenir sur une ligne — aucune config
   première et la dernière page restent toujours visibles aux côtés de la page active, même à
   budget réduit — pour préserver le contexte de navigation — jusqu'au palier texte ci-dessous.
 - **Largeur extrême** : les numéros de page sont remplacés par un `<select>` de saut de page,
-  peuplé des mêmes pages que la fenêtre minimale ci-dessus (première page, dernière page, page
-  active) — les ellipses y apparaissent comme options désactivées. Sélectionner une page dans
-  cette liste a le même effet qu'un clic sur un numéro. Les boutons précédent/suivant restent
-  toujours affichés et fonctionnels.
+  peuplé du même jeu de pages qu'à largeur confortable (pas une fenêtre réduite à la largeur
+  actuelle) — le mobile n'est jamais moins capable que le desktop, seulement rendu différemment.
+  Les ellipses y apparaissent comme options désactivées. Sélectionner une page dans cette liste
+  déclenche le même changement de page qu'un clic sur un numéro (le focus reste toutefois sur le
+  `<select>`, contrairement à un clic sur un lien qui le déplace vers la page active). Les boutons
+  précédent/suivant restent toujours affichés et fonctionnels.
 
 Le composant peut être placé dans un conteneur étroit (ex. barre latérale) sur un écran large : le
 comportement suit la largeur du conteneur, pas celle de l'écran.
