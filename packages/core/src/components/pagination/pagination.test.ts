@@ -548,6 +548,20 @@ describe('ArPagination', () => {
             expect(el.current).toBe(3);
         });
 
+        it("un clic sur le span imbriqué (numéro visible) à l'intérieur du lien met à jour current", async () => {
+            // Régression : `renderPageLabel` enveloppe le numéro visible dans un
+            // `<span aria-hidden="true">` nichée dans le `<a part="link">`. `_onPageChange`
+            // doit résoudre l'ancre via `closest()` même quand `event.target` est ce span
+            // imbriqué plutôt que l'ancre elle-même.
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const pageLink = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            const visibleNumber = pageLink.querySelector('[aria-hidden="true"]') as HTMLElement;
+            visibleNumber.click();
+            await waitForUpdate(el);
+            expect(el.current).toBe(3);
+        });
+
         it('un clic sur un lien de page focalise le nouvel élément part="current"', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;

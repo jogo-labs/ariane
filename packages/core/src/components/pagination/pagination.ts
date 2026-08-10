@@ -400,9 +400,11 @@ export class ArPagination extends LitElement {
     }
 
     private _onPageChange(event: MouseEvent): void {
-        const target = event.target as HTMLElement;
-        const page = target.dataset['arPaginationPage'];
-        if (target.tagName !== 'A' || !page) return;
+        const link = (event.target as HTMLElement).closest<HTMLAnchorElement>(
+            'a[data-ar-pagination-page]',
+        );
+        const page = link?.dataset['arPaginationPage'];
+        if (!link || !page) return;
         const from = this.current;
         this.current = parseInt(page);
         this._emit({ from, to: this.current });

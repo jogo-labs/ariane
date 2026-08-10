@@ -34,6 +34,26 @@ describe('ar-pagination — browser', () => {
         });
     });
 
+    describe('clic sur le contenu imbriqué du lien (régression)', () => {
+        // `renderPageLabel` enveloppe le numéro visible dans un `<span aria-hidden="true">`
+        // (structure : `<a part="link">` > `<span aria-hidden>`). Un clic utilisateur réel sur
+        // le chiffre affiché a pour `event.target` ce `<span>` imbriqué, pas le `<a>` lui-même —
+        // contrairement aux autres tests de ce fichier/suite qui appellent `.click()`
+        // directement sur le `<a>`. Vérifie que `_onPageChange` résout bien l'ancre via
+        // `closest()` et change effectivement la page dans ce cas.
+        it('un clic sur le numéro visible (span aria-hidden imbriqué) change la page', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const shadow = el.shadowRoot as ShadowRoot;
+            const link = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
+            const visibleNumber = link.querySelector('[aria-hidden="true"]') as HTMLElement;
+
+            visibleNumber.click();
+            await elementUpdated(el);
+
+            expect((el as unknown as { current: number }).current).to.equal(3);
+        });
+    });
+
     describe('propriétés logiques (RTL)', () => {
         it('[part="list"] utilise padding-inline-start plutôt que padding-left', async () => {
             const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
