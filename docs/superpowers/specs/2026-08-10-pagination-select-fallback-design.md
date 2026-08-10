@@ -82,9 +82,8 @@ ailleurs dans le composant, sur des éléments DOM normaux).
 Si la vérification empirique montre un débordement, le repli se fait donc directement vers un
 label d'option court (`${n}`) accompagné d'un total en texte statique **sibling** du `<select>`
 (élément DOM normal, hors du contrôle) — c'est à ce niveau, et uniquement à ce niveau, qu'une
-compression visuel/SR différenciée est possible si l'espace reste serré : `/` visible (`aria-hidden`)
-
-- "sur" en `sr-only`, et en dernier recours "Page" également en `sr-only`.
+compression visuel/SR différenciée est possible si l'espace reste serré : `/` visible
+(`aria-hidden`) + "sur" en `sr-only`, et en dernier recours "Page" également en `sr-only`.
 
 Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options "Page 1 sur 20" ·
 … · "Page 10 sur 20" · … · "Page 20 sur 20" — le jeu de pages est identique à ce que produirait un
