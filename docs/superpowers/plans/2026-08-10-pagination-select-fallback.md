@@ -16,8 +16,7 @@ un débordement du déclencheur fermé à 320-375px, Task 3 (conditionnelle) bas
 d'option courts + un `aria-label` dynamique combinant nom et valeur.
 
 **Tech Stack:** Lit 3 + TypeScript, Vitest (happy-dom) pour les tests unitaires, `@web/test-runner`
-
-- Playwright/Chromium pour les tests navigateur.
+et Playwright/Chromium pour les tests navigateur.
 
 ## Global Constraints
 
