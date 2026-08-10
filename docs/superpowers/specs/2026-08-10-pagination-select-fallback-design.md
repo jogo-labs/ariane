@@ -70,8 +70,21 @@ Le label complet ("Page 2 sur 20", cohérent avec le texte déjà utilisé par `
 qu'un simple numéro : un `<select>` fermé affiche le texte de l'option sélectionnée, donc ce choix
 expose le total sans avoir à ouvrir le picker. Contrepartie assumée : le déclencheur fermé est plus
 large qu'un simple numéro — **à confirmer empiriquement** (§5) qu'il tient toujours à 320-375px à
-côté de prev/next. Si la vérification échoue, repli vers un label court (`${n}`) avec le total
-affiché en texte statique sibling du `<select>` (hors du contrôle, toujours visible).
+côté de prev/next.
+
+**Contrainte technique** : le contenu d'un `<option>` est du texte brut — toute balise imbriquée
+(`<span aria-hidden>`, `sr-only`, etc.) est ignorée par le navigateur, aussi bien à l'affichage
+(y compris le picker natif OS) qu'à l'annonce lecteur d'écran. Le texte visuel et le texte
+accessible d'une option sont donc nécessairement identiques ; aucune compression différenciée n'est
+possible à l'intérieur des `<option>` (contrairement aux `<span class="sr-only">` déjà utilisés
+ailleurs dans le composant, sur des éléments DOM normaux).
+
+Si la vérification empirique montre un débordement, le repli se fait donc directement vers un
+label d'option court (`${n}`) accompagné d'un total en texte statique **sibling** du `<select>`
+(élément DOM normal, hors du contrôle) — c'est à ce niveau, et uniquement à ce niveau, qu'une
+compression visuel/SR différenciée est possible si l'espace reste serré : `/` visible (`aria-hidden`)
+
+- "sur" en `sr-only`, et en dernier recours "Page" également en `sr-only`.
 
 Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options "Page 1 sur 20" ·
 … · "Page 10 sur 20" · … · "Page 20 sur 20" — le jeu de pages est identique à ce que produirait un
