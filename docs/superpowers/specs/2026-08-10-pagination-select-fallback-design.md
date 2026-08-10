@@ -63,11 +63,19 @@ restent affichés et fonctionnels dans tous les cas, y compris au palier `<selec
 Réutilisation directe de `_calculatePages(current, total, this._budget)` — aucune modification de
 `pagination.utils.ts`. Le mapping des éléments retournés :
 
-- page numérique `n` → `<option value="${n}" ?selected=${n === current}>${n}</option>`
+- page numérique `n` → `<option value="${n}" ?selected=${n === current}>Page ${n} sur ${total}</option>`
 - sentinelle d'ellipse (`-1`/`-2`) → `<option disabled>…</option>`
 
-Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options `1 · … · 10 · … · 20` —
-identique à ce que produirait un desktop très réduit avec le même budget, pas une liste 1..20.
+Le label complet ("Page 2 sur 20", cohérent avec le texte déjà utilisé par `announceA11y`) plutôt
+qu'un simple numéro : un `<select>` fermé affiche le texte de l'option sélectionnée, donc ce choix
+expose le total sans avoir à ouvrir le picker. Contrepartie assumée : le déclencheur fermé est plus
+large qu'un simple numéro — **à confirmer empiriquement** (§5) qu'il tient toujours à 320-375px à
+côté de prev/next. Si la vérification échoue, repli vers un label court (`${n}`) avec le total
+affiché en texte statique sibling du `<select>` (hors du contrôle, toujours visible).
+
+Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options "Page 1 sur 20" ·
+… · "Page 10 sur 20" · … · "Page 20 sur 20" — le jeu de pages est identique à ce que produirait un
+desktop très réduit avec le même budget, seul le label change.
 
 ### 3. Interaction et accessibilité
 
@@ -112,7 +120,10 @@ troisième point ("Largeur extrême : … remplacés par un texte") est réécri
 - **Vérification manuelle (Playwright)** : avant de considérer le spec figé, vérifier
   empiriquement que la bascule vers le `<select>` se produit bien autour de 320-375px selon le
   budget réel mesuré (pas seulement en test headless/jsdom), et que le style natif + custom du
-  `<select>` se comporte correctement dans un vrai rendu navigateur.
+  `<select>` se comporte correctement dans un vrai rendu navigateur. Vérifier en particulier que le
+  déclencheur fermé avec label complet ("Page 20 sur 20", le cas le plus large) ne déborde pas à
+  320-375px à côté de prev/next — sinon appliquer le repli décrit en §2 (label court + total en
+  texte sibling) avant de figer le plan d'implémentation.
 
 ## Hors scope
 
