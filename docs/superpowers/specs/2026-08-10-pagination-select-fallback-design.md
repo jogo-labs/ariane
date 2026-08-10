@@ -82,7 +82,7 @@ ailleurs dans le composant, sur des éléments DOM normaux).
 Si la vérification empirique montre un débordement, le repli se fait sans ajouter d'élément
 sibling — le `<select>` reste seul : les options passent à un label court (`${n}`), et le
 `<select>` porte un `aria-label` dynamique combinant nom et valeur courante
-(ex. `"Aller à la page, page 2 sur 20"`, recalculé à chaque changement de `current`), à la place du
+(ex. `"Aller à la page 2 sur 20"`, recalculé à chaque changement de `current`), à la place du
 `aria-labelledby` statique décrit en §3. Le texte visuel affiché dans le déclencheur fermé reste
 court (`"2"`), seul le nom accessible porte l'information complète.
 

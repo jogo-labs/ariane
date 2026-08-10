@@ -524,7 +524,7 @@ it('le select porte un aria-label dynamique combinant nom et valeur courante', a
     await waitForUpdate(el);
 
     const select = getPart(el, 'select') as HTMLSelectElement;
-    expect(select.getAttribute('aria-label')).toBe('Aller à la page, page 3 sur 15');
+    expect(select.getAttribute('aria-label')).toBe('Aller à la page 3 sur 15');
     expect(select.hasAttribute('aria-labelledby')).toBe(false);
 });
 ```
@@ -551,7 +551,7 @@ Dans `packages/core/src/components/pagination/pagination.ts`, remplacer `renderP
         return html`<li part="item page-select">
             <select
                 part="select"
-                aria-label="Aller à la page, page ${current} sur ${total}"
+                aria-label="Aller à la page ${current} sur ${total}"
                 .value=${String(current)}
                 @change=${this._onSelectChange}
             >
@@ -584,7 +584,7 @@ par :
 
 ```ts
 expect(options[2]?.textContent?.trim()).to.equal('8');
-expect(select.getAttribute('aria-label')).to.equal('Aller à la page, page 8 sur 15');
+expect(select.getAttribute('aria-label')).to.equal('Aller à la page 8 sur 15');
 ```
 
 - [ ] **Step 6: Relancer la vérification empirique (Task 2 Step 5) pour confirmer le repli**
