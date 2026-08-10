@@ -41,8 +41,11 @@ export interface ArPaginationPageChangeDetail {
  * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
  * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
- * @csspart page-status - Le `<li>` du texte "Page X sur Y" affiché à la place de la liste de
- *   pages quand l'espace disponible ne permet plus d'afficher de numéros (palier minimal).
+ * @csspart page-select - Le `<li>` englobant le `<select>` de saut de page, affiché à la place
+ *   de la liste de pages quand l'espace disponible ne permet plus d'afficher de numéros (palier
+ *   minimal).
+ * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
+ *   (apparence, flèche custom via `appearance: none` posé en structurel).
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -228,7 +231,7 @@ export class ArPagination extends LitElement {
         const nextPageNumber = _clamp(current + 1, 1, total);
         const isEdgeCurrent = current <= 1 || current >= total;
         const floorSlots = isEdgeCurrent ? 3 : 5;
-        const useTextMode = this._budget !== undefined && this._budget < floorSlots;
+        const useSelectMode = this._budget !== undefined && this._budget < floorSlots;
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination</p>
@@ -245,8 +248,8 @@ export class ArPagination extends LitElement {
                     </a>
                 </li>
 
-                ${useTextMode
-                    ? html`<li part="item page-status">Page ${current} sur ${total}</li>`
+                ${useSelectMode
+                    ? this.renderPageSelect(current, total)
                     : repeat(
                           _calculatePages(current, total, this._budget),
                           (page) => page,
@@ -302,6 +305,40 @@ export class ArPagination extends LitElement {
     /** Génère le label d'une page avec texte sr-only pour les lecteurs d'écran */
     protected renderPageLabel(page: number): TemplateResult {
         return html`<span class="sr-only">Page&nbsp;</span>${page}`;
+    }
+
+    /**
+     * Génère le `<li>` du select de saut de page, affiché à la place de la liste de pages au
+     * palier minimal (largeur insuffisante pour la fenêtre de boutons la plus réduite).
+     */
+    protected renderPageSelect(current: number, total: number): TemplateResult {
+        return html`<li part="item page-select">
+            <span class="sr-only" id="ar-pagination-select-label">Aller à la page</span>
+            <select
+                part="select"
+                aria-labelledby="ar-pagination-select-label"
+                .value=${String(current)}
+                @change=${this._onSelectChange}
+            >
+                ${_calculatePages(current, total, this._budget).map((page) =>
+                    page === -1 || page === -2
+                        ? html`<option disabled value="">…</option>`
+                        : html`<option value=${page} ?selected=${page === current}>
+                              Page ${page} sur ${total}
+                          </option>`,
+                )}
+            </select>
+        </li>`;
+    }
+
+    private _onSelectChange(event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        const page = parseInt(select.value, 10);
+        if (Number.isNaN(page) || page === this.current) return;
+        const from = this.current;
+        this.current = page;
+        this._emit({ from, to: this.current });
+        this._announcePageChange();
     }
 
     private _onPreviousPage(): void {

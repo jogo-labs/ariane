@@ -24,6 +24,7 @@ export default css`
     [part~='next'],
     [part~='link'],
     [part~='current'],
+    [part~='select'],
     [part~='ellipsis'] {
         display: inline-flex;
         align-items: center;
@@ -46,7 +47,8 @@ export default css`
     [part~='prev'],
     [part~='next'],
     [part~='link'],
-    [part~='current'] {
+    [part~='current'],
+    [part~='select'] {
         &:focus-visible {
             outline: 2px solid currentColor;
             outline-offset: 2px;
@@ -71,7 +73,7 @@ export default css`
         cursor: not-allowed;
     }
 
-    [part~='page-status'] {
-        white-space: nowrap;
+    [part~='select'] {
+        appearance: none;
     }
 `;

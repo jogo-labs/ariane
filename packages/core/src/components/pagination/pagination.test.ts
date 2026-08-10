@@ -214,10 +214,10 @@ describe('ArPagination', () => {
         });
     });
 
-    // ── Palier texte (budget très restreint) ─────────────────────────────────
+    // ── Palier select (budget très restreint) ────────────────────────────────
 
-    describe('palier texte sous le plancher', () => {
-        it('bascule sur un texte "Page X sur Y" quand _budget est sous le plancher', async () => {
+    describe('palier select sous le plancher', () => {
+        it('bascule sur un <select> de saut de page quand _budget est sous le plancher', async () => {
             el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
             // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
             el._budget = 2;
@@ -225,13 +225,84 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const shadow = el.shadowRoot as ShadowRoot;
-            const status = shadow.querySelector('[part~="page-status"]');
-            expect(status).not.toBeNull();
-            expect(status?.textContent?.trim()).toBe('Page 3 sur 15');
+            // Match exact (`=`, pas `~=`) : happy-dom scinde aussi sur les tirets dans son
+            // implémentation de `~=`, donc `[part~="select"]` matcherait à tort le `<li
+            // part="item page-select">` (voir mise en garde dans test-utils.ts) avant même
+            // d'atteindre le `<select part="select">` imbriqué.
+            const select = shadow.querySelector('[part="select"]');
+            expect(select).not.toBeNull();
+            expect(select?.tagName.toLowerCase()).toBe('select');
             expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
         });
 
-        it('prev/next restent affichés et fonctionnels en palier texte', async () => {
+        it('peuple le select avec les mêmes pages que _calculatePages au plancher (première/dernière page, fenêtre minimale, ellipses en disabled)', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            // Match exact, cf. mise en garde `~=`/happy-dom ci-dessus.
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            const options = Array.from(select.querySelectorAll('option'));
+            // _calculatePages(3, 15, 2) retombe sur _minimalPages(3, 15) = [1, -1, 3, -2, 15]
+            expect(options).toHaveLength(5);
+            expect(options.map((o) => o.disabled)).toEqual([false, true, false, true, false]);
+            expect(options.map((o) => o.value)).toEqual(['1', '', '3', '', '15']);
+            // Attribut `selected` (pas la propriété IDL `.selected`) : happy-dom ne recalcule pas
+            // correctement la "selectedness" d'un <select> au fil de l'insertion incrémentale de
+            // ses <option> (bug reproduit indépendamment de ce composant, y compris sans binding
+            // `.value` sur le <select>, avec un simple `render()` Lit) — `.selected` y retombe sur
+            // un index arbitraire. L'attribut HTML reflète fidèlement ce que le template pose via
+            // `?selected`, ce qu'un vrai navigateur traduirait correctement en `.selected === true`.
+            expect(options[2]?.hasAttribute('selected')).toBe(true);
+            expect(options.filter((o) => o.hasAttribute('selected'))).toHaveLength(1);
+        });
+
+        it('le label de chaque option contient "Page X sur Y"', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            const options = Array.from(select.querySelectorAll('option'));
+            expect(options[0]?.textContent?.trim()).toBe('Page 1 sur 15');
+            expect(options[2]?.textContent?.trim()).toBe('Page 3 sur 15');
+            expect(options[4]?.textContent?.trim()).toBe('Page 15 sur 15');
+        });
+
+        it('changer la valeur du select émet ar-pagination-page-change et met à jour current', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
+            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                '[part="select"]',
+            ) as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change'));
+            await waitForUpdate(el);
+
+            expect(el.current).toBe(15);
+            expect(handler).toHaveBeenCalledOnce();
+            const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
+                .detail;
+            expect(detail).toEqual({ from: 3, to: 15 });
+        });
+
+        it('prev/next restent affichés et fonctionnels au palier select', async () => {
             el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
             // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
             el._budget = 2;
@@ -245,7 +316,7 @@ describe('ArPagination', () => {
             expect(el.current).toBe(4);
         });
 
-        it('ne bascule pas en palier texte si _budget est au-dessus du plancher', async () => {
+        it('ne bascule pas en palier select si _budget est au-dessus du plancher', async () => {
             el = await fixture('<ar-pagination current="8" total="15"></ar-pagination>');
             // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
             el._budget = 5;
@@ -253,7 +324,7 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('[part~="page-status"]')).toBeNull();
+            expect(shadow.querySelector('[part~="select"]')).toBeNull();
         });
     });
 
