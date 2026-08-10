@@ -114,7 +114,7 @@ describe('ar-pagination — browser', () => {
             expect(numericCount).to.equal(5);
         });
 
-        it('bascule sur le palier texte "Page X sur Y" à largeur extrême', async () => {
+        it('bascule sur un <select> de saut de page à largeur extrême', async () => {
             const wrapper = await fixture(
                 html`<div style="width: 900px;">
                     <ar-pagination current="8" total="15"></ar-pagination>
@@ -128,21 +128,40 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             const shadow = el.shadowRoot as ShadowRoot;
-            const status = shadow.querySelector('[part~="page-status"]') as HTMLElement;
-            expect(status).to.not.equal(null);
-            expect(status?.textContent?.trim()).to.equal('Page 8 sur 15');
+            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            expect(select).to.not.equal(null);
+            expect(select.tagName.toLowerCase()).to.equal('select');
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
 
-            // `textContent` seul ne détecterait pas une régression où les espaces entre les
-            // mots disparaissent visuellement (chaque run devenant un flex item anonyme
-            // distinct sous [part~='item'] { display: flex }) : `innerText` reflète le rendu
-            // réel (layout appliqué), contrairement à `textContent` qui lit l'arbre DOM brut.
-            // Égalité stricte (pas une regex `\s+`) : `\s` matche aussi les retours à la ligne
-            // qu'`innerText` insère entre flex items séparés, ce qui laisserait passer un
-            // ancien balisage buggé (ex. "Page\n8\nsur\n15") sans jamais échouer.
-            expect(status.innerText.trim()).to.equal('Page 8 sur 15');
+            // _calculatePages(8, 15, budget-plancher) → _minimalPages(8, 15) = [1, -1, 8, -2, 15]
+            const options = Array.from(select.querySelectorAll('option'));
+            expect(options).to.have.lengthOf(5);
+            expect(options[2]?.selected).to.equal(true);
+            expect(options[2]?.textContent?.trim()).to.equal('Page 8 sur 15');
+            expect(options[1]?.disabled).to.equal(true);
+            expect(options[3]?.disabled).to.equal(true);
         });
 
-        it('prev/next restent cliquables au palier texte', async () => {
+        it('sélectionner une option du select change la page', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 90px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            await elementUpdated(el);
+
+            expect((el as unknown as { current: number }).current).to.equal(15);
+        });
+
+        it('prev/next restent cliquables au palier select', async () => {
             const wrapper = await fixture(
                 html`<div style="width: 90px;">
                     <ar-pagination current="8" total="15"></ar-pagination>
@@ -167,12 +186,12 @@ describe('ar-pagination — browser', () => {
             expect(getComputedStyle(list).flexWrap).to.equal('nowrap');
         });
 
-        it("ne reste pas bloqué au palier texte après un changement d'ordre de grandeur de total suivi d'un réélargissement", async () => {
+        it("ne reste pas bloqué au palier select après un changement d'ordre de grandeur de total suivi d'un réélargissement", async () => {
             // Régression : `total` qui change d'ordre de grandeur (9 → 10, 99 → 100, ...)
-            // pendant que le composant est déjà au palier texte marquait `_itemWidth` comme à
+            // pendant que le composant est déjà au palier select marquait `_itemWidth` comme à
             // remesurer, mais aucun item numérique n'est rendu à ce palier — sans item à
             // mesurer, `_recalculateBudget` ne recalculait plus jamais `_budget`, bloquant le
-            // composant sur "Page X sur Y" même après un réélargissement massif du conteneur.
+            // composant sur le select même après un réélargissement massif du conteneur.
             const wrapper = await fixture(
                 html`<div style="width: 700px;">
                     <ar-pagination current="100" total="200"></ar-pagination>
@@ -189,14 +208,14 @@ describe('ar-pagination — browser', () => {
                 shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
             ).to.be.greaterThan(0);
 
-            // 2. Rétrécir jusqu'au palier texte.
+            // 2. Rétrécir jusqu'au palier select.
             wrapper.style.width = '90px';
             await waitForResize();
-            expect(shadow.querySelector('[part~="page-status"]')).to.not.equal(null);
+            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
             expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
 
             // 3. Changer `total` (et `current`, pour rester valide) d'ordre de grandeur pendant
-            //    que le composant est au palier texte (déclenche l'invalidation de
+            //    que le composant est au palier select (déclenche l'invalidation de
             //    `_itemWidth`) — toujours aucun item numérique disponible pour remesurer
             //    immédiatement.
             (el as unknown as { total: number; current: number }).total = 15;
@@ -205,11 +224,11 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             // 4. Réélargir le conteneur → les numéros doivent réapparaître normalement, pas
-            //    rester bloqués sur "Page X sur Y".
+            //    rester bloqués sur le select.
             wrapper.style.width = '700px';
             await waitForResize();
 
-            expect(shadow.querySelector('[part~="page-status"]')).to.equal(null);
+            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
             expect(
                 shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
             ).to.be.greaterThan(0);
