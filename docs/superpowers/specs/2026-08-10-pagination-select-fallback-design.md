@@ -1,0 +1,125 @@
+# Design — `<select>` de saut de page au palier minimal d'ar-pagination
+
+**Statut :** Validé (en attente de plan d'implémentation)
+**Date :** 2026-08-10
+**Contexte :** suite du masquage responsive progressif (#152, [spec du
+2026-08-07](2026-08-07-pagination-responsive-masking-design.md), PR #172)
+
+## Contexte
+
+Le masquage responsive livré en PR #172 introduit un palier texte ("Page X sur Y", non
+interactif) quand la largeur disponible ne permet plus d'afficher la fenêtre minimale de boutons
+numérotés (`floorSlots` : 3 en position de bord, 5 sinon). Ce palier dégrade significativement
+l'expérience par rapport au desktop : plus aucun moyen d'atteindre directement une page qui n'est
+ni la précédente ni la suivante, alors que ce plancher se déclenche dès ~375px de large — une
+largeur d'écran mobile courante, pas un cas extrême.
+
+La spec du 2026-08-07 excluait explicitement un widget de saut de page ("hors scope : pattern
+d'interaction différent, non demandé par l'issue"). Ce document révise cette décision : un
+`<select>` natif remplace le palier texte, sans élargir le périmètre visuel ni casser le contrat
+headless.
+
+## Décisions issues du brainstorming
+
+- **Portée de la bascule** : uniquement le palier le plus étroit (ex-mode texte). Les réductions
+  intermédiaires (fenêtre à ellipses avec boutons cliquables, budget entre le plancher et le total)
+  restent inchangées.
+- **Contenu du `<select>`** : les mêmes options que produirait `_calculatePages` au plancher —
+  première page, dernière page, fenêtre minimale autour de la page courante — pas la liste
+  complète 1..total. Les ellipses deviennent des `<option disabled>`. Aucune modification de
+  l'algorithme `_calculatePages` : son plancher naturel (`_minimalPages`) est déjà exactement ce
+  qu'il faut peupler.
+- **Style** : le `<select>` reste headless (`appearance: none` structurel dans les styles du
+  composant, apparence visuelle dans `themes/default.css`) — le déclencheur est stylable, la liste
+  d'options natives (rendue par l'OS) ne l'est pas, ce qui est un compromis accepté et déjà
+  pratiqué sur d'autres projets par l'équipe.
+- **Repli sous le `<select>`** : pas de mécanisme dédié. Un `<select>` (contrôle unique) est bien
+  plus étroit que la rangée de boutons qu'il remplace ; le cas où même lui ne tiendrait pas à côté
+  de prev/next (largeur extrême, <150px) n'est pas traité séparément — pas de sur-ingénierie pour
+  un cas non observé aux largeurs réelles ciblées (320px+).
+
+## Architecture
+
+### 1. Rendu — un seul point de bascule modifié
+
+Dans `pagination.ts`, la condition `useTextMode` (actuellement `this._budget < floorSlots`)
+déclenche désormais le rendu d'un `<select>` au lieu du texte statique :
+
+```html
+<li part="item page-select">
+    <span class="sr-only" id="ar-pagination-select-label">Aller à la page</span>
+    <select part="select" aria-labelledby="ar-pagination-select-label" @change="${...}">
+        <!-- options générées depuis _calculatePages(current, total, this._budget) -->
+    </select>
+</li>
+```
+
+Rien d'autre ne change : la réduction progressive par `siblingCount` décroissant (largeurs
+intermédiaires) continue de rendre des `<li>` numérotés cliquables comme aujourd'hui ; prev/next
+restent affichés et fonctionnels dans tous les cas, y compris au palier `<select>`.
+
+### 2. Génération des options
+
+Réutilisation directe de `_calculatePages(current, total, this._budget)` — aucune modification de
+`pagination.utils.ts`. Le mapping des éléments retournés :
+
+- page numérique `n` → `<option value="${n}" ?selected=${n === current}>${n}</option>`
+- sentinelle d'ellipse (`-1`/`-2`) → `<option disabled>…</option>`
+
+Exemple à `total=20, current=10` (fenêtre minimale, non-bord) : options `1 · … · 10 · … · 20` —
+identique à ce que produirait un desktop très réduit avec le même budget, pas une liste 1..20.
+
+### 3. Interaction et accessibilité
+
+- Événement `change` sur le `<select>` → même chemin que `_onPageChange` aujourd'hui : lecture de
+  la valeur sélectionnée, `this.current = ...`, émission de `ar-pagination-page-change`
+  (`{ from, to }`), `announceA11y`. Pas de gestion de focus additionnelle : le focus natif reste
+  sur le `<select>` après sélection (contrairement au clic sur un lien, qui déplace le focus vers
+  `[part~="current"]` via `focusAfterUpdate`).
+- Nom accessible : `<span class="sr-only">` + `aria-labelledby`, cohérent avec le pattern déjà
+  utilisé pour prev/next (`<span class="sr-only">Page précédente…</span>`), plutôt qu'un
+  `aria-label` en dur.
+- Les `<option disabled>` (ellipses) sont nativement ignorées par la navigation clavier et les
+  lecteurs d'écran — comportement natif du `<select>`, aucun code custom requis.
+
+### 4. Style
+
+- Nouveaux parts : `select` (sur l'élément `<select>`) et `page-select` (sur le `<li>` englobant,
+  symétrique à `page-status` qu'il remplace).
+- `pagination.styles.ts` : `appearance: none` structurel + réutilisation de
+  `--ar-pagination-btn-size` pour la hauteur minimale (cohérence WCAG 2.5.8 avec les autres
+  contrôles). Aucune couleur/fond en dur — va dans `themes/default.css` (flèche custom, apparence
+  visuelle du déclencheur), conformément à la philosophie headless du projet.
+- `[part~='page-status']` et sa règle `white-space: nowrap` sont supprimés (le mode texte
+  disparaît).
+- JSDoc du composant : entrée `@csspart page-status` retirée, `@csspart select` et
+  `@csspart page-select` ajoutées.
+
+### 5. Documentation
+
+`apps/docs/src/content/components/ar-pagination.mdx`, section "Comportement responsive" : le
+troisième point ("Largeur extrême : … remplacés par un texte") est réécrit pour décrire le
+`<select>` de saut de page à la place du texte statique.
+
+## Tests
+
+- **Unitaires (Vitest)** : génération des options du `<select>` à partir de
+  `_calculatePages` (mapping page → `<option>`, ellipse → `<option disabled>`, `selected` sur la
+  page courante) ; émission de `ar-pagination-page-change` au `change`.
+- **Browser (WTR)** : comportement responsive réel au palier minimal — présence du `part="select"`
+  à largeur réduite (remplaçant l'actuel test du palier texte), absence des anciens
+  `part="page-status"`, sélection d'une option qui déclenche bien le changement de page.
+- **Vérification manuelle (Playwright)** : avant de considérer le spec figé, vérifier
+  empiriquement que la bascule vers le `<select>` se produit bien autour de 320-375px selon le
+  budget réel mesuré (pas seulement en test headless/jsdom), et que le style natif + custom du
+  `<select>` se comporte correctement dans un vrai rendu navigateur.
+
+## Hors scope
+
+- Peupler le `<select>` avec la liste complète 1..total (redondant avec l'objectif de réduction
+  visuelle ; le picker natif deviendrait long sans bénéfice par rapport à la fenêtre réduite).
+- Mesure dédiée de la largeur du `<select>` pour un repli prev/next-seul en dessous — cas non
+  observé aux largeurs réelles ciblées, à reconsidérer seulement si un usage réel le montre
+  nécessaire.
+- Support de tailles d'item hétérogènes entre les numéros de page (hérité de la spec du
+  2026-08-07, toujours hors scope ici).
