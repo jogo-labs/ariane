@@ -11,14 +11,20 @@ import { fixture, html, expect, elementUpdated } from '@open-wc/testing';
 import './index.js';
 
 describe('ar-pagination — browser', () => {
-    describe('focus après activation (#154)', () => {
+    describe('focus après activation, confirmée par le consommateur (#154, #161)', () => {
         // Vérifie que le focus atterrit sur le nouvel élément part="current" et que
-        // :focus-visible matche après un focus() + click() programmatiques. Ne vérifie PAS
-        // l'ordre de tabulation réel ni la distinction clavier/souris — nécessiterait
-        // @web/test-runner-commands (sendKeys/sendMouse), non installé, hors scope de ce
-        // correctif.
-        it('focalise le nouvel élément part="current" et :focus-visible matche après activation', async () => {
+        // :focus-visible matche après un focus() + click() programmatiques, une fois que le
+        // consommateur a réassigné `current` en réponse à ar-pagination-page-change (modèle
+        // contrôlé depuis #161). Ne vérifie PAS l'ordre de tabulation réel ni la distinction
+        // clavier/souris — nécessiterait @web/test-runner-commands (sendKeys/sendMouse), non
+        // installé, hors scope.
+        it('focalise le nouvel élément part="current" et :focus-visible matche après confirmation', async () => {
             const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                (el as unknown as { current: number }).current = (
+                    e as CustomEvent<{ from: number; to: number }>
+                ).detail.to;
+            });
             const shadowRoot = el.shadowRoot as ShadowRoot;
             const pageLink = shadowRoot.querySelector(
                 '[data-ar-pagination-page="3"]',
@@ -32,25 +38,37 @@ describe('ar-pagination — browser', () => {
             expect(shadowRoot.activeElement).to.equal(current);
             expect(current.matches(':focus-visible')).to.equal(true);
         });
+
+        it('sans confirmation, le focus reste sur le lien cliqué (pas de span "current" créé)', async () => {
+            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
+            const shadowRoot = el.shadowRoot as ShadowRoot;
+            const pageLink = shadowRoot.querySelector(
+                '[data-ar-pagination-page="3"]',
+            ) as HTMLElement;
+
+            pageLink.focus();
+            pageLink.click();
+            await elementUpdated(el);
+
+            expect(shadowRoot.activeElement).to.equal(pageLink);
+        });
     });
 
     describe('clic sur le contenu imbriqué du lien (régression)', () => {
-        // `renderPageLabel` enveloppe le numéro visible dans un `<span aria-hidden="true">`
-        // (structure : `<a part="link">` > `<span aria-hidden>`). Un clic utilisateur réel sur
-        // le chiffre affiché a pour `event.target` ce `<span>` imbriqué, pas le `<a>` lui-même —
-        // contrairement aux autres tests de ce fichier/suite qui appellent `.click()`
-        // directement sur le `<a>`. Vérifie que `_onPageChange` résout bien l'ancre via
-        // `closest()` et change effectivement la page dans ce cas.
-        it('un clic sur le numéro visible (span aria-hidden imbriqué) change la page', async () => {
+        it('un clic sur le numéro visible (span aria-hidden imbriqué) dispatch bien ar-pagination-page-change avec la bonne cible', async () => {
             const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
             const shadow = el.shadowRoot as ShadowRoot;
             const link = shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement;
             const visibleNumber = link.querySelector('[aria-hidden="true"]') as HTMLElement;
 
+            let detail: { from: number; to: number } | undefined;
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                detail = (e as CustomEvent<{ from: number; to: number }>).detail;
+            });
             visibleNumber.click();
             await elementUpdated(el);
 
-            expect((el as unknown as { current: number }).current).to.equal(3);
+            expect(detail).to.deep.equal({ from: 1, to: 3 });
         });
     });
 
@@ -164,13 +182,18 @@ describe('ar-pagination — browser', () => {
             expect(options[7]?.disabled).to.equal(true);
         });
 
-        it('sélectionner une option du select change la page', async () => {
+        it('sélectionner une option du select confirmée change la page', async () => {
             const wrapper = await fixture(
                 html`<div style="width: 90px;">
                     <ar-pagination current="8" total="15"></ar-pagination>
                 </div>`,
             );
             const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                (el as unknown as { current: number }).current = (
+                    e as CustomEvent<{ from: number; to: number }>
+                ).detail.to;
+            });
             await elementUpdated(el);
             await waitForResize();
 
@@ -187,13 +210,18 @@ describe('ar-pagination — browser', () => {
             );
         });
 
-        it('prev/next restent cliquables au palier select', async () => {
+        it('prev/next confirmés restent fonctionnels au palier select', async () => {
             const wrapper = await fixture(
                 html`<div style="width: 90px;">
                     <ar-pagination current="8" total="15"></ar-pagination>
                 </div>`,
             );
             const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                (el as unknown as { current: number }).current = (
+                    e as CustomEvent<{ from: number; to: number }>
+                ).detail.to;
+            });
             await elementUpdated(el);
             await waitForResize();
 
