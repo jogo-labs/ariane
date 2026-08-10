@@ -72,11 +72,18 @@ plein cycle `updated()`, cf. `await host.updateComplete`).
 page (vérifié : ce n'est pas une injection `innerHTML` côté client, donc pas soumis à
 l'inertie des scripts injectés dynamiquement).
 
-Un seul `<script>` ajouté une fois (dans le `html:` de la dernière variante) écoute
-`ar-pagination-page-change` par délégation sur `document` et fait `e.target.current =
-e.detail.to` — exactement le snippet montré dans l'exemple dédié de la section "Utilisation" (un
-seul listener document-level, pas de `querySelectorAll` par élément). Couvre nativement les 4
-variantes + la démo playground du bas, y compris les instances ajoutées dynamiquement.
+Un seul `<script>` écoute `ar-pagination-page-change` par délégation sur `document` et fait
+`e.target.current = e.detail.to` — exactement le snippet montré dans l'exemple dédié de la
+section "Utilisation" (un seul listener document-level, pas de `querySelectorAll` par élément).
+Couvre nativement les 4 variantes + la démo playground du bas.
+
+Ce script n'est _pas_ rattaché à une variante précise dans le HTML — le rattacher à une seule
+(ex. dans son champ `html:`) serait trompeur, puisqu'il agit en réalité sur toute la page. Il
+vit dans un champ frontmatter dédié `pageScript` (nouveau champ optionnel du schema de la
+collection `components`, `apps/docs/src/content.config.ts`), consommé une seule fois par le
+template `apps/docs/src/pages/components/[slug].astro` via `<Fragment set:html={pageScript} />`,
+hors de la boucle des variantes gérée par `Playground.astro`. Rétrocompatible : champ optionnel,
+sans effet sur les pages composant qui ne le définissent pas.
 
 `ar-stepper.mdx` a le même trou (démos non câblées, `ar-stepper-step-change` déjà un modèle
 contrôlé sans simulation live) — **hors scope de #161**, noté comme suivi séparé.
