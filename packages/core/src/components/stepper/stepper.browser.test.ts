@@ -126,7 +126,7 @@ describe('ar-stepper — browser', () => {
             await elementUpdated(el);
 
             el.addEventListener('ar-stepper-step-change', (event: Event) => {
-                el.currentPath = (event as CustomEvent<{ path: string }>).detail.path;
+                el.currentPath = (event as CustomEvent<{ from: string; to: string }>).detail.to;
             });
 
             const shadowRoot = el.shadowRoot as ShadowRoot;

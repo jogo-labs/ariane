@@ -1,0 +1,140 @@
+# Design — `ar-stepper` : deux événements demande/confirmation
+
+**Statut :** Validé (en attente de plan d'implémentation)
+**Date :** 2026-08-11
+**Contexte :** issue [#174](https://github.com/jogo-labs/ariane/issues/174) — suivi identifié en marge de
+#161 (`ar-pagination`, PR #173)
+
+## Contexte
+
+`ar-stepper.currentPath` est déjà un modèle contrôlé : le composant ne le mute jamais lui-même
+(sauf via `follow-scroll`, qui le fait pour une raison différente — synchronisation avec le
+scroll, pas une action de clic). Le focus (`_pendingFocusPath`, `stepper.ts:158,462,258-263`)
+est déjà correctement gardé par confirmation.
+
+Le trou réel : `onClickLink` (`stepper.ts:458-491`) dispatche `ar-stepper-step-change` (non
+annulable aujourd'hui) **et** appelle `announceA11y(node?.label ?? path, 'polite')`
+immédiatement au clic (ligne 490), sans attendre que le consommateur confirme la navigation en
+réassignant `currentPath`. Si le stepper pilote un contenu chargé de façon asynchrone et que ce
+chargement échoue, l'annonce a déjà eu lieu alors que le contenu réel n'a pas changé.
+
+## Décisions issues du brainstorming
+
+### 1. Deux événements, détail aligné sur `ar-pagination` : `{ from, to }`
+
+- **`ar-stepper-step-change`** (devient `cancelable: true`, inchangé sinon) — dispatché au clic
+  depuis `onClickLink`, avant toute confirmation. `detail: { from, to }`.
+- **`ar-stepper-step-changed`** (nouveau, `cancelable: false`) — dispatché depuis `updated()`
+  quand `currentPath` a réellement transitionné, quelle qu'en soit la source (réassignation
+  externe suite à confirmation, ou `follow-scroll`). `detail: { from, to }`.
+
+**Revu en cours de brainstorming** : `ArStepperStepChangeDetail` passe de `{ path: string }` à
+`{ from: string; to: string }` — décision initiale (garder `path`) revisée après discussion.
+`from`/`to` n'est pas réservé aux positions numériques ordonnées : c'est l'idiome standard pour
+décrire une transition d'état (routeurs, machines à états — `transition(from, event) → to`),
+sans notion d'ordre ni de distance requise — `ar-stepper` est fondamentalement un système de
+navigation comme `ar-pagination`, avec des "pages" nommées (`path`) plutôt que numérotées.
+`ar-pagination` a déjà établi le précédent "nom de champ de l'event ≠ nom de la propriété"
+(`event.detail.to` → assigné à `el.current`) ; faire pareil ici (`event.detail.to` →
+`el.currentPath`) suit ce pattern déjà en place, pas une nouvelle incohérence. `from` a aussi une
+utilité concrète (marquer l'étape précédente comme visitée, garde de navigation, analytics) que
+`path` seul n'exposait pas.
+
+Impact du renommage : `ArStepperStepChangeDetail` (interface), les deux dispatches
+(`onClickLink`/`updated()`), le JSDoc `@event`, les exemples de doc, et tous les tests qui
+lisent `.detail.path` (à remplacer par `.detail.to`, avec `.detail.from` disponible en plus).
+
+### 2. Annonce a11y déplacée vers la confirmation, résolue à ce moment-là
+
+L'appel à `announceA11y` sort de `onClickLink` et se fait depuis le bloc `updated()` qui gère
+`changed.has('currentPath')`, une fois la transition confirmée réelle. Le label annoncé est
+résolu à ce moment via `this.navigation.currentNode?.label` (état vivant de l'arbre après
+`willUpdate()` → `this.navigation.setCurrentPath(...)`), pas figé sur le `node` trouvé au clic —
+plus correct si l'arbre a changé entre temps, et cohérent avec le principe "rien n'est affirmé
+avant confirmation".
+
+### 3. Focus : mécanisme `_pendingFocusPath` conservé, unifié dans le même bloc
+
+Pas de changement de logique : `_pendingFocusPath` n'est posé que dans `onClickLink`, jamais dans
+`handleScrollChange` — le scroll ne vole donc toujours pas le focus. Le check
+`this.currentPath === this._pendingFocusPath` et le focus qui en découle sont simplement
+regroupés dans le même bloc `updated()` que le dispatch de `-changed` et l'annonce, plutôt que
+dispersés — un seul point d'entrée pour "la transition est confirmée, voici les 3 conséquences
+(event, annonce, focus éventuel)".
+
+**Precision technique actée en discussion** (à ne pas perdre en implémentation) : le gate sur la
+confirmation n'est pas un délai arbitraire imposé au focus — c'est une nécessité mécanique. Le
+lien cliqué reste un `<a>` focalisable tant que `currentPath` n'est pas confirmé (aucun re-rendu
+ne le remplace), donc le focus n'a _jamais quitté_ l'élément cliqué dans ce cas : rien à faire.
+Sans le gate, `focusAfterUpdate` ciblerait `[part~="current"]` qui pointerait encore vers
+l'**ancienne** étape active, arrachant le focus du lien cliqué pour le renvoyer en arrière — le
+contraire de l'effet recherché. Le gate garantit que le focus ne bouge que quand il y a
+effectivement un nouvel élément vers lequel aller.
+
+### 4. `_pendingFocusPath` vidé immédiatement si `-change` est annulé
+
+Amélioration mineure : si `event.preventDefault()` est appelé sur `ar-stepper-step-change`,
+`_pendingFocusPath` est remis à `undefined` tout de suite après le `dispatchEvent` plutôt que
+d'attendre l'expiration naturelle en fin de cycle — pas d'intention de focus à conserver pour une
+navigation refusée.
+
+### 5. Guard premier rendu : `this.hasUpdated` natif de Lit, pas de champ dédié
+
+Contrairement à `ar-pagination` (qui a ajouté un champ privé `_hasRenderedOnce`), `ar-stepper`
+utilise `this.hasUpdated` — propriété native `ReactiveElement`, `false` pendant tout le premier
+cycle `updated()`/`firstUpdated()`, `true` à partir du suivant (vérifié via la doc Lit
+officielle). Évite un faux positif quand `currentPath` "change" par rapport à sa valeur
+pré-upgrade non définie, sans introduire de champ redondant avec ce que le framework fournit
+déjà. **Note pour un futur ménage** : `ArPagination._hasRenderedOnce` (#161) pourrait être
+simplifié de la même façon, mais c'est hors scope de #174 (code déjà mergé, pas de raison
+fonctionnelle de le retoucher ici).
+
+## Impact
+
+**Composant** (`packages/core/src/components/stepper/stepper.ts`) :
+
+- `onClickLink` (:458-491) : ajoute `cancelable: true` au dispatch de `ar-stepper-step-change` ;
+  retire l'appel `announceA11y` (ligne 490) ; vide `_pendingFocusPath` si l'event est annulé.
+- `updated()` (:240-264) : bloc `changed.has('currentPath')` existant étendu pour dispatcher
+  `ar-stepper-step-changed`, annoncer (label résolu via `this.navigation.currentNode`), et
+  effectuer le focus déjà prévu — guardé par `this.hasUpdated`.
+- JSDoc `@event` mis à jour (deux entrées, `@cancelable` sur la première — cf. régression trouvée
+  en revue finale sur #161, à ne pas reproduire ici).
+- Nouvelle méthode privée `_emitChanged({ from, to })` (miroir de `_emitChanged` sur
+  `ArPagination`).
+
+**Docs** (`apps/docs/src/content/components/ar-stepper.mdx`) :
+
+- Sous-section "Écouter le changement d'étape" réécrite dans le style désormais adopté sur
+  `ar-pagination.mdx` (deux phrases directes + un seul exemple de code, pas de reformulation
+  supplémentaire pour `-changed` — la table "Référence API" documente déjà l'annulabilité et le
+  détail des deux events) :
+    ```js
+    document.addEventListener('ar-stepper-step-change', (e) => {
+        /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+        e.target.currentPath = e.detail.to;
+    });
+    ```
+    Les autres sous-sections ("Mode `create` vs `edit`", "`follow-scroll`", "Navigation
+    programmatique") restent inchangées — non affectées par ce chantier.
+- Champ `pageScript` ajouté au frontmatter (mécanisme déjà générique, livré avec #161 — aucune
+  modification de schema/template nécessaire), avec le même snippet que ci-dessus, pour garder
+  les démos live des variantes interactives. Referme le point "hors scope" identifié plus bas.
+
+**Tests** (`stepper.test.ts`, `stepper.browser.test.ts`, `stepper.a11y.test.ts`) :
+
+- Nouveaux cas : `ar-stepper-step-change` est `cancelable` ; `preventDefault()` bloque tout (pas
+  de `-changed`, pas d'annonce, pas de focus, `_pendingFocusPath` vidé) ; `-changed` ne fire
+  qu'après réassignation externe de `currentPath` (ou via `follow-scroll`) ; annonce n'a lieu
+  qu'après confirmation, avec le bon label.
+- Vérifier qu'aucun test existant ne dépendait de l'annonce immédiate au clic (à adapter sinon).
+
+## Hors scope
+
+- Retouche du mécanisme `_pendingFocusPath` lui-même (structure arbre/desktop-mobile) — il
+  fonctionne déjà correctement, seul son point de déclenchement est regroupé avec les deux autres
+  conséquences de la confirmation.
+
+**Mise à jour** : le point "démos live non câblées" initialement listé ici est finalement traité
+dans ce chantier (cf. section Docs ci-dessus) — le mécanisme `pageScript` livré avec #161 est déjà
+générique, aucune raison de le reporter.

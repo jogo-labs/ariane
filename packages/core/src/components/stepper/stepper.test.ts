@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ArStepper } from './stepper.js';
+import type { ArStepperStepChangeDetail } from './stepper.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
@@ -241,7 +242,7 @@ describe('ArStepper', () => {
     // ── Événements ───────────────────────────────────────────────────────────
 
     describe('événements', () => {
-        it('émet ar-stepper-step-change au clic sur un lien', async () => {
+        it('émet ar-stepper-step-change au clic sur un lien, avec { from, to }', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -252,15 +253,74 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
-            if (link) {
-                link.click();
-                expect(handler).toHaveBeenCalledOnce();
-                const event = handler.mock.calls[0][0] as CustomEvent;
-                expect(event.detail).toHaveProperty('path');
-            }
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            link.click();
+
+            expect(handler).toHaveBeenCalledOnce();
+            const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
+            expect(event.detail).toEqual({ from: '/b', to: '/a' });
 
             el.removeEventListener('ar-stepper-step-change', handler);
+        });
+
+        it('ar-stepper-step-change est cancelable', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-stepper-step-change', handler);
+
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            link.click();
+
+            expect(handler).toHaveBeenCalledOnce();
+            const event = handler.mock.calls[0][0] as CustomEvent;
+            expect(event.cancelable).toBe(true);
+        });
+
+        it('preventDefault() sur ar-stepper-step-change bloque toute suite : currentPath inchangé, focus reste sur le lien cliqué', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+            const changedHandler = vi.fn();
+            el.addEventListener('ar-stepper-step-changed', changedHandler);
+
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            link.focus();
+            link.click();
+            await waitForUpdate(el);
+
+            expect(el.currentPath).toBe('/b');
+            expect(changedHandler).not.toHaveBeenCalled();
+            expect(shadow(el).activeElement).toBe(link);
+        });
+
+        it("preventDefault() sur ar-stepper-step-change bloque aussi la navigation native quand l'étape a un href réel", async () => {
+            // Contrat documenté (JSDoc @event) : preventDefault() bloque la navigation, sans
+            // qualification sur la présence d'un href réel. Un href réel (ex: "#etape-2-1",
+            // utilisé par la doc pour les sous-étapes) doit donc aussi voir son comportement
+            // natif d'ancre bloqué quand le consommateur annule l'event.
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" href="#etape-2-1" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+            link.dispatchEvent(clickEvent);
+
+            expect(clickEvent.defaultPrevented).toBe(true);
+            expect(el.currentPath).toBe('/b');
         });
 
         it("n'émet plus step-changed (nom court) au clic", async () => {
@@ -281,6 +341,65 @@ describe('ArStepper', () => {
             }
 
             el.removeEventListener('step-changed', handler);
+        });
+    });
+
+    describe('événement ar-stepper-step-changed', () => {
+        it("n'est pas émis tant que currentPath n'a pas réellement changé", async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-stepper-step-changed', handler);
+
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            link.click();
+            await waitForUpdate(el);
+
+            expect(handler).not.toHaveBeenCalled();
+        });
+
+        it('est émis avec { from, to }, non cancelable, quand currentPath change (réassignation externe)', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-stepper-step-changed', handler);
+
+            el.currentPath = '/a';
+            await waitForUpdate(el);
+
+            expect(handler).toHaveBeenCalledOnce();
+            const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
+            expect(event.cancelable).toBe(false);
+            expect(event.detail).toEqual({ from: '/b', to: '/a' });
+        });
+
+        it("n'est pas émis au premier rendu", async () => {
+            // Le listener est attaché sur document AVANT le montage : l'event bubble
+            // (bubbles: true, composed: true) donc si le garde-fou _hasRenderedOnce était
+            // absent, l'émission aurait lieu pendant fixtureWithItems() et serait captée ici.
+            const handler = vi.fn();
+            document.addEventListener('ar-stepper-step-changed', handler);
+
+            try {
+                await fixtureWithItems(`
+                    <ar-stepper current-path="/b" mode="edit">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+                expect(handler).not.toHaveBeenCalled();
+            } finally {
+                document.removeEventListener('ar-stepper-step-changed', handler);
+            }
         });
     });
 
@@ -805,7 +924,7 @@ describe('ArStepper', () => {
             document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
         });
 
-        it('un clic sur une étape de premier niveau annonce son label', async () => {
+        it("n'annonce rien tant que currentPath n'est pas confirmé par le consommateur", async () => {
             vi.spyOn(window, 'matchMedia').mockReturnValue({
                 matches: true,
                 addEventListener: vi.fn(),
@@ -824,10 +943,36 @@ describe('ArStepper', () => {
             link.click();
             await new Promise((resolve) => setTimeout(resolve, 60));
 
+            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+        });
+
+        it('un clic confirmé sur une étape de premier niveau annonce son label', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => {
+                el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
+            });
+
+            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
+            if (!link) throw new Error('Lien vers /a introuvable');
+            link.click();
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe('Étape A');
         });
 
-        it('un clic sur une sous-étape annonce son label (branche flatMap)', async () => {
+        it('un clic confirmé sur une sous-étape annonce son label (branche flatMap)', async () => {
             vi.spyOn(window, 'matchMedia').mockReturnValue({
                 matches: true,
                 addEventListener: vi.fn(),
@@ -843,10 +988,14 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
+            el.addEventListener('ar-stepper-step-change', (e) => {
+                el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
+            });
 
             const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
             if (!link) throw new Error('Lien vers /a/2 introuvable');
             link.click();
+            await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(

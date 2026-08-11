@@ -65,6 +65,13 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
+pageScript: |
+    <script>
+        document.addEventListener('ar-stepper-step-change', (e) => {
+            /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+            e.target.currentPath = e.detail.to;
+        });
+    </script>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -115,11 +122,13 @@ se déplace dans l'élément ciblé sur desktop, et revient à sa position d'ori
 
 ### Écouter le changement d'étape
 
-`ar-stepper` émet `ar-stepper-step-change` au clic sur une étape, avec l'attribut `path` de l'étape sélectionnée dans `detail` :
+Lorsque l'utilisateur souhaite changer d'étape, un événement `ar-stepper-step-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `currentPath` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'étape active du stepper.
 
 ```js
-document.querySelector('ar-stepper').addEventListener('ar-stepper-step-change', (e) => {
-    console.log('Étape sélectionnée :', e.detail.path);
+document.addEventListener('ar-stepper-step-change', (e) => {
+    /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+    e.target.currentPath = e.detail.to;
 });
 ```
 

@@ -22,10 +22,16 @@ import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
 
-/** Détail de l'événement émis lors d'un changement d'étape */
+/** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail {
-    /** Chemin (`href`) de l'étape sélectionnée */
-    path: string;
+    /**
+     * Chemin de l'étape courante avant la transition. Peut être `''` si le stepper
+     * est monté sans `current-path` initial et que `currentPath` est assigné pour la
+     * première fois.
+     */
+    from: string;
+    /** Chemin de l'étape cible (demandée sur `-change`, confirmée sur `-changed`) */
+    to: string;
 }
 
 /**
@@ -81,7 +87,12 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
- * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-change - Émis avant le
+ *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
+ *   `currentPath` ne change pas. Contient `from` et `to`. @cancelable
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
+ *   `currentPath` a réellement changé (réassignation externe suite à la confirmation du
+ *   consommateur, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
  */
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
@@ -155,6 +166,13 @@ export class ArStepper extends LitElement {
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
     private _dropdownAttached = false;
+    // Distingue le tout premier cycle updated() (où `currentPath` "change" par rapport à sa
+    // valeur pré-upgrade non définie) des transitions réelles ultérieures. `this.hasUpdated`
+    // (natif Lit) ne convient pas ici : Lit le passe à `true` AVANT d'invoquer updated() sur
+    // ce tout premier cycle, donc il vaut déjà `true` pendant son exécution — vérifié
+    // empiriquement contre @lit/reactive-element (hasUpdated est assigné dans _$didUpdate()
+    // avant l'appel à updated()). Même pattern que ArPagination._hasRenderedOnce.
+    private _hasRenderedOnce = false;
     private _pendingFocusPath: string | undefined;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
@@ -255,11 +273,18 @@ export class ArStepper extends LitElement {
                 });
             }
         }
-        if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
-            this.shadowRoot
-                ?.querySelector<HTMLElement>(`[data-path="${this._pendingFocusPath}"]`)
-                ?.focus();
+        if (this._hasRenderedOnce && changed.has('currentPath')) {
+            const from = changed.get('currentPath') as string;
+            const to = this.currentPath;
+            if (from !== to) {
+                this._emitChanged({ from, to });
+                announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
+                if (to === this._pendingFocusPath) {
+                    this.shadowRoot?.querySelector<HTMLElement>(`[data-path="${to}"]`)?.focus();
+                }
+            }
         }
+        this._hasRenderedOnce = true;
         this._pendingFocusPath = undefined;
     }
 
@@ -453,6 +478,16 @@ export class ArStepper extends LitElement {
         return this.navigation.tree.flatMap((step) => step.children.map((sub) => sub.path));
     }
 
+    private _emitChanged(detail: ArStepperStepChangeDetail): void {
+        this.dispatchEvent(
+            new CustomEvent<ArStepperStepChangeDetail>('ar-stepper-step-changed', {
+                bubbles: true,
+                composed: true,
+                detail,
+            }),
+        );
+    }
+
     // ── Events ───────────────────────────────────────────────────────────────
 
     private onClickLink = (event: MouseEvent): void => {
@@ -474,11 +509,20 @@ export class ArStepper extends LitElement {
             event.preventDefault();
         }
 
-        const detail: ArStepperStepChangeDetail = { path };
+        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: path };
 
-        this.dispatchEvent(
-            new CustomEvent('ar-stepper-step-change', { bubbles: true, composed: true, detail }),
+        const proceed = this.dispatchEvent(
+            new CustomEvent('ar-stepper-step-change', {
+                bubbles: true,
+                composed: true,
+                cancelable: true,
+                detail,
+            }),
         );
+        if (!proceed) {
+            this._pendingFocusPath = undefined;
+            event.preventDefault();
+        }
 
         // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
         // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
@@ -486,8 +530,6 @@ export class ArStepper extends LitElement {
         // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
         // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
         this.requestUpdate();
-
-        announceA11y(node?.label ?? path, 'polite');
     };
 
     private handleScrollChange = (event: CustomEvent<string>): void => {
