@@ -66,11 +66,16 @@ Amélioration mineure : si `event.preventDefault()` est appelé sur `ar-stepper-
 d'attendre l'expiration naturelle en fin de cycle — pas d'intention de focus à conserver pour une
 navigation refusée.
 
-### 5. Flag `_hasRenderedOnce`
+### 5. Guard premier rendu : `this.hasUpdated` natif de Lit, pas de champ dédié
 
-Ajouté (comme sur `ar-pagination`) pour ne déclencher ni `-changed`, ni l'annonce, ni le focus au
-tout premier rendu — évite un faux positif quand `currentPath` "change" par rapport à sa valeur
-pré-upgrade non définie.
+Contrairement à `ar-pagination` (qui a ajouté un champ privé `_hasRenderedOnce`), `ar-stepper`
+utilise `this.hasUpdated` — propriété native `ReactiveElement`, `false` pendant tout le premier
+cycle `updated()`/`firstUpdated()`, `true` à partir du suivant (vérifié via la doc Lit
+officielle). Évite un faux positif quand `currentPath` "change" par rapport à sa valeur
+pré-upgrade non définie, sans introduire de champ redondant avec ce que le framework fournit
+déjà. **Note pour un futur ménage** : `ArPagination._hasRenderedOnce` (#161) pourrait être
+simplifié de la même façon, mais c'est hors scope de #174 (code déjà mergé, pas de raison
+fonctionnelle de le retoucher ici).
 
 ## Impact
 
@@ -80,7 +85,7 @@ pré-upgrade non définie.
   retire l'appel `announceA11y` (ligne 490) ; vide `_pendingFocusPath` si l'event est annulé.
 - `updated()` (:240-264) : bloc `changed.has('currentPath')` existant étendu pour dispatcher
   `ar-stepper-step-changed`, annoncer (label résolu via `this.navigation.currentNode`), et
-  effectuer le focus déjà prévu — guardé par le nouveau `_hasRenderedOnce`.
+  effectuer le focus déjà prévu — guardé par `this.hasUpdated`.
 - JSDoc `@event` mis à jour (deux entrées, `@cancelable` sur la première — cf. régression trouvée
   en revue finale sur #161, à ne pas reproduire ici).
 - Nouvelle méthode privée `_emitChanged({ path })` (miroir de `_emitChanged` sur `ArPagination`).

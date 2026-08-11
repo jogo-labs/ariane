@@ -4,7 +4,7 @@
 
 **Goal:** `ar-stepper-step-change` devient annulable et n'annonce plus rien immédiatement au clic ; un nouvel event `ar-stepper-step-changed` (non-cancelable) et l'annonce aria-live ne se déclenchent que quand `currentPath` a réellement transitionné — le mécanisme de focus existant (`_pendingFocusPath`) est conservé tel quel mais regroupé dans le même point d'entrée.
 
-**Architecture:** Miroir du pattern livré sur `ar-pagination` (#161, PR #173), adapté à un composant déjà partiellement contrôlé : `currentPath` ne bougeait déjà jamais tout seul (sauf `follow-scroll`), et le focus était déjà gardé par confirmation. Seule l'annonce a11y était prématurée — elle rejoint le focus dans un unique bloc `updated()` guardé par confirmation réelle (`_hasRenderedOnce` + `changed.has('currentPath')` + `from !== to`).
+**Architecture:** Miroir du pattern livré sur `ar-pagination` (#161, PR #173), adapté à un composant déjà partiellement contrôlé : `currentPath` ne bougeait déjà jamais tout seul (sauf `follow-scroll`), et le focus était déjà gardé par confirmation. Seule l'annonce a11y était prématurée — elle rejoint le focus dans un unique bloc `updated()` guardé par confirmation réelle (`this.hasUpdated` natif de Lit + `changed.has('currentPath')` + `from !== to`).
 
 **Tech Stack:** Lit 3, TypeScript, Vitest (happy-dom), @open-wc/testing + @web/test-runner (Chromium réel), Astro 6 + MDX (docs).
 
@@ -41,8 +41,8 @@ git checkout -b fix/174-stepper-step-events
 
 **Files:**
 
-- Modify: `packages/core/src/components/stepper/stepper.ts:84` (JSDoc `@event`), `:158` (champ
-  privé), `:240-264` (`updated()`), `:458-491` (`onClickLink`)
+- Modify: `packages/core/src/components/stepper/stepper.ts:84` (JSDoc `@event`), `:240-264`
+  (`updated()`), `:458-491` (`onClickLink`)
 - Test: `packages/core/src/components/stepper/stepper.test.ts` (describes `événements`,
   `annonces a11y`, nouveau describe `événement ar-stepper-step-changed`)
 
@@ -265,17 +265,7 @@ encore immédiatement au clic au lieu d'attendre confirmation.
 
 - [ ] **Step 3: Implémenter dans `stepper.ts`**
 
-3a. Ajouter le champ privé juste après `private _pendingFocusPath: string | undefined;`
-(ligne 158) :
-
-```typescript
-    // Distingue le tout premier cycle updated() (où currentPath "change" par rapport à sa
-    // valeur pré-upgrade non définie) des transitions réelles ultérieures — sans ce flag,
-    // ar-stepper-step-changed/l'annonce/le focus se déclencheraient au montage initial.
-    private _hasRenderedOnce = false;
-```
-
-3b. Remplacer le bloc de fin de `updated()` (lignes 258-263) :
+3a. Remplacer le bloc de fin de `updated()` (lignes 258-263) :
 
 ```typescript
 if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
@@ -287,7 +277,11 @@ this._pendingFocusPath = undefined;
 par :
 
 ```typescript
-if (this._hasRenderedOnce && changed.has('currentPath')) {
+// this.hasUpdated (natif Lit, ReactiveElement) : false pendant tout le premier cycle
+// updated()/firstUpdated(), true à partir du suivant — distingue le montage initial (où
+// currentPath "change" par rapport à sa valeur pré-upgrade non définie) des transitions
+// réelles ultérieures, sans champ privé dédié.
+if (this.hasUpdated && changed.has('currentPath')) {
     const from = changed.get('currentPath') as string;
     const to = this.currentPath;
     if (from !== to) {
@@ -299,10 +293,13 @@ if (this._hasRenderedOnce && changed.has('currentPath')) {
     }
 }
 this._pendingFocusPath = undefined;
-this._hasRenderedOnce = true;
 ```
 
-3c. Ajouter la méthode privée, par exemple juste après `getScrollTargets()` (avant la section
+Note : `this.hasUpdated` est déjà `false` pendant l'exécution de ce tout premier `updated()`
+(Lit ne le passe à `true` qu'après ce cycle) — le guard fonctionne donc correctement dès le
+montage, sans champ privé supplémentaire à déclarer ni à réinitialiser.
+
+3b. Ajouter la méthode privée, par exemple juste après `getScrollTargets()` (avant la section
 `// ── Events ──`, ligne 456) :
 
 ```typescript
@@ -317,7 +314,7 @@ this._hasRenderedOnce = true;
     }
 ```
 
-3d. Dans `onClickLink` (lignes 458-491), remplacer :
+3c. Dans `onClickLink` (lignes 458-491), remplacer :
 
 ```typescript
         const detail: ArStepperStepChangeDetail = { path };
@@ -363,7 +360,7 @@ par :
     };
 ```
 
-3e. Mettre à jour le JSDoc `@event` (ligne 84) — remplacer :
+3d. Mettre à jour le JSDoc `@event` (ligne 84) — remplacer :
 
 ```typescript
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
@@ -562,15 +559,16 @@ EOF
 
 1. `ar-stepper-step-change` cancelable → Task 2.
 2. `ar-stepper-step-changed`, annonce déplacée et résolue à la confirmation → Task 2.
-3. `_pendingFocusPath` conservé, regroupé dans le même bloc → Task 2 (Step 3b).
-4. `_pendingFocusPath` vidé si annulé → Task 2 (Step 3d).
-5. `_hasRenderedOnce` → Task 2 (Step 3a).
+3. `_pendingFocusPath` conservé, regroupé dans le même bloc → Task 2 (Step 3a).
+4. `_pendingFocusPath` vidé si annulé → Task 2 (Step 3c).
+5. Guard premier rendu → Task 2 (Step 3a), via `this.hasUpdated` natif de Lit (pas de champ
+   privé à ajouter — vérifié via la doc Lit officielle : `false` pendant tout le premier cycle
+   `updated()`/`firstUpdated()`, `true` à partir du suivant).
 6. Docs : style Utilisation aligné + `pageScript` → Task 3.
 
 **Cohérence des types/signatures** : `ArStepperStepChangeDetail { path }` réutilisé identique
 partout. `_emitChanged(detail: ArStepperStepChangeDetail): void` défini et utilisé uniquement en
-Task 2. `_hasRenderedOnce` déclaré et lu dans la même task. Pas de référence à un nom non défini
-dans une task antérieure.
+Task 2. Pas de référence à un nom non défini dans une task antérieure.
 
 **Pas de régression sur le describe `focus après activation d'un lien`** : vérifié
 manuellement contre les 5 tests existants (lignes 367-474 du fichier avant modification) — tous
