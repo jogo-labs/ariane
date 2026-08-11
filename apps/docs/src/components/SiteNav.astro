@@ -29,7 +29,8 @@ interface NavLink {
 
 const gettingStartedLinks: NavLink[] = [
     { href: '/getting-started/quickstart', label: 'Démarrage rapide', ariaCurrent: undefined },
-    { href: '/getting-started/utilisation',  label: 'Utilisation',  ariaCurrent: undefined },
+    { href: '/getting-started/utilisation', label: 'Utilisation', ariaCurrent: undefined },
+    { href: '/getting-started/shadow-dom', label: 'Shadow DOM applicatif', ariaCurrent: undefined },
 ].map((link) => ({
     ...link,
     ariaCurrent: currentPath === link.href ? ('page' as const) : undefined,

@@ -42,6 +42,10 @@
 
 .main-section {
     gap: 2rem;
+
+    > div p {
+        margin: 0;
+    }
 }
 
 .subsection {
@@ -117,6 +121,16 @@ pre {
     margin: 0;
 }
 
+code {
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.9rem;
+    display: inline-block;
+    line-height: 1.6;
+    background-color: var(--doc-accent-bg);
+    color: var(--doc-accent);
+    font-weight: 500;
+}
+
 pre code {
     font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 0.82rem;
@@ -159,6 +173,33 @@ pre code {
     font-size: 0.875rem;
     line-height: 1.7;
     color: var(--doc-text);
+}
+
+.doc-callout-alert {
+    --ar-alert-bg: var(--doc-accent-bg);
+    --ar-alert-border: var(--doc-accent-border);
+    --ar-alert-icon: var(--doc-accent);
+    --ar-alert-color: var(--doc-text);
+}
+
+.doc-callout-alert-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--doc-accent);
+    padding: 0 0 0.4rem;
+    margin: 0;
+}
+
+.doc-callout-alert-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    p {
+        margin: 0;
+    }
 }
 
 .badge-subtle {
