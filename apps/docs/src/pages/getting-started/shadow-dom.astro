@@ -3,10 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',       level: 1 as const },
-    { id: 'charger-le-theme', label: 'Charger un thème dans votre shadow root', level: 1 as const },
-    { id: 'preparez-theme',   label: 'Préparez votre thème',                   level: 2 as const },
-    { id: 'theme-ariane',     label: "Utiliser le thème par défaut d'Ariane",  level: 2 as const },
+    { id: 'pourquoi',         label: 'Un style appliqué partiellement',   level: 1 as const },
+    { id: 'charger-un-theme', label: 'Charger un thème',                  level: 1 as const },
+    { id: 'preparez-theme',   label: 'Préparez votre thème',              level: 2 as const },
+    { id: 'theme-defaut',     label: 'Utiliser le thème par défaut',      level: 2 as const },
 ];
 
 const codeAdoptedStyleSheetsCdnComponent = `// mon-app.js — définition du composant, fichier séparé de la page
@@ -65,7 +65,7 @@ customElements.define('mon-app', MonApp);`;
 >
     <div class="page-container">
         <div class="page-header">
-            <h2 class="page-title">Ariane dans un shadow DOM applicatif</h2>
+            <h2 class="page-title">Utiliser Ariane dans un shadow DOM</h2>
             <p class="summary">
                 Si votre application encapsule sa propre page ou une partie de
                 son contenu dans un <em>web component</em> avec son propre shadow DOM, le thème CSS
@@ -77,13 +77,11 @@ customElements.define('mon-app', MonApp);`;
 
         <section id="pourquoi" class="main-section">
             <div>
-                <h3 class="section-title">Que se passe-t-il ?</h3>
+                <h3 class="section-title">Un style appliqué partiellement ?</h3>
                 <p>
                     Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
-                    traversent la frontière du shadow DOM par héritage CSS natif.
-                </p>
-                <p>
-                    Les règles utilisant <strong><code>::part()</code></strong> par contre ne peuvent pas
+                    traversent la frontière du shadow DOM par héritage CSS natif.<br>
+                    Les règles utilisant <code>::part()</code> par contre ne peuvent pas
                     traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
                     donc pas.<br>
                     C'est la raison pour laquelle votre thème ne s'applique que partiellement.
@@ -91,9 +89,9 @@ customElements.define('mon-app', MonApp);`;
             </div>
         </section>
 
-        <section id="charger-le-theme" class="main-section">
+        <section id="charger-un-theme" class="main-section">
             <div>
-                <h3 class="section-title">Charger le thème dans le shadow root</h3>
+                <h3 class="section-title">Charger un thème</h3>
                 <p>
                     N'importe quelle feuille de style peut être transformée en
                     <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet"
@@ -104,7 +102,7 @@ customElements.define('mon-app', MonApp);`;
                     les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
                 </p>
 
-                <ar-alert variant="info" class="doc-callout-alert">
+                <ar-alert variant="info" class="doc-callout-alert" style="margin-top: 1rem">
                     <p class="doc-callout-alert-title">Compatibilité</p>
                     <div class="doc-callout-alert-content">
                         <p>
@@ -136,8 +134,8 @@ customElements.define('mon-app', MonApp);`;
                 </ar-alert>
             </section>
 
-            <section id="theme-ariane" class="subsection">
-                <h4 class="subsection-title">Utiliser le thème par défaut d'Ariane</h4>
+            <section id="theme-defaut" class="subsection">
+                <h4 class="subsection-title">Utiliser le thème par défaut</h4>
                 <p>
                     Si vous utilisez le thème Ariane dans votre projet, celui-ci est packagé en JS
                     et utilisable via le CDN ou le paquet npm.

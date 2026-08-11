@@ -42,6 +42,10 @@
 
 .main-section {
     gap: 2rem;
+
+    > div p {
+        margin: 0;
+    }
 }
 
 .subsection {
@@ -115,6 +119,16 @@ pre {
     padding: 1rem 1.25rem;
     overflow-x: auto;
     margin: 0;
+}
+
+code {
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.9rem;
+    display: inline-block;
+    line-height: 1.6;
+    background-color: var(--doc-accent-bg);
+    color: var(--doc-accent);
+    font-weight: 500;
 }
 
 pre code {
