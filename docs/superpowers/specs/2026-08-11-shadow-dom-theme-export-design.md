@@ -46,30 +46,47 @@ feuille est adoptée, donc fonctionnent tels quels dans un shadow root imbriqué
 Conséquence : `default.js` ne sert que le cas `::part()` — cohérent avec le fait que les tokens
 n'ont besoin d'aucune étape supplémentaire (héritage CSS natif).
 
-### 3. Génération : split au build sur l'ancre `THÈME COMPOSANTS`, pas de parsing CSS général
+### 3. Génération : split au build sur une ancre dédiée, pas de parsing CSS général
+
+Le commentaire-bannière `THÈME COMPOSANTS` existant est décoratif (titre de section lisible par un
+humain) — s'appuyer dessus comme unique point d'ancrage du build serait fragile : un futur passage
+de reformulation de la doc interne pourrait le renommer sans que personne réalise qu'il est
+structurant pour le script. Le split se fait donc sur une **ancre dédiée, distincte de la bannière
+et non décorative**, insérée juste avant elle :
+
+```css
+/* build-split-anchor: components — ne pas renommer, cf. scripts/build-css.js */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * THÈME COMPOSANTS
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+```
 
 `packages/core/scripts/build-css.js` (déjà responsable de minifier `default.css` vers
 `dist/styles/themes/default.css` via esbuild) est étendu :
 
-- Repérer le commentaire-bannière `THÈME COMPOSANTS` dans le CSS **source** (avant minification,
-  puisque le commentaire est retiré par la minification) pour déterminer l'offset où commence la
-  partie composants, découper la source brute en deux sous-chaînes à cet offset, puis minifier
-  séparément la sous-chaîne "composants" via esbuild (`transform`, en mémoire — pas un entry point
-  fichier séparé sur disque) pour produire le CSS embarqué dans `default.js`.
+- Chercher la chaîne exacte `build-split-anchor: components` dans le CSS **source** (avant
+  minification, puisque tout commentaire est retiré par la minification) pour déterminer l'offset
+  où commence la partie composants, découper la source brute en deux sous-chaînes à cet offset,
+  puis minifier séparément la sous-chaîne "composants" via esbuild (`transform`, en mémoire — pas
+  un entry point fichier séparé sur disque) pour produire le CSS embarqué dans `default.js`.
 - Émettre `dist/styles/themes/default.js` :
     ```js
     export const defaultTheme = new CSSStyleSheet();
     defaultTheme.replaceSync(`...CSS minifié de la partie ::part() uniquement...`);
     ```
-- **Échec de build explicite** si l'ancre `THÈME COMPOSANTS` n'est pas trouvée dans le fichier
-  source (protection contre un renommage/suppression silencieux du marqueur qui casserait le split
-  sans erreur visible).
+- **Échec de build explicite** (message d'erreur nommant le fichier et la chaîne recherchée, exit
+  code non nul) si l'ancre `build-split-anchor: components` n'est pas trouvée dans le fichier
+  source — protège contre un renommage/suppression silencieux qui casserait le split sans erreur
+  visible. Contrairement à la bannière décorative, cette chaîne n'a aucune raison légitime d'être
+  reformulée ; son commentaire porte l'avertissement explicite ("ne pas renommer").
 - Le `.css` complet existant (tokens + composants, minifié) continue d'être généré exactement comme
-  aujourd'hui, sans changement de comportement pour les consommateurs `<link>`/`@import`.
+  aujourd'hui, sans changement de comportement pour les consommateurs `<link>`/`@import` — l'ancre
+  est un simple commentaire CSS, invisible pour ce chemin.
 
 Pas de dépendance nouvelle : réutilise esbuild déjà en place. Pas de parsing CSS générique
-(brace-counting, AST) — un split sur un marqueur de commentaire fixe et déjà présent dans le
-fichier est suffisant et plus robuste qu'un parseur maison pour ce besoin précis.
+(brace-counting, AST) — un split sur une chaîne d'ancrage fixe et explicitement marquée comme
+structurante est suffisant et plus robuste qu'un parseur maison pour ce besoin précis.
 
 ### 4. Export npm : chemin en miroir du `.css` existant
 
@@ -94,12 +111,18 @@ consommateurs ayant une contrainte de compatibilité plus large — la piste 1 e
 
 ## Impact
 
+**Source** (`packages/core/src/styles/themes/default.css`) :
+
+- Commentaire d'ancrage `/* build-split-anchor: components — ne pas renommer, cf.
+scripts/build-css.js */` déjà ajouté juste avant la bannière `THÈME COMPOSANTS` (fait en amont du
+  plan, changement non fonctionnel, zéro impact sur le `.css` publié).
+
 **Build** (`packages/core/scripts/build-css.js`) :
 
 - Pour chaque `.css` sous `src/styles/themes/`, en plus du `.css` minifié déjà produit, génère un
-  `.js` jumeau contenant uniquement la partie après l'ancre `THÈME COMPOSANTS`, minifiée, embarquée
-  en template string, exportée comme `CSSStyleSheet` déjà peuplé (nom d'export dérivé du nom de
-  fichier — `defaultTheme` pour `default.css`).
+  `.js` jumeau contenant uniquement la partie après l'ancre `build-split-anchor: components`,
+  minifiée, embarquée en template string, exportée comme `CSSStyleSheet` déjà peuplé (nom d'export
+  dérivé du nom de fichier — `defaultTheme` pour `default.css`).
 - Échoue explicitement (message d'erreur clair, exit code non nul) si l'ancre n'est pas trouvée
   dans un fichier thème source.
 

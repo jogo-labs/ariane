@@ -663,6 +663,8 @@
         }
     }
 
+    /* build-split-anchor: components — ne pas renommer, cf. scripts/build-css.js */
+
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * THÈME COMPOSANTS
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
