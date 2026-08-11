@@ -6,24 +6,11 @@ const tocEntries = [
     { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',    level: 1 as const },
     { id: 'charger-le-theme', label: 'Charger le thème dans votre shadow root', level: 1 as const },
     { id: 'votre-theme',      label: 'Construire votre propre thème',       level: 2 as const },
+    { id: 'theme-ariane',     label: "Utiliser le thème par défaut d'Ariane", level: 2 as const },
 ];
 
-const codeAdoptedStyleSheetsCdn = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
-<script type="module">
-import { defaultTheme } from 'https://unpkg.com/@ariane-ui/core/themes/default.js';
-
-class MonApp extends HTMLElement {
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
-        shadow.adoptedStyleSheets = [defaultTheme];
-        shadow.append(document.createElement('ar-datepicker'));
-    }
-}
-customElements.define('mon-app', MonApp);
-</scr` + `ipt>`;
-
-const codeAdoptedStyleSheetsNpm = `import '@ariane-ui/core'; // enregistre les composants — fichier distinct du thème
-import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+const codeAdoptedStyleSheetsCdnComponent = `// mon-app.js — définition du composant, fichier séparé de la page
+import { defaultTheme } from 'https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.js';
 
 class MonApp extends HTMLElement {
     connectedCallback() {
@@ -33,6 +20,28 @@ class MonApp extends HTMLElement {
     }
 }
 customElements.define('mon-app', MonApp);`;
+
+const codeAdoptedStyleSheetsCdnPage = `<!-- Enregistre ar-datepicker et les autres composants Ariane, cf. Démarrage rapide -->
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
+<script type="module" src="/mon-app.js"></scr` + `ipt>
+
+<mon-app></mon-app>`;
+
+const codeAdoptedStyleSheetsNpmComponent = `// mon-app.js — définition du composant, fichier séparé de la page
+import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+
+export class MonApp extends HTMLElement {
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.adoptedStyleSheets = [defaultTheme];
+        shadow.append(document.createElement('ar-datepicker'));
+    }
+}
+customElements.define('mon-app', MonApp);`;
+
+const codeAdoptedStyleSheetsNpmPage = `// main.js
+import '@ariane-ui/core'; // enregistre les composants Ariane
+import './mon-app.js';`;
 
 const codeCustomTheme = `const monTheme = new CSSStyleSheet();
 monTheme.replaceSync(\`
@@ -87,52 +96,64 @@ shadow.adoptedStyleSheets = [monTheme];`;
                     chargement synchrone (pas de FOUC), et une seule feuille parsée, partageable
                     telle quelle entre plusieurs shadow roots de votre application.
                 </p>
-                <p>
-                    Ariane publie son propre thème packagé ainsi —
-                    <code>@ariane-ui/core/themes/default.js</code> exporte <code>defaultTheme</code>,
-                    prêt à l'emploi. Les exemples ci-dessous l'utilisent pour illustrer la
-                    technique, mais l'objectif est que vous puissiez faire de même avec
-                    <strong>votre propre thème</strong> (voir <a href="#votre-theme">plus bas</a>).
-                    Notez aussi que le thème est un fichier distinct des composants eux-mêmes —
-                    <code>ar-datepicker</code> doit être enregistré séparément (autoloader, bundle,
-                    ou <code>import '@ariane-ui/core'</code>), comme dans le
-                    <a href="/getting-started/quickstart">Démarrage rapide</a>.
-                </p>
             </div>
-
-            <section class="subsection">
-                <h4 class="subsection-title">Via CDN <span class="badge">Recommandé</span></h4>
-                <pre><code class="language-html" set:text={codeAdoptedStyleSheetsCdn} /></pre>
-            </section>
-
-            <section class="subsection">
-                <h4 class="subsection-title">Via npm <span class="badge badge-subtle">Avec bundler</span></h4>
-                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpm} /></pre>
-            </section>
-
-            <p class="hint">
-                <code>default.js</code> ne contient que les règles <code>::part()</code>, pas les
-                tokens — les tokens n'ont besoin d'aucune de ces méthodes (héritage CSS natif, cf.
-                section précédente).
-            </p>
-
-            <ar-alert variant="info" class="doc-callout-alert">
-                <span slot="title">Compatibilité</span>
-                <span slot="content">
-                    <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
-                    sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
-                    2023).
-                </span>
-            </ar-alert>
 
             <section id="votre-theme" class="subsection">
                 <h4 class="subsection-title">Construire votre propre thème</h4>
                 <p>
-                    <code>defaultTheme</code> n'a rien de spécial — c'est le même
-                    <code>CSSStyleSheet</code> constructible que vous pouvez créer avec votre
-                    propre CSS :
+                    Le cas le plus courant : votre application a déjà son propre thème, local à
+                    votre code — la technique est la même quel que soit le CSS :
                 </p>
                 <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
+            </section>
+
+            <section id="theme-ariane" class="subsection">
+                <h4 class="subsection-title">Utiliser le thème par défaut d'Ariane</h4>
+                <p>
+                    Ariane publie son propre thème packagé de la même façon —
+                    <code>@ariane-ui/core/themes/default.js</code> exporte <code>defaultTheme</code>,
+                    prêt à l'emploi si vous préférez repartir de celui-ci plutôt que d'écrire le
+                    vôtre.
+                </p>
+                <p>
+                    Le composant qui englobe le contenu de votre page vit dans son propre fichier,
+                    comme dans une vraie application — c'est <em>ce fichier</em> qui importe
+                    <code>defaultTheme</code>, peu importe où il est lui-même chargé depuis. Un
+                    import d'URL absolue (<code>https://unpkg.com/...</code>) se résout toujours de
+                    la même façon, quel que soit l'endroit d'où le module qui l'importe est
+                    lui-même servi.
+                </p>
+
+                <p><strong>Via CDN :</strong></p>
+                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsCdnComponent} /></pre>
+                <p>Chargé depuis la page, aux côtés de l'autoloader habituel :</p>
+                <pre><code class="language-html" set:text={codeAdoptedStyleSheetsCdnPage} /></pre>
+                <p class="hint">
+                    Chemin complet <code>dist/styles/themes/default.js</code>, pas le raccourci
+                    <code>themes/default.js</code> : unpkg ne résout pas les alias de l'
+                    <code>exports</code> du <code>package.json</code>, seulement les chemins de
+                    fichiers réels.
+                </p>
+
+                <p><strong>Via npm :</strong></p>
+                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmComponent} /></pre>
+                <p>Importé depuis votre point d'entrée :</p>
+                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmPage} /></pre>
+
+                <p class="hint">
+                    <code>default.js</code> ne contient que les règles <code>::part()</code>, pas
+                    les tokens — les tokens n'ont besoin d'aucune de ces méthodes (héritage CSS
+                    natif, cf. section précédente).
+                </p>
+
+                <ar-alert variant="info" class="doc-callout-alert">
+                    <p class="doc-callout-alert-title">Compatibilité</p>
+                    <p>
+                        <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
+                        sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
+                        2023).
+                    </p>
+                </ar-alert>
             </section>
         </section>
     </div>
