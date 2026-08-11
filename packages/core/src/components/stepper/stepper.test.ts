@@ -302,6 +302,27 @@ describe('ArStepper', () => {
             expect(shadow(el).activeElement).toBe(link);
         });
 
+        it("preventDefault() sur ar-stepper-step-change bloque aussi la navigation native quand l'étape a un href réel", async () => {
+            // Contrat documenté (JSDoc @event) : preventDefault() bloque la navigation, sans
+            // qualification sur la présence d'un href réel. Un href réel (ex: "#etape-2-1",
+            // utilisé par la doc pour les sous-étapes) doit donc aussi voir son comportement
+            // natif d'ancre bloqué quand le consommateur annule l'event.
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" href="#etape-2-1" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+
+            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+            link.dispatchEvent(clickEvent);
+
+            expect(clickEvent.defaultPrevented).toBe(true);
+            expect(el.currentPath).toBe('/b');
+        });
+
         it("n'émet plus step-changed (nom court) au clic", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
@@ -361,17 +382,24 @@ describe('ArStepper', () => {
         });
 
         it("n'est pas émis au premier rendu", async () => {
+            // Le listener est attaché sur document AVANT le montage : l'event bubble
+            // (bubbles: true, composed: true) donc si le garde-fou _hasRenderedOnce était
+            // absent, l'émission aurait lieu pendant fixtureWithItems() et serait captée ici.
             const handler = vi.fn();
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/b" mode="edit">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            el.addEventListener('ar-stepper-step-changed', handler);
-            await waitForUpdate(el);
+            document.addEventListener('ar-stepper-step-changed', handler);
 
-            expect(handler).not.toHaveBeenCalled();
+            try {
+                await fixtureWithItems(`
+                    <ar-stepper current-path="/b" mode="edit">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+                expect(handler).not.toHaveBeenCalled();
+            } finally {
+                document.removeEventListener('ar-stepper-step-changed', handler);
+            }
         });
     });
 

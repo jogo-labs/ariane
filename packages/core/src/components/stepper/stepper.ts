@@ -24,7 +24,11 @@ import { warn } from '../../utils/warn.js';
 
 /** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail {
-    /** Chemin de l'étape courante avant la transition */
+    /**
+     * Chemin de l'étape courante avant la transition. Peut être `''` si le stepper
+     * est monté sans `current-path` initial et que `currentPath` est assigné pour la
+     * première fois.
+     */
     from: string;
     /** Chemin de l'étape cible (demandée sur `-change`, confirmée sur `-changed`) */
     to: string;
@@ -517,6 +521,7 @@ export class ArStepper extends LitElement {
         );
         if (!proceed) {
             this._pendingFocusPath = undefined;
+            event.preventDefault();
         }
 
         // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
