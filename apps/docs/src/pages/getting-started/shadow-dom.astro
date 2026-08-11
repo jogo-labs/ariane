@@ -3,10 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',    level: 1 as const },
-    { id: 'charger-le-theme', label: 'Charger le thème dans votre shadow root', level: 1 as const },
-    { id: 'votre-theme',      label: 'Construire votre propre thème',       level: 2 as const },
-    { id: 'theme-ariane',     label: "Utiliser le thème par défaut d'Ariane", level: 2 as const },
+    { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',       level: 1 as const },
+    { id: 'charger-le-theme', label: 'Charger un thème dans votre shadow root', level: 1 as const },
+    { id: 'preparez-theme',   label: 'Préparez votre thème',                   level: 2 as const },
+    { id: 'theme-ariane',     label: "Utiliser le thème par défaut d'Ariane",  level: 2 as const },
 ];
 
 const codeAdoptedStyleSheetsCdnComponent = `// mon-app.js — définition du composant, fichier séparé de la page
@@ -21,12 +21,6 @@ class MonApp extends HTMLElement {
 }
 customElements.define('mon-app', MonApp);`;
 
-const codeAdoptedStyleSheetsCdnPage = `<!-- Enregistre ar-datepicker et les autres composants Ariane, cf. Démarrage rapide -->
-<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
-<script type="module" src="/mon-app.js"></scr` + `ipt>
-
-<mon-app></mon-app>`;
-
 const codeAdoptedStyleSheetsNpmComponent = `// mon-app.js — définition du composant, fichier séparé de la page
 import { defaultTheme } from '@ariane-ui/core/themes/default.js';
 
@@ -39,16 +33,29 @@ export class MonApp extends HTMLElement {
 }
 customElements.define('mon-app', MonApp);`;
 
-const codeAdoptedStyleSheetsNpmPage = `// main.js
-import '@ariane-ui/core'; // enregistre les composants Ariane
-import './mon-app.js';`;
+const codeCustomTheme = `// mon-theme.js — généré par votre build à partir de votre fichier CSS
+export const monTheme = new CSSStyleSheet();
 
-const codeCustomTheme = `const monTheme = new CSSStyleSheet();
+/* Injectez le contenu de votre fichier CSS ci-dessous */
 monTheme.replaceSync(\`
-    ar-datepicker::part(panel) { border-radius: 1rem; }
+    ar-datepicker::part(panel) {
+        width: 20rem;
+        padding: 1rem;
+    }
+    ...
 \`);
 
-shadow.adoptedStyleSheets = [monTheme];`;
+// mon-app.js — définition du composant, importe le fichier ainsi créé
+import { monTheme } from 'mon-theme.js';
+
+export class MonApp extends HTMLElement {
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+        // Importez le thème dans le shadowRoot
+        shadow.adoptedStyleSheets = [monTheme];
+    }
+}
+customElements.define('mon-app', MonApp);`;
 ---
 
 <Layout
@@ -60,100 +67,87 @@ shadow.adoptedStyleSheets = [monTheme];`;
         <div class="page-header">
             <h2 class="page-title">Ariane dans un shadow DOM applicatif</h2>
             <p class="summary">
-                Ce guide s'applique si votre application encapsule sa propre page ou une partie de
-                son contenu dans un <em>web component</em> avec son propre shadow DOM, et y
-                instancie des composants Ariane à l'intérieur. C'est un cas différent de
-                l'imbrication interne à la librairie (un composant Ariane qui en instancie un
-                autre dans son propre shadow root) — ici c'est votre propre frontière shadow DOM,
-                pas celle d'Ariane.
+                Si votre application encapsule sa propre page ou une partie de
+                son contenu dans un <em>web component</em> avec son propre shadow DOM, le thème CSS
+                ne s'appliquera que partiellement à vos composants.<br>
+                Il s'agit là d'une contrainte inhérente au shadow DOM, mais cette page vous guidera
+                pour vous aider à afficher vos composants correctement.
             </p>
         </div>
 
         <section id="pourquoi" class="main-section">
             <div>
-                <h3 class="section-title">Pourquoi <code>::part()</code> ne traverse pas la frontière</h3>
+                <h3 class="section-title">Que se passe-t-il ?</h3>
                 <p>
-                    Les <strong>tokens</strong> (<code>--ar-*</code>) traversent la frontière par
-                    héritage CSS natif — rien à faire, à condition que le thème reste chargé au
-                    niveau document comme d'habitude.
+                    Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
+                    traversent la frontière du shadow DOM par héritage CSS natif.
                 </p>
                 <p>
-                    <strong><code>::part()</code></strong> ne traverse pas : votre shadow root est
-                    une frontière que vous avez créée, elle ne partage plus le même arbre DOM que
-                    <code>default.css</code> chargé au niveau document. C'est le fonctionnement
-                    standard du Shadow DOM — qui crée une frontière est responsable d'y importer ce
-                    dont elle a besoin.
+                    Les règles utilisant <strong><code>::part()</code></strong> par contre ne peuvent pas
+                    traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
+                    donc pas.<br>
+                    C'est la raison pour laquelle votre thème ne s'applique que partiellement.
                 </p>
             </div>
         </section>
 
         <section id="charger-le-theme" class="main-section">
             <div>
-                <h3 class="section-title">Charger le thème dans votre shadow root</h3>
+                <h3 class="section-title">Charger le thème dans le shadow root</h3>
                 <p>
-                    N'importe quelle feuille CSS peut devenir un <code>CSSStyleSheet</code>
-                    adoptable, à assigner directement à <code>shadow.adoptedStyleSheets</code> :
-                    chargement synchrone (pas de FOUC), et une seule feuille parsée, partageable
-                    telle quelle entre plusieurs shadow roots de votre application.
+                    N'importe quelle feuille de style peut être transformée en
+                    <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet"
+                    target="_blank" rel="noopener" title="Visiter la page dédiée sur MDN (nouvel onglet)"><code>CSSStyleSheet</code></a>.
+                    Elle peut ensuite être "adoptée" par chaque composant qui en a besoin, chacun partageant
+                    une même instance chargée et parsée une seule fois.<br>
+                    Contrairement au chargement du CSS via une balise <code>&lt;link&gt;</code>,
+                    les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
                 </p>
+
+                <ar-alert variant="info" class="doc-callout-alert">
+                    <p class="doc-callout-alert-title">Compatibilité</p>
+                    <div class="doc-callout-alert-content">
+                        <p>
+                            <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
+                            sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
+                            2023).
+                        </p>
+                    </div>
+                </ar-alert>
             </div>
 
-            <section id="votre-theme" class="subsection">
-                <h4 class="subsection-title">Construire votre propre thème</h4>
+            <section id="preparez-theme" class="subsection">
+                <h4 class="subsection-title">Préparez votre thème</h4>
                 <p>
-                    Le cas le plus courant : votre application a déjà son propre thème, local à
-                    votre code — la technique est la même quel que soit le CSS :
+                    Le plus souvent votre application a déjà son propre thème, local à votre code
+                    — la technique est la même quel que soit le CSS.<br>
+                    Il s'agit de créer à partir de votre fichier CSS une version <code>*.js</code>
+                    qui sera utilisée en complément de votre fichier CSS.
                 </p>
                 <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
+                <ar-alert variant="info" class="doc-callout-alert">
+                    <p class="doc-callout-alert-title">N'importez pas les tokens</p>
+                    <div class="doc-callout-alert-content">
+                        <p>
+                            Les CSS Custom properties n'ont pas besoin d'être incluses dans cette version JS,
+                            le sélecteur <code>:root</code> ne s'appliquant pas dans le contexte du shadow DOM.
+                        </p>
+                    </div>
+                </ar-alert>
             </section>
 
             <section id="theme-ariane" class="subsection">
                 <h4 class="subsection-title">Utiliser le thème par défaut d'Ariane</h4>
                 <p>
-                    Ariane publie son propre thème packagé de la même façon —
-                    <code>@ariane-ui/core/themes/default.js</code> exporte <code>defaultTheme</code>,
-                    prêt à l'emploi si vous préférez repartir de celui-ci plutôt que d'écrire le
-                    vôtre.
-                </p>
-                <p>
-                    Le composant qui englobe le contenu de votre page vit dans son propre fichier,
-                    comme dans une vraie application — c'est <em>ce fichier</em> qui importe
-                    <code>defaultTheme</code>, peu importe où il est lui-même chargé depuis. Un
-                    import d'URL absolue (<code>https://unpkg.com/...</code>) se résout toujours de
-                    la même façon, quel que soit l'endroit d'où le module qui l'importe est
-                    lui-même servi.
+                    Si vous utilisez le thème Ariane dans votre projet, celui-ci est packagé en JS
+                    et utilisable via le CDN ou le paquet npm.
                 </p>
 
                 <p><strong>Via CDN :</strong></p>
                 <pre><code class="language-js" set:text={codeAdoptedStyleSheetsCdnComponent} /></pre>
-                <p>Chargé depuis la page, aux côtés de l'autoloader habituel :</p>
-                <pre><code class="language-html" set:text={codeAdoptedStyleSheetsCdnPage} /></pre>
-                <p class="hint">
-                    Chemin complet <code>dist/styles/themes/default.js</code>, pas le raccourci
-                    <code>themes/default.js</code> : unpkg ne résout pas les alias de l'
-                    <code>exports</code> du <code>package.json</code>, seulement les chemins de
-                    fichiers réels.
-                </p>
 
                 <p><strong>Via npm :</strong></p>
                 <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmComponent} /></pre>
-                <p>Importé depuis votre point d'entrée :</p>
-                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmPage} /></pre>
-
-                <p class="hint">
-                    <code>default.js</code> ne contient que les règles <code>::part()</code>, pas
-                    les tokens — les tokens n'ont besoin d'aucune de ces méthodes (héritage CSS
-                    natif, cf. section précédente).
-                </p>
-
-                <ar-alert variant="info" class="doc-callout-alert">
-                    <p class="doc-callout-alert-title">Compatibilité</p>
-                    <p>
-                        <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
-                        sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
-                        2023).
-                    </p>
-                </ar-alert>
             </section>
         </section>
     </div>
@@ -163,10 +157,4 @@ shadow.adoptedStyleSheets = [monTheme];`;
 
 <style>
     @import '../../styles/doc-prose.css';
-
-    .hint {
-        font-size: 0.875rem;
-        color: var(--doc-text-muted);
-        margin-top: -0.5rem;
-    }
 </style>

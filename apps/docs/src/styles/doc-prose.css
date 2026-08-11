@@ -174,7 +174,18 @@ pre code {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--doc-accent);
-    margin: 0 0 0.4rem;
+    padding: 0 0 0.4rem;
+    margin: 0;
+}
+
+.doc-callout-alert-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    p {
+        margin: 0;
+    }
 }
 
 .badge-subtle {
