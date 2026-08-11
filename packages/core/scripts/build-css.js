@@ -98,16 +98,16 @@ async function generateThemeJsExports() {
             );
         }
 
-        // Extraire le CSS après la fermeture du commentaire
-        let componentsSource = source.slice(commentEndIndex + 2);
-
-        // Le CSS des composants est enrobé dans une @layer, qui se ferme par une }
-        // à la fin du fichier. Quand on extrait juste les composants, cette }
-        // orpheline cause une erreur de syntaxe. La retirer.
-        componentsSource = componentsSource.trimEnd();
-        if (componentsSource.endsWith('}')) {
-            componentsSource = componentsSource.slice(0, -1).trimEnd();
-        }
+        // Extraire le CSS après la fermeture du commentaire. Dans le fichier
+        // source, ce CSS est enrobé dans une @layer ariane.theme { ... } dont
+        // l'ouverture précède l'ancre et dont la fermeture } se trouve en fin
+        // de fichier. On la ré-enrobe dans une @layer fraîche et complète
+        // (plutôt que de retirer la } de fermeture d'origine) pour préserver
+        // le layering : sans lui, les règles ::part() de default.js seraient
+        // non-layered alors qu'elles le sont dans default.css, cassant
+        // l'équivalence de cascade entre les deux méthodes de chargement
+        // documentées (<link> vs adoptedStyleSheets — cf. #170).
+        const componentsSource = `@layer ariane.theme {\n${source.slice(commentEndIndex + 2)}`;
 
         const { code: minified, warnings } = await esbuild.transform(componentsSource, {
             loader: 'css',

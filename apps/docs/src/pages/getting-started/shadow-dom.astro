@@ -56,7 +56,11 @@ customElements.define('mon-app', MonApp);`;
                 <p>
                     Les <strong>tokens</strong> (CSS Custom Properties, <code>--ar-*</code>)
                     continuent de fonctionner sans rien faire : les custom properties héritent
-                    naturellement à travers les frontières de shadow DOM, y compris la vôtre.
+                    naturellement à travers les frontières de shadow DOM, y compris la vôtre. Cela
+                    suppose toujours qu'un thème (<code>default.css</code> ou équivalent) reste
+                    chargé au niveau document comme d'habitude — ce guide n'ajoute que l'étape
+                    supplémentaire nécessaire pour <code>::part()</code> à l'intérieur de votre
+                    propre shadow root.
                 </p>
                 <p>
                     <strong><code>::part()</code></strong> en revanche ne peut pas atteindre les

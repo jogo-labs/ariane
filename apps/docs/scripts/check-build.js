@@ -20,6 +20,7 @@ const EXPECTED_PAGES = [
     'index.html',
     'getting-started/quickstart/index.html',
     'getting-started/utilisation/index.html',
+    'getting-started/shadow-dom/index.html',
 ];
 
 let hasError = false;
