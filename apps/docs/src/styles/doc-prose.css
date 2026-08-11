@@ -161,6 +161,13 @@ pre code {
     color: var(--doc-text);
 }
 
+.doc-callout-alert {
+    --ar-alert-bg: var(--doc-accent-bg);
+    --ar-alert-border: var(--doc-accent-border);
+    --ar-alert-icon: var(--doc-accent);
+    --ar-alert-color: var(--doc-text);
+}
+
 .badge-subtle {
     font-size: 0.7rem;
     font-weight: 600;

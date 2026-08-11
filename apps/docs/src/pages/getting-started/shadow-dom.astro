@@ -7,20 +7,20 @@ const tocEntries = [
     { id: 'charger-le-theme', label: 'Charger le thème dans votre shadow root', level: 1 as const },
 ];
 
-const codeLinkMethod = `class MonApp extends HTMLElement {
+const codeAdoptedStyleSheetsCdn = `<script type="module">
+import { defaultTheme } from 'https://unpkg.com/@ariane-ui/core/themes/default.js';
+
+class MonApp extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
-
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/@ariane-ui/core/themes/default.css';
-
-        shadow.append(link, document.createElement('ar-datepicker'));
+        shadow.adoptedStyleSheets = [defaultTheme];
+        shadow.append(document.createElement('ar-datepicker'));
     }
 }
-customElements.define('mon-app', MonApp);`;
+customElements.define('mon-app', MonApp);
+</script>`;
 
-const codeAdoptedStyleSheets = `import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+const codeAdoptedStyleSheetsNpm = `import { defaultTheme } from '@ariane-ui/core/themes/default.js';
 
 class MonApp extends HTMLElement {
     connectedCallback() {
@@ -54,23 +54,16 @@ customElements.define('mon-app', MonApp);`;
             <div>
                 <h3 class="section-title">Pourquoi <code>::part()</code> ne traverse pas la frontière</h3>
                 <p>
-                    Les <strong>tokens</strong> (CSS Custom Properties, <code>--ar-*</code>)
-                    continuent de fonctionner sans rien faire : les custom properties héritent
-                    naturellement à travers les frontières de shadow DOM, y compris la vôtre. Cela
-                    suppose toujours qu'un thème (<code>default.css</code> ou équivalent) reste
-                    chargé au niveau document comme d'habitude — ce guide n'ajoute que l'étape
-                    supplémentaire nécessaire pour <code>::part()</code> à l'intérieur de votre
-                    propre shadow root.
+                    Les <strong>tokens</strong> (<code>--ar-*</code>) traversent la frontière par
+                    héritage CSS natif — rien à faire, à condition que le thème reste chargé au
+                    niveau document comme d'habitude.
                 </p>
                 <p>
-                    <strong><code>::part()</code></strong> en revanche ne peut pas atteindre les
-                    composants Ariane depuis <code>default.css</code> chargé au niveau du document
-                    : votre shadow root est une frontière que vous avez créée, et
-                    <code>default.css</code> chargé au niveau document ne partage plus le même
-                    arbre DOM que les composants Ariane qu'il cible à l'intérieur de votre shadow
-                    root. C'est le fonctionnement standard du Shadow DOM — qui crée une frontière
-                    est responsable d'y importer ce dont il a besoin, ce n'est pas une lacune
-                    d'Ariane à corriger.
+                    <strong><code>::part()</code></strong> ne traverse pas : votre shadow root est
+                    une frontière que vous avez créée, elle ne partage plus le même arbre DOM que
+                    <code>default.css</code> chargé au niveau document. C'est le fonctionnement
+                    standard du Shadow DOM — qui crée une frontière est responsable d'y importer ce
+                    dont elle a besoin.
                 </p>
             </div>
         </section>
@@ -79,50 +72,40 @@ customElements.define('mon-app', MonApp);`;
             <div>
                 <h3 class="section-title">Charger le thème dans votre shadow root</h3>
                 <p>
-                    Deux méthodes équivalentes en résultat visuel — chargez le thème
-                    <em>dans</em> votre shadow root plutôt qu'au niveau document.
+                    Ariane publie <code>@ariane-ui/core/themes/default.js</code>, un export du
+                    thème sous forme de <code>CSSStyleSheet</code> déjà construit
+                    (<code>defaultTheme</code>), à adopter directement dans votre shadow root via
+                    <code>shadow.adoptedStyleSheets</code>. Chargement synchrone (pas de FOUC), et
+                    une seule feuille parsée, partageable telle quelle entre plusieurs shadow roots
+                    de votre application — le module n'est évalué qu'une fois, chaque import y
+                    compris depuis des fichiers différents pointe vers la même instance.
                 </p>
             </div>
 
             <section class="subsection">
-                <h4 class="subsection-title">Via <code>&lt;link&gt;</code> (universel)</h4>
-                <p>
-                    Un <code>&lt;link&gt;</code> classique, inséré dans votre shadow root plutôt
-                    qu'au niveau document. Fonctionne dans tous les navigateurs, un fetch/parse
-                    par instance de shadow root.
-                </p>
-                <pre><code class="language-js" set:text={codeLinkMethod} /></pre>
+                <h4 class="subsection-title">Via CDN <span class="badge">Recommandé</span></h4>
+                <pre><code class="language-html" set:text={codeAdoptedStyleSheetsCdn} /></pre>
             </section>
 
             <section class="subsection">
-                <h4 class="subsection-title">
-                    Via <code>adoptedStyleSheets</code> <span class="badge">Recommandé</span>
-                </h4>
-                <p>
-                    Ariane publie <code>@ariane-ui/core/themes/default.js</code>, un export du
-                    thème sous forme de <code>CSSStyleSheet</code> déjà construit
-                    (<code>defaultTheme</code>). Chargement synchrone (pas de FOUC), et une seule
-                    feuille parsée, partageable telle quelle entre plusieurs shadow roots de votre
-                    application via <code>shadow.adoptedStyleSheets</code> — le module n'est évalué
-                    qu'une fois, chaque import y compris depuis des fichiers différents pointe vers
-                    la même instance.
-                </p>
-                <pre><code class="language-js" set:text={codeAdoptedStyleSheets} /></pre>
-                <p class="hint">
-                    <code>default.js</code> ne contient que les règles <code>::part()</code>, pas
-                    les tokens — les tokens n'ont besoin d'aucune de ces deux méthodes (héritage
-                    CSS natif, cf. section précédente).
-                </p>
-                <div class="callout">
-                    <p class="callout-title">Compatibilité</p>
-                    <p>
-                        <code>CSSStyleSheet</code> constructible et
-                        <code>adoptedStyleSheets</code> sont supportés par tous les navigateurs
-                        majeurs actuels (Safari 16.4+, mars 2023). Sans cette contrainte, préférez
-                        la méthode <code>&lt;link&gt;</code> ci-dessus.
-                    </p>
-                </div>
+                <h4 class="subsection-title">Via npm <span class="badge badge-subtle">Avec bundler</span></h4>
+                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpm} /></pre>
             </section>
+
+            <p class="hint">
+                <code>default.js</code> ne contient que les règles <code>::part()</code>, pas les
+                tokens — les tokens n'ont besoin d'aucune de ces méthodes (héritage CSS natif, cf.
+                section précédente).
+            </p>
+
+            <ar-alert variant="info" class="doc-callout-alert">
+                <span slot="title">Compatibilité</span>
+                <span slot="content">
+                    <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
+                    sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
+                    2023).
+                </span>
+            </ar-alert>
         </section>
     </div>
 
