@@ -5,9 +5,11 @@ import TableOfContents from '../../components/TableOfContents.astro';
 const tocEntries = [
     { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',    level: 1 as const },
     { id: 'charger-le-theme', label: 'Charger le thème dans votre shadow root', level: 1 as const },
+    { id: 'votre-theme',      label: 'Construire votre propre thème',       level: 2 as const },
 ];
 
-const codeAdoptedStyleSheetsCdn = `<script type="module">
+const codeAdoptedStyleSheetsCdn = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
+<script type="module">
 import { defaultTheme } from 'https://unpkg.com/@ariane-ui/core/themes/default.js';
 
 class MonApp extends HTMLElement {
@@ -18,9 +20,10 @@ class MonApp extends HTMLElement {
     }
 }
 customElements.define('mon-app', MonApp);
-</script>`;
+</scr` + `ipt>`;
 
-const codeAdoptedStyleSheetsNpm = `import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+const codeAdoptedStyleSheetsNpm = `import '@ariane-ui/core'; // enregistre les composants — fichier distinct du thème
+import { defaultTheme } from '@ariane-ui/core/themes/default.js';
 
 class MonApp extends HTMLElement {
     connectedCallback() {
@@ -30,6 +33,13 @@ class MonApp extends HTMLElement {
     }
 }
 customElements.define('mon-app', MonApp);`;
+
+const codeCustomTheme = `const monTheme = new CSSStyleSheet();
+monTheme.replaceSync(\`
+    ar-datepicker::part(panel) { border-radius: 1rem; }
+\`);
+
+shadow.adoptedStyleSheets = [monTheme];`;
 ---
 
 <Layout
@@ -72,13 +82,21 @@ customElements.define('mon-app', MonApp);`;
             <div>
                 <h3 class="section-title">Charger le thème dans votre shadow root</h3>
                 <p>
-                    Ariane publie <code>@ariane-ui/core/themes/default.js</code>, un export du
-                    thème sous forme de <code>CSSStyleSheet</code> déjà construit
-                    (<code>defaultTheme</code>), à adopter directement dans votre shadow root via
-                    <code>shadow.adoptedStyleSheets</code>. Chargement synchrone (pas de FOUC), et
-                    une seule feuille parsée, partageable telle quelle entre plusieurs shadow roots
-                    de votre application — le module n'est évalué qu'une fois, chaque import y
-                    compris depuis des fichiers différents pointe vers la même instance.
+                    N'importe quelle feuille CSS peut devenir un <code>CSSStyleSheet</code>
+                    adoptable, à assigner directement à <code>shadow.adoptedStyleSheets</code> :
+                    chargement synchrone (pas de FOUC), et une seule feuille parsée, partageable
+                    telle quelle entre plusieurs shadow roots de votre application.
+                </p>
+                <p>
+                    Ariane publie son propre thème packagé ainsi —
+                    <code>@ariane-ui/core/themes/default.js</code> exporte <code>defaultTheme</code>,
+                    prêt à l'emploi. Les exemples ci-dessous l'utilisent pour illustrer la
+                    technique, mais l'objectif est que vous puissiez faire de même avec
+                    <strong>votre propre thème</strong> (voir <a href="#votre-theme">plus bas</a>).
+                    Notez aussi que le thème est un fichier distinct des composants eux-mêmes —
+                    <code>ar-datepicker</code> doit être enregistré séparément (autoloader, bundle,
+                    ou <code>import '@ariane-ui/core'</code>), comme dans le
+                    <a href="/getting-started/quickstart">Démarrage rapide</a>.
                 </p>
             </div>
 
@@ -106,6 +124,16 @@ customElements.define('mon-app', MonApp);`;
                     2023).
                 </span>
             </ar-alert>
+
+            <section id="votre-theme" class="subsection">
+                <h4 class="subsection-title">Construire votre propre thème</h4>
+                <p>
+                    <code>defaultTheme</code> n'a rien de spécial — c'est le même
+                    <code>CSSStyleSheet</code> constructible que vous pouvez créer avec votre
+                    propre CSS :
+                </p>
+                <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
+            </section>
         </section>
     </div>
 
