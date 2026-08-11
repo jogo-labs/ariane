@@ -87,8 +87,21 @@ pré-upgrade non définie.
 
 **Docs** (`apps/docs/src/content/components/ar-stepper.mdx`) :
 
-- Section "Utilisation" à vérifier/enrichir avec le nouvel event `ar-stepper-step-changed` et sa
-  relation avec l'annonce a11y.
+- Sous-section "Écouter le changement d'étape" réécrite dans le style désormais adopté sur
+  `ar-pagination.mdx` (deux phrases directes + un seul exemple de code, pas de reformulation
+  supplémentaire pour `-changed` — la table "Référence API" documente déjà l'annulabilité et le
+  détail des deux events) :
+    ```js
+    document.addEventListener('ar-stepper-step-change', (e) => {
+        /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+        e.target.currentPath = e.detail.path;
+    });
+    ```
+    Les autres sous-sections ("Mode `create` vs `edit`", "`follow-scroll`", "Navigation
+    programmatique") restent inchangées — non affectées par ce chantier.
+- Champ `pageScript` ajouté au frontmatter (mécanisme déjà générique, livré avec #161 — aucune
+  modification de schema/template nécessaire), avec le même snippet que ci-dessus, pour garder
+  les démos live des variantes interactives. Referme le point "hors scope" identifié plus bas.
 
 **Tests** (`stepper.test.ts`, `stepper.browser.test.ts`, `stepper.a11y.test.ts`) :
 
@@ -100,9 +113,10 @@ pré-upgrade non définie.
 
 ## Hors scope
 
-- Démos live de `ar-stepper.mdx` non câblées (pas d'équivalent `pageScript`) — trou similaire à
-  celui identifié et corrigé sur `ar-pagination.mdx`, mentionné dans l'issue #174 mais traité
-  séparément si besoin.
 - Retouche du mécanisme `_pendingFocusPath` lui-même (structure arbre/desktop-mobile) — il
   fonctionne déjà correctement, seul son point de déclenchement est regroupé avec les deux autres
   conséquences de la confirmation.
+
+**Mise à jour** : le point "démos live non câblées" initialement listé ici est finalement traité
+dans ce chantier (cf. section Docs ci-dessus) — le mécanisme `pageScript` livré avec #161 est déjà
+générique, aucune raison de le reporter.
