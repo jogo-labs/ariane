@@ -53,7 +53,13 @@ export interface ArPaginationPageChangeDetail {
  * @cssprop --ar-pagination-btn-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
- * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis à chaque changement de page. Contient `from` et `to`.
+ * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
+ *   changement de page, à chaque interaction (clic page, précédent, suivant, sélection dans le
+ *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
+ *   change pas. Contient `from` et `to`. @cancelable
+ * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
+ *   `current` a réellement changé (réassignation externe suite à la confirmation du
+ *   consommateur, ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
  */
 export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
@@ -88,6 +94,15 @@ export class ArPagination extends LitElement {
     // `_recalculateBudget`) plutôt que d'être remis à 0, sous peine de bloquer définitivement le
     // composant en palier texte (plus aucune mesure exploitable pour recalculer `_budget`).
     private _needsRemeasure = false;
+    // Distingue le tout premier cycle updated() (où `current` "change" par rapport à sa
+    // valeur pré-upgrade non définie) des transitions réelles ultérieures — sans ce flag,
+    // ar-pagination-page-changed/l'annonce/le focus se déclencheraient au montage initial.
+    private _hasRenderedOnce = false;
+    // Cible du transfert de focus après confirmation — posé uniquement par _onPageChange
+    // (clic sur un numéro de page), jamais par prev/next/select : reproduit le
+    // comportement d'avant #161, où seul ce chemin déplaçait le focus. Consommé au
+    // prochain updated() si current le confirme, sinon expire (fenêtre d'un seul cycle).
+    private _pendingFocusPage: number | undefined;
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -196,6 +211,19 @@ export class ArPagination extends LitElement {
             const value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
             if (select.value !== value) select.value = value;
         }
+        if (this._hasRenderedOnce && changed.has('current')) {
+            const from = changed.get('current') as number;
+            const to = this.current;
+            if (from !== to) {
+                this._emitChanged({ from, to });
+                this._announcePageChange();
+                if (this.current === this._pendingFocusPage) {
+                    void focusAfterUpdate(this, '[part~="current"]');
+                }
+            }
+        }
+        this._hasRenderedOnce = true;
+        this._pendingFocusPage = undefined;
     }
 
     private _defaultPrevIcon(): TemplateResult {
@@ -377,26 +405,22 @@ export class ArPagination extends LitElement {
         const select = event.target as HTMLSelectElement;
         const page = parseInt(select.value, 10);
         if (Number.isNaN(page) || page === this.current) return;
-        const from = this.current;
-        this.current = page;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        if (!this._requestPageChange(page)) {
+            // Annulé : le <select> a déjà muté nativement sa .value avant que ce handler ne
+            // s'exécute. Puisque current ne change pas, aucun cycle de rendu ne
+            // redéclenchera le sync existant dans updated() — revert explicite nécessaire ici.
+            select.value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
+        }
     }
 
     private _onPreviousPage(): void {
         if (this.current <= 1) return;
-        const from = this.current;
-        this.current = this.current - 1;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        this._requestPageChange(this.current - 1);
     }
 
     private _onNextPage(): void {
         if (this.current >= this.total) return;
-        const from = this.current;
-        this.current = this.current + 1;
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
+        this._requestPageChange(this.current + 1);
     }
 
     private _onPageChange(event: MouseEvent): void {
@@ -405,16 +429,33 @@ export class ArPagination extends LitElement {
         );
         const page = link?.dataset['arPaginationPage'];
         if (!link || !page) return;
-        const from = this.current;
-        this.current = parseInt(page);
-        this._emit({ from, to: this.current });
-        this._announcePageChange();
-        void focusAfterUpdate(this, '[part~="current"]');
+        const to = parseInt(page);
+        this._pendingFocusPage = to;
+        this._requestPageChange(to);
     }
 
-    private _emit(detail: ArPaginationPageChangeDetail): void {
-        this.dispatchEvent(
+    /**
+     * Dispatch l'intention de changement de page, sans muter `current` : c'est au
+     * consommateur de le réassigner en réponse à cet event pour que le changement
+     * prenne effet (modèle contrôlé, cf. ar-stepper.currentPath).
+     * @returns `false` si `preventDefault()` a été appelé sur l'event (valeur native de
+     *   `dispatchEvent` pour un event cancelable).
+     */
+    private _requestPageChange(to: number): boolean {
+        const from = this.current;
+        return this.dispatchEvent(
             new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-change', {
+                bubbles: true,
+                composed: true,
+                cancelable: true,
+                detail: { from, to },
+            }),
+        );
+    }
+
+    private _emitChanged(detail: ArPaginationPageChangeDetail): void {
+        this.dispatchEvent(
+            new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-changed', {
                 bubbles: true,
                 composed: true,
                 detail,

@@ -51,6 +51,10 @@ const components = defineCollection({
         variants: z.preprocess((val) => (Array.isArray(val) ? val : []), z.array(variantSchema)),
         /** Tokens d'autres composants applicables ici (composant imbriqué en interne) */
         relatedTokens: z.array(relatedTokensSchema).optional(),
+        /** Script injecté une fois en fin de page, hors des variantes — pour du JS de démo
+         *  page-level (ex. écouter un event et simuler la réaction attendue du consommateur)
+         *  sans le rattacher artificiellement à une variante précise. */
+        pageScript: z.string().optional(),
     }),
 });
 

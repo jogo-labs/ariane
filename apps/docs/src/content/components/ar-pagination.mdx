@@ -23,6 +23,13 @@ variants:
       description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
+pageScript: |
+    <script>
+        document.addEventListener('ar-pagination-page-change', (e) => {
+            /* Mettez à jour le contenu de la page, puis la page active du composant */
+            e.target.current = e.detail.to;
+        });
+    </script>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -52,6 +59,10 @@ import WcagRef from '../../components/WcagRef.astro';
   management) pour que l'utilisateur clavier sache que la page a changé.
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
+- **`current` ne change que si vous le réassignez.** Le focus et l'annonce aria-live suivent
+  cette réassignation — mettez `current` à jour de façon synchrone (ou quasi-synchrone) dans le
+  handler de `ar-pagination-page-change` pour qu'ils restent cohérents avec l'action de
+  l'utilisateur.
 
 ## Comportement responsive
 
@@ -61,14 +72,12 @@ peuplé du même jeu de pages qu'à largeur confortable.
 
 ## Utilisation
 
-### Écouter le changement de page
-
-`ar-pagination` émet `ar-pagination-page-change` à chaque changement de page (clic sur une page, précédent/suivant), avec `detail: { from, to }` :
+Lorsque l'utilisateur souhaite changer de page, un événement `ar-pagination-page-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `current` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'état du composant de pagination.
 
 ```js
-document.querySelector('ar-pagination').addEventListener('ar-pagination-page-change', (e) => {
-    const { from, to } = e.detail;
-    console.log(`Page ${from} → ${to}`);
-    // Charger les données de la page `to`, puis mettre à jour `current` / `total` si besoin.
+document.addEventListener('ar-pagination-page-change', (e) => {
+    /* Mettez à jour le contenu de la page, puis la page active du composant */
+    e.target.current = e.detail.to;
 });
 ```
