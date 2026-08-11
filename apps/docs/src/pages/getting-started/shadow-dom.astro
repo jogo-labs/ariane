@@ -1,0 +1,136 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'pourquoi',         label: 'Pourquoi ::part() ne traverse pas',    level: 1 as const },
+    { id: 'charger-le-theme', label: 'Charger le thème dans votre shadow root', level: 1 as const },
+];
+
+const codeLinkMethod = `class MonApp extends HTMLElement {
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/@ariane-ui/core/themes/default.css';
+
+        shadow.append(link, document.createElement('ar-datepicker'));
+    }
+}
+customElements.define('mon-app', MonApp);`;
+
+const codeAdoptedStyleSheets = `import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+
+class MonApp extends HTMLElement {
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.adoptedStyleSheets = [defaultTheme];
+        shadow.append(document.createElement('ar-datepicker'));
+    }
+}
+customElements.define('mon-app', MonApp);`;
+---
+
+<Layout
+    title="Ariane dans un shadow DOM applicatif"
+    currentPath="/getting-started/shadow-dom"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Ariane dans un shadow DOM applicatif</h2>
+            <p class="summary">
+                Ce guide s'applique si votre application encapsule sa propre page ou une partie de
+                son contenu dans un <em>web component</em> avec son propre shadow DOM, et y
+                instancie des composants Ariane à l'intérieur. C'est un cas différent de
+                l'imbrication interne à la librairie (un composant Ariane qui en instancie un
+                autre dans son propre shadow root) — ici c'est votre propre frontière shadow DOM,
+                pas celle d'Ariane.
+            </p>
+        </div>
+
+        <section id="pourquoi" class="main-section">
+            <div>
+                <h3 class="section-title">Pourquoi <code>::part()</code> ne traverse pas la frontière</h3>
+                <p>
+                    Les <strong>tokens</strong> (CSS Custom Properties, <code>--ar-*</code>)
+                    continuent de fonctionner sans rien faire : les custom properties héritent
+                    naturellement à travers les frontières de shadow DOM, y compris la vôtre.
+                </p>
+                <p>
+                    <strong><code>::part()</code></strong> en revanche ne peut pas atteindre les
+                    composants Ariane depuis <code>default.css</code> chargé au niveau du document
+                    : votre shadow root est une frontière que vous avez créée, et
+                    <code>default.css</code> chargé au niveau document ne partage plus le même
+                    arbre DOM que les composants Ariane qu'il cible à l'intérieur de votre shadow
+                    root. C'est le fonctionnement standard du Shadow DOM — qui crée une frontière
+                    est responsable d'y importer ce dont il a besoin, ce n'est pas une lacune
+                    d'Ariane à corriger.
+                </p>
+            </div>
+        </section>
+
+        <section id="charger-le-theme" class="main-section">
+            <div>
+                <h3 class="section-title">Charger le thème dans votre shadow root</h3>
+                <p>
+                    Deux méthodes équivalentes en résultat visuel — chargez le thème
+                    <em>dans</em> votre shadow root plutôt qu'au niveau document.
+                </p>
+            </div>
+
+            <section class="subsection">
+                <h4 class="subsection-title">Via <code>&lt;link&gt;</code> (universel)</h4>
+                <p>
+                    Un <code>&lt;link&gt;</code> classique, inséré dans votre shadow root plutôt
+                    qu'au niveau document. Fonctionne dans tous les navigateurs, un fetch/parse
+                    par instance de shadow root.
+                </p>
+                <pre><code class="language-js" set:text={codeLinkMethod} /></pre>
+            </section>
+
+            <section class="subsection">
+                <h4 class="subsection-title">
+                    Via <code>adoptedStyleSheets</code> <span class="badge">Recommandé</span>
+                </h4>
+                <p>
+                    Ariane publie <code>@ariane-ui/core/themes/default.js</code>, un export du
+                    thème sous forme de <code>CSSStyleSheet</code> déjà construit
+                    (<code>defaultTheme</code>). Chargement synchrone (pas de FOUC), et une seule
+                    feuille parsée, partageable telle quelle entre plusieurs shadow roots de votre
+                    application via <code>shadow.adoptedStyleSheets</code> — le module n'est évalué
+                    qu'une fois, chaque import y compris depuis des fichiers différents pointe vers
+                    la même instance.
+                </p>
+                <pre><code class="language-js" set:text={codeAdoptedStyleSheets} /></pre>
+                <p class="hint">
+                    <code>default.js</code> ne contient que les règles <code>::part()</code>, pas
+                    les tokens — les tokens n'ont besoin d'aucune de ces deux méthodes (héritage
+                    CSS natif, cf. section précédente).
+                </p>
+                <div class="callout">
+                    <p class="callout-title">Compatibilité</p>
+                    <p>
+                        <code>CSSStyleSheet</code> constructible et
+                        <code>adoptedStyleSheets</code> sont supportés par tous les navigateurs
+                        majeurs actuels (Safari 16.4+, mars 2023). Sans cette contrainte, préférez
+                        la méthode <code>&lt;link&gt;</code> ci-dessus.
+                    </p>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+
+    .hint {
+        font-size: 0.875rem;
+        color: var(--doc-text-muted);
+        margin-top: -0.5rem;
+    }
+</style>
