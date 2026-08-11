@@ -72,9 +72,8 @@ peuplé du même jeu de pages qu'à largeur confortable.
 
 ## Utilisation
 
-`current` est piloté depuis l'extérieur : `ar-pagination` émet `ar-pagination-page-change`
-(annulable) avant chaque changement, puis `ar-pagination-page-changed` une fois `current`
-effectivement mis à jour. `detail` contient `{ from, to }` dans les deux cas.
+Lorsque l'utilisateur souhaite changer de page, un événement `ar-pagination-page-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `current` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'état du composant de pagination.
 
 ```js
 document.addEventListener('ar-pagination-page-change', (e) => {
