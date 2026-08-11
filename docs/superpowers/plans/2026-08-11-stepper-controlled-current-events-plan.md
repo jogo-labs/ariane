@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `ar-stepper-step-change` devient annulable et n'annonce plus rien immédiatement au clic ; un nouvel event `ar-stepper-step-changed` (non-cancelable) et l'annonce aria-live ne se déclenchent que quand `currentPath` a réellement transitionné — le mécanisme de focus existant (`_pendingFocusPath`) est conservé tel quel mais regroupé dans le même point d'entrée.
+**Goal:** `ar-stepper-step-change` devient annulable et n'annonce plus rien immédiatement au clic ; un nouvel event `ar-stepper-step-changed` (non-cancelable) et l'annonce aria-live ne se déclenchent que quand `currentPath` a réellement transitionné — le mécanisme de focus existant (`_pendingFocusPath`) est conservé tel quel mais regroupé dans le même point d'entrée. Le détail des deux events passe de `{ path }` à `{ from, to }`, aligné sur `ar-pagination`.
 
 **Architecture:** Miroir du pattern livré sur `ar-pagination` (#161, PR #173), adapté à un composant déjà partiellement contrôlé : `currentPath` ne bougeait déjà jamais tout seul (sauf `follow-scroll`), et le focus était déjà gardé par confirmation. Seule l'annonce a11y était prématurée — elle rejoint le focus dans un unique bloc `updated()` guardé par confirmation réelle (`this.hasUpdated` natif de Lit + `changed.has('currentPath')` + `from !== to`).
 
@@ -19,6 +19,8 @@
 - Le marqueur `@cancelable` dans le JSDoc `@event` doit être le tout dernier token de la
   description (regex end-anchored côté doc, `apps/docs/src/utils/events.ts`) — piège déjà
   rencontré et corrigé sur #161, à ne pas reproduire.
+- Détail des deux events : `{ from: string; to: string }` (pas `{ path }`) — décision revue en
+  cours de brainstorming, alignée sur `ar-pagination`.
 
 ---
 
@@ -37,18 +39,20 @@ git checkout -b fix/174-stepper-step-events
 
 ---
 
-### Task 2: `ar-stepper-step-change` cancelable, `ar-stepper-step-changed`, annonce/focus regroupés
+### Task 2: `ar-stepper-step-change` cancelable, `ar-stepper-step-changed`, détail `{ from, to }`, annonce/focus regroupés
 
 **Files:**
 
-- Modify: `packages/core/src/components/stepper/stepper.ts:84` (JSDoc `@event`), `:240-264`
-  (`updated()`), `:458-491` (`onClickLink`)
+- Modify: `packages/core/src/components/stepper/stepper.ts:26-29` (interface
+  `ArStepperStepChangeDetail`), `:84` (JSDoc `@event`), `:240-264` (`updated()`), `:458-491`
+  (`onClickLink`)
 - Test: `packages/core/src/components/stepper/stepper.test.ts` (describes `événements`,
   `annonces a11y`, nouveau describe `événement ar-stepper-step-changed`)
 
 **Interfaces:**
 
-- Consumes: `ArStepperStepChangeDetail` (déjà défini, `stepper.ts:26-29`, `{ path: string }`).
+- Consumes/Produces (redéfini dans cette task) : `ArStepperStepChangeDetail` devient
+  `{ from: string; to: string }` (au lieu de `{ path: string }`).
 - Produces: `private _emitChanged(detail: ArStepperStepChangeDetail): void` — dispatch
   `ar-stepper-step-changed` (non-cancelable). Rien d'autre dans ce plan n'en dépend.
 
@@ -59,10 +63,31 @@ Dans `packages/core/src/components/stepper/stepper.test.ts` :
 1. Ajouter `import type { ArStepperStepChangeDetail } from './stepper.js';` en haut du fichier,
    à côté de `import type { ArStepper } from './stepper.js';`.
 
-2. Dans le describe `événements` (lignes 243-285), ajouter ces deux tests à la fin, avant
-   l'accolade fermante du describe :
+2. Dans le describe `événements` (lignes 243-285), remplacer le premier test (`'émet
+ar-stepper-step-change au clic sur un lien'`, lignes 244-264) par :
 
 ```typescript
+it('émet ar-stepper-step-change au clic sur un lien, avec { from, to }', async () => {
+    const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+    const handler = vi.fn();
+    el.addEventListener('ar-stepper-step-change', handler);
+
+    const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+    link.click();
+
+    expect(handler).toHaveBeenCalledOnce();
+    const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
+    expect(event.detail).toEqual({ from: '/b', to: '/a' });
+
+    el.removeEventListener('ar-stepper-step-change', handler);
+});
+
 it('ar-stepper-step-change est cancelable', async () => {
     const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
@@ -103,6 +128,9 @@ it('preventDefault() sur ar-stepper-step-change bloque toute suite : currentPath
 });
 ```
 
+Le second test du describe (`"n'émet plus step-changed (nom court) au clic"`, lignes 266-284)
+reste inchangé.
+
 3. Ajouter un nouveau describe juste après le describe `événements` (avant le describe
    `navigation — preventDefault sur les liens sans href réel`) :
 
@@ -125,7 +153,7 @@ describe('événement ar-stepper-step-changed', () => {
         expect(handler).not.toHaveBeenCalled();
     });
 
-    it('est émis avec { path }, non cancelable, quand currentPath change (réassignation externe)', async () => {
+    it('est émis avec { from, to }, non cancelable, quand currentPath change (réassignation externe)', async () => {
         const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -141,7 +169,7 @@ describe('événement ar-stepper-step-changed', () => {
         expect(handler).toHaveBeenCalledOnce();
         const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
         expect(event.cancelable).toBe(false);
-        expect(event.detail).toEqual({ path: '/a' });
+        expect(event.detail).toEqual({ from: '/b', to: '/a' });
     });
 
     it("n'est pas émis au premier rendu", async () => {
@@ -204,7 +232,7 @@ describe('annonces a11y', () => {
                 </ar-stepper>
             `);
         el.addEventListener('ar-stepper-step-change', (e) => {
-            el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.path;
+            el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
         });
 
         const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
@@ -233,7 +261,7 @@ describe('annonces a11y', () => {
                 </ar-stepper>
             `);
         el.addEventListener('ar-stepper-step-change', (e) => {
-            el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.path;
+            el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
         });
 
         const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
@@ -249,8 +277,8 @@ describe('annonces a11y', () => {
 
 Ne pas toucher au describe `focus après activation d'un lien` (lignes 367-474) : ses 5 tests
 confirment déjà `currentPath` explicitement avant d'asserter le focus (pattern déjà aligné sur le
-nouveau modèle) — ils doivent continuer à passer sans modification une fois l'implémentation
-faite (Step 4 vérifie ça).
+nouveau modèle), et aucun n'inspecte la forme du `detail` — ils doivent continuer à passer sans
+modification une fois l'implémentation faite (Step 4 vérifie ça).
 
 - [ ] **Step 2: Lancer les tests, vérifier qu'ils échouent contre le code actuel**
 
@@ -259,13 +287,36 @@ cd /Users/jon/Code/Active_projects/ariane
 npx vitest run packages/core/src/components/stepper/stepper.test.ts
 ```
 
-Expected : échecs sur `event.cancelable` (event actuel non cancelable), sur `preventDefault()`
-sans effet, sur `ar-stepper-step-changed` jamais émis, sur les annonces qui se déclenchent
-encore immédiatement au clic au lieu d'attendre confirmation.
+Expected : échecs sur la forme du `detail` (`{ path }` au lieu de `{ from, to }`), sur
+`event.cancelable` (event actuel non cancelable), sur `preventDefault()` sans effet, sur
+`ar-stepper-step-changed` jamais émis, sur les annonces qui se déclenchent encore immédiatement
+au clic au lieu d'attendre confirmation.
 
 - [ ] **Step 3: Implémenter dans `stepper.ts`**
 
-3a. Remplacer le bloc de fin de `updated()` (lignes 258-263) :
+3a. Remplacer l'interface (lignes 25-29) :
+
+```typescript
+/** Détail de l'événement émis lors d'un changement d'étape */
+export interface ArStepperStepChangeDetail {
+    /** Chemin (`href`) de l'étape sélectionnée */
+    path: string;
+}
+```
+
+par :
+
+```typescript
+/** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
+export interface ArStepperStepChangeDetail {
+    /** Chemin de l'étape courante avant la transition */
+    from: string;
+    /** Chemin de l'étape cible (demandée sur `-change`, confirmée sur `-changed`) */
+    to: string;
+}
+```
+
+3b. Remplacer le bloc de fin de `updated()` (lignes 258-263) :
 
 ```typescript
 if (changed.has('currentPath') && this.currentPath === this._pendingFocusPath) {
@@ -285,7 +336,7 @@ if (this.hasUpdated && changed.has('currentPath')) {
     const from = changed.get('currentPath') as string;
     const to = this.currentPath;
     if (from !== to) {
-        this._emitChanged({ path: to });
+        this._emitChanged({ from, to });
         announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
         if (to === this._pendingFocusPath) {
             this.shadowRoot?.querySelector<HTMLElement>(`[data-path="${to}"]`)?.focus();
@@ -299,7 +350,7 @@ Note : `this.hasUpdated` est déjà `false` pendant l'exécution de ce tout prem
 (Lit ne le passe à `true` qu'après ce cycle) — le guard fonctionne donc correctement dès le
 montage, sans champ privé supplémentaire à déclarer ni à réinitialiser.
 
-3b. Ajouter la méthode privée, par exemple juste après `getScrollTargets()` (avant la section
+3c. Ajouter la méthode privée, par exemple juste après `getScrollTargets()` (avant la section
 `// ── Events ──`, ligne 456) :
 
 ```typescript
@@ -314,7 +365,7 @@ montage, sans champ privé supplémentaire à déclarer ni à réinitialiser.
     }
 ```
 
-3c. Dans `onClickLink` (lignes 458-491), remplacer :
+3d. Dans `onClickLink` (lignes 458-491), remplacer :
 
 ```typescript
         const detail: ArStepperStepChangeDetail = { path };
@@ -337,7 +388,7 @@ montage, sans champ privé supplémentaire à déclarer ni à réinitialiser.
 par :
 
 ```typescript
-        const detail: ArStepperStepChangeDetail = { path };
+        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: path };
 
         const proceed = this.dispatchEvent(
             new CustomEvent('ar-stepper-step-change', {
@@ -360,7 +411,11 @@ par :
     };
 ```
 
-3d. Mettre à jour le JSDoc `@event` (ligne 84) — remplacer :
+Remarque : `from: this.currentPath` est lu **avant** le dispatch, donc reflète bien la valeur
+courante au moment du clic (pas altérée par le dispatch lui-même, puisque le composant ne mute
+jamais `currentPath` en interne).
+
+3e. Mettre à jour le JSDoc `@event` (ligne 84) — remplacer :
 
 ```typescript
  * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis au clic sur une étape.
@@ -369,12 +424,12 @@ par :
 par :
 
 ```typescript
- * @event {CustomEvent<{ path: string }>} ar-stepper-step-change - Émis avant le changement
- *   d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation, `currentPath`
- *   ne change pas. Contient `path`. @cancelable
- * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis quand `currentPath` a
- *   réellement changé (réassignation externe suite à la confirmation du consommateur, ou via
- *   `follow-scroll`). Non annulable. Contient `path`.
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-change - Émis avant le
+ *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
+ *   `currentPath` ne change pas. Contient `from` et `to`. @cancelable
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
+ *   `currentPath` a réellement changé (réassignation externe suite à la confirmation du
+ *   consommateur, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
 ```
 
 - [ ] **Step 4: Lancer les tests, vérifier qu'ils passent**
@@ -400,15 +455,30 @@ Expected: PASS.
 npm run test:browser --workspace=packages/core
 ```
 
-Expected: PASS — `stepper.browser.test.ts` écoute déjà `ar-stepper-step-change` et confirme
-`currentPath` avant d'asserter le focus (`stepper.browser.test.ts:128`), aucune modification de
-ce fichier n'est nécessaire.
+Expected: PASS. `stepper.browser.test.ts` écoute déjà `ar-stepper-step-change` et confirme
+`currentPath` avant d'asserter le focus, mais lit le detail via
+`(event as CustomEvent<{ path: string }>).detail.path` (ligne 126) — ce champ n'existe plus
+après ce changement. **Avant de lancer ce Step**, corriger
+`packages/core/src/components/stepper/stepper.browser.test.ts:126` : remplacer
+
+```typescript
+el.currentPath = (event as CustomEvent<{ path: string }>).detail.path;
+```
+
+par
+
+```typescript
+el.currentPath = (event as CustomEvent<{ from: string; to: string }>).detail.to;
+```
+
+Seule ligne de ce fichier à toucher, le reste de la logique (écoute + réassignation de
+`currentPath`) reste identique. Ajouter cette correction au commit de cette task.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add packages/core/src/components/stepper/stepper.ts packages/core/src/components/stepper/stepper.test.ts
-git commit -m "fix(stepper): step-change annulable, ajoute step-changed, annonce apres confirmation (#174)"
+git add packages/core/src/components/stepper/stepper.ts packages/core/src/components/stepper/stepper.test.ts packages/core/src/components/stepper/stepper.browser.test.ts
+git commit -m "fix(stepper): step-change annulable, ajoute step-changed avec detail {from,to} (#174)"
 ```
 
 ---
@@ -426,17 +496,15 @@ Remplacer les lignes 116-124 par :
 ````mdx
 ### Écouter le changement d'étape
 
-Lorsque l'utilisateur souhaite changer d'étape, un événement `ar-stepper-step-change` est émis avec `{ path }` dans `event.detail`.
-Mettez à jour la propriété `currentPath` du composant avec `event.detail.path` une fois le nouveau contenu chargé pour synchroniser l'étape active du stepper.
+Lorsque l'utilisateur souhaite changer d'étape, un événement `ar-stepper-step-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `currentPath` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'étape active du stepper.
 
 ```js
 document.addEventListener('ar-stepper-step-change', (e) => {
     /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
-    e.target.currentPath = e.detail.path;
+    e.target.currentPath = e.detail.to;
 });
 ```
-````
-
 ````
 
 Les sous-sections suivantes ("Mode `create` vs `edit`", `follow-scroll`, "Navigation
@@ -452,10 +520,10 @@ pageScript: |
     <script>
         document.addEventListener('ar-stepper-step-change', (e) => {
             /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
-            e.target.currentPath = e.detail.path;
+            e.target.currentPath = e.detail.to;
         });
     </script>
-````
+```
 
 Aucune modification de schema/template nécessaire — le champ `pageScript` existe déjà
 (`apps/docs/src/content.config.ts`, `apps/docs/src/pages/components/[slug].astro`), livré avec
@@ -489,7 +557,7 @@ un redémarrage complet, pas seulement un rafraîchissement navigateur).
 
 ```bash
 git add apps/docs/src/content/components/ar-stepper.mdx
-git commit -m "docs(stepper): documente step-changed, aligne le style Utilisation, ajoute pageScript (#174)"
+git commit -m "docs(stepper): documente step-changed {from,to}, aligne le style Utilisation, ajoute pageScript (#174)"
 ```
 
 ---
@@ -529,12 +597,13 @@ Expected: PASS.
 
 ```bash
 git push -u origin fix/174-stepper-step-events
-gh pr create --base dev --title "fix(stepper): step-change annulable, ajoute step-changed (#174)" --body "$(cat <<'EOF'
+gh pr create --base dev --title "fix(stepper): step-change annulable, ajoute step-changed avec detail {from,to} (#174)" --body "$(cat <<'EOF'
 ## Résumé
 
 - `ar-stepper-step-change` devient annulable (`preventDefault()` bloque la navigation).
 - Nouvel event `ar-stepper-step-changed` (non-cancelable), émis quand `currentPath` a réellement transitionné (confirmation externe ou `follow-scroll`).
-- L'annonce aria-live est déplacée du clic vers cette confirmation réelle — le stepper ne "ment" plus sur l'état affiché pendant un chargement async qui échouerait.
+- Le détail des deux events passe de `{ path }` à `{ from, to }`, aligné sur `ar-pagination` — `ar-stepper` est fondamentalement un système de navigation comme `ar-pagination`, avec des pages nommées plutôt que numérotées.
+- L'annonce aria-live est déplacée du clic vers la confirmation réelle — le stepper ne "ment" plus sur l'état affiché pendant un chargement async qui échouerait.
 - Le mécanisme de focus (`_pendingFocusPath`) est inchangé fonctionnellement, juste regroupé au même point d'entrée.
 - Doc alignée sur le style adopté pour `ar-pagination` ; démos live câblées via le champ `pageScript` existant (#161).
 - Breaking change (package alpha, pas de dépréciation) — closes #174.
@@ -559,18 +628,23 @@ EOF
 
 1. `ar-stepper-step-change` cancelable → Task 2.
 2. `ar-stepper-step-changed`, annonce déplacée et résolue à la confirmation → Task 2.
-3. `_pendingFocusPath` conservé, regroupé dans le même bloc → Task 2 (Step 3a).
-4. `_pendingFocusPath` vidé si annulé → Task 2 (Step 3c).
-5. Guard premier rendu → Task 2 (Step 3a), via `this.hasUpdated` natif de Lit (pas de champ
+3. `_pendingFocusPath` conservé, regroupé dans le même bloc → Task 2 (Step 3b).
+4. `_pendingFocusPath` vidé si annulé → Task 2 (Step 3d).
+5. Guard premier rendu → Task 2 (Step 3b), via `this.hasUpdated` natif de Lit (pas de champ
    privé à ajouter — vérifié via la doc Lit officielle : `false` pendant tout le premier cycle
    `updated()`/`firstUpdated()`, `true` à partir du suivant).
-6. Docs : style Utilisation aligné + `pageScript` → Task 3.
+6. Détail `{ from, to }` (revu en cours de brainstorming) → Task 2 (Step 3a, 3d, 3e), Task 3
+   (Steps 1-2, exemples de doc).
+7. Docs : style Utilisation aligné + `pageScript` → Task 3.
 
-**Cohérence des types/signatures** : `ArStepperStepChangeDetail { path }` réutilisé identique
-partout. `_emitChanged(detail: ArStepperStepChangeDetail): void` défini et utilisé uniquement en
-Task 2. Pas de référence à un nom non défini dans une task antérieure.
+**Cohérence des types/signatures** : `ArStepperStepChangeDetail { from: string; to: string }`
+réutilisé identique partout (interface, les deux dispatches, JSDoc, tests, doc). `_emitChanged
+(detail: ArStepperStepChangeDetail): void` défini et utilisé uniquement en Task 2. Pas de
+référence résiduelle à `.detail.path` — vérifié dans `stepper.test.ts` (Step 1 de la Task 2) et
+`stepper.browser.test.ts` (Step 6 de la Task 2, seul autre fichier qui lisait ce champ).
 
 **Pas de régression sur le describe `focus après activation d'un lien`** : vérifié
 manuellement contre les 5 tests existants (lignes 367-474 du fichier avant modification) — tous
-confirment déjà `currentPath` explicitement avant d'asserter le focus, donc aucune modification
-requise et ils doivent continuer à passer tels quels (vérifié en Step 4 de la Task 2).
+confirment déjà `currentPath` explicitement avant d'asserter le focus et n'inspectent pas la
+forme du `detail`, donc aucune modification requise et ils doivent continuer à passer tels quels
+(vérifié en Step 4 de la Task 2).

@@ -20,17 +20,29 @@ chargement échoue, l'annonce a déjà eu lieu alors que le contenu réel n'a pa
 
 ## Décisions issues du brainstorming
 
-### 1. Deux événements, même détail `{ path }`
+### 1. Deux événements, détail aligné sur `ar-pagination` : `{ from, to }`
 
 - **`ar-stepper-step-change`** (devient `cancelable: true`, inchangé sinon) — dispatché au clic
-  depuis `onClickLink`, avant toute confirmation. `detail: { path }`.
+  depuis `onClickLink`, avant toute confirmation. `detail: { from, to }`.
 - **`ar-stepper-step-changed`** (nouveau, `cancelable: false`) — dispatché depuis `updated()`
   quand `currentPath` a réellement transitionné, quelle qu'en soit la source (réassignation
-  externe suite à confirmation, ou `follow-scroll`). `detail: { path }`.
+  externe suite à confirmation, ou `follow-scroll`). `detail: { from, to }`.
 
-Pas de renommage vers `{ from, to }` façon `ar-pagination` — `path` est déjà la terminologie
-établie de `ar-stepper` (propriété unique, pas de position numérique), pas de valeur ajoutée à
-aligner la forme du détail entre les deux composants.
+**Revu en cours de brainstorming** : `ArStepperStepChangeDetail` passe de `{ path: string }` à
+`{ from: string; to: string }` — décision initiale (garder `path`) revisée après discussion.
+`from`/`to` n'est pas réservé aux positions numériques ordonnées : c'est l'idiome standard pour
+décrire une transition d'état (routeurs, machines à états — `transition(from, event) → to`),
+sans notion d'ordre ni de distance requise — `ar-stepper` est fondamentalement un système de
+navigation comme `ar-pagination`, avec des "pages" nommées (`path`) plutôt que numérotées.
+`ar-pagination` a déjà établi le précédent "nom de champ de l'event ≠ nom de la propriété"
+(`event.detail.to` → assigné à `el.current`) ; faire pareil ici (`event.detail.to` →
+`el.currentPath`) suit ce pattern déjà en place, pas une nouvelle incohérence. `from` a aussi une
+utilité concrète (marquer l'étape précédente comme visitée, garde de navigation, analytics) que
+`path` seul n'exposait pas.
+
+Impact du renommage : `ArStepperStepChangeDetail` (interface), les deux dispatches
+(`onClickLink`/`updated()`), le JSDoc `@event`, les exemples de doc, et tous les tests qui
+lisent `.detail.path` (à remplacer par `.detail.to`, avec `.detail.from` disponible en plus).
 
 ### 2. Annonce a11y déplacée vers la confirmation, résolue à ce moment-là
 
@@ -88,7 +100,8 @@ fonctionnelle de le retoucher ici).
   effectuer le focus déjà prévu — guardé par `this.hasUpdated`.
 - JSDoc `@event` mis à jour (deux entrées, `@cancelable` sur la première — cf. régression trouvée
   en revue finale sur #161, à ne pas reproduire ici).
-- Nouvelle méthode privée `_emitChanged({ path })` (miroir de `_emitChanged` sur `ArPagination`).
+- Nouvelle méthode privée `_emitChanged({ from, to })` (miroir de `_emitChanged` sur
+  `ArPagination`).
 
 **Docs** (`apps/docs/src/content/components/ar-stepper.mdx`) :
 
@@ -99,7 +112,7 @@ fonctionnelle de le retoucher ici).
     ```js
     document.addEventListener('ar-stepper-step-change', (e) => {
         /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
-        e.target.currentPath = e.detail.path;
+        e.target.currentPath = e.detail.to;
     });
     ```
     Les autres sous-sections ("Mode `create` vs `edit`", "`follow-scroll`", "Navigation
