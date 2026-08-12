@@ -160,5 +160,18 @@ describe('ar-dialog — browser', () => {
             expect(document.activeElement).to.equal(trigger);
             trigger.remove();
         });
+
+        it('sans header (without-header) et sans contenu focalisable, le focus retombe sur le <dialog>', async () => {
+            el = await fixture(html`
+                <ar-dialog without-header label="Sans header">
+                    <p>Contenu non interactif.</p>
+                </ar-dialog>
+            `);
+            el.open = true;
+            await aTimeout(50);
+
+            const dialogEl = getDialogEl(el);
+            expect(el.shadowRoot?.activeElement).to.equal(dialogEl);
+        });
     });
 });
