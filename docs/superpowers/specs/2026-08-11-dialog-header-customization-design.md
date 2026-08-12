@@ -54,6 +54,26 @@ et le bouton close (donc juste avant lui dans l'ordre de tabulation). Alignement
 WebAwesome sur ce point précis (même nom de slot, même position) — ici la convergence est
 justifiée par un vrai besoin partagé, pas par mimétisme.
 
+**Amendement (2026-08-12, avant merge de la PR #179)** : décision initiale (pas de wrapper dédié,
+`<slot name="header-actions">` directement enfant flex de `header`) revue après revue manuelle de
+la PR. `<slot>` a `display: contents` par défaut (feuille de style UA du HTML Living Standard,
+vérifié empiriquement) — chaque nœud slotté devient donc un item flex indépendant de `header`,
+pas un groupe. Deux conséquences bloquantes pour le cas d'usage réel de #145 (actions dans un
+header de _drawer_, contexte mobile-first) :
+
+- Un `gap` posé sur `::part(header)` s'appliquerait uniformément entre tous les items (titre↔action,
+  action↔action, action↔close) — impossible d'espacer les actions entre elles sans aussi espacer
+  le titre et le close.
+- `flex-wrap` sur `header` ferait potentiellement passer le titre à la ligne en même temps que les
+  actions en cas de manque de place — pas isolable au groupe d'actions seul.
+
+**Nouvelle décision** : wrapper dédié `<div part="header-actions">` autour du `<slot
+name="header-actions">`, rendu conditionnellement (même pattern que le footer existant —
+`_slotController.test('header-actions')`, pas de boîte fantôme si le slot est vide). Le wrapper a
+son propre `display: flex` pour permettre un contrôle indépendant du `gap`/`flex-wrap` des actions,
+sans toucher au layout titre/close de `header`. `header-actions` (nom du slot) devient aussi le nom
+du `csspart` du wrapper — pas de collision, un seul concept exposé au consommateur.
+
 ### 2. Titre non visible (mais toujours nommé pour l'a11y)
 
 **Pas de nouvel attribut.** `part="title"` existe déjà sur le `h1` — le consommateur masque
@@ -136,21 +156,27 @@ enchaînement de `??` — quand `[data-ar-dismiss]` n'existe plus dans le shadow
 - Nouvelle propriété `@property({ reflect: true, type: Boolean, attribute: 'without-header' })
 withoutHeader = false;`.
 - `render()` : le bloc `<header>` devient conditionnel sur `!this.withoutHeader` (pattern miroir
-  du footer existant). Ajout du slot `header-actions` entre le titre et le bouton close, dans le
-  header. `aria-labelledby`/`aria-label` sur le `<dialog>` racine devient conditionnel sur
-  `this.withoutHeader`.
+  du footer existant). Ajout, entre le titre et le bouton close, d'un wrapper `<div
+part="header-actions">` contenant `<slot name="header-actions"></slot>`, rendu conditionnellement
+  sur `this._slotController.test('header-actions')` (même pattern que le footer — pas de boîte
+  vide si le slot n'a pas de contenu assigné). `aria-labelledby`/`aria-label` sur le `<dialog>`
+  racine devient conditionnel sur `this.withoutHeader`.
+- `_slotController` (`HasSlotController`) étend sa liste surveillée de `('footer', 'label')` à
+  `('footer', 'label', 'header-actions')`.
 - Nouvelle méthode privée `_warnIfNoCloseMechanism()` (ou extension de `_warnIfMissingLabel`),
   appelée depuis `updated()`, une seule fois (même pattern `_hasWarnedX` que l'existant).
 - Warning dev pour `slot="label"` fourni sans prop `label` en mode `without-header`.
-- JSDoc : nouveau `@slot header-actions`, nouveau `@csspart` si nécessaire (aucun a priori — pas
-  de wrapper dédié prévu pour `header-actions`, le slot s'insère directement dans `header`),
-  `@attr without-header` documenté avec la contrainte "label requis dans ce mode".
+- JSDoc : nouveau `@slot header-actions`, nouveau `@csspart header-actions` (le wrapper, absent du
+  DOM si le slot est vide ou si `without-header` est actif), `@attr without-header` documenté avec
+  la contrainte "label requis dans ce mode".
 
 **Styles** (`packages/core/src/components/dialog/dialog.styles.ts`) :
 
-- Positionnement du contenu du slot `header-actions` dans le `header` (`display: flex` déjà en
-  place sur `header` — le nouveau slot s'intègre dans le flow existant, entre le titre et
-  `[part='close']`).
+- `[part='header-actions']` : `display: flex; align-items: center;` — conteneur flex indépendant
+  pour permettre au thème de piloter `gap`/`flex-wrap` des actions sans affecter le layout
+  titre/close de `header`. Pas de valeur de `gap` imposée par défaut (cohérent avec l'absence de
+  gap sur `footer` aujourd'hui — le thème ou le consommateur reste libre de la définir via
+  `::part(header-actions)`).
 
 **Docs** (`apps/docs/src/content/components/ar-dialog.mdx`) :
 
@@ -165,7 +191,9 @@ withoutHeader = false;`.
 
 - `without-header` : header absent du DOM rendu, `aria-label` posé au lieu de `aria-labelledby`,
   slot `label` sans effet (warning émis si fourni sans prop `label`).
-- `header-actions` : slot rendu et positionné avant le bouton close.
+- `header-actions` : wrapper `part="header-actions"` absent du DOM sans contenu assigné, présent
+  et positionné avant le bouton close dès qu'un enfant `slot="header-actions"` est fourni,
+  disparaît dynamiquement si retiré (même trio de tests que le footer conditionnel existant).
 - Warning dev émis quand `without-header` + `closeOnBackdrop=false` + aucun élément
   dismiss/accept dans le contenu ; absent sinon (close-on-backdrop actif, ou élément dismiss
   présent).
