@@ -519,7 +519,7 @@ const showPlayground = displayMode === 'demo';
      * (ar-pagination, ResizeObserver) se retrouve donc contraint à la largeur de son
      * contenu au lieu de la largeur réelle du preview.
      */
-    .preview :global(ar-pagination) {
+    .preview > :global(ar-pagination) {
         flex: 1 1 100%;
     }
 </style>

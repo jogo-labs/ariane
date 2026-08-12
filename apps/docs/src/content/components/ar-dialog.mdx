@@ -48,19 +48,32 @@ variants:
           </ar-dialog>
     - name: header-actions
       label: Actions dans le header
-      description: Le slot header-actions place des actions additionnelles avant le bouton de fermeture (ex. bouton plein écran).
+      description: Le slot header-actions permet d'ajouter des actions additionnelles avant le bouton de fermeture (ex. bouton plein écran).
       html: |
           <button class="btn btn-primary" data-ar-dialog-open="demo-header-actions">Ouvrir</button>
           <ar-dialog id="demo-header-actions" label="Rapport mensuel">
-              <button slot="header-actions" aria-label="Plein écran" style="width:2rem;height:2rem;border:none;background:transparent;cursor:pointer;font-size:1rem;">⤢</button>
-              <p>Contenu du dialog, avec une action additionnelle dans le header.</p>
+              <button class="btn btn-secondary" slot="header-actions" aria-label="Passer en plein écran" style="font-size: 1.5rem">⤢</button>
+              <p style="margin: 0">Contenu du dialog, avec une action additionnelle dans le header.</p>
           </ar-dialog>
     - name: header-actions-advanced
-      label: Actions + pagination dans le header
-      description: Un seul enfant slotté dans header-actions peut porter son propre layout — ici des actions à gauche et une pagination compacte à droite, titre du drawer masqué visuellement (sr-only) au profit d'un titre visible dans le contenu.
+      label: Header avancé
+      description: Un seul enfant slotté dans header-actions peut porter son propre layout — ici des actions à gauche et une pagination compacte à droite, titre du drawer masqué visuellement (sr-only) au profit d'un titre secondaire visible dans le contenu.
       html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-header-advanced">Ouvrir le drawer</button>
+          <ar-dialog id="demo-header-advanced" class="demo-header-advanced" label="Titre accessible du volet" mode="drawer">
+              <div slot="header-actions" class="demo-header-advanced-actions">
+                  <div class="actions">
+                      <button class="btn btn-primary">Action 1</button>
+                      <button class="btn btn-secondary">Action 2</button>
+                  </div>
+                  <ar-pagination current="3" total="10"></ar-pagination>
+              </div>
+              <h2>Titre secondaire du volet</h2>
+              <p>Contenu du volet</p>
+          </ar-dialog>
           <style>
-              .demo-job-detail::part(title) {
+              /* Masquage accessible du titre */
+              .demo-header-advanced::part(title) {
                   position: absolute;
                   width: 1px;
                   height: 1px;
@@ -68,35 +81,23 @@ variants:
                   clip: rect(0, 0, 0, 0);
                   white-space: nowrap;
               }
-              .demo-job-actions {
+
+              /* Style minimal pour la layout de bloc d'actions */
+              .demo-header-advanced-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                gap: 0.5rem;
+
+                .actions {
                   display: flex;
-                  justify-content: space-between;
                   align-items: center;
-                  width: 100%;
-                  gap: 0.5rem;
-              }
-              .demo-job-actions .actions {
-                  display: flex;
-                  align-items: center;
-                  /* flex: 1 1 100% réclame l'espace en priorité sur la pagination (qui reste à
-                     sa taille de contenu par défaut) — garde ar-pagination en mode compact
-                     (select) sans dépendre d'une largeur en dur liée à son rendu interne. */
                   flex: 1 1 100%;
                   gap: 0.5rem;
+                }
               }
           </style>
-          <button class="btn btn-primary" data-ar-dialog-open="demo-job-detail">Voir une offre</button>
-          <ar-dialog id="demo-job-detail" class="demo-job-detail" label="Détail de l'offre n°1234" mode="drawer">
-              <div slot="header-actions" class="demo-job-actions">
-                  <div class="actions">
-                      <button class="btn btn-primary">Postuler</button>
-                      <button aria-label="Partager le lien" style="width:2rem;height:2rem;border:none;background:transparent;cursor:pointer;font-size:1rem;">🔗</button>
-                  </div>
-                  <ar-pagination current="3" total="50"></ar-pagination>
-              </div>
-              <h2>Développeur·se Frontend Senior</h2>
-              <p>Description de l'offre…</p>
-          </ar-dialog>
     - name: without-header
       label: Sans header
       description: without-header retire titre, actions et bouton de fermeture — label reste requis pour le nom accessible (aria-label). Prévoir un moyen de fermeture (ici close-on-backdrop).
