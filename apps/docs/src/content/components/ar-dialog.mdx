@@ -165,6 +165,14 @@ Le slot `header-actions` place des actions additionnelles entre le titre et le b
 </ar-dialog>
 ```
 
+Le conteneur des actions expose son propre `::part(header-actions)`, indépendant du layout titre/fermeture — utile pour définir un espacement entre plusieurs actions sans affecter le reste du header :
+
+```css
+ar-dialog::part(header-actions) {
+    gap: 0.5rem;
+}
+```
+
 Pour masquer visuellement le titre sans casser le nom accessible du dialog, masquez `::part(title)` avec la technique sr-only standard — pas `display: none` ni `visibility: hidden`, qui peuvent faire perdre le nom accessible calculé via `aria-labelledby` dans certains navigateurs :
 
 ```css

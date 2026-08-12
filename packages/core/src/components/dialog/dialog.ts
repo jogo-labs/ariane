@@ -58,6 +58,7 @@ if (typeof document !== 'undefined') {
  *
  * @csspart dialog - L'élément <dialog> racine.
  * @csspart header - L'en-tête contenant le titre et le bouton de fermeture. Absent du DOM si `without-header` est actif.
+ * @csspart header-actions - Le conteneur des actions additionnelles du header (slot `header-actions`). Absent du DOM si le slot est vide ou si `without-header` est actif.
  * @csspart title - Le titre du dialog.
  * @csspart close - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
  * @csspart body - La zone de contenu principale.
@@ -192,7 +193,12 @@ export class ArDialog extends LitElement {
     /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
     private _triggerElement: Element | null = null;
 
-    private readonly _slotController = new HasSlotController(this, 'footer', 'label');
+    private readonly _slotController = new HasSlotController(
+        this,
+        'footer',
+        'label',
+        'header-actions',
+    );
     private _hasWarnedMissingLabel = false;
     private _hasWarnedSlotLabelIgnored = false;
     private _hasWarnedNoCloseMechanism = false;
@@ -298,7 +304,11 @@ export class ArDialog extends LitElement {
                                   ? html`<slot name="label"></slot>`
                                   : headingLabel}
                           </h1>
-                          <slot name="header-actions"></slot>
+                          ${this._slotController.test('header-actions')
+                              ? html`<div part="header-actions">
+                                    <slot name="header-actions"></slot>
+                                </div>`
+                              : nothing}
                           <button part="close" type="button" data-ar-dismiss>
                               <slot name="close-icon">
                                   <svg

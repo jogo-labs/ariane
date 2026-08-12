@@ -134,6 +134,11 @@ export default [
             margin-inline-end: auto;
         }
 
+        [part='header-actions'] {
+            display: flex;
+            align-items: center;
+        }
+
         [part='close'] {
             display: flex;
             align-items: center;
