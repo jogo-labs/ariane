@@ -50,15 +50,16 @@ if (typeof document !== 'undefined') {
 /**
  * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
  *
- * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire.
+ * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.
+ * @slot header-actions - Actions additionnelles dans le header, positionnées avant le bouton de fermeture (ex. bouton plein écran, menu). Retiré du DOM si `without-header` est actif.
  * @slot - Contenu principal du dialog.
  * @slot footer - Actions du dialog (boutons). Absent du DOM si non fourni.
- * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
+ * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut. Retiré du DOM si `without-header` est actif.
  *
  * @csspart dialog - L'élément <dialog> racine.
- * @csspart header - L'en-tête contenant le titre et le bouton de fermeture.
+ * @csspart header - L'en-tête contenant le titre et le bouton de fermeture. Absent du DOM si `without-header` est actif.
  * @csspart title - Le titre du dialog.
- * @csspart close - Le bouton de fermeture dans l'en-tête.
+ * @csspart close - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
@@ -113,6 +114,17 @@ export class ArDialog extends LitElement {
      * @default ''
      */
     @property({ reflect: true }) label = '';
+
+    /**
+     * Si présent, retire entièrement le header (titre, actions, bouton de fermeture) du DOM.
+     * La propriété `label` devient alors le seul nom accessible du dialog (`aria-label`) —
+     * elle est requise dans ce mode, le slot `label` (HTML) est sans effet.
+     *
+     * @attr without-header
+     * @default false
+     */
+    @property({ reflect: true, type: Boolean, attribute: 'without-header' })
+    withoutHeader: boolean = false;
 
     /**
      * Mode d'affichage : `modal` (centré avec backdrop) ou `drawer` (panneau latéral).
@@ -239,7 +251,8 @@ export class ArDialog extends LitElement {
             <dialog
                 part="dialog"
                 role="dialog"
-                aria-labelledby="dialog-heading"
+                aria-labelledby=${this.withoutHeader ? nothing : 'dialog-heading'}
+                aria-label=${this.withoutHeader ? headingLabel : nothing}
                 aria-describedby="dialog-body"
                 aria-modal="true"
                 ?inert=${!this.open || this._isClosing}
@@ -248,31 +261,34 @@ export class ArDialog extends LitElement {
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                <header part="header">
-                    <h1 part="title" id="dialog-heading">
-                        ${this._slotController.test('label')
-                            ? html`<slot name="label"></slot>`
-                            : headingLabel}
-                    </h1>
-                    <button part="close" type="button" data-ar-dismiss>
-                        <slot name="close-icon">
-                            <svg
-                                aria-hidden="true"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18 18 6M6 6l12 12"
-                                ></path>
-                            </svg>
-                        </slot>
-                        <span class="sr-only">${this.closeLabel}</span>
-                    </button>
-                </header>
+                ${this.withoutHeader
+                    ? nothing
+                    : html`<header part="header">
+                          <h1 part="title" id="dialog-heading">
+                              ${this._slotController.test('label')
+                                  ? html`<slot name="label"></slot>`
+                                  : headingLabel}
+                          </h1>
+                          <slot name="header-actions"></slot>
+                          <button part="close" type="button" data-ar-dismiss>
+                              <slot name="close-icon">
+                                  <svg
+                                      aria-hidden="true"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke-width="1.5"
+                                      stroke="currentColor"
+                                  >
+                                      <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M6 18 18 6M6 6l12 12"
+                                      ></path>
+                                  </svg>
+                              </slot>
+                              <span class="sr-only">${this.closeLabel}</span>
+                          </button>
+                      </header>`}
                 <div part="body" id="dialog-body">
                     <slot></slot>
                 </div>

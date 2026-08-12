@@ -157,6 +157,85 @@ describe('ArDialog', () => {
         });
     });
 
+    // ── without-header ───────────────────────────────────────────────────────
+
+    describe('without-header', () => {
+        it('withoutHeader vaut false par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(el.withoutHeader).toBe(false);
+        });
+
+        it('without-header reflète en attribut', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(el.hasAttribute('without-header')).toBe(true);
+            expect(el.withoutHeader).toBe(true);
+        });
+
+        it('le header est présent par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+        });
+
+        it('le header est absent du DOM quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getPart(el, 'title')).toBeNull();
+            expect(getPart(el, 'close')).toBeNull();
+            expect(requireShadow(el).querySelector('[data-ar-dismiss]')).toBeNull();
+        });
+
+        it('le dialog et le body restent présents quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'dialog')).not.toBeNull();
+            expect(getPart(el, 'body')).not.toBeNull();
+        });
+    });
+
+    // ── header-actions ───────────────────────────────────────────────────────
+
+    describe('slot header-actions', () => {
+        it('le slot header-actions est rendu dans le header', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            const header = getPart(el, 'header') as HTMLElement;
+            expect(header.querySelector('slot[name="header-actions"]')).not.toBeNull();
+        });
+
+        it('le contenu slot="header-actions" est assigné', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions" id="action-btn">Plein écran</button>
+                </ar-dialog>
+            `);
+            const slotEl = requireShadow(el).querySelector<HTMLSlotElement>(
+                'slot[name="header-actions"]',
+            );
+            expect(slotEl).not.toBeNull();
+            const assigned = slotEl!.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect((assigned[0] as HTMLElement).id).toBe('action-btn');
+        });
+
+        it('le slot header-actions est positionné avant le bouton close', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            const header = getPart(el, 'header') as HTMLElement;
+            const slot = header.querySelector('slot[name="header-actions"]');
+            const closeBtn = header.querySelector('[data-ar-dismiss]');
+            expect(slot).not.toBeNull();
+            expect(closeBtn).not.toBeNull();
+            const position = slot!.compareDocumentPosition(closeBtn!);
+            expect(Boolean(position & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+        });
+
+        it('le slot header-actions est absent du DOM quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(requireShadow(el).querySelector('slot[name="header-actions"]')).toBeNull();
+        });
+    });
+
     // ── Ouverture ─────────────────────────────────────────────────────────────
 
     describe('ouverture', () => {

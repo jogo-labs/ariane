@@ -126,12 +126,12 @@ export default [
         header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             flex-shrink: 0;
         }
 
         h1 {
             margin: 0;
+            margin-inline-end: auto;
         }
 
         [part='close'] {

@@ -90,4 +90,24 @@ describe('ar-dialog — accessibilité', () => {
         expect(dialogEl.getAttribute('role')).to.equal('dialog');
         expect(dialogEl.getAttribute('aria-modal')).to.equal('true');
     });
+
+    it('sans without-header, aria-labelledby est utilisé (pas aria-label)', () => {
+        const dialogEl = requireDialog(el);
+        expect(dialogEl.hasAttribute('aria-labelledby')).to.equal(true);
+        expect(dialogEl.hasAttribute('aria-label')).to.equal(false);
+    });
+
+    it('avec without-header, aria-label remplace aria-labelledby', async () => {
+        el.remove();
+        el = await fixture(html`<ar-dialog without-header label="Titre sans header"></ar-dialog>`);
+        const dialogEl = requireDialog(el);
+        expect(dialogEl.hasAttribute('aria-labelledby')).to.equal(false);
+        expect(dialogEl.getAttribute('aria-label')).to.equal('Titre sans header');
+    });
+
+    it('avec without-header, le header est absent du DOM', async () => {
+        el.remove();
+        el = await fixture(html`<ar-dialog without-header label="Titre"></ar-dialog>`);
+        expect(requireShadow(el).querySelector('header')).to.equal(null);
+    });
 });
