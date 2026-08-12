@@ -78,13 +78,11 @@ variants:
               .demo-job-actions .actions {
                   display: flex;
                   align-items: center;
+                  /* flex: 1 1 100% réclame l'espace en priorité sur la pagination (qui reste à
+                     sa taille de contenu par défaut) — garde ar-pagination en mode compact
+                     (select) sans dépendre d'une largeur en dur liée à son rendu interne. */
+                  flex: 1 1 100%;
                   gap: 0.5rem;
-              }
-              .demo-job-actions ar-pagination {
-                  /* Garde la pagination en mode compact (select) : au-delà, l'espace laissé
-                     disponible par le layout de header-actions suffit à afficher la liste
-                     numérotée complète, pas souhaitable dans un header de drawer. */
-                  max-width: 230px;
               }
           </style>
           <button class="btn btn-primary" data-ar-dialog-open="demo-job-detail">Voir une offre</button>
