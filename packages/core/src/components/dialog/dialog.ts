@@ -194,6 +194,8 @@ export class ArDialog extends LitElement {
 
     private readonly _slotController = new HasSlotController(this, 'footer', 'label');
     private _hasWarnedMissingLabel = false;
+    private _hasWarnedSlotLabelIgnored = false;
+    private _hasWarnedNoCloseMechanism = false;
 
     private _getHeadingLabel(): string {
         return (this.label ?? '').trim() || DEFAULT_DIALOG_LABEL;
@@ -207,6 +209,32 @@ export class ArDialog extends LitElement {
         warn(
             'ar-dialog',
             'Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".',
+        );
+    }
+
+    private _warnIfSlotLabelIgnored(): void {
+        if (this._hasWarnedSlotLabelIgnored) return;
+        if (!this.withoutHeader) return;
+        if ((this.label ?? '').trim()) return;
+        if (!this._slotController.test('label')) return;
+
+        this._hasWarnedSlotLabelIgnored = true;
+        warn(
+            'ar-dialog',
+            'slot="label" est ignoré quand without-header est actif (aria-label ne peut contenir que du texte brut). Utilisez la propriété "label".',
+        );
+    }
+
+    private _warnIfNoCloseMechanism(): void {
+        if (this._hasWarnedNoCloseMechanism) return;
+        if (!this.withoutHeader) return;
+        if (this.closeOnBackdrop) return;
+        if (this.querySelector('[data-ar-dismiss], [data-ar-accept]')) return;
+
+        this._hasWarnedNoCloseMechanism = true;
+        warn(
+            'ar-dialog',
+            'without-header est actif sans close-on-backdrop ni élément [data-ar-dismiss]/[data-ar-accept] dans le contenu : seule la touche Échap permet de fermer ce dialog.',
         );
     }
 
@@ -226,6 +254,8 @@ export class ArDialog extends LitElement {
 
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
+        this._warnIfSlotLabelIgnored();
+        this._warnIfNoCloseMechanism();
         if (
             (changedProperties.has('placement') || changedProperties.has('mode')) &&
             this.mode === 'modal' &&

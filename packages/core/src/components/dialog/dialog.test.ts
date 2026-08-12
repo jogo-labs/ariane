@@ -797,4 +797,95 @@ describe('ArDialog', () => {
             expect(placementWarns).toHaveLength(0);
         });
     });
+
+    describe('warn() — slot label ignoré en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si slot="label" est fourni sans la prop label et without-header actif', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si la prop label est fournie en plus du slot", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+    });
+
+    describe('warn() — aucun moyen de fermeture en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si without-header sans close-on-backdrop ni data-ar-dismiss/accept', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si close-on-backdrop est actif", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog without-header close-on-backdrop label="Titre"></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-dismiss est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <button data-ar-dismiss>Fermer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+    });
 });
