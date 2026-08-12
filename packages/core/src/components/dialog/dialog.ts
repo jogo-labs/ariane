@@ -255,7 +255,6 @@ export class ArDialog extends LitElement {
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
         this._warnIfSlotLabelIgnored();
-        this._warnIfNoCloseMechanism();
         if (
             (changedProperties.has('placement') || changedProperties.has('mode')) &&
             this.mode === 'modal' &&
@@ -457,6 +456,7 @@ export class ArDialog extends LitElement {
 
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
+        this._warnIfNoCloseMechanism();
         this._triggerElement = document.activeElement;
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {

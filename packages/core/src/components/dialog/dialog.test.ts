@@ -189,6 +189,28 @@ describe('ArDialog', () => {
             expect(getPart(el, 'dialog')).not.toBeNull();
             expect(getPart(el, 'body')).not.toBeNull();
         });
+
+        it('combiné à mode="drawer", le header reste absent et aria-label reste appliqué', async () => {
+            el = await fixture(
+                '<ar-dialog without-header mode="drawer" label="Filtres"></ar-dialog>',
+            );
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Filtres');
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+        });
+
+        it('bascule without-header à true après le montage remplace aria-labelledby par aria-label', async () => {
+            el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-labelledby')).toBe('dialog-heading');
+
+            el.withoutHeader = true;
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Titre');
+        });
     });
 
     // ── header-actions ───────────────────────────────────────────────────────
@@ -851,7 +873,7 @@ describe('ArDialog', () => {
         it('émet un warn si without-header sans close-on-backdrop ni data-ar-dismiss/accept', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await fixture('<ar-dialog without-header label="Titre" open></ar-dialog>');
 
             const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
             expect(closeWarns.length).toBeGreaterThan(0);
@@ -860,7 +882,9 @@ describe('ArDialog', () => {
         it("n'émet pas ce warn si close-on-backdrop est actif", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            await fixture('<ar-dialog without-header close-on-backdrop label="Titre"></ar-dialog>');
+            await fixture(
+                '<ar-dialog without-header close-on-backdrop label="Titre" open></ar-dialog>',
+            );
 
             const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
             expect(closeWarns).toHaveLength(0);
@@ -870,8 +894,21 @@ describe('ArDialog', () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
             await fixture(`
-                <ar-dialog without-header label="Titre">
+                <ar-dialog without-header label="Titre" open>
                     <button data-ar-dismiss>Fermer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-accept est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre" open>
+                    <button data-ar-accept>Confirmer</button>
                 </ar-dialog>
             `);
 
@@ -882,10 +919,34 @@ describe('ArDialog', () => {
         it("n'émet pas ce warn hors mode without-header", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            await fixture('<ar-dialog></ar-dialog>');
+            await fixture('<ar-dialog open></ar-dialog>');
 
             const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
             expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn au montage initial (avant ouverture), même sans moyen de fermeture", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("émet ce warn à l'ouverture (_show), pas seulement au montage", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('Échap'))).toHaveLength(0);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
         });
     });
 });

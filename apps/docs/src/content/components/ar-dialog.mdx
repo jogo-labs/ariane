@@ -57,7 +57,7 @@ variants:
           </ar-dialog>
     - name: without-header
       label: Sans header
-      description: 'without-header retire titre, actions et bouton de fermeture — label reste requis pour le nom accessible (aria-label). Prévoir un moyen de fermeture (ici close-on-backdrop).'
+      description: without-header retire titre, actions et bouton de fermeture — label reste requis pour le nom accessible (aria-label). Prévoir un moyen de fermeture (ici close-on-backdrop).
       html: |
           <button class="btn btn-primary" data-ar-dialog-open="demo-without-header">Ouvrir</button>
           <ar-dialog id="demo-without-header" label="Aperçu image" without-header close-on-backdrop>
@@ -112,7 +112,7 @@ import WcagRef from '../../components/WcagRef.astro';
 
 - Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
 - Quand `without-header` est actif, `aria-label` (basé sur `label`) remplace `aria-labelledby` — le nom accessible reste garanti même sans header visible.
-- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent — conforme
+- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent, ou sur le `<dialog>` lui-même si le header est absent — conforme
     <WcagRef
         criterion="2.1.2"
         summary="No Keyboard Trap : le focus clavier peut toujours quitter un composant via les touches standard (Escape, Tab)."
@@ -175,6 +175,14 @@ ar-dialog::part(title) {
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
+}
+```
+
+Cette technique sort le titre du flux (`position: absolute`), ce qui rompt le `margin-inline-end: auto` utilisé par le composant pour aligner `header-actions` et le bouton de fermeture en fin de header. Complétez avec `justify-content` sur `::part(header)` pour conserver cet alignement :
+
+```css
+ar-dialog::part(header) {
+    justify-content: flex-end;
 }
 ```
 

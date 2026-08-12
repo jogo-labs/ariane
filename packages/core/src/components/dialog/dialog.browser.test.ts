@@ -72,6 +72,19 @@ describe('ar-dialog — browser', () => {
             await aTimeout(ANIM_CLOSE);
             expect(count).to.equal(1);
         });
+
+        it('Escape ferme toujours le dialog en mode without-header', async () => {
+            el.remove();
+            el = await fixture(html`
+                <ar-dialog without-header label="Sans header" open></ar-dialog>
+            `);
+            await aTimeout(ANIM_OPEN);
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await aTimeout(ANIM_CLOSE);
+
+            expect(getDialogEl(el).open).to.equal(false);
+        });
     });
 
     // ── Scroll lock / unlock ─────────────────────────────────────────────────
