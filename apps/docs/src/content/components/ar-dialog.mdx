@@ -194,6 +194,52 @@ ar-dialog::part(header) {
 }
 ```
 
+**Layout avancé dans `header-actions`.** Le slot n'est pas limité à des boutons isolés — un seul
+enfant slotté peut lui-même être un conteneur avec son propre layout interne. Exemple : un drawer
+affichant le détail d'une offre d'emploi parmi une liste de résultats, avec un titre sr-only (masqué
+via la technique `::part(title)` ci-dessus, complété par un `<h2>` visible dans le contenu), un
+groupe d'actions plaqué à gauche et une pagination pour naviguer entre les résultats sans fermer le
+drawer :
+
+```html
+<ar-dialog id="job-detail" label="Détail de l'offre n°1234" mode="drawer">
+    <div
+        slot="header-actions"
+        style="display:flex; justify-content:space-between; align-items:center; width:100%;"
+    >
+        <div class="actions">
+            <button data-ar-dismiss>Marquer comme lu</button>
+            <button>Postuler</button>
+        </div>
+        <nav class="pagination" aria-label="Résultats">
+            <button aria-label="Offre précédente">‹</button>
+            <span>3 / 50</span>
+            <button aria-label="Offre suivante">›</button>
+        </nav>
+    </div>
+    <h2>Développeur·se Frontend Senior</h2>
+    <p>Description de l'offre…</p>
+</ar-dialog>
+```
+
+```css
+#job-detail::part(title) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+```
+
+Le `width: 100%` posé par le consommateur sur son propre conteneur suffit à occuper tout l'espace
+disponible dans `::part(header-actions)` — pas besoin de `flex` supplémentaire côté thème. Le
+`justify-content: space-between` interne (light DOM, entièrement sous contrôle du consommateur)
+répartit ensuite actions et pagination. Notez qu'ici `::part(header) { justify-content: flex-end }`
+n'est pas nécessaire : le conteneur d'actions occupant déjà toute la largeur disponible, il ne
+reste aucun espace à redistribuer.
+
 Pour retirer entièrement le header (titre, actions, bouton de fermeture), utilisez `without-header`. `label` devient alors requis, et un moyen de fermeture doit rester disponible (ici `close-on-backdrop`) :
 
 ```html
