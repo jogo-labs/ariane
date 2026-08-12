@@ -25,8 +25,10 @@
 
 import esbuild from 'esbuild';
 import { readdirSync, mkdirSync, rmSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { minifyHTMLLiterals } from 'minify-literals';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -84,6 +86,35 @@ const cdnEntryPoints = {
     index: join(SRC, 'index.ts'),
     autoloader: join(SRC, 'autoloader.ts'),
 };
+
+// ─── Plugin : minification des templates `html`/`css` (Lit) ──────────────────
+//
+// esbuild `minify: true` minifie la syntaxe JS mais ne touche pas au contenu
+// des template literals — un composant expédie donc son CSS (`css\`...\``)
+// et son markup (`html\`...\``) tels qu'écrits en source (indentation,
+// commentaires) même dans un bundle CDN "prod". `minify-literals` fait ce
+// travail correctement : parsing du TS via acorn (gère les décorateurs Lit),
+// minification CSS via lightningcss, HTML via html-minifier-next, et surtout
+// une minification partielle correcte autour des interpolations `${...}`
+// (quasi systématiques dans les `html\`\`` de Lit pour les bindings
+// d'événements/attributs) — un scan naïf de template literal les ignorerait
+// presque tous.
+function minifyLitTemplatesPlugin() {
+    return {
+        name: 'minify-lit-templates',
+        setup(build) {
+            build.onLoad({ filter: /\.ts$/ }, async (args) => {
+                const source = await readFile(args.path, 'utf8');
+                if (!source.includes('html`') && !source.includes('css`')) return null;
+
+                const result = await minifyHTMLLiterals(source, { fileName: args.path });
+                if (!result) return null;
+
+                return { contents: result.code, loader: 'ts' };
+            });
+        },
+    };
+}
 
 // ─── Options communes ─────────────────────────────────────────────────────────
 
@@ -194,6 +225,7 @@ async function buildCdnProd() {
         chunkNames: 'chunks/[name]-[hash]',
         define: { __DEV__: 'false' },
         metafile: true,
+        plugins: [minifyLitTemplatesPlugin()],
     };
 
     const result = await esbuild.build(options);
