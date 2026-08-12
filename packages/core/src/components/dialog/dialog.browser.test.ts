@@ -187,4 +187,31 @@ describe('ar-dialog — browser', () => {
             expect(el.shadowRoot?.activeElement).to.equal(dialogEl);
         });
     });
+
+    // ── Layout header-actions ─────────────────────────────────────────────────
+
+    describe('layout header-actions', () => {
+        it('le bouton close reste centré verticalement même quand header-actions est plus haut que lui', async () => {
+            el = await fixture(html`
+                <ar-dialog label="Titre">
+                    <div slot="header-actions" style="height: 80px; display: flex;">
+                        Contenu haut
+                    </div>
+                </ar-dialog>
+            `);
+            el.open = true;
+            await aTimeout(50);
+
+            const shadow = el.shadowRoot!;
+            const headerEl = shadow.querySelector('[part="header"]') as HTMLElement;
+            const closeEl = shadow.querySelector('[part="close"]') as HTMLElement;
+
+            const headerRect = headerEl.getBoundingClientRect();
+            const closeRect = closeEl.getBoundingClientRect();
+            const headerCenterY = headerRect.y + headerRect.height / 2;
+            const closeCenterY = closeRect.y + closeRect.height / 2;
+
+            expect(Math.abs(closeCenterY - headerCenterY)).to.be.lessThan(3);
+        });
+    });
 });

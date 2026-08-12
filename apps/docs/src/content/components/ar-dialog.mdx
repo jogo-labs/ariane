@@ -77,7 +77,14 @@ variants:
               }
               .demo-job-actions .actions {
                   display: flex;
+                  align-items: center;
                   gap: 0.5rem;
+              }
+              .demo-job-actions ar-pagination {
+                  /* Garde la pagination en mode compact (select) : au-delà, l'espace laissé
+                     disponible par le layout de header-actions suffit à afficher la liste
+                     numérotée complète, pas souhaitable dans un header de drawer. */
+                  max-width: 230px;
               }
           </style>
           <button class="btn btn-primary" data-ar-dialog-open="demo-job-detail">Voir une offre</button>
