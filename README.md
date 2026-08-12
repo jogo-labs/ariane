@@ -28,7 +28,7 @@ Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil 
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />
 ```
 
 > En développement local, remplacez `autoloader.prod.js` par `autoloader.js` pour obtenir des avertissements détaillés dans la console.
@@ -39,7 +39,7 @@ Charge tous les composants en une seule requête.
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />
 ```
 
 ### Via npm _(avec bundler)_

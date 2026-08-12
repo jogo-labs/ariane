@@ -63,6 +63,7 @@
     "custom-element-vs-code-integration": "^1.5.0",
     "esbuild": "^0.28.0",
     "happy-dom": "^20.8.9",
+    "minify-literals": "^2.1.0",
     "sinon": "^22.0.0",
     "vitest": "^4.1.8"
   },
