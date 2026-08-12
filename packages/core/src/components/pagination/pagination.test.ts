@@ -51,6 +51,11 @@ describe('ArPagination', () => {
             expect(partContains(requirePart(el, 'next'), 'next')).toBe(true);
             expect(partContains(requirePart(el, 'next'), 'nav-btn')).toBe(true);
         });
+
+        it('part="list" n\'a pas de margin-top (repli UA du <ul> non réinitialisé sinon)', () => {
+            const list = requirePart(el, 'list') as HTMLElement;
+            expect(getComputedStyle(list).marginTop).toBe('0px');
+        });
     });
 
     // ── Slots d'icônes prev/next ─────────────────────────────────────────────

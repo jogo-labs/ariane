@@ -157,6 +157,144 @@ describe('ArDialog', () => {
         });
     });
 
+    // ── without-header ───────────────────────────────────────────────────────
+
+    describe('without-header', () => {
+        it('withoutHeader vaut false par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(el.withoutHeader).toBe(false);
+        });
+
+        it('without-header reflète en attribut', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(el.hasAttribute('without-header')).toBe(true);
+            expect(el.withoutHeader).toBe(true);
+        });
+
+        it('le header est présent par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+        });
+
+        it('le header est absent du DOM quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getPart(el, 'title')).toBeNull();
+            expect(getPart(el, 'close')).toBeNull();
+            expect(requireShadow(el).querySelector('[data-ar-dismiss]')).toBeNull();
+        });
+
+        it('le dialog et le body restent présents quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'dialog')).not.toBeNull();
+            expect(getPart(el, 'body')).not.toBeNull();
+        });
+
+        it('combiné à mode="drawer", le header reste absent et aria-label reste appliqué', async () => {
+            el = await fixture(
+                '<ar-dialog without-header mode="drawer" label="Filtres"></ar-dialog>',
+            );
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Filtres');
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+        });
+
+        it('bascule without-header à true après le montage remplace aria-labelledby par aria-label', async () => {
+            el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-labelledby')).toBe('dialog-heading');
+
+            el.withoutHeader = true;
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Titre');
+        });
+    });
+
+    // ── header-actions ───────────────────────────────────────────────────────
+
+    describe('slot header-actions', () => {
+        it('le wrapper part="header-actions" est absent du DOM sans contenu assigné', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(getPart(el, 'header-actions')).toBeNull();
+        });
+
+        it('le wrapper part="header-actions" est présent si un enfant slot="header-actions" est fourni', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).not.toBeNull();
+        });
+
+        it('le wrapper disparaît dynamiquement si le slot="header-actions" est retiré', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions" id="a">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).not.toBeNull();
+
+            (el.querySelector('#a') as Element).remove();
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'header-actions')).toBeNull();
+        });
+
+        it('le slot header-actions est rendu dans le wrapper', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            const wrapper = getPart(el, 'header-actions') as HTMLElement;
+            expect(wrapper.querySelector('slot[name="header-actions"]')).not.toBeNull();
+        });
+
+        it('le contenu slot="header-actions" est assigné', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions" id="action-btn">Plein écran</button>
+                </ar-dialog>
+            `);
+            const slotEl = requireShadow(el).querySelector<HTMLSlotElement>(
+                'slot[name="header-actions"]',
+            );
+            expect(slotEl).not.toBeNull();
+            const assigned = slotEl!.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect((assigned[0] as HTMLElement).id).toBe('action-btn');
+        });
+
+        it('le wrapper header-actions est positionné avant le bouton close', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            const header = getPart(el, 'header') as HTMLElement;
+            const wrapper = getPart(el, 'header-actions');
+            const closeBtn = header.querySelector('[data-ar-dismiss]');
+            expect(wrapper).not.toBeNull();
+            expect(closeBtn).not.toBeNull();
+            const position = wrapper!.compareDocumentPosition(closeBtn!);
+            expect(Boolean(position & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+        });
+
+        it('le wrapper header-actions est absent du DOM quand without-header est actif', async () => {
+            el = await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).toBeNull();
+            expect(requireShadow(el).querySelector('slot[name="header-actions"]')).toBeNull();
+        });
+    });
+
     // ── Ouverture ─────────────────────────────────────────────────────────────
 
     describe('ouverture', () => {
@@ -716,6 +854,136 @@ describe('ArDialog', () => {
 
             const placementWarns = spy.mock.calls.filter((c) => String(c[0]).includes('placement'));
             expect(placementWarns).toHaveLength(0);
+        });
+    });
+
+    describe('warn() — slot label ignoré en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si slot="label" est fourni sans la prop label et without-header actif', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si la prop label est fournie en plus du slot", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+    });
+
+    describe('warn() — aucun moyen de fermeture en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si without-header sans close-on-backdrop ni data-ar-dismiss/accept', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog without-header label="Titre" open></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si close-on-backdrop est actif", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(
+                '<ar-dialog without-header close-on-backdrop label="Titre" open></ar-dialog>',
+            );
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-dismiss est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre" open>
+                    <button data-ar-dismiss>Fermer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-accept est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre" open>
+                    <button data-ar-accept>Confirmer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog open></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn au montage initial (avant ouverture), même sans moyen de fermeture", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("émet ce warn à l'ouverture (_show), pas seulement au montage", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('Échap'))).toHaveLength(0);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
         });
     });
 });

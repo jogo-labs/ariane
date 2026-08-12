@@ -11,6 +11,7 @@ export default css`
         flex-wrap: nowrap;
         justify-content: center;
         padding-inline-start: 0;
+        margin-top: 0;
         margin-bottom: 0;
         list-style: none;
     }

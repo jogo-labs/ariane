@@ -50,15 +50,17 @@ if (typeof document !== 'undefined') {
 /**
  * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
  *
- * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire.
+ * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.
+ * @slot header-actions - Actions additionnelles dans le header, positionnées avant le bouton de fermeture (ex. bouton plein écran, menu). Retiré du DOM si `without-header` est actif.
  * @slot - Contenu principal du dialog.
  * @slot footer - Actions du dialog (boutons). Absent du DOM si non fourni.
- * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
+ * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut. Retiré du DOM si `without-header` est actif.
  *
  * @csspart dialog - L'élément <dialog> racine.
- * @csspart header - L'en-tête contenant le titre et le bouton de fermeture.
+ * @csspart header - L'en-tête contenant le titre et le bouton de fermeture. Absent du DOM si `without-header` est actif.
+ * @csspart header-actions - Le conteneur des actions additionnelles du header (slot `header-actions`). Absent du DOM si le slot est vide ou si `without-header` est actif.
  * @csspart title - Le titre du dialog.
- * @csspart close - Le bouton de fermeture dans l'en-tête.
+ * @csspart close - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
@@ -113,6 +115,17 @@ export class ArDialog extends LitElement {
      * @default ''
      */
     @property({ reflect: true }) label = '';
+
+    /**
+     * Si présent, retire entièrement le header (titre, actions, bouton de fermeture) du DOM.
+     * La propriété `label` devient alors le seul nom accessible du dialog (`aria-label`) —
+     * elle est requise dans ce mode, le slot `label` (HTML) est sans effet.
+     *
+     * @attr without-header
+     * @default false
+     */
+    @property({ reflect: true, type: Boolean, attribute: 'without-header' })
+    withoutHeader: boolean = false;
 
     /**
      * Mode d'affichage : `modal` (centré avec backdrop) ou `drawer` (panneau latéral).
@@ -180,8 +193,15 @@ export class ArDialog extends LitElement {
     /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
     private _triggerElement: Element | null = null;
 
-    private readonly _slotController = new HasSlotController(this, 'footer', 'label');
+    private readonly _slotController = new HasSlotController(
+        this,
+        'footer',
+        'label',
+        'header-actions',
+    );
     private _hasWarnedMissingLabel = false;
+    private _hasWarnedSlotLabelIgnored = false;
+    private _hasWarnedNoCloseMechanism = false;
 
     private _getHeadingLabel(): string {
         return (this.label ?? '').trim() || DEFAULT_DIALOG_LABEL;
@@ -195,6 +215,32 @@ export class ArDialog extends LitElement {
         warn(
             'ar-dialog',
             'Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".',
+        );
+    }
+
+    private _warnIfSlotLabelIgnored(): void {
+        if (this._hasWarnedSlotLabelIgnored) return;
+        if (!this.withoutHeader) return;
+        if ((this.label ?? '').trim()) return;
+        if (!this._slotController.test('label')) return;
+
+        this._hasWarnedSlotLabelIgnored = true;
+        warn(
+            'ar-dialog',
+            'slot="label" est ignoré quand without-header est actif (aria-label ne peut contenir que du texte brut). Utilisez la propriété "label".',
+        );
+    }
+
+    private _warnIfNoCloseMechanism(): void {
+        if (this._hasWarnedNoCloseMechanism) return;
+        if (!this.withoutHeader) return;
+        if (this.closeOnBackdrop) return;
+        if (this.querySelector('[data-ar-dismiss], [data-ar-accept]')) return;
+
+        this._hasWarnedNoCloseMechanism = true;
+        warn(
+            'ar-dialog',
+            'without-header est actif sans close-on-backdrop ni élément [data-ar-dismiss]/[data-ar-accept] dans le contenu : seule la touche Échap permet de fermer ce dialog.',
         );
     }
 
@@ -214,6 +260,7 @@ export class ArDialog extends LitElement {
 
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
+        this._warnIfSlotLabelIgnored();
         if (
             (changedProperties.has('placement') || changedProperties.has('mode')) &&
             this.mode === 'modal' &&
@@ -239,7 +286,8 @@ export class ArDialog extends LitElement {
             <dialog
                 part="dialog"
                 role="dialog"
-                aria-labelledby="dialog-heading"
+                aria-labelledby=${this.withoutHeader ? nothing : 'dialog-heading'}
+                aria-label=${this.withoutHeader ? headingLabel : nothing}
                 aria-describedby="dialog-body"
                 aria-modal="true"
                 ?inert=${!this.open || this._isClosing}
@@ -248,31 +296,38 @@ export class ArDialog extends LitElement {
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                <header part="header">
-                    <h1 part="title" id="dialog-heading">
-                        ${this._slotController.test('label')
-                            ? html`<slot name="label"></slot>`
-                            : headingLabel}
-                    </h1>
-                    <button part="close" type="button" data-ar-dismiss>
-                        <slot name="close-icon">
-                            <svg
-                                aria-hidden="true"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18 18 6M6 6l12 12"
-                                ></path>
-                            </svg>
-                        </slot>
-                        <span class="sr-only">${this.closeLabel}</span>
-                    </button>
-                </header>
+                ${this.withoutHeader
+                    ? nothing
+                    : html`<header part="header">
+                          <h1 part="title" id="dialog-heading">
+                              ${this._slotController.test('label')
+                                  ? html`<slot name="label"></slot>`
+                                  : headingLabel}
+                          </h1>
+                          ${this._slotController.test('header-actions')
+                              ? html`<div part="header-actions">
+                                    <slot name="header-actions"></slot>
+                                </div>`
+                              : nothing}
+                          <button part="close" type="button" data-ar-dismiss>
+                              <slot name="close-icon">
+                                  <svg
+                                      aria-hidden="true"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke-width="1.5"
+                                      stroke="currentColor"
+                                  >
+                                      <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M6 18 18 6M6 6l12 12"
+                                      ></path>
+                                  </svg>
+                              </slot>
+                              <span class="sr-only">${this.closeLabel}</span>
+                          </button>
+                      </header>`}
                 <div part="body" id="dialog-body">
                     <slot></slot>
                 </div>
@@ -411,6 +466,7 @@ export class ArDialog extends LitElement {
 
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
+        this._warnIfNoCloseMechanism();
         this._triggerElement = document.activeElement;
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {

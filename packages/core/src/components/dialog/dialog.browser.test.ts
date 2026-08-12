@@ -72,6 +72,19 @@ describe('ar-dialog — browser', () => {
             await aTimeout(ANIM_CLOSE);
             expect(count).to.equal(1);
         });
+
+        it('Escape ferme toujours le dialog en mode without-header', async () => {
+            el.remove();
+            el = await fixture(html`
+                <ar-dialog without-header label="Sans header" open></ar-dialog>
+            `);
+            await aTimeout(ANIM_OPEN);
+
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await aTimeout(ANIM_CLOSE);
+
+            expect(getDialogEl(el).open).to.equal(false);
+        });
     });
 
     // ── Scroll lock / unlock ─────────────────────────────────────────────────
@@ -159,6 +172,46 @@ describe('ar-dialog — browser', () => {
 
             expect(document.activeElement).to.equal(trigger);
             trigger.remove();
+        });
+
+        it('sans header (without-header) et sans contenu focalisable, le focus retombe sur le <dialog>', async () => {
+            el = await fixture(html`
+                <ar-dialog without-header label="Sans header">
+                    <p>Contenu non interactif.</p>
+                </ar-dialog>
+            `);
+            el.open = true;
+            await aTimeout(50);
+
+            const dialogEl = getDialogEl(el);
+            expect(el.shadowRoot?.activeElement).to.equal(dialogEl);
+        });
+    });
+
+    // ── Layout header-actions ─────────────────────────────────────────────────
+
+    describe('layout header-actions', () => {
+        it('le bouton close reste centré verticalement même quand header-actions est plus haut que lui', async () => {
+            el = await fixture(html`
+                <ar-dialog label="Titre">
+                    <div slot="header-actions" style="height: 80px; display: flex;">
+                        Contenu haut
+                    </div>
+                </ar-dialog>
+            `);
+            el.open = true;
+            await aTimeout(50);
+
+            const shadow = el.shadowRoot!;
+            const headerEl = shadow.querySelector('[part="header"]') as HTMLElement;
+            const closeEl = shadow.querySelector('[part="close"]') as HTMLElement;
+
+            const headerRect = headerEl.getBoundingClientRect();
+            const closeRect = closeEl.getBoundingClientRect();
+            const headerCenterY = headerRect.y + headerRect.height / 2;
+            const closeCenterY = closeRect.y + closeRect.height / 2;
+
+            expect(Math.abs(closeCenterY - headerCenterY)).to.be.lessThan(3);
         });
     });
 });

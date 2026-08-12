@@ -126,19 +126,33 @@ export default [
         header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             flex-shrink: 0;
         }
 
         h1 {
             margin: 0;
+            margin-inline-end: auto;
+        }
+
+        [part='header-actions'] {
+            display: flex;
+            align-items: center;
+            /* Absorbe l'espace disponible seulement quand h1 est hors flux (::part(title) en
+               position: absolute — cf. doc "titre sr-only") : sinon, margin-inline-end: auto sur
+               h1 consomme déjà tout l'espace libre en priorité sur les marges auto (spec flexbox,
+               résolu avant la distribution flex-grow), donc ce flex: 1 reste sans effet visuel
+               tant que le titre est visible et en flux normal. */
+            flex: 1;
+            /* Garde le contenu collé au bouton close (comme un slot vide) même quand ce
+               conteneur grandit — sans ça, un slot avec un seul petit bouton se retrouverait
+               plaqué au début du header plutôt qu'à côté du close une fois ce flex: 1 actif. */
+            justify-content: flex-end;
         }
 
         [part='close'] {
             display: flex;
             align-items: center;
             justify-content: center;
-            align-self: flex-start;
             flex-shrink: 0;
             /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
             width: var(--ar-dialog-close-size, 2.5rem);

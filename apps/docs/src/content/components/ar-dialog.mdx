@@ -46,6 +46,66 @@ variants:
               <button class="btn btn-secondary" slot="footer" data-ar-dismiss>Annuler</button>
               <button class="btn btn-danger" slot="footer" data-ar-accept>Supprimer</button>
           </ar-dialog>
+    - name: header-actions
+      label: Actions dans le header
+      description: Le slot header-actions permet d'ajouter des actions additionnelles avant le bouton de fermeture (ex. bouton plein écran).
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-header-actions">Ouvrir</button>
+          <ar-dialog id="demo-header-actions" label="Rapport mensuel">
+              <button class="btn btn-secondary" slot="header-actions" aria-label="Passer en plein écran" style="font-size: 1.5rem">⤢</button>
+              <p style="margin: 0">Contenu du dialog, avec une action additionnelle dans le header.</p>
+          </ar-dialog>
+    - name: header-actions-advanced
+      label: Header avancé
+      description: Un seul enfant slotté dans header-actions peut porter son propre layout — ici des actions à gauche et une pagination compacte à droite, titre du drawer masqué visuellement (sr-only) au profit d'un titre secondaire visible dans le contenu.
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-header-advanced">Ouvrir le drawer</button>
+          <ar-dialog id="demo-header-advanced" class="demo-header-advanced" label="Titre accessible du volet" mode="drawer">
+              <div slot="header-actions" class="demo-header-advanced-actions">
+                  <div class="actions">
+                      <button class="btn btn-primary">Action 1</button>
+                      <button class="btn btn-secondary">Action 2</button>
+                  </div>
+                  <ar-pagination current="3" total="10"></ar-pagination>
+              </div>
+              <h2>Titre secondaire du volet</h2>
+              <p>Contenu du volet</p>
+          </ar-dialog>
+          <style>
+              /* Masquage accessible du titre */
+              .demo-header-advanced::part(title) {
+                  position: absolute;
+                  width: 1px;
+                  height: 1px;
+                  overflow: hidden;
+                  clip: rect(0, 0, 0, 0);
+                  white-space: nowrap;
+              }
+
+              /* Style minimal pour la layout de bloc d'actions */
+              .demo-header-advanced-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                gap: 0.5rem;
+
+                .actions {
+                  display: flex;
+                  align-items: center;
+                  flex: 1 1 100%;
+                  gap: 0.5rem;
+                }
+              }
+          </style>
+    - name: without-header
+      label: Sans header
+      description: without-header retire titre, actions et bouton de fermeture — label reste requis pour le nom accessible (aria-label). Prévoir un moyen de fermeture (ici close-on-backdrop).
+      html: |
+          <button class="btn btn-primary" data-ar-dialog-open="demo-without-header">Ouvrir</button>
+          <ar-dialog id="demo-without-header" label="Aperçu image" without-header close-on-backdrop>
+              <img src="https://placehold.co/480x270" alt="Aperçu" style="display:block;width:100%;" />
+          </ar-dialog>
     - name: autofocus
       label: Focus initial
       description: Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — ici un champ de recherche dans un drawer.
@@ -94,7 +154,8 @@ import WcagRef from '../../components/WcagRef.astro';
 ### Pris en charge automatiquement
 
 - Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
-- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent — conforme
+- Quand `without-header` est actif, `aria-label` (basé sur `label`) remplace `aria-labelledby` — le nom accessible reste garanti même sans header visible.
+- Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent, ou sur le `<dialog>` lui-même si le header est absent — conforme
     <WcagRef
         criterion="2.1.2"
         summary="No Keyboard Trap : le focus clavier peut toujours quitter un composant via les touches standard (Escape, Tab)."
@@ -112,6 +173,7 @@ import WcagRef from '../../components/WcagRef.astro';
 ### À votre charge
 
 - **Fournir un `label` descriptif.** Un fallback `Dialogue` existe, mais il doit rester un filet de sécurité, pas le libellé final du composant. Un avertissement est émis dans la console si ni `label` ni `slot="label"` ne sont fournis.
+- **`without-header` retire le bouton de fermeture.** `label` devient requis (le slot `label` HTML est sans effet dans ce mode), et un moyen de fermeture doit rester accessible — `close-on-backdrop`, ou une action `data-ar-dismiss`/`data-ar-accept` dans votre contenu. Un avertissement est émis en développement si aucun n'est détecté (Échap reste toujours disponible).
 - **Toujours proposer une issue claire.** Le backdrop est statique par défaut : prévoir un bouton de fermeture visible ou une action `data-ar-dismiss`.
 - **Si vous bloquez la fermeture, renseigner `prevented-message`.** Le message doit expliquer quoi faire pour continuer ou confirmer l'action.
 - **Piloter le focus initial si nécessaire.** Posez `autofocus` sur l'élément qui doit recevoir le focus à l'ouverture — utile par exemple pour un champ de saisie dans un drawer.
@@ -132,6 +194,58 @@ Plutôt que de piloter `open` en JavaScript, un élément cliquable peut ouvrir 
         <button data-ar-dismiss>Annuler</button>
         <button data-ar-accept>Confirmer</button>
     </div>
+</ar-dialog>
+```
+
+### Personnaliser le header
+
+Le slot `header-actions` place des actions additionnelles entre le titre et le bouton de fermeture :
+
+```html
+<ar-dialog label="Rapport mensuel">
+    <button slot="header-actions" aria-label="Plein écran">⤢</button>
+    <p>Contenu du dialog.</p>
+</ar-dialog>
+```
+
+Le conteneur des actions expose son propre `::part(header-actions)`, indépendant du layout titre/fermeture — utile pour définir un espacement entre plusieurs actions sans affecter le reste du header :
+
+```css
+ar-dialog::part(header-actions) {
+    gap: 0.5rem;
+}
+```
+
+Pour masquer visuellement le titre sans casser le nom accessible du dialog, masquez `::part(title)` avec la technique sr-only standard — pas `display: none` ni `visibility: hidden`, qui peuvent faire perdre le nom accessible calculé via `aria-labelledby` dans certains navigateurs :
+
+```css
+ar-dialog::part(title) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+```
+
+Cette technique sort le titre du flux (`position: absolute`), ce qui rompt le `margin-inline-end: auto` utilisé par le composant pour aligner `header-actions` et le bouton de fermeture en fin de header. Complétez avec `justify-content` sur `::part(header)` pour conserver cet alignement :
+
+```css
+ar-dialog::part(header) {
+    justify-content: flex-end;
+}
+```
+
+Le slot n'est pas limité à des boutons isolés — un seul enfant slotté peut lui-même porter son
+propre layout interne (actions à gauche, pagination à droite, titre sr-only…). Voir l'exemple
+« Actions + pagination dans le header » ci-dessus pour une démonstration complète.
+
+Pour retirer entièrement le header (titre, actions, bouton de fermeture), utilisez `without-header`. `label` devient alors requis, et un moyen de fermeture doit rester disponible (ici `close-on-backdrop`) :
+
+```html
+<ar-dialog label="Aperçu image" without-header close-on-backdrop>
+    <img src="/apercu.jpg" alt="Aperçu" />
 </ar-dialog>
 ```
 
