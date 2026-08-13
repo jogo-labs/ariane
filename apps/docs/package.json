@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "predev": "node scripts/check-manifest.js",
-    "dev": "astro dev",
+    "dev": "astro dev --force",
     "build": "astro build",
     "lint": "astro check",
     "test": "vitest run",
