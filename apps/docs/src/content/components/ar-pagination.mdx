@@ -23,6 +23,11 @@ variants:
       description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
+    - name: compact
+      label: Mode compact
+      description: Mode compact — uniquement précédent/suivant et un label de position, identique en mobile et desktop.
+      html: |
+          <ar-pagination compact current="4" total="12"></ar-pagination>
 pageScript: |
     <script>
         document.addEventListener('ar-pagination-page-change', (e) => {
