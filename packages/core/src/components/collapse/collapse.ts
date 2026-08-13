@@ -49,7 +49,14 @@ export class ArCollapse extends LitElement {
      * `before` (défaut) : trigger avant le panel. `after` : trigger après le panel.
      * L'ordre DOM reflète l'ordre visuel — pas de CSS `order` — pour respecter WCAG 2.4.3.
      */
-    @property({ attribute: 'trigger-position', reflect: true })
+    @property({
+        attribute: 'trigger-position',
+        reflect: true,
+        converter: {
+            fromAttribute: (value: string | null) => (value === 'after' ? 'after' : 'before'),
+            toAttribute: (value: 'before' | 'after') => (value === 'after' ? 'after' : null),
+        },
+    })
     triggerPosition: 'before' | 'after' = 'before';
 
     /** Désactive le composant — le trigger ne répond plus aux clics. */
