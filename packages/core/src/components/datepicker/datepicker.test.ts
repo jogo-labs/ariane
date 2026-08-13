@@ -20,6 +20,12 @@ describe('ArDatepicker', () => {
         it('contient un label part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
         it('contient un p part="hint"', () => expect(getPart(el, 'hint')).not.toBeNull());
         it('contient un p part="error"', () => expect(getPart(el, 'error')).not.toBeNull());
+        it('contient un div racine part="datepicker" enveloppant tout le contenu', () => {
+            const root = getPart(el, 'datepicker');
+            expect(root).not.toBeNull();
+            expect(root?.contains(getPart(el, 'input'))).toBe(true);
+            expect(root?.contains(getPart(el, 'panel'))).toBe(true);
+        });
         it('expose inputElement getter', () =>
             expect(el.inputElement).toBeInstanceOf(HTMLInputElement));
     });

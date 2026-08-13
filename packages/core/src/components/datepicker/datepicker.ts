@@ -24,6 +24,8 @@ import { warn } from '../../utils/warn.js';
  * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le prop
  *                     `closeLabel`).
  *
+ * @csspart datepicker - Rôle transverse (voir /getting-started/naming-conventions) : racine du
+ *   composant.
  * @csspart input      - Le champ texte.
  * @csspart trigger    - Le bouton d'ouverture du calendrier.
  * @csspart panel      - Le popover flottant.
@@ -225,74 +227,76 @@ export class ArDatepicker extends LitElement {
             : formatLine;
 
         return html`
-            <label part="label" id="dp-label-${this._uid}" for="dp-input-${this._uid}">
-                <slot name="label">${this.label}</slot>
-            </label>
-            <slot name="after-label"></slot>
+            <div part="datepicker">
+                <label part="label" id="dp-label-${this._uid}" for="dp-input-${this._uid}">
+                    <slot name="label">${this.label}</slot>
+                </label>
+                <slot name="after-label"></slot>
 
-            <div class="input-wrapper">
-                <input
-                    part="input"
-                    id="dp-input-${this._uid}"
-                    type="text"
-                    ?disabled=${this.disabled}
-                    ?readonly=${this.readonly}
-                    aria-required=${this.required ? 'true' : nothing}
-                    autocomplete=${this.autocomplete || nothing}
-                    placeholder=${this.placeholder || nothing}
-                    aria-labelledby="dp-label-${this._uid}"
-                    aria-describedby=${`dp-hint-${this._uid}${this._hasSlot.test('error') ? ` dp-error-${this._uid}` : ''}`}
-                    @input=${this._handleInput}
-                    @blur=${this._handleBlur}
-                />
-                <button
-                    part="trigger"
-                    type="button"
-                    ?disabled=${this.disabled || this.readonly}
-                    aria-label="Ouvrir le calendrier"
-                    aria-haspopup="dialog"
-                    aria-expanded=${this.open}
-                    @click=${this._handleTriggerClick}
-                >
-                    <svg
-                        aria-hidden="true"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <div class="input-wrapper">
+                    <input
+                        part="input"
+                        id="dp-input-${this._uid}"
+                        type="text"
+                        ?disabled=${this.disabled}
+                        ?readonly=${this.readonly}
+                        aria-required=${this.required ? 'true' : nothing}
+                        autocomplete=${this.autocomplete || nothing}
+                        placeholder=${this.placeholder || nothing}
+                        aria-labelledby="dp-label-${this._uid}"
+                        aria-describedby=${`dp-hint-${this._uid}${this._hasSlot.test('error') ? ` dp-error-${this._uid}` : ''}`}
+                        @input=${this._handleInput}
+                        @blur=${this._handleBlur}
+                    />
+                    <button
+                        part="trigger"
+                        type="button"
+                        ?disabled=${this.disabled || this.readonly}
+                        aria-label="Ouvrir le calendrier"
+                        aria-haspopup="dialog"
+                        aria-expanded=${this.open}
+                        @click=${this._handleTriggerClick}
                     >
-                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                        <line x1="16" y1="2" x2="16" y2="6" />
-                        <line x1="8" y1="2" x2="8" y2="6" />
-                        <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                </button>
-            </div>
+                        <svg
+                            aria-hidden="true"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                    </button>
+                </div>
 
-            <p part="hint" id="dp-hint-${this._uid}">
-                <slot name="hint">${defaultHint}</slot>
-            </p>
-            <p
-                part="error"
-                id="dp-error-${this._uid}"
-                role=${this._hasSlot.test('error') ? 'alert' : nothing}
-            >
-                <slot name="error"></slot>
-            </p>
+                <p part="hint" id="dp-hint-${this._uid}">
+                    <slot name="hint">${defaultHint}</slot>
+                </p>
+                <p
+                    part="error"
+                    id="dp-error-${this._uid}"
+                    role=${this._hasSlot.test('error') ? 'alert' : nothing}
+                >
+                    <slot name="error"></slot>
+                </p>
 
-            <div
-                part="panel"
-                popover="auto"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Sélectionner une date"
-                aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
-                id="ar-dp-panel-${this._uid}"
-                @keydown=${this._handlePanelKeyDown}
-            >
-                ${this.open ? this._renderCalendar(locale) : nothing}
+                <div
+                    part="panel"
+                    popover="auto"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Sélectionner une date"
+                    aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
+                    id="ar-dp-panel-${this._uid}"
+                    @keydown=${this._handlePanelKeyDown}
+                >
+                    ${this.open ? this._renderCalendar(locale) : nothing}
+                </div>
             </div>
         `;
     }
