@@ -94,7 +94,7 @@ export default css`
         table-layout: fixed;
     }
 
-    [part='day'] {
+    [part~='day'] {
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
         width: var(--ar-datepicker-day-size, 2.5rem);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — [part='grid'] a border-collapse: collapse, qui supprime l'espacement natif du <table> ; sans thème la cellule se dimensionnerait à son seul contenu textuel */
@@ -111,7 +111,7 @@ export default css`
         border-color: var(--ar-datepicker-day-border-color, transparent);
     }
 
-    [part='day'].today {
+    [part~='day'].today {
         color: var(--ar-datepicker-day-today-color);
         /* a11y-fallback: garde une distinction visible du reste de la grille sans thème */
         border-color: var(--ar-datepicker-day-today-border, GrayText);
@@ -119,11 +119,11 @@ export default css`
     }
 
     /* Efface la bordure au hover, sauf sur la cellule active de la grille */
-    [part='day']:not([aria-disabled='true']):not(.disabled):not([tabindex='0']):hover {
+    [part~='day']:not([aria-disabled='true']):not(.disabled):not([tabindex='0']):hover {
         border-color: transparent;
     }
 
-    [part='day']:not([aria-disabled='true']):not(.disabled):hover {
+    [part~='day']:not([aria-disabled='true']):not(.disabled):hover {
         /* a11y-fallback: fond et texte pairés — un fallback de fond seul introduirait une combinaison non testée */
         background-color: var(--ar-datepicker-day-hover-bg, ButtonFace);
         color: var(--ar-datepicker-day-hover-color, ButtonText);
@@ -134,7 +134,7 @@ export default css`
      * :focus-within couvre le focus programmatique (ouverture du picker) ET le focus clavier,
      * contrairement à :focus-visible qui ne s'active pas pour le focus programmatique.
      */
-    [part='grid']:focus-within [part='day'][tabindex='0'] {
+    [part='grid']:focus-within [part~='day'][tabindex='0'] {
         outline-style: solid;
         /* a11y-fallback: WCAG 2.4.7 (Focus Visible) */
         outline-width: var(--ar-datepicker-day-focus-ring-width, 2px);
@@ -144,7 +144,7 @@ export default css`
         border-color: var(--ar-datepicker-day-focus-border-color, transparent);
     }
 
-    [part='grid']:focus-within [part='day'][tabindex='0']:not(.selected) {
+    [part='grid']:focus-within [part~='day'][tabindex='0']:not(.selected) {
         background-color: var(--ar-datepicker-day-hover-bg);
         color: var(--ar-datepicker-day-hover-color);
     }
@@ -153,30 +153,30 @@ export default css`
      * Curseur de navigation visible quand le focus est hors de la grille (boutons nav/footer).
      * Indique quel jour prendra le focus au prochain Tab dans la grille.
      */
-    [part='day'][tabindex='0']:not(:focus-visible) {
+    [part~='day'][tabindex='0']:not(:focus-visible) {
         outline: 1px dashed var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
     }
 
-    [part='day'].selected {
+    [part~='day'].selected {
         /* a11y-fallback: sinon indiscernable des jours non sélectionnés sans thème */
         background-color: var(--ar-datepicker-day-selected-bg, Highlight);
         color: var(--ar-datepicker-day-selected-color, HighlightText);
         border-color: transparent;
     }
 
-    [part='day'].selected:not([aria-disabled='true']):not(.disabled):hover {
+    [part~='day'].selected:not([aria-disabled='true']):not(.disabled):hover {
         background-color: var(--ar-datepicker-day-selected-bg);
         /* border-color: transparent; */
     }
 
-    [part='day'].other-month {
+    [part~='day'].other-month {
         /* a11y-fallback: atténuation visible sans thème */
         color: var(--ar-datepicker-day-other-month-color, GrayText);
     }
 
-    [part='day'].disabled,
-    [part='day'][aria-disabled='true'] {
+    [part~='day'].disabled,
+    [part~='day'][aria-disabled='true'] {
         opacity: 0.4;
         cursor: not-allowed;
     }

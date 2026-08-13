@@ -44,6 +44,8 @@ import { warn } from '../../utils/warn.js';
  * @csspart hint       - Le texte d'aide sous l'input.
  * @csspart error      - Le message d'erreur sous l'input.
  * @csspart day        - Les boutons jours.
+ * @csspart control - Rôle transverse (voir /getting-started/naming-conventions), porté par `day` :
+ *   élément interactif générique.
  * @csspart footer     - Pied du calendrier.
  * @csspart footer-btn - Tous les boutons du footer (ciblage groupé).
  * @csspart today-btn  - Bouton « Aujourd'hui ».
@@ -425,7 +427,7 @@ export class ArDatepicker extends LitElement {
             <td role="gridcell" aria-selected=${selected ? 'true' : 'false'}>
                 <button
                     type="button"
-                    part="day"
+                    part="day control"
                     tabindex=${focused ? '0' : '-1'}
                     aria-label=${ariaLabel}
                     aria-current=${today ? 'date' : nothing}

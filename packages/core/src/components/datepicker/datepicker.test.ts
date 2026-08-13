@@ -134,7 +134,7 @@ describe('ArDatepicker', () => {
             el.addEventListener('ar-datepicker-hide', (e) => e.preventDefault());
 
             const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             dayBtn?.focus();
             dayBtn?.click();
@@ -162,6 +162,13 @@ describe('ArDatepicker', () => {
             await new Promise((r) => setTimeout(r, 50));
             // Le panel doit rester fermé (show annulé)
             expect(el.open).toBe(false);
+        });
+
+        it('les cellules jour portent le rôle transverse "control"', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            const day = el.shadowRoot?.querySelector('[part~="day"]');
+            expect(day?.getAttribute('part')?.split(/\s+/)).toContain('control');
         });
     });
 
