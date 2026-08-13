@@ -67,19 +67,29 @@ button`/`action-item`/`action-card` — PatternFly ; `remove-button` — Vaadin)
 
 ## Vocabulaire retenu
 
-| Rôle                 | Signification                                             | Sources qui le valident                          |
-| -------------------- | --------------------------------------------------------- | ------------------------------------------------ |
-| _(nom du composant)_ | Racine du composant (remplace `base`/`container`/absence) | Web Awesome                                      |
-| `panel`              | Conteneur flottant secondaire                             | Shoelace, Web Awesome                            |
-| `body`               | Zone de contenu principal                                 | Radix, Shoelace, Web Awesome, notre existant     |
-| `trigger`            | Ouvre/ferme un panel ou une zone repliable                | Shoelace, Web Awesome, Radix, notre existant     |
-| `header` / `footer`  | En-tête / pied de composant                               | Shoelace, Web Awesome, Radix, notre existant     |
-| `control`            | Élément interactif générique (hors field/action/trigger)  | Spectrum (officiel)                              |
-| `field`              | Reçoit une saisie                                         | Spectrum (officiel)                              |
-| `action-button`      | Bouton qui déclenche une action ponctuelle                | Spectrum, PatternFly, Vaadin (pattern `-button`) |
-| `indicator`          | Marqueur/indicateur visuel                                | Spectrum, Radix, notre `ar-table-sort` existant  |
-| `label`              | Texte descriptif                                          | Déjà transverse de fait dans Ariane              |
-| `icon`               | Icône                                                     | Déjà transverse de fait dans Ariane (`ar-alert`) |
+| Rôle                 | Signification                                                      | Sources qui le valident                          |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ |
+| _(nom du composant)_ | Racine du composant (remplace `base`/`container` s'il existe déjà) | Web Awesome                                      |
+| `panel`              | Conteneur flottant secondaire                                      | Shoelace, Web Awesome                            |
+| `body`               | Zone de contenu principal                                          | Radix, Shoelace, Web Awesome, notre existant     |
+| `trigger`            | Ouvre/ferme un panel ou une zone repliable                         | Shoelace, Web Awesome, Radix, notre existant     |
+| `header` / `footer`  | En-tête / pied de composant                                        | Shoelace, Web Awesome, Radix, notre existant     |
+| `control`            | Élément interactif générique (hors field/action/trigger)           | Spectrum (officiel)                              |
+| `field`              | Reçoit une saisie                                                  | Spectrum (officiel)                              |
+| `action-button`      | Bouton qui déclenche une action ponctuelle                         | Spectrum, PatternFly, Vaadin (pattern `-button`) |
+| `indicator`          | Marqueur/indicateur visuel                                         | Spectrum, Radix, notre `ar-table-sort` existant  |
+| `label`              | Texte descriptif                                                   | Déjà transverse de fait dans Ariane              |
+| `icon`               | Icône                                                              | Déjà transverse de fait dans Ariane (`ar-alert`) |
+
+**Le part racine ne justifie jamais, à lui seul, l'ajout d'un nouvel élément wrapper.** La
+justification initiale (éviter une collision de nom lors d'un chaînage `exportparts` si un
+composant est un jour imbriqué dans un autre) s'est révélée spéculative en pratique : `exportparts`
+n'est utilisé nulle part dans le codebase actuel, et le seul nesting réel entre composants Ariane
+(`ar-tooltip` dans `ar-table-sort`, #168) ne s'appuie pas sur ce mécanisme. Renommer un part racine
+déjà existant (`base`/`container` → nom du composant) reste fait, sans coût, par clarté — mais
+ajouter un wrapper dédié rien que pour porter ce rôle (comme fait pour `ar-datepicker` au lot 1)
+n'est plus la politique par défaut : ne l'envisager que si un besoin concret de nesting/exportparts
+se présente. `ar-datepicker` n'est pas revu rétroactivement pour l'instant.
 
 `trigger` et `action-button` restent des rôles frères, pas hiérarchiques : `trigger` uniquement
 pour un toggle de panel/zone repliable, `action-button` pour tout autre bouton de commande (close,
@@ -199,6 +209,17 @@ subagent-driven-development, revue finale de branche). Premier lot suggéré : `
 absente). Le correctif de slot `ar-charcounter` (`icon-warning`/`icon-error` →
 `warning-icon`/`error-icon`) est indépendant du reste — peut être fait dans n'importe quel lot,
 y compris le premier. Ordre des lots suivants à affiner au moment d'écrire le premier plan.
+
+**Lot 2** : renommage du part racine `base`/`container` → nom du composant, gratuit (élément
+wrapper déjà existant, simple renommage de chaîne) sur `ar-breadcrumb` (additif : `nav breadcrumb`,
+`nav` gardé car sémantiquement significatif — même schéma que `nav pagination` au lot 1),
+`ar-collapse`, `ar-progressbar`, `ar-tab`, `ar-tab-panel`, `ar-tab-group`, `ar-tooltip` (additif :
+`bubble tooltip`). `ar-alert`, `ar-dropdown`, `ar-table-sort` et `ar-spinner` n'ont pas de wrapper
+existant pour porter ce rôle sans en ajouter un — exclus du lot 2 par la politique retenue
+ci-dessus (pas de wrapper ajouté sans besoin concret). Le lot 2 inclut aussi 2 correctifs propres à
+`ar-collapse` : `content` → `body` (aligne sur le rôle transverse retenu) et `panel` → `collapsible`
+(le wrapper animé overflow/hauteur n'est pas un conteneur flottant, collision de sens à lever avec
+le rôle `panel`).
 
 ## Impact `custom-elements.json` / doc générée
 
