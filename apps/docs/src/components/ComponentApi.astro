@@ -223,13 +223,15 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
             )}
             {/* ── Tokens d'un composant imbriqué en interne (ex. tooltip dans table-sort) ── */}
             {relatedTokens.length > 0 && (
-                <ar-alert class="related-tokens" variant="info" without-notification>
-                    {relatedTokens.map((rt) => (
-                        <p class="related-tokens-note">
-                            {rt.description}{' '}<br>
-                            <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
-                        </p>
-                    ))}
+                <ar-alert class="doc-callout-alert" variant="info" without-notification>
+                    <div class="doc-callout-alert-content">
+                        {relatedTokens.map((rt) => (
+                            <p>
+                                {rt.description}{' '}<br>
+                                <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
+                            </p>
+                        ))}
+                    </div>
                 </ar-alert>
             )}
         </section>
@@ -288,30 +290,6 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
 
     .own-props-intro {
         margin-top: 1.875rem;
-    }
-
-    ar-alert.related-tokens {
-        margin-top: 1.875rem;
-
-        &::part(body) {
-            display: flex;
-            flex-direction: column;
-            row-gap: 0.5rem;
-        }
-    }
-
-    .related-tokens-note {
-        margin: 0;
-        font-size: 0.875rem;
-        /* Pas de couleur explicite : hérite de --ar-alert-color posé par ar-alert sur
-           :host — ar-alert calcule déjà un contraste correct contre son propre fond de
-           variante (info/warning/...), un remplacement fixe ici casserait ce contrat
-           pour tout variant dont le fond diffère de la couleur muette de la doc. */
-    }
-
-    .related-tokens-note a {
-        color: inherit;
-        text-decoration: underline;
     }
 
     .token-example pre {
