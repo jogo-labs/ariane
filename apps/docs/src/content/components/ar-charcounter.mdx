@@ -32,7 +32,7 @@ variants:
     - name: icon
       label: Icônes dans les slots
       description: |
-          Les slots `icon-warning` et `icon-error` permettent d'ajouter un signal non-couleur
+          Les slots `warning-icon` et `error-icon` permettent d'ajouter un signal non-couleur
           conforme WCAG 1.4.1. Le contenu du slot est rendu à côté du compteur dans l'état correspondant.
       html: |
           <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
@@ -40,8 +40,8 @@ variants:
               <textarea id="cc-icon" rows="3"
                   style="width:100%;resize:vertical;"></textarea>
               <ar-charcounter id="cc-icon-counter" for="cc-icon" max="80">
-                  <span slot="icon-warning" aria-hidden="true">⚠️</span>
-                  <span slot="icon-error" aria-hidden="true">❌</span>
+                  <span slot="warning-icon" aria-hidden="true">⚠️</span>
+                  <span slot="error-icon" aria-hidden="true">❌</span>
               </ar-charcounter>
           </div>
     - name: label
@@ -93,4 +93,4 @@ form.addEventListener('submit', (e) => {
 });
 ```
 
-- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="4.1.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `icon-warning` et `icon-error` permettent d'insérer un signal visuel supplémentaire (icône, symbole) à côté du compteur. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
+- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="4.1.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire (icône, symbole) à côté du compteur. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.

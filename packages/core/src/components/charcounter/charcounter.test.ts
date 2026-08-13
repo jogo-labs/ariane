@@ -54,7 +54,7 @@ describe('ArCharcounter', () => {
             el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
         });
 
-        it('contient part="container"', () => expect(getPart(el, 'container')).not.toBeNull());
+        it('contient part="charcounter"', () => expect(getPart(el, 'charcounter')).not.toBeNull());
         it('contient part="count"', () => expect(getPart(el, 'count')).not.toBeNull());
         it('contient part="remaining"', () => expect(getPart(el, 'remaining')).not.toBeNull());
         it('contient part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
@@ -79,7 +79,7 @@ describe('ArCharcounter', () => {
             vi.spyOn(console, 'warn').mockImplementation(() => {});
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f"></ar-charcounter>');
-            expect(getPart(el, 'container')).toBeNull();
+            expect(getPart(el, 'charcounter')).toBeNull();
             vi.restoreAllMocks();
         });
     });
