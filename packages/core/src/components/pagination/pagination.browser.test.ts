@@ -390,4 +390,90 @@ describe('ar-pagination — browser', () => {
             }
         });
     });
+
+    describe('mode compact (#180) — pas de bascule responsive', () => {
+        it('reste en mode compact quelle que soit la largeur du conteneur', async () => {
+            const wrapper = await fixture(
+                html`<div style="width: 900px;">
+                    <ar-pagination compact current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+
+            wrapper.style.width = '90px';
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // À 90px, le mode adaptatif basculerait sur un <select> (cf. test existant "bascule
+            // sur un <select>..." plus haut dans ce fichier) — le mode compact doit rester
+            // strictement identique, aucune bascule.
+            expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
+            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+        });
+
+        it('bascule compact→false→true→false remplace correctement un <select> déjà actif', async () => {
+            async function waitForResize(): Promise<void> {
+                await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            }
+
+            // 1. Instance non compacte dans un conteneur étroit : le vrai ResizeObserver doit
+            //    faire basculer le composant sur le palier <select> (précondition).
+            const wrapper = await fixture(
+                html`<div style="width: 90px;">
+                    <ar-pagination current="8" total="15"></ar-pagination>
+                </div>`,
+            );
+            const el = wrapper.querySelector('ar-pagination') as HTMLElement;
+            await elementUpdated(el);
+            await waitForResize();
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
+
+            // 2. Passage en mode compact alors que le <select> est déjà affiché : doit le
+            //    remplacer par le label, sans attendre de resize (compact ne dépend pas de la
+            //    largeur).
+            (el as unknown as { compact: boolean }).compact = true;
+            await elementUpdated(el);
+
+            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+            expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
+
+            // 3. Retour en mode non compact, toujours dans le conteneur étroit : le
+            //    ResizeObserver doit se rattacher et remesurer, restaurant le <select>.
+            (el as unknown as { compact: boolean }).compact = false;
+            await elementUpdated(el);
+            await waitForResize();
+
+            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
+        });
+
+        it('un clic sur next confirmé garde le focus sur le bouton actionné', async () => {
+            const el = await fixture(
+                html`<ar-pagination compact current="3" total="12"></ar-pagination>`,
+            );
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                (el as unknown as { current: number }).current = (
+                    e as CustomEvent<{ from: number; to: number }>
+                ).detail.to;
+            });
+            const shadowRoot = el.shadowRoot as ShadowRoot;
+            const next = shadowRoot.querySelector('[part~="next"]') as HTMLElement;
+
+            next.focus();
+            next.click();
+            await elementUpdated(el);
+
+            expect(shadowRoot.activeElement).to.equal(next);
+            expect((el as unknown as { current: number }).current).to.equal(4);
+        });
+    });
 });

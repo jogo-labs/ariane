@@ -1085,8 +1085,12 @@
     }
 
     ar-pagination {
-        &::part(list) {
+        &:not([compact])::part(list) {
             column-gap: 0.25rem;
+        }
+
+        &::part(page-label) {
+            padding-right: 0.5rem;
         }
 
         &::part(link),
@@ -1101,7 +1105,16 @@
         &::part(prev),
         &::part(next),
         &::part(select) {
-            border-radius: var(--ar-border-radius-xl);
+            border-radius: var(--ar-border-radius-lg);
+        }
+
+        &[compact]::part(prev) {
+            border-radius: var(--ar-border-radius-xl) 0 0 var(--ar-border-radius-lg);
+            border-right: 1px solid var(--ar-color-neutral-80);
+        }
+
+        &[compact]::part(next) {
+            border-radius: 0 var(--ar-border-radius-xl) var(--ar-border-radius-lg) 0;
         }
 
         /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
@@ -1183,6 +1196,14 @@
             background-position:
                 calc(100% - 0.75rem) center,
                 calc(100% - 1.1rem) center;
+        }
+
+        /* Même couleur de texte que link/prev/next (`--ar-color-text`) : le label doit rester
+           visuellement cohérent avec le reste du composant, bien qu'il ne soit pas interactif
+           (pas de background-color ni d'état hover/focus/active, contrairement aux parts
+           cliquables ci-dessus). */
+        &::part(label) {
+            color: var(--ar-color-text);
         }
 
         &::part(current) {

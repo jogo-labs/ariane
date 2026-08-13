@@ -23,6 +23,11 @@ variants:
       description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
+    - name: compact
+      label: Mode compact
+      description: Mode compact — uniquement précédent/suivant et un label de position, identique en mobile et desktop.
+      html: |
+          <ar-pagination compact current="4" total="12"></ar-pagination>
 pageScript: |
     <script>
         document.addEventListener('ar-pagination-page-change', (e) => {
@@ -68,7 +73,10 @@ import WcagRef from '../../components/WcagRef.astro';
 
 Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
 Lorsque l'espace disponible n'est plus jugé suffisant, les numéros de page sont remplacés par un `<select>` de saut de page,
-peuplé du même jeu de pages qu'à largeur confortable.
+peuplé du même jeu de pages qu'à largeur confortable — sauf en mode `compact`, qui ne bascule jamais et reste identique quelle
+que soit la largeur. Ce mode n'offre donc aucun filet de sécurité anti-débordement à largeur extrême (contrairement au mode
+adaptatif ci-dessus) : à vous de vérifier que le label et les boutons prev/next restent lisibles dans le contexte d'usage visé
+(ex. panneau de détail, drawer).
 
 ## Utilisation
 

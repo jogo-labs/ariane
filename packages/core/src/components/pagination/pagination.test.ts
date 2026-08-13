@@ -13,6 +13,21 @@ function partContains(el: Element, token: string): boolean {
     return (el.getAttribute('part') ?? '').split(/\s+/).includes(token);
 }
 
+/**
+ * Retourne le `<span part="label">` du mode compact (`renderCompactLabel`).
+ *
+ * `requirePart(el, 'label')` ne convient pas ici : happy-dom scinde aussi `~=` sur les
+ * tirets (mise en garde documentée dans test-utils.ts), donc `[part~="label"]` matche à
+ * tort le `<li part="item page-label">` englobant — rencontré en premier dans l'ordre du
+ * document — avant le `<span part="label">` réel. Sélecteur d'attribut exact (`=`) sur le
+ * `<span>` pour contourner ce faux positif propre à l'environnement de test.
+ */
+function requireLabel(el: ArPagination): Element {
+    const found = el.shadowRoot?.querySelector('span[part="label"]');
+    if (!found) throw new Error('Part "label" (span) not found in shadow DOM');
+    return found;
+}
+
 describe('ArPagination', () => {
     let el: ArPagination;
 
@@ -432,6 +447,61 @@ describe('ArPagination', () => {
         });
     });
 
+    // ── Mode compact — cycle de vie ResizeObserver ──────────────────────────
+
+    describe('mode compact — cycle de vie ResizeObserver', () => {
+        it('compact vaut false par défaut', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            expect(el.compact).toBe(false);
+        });
+
+        it('reflète compact en attribut HTML', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            el.compact = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('compact')).toBe(true);
+        });
+
+        it('compact=false (défaut) : instancie un ResizeObserver au montage', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+            expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
+        });
+
+        it("compact=true : n'instancie aucun ResizeObserver au montage", async () => {
+            el = await fixture('<ar-pagination compact></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+            expect(el._resizeObserver).toBeUndefined();
+        });
+
+        it('passer compact de true à false attache le ResizeObserver', async () => {
+            el = await fixture('<ar-pagination compact></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+            expect(el._resizeObserver).toBeUndefined();
+
+            el.compact = false;
+            await waitForUpdate(el);
+
+            // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+            expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
+        });
+
+        it('passer compact de false à true déconnecte le ResizeObserver existant', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour récupérer le ResizeObserver interne
+            const observer = el._resizeObserver;
+            expect(observer).toBeInstanceOf(ResizeObserver);
+            const disconnectSpy = vi.spyOn(observer as ResizeObserver, 'disconnect');
+
+            el.compact = true;
+            await waitForUpdate(el);
+
+            expect(disconnectSpy).toHaveBeenCalled();
+            // @ts-expect-error accès à un champ privé pour vérifier la déconnexion
+            expect(el._resizeObserver).toBeUndefined();
+        });
+    });
+
     describe("part d'état item--current", () => {
         it('le <li> de la page active porte part="item item--current"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
@@ -551,6 +621,80 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
             expect(el.current).toBe(4);
             expect(el.shadowRoot?.activeElement).toBe(nextBtn);
+        });
+    });
+
+    describe('mode compact — rendu', () => {
+        it('rend le label "Page X / Y" avec part="label"', async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            const label = requireLabel(el);
+            expect(label.textContent?.trim()).toBe('Page 3 / 12');
+        });
+
+        it('le <li> englobant du label porte part="item page-label" et aria-hidden', async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            const label = requireLabel(el);
+            const li = label.closest('[part~="page-label"]');
+            expect(li?.getAttribute('part')).toBe('item page-label');
+            expect(li?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('ordre DOM : label, prev, next', async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const items = Array.from(shadow.querySelectorAll('[part~="item"]'));
+            expect(items).toHaveLength(3);
+            expect(items[0]?.getAttribute('part')).toBe('item page-label');
+            expect((items[1] as Element).querySelector('[part~="prev"]')).not.toBeNull();
+            expect((items[2] as Element).querySelector('[part~="next"]')).not.toBeNull();
+        });
+
+        it("n'affiche aucun numéro de page ni <select> de saut de page", async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
+            expect(shadow.querySelector('[part~="select"]')).toBeNull();
+        });
+
+        it('total=1 : label affiche "Page 1 / 1", prev et next désactivés', async () => {
+            el = await fixture('<ar-pagination compact current="1" total="1"></ar-pagination>');
+            expect(requireLabel(el).textContent?.trim()).toBe('Page 1 / 1');
+            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(true);
+        });
+
+        it('prev désactivé en page 1, next actif', async () => {
+            el = await fixture('<ar-pagination compact current="1" total="12"></ar-pagination>');
+            expect(requirePart(el, 'prev').getAttribute('aria-disabled')).toBe('true');
+            expect(requirePart(el, 'next').getAttribute('aria-disabled')).toBe('false');
+        });
+
+        it('next désactivé en dernière page, prev actif', async () => {
+            el = await fixture('<ar-pagination compact current="12" total="12"></ar-pagination>');
+            expect(requirePart(el, 'next').getAttribute('aria-disabled')).toBe('true');
+            expect(requirePart(el, 'prev').getAttribute('aria-disabled')).toBe('false');
+        });
+
+        it('le label se met à jour après un changement de page confirmé', async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(requireLabel(el).textContent?.trim()).toBe('Page 4 / 12');
+        });
+
+        it('prev/next émettent ar-pagination-page-change en mode compact ({from, to})', async () => {
+            el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(handler).toHaveBeenCalledOnce();
+            const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
+                .detail;
+            expect(detail).toEqual({ from: 3, to: 4 });
         });
     });
 
