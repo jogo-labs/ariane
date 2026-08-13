@@ -36,16 +36,16 @@ const tooltipStyles = css`
         line-height: var(--ar-tooltip-line-height);
     }
 
-    [part='bubble']:not(:popover-open) {
+    [part~='bubble']:not(:popover-open) {
         display: none;
     }
 
-    [part='bubble']:popover-open {
+    [part~='bubble']:popover-open {
         animation: arPanelShow var(--ar-tooltip-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {
-        [part='bubble']:popover-open {
+        [part~='bubble']:popover-open {
             animation: none;
         }
     }
