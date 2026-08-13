@@ -54,6 +54,12 @@ charcounter) vs absente (spinner, pagination, dialog) ; zone de contenu principa
 button`/`action-item`/`action-card` — PatternFly ; `remove-button` — Vaadin).
 - **`panel` = conteneur flottant** est le sens consensuel (Shoelace/Web Awesome), pas la zone
   animée d'`ar-collapse` — décision inverse de la première intuition de ce brainstorming.
+- **`body`, pas `content`, pour la zone de contenu principal** : Radix formalise explicitement le
+  triptyque _« Header, Body, and Footer, borrowing directly from HTML's document structure »_, et
+  Shoelace/Web Awesome l'appliquent tel quel sur leur dialog (`header`/`body`/`footer`/
+  `close-button`). Spectrum définit certes `content` comme terme séparé, mais de façon redondante
+  avec son propre `body` — aucune source ne traite `content` de façon plus cohérente que `body`.
+  Avec `header`/`footer` déjà retenus comme rôles transverses, `body` en est le complément naturel.
 - Certains systèmes de référence (Salesforce Lightning Design System, en BEM) n'ont **aucun**
   vocabulaire transverse et scopent chaque nom à son composant — confirme que la démarche de
   l'issue #181 n'est pas une évidence universelle, mais un choix cohérent avec la philosophie
@@ -65,7 +71,7 @@ button`/`action-item`/`action-card` — PatternFly ; `remove-button` — Vaadin)
 | -------------------- | --------------------------------------------------------- | ------------------------------------------------ |
 | _(nom du composant)_ | Racine du composant (remplace `base`/`container`/absence) | Web Awesome                                      |
 | `panel`              | Conteneur flottant secondaire                             | Shoelace, Web Awesome                            |
-| `content`            | Zone de contenu principal (remplace/complète `body`)      | Spectrum, notre `ar-collapse` existant           |
+| `body`               | Zone de contenu principal                                 | Radix, Shoelace, Web Awesome, notre existant     |
 | `trigger`            | Ouvre/ferme un panel ou une zone repliable                | Shoelace, Web Awesome, Radix, notre existant     |
 | `header` / `footer`  | En-tête / pied de composant                               | Shoelace, Web Awesome, Radix, notre existant     |
 | `control`            | Élément interactif générique (hors field/action/trigger)  | Spectrum (officiel)                              |
@@ -90,8 +96,10 @@ futur composant a besoin d'un texte d'aide ou d'un marqueur de validation.
 
 **Additif uniquement, jamais de renommage breaking.** Un élément qui a déjà un part spécifique
 gagne le rôle transverse en plus, dans le même attribut `part` : `part="close action-button"`,
-`part="container base"` devient `part="progressbar"` (voir note racine ci-dessous),
-`part="body content"`.
+`part="container base"` devient `part="progressbar"` (voir note racine ci-dessous). `ar-alert`/
+`ar-dialog` n'ont rien à changer, ils utilisent déjà `body` — il devient directement le rôle
+transverse confirmé. Seul `ar-collapse` renomme son ancien `panel` (libéré pour le sens flottant,
+cf. ci-dessus) en `body`.
 
 **Racine du composant — cas particulier.** Contrairement aux autres rôles (additifs), la racine
 n'accumule pas ancien nom + nouveau : le part générique existant (`base` ou `container`) est
