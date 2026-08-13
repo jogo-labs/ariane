@@ -9,6 +9,7 @@
 import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
+import { isTransversePart } from '../utils/transverse-roles.ts';
 
 interface RelatedTokens {
     component:   string;
@@ -26,6 +27,10 @@ const publicMethods = getPublicMethods(component);
 
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
+
+const hasTransverseParts = (component.cssParts ?? []).some((p) =>
+    isTransversePart(p.name, component.tagName ?? ''),
+);
 ---
 
 <div class="component-api">
@@ -133,6 +138,14 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
             <h4 id="api-css-parts" class="subsection-title">CSS Parts</h4>
             <p class="hint">
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
+                {hasTransverseParts && (
+                    <>
+                        {' '}
+                        Certaines parts ci-dessous ont aussi un rôle transverse, partagé avec
+                        d'autres composants — voir les{' '}
+                        <a href="/getting-started/naming-conventions">conventions de nommage</a>.
+                    </>
+                )}
             </p>
             <div class="table-wrap">
                 <table>

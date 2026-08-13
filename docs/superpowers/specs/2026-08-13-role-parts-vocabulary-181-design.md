@@ -154,16 +154,26 @@ que de la reporter à un futur renommage. Composants sans aucun part racine actu
 pagination, dialog) : le part est simplement ajouté, pas de migration.
 
 **JSDoc `@csspart`.** Une ligne dédiée par rôle transverse (même convention que les parts d'état
-`--current`/`--pending`), marquée explicitement comme rôle transverse avec renvoi vers la page de
-doc dédiée :
+`--current`/`--pending`), avec une description normale — **sans** marqueur « Rôle transverse (voir
+...) » répété sur chaque ligne. Décision révisée après livraison du premier lot : le marqueur par
+ligne, présent sur chaque `@csspart` d'un rôle transverse, s'est révélé répétitif dès qu'un
+composant porte plusieurs rôles (jusqu'à 4 lignes dupliquant la même mention sur `ar-datepicker`).
 
 ```ts
 /**
  * @csspart close - Le bouton de fermeture.
- * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions) : déclenche une action de
- *   fermeture.
+ * @csspart action-button - Porté par `close` : déclenche une action ponctuelle.
  */
 ```
+
+**Détection automatique + mention unique dans la doc générée.** Plutôt que documenter le caractère
+transverse dans chaque ligne JSDoc, la page composant (`ComponentApi.astro`) détecte
+automatiquement si le composant expose au moins un rôle transverse — comparaison de chaque nom de
+part contre le catalogue des rôles (`apps/docs/src/utils/transverse-roles.ts`, source de vérité
+unique synchronisée avec la table de `/getting-started/naming-conventions`), plus un cas
+particulier pour la racine (nom de part égal au nom du composant sans préfixe). Si détecté, une
+phrase est ajoutée automatiquement au paragraphe d'aide (`hint`) de la section CSS Parts, avec un
+lien cliquable vers `/getting-started/naming-conventions` — pas de répétition par ligne.
 
 ## Documentation
 
@@ -193,9 +203,12 @@ y compris le premier. Ordre des lots suivants à affiner au moment d'écrire le 
 ## Impact `custom-elements.json` / doc générée
 
 Les rôles transverses sont de simples `@csspart` supplémentaires, déjà supportés par le pipeline
-CEM existant — aucun mécanisme nouveau requis côté génération de manifeste. Seule nouveauté :
-détecter et regrouper les parts marqués « rôle transverse » pour alimenter la nouvelle page de doc
-dédiée (mécanisme précis à définir au moment du plan d'implémentation).
+CEM existant — aucun mécanisme nouveau requis côté génération de manifeste. La page de doc dédiée
+(`/getting-started/naming-conventions`) reste écrite à la main (table statique), pas générée
+depuis le manifeste — cf. section « Documentation ». Seule nouveauté côté site de doc :
+`ComponentApi.astro` détecte, pour chaque composant, si l'un de ses parts porte un rôle transverse
+(catalogue dans `apps/docs/src/utils/transverse-roles.ts`) afin d'afficher une mention avec lien
+vers la page dédiée dans le paragraphe d'aide de la section CSS Parts — cf. section « Mécanisme ».
 
 ## Hors scope de ce chantier
 

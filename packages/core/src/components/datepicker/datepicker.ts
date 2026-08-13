@@ -24,12 +24,11 @@ import { warn } from '../../utils/warn.js';
  * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le prop
  *                     `closeLabel`).
  *
- * @csspart datepicker - Rôle transverse (voir /getting-started/naming-conventions) : racine du
- *   composant.
- * @csspart field      - Rôle transverse (voir /getting-started/naming-conventions), porté par `input` :
- *   élément qui reçoit une saisie. Sous-rôle standard de `field` (avec `select`, cf.
- *   ar-pagination), réutilisable par tout futur composant avec un champ texte.
+ * @csspart datepicker - Racine du composant.
  * @csspart input      - Le champ texte.
+ * @csspart field      - Porté par `input` : élément qui reçoit une saisie. Sous-rôle standard de
+ *   `field` (avec `select`, cf. ar-pagination), réutilisable par tout futur composant avec un
+ *   champ texte.
  * @csspart trigger    - Le bouton d'ouverture du calendrier.
  * @csspart panel      - Le popover flottant.
  * @csspart header     - En-tête du calendrier (navigation).
@@ -44,15 +43,13 @@ import { warn } from '../../utils/warn.js';
  * @csspart hint       - Le texte d'aide sous l'input.
  * @csspart error      - Le message d'erreur sous l'input.
  * @csspart day        - Les boutons jours.
- * @csspart control - Rôle transverse (voir /getting-started/naming-conventions), porté par `day` :
- *   élément interactif générique.
+ * @csspart control - Porté par `day` : élément interactif générique.
  * @csspart footer     - Pied du calendrier.
  * @csspart footer-button - Tous les boutons du footer (ciblage groupé).
  * @csspart today-button  - Bouton « Aujourd'hui ».
  * @csspart close-button  - Bouton « Fermer ».
- * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions), porté par
- *   les 4 boutons de navigation (`nav-button`) et les 2 boutons du footer (`footer-button`) :
- *   bouton qui déclenche une action ponctuelle.
+ * @csspart action-button - Porté par les 4 boutons de navigation (`nav-button`) et les 2 boutons
+ *   du footer (`footer-button`) : bouton qui déclenche une action ponctuelle.
  *
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).

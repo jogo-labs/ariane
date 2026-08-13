@@ -31,19 +31,16 @@ export interface ArPaginationPageChangeDetail {
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
  *
  * @csspart nav      - L'élément `<nav>` englobant.
- * @csspart pagination - Rôle transverse (voir /getting-started/naming-conventions) : racine du
- *   composant.
+ * @csspart pagination - Racine du composant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
  * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
  * @csspart item--current - Le `<li>` de la page courante (variante d'état de `item`).
  * @csspart link     - Les `<a>` cliquables de chaque page. Personnalisable via `::part(link)` (fond, couleur, bordure, survol/pressé/focus).
- * @csspart control - Rôle transverse (voir /getting-started/naming-conventions), porté par `link`
- *   et `current` : élément interactif générique.
+ * @csspart control - Porté par `link` et `current` : élément interactif générique.
  * @csspart current  - Le `<span>` de la page courante (non cliquable). Personnalisable via `::part(current)` (fond, couleur, bordure, épaisseur de trait).
  * @csspart prev     - Le bouton "Page précédente". Porte aussi le part combiné `nav-button`, partagé avec `next`.
  * @csspart next     - Le bouton "Page suivante". Porte aussi le part combiné `nav-button`, partagé avec `prev`.
- * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions), porté par
- *   `prev` et `next` : bouton qui déclenche une action ponctuelle.
+ * @csspart action-button - Porté par `prev` et `next` : bouton qui déclenche une action ponctuelle.
  * @csspart nav-button  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-button)` pour un style commun distinct des numéros de page).
  * @csspart nav-button--disabled - Variante d'état de `nav-button` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
@@ -52,9 +49,9 @@ export interface ArPaginationPageChangeDetail {
  *   minimal).
  * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
  *   (apparence). Conserve l'apparence native du navigateur (flèche incluse) par défaut.
- * @csspart field - Rôle transverse (voir /getting-started/naming-conventions), porté par `select` :
- *   élément qui reçoit une saisie. Sous-rôle standard de `field` (avec `input`, cf.
- *   ar-datepicker), réutilisable par tout futur composant avec une liste déroulante.
+ * @csspart field - Porté par `select` : élément qui reçoit une saisie. Sous-rôle standard de
+ *   `field` (avec `input`, cf. ar-datepicker), réutilisable par tout futur composant avec une
+ *   liste déroulante.
  * @csspart page-label - Le `<li>` englobant le label de position en mode compact (`compact`),
  *   affiché à la place de la liste de pages. Sur le modèle de `page-select`.
  * @csspart label - Le `<span>` du label de position en mode compact ("Page X / Y"), non
