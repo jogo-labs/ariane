@@ -76,7 +76,7 @@ const showPlayground = displayMode === 'demo';
                                 <Fragment set:html={variant.html} />
                             </div>
                         </div>
-                        <ar-collapse for={`collapse-${variant.name}`}>
+                        <ar-collapse class="code-collapse" for={`collapse-${variant.name}`}>
                             <div class="code-block">
                                 <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
                                 <pre><code class="language-html">{variant.html.trim()}</code></pre>
@@ -185,11 +185,26 @@ const showPlayground = displayMode === 'demo';
 <style>
     @import '../styles/doc-prose.css';
 
-    /* Évite le flash non-stylé le temps de l'hydratation du custom element
-       (Lit n'applique son shadow DOM/style qu'une fois défini côté client). */
-    ar-alert:not(:defined),
-    ar-collapse:not(:defined) {
+    /* Le cas général (masquer tout élément custom non défini) est couvert par la règle
+       globale `*:not(:defined)` dans Layout.astro (site-wide : nav du header, démos
+       injectées via `set:html` non scopées par Astro comprises). Reste ici uniquement le
+       correctif supplémentaire propre au ar-collapse du bloc de code : un élément custom
+       non défini a un display UA par défaut de "inline", donc `height` n'a aucun effet sur
+       lui — visibility:hidden masque bien la peinture, mais le `.code-block` (block-level)
+       qu'il contient continue de réserver son espace de layout (mesuré : ~160px). Résultat
+       sans ce correctif : un espace vide invisible qui s'effondre brutalement à 0 dès la
+       définition du composant (le panel est fermé par défaut) — un décalage de mise en page
+       perceptible comme un flash, même si rien n'est réellement peint. display:block +
+       height:0 + overflow:hidden alignent l'état "non défini" sur l'état final réel (panel
+       fermé), donc plus aucun saut. Ce sélecteur cible spécifiquement le wrapper de bloc de
+       code (class="code-collapse") — jamais les démos ar-collapse de sa propre page de doc
+       (couvertes par la règle générale ci-dessus), qui n'ont pas vocation à être forcées à
+       hauteur 0 (ex. variante "open"). */
+    ar-collapse.code-collapse:not(:defined) {
         visibility: hidden;
+        display: block;
+        height: 0;
+        overflow: hidden;
     }
 
     /* ── Variantes ─────────────────────────────────────── */

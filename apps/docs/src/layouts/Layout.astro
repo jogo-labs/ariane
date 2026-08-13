@@ -94,6 +94,18 @@ const {
             .narrative a:active {
                 color: var(--doc-accent);
             }
+
+            /* Masque tout élément custom non défini, où qu'il soit dans la page (nav du
+               header, démos de composant injectées via `set:html` — ces dernières ne
+               portent jamais l'attribut de scope Astro, donc un sélecteur scopé par
+               composant ne les matcherait jamais). Évite le flash de contenu slotté non
+               stylé le temps que /cdn/index.js définisse les custom elements.
+               :not(:defined) ne matche jamais les éléments HTML natifs (toujours
+               "defined"), donc ce sélecteur ne cible que les custom elements réellement en
+               attente d'hydratation — sans risque d'affecter le reste de la page. */
+            *:not(:defined) {
+                visibility: hidden;
+            }
         </style>
         <style>
             *, *::before, *::after { box-sizing: border-box; }
