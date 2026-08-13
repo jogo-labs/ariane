@@ -52,6 +52,10 @@ describe('ArPagination', () => {
             expect(getPart(el, 'list')).not.toBeNull();
         });
 
+        it('la racine <nav> porte aussi le part transverse "pagination"', () => {
+            expect(partContains(requirePart(el, 'nav'), 'pagination')).toBe(true);
+        });
+
         it('contient un part="prev"', () => {
             expect(getPart(el, 'prev')).not.toBeNull();
         });
@@ -60,11 +64,16 @@ describe('ArPagination', () => {
             expect(getPart(el, 'next')).not.toBeNull();
         });
 
-        it('contient un part="prev nav-btn" et part="next nav-btn"', () => {
+        it('contient un part="prev nav-button" et part="next nav-button"', () => {
             expect(partContains(requirePart(el, 'prev'), 'prev')).toBe(true);
-            expect(partContains(requirePart(el, 'prev'), 'nav-btn')).toBe(true);
+            expect(partContains(requirePart(el, 'prev'), 'nav-button')).toBe(true);
             expect(partContains(requirePart(el, 'next'), 'next')).toBe(true);
-            expect(partContains(requirePart(el, 'next'), 'nav-btn')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-button')).toBe(true);
+        });
+
+        it('prev/next portent aussi le rôle transverse "action-button"', () => {
+            expect(partContains(requirePart(el, 'prev'), 'action-button')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'action-button')).toBe(true);
         });
 
         it('part="list" n\'a pas de margin-top (repli UA du <ul> non réinitialisé sinon)', () => {
@@ -181,7 +190,7 @@ describe('ArPagination', () => {
         it('la page active a aria-current="page"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            const current = shadow.querySelector('[part="current"]') as Element;
+            const current = shadow.querySelector('span[part~="current"]') as Element;
             expect(current).not.toBeNull();
             expect(current.getAttribute('aria-current')).toBe('page');
         });
@@ -202,28 +211,36 @@ describe('ArPagination', () => {
         it('toutes les pages sont affichées si total < 10', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            const links = shadow.querySelectorAll('[part="link"], [part="current"]');
+            const links = shadow.querySelectorAll('[part~="link"], span[part~="current"]');
             expect(links.length).toBe(5);
         });
 
         it('la page courante utilise part="current" (span, non cliquable)', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            // Volontairement `=` strict (pas `~=`) : happy-dom (Vitest) a une implémentation
-            // non conforme de `~=` qui matche aussi "item--current" pour le token "current"
-            // (cf. mise en garde dans test-utils.ts) — un vrai navigateur ne matcherait pas
-            // le <li part="item item--current"> ici, mais happy-dom le ferait et casserait
-            // la distinction span/li que ce test vérifie précisément.
-            const currentPage = shadow.querySelector('[part="current"]') as Element;
+            // Qualifié par balise (`span[part~=...]`, pas juste `[part~=...]`) : happy-dom
+            // (Vitest) a une implémentation non conforme de `~=` qui matche aussi
+            // "item--current" pour le token "current" (cf. mise en garde dans test-utils.ts) —
+            // un vrai navigateur ne matcherait pas le <li part="item item--current"> ici, mais
+            // happy-dom le ferait et casserait la distinction span/li que ce test vérifie
+            // précisément. La qualification par balise écarte le <li>, qui n'est pas un <span>.
+            const currentPage = shadow.querySelector('span[part~="current"]') as Element;
             expect(currentPage.tagName.toLowerCase()).toBe('span');
         });
 
         it('les autres pages utilisent part="link" (lien cliquable)', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            const links = shadow.querySelectorAll('[part="link"]');
+            const links = shadow.querySelectorAll('[part~="link"]');
             // Toutes les pages sauf la 1ère sont des liens
             expect(links.length).toBe(4);
+        });
+
+        it('link/current portent le rôle transverse "control"', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            const shadow = el.shadowRoot as ShadowRoot;
+            const link = shadow.querySelector('[part~="link"]');
+            expect(link && partContains(link, 'control')).toBe(true);
         });
 
         it('ellipses présentes si total >= 10 et current éloigné des bords, avec part="ellipsis"', async () => {
@@ -256,7 +273,7 @@ describe('ArPagination', () => {
         it('le sr-only de la page active inclut le total ("Page X sur Y")', async () => {
             el = await fixture('<ar-pagination current="3" total="12"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            const current = shadow.querySelector('[part="current"]') as Element;
+            const current = shadow.querySelector('span[part~="current"]') as Element;
             const srOnly = current.querySelector('.sr-only');
             expect(srOnly?.textContent).toBe('Page 3 sur 12');
         });
@@ -299,14 +316,14 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const shadow = el.shadowRoot as ShadowRoot;
-            // Match exact (`=`, pas `~=`) : happy-dom scinde aussi sur les tirets dans son
-            // implémentation de `~=`, donc `[part~="select"]` matcherait à tort le `<li
-            // part="item page-select">` (voir mise en garde dans test-utils.ts) avant même
-            // d'atteindre le `<select part="select">` imbriqué.
-            const select = shadow.querySelector('[part="select"]');
+            // Qualifié par balise (`select[part~=...]`, pas juste `[part~=...]`) : happy-dom
+            // scinde aussi sur les tirets dans son implémentation de `~=`, donc `[part~="select"]`
+            // seul matcherait à tort le `<li part="item page-select">` (voir mise en garde dans
+            // test-utils.ts) avant même d'atteindre le `<select part="select field">` imbriqué.
+            const select = shadow.querySelector('select[part~="select"]');
             expect(select).not.toBeNull();
             expect(select?.tagName.toLowerCase()).toBe('select');
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
+            expect(shadow.querySelectorAll('[part~="link"], span[part~="current"]').length).toBe(0);
         });
 
         it("peuple le select avec le même jeu de pages qu'à largeur confortable, pas la fenêtre réduite au budget actuel", async () => {
@@ -316,9 +333,9 @@ describe('ArPagination', () => {
             el.requestUpdate();
             await waitForUpdate(el);
 
-            // Match exact, cf. mise en garde `~=`/happy-dom ci-dessus.
+            // Qualifié par balise, cf. mise en garde `~=`/happy-dom ci-dessus.
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             const options = Array.from(select.querySelectorAll('option'));
             // _calculatePages(3, 15) SANS budget (donc budget par défaut 9) = [1, 2, 3, 4, 5, 6, 7, -2, 15]
@@ -365,7 +382,7 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             const options = Array.from(select.querySelectorAll('option'));
             // Même jeu de 9 options qu'avec _budget = 2 ci-dessus : le contenu du select ne varie
@@ -391,9 +408,9 @@ describe('ArPagination', () => {
             el.requestUpdate();
             await waitForUpdate(el);
 
-            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            // Qualifié par balise, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             const options = Array.from(select.querySelectorAll('option'));
             expect(options[0]?.textContent?.trim()).toBe('Page 1 sur 15');
@@ -412,7 +429,7 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('[part~="select"]')).toBeNull();
+            expect(shadow.querySelector('select[part~="select"]')).toBeNull();
         });
 
         it('bascule en palier select si le budget suffirait techniquement mais la fenêtre obtenue a 2 ellipses (seulement 3 pages réelles)', async () => {
@@ -426,9 +443,21 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
 
             const shadow = el.shadowRoot as ShadowRoot;
-            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
-            expect(shadow.querySelector('[part="select"]')).not.toBeNull();
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
+            // Qualifié par balise, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            expect(shadow.querySelector('select[part~="select"]')).not.toBeNull();
+            expect(shadow.querySelectorAll('[part~="link"], span[part~="current"]').length).toBe(0);
+        });
+
+        it('select porte le rôle transverse "field"', async () => {
+            el = await fixture('<ar-pagination current="8" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 5;
+            el.requestUpdate();
+            await waitForUpdate(el);
+
+            const shadow = el.shadowRoot as ShadowRoot;
+            const select = shadow.querySelector('select[part~="select"]');
+            expect(select && partContains(select, 'field')).toBe(true);
         });
 
         it('le plancher est identique en bord de liste et en position intermédiaire (pas de dépendance à la position de current)', async () => {
@@ -442,8 +471,10 @@ describe('ArPagination', () => {
             el.requestUpdate();
             await waitForUpdate(el);
 
-            // Match exact, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
-            expect((el.shadowRoot as ShadowRoot).querySelector('[part="select"]')).not.toBeNull();
+            // Qualifié par balise, cf. mise en garde `~=`/happy-dom plus haut dans ce describe.
+            expect(
+                (el.shadowRoot as ShadowRoot).querySelector('select[part~="select"]'),
+            ).not.toBeNull();
         });
     });
 
@@ -523,25 +554,25 @@ describe('ArPagination', () => {
         });
     });
 
-    describe("part d'état nav-btn--disabled", () => {
-        it('prev porte le part nav-btn--disabled en page 1', async () => {
+    describe("part d'état nav-button--disabled", () => {
+        it('prev porte le part nav-button--disabled en page 1', async () => {
             el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
-            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(true);
+            expect(partContains(requirePart(el, 'prev'), 'nav-button--disabled')).toBe(true);
         });
 
-        it('prev ne porte pas nav-btn--disabled quand current > 1', async () => {
+        it('prev ne porte pas nav-button--disabled quand current > 1', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
-            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(false);
+            expect(partContains(requirePart(el, 'prev'), 'nav-button--disabled')).toBe(false);
         });
 
-        it('next porte le part nav-btn--disabled en dernière page', async () => {
+        it('next porte le part nav-button--disabled en dernière page', async () => {
             el = await fixture('<ar-pagination current="5" total="5"></ar-pagination>');
-            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-button--disabled')).toBe(true);
         });
 
-        it('next ne porte pas nav-btn--disabled avant la dernière page', async () => {
+        it('next ne porte pas nav-button--disabled avant la dernière page', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
-            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(false);
+            expect(partContains(requirePart(el, 'next'), 'nav-button--disabled')).toBe(false);
         });
     });
 
@@ -652,15 +683,15 @@ describe('ArPagination', () => {
         it("n'affiche aucun numéro de page ni <select> de saut de page", async () => {
             el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).toBe(0);
-            expect(shadow.querySelector('[part~="select"]')).toBeNull();
+            expect(shadow.querySelectorAll('[part~="link"], span[part~="current"]').length).toBe(0);
+            expect(shadow.querySelector('select[part~="select"]')).toBeNull();
         });
 
         it('total=1 : label affiche "Page 1 / 1", prev et next désactivés', async () => {
             el = await fixture('<ar-pagination compact current="1" total="1"></ar-pagination>');
             expect(requireLabel(el).textContent?.trim()).toBe('Page 1 / 1');
-            expect(partContains(requirePart(el, 'prev'), 'nav-btn--disabled')).toBe(true);
-            expect(partContains(requirePart(el, 'next'), 'nav-btn--disabled')).toBe(true);
+            expect(partContains(requirePart(el, 'prev'), 'nav-button--disabled')).toBe(true);
+            expect(partContains(requirePart(el, 'next'), 'nav-button--disabled')).toBe(true);
         });
 
         it('prev désactivé en page 1, next actif', async () => {
@@ -819,7 +850,7 @@ describe('ArPagination', () => {
             const handler = vi.fn();
             el.addEventListener('ar-pagination-page-change', handler);
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             select.value = '15';
             select.dispatchEvent(new Event('change'));
@@ -841,7 +872,7 @@ describe('ArPagination', () => {
             el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
 
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             select.value = '15';
             select.dispatchEvent(new Event('change'));
@@ -862,7 +893,7 @@ describe('ArPagination', () => {
             });
 
             const select = (el.shadowRoot as ShadowRoot).querySelector(
-                '[part="select"]',
+                'select[part~="select"]',
             ) as HTMLSelectElement;
             select.value = '15';
             select.dispatchEvent(new Event('change'));
@@ -1000,14 +1031,14 @@ describe('ArPagination', () => {
             pageLink.click();
             await waitForUpdate(el);
 
-            const current = shadow.querySelector('[part~="current"]') as HTMLElement;
+            const current = shadow.querySelector('span[part~="current"]') as HTMLElement;
             expect(shadow.activeElement).toBe(current);
         });
 
         it('le nouvel élément part="current" porte tabindex="-1"', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             const shadow = el.shadowRoot as ShadowRoot;
-            const current = shadow.querySelector('[part="current"]') as HTMLElement;
+            const current = shadow.querySelector('span[part~="current"]') as HTMLElement;
             expect(current.getAttribute('tabindex')).toBe('-1');
         });
     });
@@ -1054,7 +1085,7 @@ describe('ArPagination', () => {
 
         it('total négatif : render() reste fonctionnel et ne montre aucun numéro de page négatif', async () => {
             el = await fixture('<ar-pagination total="-3"></ar-pagination>');
-            expect(el.shadowRoot?.querySelector('[part="nav"]')).not.toBeNull();
+            expect(el.shadowRoot?.querySelector('[part~="nav"]')).not.toBeNull();
 
             const prevLabel = el.shadowRoot?.querySelector('[part~="prev"] .sr-only')?.textContent;
             const nextLabel = el.shadowRoot?.querySelector('[part~="next"] .sr-only')?.textContent;

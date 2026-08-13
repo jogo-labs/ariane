@@ -31,9 +31,9 @@ export default css`
         align-items: center;
         justify-content: center;
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
-        min-height: var(--ar-pagination-btn-size, 2.5rem);
+        min-height: var(--ar-pagination-button-size, 2.5rem);
         /* a11y-fallback: WCAG 2.5.8 taille de cible minimale */
-        min-width: var(--ar-pagination-btn-size, 2.5rem);
+        min-width: var(--ar-pagination-button-size, 2.5rem);
     }
 
     [part~='prev'],
@@ -83,7 +83,7 @@ export default css`
         width: auto;
     }
 
-    [part~='nav-btn--disabled'] {
+    [part~='nav-button--disabled'] {
         cursor: not-allowed;
     }
 `;

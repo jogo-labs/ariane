@@ -401,7 +401,7 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Pagination
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-pagination-btn-size: 2.5rem;
+        --ar-pagination-button-size: 2.5rem;
         --ar-pagination-transition-duration: var(--ar-button-transition-duration);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -683,7 +683,7 @@
             padding: 1rem;
         }
 
-        &::part(nav-btn) {
+        &::part(nav-button) {
             width: 2rem;
             height: 2rem;
             background: transparent;
@@ -692,15 +692,15 @@
             border-radius: var(--ar-border-radius-sm);
         }
 
-        &::part(nav-btn):hover {
+        &::part(nav-button):hover {
             background: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
         }
 
-        &::part(nav-btn):active {
+        &::part(nav-button):active {
             background: color-mix(in srgb, var(--ar-color-text) 14%, transparent);
         }
 
-        &::part(nav-btn):focus-visible {
+        &::part(nav-button):focus-visible {
             outline-offset: var(--ar-focus-ring-offset);
         }
 
@@ -1148,13 +1148,13 @@
         }
 
         /* Spécificité égale aux variantes :focus-visible/:hover/:active ci-dessus (pseudo-élément
-           + pseudo-classe) requise pour gagner la cascade : ::part(nav-btn--disabled) seul
+           + pseudo-classe) requise pour gagner la cascade : ::part(nav-button--disabled) seul
            (spécificité pseudo-élément uniquement) perdrait face à ::part(prev):hover malgré
            un ordre de déclaration ultérieur. */
-        &::part(nav-btn--disabled),
-        &::part(nav-btn--disabled):hover,
-        &::part(nav-btn--disabled):active,
-        &::part(nav-btn--disabled):focus-visible {
+        &::part(nav-button--disabled),
+        &::part(nav-button--disabled):hover,
+        &::part(nav-button--disabled):active,
+        &::part(nav-button--disabled):focus-visible {
             background-color: var(--ar-button-disabled-bg);
             color: var(--ar-button-disabled-color);
         }

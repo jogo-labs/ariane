@@ -31,21 +31,30 @@ export interface ArPaginationPageChangeDetail {
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
  *
  * @csspart nav      - L'élément `<nav>` englobant.
+ * @csspart pagination - Rôle transverse (voir /getting-started/naming-conventions) : racine du
+ *   composant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
  * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
  * @csspart item--current - Le `<li>` de la page courante (variante d'état de `item`).
  * @csspart link     - Les `<a>` cliquables de chaque page. Personnalisable via `::part(link)` (fond, couleur, bordure, survol/pressé/focus).
+ * @csspart control - Rôle transverse (voir /getting-started/naming-conventions), porté par `link`
+ *   et `current` : élément interactif générique.
  * @csspart current  - Le `<span>` de la page courante (non cliquable). Personnalisable via `::part(current)` (fond, couleur, bordure, épaisseur de trait).
- * @csspart prev     - Le bouton "Page précédente". Porte aussi le part combiné `nav-btn`, partagé avec `next`.
- * @csspart next     - Le bouton "Page suivante". Porte aussi le part combiné `nav-btn`, partagé avec `prev`.
- * @csspart nav-btn  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-btn)` pour un style commun distinct des numéros de page).
- * @csspart nav-btn--disabled - Variante d'état de `nav-btn` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
+ * @csspart prev     - Le bouton "Page précédente". Porte aussi le part combiné `nav-button`, partagé avec `next`.
+ * @csspart next     - Le bouton "Page suivante". Porte aussi le part combiné `nav-button`, partagé avec `prev`.
+ * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions), porté par
+ *   `prev` et `next` : bouton qui déclenche une action ponctuelle.
+ * @csspart nav-button  - Part combiné sur `prev`/`next`, pour cibler les deux boutons de navigation ensemble (ex. `::part(nav-button)` pour un style commun distinct des numéros de page).
+ * @csspart nav-button--disabled - Variante d'état de `nav-button` posée sur `prev`/`next` quand désactivé (page 1 ou dernière page).
  * @csspart ellipsis - Le `<span>` d'ellipse (`...`) entre deux groupes de pages, non interactif.
  * @csspart page-select - Le `<li>` englobant le `<select>` de saut de page, affiché à la place
  *   de la liste de pages quand l'espace disponible ne permet plus d'afficher de numéros (palier
  *   minimal).
  * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
  *   (apparence). Conserve l'apparence native du navigateur (flèche incluse) par défaut.
+ * @csspart field - Rôle transverse (voir /getting-started/naming-conventions), porté par `select` :
+ *   élément qui reçoit une saisie. Sous-rôle standard de `field` (avec `input`, cf.
+ *   ar-datepicker), réutilisable par tout futur composant avec une liste déroulante.
  * @csspart page-label - Le `<li>` englobant le label de position en mode compact (`compact`),
  *   affiché à la place de la liste de pages. Sur le modèle de `page-select`.
  * @csspart label - Le `<span>` du label de position en mode compact ("Page X / Y"), non
@@ -56,7 +65,7 @@ export interface ArPaginationPageChangeDetail {
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
  *
- * @cssprop --ar-pagination-btn-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
+ * @cssprop --ar-pagination-button-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
@@ -123,7 +132,7 @@ export class ArPagination extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         // `_initialized` reste faux ici au tout premier montage (le shadow DOM n'existe pas
-        // encore, `_setupResizeObserver` ne trouverait pas `[part="nav"]`) — ce n'est donc PAS un
+        // encore, `_setupResizeObserver` ne trouverait pas `[part~="nav"]`) — ce n'est donc PAS un
         // doublon avec l'appel dans `firstUpdated()` ci-dessous, qui gère ce premier montage une
         // fois le rendu initial fait. Cet appel-ci ne joue que lors d'une reconnexion ultérieure
         // (élément déplacé/réinséré dans le DOM après un premier montage), pour réattacher
@@ -147,7 +156,7 @@ export class ArPagination extends LitElement {
 
     private _setupResizeObserver(): void {
         this._resizeObserver?.disconnect();
-        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part~="nav"]');
         if (!nav) return;
         this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
         this._resizeObserver.observe(nav);
@@ -175,7 +184,7 @@ export class ArPagination extends LitElement {
     }
 
     private _recalculateBudget(): void {
-        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part~="nav"]');
         const list = this.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
         const prev = this.shadowRoot?.querySelector<HTMLElement>('[part~="prev"]');
         const next = this.shadowRoot?.querySelector<HTMLElement>('[part~="next"]');
@@ -271,7 +280,12 @@ export class ArPagination extends LitElement {
                 this._emitChanged({ from, to });
                 this._announcePageChange();
                 if (this.current === this._pendingFocusPage) {
-                    void focusAfterUpdate(this, '[part~="current"]');
+                    // Qualifié par balise (`span[part~=...]`) : sous happy-dom (Vitest), `~=`
+                    // scinde aussi sur les tirets et matcherait à tort le `<li
+                    // part="item item--current">` englobant avant le `<span part="current">`
+                    // réel (mise en garde dans test-utils.ts). Sans effet en navigateur réel
+                    // (spec-conforme), où seul le `<span>` matche de toute façon.
+                    void focusAfterUpdate(this, 'span[part~="current"]');
                 }
             }
         }
@@ -316,14 +330,16 @@ export class ArPagination extends LitElement {
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
 
-        return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
+        return html` <nav part="nav pagination" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
             <ul part="list" @click=${this._onPageChange}>
                 ${this.compact ? this.renderCompactLabel(current, total) : nothing}
 
                 <li part="item">
                     <a
-                        part="prev nav-btn${isPreviousDisabled ? ' nav-btn--disabled' : ''}"
+                        part="prev nav-button action-button${isPreviousDisabled
+                            ? ' nav-button--disabled'
+                            : ''}"
                         href="javascript:;"
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
@@ -339,7 +355,9 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="next nav-btn${isNextDisabled ? ' nav-btn--disabled' : ''}"
+                        part="next nav-button action-button${isNextDisabled
+                            ? ' nav-button--disabled'
+                            : ''}"
                         href="javascript:;"
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
@@ -412,7 +430,7 @@ export class ArPagination extends LitElement {
     protected renderPageLink(page: number, active: boolean, total: number): TemplateResult {
         if (active) {
             return html` <span
-                part="current"
+                part="current control"
                 tabindex="-1"
                 aria-current="page"
                 data-ar-pagination-page="${page}"
@@ -420,7 +438,7 @@ export class ArPagination extends LitElement {
                 ${this.renderPageLabel(page, total)}
             </span>`;
         }
-        return html` <a part="link" data-ar-pagination-page="${page}" href="javascript:;">
+        return html` <a part="link control" data-ar-pagination-page="${page}" href="javascript:;">
             ${this.renderPageLabel(page, total)}
         </a>`;
     }
@@ -450,7 +468,7 @@ export class ArPagination extends LitElement {
         return html`<li part="item page-select">
             <span class="sr-only" id="ar-pagination-select-label">Aller à la page</span>
             <select
-                part="select"
+                part="select field"
                 aria-labelledby="ar-pagination-select-label"
                 @change=${this._onSelectChange}
             >
