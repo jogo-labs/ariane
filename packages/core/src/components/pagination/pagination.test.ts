@@ -432,6 +432,61 @@ describe('ArPagination', () => {
         });
     });
 
+    // ── Mode compact — cycle de vie ResizeObserver ──────────────────────────
+
+    describe('mode compact — cycle de vie ResizeObserver', () => {
+        it('compact vaut false par défaut', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            expect(el.compact).toBe(false);
+        });
+
+        it('reflète compact en attribut HTML', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            el.compact = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('compact')).toBe(true);
+        });
+
+        it('compact=false (défaut) : instancie un ResizeObserver au montage', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+            expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
+        });
+
+        it("compact=true : n'instancie aucun ResizeObserver au montage", async () => {
+            el = await fixture('<ar-pagination compact></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+            expect(el._resizeObserver).toBeUndefined();
+        });
+
+        it('passer compact de true à false attache le ResizeObserver', async () => {
+            el = await fixture('<ar-pagination compact></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+            expect(el._resizeObserver).toBeUndefined();
+
+            el.compact = false;
+            await waitForUpdate(el);
+
+            // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+            expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
+        });
+
+        it('passer compact de false à true déconnecte le ResizeObserver existant', async () => {
+            el = await fixture('<ar-pagination></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour récupérer le ResizeObserver interne
+            const observer = el._resizeObserver;
+            expect(observer).toBeInstanceOf(ResizeObserver);
+            const disconnectSpy = vi.spyOn(observer as ResizeObserver, 'disconnect');
+
+            el.compact = true;
+            await waitForUpdate(el);
+
+            expect(disconnectSpy).toHaveBeenCalled();
+            // @ts-expect-error accès à un champ privé pour vérifier la déconnexion
+            expect(el._resizeObserver).toBeUndefined();
+        });
+    });
+
     describe("part d'état item--current", () => {
         it('le <li> de la page active porte part="item item--current"', async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');

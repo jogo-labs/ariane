@@ -83,6 +83,15 @@ export class ArPagination extends LitElement {
     @property({ reflect: true, type: Number, useDefault: true })
     total: number = ArPagination.DEFAULT_TOTAL;
 
+    /**
+     * Mode compact : uniquement les boutons précédent/suivant et un label de position
+     * ("Page X / Y"), navigation strictement séquentielle (pas de saut direct à une page).
+     * @attr compact
+     * @default false
+     */
+    @property({ reflect: true, type: Boolean })
+    compact: boolean = false;
+
     @state() private _budget?: number;
     private _resizeObserver?: ResizeObserver | undefined;
     private _itemWidth = 0;
@@ -106,11 +115,21 @@ export class ArPagination extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        if (this._initialized) this._setupResizeObserver();
+        // `_initialized` reste faux ici au tout premier montage (le shadow DOM n'existe pas
+        // encore, `_setupResizeObserver` ne trouverait pas `[part="nav"]`) — ce n'est donc PAS un
+        // doublon avec l'appel dans `firstUpdated()` ci-dessous, qui gère ce premier montage une
+        // fois le rendu initial fait. Cet appel-ci ne joue que lors d'une reconnexion ultérieure
+        // (élément déplacé/réinséré dans le DOM après un premier montage), pour réattacher
+        // l'observer que `disconnectedCallback` a démonté à la déconnexion précédente.
+        if (this._initialized && !this.compact) this._setupResizeObserver();
     }
 
     override firstUpdated(): void {
         this._initialized = true;
+        // Mode compact : pas de repli automatique en <select>, donc aucun besoin de mesurer la
+        // largeur disponible — le ResizeObserver et la remesure liée aux polices web seraient un
+        // travail pur perte, court-circuités entièrement ici.
+        if (this.compact) return;
         this._setupResizeObserver();
         // Une police web chargée après le premier paint peut changer la largeur mesurée des
         // items (ex. police variable, chargement asynchrone) : force une remesure une fois
@@ -179,6 +198,14 @@ export class ArPagination extends LitElement {
     }
 
     override updated(changed: Map<string, unknown>): void {
+        if (changed.has('compact')) {
+            if (this.compact) {
+                this._resizeObserver?.disconnect();
+                this._resizeObserver = undefined;
+            } else if (this._initialized) {
+                this._setupResizeObserver();
+            }
+        }
         if (changed.has('total') && this.total < 1) {
             warn('ar-pagination', `total doit être ≥ 1. Valeur reçue : ${this.total}.`);
         }
@@ -194,7 +221,7 @@ export class ArPagination extends LitElement {
         }
         if (changed.has('total')) {
             const digits = String(Math.max(this.total, 1)).length;
-            if (this._prevTotalDigits && digits !== this._prevTotalDigits) {
+            if (!this.compact && this._prevTotalDigits && digits !== this._prevTotalDigits) {
                 // Le nombre de chiffres du total a changé (ex. 9 → 10, 99 → 100) : la largeur
                 // d'item mesurée précédemment (figée sur l'ancien total) n'est plus fiable —
                 // marque une remesure comme due avant le prochain calcul de budget. La remesure
