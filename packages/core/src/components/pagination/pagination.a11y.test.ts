@@ -38,3 +38,33 @@ describe('ar-pagination — accessibilité', () => {
         await expect(el).to.be.accessible();
     });
 });
+
+describe('ar-pagination — mode compact — accessibilité', () => {
+    it('page milieu de liste, mode compact, est accessible', async () => {
+        const el = await fixture(
+            html`<ar-pagination compact current="4" total="12"></ar-pagination>`,
+        );
+        await expect(el).to.be.accessible();
+    });
+
+    it('première page, mode compact (prev désactivé), est accessible', async () => {
+        const el = await fixture(
+            html`<ar-pagination compact current="1" total="12"></ar-pagination>`,
+        );
+        await expect(el).to.be.accessible();
+    });
+
+    it('dernière page, mode compact (next désactivé), est accessible', async () => {
+        const el = await fixture(
+            html`<ar-pagination compact current="12" total="12"></ar-pagination>`,
+        );
+        await expect(el).to.be.accessible();
+    });
+
+    it('total=1, mode compact (prev et next désactivés), est accessible', async () => {
+        const el = await fixture(
+            html`<ar-pagination compact current="1" total="1"></ar-pagination>`,
+        );
+        await expect(el).to.be.accessible();
+    });
+});
