@@ -1,4 +1,4 @@
-# Design — Vocabulaire de rôles `::part()` transverses
+# Design — Vocabulaire de rôles `::part()` et conventions de `slot` transverses
 
 **Statut :** Validé (en attente de plan d'implémentation)
 **Date :** 2026-08-13
@@ -85,6 +85,29 @@ button`/`action-item`/`action-card` — PatternFly ; `remove-button` — Vaadin)
 pour un toggle de panel/zone repliable, `action-button` pour tout autre bouton de commande (close,
 prev/next, today, footer-btn...).
 
+## Slots — documenter l'existant, un correctif de cohérence
+
+Audit des `@slot` sur les 19 composants : contrairement aux `part`, les slots suivent déjà des
+conventions cohérentes de fait, sans l'incohérence type `base`/`container` trouvée sur les parts.
+Un `slot` désigne intrinsèquement un point précis de structure (l'icône du bouton close, pas un
+point d'injection générique réutilisable ailleurs) — la notion de rôle transverse abstrait ne s'y
+transpose pas comme pour les `part`. Décision : **pas de retrofit de code pour les slots**, sauf un
+correctif ponctuel repéré pendant l'audit (ci-dessous). Seule la documentation est nouvelle.
+
+Conventions déjà suivies, à formaliser dans la doc :
+
+- **Slot par défaut (sans nom)** = contenu principal — natif HTML, aucune ambiguïté possible
+  (dropdown, alert, collapse, dialog, tab, tab-panel, tooltip, table-sort...).
+- **`trigger`** — même nom, même sens que le rôle `trigger` des `part` (dropdown, collapse).
+- **Suffixe `<rôle>-icon`** — déjà systématique (mémoire `project_icon_slot_pattern`) : `close-icon`,
+  `home-icon`, `trigger-icon`, `prev-icon`/`next-icon`.
+- **`header-actions`, `footer`** (dialog) — reprennent déjà les noms des `part` homonymes.
+
+**Correctif de cohérence inclus dans ce chantier** : `ar-charcounter` expose `icon-warning`/
+`icon-error`, seul écart au suffixe `<rôle>-icon` établi partout ailleurs. Renommés en
+`warning-icon`/`error-icon`. Renommage sec (pas d'alias, pas de dépréciation) — projet en alpha,
+`warnDeprecated` non requis à ce stade (cf. CLAUDE.md).
+
 ## Hors périmètre (YAGNI)
 
 `help-text`/`validation-marker` (termes Spectrum officiels, proches de nos `hint`/`error`
@@ -117,24 +140,30 @@ doc dédiée :
 ```ts
 /**
  * @csspart close - Le bouton de fermeture.
- * @csspart action-button - Rôle transverse (voir /concepts/parts-roles) : déclenche une action de
+ * @csspart action-button - Rôle transverse (voir /concepts/naming-conventions) : déclenche une action de
  *   fermeture.
  */
 ```
 
 ## Documentation
 
-Nouvelle page dédiée dans `apps/docs` (`/concepts/parts-roles` ou emplacement équivalent choisi au
-moment du plan d'implémentation, cohérent avec l'architecture de nav existante) : liste chaque
-rôle, sa signification, et les composants/parts qui le portent. Référencée depuis chaque page
-composant concernée par au moins un rôle transverse.
+Nouvelle page dédiée dans `apps/docs` (`/concepts/naming-conventions` ou emplacement équivalent
+choisi au moment du plan d'implémentation, cohérent avec l'architecture de nav existante), en deux
+sections :
+
+1. **Rôles `::part()` transverses** : chaque rôle, sa signification, et les composants/parts qui le
+   portent. Référencée depuis chaque page composant concernée par au moins un rôle transverse.
+2. **Conventions de `slot`** : slot par défaut = contenu principal, `trigger`, suffixe `<rôle>-icon`,
+   `header-actions`/`footer` — documente l'existant, pas de nouveau mécanisme.
 
 ## Rollout
 
 Rétrofit progressif par lots sur le modèle du chantier #129 (spec + plan dédiés par lot, exécution
 subagent-driven-development, revue finale de branche). Premier lot suggéré : `ar-datepicker` et
 `ar-pagination` (les plus riches en rôles concernés : `control`, `field`, `action-button`, racine
-absente). Ordre des lots suivants à affiner au moment d'écrire le premier plan.
+absente). Le correctif de slot `ar-charcounter` (`icon-warning`/`icon-error` →
+`warning-icon`/`error-icon`) est indépendant du reste — peut être fait dans n'importe quel lot,
+y compris le premier. Ordre des lots suivants à affiner au moment d'écrire le premier plan.
 
 ## Impact `custom-elements.json` / doc générée
 
