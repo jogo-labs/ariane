@@ -83,7 +83,27 @@ button`/`action-item`/`action-card` — PatternFly ; `remove-button` — Vaadin)
 
 `trigger` et `action-button` restent des rôles frères, pas hiérarchiques : `trigger` uniquement
 pour un toggle de panel/zone repliable, `action-button` pour tout autre bouton de commande (close,
-prev/next, today, footer-btn...).
+prev/next, today, footer-button...).
+
+**`field` a deux spécialisations reconnues, réutilisables par tout futur composant** — même schéma
+générique+spécifique que `control`/`action-button` : `input` (champ texte/textarea) et `select`
+(liste déroulante). Ce ne sont pas de simples noms qui coïncident aujourd'hui sur `ar-datepicker`
+(`input`) et `ar-pagination` (`select`) — ce sont désormais des noms de vocabulaire officiels :
+tout futur composant avec un champ texte doit utiliser `part="input field"`, tout futur composant
+avec une liste déroulante `part="select field"`, plutôt que d'inventer un nom propre. Justification
+pratique (retour utilisateur) : un consommateur qui veut un style de champ cohérent entre un input
+texte et un select a besoin de cibler `::part(field)` pour le commun (bordure, padding, focus-ring)
+tout en gardant `::part(input)`/`::part(select)` pour ce qui diverge structurellement (flèche du
+select, largeur, `appearance`).
+
+**Convention `-button` en toutes lettres, jamais `-btn` abrégé.** `action-button` établit la
+convention en toutes lettres ; les parts déjà existants `nav-btn`/`footer-btn`/`today-btn`/
+`close-btn` (datepicker) et `nav-btn` (pagination), ainsi que les `@cssprop` associés
+(`--ar-pagination-btn-size`, `--ar-datepicker-nav-btn-*`, `--ar-datepicker-footer-btn-*`), sont
+renommés en toutes lettres (`nav-button`, `footer-button`, `today-button`, `close-button`,
+`--ar-pagination-button-size`, etc.) pour rester cohérents avec le reste du vocabulaire. Renommage
+sec (alpha, cf. contrainte projet), entièrement contenu dans les 2 composants déjà dans le
+périmètre de ce lot — aucune extension à d'autres composants.
 
 ## Slots — documenter l'existant, un correctif de cohérence
 
@@ -140,19 +160,25 @@ doc dédiée :
 ```ts
 /**
  * @csspart close - Le bouton de fermeture.
- * @csspart action-button - Rôle transverse (voir /concepts/naming-conventions) : déclenche une action de
+ * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions) : déclenche une action de
  *   fermeture.
  */
 ```
 
 ## Documentation
 
-Nouvelle page dédiée dans `apps/docs` (`/concepts/naming-conventions` ou emplacement équivalent
-choisi au moment du plan d'implémentation, cohérent avec l'architecture de nav existante), en deux
-sections :
+Nouvelle page dédiée dans `apps/docs` (`/getting-started/naming-conventions` ou emplacement équivalent
+choisi au moment du plan d'implémentation, cohérent avec l'architecture de nav existante).
+**Objectif explicite de la page, pas seulement une table de référence passive** : donner au
+consommateur les moyens d'écrire des règles CSS transverses qui facilitent l'intégration
+d'Ariane dans son propre design system — un thème qui style `::part(action-button)` une seule
+fois s'applique à tous les composants qui portent ce rôle, sans dupliquer la règle composant par
+composant. La page inclut donc un exemple « recette » concret de règle multi-composants, pas
+seulement la table des rôles. Deux sections :
 
-1. **Rôles `::part()` transverses** : chaque rôle, sa signification, et les composants/parts qui le
-   portent. Référencée depuis chaque page composant concernée par au moins un rôle transverse.
+1. **Rôles `::part()` transverses** : chaque rôle, sa signification, les composants/parts qui le
+   portent, et un exemple de règle CSS ciblant plusieurs composants à la fois via le même rôle.
+   Référencée depuis chaque page composant concernée par au moins un rôle transverse.
 2. **Conventions de `slot`** : slot par défaut = contenu principal, `trigger`, suffixe `<rôle>-icon`,
    `header-actions`/`footer` — documente l'existant, pas de nouveau mécanisme.
 
