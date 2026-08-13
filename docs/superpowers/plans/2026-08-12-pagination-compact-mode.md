@@ -85,35 +85,32 @@ describe('mode compact — cycle de vie ResizeObserver', () => {
 
     it('compact=false (défaut) : instancie un ResizeObserver au montage', async () => {
         el = await fixture('<ar-pagination></ar-pagination>');
-        expect(
-            (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver,
-        ).toBeInstanceOf(ResizeObserver);
+        // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+        expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
     });
 
     it("compact=true : n'instancie aucun ResizeObserver au montage", async () => {
         el = await fixture('<ar-pagination compact></ar-pagination>');
-        expect(
-            (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver,
-        ).toBeUndefined();
+        // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+        expect(el._resizeObserver).toBeUndefined();
     });
 
     it('passer compact de true à false attache le ResizeObserver', async () => {
         el = await fixture('<ar-pagination compact></ar-pagination>');
-        expect(
-            (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver,
-        ).toBeUndefined();
+        // @ts-expect-error accès à un champ privé pour vérifier l'absence de ResizeObserver
+        expect(el._resizeObserver).toBeUndefined();
 
         el.compact = false;
         await waitForUpdate(el);
 
-        expect(
-            (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver,
-        ).toBeInstanceOf(ResizeObserver);
+        // @ts-expect-error accès à un champ privé pour vérifier l'instanciation du ResizeObserver
+        expect(el._resizeObserver).toBeInstanceOf(ResizeObserver);
     });
 
     it('passer compact de false à true déconnecte le ResizeObserver existant', async () => {
         el = await fixture('<ar-pagination></ar-pagination>');
-        const observer = (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver;
+        // @ts-expect-error accès à un champ privé pour récupérer le ResizeObserver interne
+        const observer = el._resizeObserver;
         expect(observer).toBeInstanceOf(ResizeObserver);
         const disconnectSpy = vi.spyOn(observer as ResizeObserver, 'disconnect');
 
@@ -121,12 +118,19 @@ describe('mode compact — cycle de vie ResizeObserver', () => {
         await waitForUpdate(el);
 
         expect(disconnectSpy).toHaveBeenCalled();
-        expect(
-            (el as unknown as { _resizeObserver?: ResizeObserver })._resizeObserver,
-        ).toBeUndefined();
+        // @ts-expect-error accès à un champ privé pour vérifier la déconnexion
+        expect(el._resizeObserver).toBeUndefined();
     });
 });
 ```
+
+Accès à un champ `private` depuis un test : `private` n'existe qu'au niveau TypeScript (effacé à la
+compilation), donc rien n'empêche l'accès à l'exécution — seul le compilateur le refuserait sans
+`@ts-expect-error`. C'est déjà la convention de ce fichier (`el._budget = 2` ailleurs dans
+`pagination.test.ts`, avec le même commentaire) : chaque accès est précédé de son propre
+`@ts-expect-error` plutôt que d'un cast global `as unknown as {...}` (ce dernier pattern existe dans
+`pagination.a11y.test.ts`/`pagination.browser.test.ts`, mais pas dans ce fichier — on garde la
+convention locale à chaque fichier de test, pas de mélange).
 
 - [ ] **Step 2: Lancer les tests et vérifier qu'ils échouent**
 
@@ -146,9 +150,6 @@ Dans `pagination.ts`, juste après la propriété `total` (après la ligne `tota
     /**
      * Mode compact : uniquement les boutons précédent/suivant et un label de position
      * ("Page X / Y"), navigation strictement séquentielle (pas de saut direct à une page).
-     * Rendu identique en mobile et desktop — contrairement au repli automatique en `<select>`
-     * (comportement par défaut de ce composant), ce mode n'est jamais déclenché par la largeur
-     * du conteneur : c'est un mode à activer explicitement via cet attribut.
      * @attr compact
      * @default false
      */
@@ -188,6 +189,12 @@ par :
 ```typescript
     override connectedCallback(): void {
         super.connectedCallback();
+        // `_initialized` reste faux ici au tout premier montage (le shadow DOM n'existe pas
+        // encore, `_setupResizeObserver` ne trouverait pas `[part="nav"]`) — ce n'est donc PAS un
+        // doublon avec l'appel dans `firstUpdated()` ci-dessous, qui gère ce premier montage une
+        // fois le rendu initial fait. Cet appel-ci ne joue que lors d'une reconnexion ultérieure
+        // (élément déplacé/réinséré dans le DOM après un premier montage), pour réattacher
+        // l'observer que `disconnectedCallback` a démonté à la déconnexion précédente.
         if (this._initialized && !this.compact) this._setupResizeObserver();
     }
 
@@ -248,8 +255,13 @@ par :
 ```typescript
         if (changed.has('total')) {
             const digits = String(Math.max(this.total, 1)).length;
-            if (this._prevTotalDigits && digits !== this._prevTotalDigits && !this.compact) {
+            if (!this.compact && this._prevTotalDigits && digits !== this._prevTotalDigits) {
 ```
+
+`!this.compact` en tête plutôt qu'en fin de condition : sort de la condition avant même d'évaluer
+`_prevTotalDigits`/`digits`, cohérent avec l'intention (« en mode compact, toute cette logique de
+remesure ne s'applique pas ») plutôt que de la laisser en dernière clause comme une restriction
+accessoire.
 
 (le reste du bloc — `this._needsRemeasure = true; this._recalculateBudget();` puis
 `this._prevTotalDigits = digits;` — ne change pas.)
@@ -802,38 +814,21 @@ frontmatter, ajouter une entrée après `20-pages-end` (avant `pageScript:`) :
       <ar-pagination compact current="4" total="12"></ar-pagination>
 ```
 
-- [ ] **Step 2: Ajouter une section "Mode compact" dans le corps de la page**
+Pas de section de prose supplémentaire à ajouter dans le corps de la page : `ComponentApi.astro`
+(`apps/docs/src/components/ComponentApi.astro:53`) affiche `attr.description` directement depuis le
+JSDoc `@attr` du composant — le texte déjà écrit en Task 2 Step 3 ("Mode compact : uniquement les
+boutons précédent/suivant...") apparaîtra donc tel quel dans le tableau d'attributs auto-généré.
+Ajouter une section manuelle dupliquerait cette description sans rien apporter ; la démo de la
+Step 1 ci-dessus suffit à montrer le rendu.
 
-Dans le corps du fichier, ajouter une nouvelle section après `## Comportement responsive` (avant
-`## Utilisation`) :
-
-````markdown
-## Mode compact
-
-L'attribut booléen `compact` remplace la numérotation par un simple prev/next accompagné d'un
-label de position non cliquable ("Page 4 / 12"). Contrairement au repli automatique en `<select>`
-décrit ci-dessus, ce mode est **fixe** : il ne réagit pas à la largeur du conteneur, le rendu est
-identique en mobile et en desktop. Adapté aux contextes où seule une navigation séquentielle
-(page suivante/précédente) est utile — par exemple un panneau de détail ou un drawer.
-
-```html
-<ar-pagination compact current="4" total="12"></ar-pagination>
-```
-````
-
-La navigation reste strictement séquentielle dans ce mode : il n'y a pas de saut direct à une page
-arbitraire (pas de numéros cliquables, pas de `<select>`).
-
-````
-
-- [ ] **Step 3: Régénérer le manifest CEM (fait apparaître `compact`/`page-label`/`label` dans le tableau d'API auto-généré)**
+- [ ] **Step 2: Régénérer le manifest CEM (fait apparaître `compact`/`page-label`/`label` dans le tableau d'API auto-généré)**
 
 ```bash
 cd /Users/jon/Code/Active_projects/ariane
 npm run build:manifest
-````
+```
 
-- [ ] **Step 4: Vérifier visuellement la page de doc en local**
+- [ ] **Step 3: Vérifier visuellement la page de doc en local**
 
 ```bash
 cd /Users/jon/Code/Active_projects/ariane
@@ -848,7 +843,7 @@ Ouvrir la page `ar-pagination`, vérifier que :
 
 Arrêter le serveur (`Ctrl+C`) une fois vérifié.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 cd /Users/jon/Code/Active_projects/ariane
