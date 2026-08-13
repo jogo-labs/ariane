@@ -33,7 +33,7 @@ import { warn } from '../../utils/warn.js';
  * @csspart trigger    - Le bouton d'ouverture du calendrier.
  * @csspart panel      - Le popover flottant.
  * @csspart header     - En-tête du calendrier (navigation).
- * @csspart nav-btn    - Tous les boutons de navigation (ciblage groupé).
+ * @csspart nav-button    - Tous les boutons de navigation (ciblage groupé).
  * @csspart prev-year  - Bouton année précédente.
  * @csspart prev-month - Bouton mois précédent.
  * @csspart next-month - Bouton mois suivant.
@@ -47,16 +47,19 @@ import { warn } from '../../utils/warn.js';
  * @csspart control - Rôle transverse (voir /getting-started/naming-conventions), porté par `day` :
  *   élément interactif générique.
  * @csspart footer     - Pied du calendrier.
- * @csspart footer-btn - Tous les boutons du footer (ciblage groupé).
- * @csspart today-btn  - Bouton « Aujourd'hui ».
- * @csspart close-btn  - Bouton « Fermer ».
+ * @csspart footer-button - Tous les boutons du footer (ciblage groupé).
+ * @csspart today-button  - Bouton « Aujourd'hui ».
+ * @csspart close-button  - Bouton « Fermer ».
+ * @csspart action-button - Rôle transverse (voir /getting-started/naming-conventions), porté par
+ *   les 4 boutons de navigation (`nav-button`) et les 2 boutons du footer (`footer-button`) :
+ *   bouton qui déclenche une action ponctuelle.
  *
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
- * @cssprop --ar-datepicker-nav-btn-border-color - Couleur de bordure des boutons nav.
- * @cssprop --ar-datepicker-footer-btn-border-color - Couleur de bordure des boutons footer.
+ * @cssprop --ar-datepicker-nav-button-border-color - Couleur de bordure des boutons nav.
+ * @cssprop --ar-datepicker-footer-button-border-color - Couleur de bordure des boutons footer.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
  * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (préserve l'absence de bordure voulue par défaut ; sans ce repli, une propriété longhand `border-color` isolée dégraderait vers `currentcolor`, une bordure non désirée sur chaque cellule).
  * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
@@ -74,8 +77,8 @@ import { warn } from '../../utils/warn.js';
  * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné. Repli `Highlight` si aucun thème n'est chargé (sinon indiscernable des jours non sélectionnés).
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
- * @cssprop --ar-datepicker-nav-btn-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- * @cssprop --ar-datepicker-footer-btn-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ * @cssprop --ar-datepicker-nav-button-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ * @cssprop --ar-datepicker-footer-button-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
  * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
@@ -324,7 +327,7 @@ export class ArDatepicker extends LitElement {
         return html`
             <div part="header">
                 <button
-                    part="nav-btn prev-year"
+                    part="nav-button prev-year action-button"
                     type="button"
                     aria-label="Année précédente"
                     @click=${() => this._nav(() => this._calendar.previousYear())}
@@ -332,7 +335,7 @@ export class ArDatepicker extends LitElement {
                     «
                 </button>
                 <button
-                    part="nav-btn prev-month"
+                    part="nav-button prev-month action-button"
                     type="button"
                     aria-label="Mois précédent"
                     @click=${() => this._nav(() => this._calendar.previousMonth())}
@@ -341,7 +344,7 @@ export class ArDatepicker extends LitElement {
                 </button>
                 <span id="dp-month-${this._uid}" aria-live="polite">${monthLabel}</span>
                 <button
-                    part="nav-btn next-month"
+                    part="nav-button next-month action-button"
                     type="button"
                     aria-label="Mois suivant"
                     @click=${() => this._nav(() => this._calendar.nextMonth())}
@@ -349,7 +352,7 @@ export class ArDatepicker extends LitElement {
                     ›
                 </button>
                 <button
-                    part="nav-btn next-year"
+                    part="nav-button next-year action-button"
                     type="button"
                     aria-label="Année suivante"
                     @click=${() => this._nav(() => this._calendar.nextYear())}
@@ -382,7 +385,7 @@ export class ArDatepicker extends LitElement {
 
             <div part="footer">
                 <button
-                    part="footer-btn today-btn"
+                    part="footer-button today-button action-button"
                     type="button"
                     aria-label=${this.todayLabel}
                     @click=${this._handleTodayClick}
@@ -390,7 +393,7 @@ export class ArDatepicker extends LitElement {
                     <slot name="today-label">${this.todayLabel}</slot>
                 </button>
                 <button
-                    part="footer-btn close-btn"
+                    part="footer-button close-button action-button"
                     type="button"
                     aria-label=${this.closeLabel}
                     @click=${this._handleCloseClick}

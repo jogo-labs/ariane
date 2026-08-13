@@ -57,7 +57,7 @@ export default css`
         text-align: center;
     }
 
-    [part~='nav-btn'] {
+    [part~='nav-button'] {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -66,14 +66,14 @@ export default css`
         font: inherit;
         border-style: solid;
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
-        border-color: var(--ar-datepicker-nav-btn-border-color, transparent);
+        border-color: var(--ar-datepicker-nav-button-border-color, transparent);
     }
 
-    [part~='nav-btn']:focus-visible {
-        outline: 2px solid var(--ar-datepicker-nav-btn-focus-ring-color, ButtonText);
+    [part~='nav-button']:focus-visible {
+        outline: 2px solid var(--ar-datepicker-nav-button-focus-ring-color, ButtonText);
     }
 
-    [part~='footer-btn'] {
+    [part~='footer-button'] {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -81,11 +81,11 @@ export default css`
         font: inherit;
         border-style: solid;
         /* a11y-fallback: border: raccourci scindé en longhands — un var() défaillant dans un raccourci invalide border-style, ce qui ferait disparaître la bordure entièrement sans thème */
-        border-color: var(--ar-datepicker-footer-btn-border-color, transparent);
+        border-color: var(--ar-datepicker-footer-button-border-color, transparent);
     }
 
-    [part~='footer-btn']:focus-visible {
-        outline: 2px solid var(--ar-datepicker-footer-btn-focus-ring-color, ButtonText);
+    [part~='footer-button']:focus-visible {
+        outline: 2px solid var(--ar-datepicker-footer-button-focus-ring-color, ButtonText);
     }
 
     [part='grid'] {
