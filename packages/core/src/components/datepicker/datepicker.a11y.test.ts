@@ -77,13 +77,13 @@ describe('ar-datepicker — accessibilité', () => {
         `);
         await openPicker(el);
 
-        const disabledDays = el.shadowRoot?.querySelectorAll('[part="day"][aria-disabled="true"]');
+        const disabledDays = el.shadowRoot?.querySelectorAll('[part~="day"][aria-disabled="true"]');
         expect(
             disabledDays?.length,
             'au moins un dimanche doit être aria-disabled',
         ).to.be.greaterThan(0);
 
-        const nativeDisabled = el.shadowRoot?.querySelectorAll('[part="day"][disabled]');
+        const nativeDisabled = el.shadowRoot?.querySelectorAll('[part~="day"][disabled]');
         expect(nativeDisabled?.length, 'disabled natif ne doit pas être utilisé').to.equal(0);
     });
 

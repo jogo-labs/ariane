@@ -1,0 +1,180 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
+    { id: 'slots', label: 'Conventions de slot', level: 1 as const },
+];
+---
+
+<Layout
+    title="Conventions de nommage"
+    description="Vocabulaire de CSS part sémantiques et conventions de slot partagés par tous les composants Ariane."
+    currentPath="/getting-started/naming-conventions"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Conventions de nommage</h2>
+        </div>
+
+        <section id="semantic-parts" class="main-section">
+            <div>
+                <h3 class="section-title">CSS Part sémantiques</h3>
+                <p>
+                    En plus de <code>CSS part</code> propres à chacun, les composants Ariane
+                    exposent des CSS part qui ont un rôle <strong>sémantique et transverse</strong>.<br>
+                    Un même élément expose souvent plusieurs CSS part complémentaires, par exemple
+                    <code>control</code> (sémantique) et <code>link</code> (spécifique).
+                </p>
+                <p style="margin-top: 1rem">
+                    Ces <code>::part()</code> sémantiques facilitent la personnalisation des éléments communs à
+                    chacun des composants, permettant une meilleure intégration à un Design System.
+                </p>
+            </div>
+
+            <section id="roles-table" class="subsection">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Part sémantique</th>
+                                <th scope="col">Signification</th>
+                                <th scope="col">Exemples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>(nom du composant)</code></td>
+                                <td>
+                                    Racine du composant. <br>
+                                    Utilisé à la place d'un nom sémantique tel que <code>base</code>
+                                    de sorte à prévenir les collisions de nom lors d'un chaînage
+                                    <code>exportparts</code> quand un composant est imbriqué
+                                    dans un autre.
+                                </td>
+                                <td>
+                                    <code>ar-charcounter::part(charcounter)</code>,
+                                    <code>ar-datepicker::part(datepicker)</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>panel</code></td>
+                                <td>Conteneur flottant secondaire (datepicker, dropdown...).</td>
+                                <td><code>ar-datepicker::part(panel)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>trigger</code></td>
+                                <td>Ouvre/ferme un panel ou une zone repliable.</td>
+                                <td><code>ar-datepicker::part(trigger)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>header</code> / <code>footer</code></td>
+                                <td>En-tête / pied de composant.</td>
+                                <td><code>ar-datepicker::part(header)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>body</code></td>
+                                <td>Zone de contenu principal.</td>
+                                <td>
+                                    <code>ar-dialog::part(body)</code>,
+                                    <code>ar-alert::part(body)</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>control</code></td>
+                                <td>
+                                    Élément interactif générique (hors
+                                    field/action-button/trigger).
+                                </td>
+                                <td>
+                                    <code>ar-pagination::part(link)</code>,
+                                    <code>ar-datepicker::part(day)</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>field</code></td>
+                                <td>
+                                    Élément qui reçoit une saisie. Deux sous-rôles standard,
+                                    réutilisables par tout futur composant :
+                                    <code>input</code> (champ texte/textarea) et
+                                    <code>select</code> (liste déroulante).
+                                </td>
+                                <td>
+                                    <code>ar-datepicker::part(input)</code>,
+                                    <code>ar-pagination::part(select)</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>action-button</code></td>
+                                <td>
+                                    Bouton qui déclenche une action ponctuelle (pas un toggle de
+                                    panel).
+                                </td>
+                                <td>
+                                    <code>ar-pagination::part(prev)</code>,
+                                    <code>ar-datepicker::part(today-button)</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>indicator</code></td>
+                                <td>Marqueur/indicateur visuel.</td>
+                                <td><code>ar-table-sort::part(indicator)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>label</code></td>
+                                <td>Texte descriptif.</td>
+                                <td><code>ar-datepicker::part(label)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>icon</code></td>
+                                <td>Icône.</td>
+                                <td><code>ar-alert::part(icon)</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <section id="slots" class="main-section">
+            <div>
+                <h3 class="section-title">Conventions de slot</h3>
+                <p>
+                    Les <code>&lt;slot&gt;</code> suivent des conventions déjà cohérentes sur
+                    toute la librairie, sans qu'un nouveau vocabulaire ait été nécessaire :
+                </p>
+                <ul>
+                    <li>
+                        <strong>Slot par défaut (sans nom)</strong> — contenu principal du
+                        composant.
+                    </li>
+                    <li>
+                        <strong><code>trigger</code></strong> — même sens que le rôle
+                        <code>trigger</code> des part : élément qui ouvre/ferme le composant.
+                    </li>
+                    <li>
+                        <strong>Suffixe <code>&lt;rôle&gt;-icon</code></strong> — icône
+                        remplaçable associée à un élément précis (<code>close-icon</code>,
+                        <code>home-icon</code>, <code>trigger-icon</code>,
+                        <code>prev-icon</code>/<code>next-icon</code>,
+                        <code>warning-icon</code>/<code>error-icon</code>).
+                    </li>
+                    <li>
+                        <strong><code>header-actions</code></strong>,
+                        <strong><code>footer</code></strong> — reprennent le nom des rôles
+                        <code>::part()</code> homonymes.
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
+</style>

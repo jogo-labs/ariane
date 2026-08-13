@@ -9,6 +9,7 @@
     display: flex;
     flex-direction: column;
     row-gap: 4rem;
+    line-height: 1.6;
 }
 
 .page-header {
@@ -19,7 +20,7 @@
     }
 
     .summary,
-    .callout {
+    .doc-callout-alert {
         margin-top: 1.5rem;
     }
 }
@@ -151,35 +152,31 @@ pre code {
     letter-spacing: 0.02em;
 }
 
-.callout {
-    padding: 1rem 1.25rem;
-    background: var(--doc-accent-bg);
-    border: 1px solid var(--doc-accent-border);
-    border-radius: 0.5rem;
-}
-
-.callout-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--doc-accent);
-    margin: 0 0 0.6rem;
-}
-
-.callout ul {
-    margin: 0;
-    padding-left: 1.25rem;
-    font-size: 0.875rem;
-    line-height: 1.7;
-    color: var(--doc-text);
-}
-
 .doc-callout-alert {
     --ar-alert-bg: var(--doc-accent-bg);
     --ar-alert-border: var(--doc-accent-border);
     --ar-alert-icon: var(--doc-accent);
     --ar-alert-color: var(--doc-text);
+
+    margin-top: 1.875rem;
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: var(--doc-text);
+    }
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+    }
 }
 
 .doc-callout-alert-title {

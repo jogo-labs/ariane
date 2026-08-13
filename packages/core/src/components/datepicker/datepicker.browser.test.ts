@@ -37,7 +37,7 @@ describe('ar-datepicker — browser', () => {
             await openPicker(el);
 
             const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             expect(focused).to.not.equal(null);
             expect(el.shadowRoot?.activeElement).to.equal(focused);
@@ -48,7 +48,7 @@ describe('ar-datepicker — browser', () => {
             await openPicker(el);
 
             const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             expect(focused?.getAttribute('aria-label')).to.include('12');
         });
@@ -76,14 +76,14 @@ describe('ar-datepicker — browser', () => {
             await openPicker(el);
 
             const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             dayBtn?.click();
             await el.updateComplete;
             await aTimeout(20);
 
             expect(el.shadowRoot?.activeElement).to.equal(
-                el.shadowRoot?.querySelector('[part="input"]'),
+                el.shadowRoot?.querySelector('[part~="input"]'),
             );
         });
     });
@@ -101,7 +101,7 @@ describe('ar-datepicker — browser', () => {
             await aTimeout(20);
 
             const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             expect(focused?.getAttribute('aria-label')).to.include('13');
         });
@@ -116,7 +116,7 @@ describe('ar-datepicker — browser', () => {
             await aTimeout(20);
 
             const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             expect(focused?.getAttribute('aria-label')).to.include('8');
         });
@@ -214,7 +214,7 @@ describe('ar-datepicker — browser', () => {
             await aTimeout(20);
 
             const dayBefore = el.shadowRoot
-                ?.querySelector('[part="day"][tabindex="0"]')
+                ?.querySelector('[part~="day"][tabindex="0"]')
                 ?.getAttribute('aria-label');
 
             // Fermer sans sélectionner, puis rouvrir
@@ -224,7 +224,7 @@ describe('ar-datepicker — browser', () => {
             await openPicker(el);
 
             const dayAfter = el.shadowRoot
-                ?.querySelector('[part="day"][tabindex="0"]')
+                ?.querySelector('[part~="day"][tabindex="0"]')
                 ?.getAttribute('aria-label');
             expect(dayAfter).to.equal(dayBefore);
         });
@@ -246,7 +246,7 @@ describe('ar-datepicker — browser', () => {
 
             // Le curseur (tabindex="0") doit être dans le mois visible (août 2026)
             const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             expect(focused).to.not.equal(null);
             // Le jour doit être le 15 (même jour, mois décalé)
@@ -287,7 +287,7 @@ describe('ar-datepicker — browser', () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             await openPicker(el);
 
-            const focused = el.shadowRoot?.querySelectorAll('[part="day"][tabindex="0"]') ?? [];
+            const focused = el.shadowRoot?.querySelectorAll('[part~="day"][tabindex="0"]') ?? [];
             expect(focused.length).to.equal(1);
         });
     });
@@ -309,7 +309,7 @@ describe('ar-datepicker — browser', () => {
             const selectedCell = el.shadowRoot?.querySelector(
                 '[role="gridcell"][aria-selected="true"]',
             );
-            const selectedBtn = selectedCell?.querySelector('[part="day"]');
+            const selectedBtn = selectedCell?.querySelector('[part~="day"]');
             expect(selectedBtn?.getAttribute('aria-label')).to.include('12');
         });
     });
@@ -331,8 +331,8 @@ describe('ar-datepicker — browser', () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             await openPicker(el);
 
-            const day = el.shadowRoot?.querySelector<HTMLElement>('[part="day"]');
-            if (!day) throw new Error('[part="day"] introuvable');
+            const day = el.shadowRoot?.querySelector<HTMLElement>('[part~="day"]');
+            if (!day) throw new Error('[part~="day"] introuvable');
             const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
             const expectedPx = `${2.5 * rootFontSize}px`;
             expect(getComputedStyle(day).width).to.equal(expectedPx);

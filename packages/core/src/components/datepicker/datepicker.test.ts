@@ -14,12 +14,21 @@ describe('ArDatepicker', () => {
 
         it('monte un shadow DOM', () => expect(el.shadowRoot).not.toBeNull());
         it('contient un input part="input"', () => expect(getPart(el, 'input')).not.toBeNull());
+        it('input porte le rôle transverse "field"', () => {
+            expect(getPart(el, 'input')?.getAttribute('part')?.split(/\s+/)).toContain('field');
+        });
         it('contient un bouton part="trigger"', () =>
             expect(getPart(el, 'trigger')).not.toBeNull());
         it('contient un div part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());
         it('contient un label part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
         it('contient un p part="hint"', () => expect(getPart(el, 'hint')).not.toBeNull());
         it('contient un p part="error"', () => expect(getPart(el, 'error')).not.toBeNull());
+        it('contient un div racine part="datepicker" enveloppant tout le contenu', () => {
+            const root = getPart(el, 'datepicker');
+            expect(root).not.toBeNull();
+            expect(root?.contains(getPart(el, 'input'))).toBe(true);
+            expect(root?.contains(getPart(el, 'panel'))).toBe(true);
+        });
         it('expose inputElement getter', () =>
             expect(el.inputElement).toBeInstanceOf(HTMLInputElement));
     });
@@ -125,7 +134,7 @@ describe('ArDatepicker', () => {
             el.addEventListener('ar-datepicker-hide', (e) => e.preventDefault());
 
             const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
-                '[part="day"][tabindex="0"]',
+                '[part~="day"][tabindex="0"]',
             );
             dayBtn?.focus();
             dayBtn?.click();
@@ -153,6 +162,13 @@ describe('ArDatepicker', () => {
             await new Promise((r) => setTimeout(r, 50));
             // Le panel doit rester fermé (show annulé)
             expect(el.open).toBe(false);
+        });
+
+        it('les cellules jour portent le rôle transverse "control"', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            const day = el.shadowRoot?.querySelector('[part~="day"]');
+            expect(day?.getAttribute('part')?.split(/\s+/)).toContain('control');
         });
     });
 
@@ -330,12 +346,22 @@ describe('ArDatepicker', () => {
             );
             el.open = true;
             await waitForUpdate(el);
-            const todayBtn = getPart(el, 'today-btn');
-            const closeBtn = getPart(el, 'close-btn');
+            const todayBtn = getPart(el, 'today-button');
+            const closeBtn = getPart(el, 'close-button');
             expect(todayBtn?.textContent?.trim()).toBe('Today');
             expect(todayBtn?.getAttribute('aria-label')).toBe('Today');
             expect(closeBtn?.textContent?.trim()).toBe('Close');
             expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
+        });
+
+        it('nav-button et footer-button portent le rôle transverse "action-button"', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            const navButton = el.shadowRoot?.querySelector('[part~="nav-button"]');
+            const footerButton = el.shadowRoot?.querySelector('[part~="footer-button"]');
+            expect(navButton?.getAttribute('part')?.split(/\s+/)).toContain('action-button');
+            expect(footerButton?.getAttribute('part')?.split(/\s+/)).toContain('action-button');
         });
 
         it('les slots today-label/close-label remplacent le contenu par défaut', async () => {
@@ -366,7 +392,7 @@ describe('ArDatepicker', () => {
             `);
             el.open = true;
             await waitForUpdate(el);
-            const closeBtn = getPart(el, 'close-btn');
+            const closeBtn = getPart(el, 'close-button');
             expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
         });
     });

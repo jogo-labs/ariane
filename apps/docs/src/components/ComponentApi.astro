@@ -9,6 +9,7 @@
 import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
+import { isTransversePart } from '../utils/transverse-roles.ts';
 
 interface RelatedTokens {
     component:   string;
@@ -26,6 +27,10 @@ const publicMethods = getPublicMethods(component);
 
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
+
+const hasTransverseParts = (component.cssParts ?? []).some((p) =>
+    isTransversePart(p.name, component.tagName ?? ''),
+);
 ---
 
 <div class="component-api">
@@ -133,6 +138,12 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
             <h4 id="api-css-parts" class="subsection-title">CSS Parts</h4>
             <p class="hint">
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
+                {hasTransverseParts && (
+                    <>
+                        <br>Certaines parts ci-dessous indiquent un rôle transverse, partagé avec
+                        d'autres composants — voir les <a href="/getting-started/naming-conventions">conventions de nommage</a>.
+                    </>
+                )}
             </p>
             <div class="table-wrap">
                 <table>
@@ -212,13 +223,15 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
             )}
             {/* ── Tokens d'un composant imbriqué en interne (ex. tooltip dans table-sort) ── */}
             {relatedTokens.length > 0 && (
-                <ar-alert class="related-tokens" variant="info" without-notification>
-                    {relatedTokens.map((rt) => (
-                        <p class="related-tokens-note">
-                            {rt.description}{' '}<br>
-                            <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
-                        </p>
-                    ))}
+                <ar-alert class="doc-callout-alert" variant="info" without-notification>
+                    <div class="doc-callout-alert-content">
+                        {relatedTokens.map((rt) => (
+                            <p>
+                                {rt.description}{' '}<br>
+                                <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
+                            </p>
+                        ))}
+                    </div>
                 </ar-alert>
             )}
         </section>
@@ -277,30 +290,6 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 
     .own-props-intro {
         margin-top: 1.875rem;
-    }
-
-    ar-alert.related-tokens {
-        margin-top: 1.875rem;
-
-        &::part(body) {
-            display: flex;
-            flex-direction: column;
-            row-gap: 0.5rem;
-        }
-    }
-
-    .related-tokens-note {
-        margin: 0;
-        font-size: 0.875rem;
-        /* Pas de couleur explicite : hérite de --ar-alert-color posé par ar-alert sur
-           :host — ar-alert calcule déjà un contraste correct contre son propre fond de
-           variante (info/warning/...), un remplacement fixe ici casserait ce contrat
-           pour tout variant dont le fond diffère de la couleur muette de la doc. */
-    }
-
-    .related-tokens-note a {
-        color: inherit;
-        text-decoration: underline;
     }
 
     .token-example pre {

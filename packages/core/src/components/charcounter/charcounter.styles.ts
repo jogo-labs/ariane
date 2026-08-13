@@ -15,16 +15,16 @@ export default css`
         font-weight: var(--ar-charcounter-error-weight, 700);
     }
 
-    slot[name='icon-warning'],
-    slot[name='icon-error'] {
+    slot[name='warning-icon'],
+    slot[name='error-icon'] {
         display: none;
     }
 
-    :host([state='warning']) slot[name='icon-warning'] {
+    :host([state='warning']) slot[name='warning-icon'] {
         display: contents;
     }
 
-    :host([state='error']) slot[name='icon-error'] {
+    :host([state='error']) slot[name='error-icon'] {
         display: contents;
     }
 `;

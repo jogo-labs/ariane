@@ -34,7 +34,7 @@ describe('ar-pagination — browser', () => {
             pageLink.click();
             await elementUpdated(el);
 
-            const current = shadowRoot.querySelector('[part~="current"]') as HTMLElement;
+            const current = shadowRoot.querySelector('span[part~="current"]') as HTMLElement;
             expect(shadowRoot.activeElement).to.equal(current);
             expect(current.matches(':focus-visible')).to.equal(true);
         });
@@ -118,9 +118,9 @@ describe('ar-pagination — browser', () => {
             // calculé par le ResizeObserver dépasse `total`, donc `_calculatePages` renvoie la
             // liste complète (cf. `_calculatePages`, branche `total <= effectiveBudget`).
             const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(
-                15,
-            );
+            expect(
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
+            ).to.equal(15);
         });
 
         it('réduit le nombre de pages affichées quand le conteneur est rétréci', async () => {
@@ -142,10 +142,10 @@ describe('ar-pagination — browser', () => {
 
             const shadow = el.shadowRoot as ShadowRoot;
             const numericCount = shadow.querySelectorAll(
-                '[part~="link"], [part~="current"]',
+                '[part~="link"], span[part~="current"]',
             ).length;
             // Valeur exacte mesurée empiriquement à 400px avec le repli headless figé
-            // (`--ar-pagination-btn-size` = 2.5rem = 40px, aucune police variable dans WTR) :
+            // (`--ar-pagination-button-size` = 2.5rem = 40px, aucune police variable dans WTR) :
             // déterministe. Une régression dans `_pagesWithSiblings` (ex. `siblingCount` qui ne
             // retire qu'une page, 14 au lieu de 5) passerait inaperçue avec une simple borne
             // `lessThan(15)` — l'égalité stricte est nécessaire pour couvrir ce cas.
@@ -166,10 +166,12 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             const shadow = el.shadowRoot as ShadowRoot;
-            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            const select = shadow.querySelector('select[part~="select"]') as HTMLSelectElement;
             expect(select).to.not.equal(null);
             expect(select.tagName.toLowerCase()).to.equal('select');
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+            expect(
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
+            ).to.equal(0);
 
             // _calculatePages(8, 15) SANS budget (donc budget par défaut 9, pas la fenêtre
             // réduite au budget réel de la largeur actuelle) = [1, -1, 6, 7, 8, 9, 10, -2, 15] —
@@ -198,7 +200,7 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             const shadow = el.shadowRoot as ShadowRoot;
-            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            const select = shadow.querySelector('select[part~="select"]') as HTMLSelectElement;
             select.value = '15';
             select.dispatchEvent(new Event('change', { bubbles: true }));
             await elementUpdated(el);
@@ -232,7 +234,7 @@ describe('ar-pagination — browser', () => {
 
             expect((el as unknown as { current: number }).current).to.equal(9);
 
-            const select = shadow.querySelector('[part~="select"]') as HTMLSelectElement;
+            const select = shadow.querySelector('select[part~="select"]') as HTMLSelectElement;
             expect(select.selectedIndex).to.not.equal(-1);
             expect(select.options[select.selectedIndex]?.textContent?.trim()).to.equal(
                 'Page 9 sur 15',
@@ -265,14 +267,16 @@ describe('ar-pagination — browser', () => {
 
             // 1. Conteneur large → numéros affichés, `_itemWidth` mesuré normalement.
             expect(
-                shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
             ).to.be.greaterThan(0);
 
             // 2. Rétrécir jusqu'au palier select.
             wrapper.style.width = '90px';
             await waitForResize();
-            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+            expect(shadow.querySelector('select[part~="select"]')).to.not.equal(null);
+            expect(
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
+            ).to.equal(0);
 
             // 3. Changer `total` (et `current`, pour rester valide) d'ordre de grandeur pendant
             //    que le composant est au palier select (déclenche l'invalidation de
@@ -288,9 +292,9 @@ describe('ar-pagination — browser', () => {
             wrapper.style.width = '700px';
             await waitForResize();
 
-            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+            expect(shadow.querySelector('select[part~="select"]')).to.equal(null);
             expect(
-                shadow.querySelectorAll('[part~="link"], [part~="current"]').length,
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
             ).to.be.greaterThan(0);
         });
     });
@@ -310,7 +314,7 @@ describe('ar-pagination — browser', () => {
 
         it('la page active porte aria-current="page"', async () => {
             const el = await fixture(html`<ar-pagination current="3" total="12"></ar-pagination>`);
-            const current = el.shadowRoot?.querySelector('[part="current"]') as HTMLElement;
+            const current = el.shadowRoot?.querySelector('span[part~="current"]') as HTMLElement;
             expect(current.getAttribute('aria-current')).to.equal('page');
         });
     });
@@ -325,7 +329,7 @@ describe('ar-pagination — browser', () => {
         // ar-pagination (column-gap sur [part='list'], padding sur link/current/ellipsis) sans
         // charger le thème complet : ce sont précisément les règles non budgétées par
         // `_recalculateBudget` avant le fix (Finding Critical #1), à l'origine d'un débordement
-        // horizontal mesuré jusqu'à 61px. `--ar-pagination-btn-size` n'a pas besoin d'être
+        // horizontal mesuré jusqu'à 61px. `--ar-pagination-button-size` n'a pas besoin d'être
         // redéclaré ici : le composant a déjà un repli interne à 2.5rem, valeur identique à
         // celle du thème par défaut.
         let themeStyle: HTMLStyleElement;
@@ -403,8 +407,10 @@ describe('ar-pagination — browser', () => {
 
             const shadow = el.shadowRoot as ShadowRoot;
             expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
-            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+            expect(
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
+            ).to.equal(0);
+            expect(shadow.querySelector('select[part~="select"]')).to.equal(null);
 
             wrapper.style.width = '90px';
             await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
@@ -414,8 +420,10 @@ describe('ar-pagination — browser', () => {
             // sur un <select>..." plus haut dans ce fichier) — le mode compact doit rester
             // strictement identique, aucune bascule.
             expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
-            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
-            expect(shadow.querySelectorAll('[part~="link"], [part~="current"]').length).to.equal(0);
+            expect(shadow.querySelector('select[part~="select"]')).to.equal(null);
+            expect(
+                shadow.querySelectorAll('[part~="link"], span[part~="current"]').length,
+            ).to.equal(0);
         });
 
         it('bascule compact→false→true→false remplace correctement un <select> déjà actif', async () => {
@@ -436,7 +444,7 @@ describe('ar-pagination — browser', () => {
             await waitForResize();
 
             const shadow = el.shadowRoot as ShadowRoot;
-            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
+            expect(shadow.querySelector('select[part~="select"]')).to.not.equal(null);
 
             // 2. Passage en mode compact alors que le <select> est déjà affiché : doit le
             //    remplacer par le label, sans attendre de resize (compact ne dépend pas de la
@@ -444,7 +452,7 @@ describe('ar-pagination — browser', () => {
             (el as unknown as { compact: boolean }).compact = true;
             await elementUpdated(el);
 
-            expect(shadow.querySelector('[part~="select"]')).to.equal(null);
+            expect(shadow.querySelector('select[part~="select"]')).to.equal(null);
             expect(shadow.querySelector('[part~="label"]')).to.not.equal(null);
 
             // 3. Retour en mode non compact, toujours dans le conteneur étroit : le
@@ -453,7 +461,7 @@ describe('ar-pagination — browser', () => {
             await elementUpdated(el);
             await waitForResize();
 
-            expect(shadow.querySelector('[part~="select"]')).to.not.equal(null);
+            expect(shadow.querySelector('select[part~="select"]')).to.not.equal(null);
         });
 
         it('un clic sur next confirmé garde le focus sur le bouton actionné', async () => {

@@ -19,10 +19,10 @@ function pluralize(count: number, label: string): string {
  * Passe en état `warning` puis `error` quand la limite approche ou est dépassée.
  * Utiliser `aria-describedby` sur le champ pour lier le counter aux lecteurs d'écran.
  *
- * @slot icon-warning - Icône affichée en état warning.
- * @slot icon-error   - Icône affichée en état error.
+ * @slot warning-icon - Icône affichée en état warning.
+ * @slot error-icon   - Icône affichée en état error.
  *
- * @csspart container - L'élément racine.
+ * @csspart charcounter - L'élément racine.
  * @csspart count     - Le bloc chiffre + label.
  * @csspart count--warning - Le bloc chiffre + label en état warning (variante d'état de `count`).
  * @csspart count--error - Le bloc chiffre + label en état error (variante d'état de `count`).
@@ -229,9 +229,9 @@ export class ArCharcounter extends LitElement {
         if (this.max === undefined) return nothing;
         const remaining = this.max - this._count;
         return html`
-            <span part="container">
-                <slot name="icon-warning"></slot>
-                <slot name="icon-error"></slot>
+            <span part="charcounter">
+                <slot name="warning-icon"></slot>
+                <slot name="error-icon"></slot>
                 <span part="count${this._state !== 'normal' ? ` count--${this._state}` : ''}">
                     <span part="remaining">${remaining}</span>
                     <span part="label"> ${pluralize(remaining, this.label)}</span>

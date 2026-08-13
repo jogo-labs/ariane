@@ -141,7 +141,7 @@ describe('ar-charcounter — accessibilité', () => {
     // ── Parts shadow DOM ──────────────────────────────────────────────────
 
     describe('parts shadow DOM', () => {
-        it('expose part="container"', async () => {
+        it('expose part="charcounter"', async () => {
             const el = await fixture<ArCharcounter>(html`
                 <div>
                     <textarea id="fc"></textarea>
@@ -149,7 +149,7 @@ describe('ar-charcounter — accessibilité', () => {
                 </div>
             `);
             const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
-            expect(counter.shadowRoot!.querySelector('[part="container"]')).to.not.equal(null);
+            expect(counter.shadowRoot!.querySelector('[part="charcounter"]')).to.not.equal(null);
         });
     });
 });
