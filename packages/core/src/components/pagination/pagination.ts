@@ -1,4 +1,4 @@
-import { LitElement, type TemplateResult, type CSSResultGroup, html } from 'lit';
+import { LitElement, type TemplateResult, type CSSResultGroup, html, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
@@ -46,6 +46,11 @@ export interface ArPaginationPageChangeDetail {
  *   minimal).
  * @csspart select - L'élément `<select>` de saut de page. Personnalisable via `::part(select)`
  *   (apparence). Conserve l'apparence native du navigateur (flèche incluse) par défaut.
+ * @csspart page-label - Le `<li>` englobant le label de position en mode compact (`compact`),
+ *   affiché à la place de la liste de pages. Sur le modèle de `page-select`.
+ * @csspart label - Le `<span>` du label de position en mode compact ("Page X / Y"), non
+ *   cliquable et masqué aux lecteurs d'écran (`aria-hidden`, l'information équivalente est déjà
+ *   portée par le landmark et les `aria-label` prev/next). Personnalisable via `::part(label)`.
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -299,8 +304,10 @@ export class ArPagination extends LitElement {
         // à 5 items dans un budget de 3-4 slots).
         const floorSlots = 5;
         // Calculé une seule fois : réutilisé pour la décision de mode ci-dessous ET pour le
-        // rendu des boutons numérotés (repeat) si on reste en mode boutons.
-        const pages = _calculatePages(current, total, this._budget);
+        // rendu des boutons numérotés (repeat) si on reste en mode boutons. En mode compact,
+        // aucun numéro n'est jamais affiché — court-circuité à un tableau vide plutôt que de
+        // calculer une fenêtre de pages qui ne sera jamais rendue.
+        const pages = this.compact ? [] : _calculatePages(current, total, this._budget);
         // Cas particulier : à budget=5 exactement (position non-bord, loin des deux extrémités),
         // `_calculatePages` retombe sur sa fenêtre minimale [1, -1, current, -2, total] — 5 slots
         // dont 2 ellipses purement décoratives, pour seulement 3 pages réellement cliquables.
@@ -312,12 +319,15 @@ export class ArPagination extends LitElement {
         const isMinimalWindowWithDoubleEllipsis =
             pages.length === 5 && pages.includes(-1) && pages.includes(-2);
         const useSelectMode =
+            !this.compact &&
             this._budget !== undefined &&
             (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
             <ul part="list" @click=${this._onPageChange}>
+                ${this.compact ? this.renderCompactLabel(current, total) : nothing}
+
                 <li part="item">
                     <a
                         part="prev nav-btn${isPreviousDisabled ? ' nav-btn--disabled' : ''}"
@@ -332,20 +342,22 @@ export class ArPagination extends LitElement {
                     </a>
                 </li>
 
-                ${useSelectMode
-                    ? this.renderPageSelect(current, total)
-                    : repeat(
-                          pages,
-                          (page) => page,
-                          (page) => {
-                              // -1 et -2 sont des sentinelles représentant les ellipses
-                              return page === -1 || page === -2
-                                  ? html` <li part="item" aria-hidden="true">
-                                        <span part="ellipsis">...</span>
-                                    </li>`
-                                  : this.renderPage(page, page === current, total);
-                          },
-                      )}
+                ${this.compact
+                    ? nothing
+                    : useSelectMode
+                      ? this.renderPageSelect(current, total)
+                      : repeat(
+                            pages,
+                            (page) => page,
+                            (page) => {
+                                // -1 et -2 sont des sentinelles représentant les ellipses
+                                return page === -1 || page === -2
+                                    ? html` <li part="item" aria-hidden="true">
+                                          <span part="ellipsis">...</span>
+                                      </li>`
+                                    : this.renderPage(page, page === current, total);
+                            },
+                        )}
 
                 <li part="item">
                     <a
@@ -425,6 +437,18 @@ export class ArPagination extends LitElement {
                           </option>`,
                 )}
             </select>
+        </li>`;
+    }
+
+    /**
+     * Génère le `<li>` du label de position en mode compact ("Page X / Y"), affiché avant
+     * prev/next. `aria-hidden` sur le `<span>` : le `<p>` sr-only du landmark et les
+     * `aria-label` "Page précédente"/"Page suivante" portent déjà l'information équivalente
+     * pour le lecteur d'écran — sans ce marquage, le texte serait annoncé deux fois.
+     */
+    protected renderCompactLabel(current: number, total: number): TemplateResult {
+        return html`<li part="item page-label">
+            <span part="label" aria-hidden="true">Page ${current} / ${total}</span>
         </li>`;
     }
 
