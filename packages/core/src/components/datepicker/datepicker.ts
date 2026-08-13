@@ -26,6 +26,9 @@ import { warn } from '../../utils/warn.js';
  *
  * @csspart datepicker - Rôle transverse (voir /getting-started/naming-conventions) : racine du
  *   composant.
+ * @csspart field      - Rôle transverse (voir /getting-started/naming-conventions), porté par `input` :
+ *   élément qui reçoit une saisie. Sous-rôle standard de `field` (avec `select`, cf.
+ *   ar-pagination), réutilisable par tout futur composant avec un champ texte.
  * @csspart input      - Le champ texte.
  * @csspart trigger    - Le bouton d'ouverture du calendrier.
  * @csspart panel      - Le popover flottant.
@@ -156,7 +159,7 @@ export class ArDatepicker extends LitElement {
     /** Élément à focus une fois la fermeture confirmée (non annulée par ar-datepicker-hide). */
     private _focusTargetAfterHide: HTMLElement | null = null;
 
-    @query('[part="input"]') private _input!: HTMLInputElement;
+    @query('[part~="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
     @query('[part="trigger"]') private _trigger!: HTMLButtonElement;
     @query('.input-wrapper') private _inputWrapper!: HTMLDivElement;
@@ -235,7 +238,7 @@ export class ArDatepicker extends LitElement {
 
                 <div class="input-wrapper">
                     <input
-                        part="input"
+                        part="input field"
                         id="dp-input-${this._uid}"
                         type="text"
                         ?disabled=${this.disabled}

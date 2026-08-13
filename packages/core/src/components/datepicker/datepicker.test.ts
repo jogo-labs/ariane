@@ -14,6 +14,9 @@ describe('ArDatepicker', () => {
 
         it('monte un shadow DOM', () => expect(el.shadowRoot).not.toBeNull());
         it('contient un input part="input"', () => expect(getPart(el, 'input')).not.toBeNull());
+        it('input porte le rôle transverse "field"', () => {
+            expect(getPart(el, 'input')?.getAttribute('part')?.split(/\s+/)).toContain('field');
+        });
         it('contient un bouton part="trigger"', () =>
             expect(getPart(el, 'trigger')).not.toBeNull());
         it('contient un div part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());

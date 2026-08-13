@@ -83,7 +83,7 @@ describe('ar-datepicker — browser', () => {
             await aTimeout(20);
 
             expect(el.shadowRoot?.activeElement).to.equal(
-                el.shadowRoot?.querySelector('[part="input"]'),
+                el.shadowRoot?.querySelector('[part~="input"]'),
             );
         });
     });

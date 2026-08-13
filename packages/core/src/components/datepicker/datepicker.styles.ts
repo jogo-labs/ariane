@@ -19,7 +19,7 @@ export default css`
         align-items: stretch;
     }
 
-    [part='input'] {
+    [part~='input'] {
         flex: 1;
         min-width: 0;
     }
@@ -37,7 +37,7 @@ export default css`
         pointer-events: none;
     }
 
-    :host([has-error]) [part='input'] {
+    :host([has-error]) [part~='input'] {
         border-color: var(--ar-datepicker-input-error-border-color);
     }
 
