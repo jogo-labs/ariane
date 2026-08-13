@@ -3,17 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'pourquoi', label: 'Un vocabulaire partagé', level: 1 as const },
-    { id: 'roles-part', label: 'Rôles ::part() transverses', level: 1 as const },
-    { id: 'roles-table', label: 'Table des rôles', level: 2 as const },
-    { id: 'roles-usage', label: 'Comment les utiliser', level: 2 as const },
+    { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
     { id: 'slots', label: 'Conventions de slot', level: 1 as const },
 ];
 ---
 
 <Layout
     title="Conventions de nommage"
-    description="Vocabulaire de rôles ::part() et conventions de slot partagés par tous les composants Ariane."
+    description="Vocabulaire de CSS part sémantiques et conventions de slot partagés par tous les composants Ariane."
     currentPath="/getting-started/naming-conventions"
     showToc={true}
 >
@@ -22,45 +19,27 @@ const tocEntries = [
             <h2 class="page-title">Conventions de nommage</h2>
         </div>
 
-        <section id="pourquoi" class="main-section">
+        <section id="semantic-parts" class="main-section">
             <div>
-                <h3 class="section-title">Un vocabulaire partagé</h3>
+                <h3 class="section-title">CSS Part sémantiques</h3>
                 <p>
-                    Chaque composant Ariane expose ses propres <code>::part()</code> spécifiques
-                    (<code>close</code>, <code>panel</code>, <code>trigger</code>...). En
-                    complément, certains éléments portent aussi un <strong>rôle transverse</strong>
-                    — un second nom générique, partagé par tous les composants qui ont un élément
-                    de même nature. Un rôle transverse s'ajoute toujours au part spécifique
-                    existant, il ne le remplace jamais (sauf la racine du composant, cas
-                    particulier documenté ci-dessous) :
-                    <code>part="input field"</code> sur le champ texte d'<code>ar-datepicker</code>.
+                    En plus de <code>CSS part</code> propres à chacun, les composants Ariane
+                    exposent des CSS part qui ont un rôle <strong>sémantique et transverse</strong>.<br>
+                    Un même élément expose souvent plusieurs CSS part complémentaires, par exemple
+                    <code>control</code> (sémantique) et <code>link</code> (spécifique).
                 </p>
-                <p>
-                    Objectif : apprendre ce vocabulaire une seule fois, puis le reconnaître sur
-                    n'importe quel composant de la librairie, sans redécouvrir le nom de chaque
-                    part composant par composant — et surtout pouvoir écrire une seule règle CSS
-                    qui s'applique à tous les composants concernés d'un coup
-                    (<code>::part(field) {'{ ... }'}</code> style tous les champs de saisie de
-                    la librairie, quel que soit le composant). C'est ce qui rend l'intégration
-                    d'Ariane dans un design system consommateur plus rapide : les décisions de
-                    style transverses (radius d'un bouton, apparence d'un champ) se prennent une
-                    fois, pas composant par composant.
+                <p style="margin-top: 1rem">
+                    Ces <code>::part()</code> sémantiques facilitent la personnalisation des éléments communs à
+                    chacun des composants, permettant une meilleure intégration à un Design System.
                 </p>
-            </div>
-        </section>
-
-        <section id="roles-part" class="main-section">
-            <div>
-                <h3 class="section-title">Rôles <code>::part()</code> transverses</h3>
             </div>
 
             <section id="roles-table" class="subsection">
-                <h4 class="subsection-title">Table des rôles</h4>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th scope="col">Rôle</th>
+                                <th scope="col">Part sémantique</th>
                                 <th scope="col">Signification</th>
                                 <th scope="col">Exemples</th>
                             </tr>
@@ -69,11 +48,10 @@ const tocEntries = [
                             <tr>
                                 <td><code>(nom du composant)</code></td>
                                 <td>
-                                    Racine du composant. Remplace un éventuel part générique
-                                    existant (<code>base</code>, <code>container</code>) plutôt
-                                    que s'y ajouter — seule exception au principe additif, pour
-                                    éviter une collision de nom lors d'un chaînage
-                                    <code>exportparts</code> si un composant est un jour imbriqué
+                                    Racine du composant. <br>
+                                    Utilisé à la place d'un nom sémantique tel que <code>base</code>
+                                    de sorte à prévenir les collisions de nom lors d'un chaînage
+                                    <code>exportparts</code> quand un composant est imbriqué
                                     dans un autre.
                                 </td>
                                 <td>
@@ -83,16 +61,8 @@ const tocEntries = [
                             </tr>
                             <tr>
                                 <td><code>panel</code></td>
-                                <td>Conteneur flottant secondaire (popover, dropdown...).</td>
+                                <td>Conteneur flottant secondaire (datepicker, dropdown...).</td>
                                 <td><code>ar-datepicker::part(panel)</code></td>
-                            </tr>
-                            <tr>
-                                <td><code>body</code></td>
-                                <td>Zone de contenu principal.</td>
-                                <td>
-                                    <code>ar-dialog::part(body)</code>,
-                                    <code>ar-alert::part(body)</code>
-                                </td>
                             </tr>
                             <tr>
                                 <td><code>trigger</code></td>
@@ -103,6 +73,14 @@ const tocEntries = [
                                 <td><code>header</code> / <code>footer</code></td>
                                 <td>En-tête / pied de composant.</td>
                                 <td><code>ar-datepicker::part(header)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>body</code></td>
+                                <td>Zone de contenu principal.</td>
+                                <td>
+                                    <code>ar-dialog::part(body)</code>,
+                                    <code>ar-alert::part(body)</code>
+                                </td>
                             </tr>
                             <tr>
                                 <td><code>control</code></td>
@@ -157,17 +135,6 @@ const tocEntries = [
                         </tbody>
                     </table>
                 </div>
-            </section>
-
-            <section id="roles-usage" class="subsection">
-                <h4 class="subsection-title">Comment les utiliser</h4>
-                <p>
-                    Un rôle transverse se cible exactement comme n'importe quel autre part, avec
-                    <code>::part(nom-du-rôle)</code> — la seule différence est qu'il peut
-                    apparaître sur plusieurs composants différents, avec le même nom. La liste
-                    complète des part d'un composant, rôles transverses inclus, reste documentée
-                    sur sa propre page (section « CSS Parts »).
-                </p>
             </section>
         </section>
 

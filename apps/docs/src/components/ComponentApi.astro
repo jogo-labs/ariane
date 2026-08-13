@@ -140,10 +140,8 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
                 {hasTransverseParts && (
                     <>
-                        {' '}
-                        Certaines parts ci-dessous ont aussi un rôle transverse, partagé avec
-                        d'autres composants — voir les{' '}
-                        <a href="/getting-started/naming-conventions">conventions de nommage</a>.
+                        <br>Certaines parts ci-dessous indiquent un rôle transverse, partagé avec
+                        d'autres composants — voir les <a href="/getting-started/naming-conventions">conventions de nommage</a>.
                     </>
                 )}
             </p>
