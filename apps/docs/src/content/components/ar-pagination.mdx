@@ -73,7 +73,8 @@ import WcagRef from '../../components/WcagRef.astro';
 
 Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
 Lorsque l'espace disponible n'est plus jugé suffisant, les numéros de page sont remplacés par un `<select>` de saut de page,
-peuplé du même jeu de pages qu'à largeur confortable.
+peuplé du même jeu de pages qu'à largeur confortable — sauf en mode `compact`, qui ne bascule jamais et reste identique quelle
+que soit la largeur.
 
 ## Utilisation
 

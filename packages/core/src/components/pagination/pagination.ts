@@ -91,6 +91,7 @@ export class ArPagination extends LitElement {
     /**
      * Mode compact : uniquement les boutons précédent/suivant et un label de position
      * ("Page X / Y"), navigation strictement séquentielle (pas de saut direct à une page).
+     * Rendu identique quelle que soit la largeur du conteneur (pas de repli en `<select>`).
      * @attr compact
      * @default false
      */
@@ -226,15 +227,17 @@ export class ArPagination extends LitElement {
         }
         if (changed.has('total')) {
             const digits = String(Math.max(this.total, 1)).length;
-            if (!this.compact && this._prevTotalDigits && digits !== this._prevTotalDigits) {
+            if (this._prevTotalDigits && digits !== this._prevTotalDigits) {
                 // Le nombre de chiffres du total a changé (ex. 9 → 10, 99 → 100) : la largeur
                 // d'item mesurée précédemment (figée sur l'ancien total) n'est plus fiable —
                 // marque une remesure comme due avant le prochain calcul de budget. La remesure
                 // effective n'a lieu que si un item numérique est rendu (cf. `_needsRemeasure`) ;
                 // sinon la dernière valeur connue de `_itemWidth` reste utilisée pour ne pas
-                // bloquer le composant au palier texte.
+                // bloquer le composant au palier texte. Le flag est posé même en mode compact
+                // (où aucun recalcul n'a lieu ici) pour que la remesure soit bien effectuée si le
+                // composant repasse en mode non compact avec ce total.
                 this._needsRemeasure = true;
-                this._recalculateBudget();
+                if (!this.compact) this._recalculateBudget();
             }
             this._prevTotalDigits = digits;
         }
@@ -442,13 +445,14 @@ export class ArPagination extends LitElement {
 
     /**
      * Génère le `<li>` du label de position en mode compact ("Page X / Y"), affiché avant
-     * prev/next. `aria-hidden` sur le `<span>` : le `<p>` sr-only du landmark et les
-     * `aria-label` "Page précédente"/"Page suivante" portent déjà l'information équivalente
-     * pour le lecteur d'écran — sans ce marquage, le texte serait annoncé deux fois.
+     * prev/next. `aria-hidden` sur le `<li>` : le `<p>` sr-only du landmark et le texte
+     * accessible (sr-only) de prev/next portent déjà l'information équivalente pour le lecteur
+     * d'écran — sans ce marquage, le texte serait annoncé deux fois (et un `<li>` sans contenu
+     * accessible serait sinon exposé vide dans l'arbre d'accessibilité).
      */
     protected renderCompactLabel(current: number, total: number): TemplateResult {
-        return html`<li part="item page-label">
-            <span part="label" aria-hidden="true">Page ${current} / ${total}</span>
+        return html`<li part="item page-label" aria-hidden="true">
+            <span part="label">Page ${current} / ${total}</span>
         </li>`;
     }
 

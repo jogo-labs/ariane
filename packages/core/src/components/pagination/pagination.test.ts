@@ -625,18 +625,18 @@ describe('ArPagination', () => {
     });
 
     describe('mode compact — rendu', () => {
-        it('rend le label "Page X / Y" avec part="label" et aria-hidden', async () => {
+        it('rend le label "Page X / Y" avec part="label"', async () => {
             el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
             const label = requireLabel(el);
             expect(label.textContent?.trim()).toBe('Page 3 / 12');
-            expect(label.getAttribute('aria-hidden')).toBe('true');
         });
 
-        it('le <li> englobant du label porte part="item page-label"', async () => {
+        it('le <li> englobant du label porte part="item page-label" et aria-hidden', async () => {
             el = await fixture('<ar-pagination compact current="3" total="12"></ar-pagination>');
             const label = requireLabel(el);
             const li = label.closest('[part~="page-label"]');
             expect(li?.getAttribute('part')).toBe('item page-label');
+            expect(li?.getAttribute('aria-hidden')).toBe('true');
         });
 
         it('ordre DOM : label, prev, next', async () => {
