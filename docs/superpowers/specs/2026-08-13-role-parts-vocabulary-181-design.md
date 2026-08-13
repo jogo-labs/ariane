@@ -169,16 +169,15 @@ doc dédiée :
 
 Nouvelle page dédiée dans `apps/docs` (`/getting-started/naming-conventions` ou emplacement équivalent
 choisi au moment du plan d'implémentation, cohérent avec l'architecture de nav existante).
-**Objectif explicite de la page, pas seulement une table de référence passive** : donner au
-consommateur les moyens d'écrire des règles CSS transverses qui facilitent l'intégration
-d'Ariane dans son propre design system — un thème qui style `::part(action-button)` une seule
-fois s'applique à tous les composants qui portent ce rôle, sans dupliquer la règle composant par
-composant. La page inclut donc un exemple « recette » concret de règle multi-composants, pas
-seulement la table des rôles. Deux sections :
+**Objectif explicite de la page, pas seulement une table de référence passive** : expliciter que ce
+vocabulaire existe pour permettre au consommateur d'écrire des règles CSS transverses qui
+facilitent l'intégration d'Ariane dans son propre design system — un thème qui style
+`::part(action-button)` une seule fois s'applique à tous les composants qui portent ce rôle, sans
+dupliquer la règle composant par composant. Cette raison d'être doit être formulée dans
+l'introduction de la page, pas seulement démontrée implicitement par la table. Deux sections :
 
-1. **Rôles `::part()` transverses** : chaque rôle, sa signification, les composants/parts qui le
-   portent, et un exemple de règle CSS ciblant plusieurs composants à la fois via le même rôle.
-   Référencée depuis chaque page composant concernée par au moins un rôle transverse.
+1. **Rôles `::part()` transverses** : chaque rôle, sa signification, et les composants/parts qui le
+   portent. Référencée depuis chaque page composant concernée par au moins un rôle transverse.
 2. **Conventions de `slot`** : slot par défaut = contenu principal, `trigger`, suffixe `<rôle>-icon`,
    `header-actions`/`footer` — documente l'existant, pas de nouveau mécanisme.
 
