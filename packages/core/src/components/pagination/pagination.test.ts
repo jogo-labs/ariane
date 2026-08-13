@@ -241,6 +241,11 @@ describe('ArPagination', () => {
             const shadow = el.shadowRoot as ShadowRoot;
             const link = shadow.querySelector('[part~="link"]');
             expect(link && partContains(link, 'control')).toBe(true);
+            // span[part~="current"] plutôt que [part~="current"] seul : happy-dom scinde aussi
+            // `~=` sur les tirets (cf. requireLabel plus haut), donc un sélecteur non qualifié
+            // matcherait à tort le `<li part="item item--current">` englobant en premier.
+            const current = shadow.querySelector('span[part~="current"]');
+            expect(current && partContains(current, 'control')).toBe(true);
         });
 
         it('ellipses présentes si total >= 10 et current éloigné des bords, avec part="ellipsis"', async () => {

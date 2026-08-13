@@ -672,11 +672,14 @@
     /* Datepicker */
     ar-datepicker {
         /* Variable locale à ce bloc thème, pas un token public du composant (pas de
-         * préfixe --ar-datepicker-*) : couple gap et margin-bottom de ::part(label)
-         * ci-dessous sans exposer d'API. Un autre thème peut reproduire la même
-         * technique avec sa propre variable. */
+         * préfixe --ar-datepicker-*) : couple gap (::part(datepicker) ci-dessous) et
+         * margin-bottom de ::part(label) plus bas sans exposer d'API. Un autre thème
+         * peut reproduire la même technique avec sa propre variable. */
         --field-gap: 0.35rem;
-        gap: var(--field-gap);
+
+        &::part(datepicker) {
+            gap: var(--field-gap);
+        }
 
         &::part(panel) {
             width: 20rem;

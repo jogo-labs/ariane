@@ -5,7 +5,7 @@ export default css`
         display: block;
     }
 
-    [part='datepicker'] {
+    [part~='datepicker'] {
         display: flex;
         flex-direction: column;
     }

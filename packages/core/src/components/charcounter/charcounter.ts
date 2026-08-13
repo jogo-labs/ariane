@@ -22,7 +22,7 @@ function pluralize(count: number, label: string): string {
  * @slot warning-icon - Icône affichée en état warning.
  * @slot error-icon   - Icône affichée en état error.
  *
- * @csspart charcounter - L'élément racine.
+ * @csspart charcounter - Rôle transverse (voir /getting-started/naming-conventions) : racine du composant.
  * @csspart count     - Le bloc chiffre + label.
  * @csspart count--warning - Le bloc chiffre + label en état warning (variante d'état de `count`).
  * @csspart count--error - Le bloc chiffre + label en état error (variante d'état de `count`).
