@@ -19,8 +19,10 @@ describe('ArTooltip', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un bubble avec part="bubble"', () => {
-            expect(getPart(el, 'bubble')).not.toBeNull();
+        it('contient un bubble avec part="bubble tooltip"', () => {
+            const bubble = getPart(el, 'bubble');
+            expect(bubble).not.toBeNull();
+            expect(bubble?.getAttribute('part')).toBe('bubble tooltip');
         });
 
         it('bubble a role="tooltip"', () => {

@@ -6,7 +6,7 @@ const tooltipStyles = css`
         display: contents;
     }
 
-    [part='bubble'] {
+    [part~='bubble'] {
         /* Popover positioning reset */
         position: absolute;
         inset: 0 auto auto 0;
