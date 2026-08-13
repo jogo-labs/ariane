@@ -54,10 +54,18 @@ describe('ArCollapse', () => {
             expect(el.getAttribute('name')).toBe('group-a');
         });
 
-        it('trigger-position reflète en attribut', async () => {
+        it('trigger-position reflète en attribut quand différent du défaut', async () => {
             el.triggerPosition = 'after';
             await waitForUpdate(el);
             expect(el.getAttribute('trigger-position')).toBe('after');
+        });
+
+        it('trigger-position ne reflète pas en attribut à la valeur par défaut', async () => {
+            el.triggerPosition = 'after';
+            await waitForUpdate(el);
+            el.triggerPosition = 'before';
+            await waitForUpdate(el);
+            expect(el.hasAttribute('trigger-position')).toBe(false);
         });
 
         it('disabled reflète en attribut', async () => {
