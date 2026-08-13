@@ -75,9 +75,9 @@ de la liste change. En mode compact, `<ul>` contient 3 `<li>` :
 
 ## Accessibilité
 
-- Le `<p id="ar-pagination">` sr-only existant (« Pagination, page X sur Y ») et les `aria-label`
-  « Page précédente (page X sur Y) » / « Page suivante » déjà posés sur prev/next restent
-  **inchangés** et portent toute l'information nécessaire au lecteur d'écran.
+- Le `<p id="ar-pagination">` sr-only existant (« Pagination, page X sur Y ») et le texte
+  accessible (sr-only) « Page précédente (page X sur Y) » / « Page suivante » déjà posé sur
+  prev/next restent **inchangés** et portent toute l'information nécessaire au lecteur d'écran.
 - Le `<span part="label">` visible porte donc **`aria-hidden="true"`** : sans ce marquage, le
   lecteur d'écran lirait le texte « Page X / Y » en plus du `<p>` sr-only déjà mis à jour à chaque
   changement de page — double annonce. Ce pattern (séparer texte visible `aria-hidden` et
@@ -139,8 +139,8 @@ de la liste change. En mode compact, `<ul>` contient 3 `<li>` :
 ## Hors scope
 
 - Attribut `mode="compact"` extensible — écarté par YAGNI, cf. section « Reconceptualisation ».
-- i18n du texte du label et des `aria-label` prev/next — cohérent avec l'absence d'infrastructure
-  i18n dans le reste du composant/projet.
+- i18n du texte du label et du texte accessible (sr-only) de prev/next — cohérent avec l'absence
+  d'infrastructure i18n dans le reste du composant/projet.
 - Style par défaut du composant pour l'agencement visuel prev/next en mode compact (gap, arrondis
   internes) — laissé au consommateur via `::part()`, le composant reste headless.
 - Navigation directe à une page arbitraire en mode compact — l'issue #180 précise explicitement une

@@ -50,7 +50,8 @@ export interface ArPaginationPageChangeDetail {
  *   affiché à la place de la liste de pages. Sur le modèle de `page-select`.
  * @csspart label - Le `<span>` du label de position en mode compact ("Page X / Y"), non
  *   cliquable et masqué aux lecteurs d'écran (`aria-hidden`, l'information équivalente est déjà
- *   portée par le landmark et les `aria-label` prev/next). Personnalisable via `::part(label)`.
+ *   portée par le landmark et le texte accessible (sr-only) de prev/next). Personnalisable via
+ *   `::part(label)`.
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
@@ -136,17 +137,7 @@ export class ArPagination extends LitElement {
         // largeur disponible — le ResizeObserver et la remesure liée aux polices web seraient un
         // travail pur perte, court-circuités entièrement ici.
         if (this.compact) return;
-        this._setupResizeObserver();
-        // Une police web chargée après le premier paint peut changer la largeur mesurée des
-        // items (ex. police variable, chargement asynchrone) : force une remesure une fois
-        // les polices prêtes. `document.fonts` est absent de certains environnements de test
-        // (happy-dom) — garde défensive.
-        if (document.fonts) {
-            void document.fonts.ready.then(() => {
-                this._needsRemeasure = true;
-                this._recalculateBudget();
-            });
-        }
+        this._setupAdaptiveMeasurement();
     }
 
     override disconnectedCallback(): void {
@@ -160,6 +151,27 @@ export class ArPagination extends LitElement {
         if (!nav) return;
         this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
         this._resizeObserver.observe(nav);
+    }
+
+    /**
+     * Monte le `ResizeObserver` et arme la remesure liée aux polices web — les deux points
+     * d'entrée du mode adaptatif (montage initial non compact, et retour à l'adaptatif après
+     * un passage par le mode compact) doivent réarmer les deux, pas seulement l'observer :
+     * sans ce regroupement, un montage compact suivi d'un passage tardif en adaptatif se
+     * retrouvait sans le hook `fonts.ready`, jamais installé au premier montage court-circuité.
+     */
+    private _setupAdaptiveMeasurement(): void {
+        this._setupResizeObserver();
+        // Une police web chargée après le premier paint peut changer la largeur mesurée des
+        // items (ex. police variable, chargement asynchrone) : force une remesure une fois
+        // les polices prêtes. `document.fonts` est absent de certains environnements de test
+        // (happy-dom) — garde défensive.
+        if (document.fonts) {
+            void document.fonts.ready.then(() => {
+                this._needsRemeasure = true;
+                this._recalculateBudget();
+            });
+        }
     }
 
     private _recalculateBudget(): void {
@@ -204,12 +216,18 @@ export class ArPagination extends LitElement {
     }
 
     override updated(changed: Map<string, unknown>): void {
-        if (changed.has('compact')) {
+        // `_hasRenderedOnce` (posé false→true seulement en fin de cycle, cf. plus bas) exclut le
+        // tout premier `updated()` : `compact` n'a pas de `useDefault`, donc `changed.has('compact')`
+        // est déjà vrai à ce premier cycle même si l'attribut n'a jamais été posé/modifié — sans
+        // cette garde, un montage non compact appellerait `_setupAdaptiveMeasurement()` deux fois
+        // de suite (une fois via `firstUpdated()`, une fois ici), créant un `ResizeObserver`
+        // jetable à chaque montage.
+        if (this._hasRenderedOnce && changed.has('compact')) {
             if (this.compact) {
                 this._resizeObserver?.disconnect();
                 this._resizeObserver = undefined;
             } else if (this._initialized) {
-                this._setupResizeObserver();
+                this._setupAdaptiveMeasurement();
             }
         }
         if (changed.has('total') && this.total < 1) {
@@ -297,34 +315,6 @@ export class ArPagination extends LitElement {
         const isPreviousDisabled = current <= 1;
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
-        // Plancher uniforme (5, le plus grand des deux planchers algorithmiques de
-        // `_calculatePages`) plutôt que 3 en bord de liste / 5 sinon : sinon, à largeur égale,
-        // la bascule vers le select dépendrait de la position de `current` (une page en bord
-        // resterait en boutons plus longtemps qu'une page intermédiaire) — incohérent du point
-        // de vue de l'utilisateur, qui ne doit pas voir un mode différent selon la page active
-        // sans changement de largeur. 5 est sûr : c'est déjà le plancher réel en position non-bord,
-        // donc aucun risque de débordement (contrairement à forcer 3, qui ferait tenter un rendu
-        // à 5 items dans un budget de 3-4 slots).
-        const floorSlots = 5;
-        // Calculé une seule fois : réutilisé pour la décision de mode ci-dessous ET pour le
-        // rendu des boutons numérotés (repeat) si on reste en mode boutons. En mode compact,
-        // aucun numéro n'est jamais affiché — court-circuité à un tableau vide plutôt que de
-        // calculer une fenêtre de pages qui ne sera jamais rendue.
-        const pages = this.compact ? [] : _calculatePages(current, total, this._budget);
-        // Cas particulier : à budget=5 exactement (position non-bord, loin des deux extrémités),
-        // `_calculatePages` retombe sur sa fenêtre minimale [1, -1, current, -2, total] — 5 slots
-        // dont 2 ellipses purement décoratives, pour seulement 3 pages réellement cliquables.
-        // Le select offre alors plus de valeur pour le même espace (jusqu'à 9 pages réelles,
-        // cf. `renderPageSelect`) : basculer vers lui même si le budget brut suffirait
-        // techniquement à afficher cette fenêtre. Repli strictement plus sûr que les boutons
-        // qu'il remplace (un `<select>` fermé est plus étroit que la fenêtre à 5 slots qu'il
-        // aurait fallu rendre), donc aucun risque de débordement supplémentaire.
-        const isMinimalWindowWithDoubleEllipsis =
-            pages.length === 5 && pages.includes(-1) && pages.includes(-2);
-        const useSelectMode =
-            !this.compact &&
-            this._budget !== undefined &&
-            (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
         return html` <nav part="nav" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
@@ -345,22 +335,7 @@ export class ArPagination extends LitElement {
                     </a>
                 </li>
 
-                ${this.compact
-                    ? nothing
-                    : useSelectMode
-                      ? this.renderPageSelect(current, total)
-                      : repeat(
-                            pages,
-                            (page) => page,
-                            (page) => {
-                                // -1 et -2 sont des sentinelles représentant les ellipses
-                                return page === -1 || page === -2
-                                    ? html` <li part="item" aria-hidden="true">
-                                          <span part="ellipsis">...</span>
-                                      </li>`
-                                    : this.renderPage(page, page === current, total);
-                            },
-                        )}
+                ${this.compact ? nothing : this.renderPageContent(current, total)}
 
                 <li part="item">
                     <a
@@ -377,6 +352,53 @@ export class ArPagination extends LitElement {
                 </li>
             </ul>
         </nav>`;
+    }
+
+    /**
+     * Génère le contenu de la liste de pages en mode adaptatif : numéros de page (avec
+     * ellipses) ou `<select>` de saut de page selon `_budget`. N'est jamais appelée en mode
+     * compact (`compact`) — `render()` bifurque directement vers `renderCompactLabel` dans ce
+     * cas, donc aucune garde `!this.compact` n'est nécessaire ici.
+     */
+    protected renderPageContent(current: number, total: number): TemplateResult {
+        // Plancher uniforme (5, le plus grand des deux planchers algorithmiques de
+        // `_calculatePages`) plutôt que 3 en bord de liste / 5 sinon : sinon, à largeur égale,
+        // la bascule vers le select dépendrait de la position de `current` (une page en bord
+        // resterait en boutons plus longtemps qu'une page intermédiaire) — incohérent du point
+        // de vue de l'utilisateur, qui ne doit pas voir un mode différent selon la page active
+        // sans changement de largeur. 5 est sûr : c'est déjà le plancher réel en position non-bord,
+        // donc aucun risque de débordement (contrairement à forcer 3, qui ferait tenter un rendu
+        // à 5 items dans un budget de 3-4 slots).
+        const floorSlots = 5;
+        const pages = _calculatePages(current, total, this._budget);
+        // Cas particulier : à budget=5 exactement (position non-bord, loin des deux extrémités),
+        // `_calculatePages` retombe sur sa fenêtre minimale [1, -1, current, -2, total] — 5 slots
+        // dont 2 ellipses purement décoratives, pour seulement 3 pages réellement cliquables.
+        // Le select offre alors plus de valeur pour le même espace (jusqu'à 9 pages réelles,
+        // cf. `renderPageSelect`) : basculer vers lui même si le budget brut suffirait
+        // techniquement à afficher cette fenêtre. Repli strictement plus sûr que les boutons
+        // qu'il remplace (un `<select>` fermé est plus étroit que la fenêtre à 5 slots qu'il
+        // aurait fallu rendre), donc aucun risque de débordement supplémentaire.
+        const isMinimalWindowWithDoubleEllipsis =
+            pages.length === 5 && pages.includes(-1) && pages.includes(-2);
+        const useSelectMode =
+            this._budget !== undefined &&
+            (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
+
+        return html`${useSelectMode
+            ? this.renderPageSelect(current, total)
+            : repeat(
+                  pages,
+                  (page) => page,
+                  (page) => {
+                      // -1 et -2 sont des sentinelles représentant les ellipses
+                      return page === -1 || page === -2
+                          ? html` <li part="item" aria-hidden="true">
+                                <span part="ellipsis">...</span>
+                            </li>`
+                          : this.renderPage(page, page === current, total);
+                  },
+              )}`;
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */
