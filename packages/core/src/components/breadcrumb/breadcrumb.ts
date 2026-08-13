@@ -28,6 +28,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * "Retour".
  *
  * @csspart nav        - L'élément `<nav>` englobant.
+ * @csspart breadcrumb - Porté par `nav` : racine du composant.
  * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
@@ -215,7 +216,7 @@ export class ArBreadcrumb extends LitElement {
         });
 
         return html`
-            <nav part="nav" role="navigation" aria-labelledby="breadcrumb-label">
+            <nav part="nav breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
                     ? html`<div class="dropdown">

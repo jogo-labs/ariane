@@ -180,14 +180,16 @@ describe('ArBreadcrumb', () => {
             expect(firstItem?.hasAttribute('aria-current')).toBe(false);
         });
 
-        it('contient un part="nav"', async () => {
+        it('contient un part="nav breadcrumb"', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'nav')).not.toBeNull();
+            const nav = getPart(el, 'nav');
+            expect(nav).not.toBeNull();
+            expect(nav?.getAttribute('part')).toBe('nav breadcrumb');
         });
     });
 
