@@ -33,14 +33,14 @@ const tocEntries = [
                     de même nature. Un rôle transverse s'ajoute toujours au part spécifique
                     existant, il ne le remplace jamais (sauf la racine du composant, cas
                     particulier documenté ci-dessous) :
-                    <code>part="close action-button"</code>.
+                    <code>part="input field"</code> sur le champ texte d'<code>ar-datepicker</code>.
                 </p>
                 <p>
                     Objectif : apprendre ce vocabulaire une seule fois, puis le reconnaître sur
                     n'importe quel composant de la librairie, sans redécouvrir le nom de chaque
                     part composant par composant — et surtout pouvoir écrire une seule règle CSS
                     qui s'applique à tous les composants concernés d'un coup
-                    (<code>::part(action-button) {'{ ... }'}</code> style tous les boutons d'action de
+                    (<code>::part(field) {'{ ... }'}</code> style tous les champs de saisie de
                     la librairie, quel que soit le composant). C'est ce qui rend l'intégration
                     d'Ariane dans un design system consommateur plus rapide : les décisions de
                     style transverses (radius d'un bouton, apparence d'un champ) se prennent une
@@ -97,7 +97,7 @@ const tocEntries = [
                             <tr>
                                 <td><code>trigger</code></td>
                                 <td>Ouvre/ferme un panel ou une zone repliable.</td>
-                                <td><code>ar-collapse::part(trigger)</code></td>
+                                <td><code>ar-datepicker::part(trigger)</code></td>
                             </tr>
                             <tr>
                                 <td><code>header</code> / <code>footer</code></td>
