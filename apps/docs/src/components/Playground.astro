@@ -76,9 +76,17 @@ const showPlayground = displayMode === 'demo';
                                 <Fragment set:html={variant.html} />
                             </div>
                         </div>
-                        <div class="code-block">
-                            <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
-                            <pre><code class="language-html">{variant.html.trim()}</code></pre>
+                        <ar-collapse for={`collapse-${variant.name}`}>
+                            <div class="code-block">
+                                <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                <pre><code class="language-html">{variant.html.trim()}</code></pre>
+                            </div>
+                        </ar-collapse>
+                        <div class="preview-controls">
+                            <button class="code-collapse-btn" id={`collapse-${variant.name}`}>
+                                <span class="sr-only">Voir le&nbsp;</span>Code&nbsp;
+                                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -179,7 +187,8 @@ const showPlayground = displayMode === 'demo';
 
     /* Évite le flash non-stylé le temps de l'hydratation du custom element
        (Lit n'applique son shadow DOM/style qu'une fois défini côté client). */
-    ar-alert:not(:defined) {
+    ar-alert:not(:defined),
+    ar-collapse:not(:defined) {
         visibility: hidden;
     }
 
@@ -285,9 +294,50 @@ const showPlayground = displayMode === 'demo';
         overflow:   hidden;
     }
 
-    .code-block          { border-radius: 0 0 0.5rem 0.5rem; }
-    .playground-code-block { border-radius: 0; }
+    .preview-controls {
+        display: flex;
+    }
 
+
+    .code-collapse-btn {
+        display:         inline-flex;
+        flex:            1 1 100%;
+        align-items:     center;
+        justify-content: center;
+        gap:             0.4rem;
+        background:      transparent;
+        color:           var(--doc-text);
+        font-family:     inherit;
+        font-size:       0.9rem;
+        font-weight:     600;
+        padding:         0.65rem 1.5rem;
+        text-decoration: none;
+        border:          1.5px solid var(--doc-border);
+        cursor:          pointer;
+        transition:      border-color 0.15s, color 0.15s;
+        width: 100%;
+
+        &:hover {
+            border-color: var(--doc-accent);
+            color:        var(--doc-accent);
+        }
+
+        svg {
+            height: 1.25rem;
+            width: auto;
+            transform: rotate(0deg);
+        }
+
+        &[aria-expanded="true"] svg {
+            rotate: 180deg;
+        }
+    }
+
+    .preview-controls,
+    .code-collapse-btn {
+        border-end-end-radius: .5rem;
+        border-end-start-radius: .5rem;
+    }
     .copy-btn {
         position:      absolute;
         top:           0.5rem;
@@ -327,10 +377,7 @@ const showPlayground = displayMode === 'demo';
         color:       #cdd6f4;
     }
 
-    :global(.code-block pre) {
-        border-radius: 0 0 0.5rem 0.5rem;
-    }
-
+    :global(.code-block pre),
     :global(.playground-code-block pre) {
         border-radius: 0;
     }

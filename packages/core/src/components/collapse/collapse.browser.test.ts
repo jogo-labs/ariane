@@ -174,4 +174,45 @@ describe('ar-collapse — browser', () => {
             expect(getPanel(el).style.height).to.equal('');
         });
     });
+
+    // ── Largeur du panel ────────────────────────────────────────────────────
+
+    describe('largeur du panel', () => {
+        it('[part="panel"] s\'étire sur toute la largeur du host, indépendamment de la largeur du trigger', async () => {
+            // [part='base'] utilise align-items: flex-start (garde le trigger à sa largeur
+            // naturelle) — sans align-self: stretch sur [part='panel'], ce même align-items
+            // rétrécit aussi le panel (et tout contenu large qu'il contient, ex. un bloc de
+            // code) à la largeur de son propre contenu au lieu de la largeur du host.
+            const wrapper = await fixture(html`
+                <div style="width: 400px;">
+                    <ar-collapse open>
+                        <button slot="trigger">T</button>
+                        <p>Contenu</p>
+                    </ar-collapse>
+                </div>
+            `);
+            const collapseEl = wrapper.querySelector('ar-collapse') as ArCollapse;
+            const panel = getPanel(collapseEl);
+            expect(panel.getBoundingClientRect().width).to.be.closeTo(
+                collapseEl.getBoundingClientRect().width,
+                1,
+            );
+        });
+
+        it('le trigger conserve sa largeur naturelle (pas étiré par le fix du panel)', async () => {
+            const wrapper = await fixture(html`
+                <div style="width: 400px;">
+                    <ar-collapse>
+                        <button slot="trigger">T</button>
+                        <p>Contenu</p>
+                    </ar-collapse>
+                </div>
+            `);
+            const collapseEl = wrapper.querySelector('ar-collapse') as ArCollapse;
+            const trigger = collapseEl.querySelector('[slot="trigger"]') as HTMLElement;
+            expect(trigger.getBoundingClientRect().width).to.be.lessThan(
+                collapseEl.getBoundingClientRect().width,
+            );
+        });
+    });
 });
