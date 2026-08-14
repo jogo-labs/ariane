@@ -229,6 +229,16 @@ besoin concret). Le lot 2 inclut aussi 2 correctifs propres à
 (le wrapper animé overflow/hauteur n'est pas un conteneur flottant, collision de sens à lever avec
 le rôle `panel`).
 
+**Lot 3** : rôle `action-button` sur les boutons de commande restants, en suivant le même schéma
+que le lot 1 (nom spécifique en toutes lettres suffixé `-button`, additif avec `action-button`) —
+`ar-alert` (`close` → `close-button`), `ar-dialog` (`close` → `close-button`), `ar-table-sort`
+(`button` → `sort-button`, générique comme l'étaient `base`/`container` pour la racine ; variante
+d'état `button--pending` → `sort-button--pending`). Aucun nouveau wrapper requis — additif sur des
+parts déjà existants. `ar-tooltip` n'est volontairement pas concerné par `panel` : sa racine ne peut
+porter aucun second rôle (règle du lot 2), et structurellement il n'utilise pas `panel.styles.ts`
+partagé par les autres composants à panel flottant (dropdown, datepicker) — pas dans la même
+famille malgré la ressemblance de surface. `ar-dropdown` déjà conforme (aucun changement).
+
 ## Impact `custom-elements.json` / doc générée
 
 Les rôles transverses sont de simples `@csspart` supplémentaires, déjà supportés par le pipeline
