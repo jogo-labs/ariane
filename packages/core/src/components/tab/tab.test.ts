@@ -40,7 +40,7 @@ describe('ArTab', () => {
             expect(el.hasAttribute('active')).toBe(true);
         });
 
-        it('émet part="tab" quand active est false', async () => {
+        it('n\'émet pas part="tab--selected" quand active est false', async () => {
             el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
             expect(getPart(el, 'tab--selected')).toBeNull();
         });

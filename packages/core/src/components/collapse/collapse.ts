@@ -17,7 +17,7 @@ import styles from './collapse.styles.js';
  * @csspart trigger-container - Wrapper du slot trigger.
  * @csspart collapsible       - Zone animée (overflow hidden, height 0 → auto). Nom distinct de
  *   `panel` (rôle transverse = conteneur flottant) : ce wrapper n'est jamais flottant.
- * @csspart body               - Wrapper interne du contenu.
+ * @csspart body              - Wrapper interne du contenu.
  *
  * @cssprop --ar-collapse-duration - Durée de la transition height.
  * @cssprop --ar-collapse-easing - Easing de la transition height.

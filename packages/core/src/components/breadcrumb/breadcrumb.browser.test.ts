@@ -156,7 +156,7 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('propriétés logiques (RTL)', () => {
-        it('[part="nav"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
+        it('[part~="nav"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
             el = await fixture<ArBreadcrumb>(html`
                 <ar-breadcrumb dir="rtl">
                     <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>

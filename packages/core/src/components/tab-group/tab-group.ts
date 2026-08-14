@@ -15,7 +15,7 @@ import styles from './tab-group.styles.js';
  *
  * @csspart tab-group - Conteneur racine.
  * @csspart nav       - Zone scrollable (overflow-x: auto).
- * @csspart tabs       - div[role="tablist"].
+ * @csspart tabs      - div[role="tablist"].
  *
  * Les classes `has-overflow-start` et `has-overflow-end` sont ajoutées automatiquement sur l'hôte
  * quand le contenu de la tablist déborde à gauche ou à droite.

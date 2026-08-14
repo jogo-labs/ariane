@@ -1258,7 +1258,7 @@
     }
 
     ar-progressbar {
-        &::part(container) {
+        &::part(progressbar) {
             row-gap: 0.75rem;
         }
 
@@ -1277,7 +1277,7 @@
     }
 
     ar-tab-group {
-        &::part(base) {
+        &::part(tab-group) {
             gap: 0;
         }
     }
@@ -1286,17 +1286,17 @@
         border-radius: 0;
         font-weight: var(--ar-font-weight-normal);
 
-        &::part(base) {
+        &::part(tab) {
             color: var(--ar-color-text-muted);
             background: transparent;
         }
 
-        &::part(base--selected) {
+        &::part(tab--selected) {
             color: var(--ar-color-interactive);
             background: transparent;
         }
 
-        &:hover:not([disabled]):not([active])::part(base) {
+        &:hover:not([disabled]):not([active])::part(tab) {
             color: var(--ar-color-text);
             background: var(--ar-color-bg-subtle);
         }
