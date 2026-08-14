@@ -19,7 +19,7 @@ export class ArProgressbarConfig {
  *
  * @slot - Label décrivant ce que mesure la barre (ex: "Chargement du fichier").
  *
- * @csspart progressbar  - Le `<div>` englobant l'ensemble du composant (racine).
+ * @csspart progressbar  - Racine du composant.
  * @csspart label        - Le `<p>` contenant le slot et le pourcentage.
  * @csspart label-text   - Le `<span>` autour du slot.
  * @csspart percent      - Le `<strong>` affichant la valeur numérique du pourcentage.

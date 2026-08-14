@@ -11,7 +11,7 @@ import styles from './tab-panel.styles.js';
  *
  * @slot - Contenu du panel.
  *
- * @csspart tab-panel - Wrapper du slot (racine).
+ * @csspart tab-panel - Racine du composant.
  */
 export class ArTabPanel extends LitElement {
     static override styles = [styles];

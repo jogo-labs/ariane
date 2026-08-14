@@ -11,7 +11,7 @@ import styles from './tab.styles.js';
  *
  * @slot - Libellé de l'onglet.
  *
- * @csspart tab - Wrapper du slot — padding, box-shadow actif.
+ * @csspart tab - Racine du composant.
  * @csspart tab--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `tab`, propriété `active` pilotée par ar-tab-group).
  *
  * @cssprop --ar-tab-padding-x - Padding horizontal.

@@ -13,7 +13,7 @@ import styles from './collapse.styles.js';
  * @slot trigger - Élément déclencheur (ignoré si `for` est défini).
  * @slot         - Contenu collapsible.
  *
- * @csspart collapse          - Conteneur racine.
+ * @csspart collapse          - Racine du composant.
  * @csspart trigger-container - Wrapper du slot trigger.
  * @csspart collapsible       - Zone animée (overflow hidden, height 0 → auto). Nom distinct de
  *   `panel` (rôle transverse = conteneur flottant) : ce wrapper n'est jamais flottant.

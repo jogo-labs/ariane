@@ -13,7 +13,7 @@ import styles from './tab-group.styles.js';
  *
  * @slot - ar-tab et ar-tab-panel enfants.
  *
- * @csspart tab-group - Conteneur racine.
+ * @csspart tab-group - Racine du composant.
  * @csspart nav       - Zone scrollable (overflow-x: auto).
  * @csspart tabs      - div[role="tablist"].
  *
