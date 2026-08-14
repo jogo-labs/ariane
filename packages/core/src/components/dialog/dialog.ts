@@ -60,7 +60,8 @@ if (typeof document !== 'undefined') {
  * @csspart header - L'en-tête contenant le titre et le bouton de fermeture. Absent du DOM si `without-header` est actif.
  * @csspart header-actions - Le conteneur des actions additionnelles du header (slot `header-actions`). Absent du DOM si le slot est vide ou si `without-header` est actif.
  * @csspart title - Le titre du dialog.
- * @csspart close - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
+ * @csspart close-button - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
+ * @csspart action-button - Porté par `close-button` : bouton qui déclenche une action ponctuelle.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
@@ -309,7 +310,7 @@ export class ArDialog extends LitElement {
                                     <slot name="header-actions"></slot>
                                 </div>`
                               : nothing}
-                          <button part="close" type="button" data-ar-dismiss>
+                          <button part="close-button action-button" type="button" data-ar-dismiss>
                               <slot name="close-icon">
                                   <svg
                                       aria-hidden="true"

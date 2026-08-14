@@ -50,7 +50,7 @@ describe('ArAlert', () => {
         });
 
         it('le bouton close est absent sans next-focus', () => {
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
     });
 
@@ -286,27 +286,36 @@ describe('ArAlert', () => {
     describe('bouton close', () => {
         it("n'est pas rendu sans l'attribut next-focus", async () => {
             el = await fixture('<ar-alert></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it('est rendu quand next-focus est défini', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            expect(getPart(el, 'close')).not.toBeNull();
+            expect(getPart(el, 'close-button')).not.toBeNull();
         });
 
         it("n'est pas rendu si next-focus est une chaîne vide", async () => {
             el = await fixture('<ar-alert next-focus=""></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it("n'est pas rendu si next-focus ne contient que des espaces", async () => {
             el = await fixture('<ar-alert next-focus="   "></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it('le bouton close a aria-label="Fermer l\'alerte"', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            expect(requirePart(el, 'close').getAttribute('aria-label')).toBe("Fermer l'alerte");
+            expect(requirePart(el, 'close-button').getAttribute('aria-label')).toBe(
+                "Fermer l'alerte",
+            );
+        });
+
+        it('porte le part combiné "close-button action-button"', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(requirePart(el, 'close-button').getAttribute('part')).toBe(
+                'close-button action-button',
+            );
         });
 
         it('reflète next-focus en attribut HTML', async () => {
@@ -354,7 +363,7 @@ describe('ArAlert', () => {
             el.removeAttribute('next-focus');
             await waitForUpdate(el);
             // canBeHidden est false donc le bouton close n'est pas rendu — pas d'appel possible à _hide()
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
     });
 
@@ -367,7 +376,7 @@ describe('ArAlert', () => {
             // _shouldAnimate() renvoie false et _finishHide() s'exécute de façon synchrone,
             // ce qui repasserait hiding à false avant même l'assertion ci-dessous.
             el.style.transitionDuration = '0.3s';
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
             // hiding est un protected property — on y accède via cast
             expect((el as unknown as { hiding: boolean }).hiding).toBe(true);
@@ -378,7 +387,7 @@ describe('ArAlert', () => {
             // Cf. commentaire ci-dessus : durée de transition non nulle requise pour que
             // hiding reste true (chemin asynchrone) au moment de l'assertion.
             el.style.transitionDuration = '0.3s';
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
             expect(el.hasAttribute('hiding')).toBe(true);
         });
@@ -393,7 +402,7 @@ describe('ArAlert', () => {
             el.addEventListener('ar-alert-close', handler);
 
             // Simule le clic → hiding=true
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
             // La fermeture attend bien la transition : rien n'est émis avant transitionend.
@@ -416,7 +425,7 @@ describe('ArAlert', () => {
             const handler = vi.fn();
             el.addEventListener('ar-alert-close', handler);
 
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
             // Simule les deux transitionend (opacity, puis transform) dans la même tâche.
@@ -440,7 +449,7 @@ describe('ArAlert', () => {
 
             // Aucun style inline, aucune feuille de thème chargée en environnement de test :
             // getComputedStyle(el).transitionDuration vaut '' (→ 0) en happy-dom par défaut.
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
             // La fermeture doit être synchrone : pas de transitionend nécessaire.
@@ -486,7 +495,7 @@ describe('ArAlert', () => {
 
             // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
             // synchroniquement au clic — pas besoin de simuler transitionend.
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
             expect(spy).toHaveBeenCalledOnce();
@@ -504,7 +513,7 @@ describe('ArAlert', () => {
 
             // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
             // synchroniquement au clic — pas besoin de simuler transitionend.
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
 
             expect(document.activeElement).toBe(target);

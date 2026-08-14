@@ -204,7 +204,7 @@ describe('ar-dialog — browser', () => {
 
             const shadow = el.shadowRoot!;
             const headerEl = shadow.querySelector('[part="header"]') as HTMLElement;
-            const closeEl = shadow.querySelector('[part="close"]') as HTMLElement;
+            const closeEl = shadow.querySelector('[part~="close-button"]') as HTMLElement;
 
             const headerRect = headerEl.getBoundingClientRect();
             const closeRect = closeEl.getBoundingClientRect();

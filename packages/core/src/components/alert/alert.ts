@@ -28,7 +28,8 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @csspart icon      - Le conteneur de l'icône de variant.
  * @csspart icon-svg  - Le SVG de l'icône de variant par défaut (absent si le slot `icon` est utilisé).
  * @csspart body      - Le conteneur du titre et du contenu.
- * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
+ * @csspart close-button - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
+ * @csspart action-button - Porté par `close-button` : bouton qui déclenche une action ponctuelle.
  *
  * @cssprop --ar-alert-bg - Fond de l'alerte.
  * @cssprop --ar-alert-border - Bordure de l'alerte.
@@ -198,7 +199,7 @@ export class ArAlert extends LitElement {
             </div>
             ${this.canBeHidden
                 ? html` <button
-                      part="close"
+                      part="close-button action-button"
                       @click=${this._hide}
                       type="button"
                       aria-label="Fermer l'alerte"

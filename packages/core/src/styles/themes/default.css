@@ -920,7 +920,7 @@
         column-gap: 0.75rem;
 
         /* Customisation */
-        &::part(close) {
+        &::part(close-button) {
             border-radius: var(--ar-border-radius-md);
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
@@ -930,12 +930,12 @@
             inset-inline-end: -0.2rem;
         }
 
-        &::part(close):hover {
+        &::part(close-button):hover {
             background-color: color-mix(in srgb, currentColor 20%, transparent);
             opacity: 1;
         }
 
-        &::part(close):focus-visible {
+        &::part(close-button):focus-visible {
             opacity: 1;
         }
 
@@ -984,13 +984,13 @@
             border-radius: var(--ar-border-radius-lg);
         }
 
-        &::part(close) {
+        &::part(close-button) {
             border-radius: var(--ar-border-radius-md);
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
         }
 
-        &::part(close):hover {
+        &::part(close-button):hover {
             background-color: color-mix(in srgb, currentColor 20%, transparent);
         }
 
@@ -1229,11 +1229,11 @@
     }
 
     ar-table-sort {
-        &::part(button) {
+        &::part(sort-button) {
             gap: 0.375rem;
         }
 
-        &::part(button--pending) {
+        &::part(sort-button--pending) {
             cursor: wait;
         }
 

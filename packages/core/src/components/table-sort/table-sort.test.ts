@@ -43,8 +43,10 @@ describe('ArTableSort', () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
         });
 
-        it('contient part="button"', () => {
-            expect(getPart(el, 'button')).not.toBeNull();
+        it('contient part="sort-button action-button"', () => {
+            expect(getPart(el, 'sort-button')?.getAttribute('part')).toBe(
+                'sort-button action-button',
+            );
         });
 
         it('contient part="indicator"', () => {
@@ -115,7 +117,7 @@ describe('ArTableSort', () => {
     describe('label pendant pending', () => {
         it('tooltip = "Tri en cours…" pendant pending', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
             expect(tooltipLabel(el)).toBe('Tri en cours…');
         });
@@ -129,7 +131,7 @@ describe('ArTableSort', () => {
             const events: CustomEvent[] = [];
             el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
 
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
 
             expect(el.pending).toBe(true);
@@ -145,7 +147,7 @@ describe('ArTableSort', () => {
             const events: CustomEvent[] = [];
             el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
 
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
 
             expect(events[0].detail.columnLabel).toBe('Prix');
@@ -156,7 +158,7 @@ describe('ArTableSort', () => {
             const events: CustomEvent[] = [];
             el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
 
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
             expect(events[0].detail.requestedOrder).toBe('desc');
         });
@@ -166,7 +168,7 @@ describe('ArTableSort', () => {
             const events: CustomEvent[] = [];
             el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
 
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
             expect(events[0].detail.requestedOrder).toBe('none');
         });
@@ -176,7 +178,7 @@ describe('ArTableSort', () => {
             const events: CustomEvent[] = [];
             el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
 
-            const btn = requirePart(el, 'button') as HTMLElement;
+            const btn = requirePart(el, 'sort-button') as HTMLElement;
             btn.click();
             await waitForUpdate(el);
             btn.click();
@@ -187,21 +189,21 @@ describe('ArTableSort', () => {
 
         it('aria-disabled="true" sur le bouton pendant pending', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
-            expect(requirePart(el, 'button').getAttribute('aria-disabled')).toBe('true');
+            expect(requirePart(el, 'sort-button').getAttribute('aria-disabled')).toBe('true');
         });
 
-        it('émet part="button button--pending" pendant pending', async () => {
+        it('émet part="sort-button sort-button--pending" pendant pending', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
-            expect(requirePart(el, 'button--pending')).not.toBeNull();
+            expect(requirePart(el, 'sort-button--pending')).not.toBeNull();
         });
 
-        it("n'émet pas button--pending avant le clic", async () => {
+        it("n'émet pas sort-button--pending avant le clic", async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            expect(getPart(el, 'button--pending')).toBeNull();
+            expect(getPart(el, 'sort-button--pending')).toBeNull();
         });
     });
 
@@ -210,7 +212,7 @@ describe('ArTableSort', () => {
     describe('confirm()', () => {
         it('avance order et efface pending', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
 
             el.confirm();
@@ -231,7 +233,7 @@ describe('ArTableSort', () => {
 
         it('second confirm() consécutif sans effet', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
             el.confirm();
             await waitForUpdate(el);
@@ -246,7 +248,7 @@ describe('ArTableSort', () => {
     describe('reject()', () => {
         it('efface pending sans changer order', async () => {
             el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
 
             el.reject();
@@ -313,7 +315,7 @@ describe('ArTableSort', () => {
 
         it('met à jour aria-sort après confirm()', async () => {
             const { th, el } = await inTh();
-            (requirePart(el, 'button') as HTMLElement).click();
+            (requirePart(el, 'sort-button') as HTMLElement).click();
             await waitForUpdate(el);
             el.confirm();
             await waitForUpdate(el);

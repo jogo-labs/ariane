@@ -54,8 +54,10 @@ describe('ArDialog', () => {
             expect(requireShadow(el).querySelector('[data-ar-dismiss]')).not.toBeNull();
         });
 
-        it('contient part="close"', () => {
-            expect(getPart(el, 'close')).not.toBeNull();
+        it('contient part="close-button action-button"', () => {
+            expect(getPart(el, 'close-button')?.getAttribute('part')).toBe(
+                'close-button action-button',
+            );
         });
 
         it("le bouton close n'a pas d'aria-describedby", async () => {
@@ -180,7 +182,7 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
             expect(getPart(el, 'header')).toBeNull();
             expect(getPart(el, 'title')).toBeNull();
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
             expect(requireShadow(el).querySelector('[data-ar-dismiss]')).toBeNull();
         });
 

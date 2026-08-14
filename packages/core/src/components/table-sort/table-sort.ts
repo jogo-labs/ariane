@@ -54,8 +54,9 @@ function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boo
  *
  * @slot - Libellé de la colonne.
  *
- * @csspart button    - Le bouton déclencheur.
- * @csspart button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `button`).
+ * @csspart sort-button    - Le bouton déclencheur.
+ * @csspart sort-button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `sort-button`).
+ * @csspart action-button - Porté par `sort-button` : bouton qui déclenche une action ponctuelle.
  * @csspart indicator - L'icône de direction de tri.
  *
  * @cssprop --ar-table-sort-indicator-size - Taille de l'icône indicateur asc / desc.
@@ -172,7 +173,7 @@ export class ArTableSort extends LitElement {
         const label = getActionLabel(this.type, this.order, this.pending);
         return html`
             <button
-                part="button${this.pending ? ' button--pending' : ''}"
+                part="sort-button action-button${this.pending ? ' sort-button--pending' : ''}"
                 type="button"
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
