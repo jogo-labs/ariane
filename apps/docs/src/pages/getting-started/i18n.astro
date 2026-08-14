@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'principe',        label: 'Principe : lang',                level: 1 as const },
+    { id: 'limite',           label: 'Limite : pas d’héritage',        level: 1 as const },
+    { id: 'fr-en',            label: 'fr/en : rien à importer',        level: 1 as const },
+    { id: 'traductions',      label: 'Fournir sa propre traduction',   level: 1 as const },
+    { id: 'composants',       label: 'Composants concernés',           level: 1 as const },
+];
+
+const codeChangeLang = `<!-- Langue par défaut de la page -->
+<html lang="en">
+
+<!-- Ou par composant, en surcharge -->
+<ar-table-sort lang="es">Prix</ar-table-sort>`;
+
+const codeCustomTranslation = `import { registerTranslation } from '@ariane-ui/core';
+import type { Translation } from '@ariane-ui/core';
+import { enTranslation } from '@ariane-ui/core';
+
+const es: Translation = {
+    ...enTranslation, // base de départ, à traduire terme par terme
+    $code: 'es',
+    $name: 'Español',
+    $dir: 'ltr',
+    today: 'Hoy',
+    close: 'Cerrar',
+    // ...
+};
+
+registerTranslation(es);`;
+
+const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, compilé, hébergé par vous -->
+<script type="module" src="/mon-app-es.js"></script>`;
+---
+
+<Layout title="Internationalisation (i18n)" currentPath="/getting-started/i18n" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Internationalisation</h2>
+            <p class="summary">
+                Certains composants Ariane embarquent des libellés accessibles (annonces
+                aria-live, aria-label). Ce mécanisme permet de les traduire sans surcharger
+                chaque instance manuellement.
+            </p>
+        </div>
+
+        <section id="principe" class="main-section">
+            <div>
+                <h3 class="section-title">Principe : l'attribut <code>lang</code></h3>
+                <p>
+                    Ariane s'appuie sur <a href="https://github.com/shoelace-style/localize"
+                    target="_blank" rel="noopener">@shoelace-style/localize</a> : la langue
+                    effective d'un composant vient de son propre attribut <code>lang</code>, ou à
+                    défaut de <code>&lt;html lang&gt;</code>. Le français est la langue par défaut
+                    si aucun <code>lang</code> n'est posé nulle part.
+                </p>
+                <pre><code class="language-html" set:text={codeChangeLang} /></pre>
+            </div>
+        </section>
+
+        <section id="limite" class="main-section">
+            <div>
+                <h3 class="section-title">Limite : pas d'héritage via un ancêtre intermédiaire</h3>
+                <ar-alert variant="warning" without-notification class="doc-callout-alert">
+                    <p class="doc-callout-alert-title">À savoir</p>
+                    <div class="doc-callout-alert-content">
+                        <p>
+                            Seuls <code>&lt;html lang&gt;</code> et le <code>lang</code> posé
+                            directement sur le composant sont pris en compte — un
+                            <code>&lt;div lang="es"&gt;</code> autour d'un composant Ariane n'a
+                            aucun effet. C'est une limite assumée de la librairie, pour des
+                            raisons de performance (pas de traversée du DOM à chaque rendu).
+                        </p>
+                    </div>
+                </ar-alert>
+            </div>
+        </section>
+
+        <section id="fr-en" class="main-section">
+            <div>
+                <h3 class="section-title"><code>fr</code>/<code>en</code> : rien à importer</h3>
+                <p>
+                    Contrairement à d'autres bibliothèques qui publient un fichier par langue à
+                    charger à la demande, les traductions <code>fr</code> (défaut) et
+                    <code>en</code> sont embarquées directement dans chaque composant qui en a
+                    besoin (CDN ou npm). Charger <code>ar-table-sort</code> ou
+                    <code>ar-datepicker</code> suffit — les deux langues sont déjà enregistrées,
+                    aucun import supplémentaire n'est nécessaire pour les utiliser.
+                </p>
+            </div>
+        </section>
+
+        <section id="traductions" class="main-section">
+            <div>
+                <h3 class="section-title">Fournir sa propre traduction</h3>
+                <p>
+                    Pour une langue tierce, partez de <code>enTranslation</code> (traduction
+                    anglaise, exportée par le package) comme référence typée, et fournissez tous
+                    les termes attendus. Cette fois l'import est à votre charge — c'est votre
+                    fichier, pas un fichier livré par Ariane.
+                </p>
+                <pre><code class="language-js" set:text={codeCustomTranslation} /></pre>
+                <p>
+                    Via CDN, enregistrez-la avec un <code>&lt;script type="module"&gt;</code>
+                    pointant vers votre propre fichier compilé :
+                </p>
+                <pre><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
+            </div>
+        </section>
+
+        <section id="composants" class="main-section">
+            <div>
+                <h3 class="section-title">Composants concernés</h3>
+                <p>
+                    <code>ar-table-sort</code> (labels de tri, annonces aria-live) et
+                    <code>ar-datepicker</code> (boutons « Aujourd'hui » / « Fermer »). D'autres
+                    composants rejoindront ce mécanisme au fil des prochaines versions.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>

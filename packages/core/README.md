@@ -226,6 +226,15 @@ async function fixture<T extends HTMLElement>(html: string): Promise<T> {
 
 ---
 
+## Crédits
+
+L'infrastructure i18n s'appuie sur [`@shoelace-style/localize`](https://github.com/shoelace-style/localize)
+(MIT), la micro-librairie de traduction de Shoelace. Ariane s'inspire plus largement de
+[WebAwesome](https://webawesome.com/) (successeur de Shoelace) comme référence de conception pour
+plusieurs de ses composants et mécanismes.
+
+---
+
 ## Contribuer
 
 Voir [CONTRIBUTING.md](../../CONTRIBUTING.md) pour le workflow complet.
