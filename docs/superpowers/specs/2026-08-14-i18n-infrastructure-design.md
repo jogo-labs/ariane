@@ -191,9 +191,23 @@ consommateurs qui ne posent jamais `lang`.
 - Au moins un test `lang="en"` sur un composant migré (table-sort ou datepicker), pour valider
   concrètement le changement de langue via l'attribut, pas seulement le fallback FR par défaut.
 
-## Hors scope
+## Hors scope (ce lot)
 
 - Contribution communautaire de traductions (modèle WebAwesome, PR pour ajouter des langues) —
   issue de suivi séparée, pas dans #80.
-- Migration d'autres composants ayant potentiellement des chaînes hardcodées à l'avenir — aucun
-  autre identifié pour l'instant en dehors de `table-sort`/`datepicker`.
+- **Lot 2, toujours dans #80, PR dédiée après la livraison de ce lot** — autres composants
+  identifiés avec des chaînes FR hardcodées lors de l'audit du 2026-08-14 :
+    - `ar-pagination` — "Page précédente/suivante (page X sur Y)", "Page X sur Y" (label + select),
+      "Aller à la page", annonce `Page ${current} sur ${total}`.
+    - `ar-spinner` — `loading-label`/`done-label` (`DEFAULT_LOADING_LABEL`/`DEFAULT_DONE_LABEL`),
+      même pattern que `today-label`/`close-label` sur `ar-datepicker` avant migration — même
+      décision de retrait de props à trancher.
+    - `ar-stepper` — `"Étapes du formulaire"` hardcodé (label sr-only de la nav,
+      `stepper.ts:348`).
+    - `ar-charcounter` — prop `label` avec syntaxe de pluriel maison
+      (`'caractère restant|caractères restants'`, séparateur `\|`) via un util `pluralize()`
+      local (`charcounter.ts:9`) — à réconcilier avec le modèle pluriel-par-fonction de la lib
+      (probable retrait de ce mécanisme maison au profit d'un terme fonction, comme fait pour
+      `today`/`close` dans ce lot).
+    - `ar-progressbar` — audité, **écarté** : le label vient entièrement du slot fourni par le
+      consommateur, aucune chaîne FR hardcodée dans le composant.
