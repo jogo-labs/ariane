@@ -49,14 +49,14 @@ const tocEntries = [
                                 <td><code>(nom du composant)</code></td>
                                 <td>
                                     Racine du composant. <br>
-                                    Utilisé à la place d'un nom sémantique tel que <code>base</code>
-                                    de sorte à prévenir les collisions de nom lors d'un chaînage
-                                    <code>exportparts</code> quand un composant est imbriqué
-                                    dans un autre.
+                                    Remplace un nom générique existant (<code>base</code>, <code>container</code>) sans valeur
+                                    propre. Si le nom existant est déjà significatif (ex. <code>nav</code>, <code>bubble</code>),
+                                    il est conservé et le nom du composant s'y ajoute plutôt que de le remplacer.
                                 </td>
                                 <td>
                                     <code>ar-charcounter::part(charcounter)</code>,
-                                    <code>ar-datepicker::part(datepicker)</code>
+                                    <code>ar-datepicker::part(datepicker)</code>,
+                                    <code>ar-breadcrumb::part(breadcrumb)</code> (additif sur <code>nav</code>)
                                 </td>
                             </tr>
                             <tr>
