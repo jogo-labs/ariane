@@ -3,10 +3,13 @@ import { property, query } from 'lit/decorators.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
@@ -19,10 +22,10 @@ import { warn } from '../../utils/warn.js';
  *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
  *                     si nécessaire.
  * @slot error       - Message d'erreur. Déclenche has-error sur le host.
- * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le prop
- *                     `todayLabel`).
- * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le prop
- *                     `closeLabel`).
+ * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le texte
+ *                     traduit par défaut).
+ * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le texte
+ *                     traduit par défaut).
  *
  * @csspart datepicker - Racine du composant.
  * @csspart input      - Le champ texte.
@@ -123,6 +126,8 @@ export class ArDatepicker extends LitElement {
         },
     });
 
+    private readonly localize = new LocalizeController(this);
+
     /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
     @property({ reflect: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
@@ -141,10 +146,6 @@ export class ArDatepicker extends LitElement {
     @property() autocomplete = '';
     /** Label du champ (alternative au slot `label`). */
     @property() label = '';
-    /** Libellé du bouton « Aujourd'hui » (alternative au slot `today-label`). */
-    @property({ attribute: 'today-label' }) todayLabel = "Aujourd'hui";
-    /** Libellé du bouton « Fermer » (alternative au slot `close-label`). */
-    @property({ attribute: 'close-label' }) closeLabel = 'Fermer';
     /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
@@ -222,7 +223,11 @@ export class ArDatepicker extends LitElement {
     }
 
     override render(): TemplateResult {
-        const locale = this.locale || navigator.language;
+        // this.localize.lang() résout déjà this.lang || <html lang> || navigator.language —
+        // pas de raison de dupliquer cette chaîne de fallback à la main.
+        const locale = this.locale || this.localize.lang();
+        const todayLabel = this.localize.term('today');
+        const closeLabel = this.localize.term('close');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
         const formatLine = `Format attendu : ${this.format} (ex. ${format(exampleDate, this.format)})`;
         const rangeText = this._rangeText(locale);
@@ -300,13 +305,17 @@ export class ArDatepicker extends LitElement {
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
                 >
-                    ${this.open ? this._renderCalendar(locale) : nothing}
+                    ${this.open ? this._renderCalendar(locale, todayLabel, closeLabel) : nothing}
                 </div>
             </div>
         `;
     }
 
-    private _renderCalendar(locale: string): TemplateResult {
+    private _renderCalendar(
+        locale: string,
+        todayLabel: string,
+        closeLabel: string,
+    ): TemplateResult {
         const viewDate = this._calendar.currentViewMonth;
         const monthLabel = this._getFormatter(locale, 'month-year', {
             month: 'long',
@@ -384,18 +393,18 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="footer-button today-button action-button"
                     type="button"
-                    aria-label=${this.todayLabel}
+                    aria-label=${todayLabel}
                     @click=${this._handleTodayClick}
                 >
-                    <slot name="today-label">${this.todayLabel}</slot>
+                    <slot name="today-label">${todayLabel}</slot>
                 </button>
                 <button
                     part="footer-button close-button action-button"
                     type="button"
-                    aria-label=${this.closeLabel}
+                    aria-label=${closeLabel}
                     @click=${this._handleCloseClick}
                 >
-                    <slot name="close-label">${this.closeLabel}</slot>
+                    <slot name="close-label">${closeLabel}</slot>
                 </button>
             </div>
         `;

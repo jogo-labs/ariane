@@ -3,6 +3,12 @@ import type { ArDatepicker } from './datepicker.js';
 import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ArDatepicker', () => {
     let el: ArDatepicker;
     afterEach(() => el?.remove());
@@ -334,24 +340,26 @@ describe('ArDatepicker', () => {
     });
 
     describe('libellés today/close', () => {
-        it('todayLabel et closeLabel valent "Aujourd\'hui" / "Fermer" par défaut', async () => {
+        it('today-button et close-button affichent "Aujourd\'hui" / "Fermer" par défaut (fr)', async () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
-            expect(el.todayLabel).toBe("Aujourd'hui");
-            expect(el.closeLabel).toBe('Fermer');
+            el.open = true;
+            await waitForUpdate(el);
+            const todayBtn = getPart(el, 'today-button');
+            const closeBtn = getPart(el, 'close-button');
+            expect(todayBtn?.textContent?.trim()).toBe("Aujourd'hui");
+            expect(todayBtn?.getAttribute('aria-label')).toBe("Aujourd'hui");
+            expect(closeBtn?.textContent?.trim()).toBe('Fermer');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
         });
 
-        it('les props todayLabel/closeLabel changent le texte des boutons', async () => {
-            el = await fixture(
-                '<ar-datepicker today-label="Today" close-label="Close"></ar-datepicker>',
-            );
+        it('today-button et close-button sont traduits en anglais via lang="en"', async () => {
+            el = await fixture('<ar-datepicker lang="en"></ar-datepicker>');
             el.open = true;
             await waitForUpdate(el);
             const todayBtn = getPart(el, 'today-button');
             const closeBtn = getPart(el, 'close-button');
             expect(todayBtn?.textContent?.trim()).toBe('Today');
-            expect(todayBtn?.getAttribute('aria-label')).toBe('Today');
             expect(closeBtn?.textContent?.trim()).toBe('Close');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
         });
 
         it('nav-button et footer-button portent le rôle transverse "action-button"', async () => {
@@ -386,14 +394,14 @@ describe('ArDatepicker', () => {
 
         it('aria-label reste posé sur le bouton même quand le slot est utilisé (icône seule)', async () => {
             el = await fixture(`
-                <ar-datepicker close-label="Fermer le calendrier">
+                <ar-datepicker>
                     <span slot="close-label" aria-hidden="true">✕</span>
                 </ar-datepicker>
             `);
             el.open = true;
             await waitForUpdate(el);
             const closeBtn = getPart(el, 'close-button');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
         });
     });
 
