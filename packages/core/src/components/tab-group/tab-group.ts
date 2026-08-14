@@ -13,9 +13,9 @@ import styles from './tab-group.styles.js';
  *
  * @slot - ar-tab et ar-tab-panel enfants.
  *
- * @csspart base - Conteneur racine.
- * @csspart nav  - Zone scrollable (overflow-x: auto).
- * @csspart tabs - div[role="tablist"].
+ * @csspart tab-group - Conteneur racine.
+ * @csspart nav       - Zone scrollable (overflow-x: auto).
+ * @csspart tabs       - div[role="tablist"].
  *
  * Les classes `has-overflow-start` et `has-overflow-end` sont ajoutées automatiquement sur l'hôte
  * quand le contenu de la tablist déborde à gauche ou à droite.
@@ -129,7 +129,7 @@ export class ArTabGroup extends LitElement {
 
     override render() {
         return html`
-            <div part="base">
+            <div part="tab-group">
                 <div part="nav">
                     <div part="tabs" role="tablist" aria-label=${this.label || nothing}>
                         <slot name="tab"></slot>

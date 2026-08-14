@@ -30,8 +30,9 @@ describe('ArTabGroup', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient part="base"', () => {
-            expect(getPart(el, 'base')).not.toBeNull();
+        it('contient part="tab-group"', () => {
+            const host = el.shadowRoot?.firstElementChild;
+            expect(host?.getAttribute('part')?.split(/\s+/)).toContain('tab-group');
         });
 
         it('contient part="nav"', () => {

@@ -8,7 +8,7 @@ export default css`
         user-select: none;
     }
 
-    [part~='base'] {
+    [part~='tab'] {
         display: flex;
         align-items: center;
         /* a11y-fallback: sans thème, le fond de l'onglet reste transparent par défaut (couleur/fond posés par le thème via ::part()) — le padding est le seul mécanisme séparant visuellement des onglets adjacents ; sans lui les libellés se collent les uns aux autres */
@@ -22,7 +22,7 @@ export default css`
         cursor: default;
     }
 
-    [part~='base--selected'] {
+    [part~='tab--selected'] {
         /* a11y-fallback: indicateur d'onglet actif indiscernable sans thème (WCAG 2.4.7) */
         box-shadow: var(--ar-tab-active-shadow, inset 0 -2px 0 Highlight);
     }
