@@ -128,9 +128,9 @@ describe('ar-datepicker — browser', () => {
         });
 
         it('PageDown navigue au mois suivant', async () => {
-            // Forcer la locale fr pour que le label du mois soit en français
+            // Forcer lang="fr" pour que le label du mois soit en français
             el = await fixture(
-                html`<ar-datepicker value="2026-06-12" locale="fr-FR"></ar-datepicker>`,
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
             );
             await openPicker(el);
 
@@ -145,7 +145,7 @@ describe('ar-datepicker — browser', () => {
 
         it("Shift+PageDown navigue à l'année suivante", async () => {
             el = await fixture(
-                html`<ar-datepicker value="2026-06-12" locale="fr-FR"></ar-datepicker>`,
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
             );
             await openPicker(el);
 
@@ -183,7 +183,7 @@ describe('ar-datepicker — browser', () => {
 
     describe('mémorisation de position', () => {
         it('conserve le mois affiché après fermeture sans sélection', async () => {
-            el = await fixture(html`<ar-datepicker locale="fr-FR"></ar-datepicker>`);
+            el = await fixture(html`<ar-datepicker lang="fr-FR"></ar-datepicker>`);
             await openPicker(el);
 
             // Naviguer 2 mois en avant via PageDown
@@ -261,7 +261,7 @@ describe('ar-datepicker — browser', () => {
 
         it('conserve le mois navigué à la réouverture (pas de reset au mois de la valeur)', async () => {
             el = await fixture(
-                html`<ar-datepicker value="2026-06-12" locale="fr-FR"></ar-datepicker>`,
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
             );
             await openPicker(el);
 

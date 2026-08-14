@@ -287,7 +287,7 @@ describe('ArDatepicker', () => {
 
         it('hint par défaut mentionne la plage quand min et max sont définis', async () => {
             el = await fixture(
-                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+                '<ar-datepicker lang="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
             );
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
@@ -296,7 +296,7 @@ describe('ArDatepicker', () => {
 
         it('la ligne de plage ne colle pas au texte du format (séparateur non vide entre les deux)', async () => {
             el = await fixture(
-                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+                '<ar-datepicker lang="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
             );
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
@@ -304,21 +304,21 @@ describe('ArDatepicker', () => {
         });
 
         it('hint par défaut mentionne uniquement min quand max est absent', async () => {
-            el = await fixture('<ar-datepicker locale="fr-FR" min="2026-01-01"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="fr-FR" min="2026-01-01"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain('à partir du 1er janvier 2026');
         });
 
         it('hint par défaut mentionne uniquement max quand min est absent', async () => {
-            el = await fixture('<ar-datepicker locale="fr-FR" max="2026-12-31"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="fr-FR" max="2026-12-31"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain("jusqu'au 31 décembre 2026");
         });
 
         it("l'ordinal « 1er » ne s'applique qu'en français", async () => {
-            el = await fixture('<ar-datepicker locale="en-US" min="2026-01-01"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="en-US" min="2026-01-01"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain('January 1, 2026');

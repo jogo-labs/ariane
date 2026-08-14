@@ -133,8 +133,6 @@ export class ArDatepicker extends LitElement {
     @property({ reflect: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
     @property() format = 'dd/MM/yyyy';
-    /** Locale BCP 47 pour les noms de jours et mois. Défaut : `navigator.language`. */
-    @property() locale = '';
     /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */
     @property() min = '';
     /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
@@ -224,9 +222,15 @@ export class ArDatepicker extends LitElement {
     }
 
     override render(): TemplateResult {
-        // this.localize.lang() résout déjà this.lang || <html lang> || navigator.language —
-        // pas de raison de dupliquer cette chaîne de fallback à la main.
-        const locale = this.locale || this.localize.lang();
+        // Une seule source de vérité pour la langue : this.localize.lang() (this.lang ||
+        // <html lang> || navigator.language). Pas de prop locale séparée — un Intl.DateTimeFormat
+        // dont la locale diverge de la langue des libellés produirait un composant à moitié
+        // traduit (ex. boutons en français, noms de mois en anglais). Un consommateur voulant un
+        // format de date régional différent sans changer la langue affichée peut poser un lang
+        // avec région (ex. lang="en-GB") : Intl.DateTimeFormat le respecte nativement, et
+        // LocalizeController retombe sur la traduction de base (en) si aucune variante
+        // régionale n'est enregistrée.
+        const locale = this.localize.lang();
         const todayLabel = this.localize.term('today');
         const closeLabel = this.localize.term('close');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
