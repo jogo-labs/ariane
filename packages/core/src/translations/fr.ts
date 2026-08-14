@@ -1,11 +1,6 @@
 import { registerTranslation } from '@shoelace-style/localize';
 import type { Translation } from '../types/translation.js';
 
-const sortLabel = (
-    type: 'alpha' | 'numeric' | 'date',
-    labels: { alpha: string; numeric: string; date: string },
-): string => labels[type];
-
 const translation: Translation = {
     $code: 'fr',
     $name: 'Français',
@@ -13,23 +8,23 @@ const translation: Translation = {
 
     // ── ar-table-sort ────────────────────────────────────────────────────
     sortAscending: (type) =>
-        sortLabel(type, {
+        ({
             alpha: 'Trier de A à Z',
             numeric: 'Trier par ordre croissant',
             date: 'Trier du plus ancien au plus récent',
-        }),
+        })[type],
     sortDescending: (type) =>
-        sortLabel(type, {
+        ({
             alpha: 'Trier de Z à A',
             numeric: 'Trier par ordre décroissant',
             date: 'Trier du plus récent au plus ancien',
-        }),
+        })[type],
     sortReset: (type) =>
-        sortLabel(type, {
+        ({
             alpha: 'Supprimer le tri alphabétique',
             numeric: 'Supprimer le tri numérique',
             date: 'Supprimer le tri chronologique',
-        }),
+        })[type],
     sortPending: 'Tri en cours…',
     sortInProgress: 'Tri en cours, veuillez patienter.',
     sortApplied: (columnLabel, order) => {

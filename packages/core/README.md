@@ -178,6 +178,7 @@ Le fichier `custom-elements.json` est généré automatiquement par
  * @summary Description courte du composant.
  * @display demo              ← mode d'affichage dans la doc (demo | docs)
  * @parent ar-stepper         ← déclare ce composant comme enfant de ar-stepper
+ * @localized                 ← affiche la section "Traduction" (mécanisme lang/LocalizeController)
  *
  * @slot                      ← slot par défaut
  * @slot prefix               ← slot nommé

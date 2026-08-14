@@ -82,6 +82,8 @@ export interface CemDeclaration {
     'x-display'?: 'demo' | 'docs';
     /** Extension JSDoc @parent — tag name du composant parent */
     'x-parent'?: string;
+    /** Extension JSDoc @localized — le composant a des libellés traduits via LocalizeController */
+    'x-localized'?: boolean;
 }
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────

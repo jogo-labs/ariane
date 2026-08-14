@@ -21,6 +21,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 /**
  * @summary Entête de colonne triable accessible — indicateur visuel ↑↓ et aria-sort automatique.
  * @display demo
+ * @localized
  *
  * Placer à l'intérieur d'un `<th>`. Le composant met à jour `aria-sort` et `scope="col"` sur
  * le `<th>` ancêtre. Appeler `confirm()` après un tri réussi, ou `reject()` en cas d'échec.

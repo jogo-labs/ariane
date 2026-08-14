@@ -169,6 +169,17 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
   pas spécifique à l'i18n) — à formuler dans le README/doc en cohérence avec cette portée plus
   large plutôt que de la limiter à ce chantier.
 
+### 6. Annotation `@localized` (ajouté après la revue finale, 2026-08-14)
+
+Plutôt qu'une liste centralisée des composants/termes dans la doc i18n (retirée, voir section
+Docs ci-dessous), un tag JSDoc `@localized` (booléen, sans valeur) sur la classe du composant —
+même pattern que `@display`/`@parent` déjà en place dans `cem.config.js` — déclenche l'affichage
+d'une section "Traduction" générique dans la Référence API générée
+(`apps/docs/src/components/ComponentApi.astro`), expliquant le mécanisme `lang` et signalant que
+`lang` (attribut HTML natif) n'apparaît pas dans le tableau Attributs & Propriétés. Ajouté sur
+`ar-table-sort` et `ar-datepicker`. Documenté dans `packages/core/README.md` § Annotations JSDoc
+reconnues.
+
 ## Impact
 
 **Composants** :

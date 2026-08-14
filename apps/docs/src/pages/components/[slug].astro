@@ -75,6 +75,9 @@ const controls = buildControls(component.members ?? []);
 // ne doit pas apparaître dans la TOC.
 
 const apiTocEntries = [
+    component['x-localized']
+        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
+        : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
         : null,

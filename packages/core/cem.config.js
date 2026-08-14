@@ -75,6 +75,11 @@ export default {
                     );
                 }
 
+                // @localized (tag booléen, sans valeur) → x-localized
+                if (jsDocTags.some((t) => t.tagName.text === 'localized')) {
+                    declaration['x-localized'] = true;
+                }
+
                 // Marquer les membres statiques et @ignore comme privés
                 // pour qu'api-demo ne les expose pas dans les knobs.
                 if (!declaration.members) return;

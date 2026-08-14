@@ -15,6 +15,7 @@ import '../../translations/en.js';
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
  * @display demo
+ * @localized
  *
  * @slot label       - Contenu riche du label (remplace le prop `label`).
  * @slot after-label - Éléments après le label (bouton d'aide, tooltip…).
