@@ -53,9 +53,12 @@ const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, com
                 <p>
                     Ariane s'appuie sur <a href="https://github.com/shoelace-style/localize"
                     target="_blank" rel="noopener">@shoelace-style/localize</a> : la langue
-                    effective d'un composant vient de son propre attribut <code>lang</code>, ou à
-                    défaut de <code>&lt;html lang&gt;</code>. Le français est la langue par défaut
-                    si aucun <code>lang</code> n'est posé nulle part.
+                    effective d'un composant vient de son propre attribut <code>lang</code>, à
+                    défaut de <code>&lt;html lang&gt;</code>, et sinon de la langue du navigateur
+                    (<code>navigator.language</code>). Le français sert de traduction de repli si
+                    la langue résolue n'a pas de traduction enregistrée — ce n'est pas une langue
+                    par défaut au sens strict : un navigateur en anglais sans <code>lang</code>
+                    explicite affichera les libellés en anglais.
                 </p>
                 <pre><code class="language-html" set:text={codeChangeLang} /></pre>
             </div>
