@@ -11,11 +11,6 @@ export { announceA11y } from './a11y/announce-a11y.js';
 export { LocalizeController } from './controllers/localize.controller.js';
 export { registerTranslation } from '@shoelace-style/localize';
 export type { Translation } from './types/translation.js';
-// L'ordre d'export ici ne pilote pas l'ordre d'enregistrement (registerTranslation) : celui-ci
-// dépend de fr.js important avant en.js dans table-sort.ts/datepicker.ts. Un import direct de
-// enTranslation sans passer par un composant doit appeler registerTranslation() soi-même pour un repli déterministe.
-export { default as frTranslation } from './translations/fr.js';
-export { default as enTranslation } from './translations/en.js';
 import './components/alert/index.js';
 export { ArAlert } from './components/alert/alert.js';
 import './components/breadcrumb/index.js';

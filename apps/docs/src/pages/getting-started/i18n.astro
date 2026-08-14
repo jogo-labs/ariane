@@ -16,24 +16,26 @@ const codeChangeLang = `<!-- Langue par défaut de la page -->
 <!-- Ou par composant, en surcharge -->
 <ar-table-sort lang="es">Prix</ar-table-sort>`;
 
-const codeCustomTranslation = `import { registerTranslation } from '@ariane-ui/core';
+const codeCustomTranslation = `// es.ts — copie de fr.ts, traduite terme par terme
+import { registerTranslation } from '@ariane-ui/core';
 import type { Translation } from '@ariane-ui/core';
-import { enTranslation } from '@ariane-ui/core';
 
 const es: Translation = {
-    ...enTranslation, // base de départ, à traduire terme par terme
     $code: 'es',
     $name: 'Español',
     $dir: 'ltr',
+    sortAscending: (type) => /* ... */,
+    // ... tous les termes de fr.ts, traduits
     today: 'Hoy',
     close: 'Cerrar',
-    // ...
 };
 
-registerTranslation(es);`;
+registerTranslation(es);
 
-const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, compilé, hébergé par vous -->
-<script type="module" src="/mon-app-es.js"></script>`;
+export default es;`;
+
+const codeCustomTranslationCdn = `<!-- es.js : le fichier ci-dessus, compilé, hébergé par vous -->
+<script type="module" src="/es.js"></script>`;
 ---
 
 <Layout title="Internationalisation (i18n)" currentPath="/getting-started/i18n" showToc={true}>
@@ -100,10 +102,18 @@ const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, com
             <div>
                 <h3 class="section-title">Fournir sa propre traduction</h3>
                 <p>
-                    Pour une langue tierce, partez de <code>enTranslation</code> (traduction
-                    anglaise, exportée par le package) comme référence typée, et fournissez tous
-                    les termes attendus. Cette fois l'import est à votre charge — c'est votre
-                    fichier, pas un fichier livré par Ariane.
+                    Pour une langue tierce, copiez{' '}
+                    <a
+                        href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        <code>fr.ts</code>
+                    </a>{' '}
+                    (la traduction source du package, la plus à jour) dans votre projet et traduisez
+                    chaque terme. Le type <code>Translation</code>, exporté par le package, vous
+                    force à fournir tous les termes attendus. Cette fois l'import est à votre
+                    charge — c'est votre fichier, pas un fichier livré par Ariane.
                 </p>
                 <pre><code class="language-js" set:text={codeCustomTranslation} /></pre>
                 <p>
