@@ -239,6 +239,14 @@ porter aucun second rôle (règle du lot 2), et structurellement il n'utilise pa
 partagé par les autres composants à panel flottant (dropdown, datepicker) — pas dans la même
 famille malgré la ressemblance de surface. `ar-dropdown` déjà conforme (aucun changement).
 
+`ar-stepper` a été oublié lors de l'audit du lot 2 (racine `<nav part="nav">` non vue) — corrigé
+dans ce lot 3 plutôt que dans un lot séparé, la modification restant limitée en surface : part
+racine `nav` → `stepper` (remplacement, même règle que le reste du lot 2), rôle `control` additif
+sur `step-link` (élément interactif générique, même schéma que `link` sur `ar-pagination`), rôle
+`indicator` additif sur `bullet` (marqueur visuel, même schéma que `ar-table-sort`). Après ce lot,
+tous les composants existants sont conformes au vocabulaire retenu, à l'exception des racines
+`ar-alert`/`ar-dropdown`/`ar-table-sort`/`ar-spinner` (exclusion permanente, cf. lot 2).
+
 ## Impact `custom-elements.json` / doc générée
 
 Les rôles transverses sont de simples `@csspart` supplémentaires, déjà supportés par le pipeline

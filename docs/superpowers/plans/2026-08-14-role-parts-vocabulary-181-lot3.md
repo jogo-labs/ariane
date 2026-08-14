@@ -1,4 +1,4 @@
-# Vocabulaire de rôles ::part() transverses — Lot 3 (action-button) Implementation Plan
+# Vocabulaire de rôles ::part() transverses — Lot 3 (action-button + ar-stepper) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -6,7 +6,9 @@
 ne le portent pas encore — `ar-alert` (`close`), `ar-dialog` (`close`), `ar-table-sort` (`button`)
 — en renommant chacun en toutes lettres (`close-button`, `sort-button`) puis en ajoutant
 `action-button` de façon additive, exactement comme au lot 1 (`nav-button`/`footer-button`/
-`today-button`/`close-button` sur `ar-datepicker`).
+`today-button`/`close-button` sur `ar-datepicker`). Complète aussi `ar-stepper`, oublié lors de
+l'audit du lot 2 : part racine manquant (`nav` → `stepper`), plus les rôles `control` sur
+`step-link` et `indicator` sur `bullet`.
 
 **Architecture:** Renommage additif sur des parts déjà existants, aucun nouveau wrapper. Chaque
 bouton reçoit `part="<nom-spécifique>-button action-button"`. `ar-table-sort` a en plus une
@@ -14,7 +16,11 @@ variante d'état `button--pending` à renommer en `sort-button--pending` (même 
 qu'elle qualifie). `ar-table-sort.styles.ts` sélectionne déjà `button` via `[part~='button']`
 (contains) — pas de conversion `~=` nécessaire là ; `ar-alert.styles.ts` et `ar-dialog.styles.ts`
 sélectionnent `close` via `[part='close']` (égalité stricte) — **doit** être converti en
-`[part~='close-button']` puisque le part devient multi-jetons.
+`[part~='close-button']` puisque le part devient multi-jetons. `ar-stepper` : le part racine `nav`
+est un remplacement pur (comme au lot 2, pas d'ajout — la racine ne cumule jamais), aucune
+conversion `~=` requise pour lui ; `step-link`/`bullet` sont déjà sélectionnés via `[part~=...]`
+dans `stepper.styles.ts`, donc l'ajout additif de `control`/`indicator` n'y requiert aucun
+changement — seuls les tests et le composant lui-même doivent être mis à jour.
 
 **Tech Stack:** Lit 3, TypeScript, Vitest (unit + a11y jsdom), Web Test Runner (browser).
 
@@ -423,7 +429,174 @@ git commit -m "fix(table-sort): button→sort-button + rôle action-button (#181
 
 ---
 
-### Task 5: Vérification finale de branche
+### Task 5: `ar-stepper` — part racine `nav` → `stepper`, rôles `control`/`indicator`
+
+**Files:**
+
+- Modify: `packages/core/src/components/stepper/stepper.ts`
+- Modify: `packages/core/src/components/stepper/stepper.renderer.ts`
+- Modify: `packages/core/src/components/stepper/stepper.test.ts`
+
+**Interfaces:**
+
+- Produces: part racine `stepper` (remplace `nav`) ; `part="step-link control"` (+
+  `step-link--current` si actif) sur les liens de navigation d'étape ; `part="bullet indicator"`
+  (+ `bullet--current` si actif) sur la puce numérotée.
+
+- [ ] **Step 1: Mettre à jour les assertions de test (échec attendu)**
+
+Dans `packages/core/src/components/stepper/stepper.test.ts` (ligne 54-61) :
+
+```ts
+// avant
+it('rend un <nav> avec part="nav" quand les items sont enregistrés', async () => {
+    const el = await fixtureWithItems(`
+        <ar-stepper current-path="/a">
+            <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+        </ar-stepper>
+    `);
+    expect(shadow(el).querySelector('[part="nav"]')).not.toBeNull();
+});
+// après
+it('rend un <nav> avec part="stepper" quand les items sont enregistrés', async () => {
+    const el = await fixtureWithItems(`
+        <ar-stepper current-path="/a">
+            <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+        </ar-stepper>
+    `);
+    expect(shadow(el).querySelector('[part="stepper"]')).not.toBeNull();
+});
+```
+
+Ligne 51 (`shadow(el).querySelector('nav')` — vérifie l'élément `<nav>` lui-même, pas un `part`) et
+ligne 237 (même vérification) restent inchangées, aucun rapport avec le nom du part.
+
+Ajouter deux nouvelles assertions dans le même describe que le test `part="list"` (juste après,
+même fixture) :
+
+```ts
+it('step-link porte aussi le rôle transverse "control"', async () => {
+    const el = await fixtureWithItems(`
+        <ar-stepper current-path="/a">
+            <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+        </ar-stepper>
+    `);
+    const link = shadow(el).querySelector('[part~="step-link"]');
+    expect(link?.getAttribute('part')?.split(/\s+/)).toContain('control');
+});
+
+it('bullet porte aussi le rôle transverse "indicator"', async () => {
+    const el = await fixtureWithItems(`
+        <ar-stepper current-path="/a">
+            <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+        </ar-stepper>
+    `);
+    const bullet = shadow(el).querySelector('[part~="bullet"]');
+    expect(bullet?.getAttribute('part')?.split(/\s+/)).toContain('indicator');
+});
+```
+
+- [ ] **Step 2: Run tests — vérifier l'échec**
+
+Run: `npm test --workspace=packages/core -- stepper`
+Expected: FAIL.
+
+- [ ] **Step 3: Modifier le composant**
+
+Dans `packages/core/src/components/stepper/stepper.ts`, JSDoc (lignes 51, 56-58) :
+
+```ts
+// avant
+ * @csspart nav          - L'élément `<nav>` englobant.
+ * @csspart list         - La liste des étapes.
+ * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
+ * @csspart step         - Une étape de premier niveau.
+ * @csspart substep      - Une sous-étape.
+ * @csspart step-link    - Le lien d'une étape.
+ * @csspart bullet       - La puce numérotée d'une étape.
+ * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
+ * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
+// après
+ * @csspart stepper      - Racine du composant.
+ * @csspart list         - La liste des étapes.
+ * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
+ * @csspart step         - Une étape de premier niveau.
+ * @csspart substep      - Une sous-étape.
+ * @csspart step-link    - Le lien d'une étape.
+ * @csspart control      - Porté par `step-link` : élément interactif générique.
+ * @csspart bullet       - La puce numérotée d'une étape.
+ * @csspart indicator    - Porté par `bullet` : marqueur/indicateur visuel.
+ * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
+ * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
+```
+
+Render (ligne 345) :
+
+```ts
+// avant
+return html` <nav part="nav" role="navigation" aria-labelledby="label-nav">
+// après
+return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
+```
+
+- [ ] **Step 4: Modifier le renderer partagé**
+
+Dans `packages/core/src/components/stepper/stepper.renderer.ts`, la fonction `withCurrentPart`
+compose déjà `part="step-link step-link--current"` / `part="bullet bullet--current"` — ajouter le
+rôle transverse comme un troisième token, toujours présent (contrairement à `--current`, qui ne
+l'est que si actif) :
+
+```ts
+// avant (ligne 34-36)
+function withCurrentPart(base: string, isCurrent: boolean): string {
+    return isCurrent ? `${base} ${base}--current` : base;
+}
+// après
+function withCurrentPart(base: string, isCurrent: boolean, role: string): string {
+    return isCurrent ? `${base} ${role} ${base}--current` : `${base} ${role}`;
+}
+```
+
+Les 3 appels de `withCurrentPart` doivent passer le rôle transverse adapté :
+
+```ts
+// ligne 44, avant
+const bulletPart = withCurrentPart('bullet', isCurrent);
+// après
+const bulletPart = withCurrentPart('bullet', isCurrent, 'indicator');
+```
+
+```ts
+// ligne 77 (renderSubStep) et ligne 117 (renderStep), avant
+part=${withCurrentPart('step-link', isCurrent)}
+// après
+part=${withCurrentPart('step-link', isCurrent, 'control')}
+```
+
+- [ ] **Step 5: Run tests — vérifier le succès**
+
+Run: `npm test --workspace=packages/core -- stepper`
+Expected: PASS.
+
+- [ ] **Step 6: Tests navigateur**
+
+Run: `cd packages/core && npx web-test-runner "src/components/stepper/*.{browser,a11y}.test.ts"`
+Expected: PASS.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add packages/core/src/components/stepper
+git commit -m "fix(stepper): part racine nav→stepper + rôles control/indicator (#181)"
+```
+
+---
+
+### Task 6: Vérification finale de branche
 
 **Files:** aucun fichier modifié.
 
@@ -454,6 +627,10 @@ Expected: PASS.
 Run: `grep -rn "part=\"close\"\|part='close'\|::part(close)\|part=\"button\"\|part='button'\|::part(button)" packages/core/src/components/alert packages/core/src/components/dialog packages/core/src/components/table-sort packages/core/src/styles/themes/default.css`
 Expected: aucune sortie.
 
+Run: `grep -rn "part=\"nav\"\|part='nav'" packages/core/src/components/stepper`
+Expected: aucune sortie (les usages de `querySelector('nav')` sans `part=` ciblent la balise HTML,
+pas un attribut `part` — hors scope, à ne pas confondre en lisant la sortie).
+
 - [ ] **Step 6: Lint/format**
 
 Run: `npm run lint`
@@ -461,7 +638,7 @@ Expected: PASS.
 
 ---
 
-### Task 6: Créer la Pull Request
+### Task 7: Créer la Pull Request
 
 **Files:** aucun fichier modifié.
 
@@ -474,7 +651,7 @@ git push -u origin fix/parts-roles-vocabulary-181-lot3
 - [ ] **Step 2: Créer la PR vers `dev`**
 
 ```bash
-gh pr create --base dev --title "fix(core): vocabulaire de rôles ::part() transverses — lot 3, action-button (#181)" --body "$(cat <<'EOF'
+gh pr create --base dev --title "fix(core): vocabulaire de rôles ::part() transverses — lot 3, action-button + ar-stepper (#181)" --body "$(cat <<'EOF'
 ## Résumé
 
 Troisième lot du chantier #181 : rôle transverse `action-button` sur les boutons de commande
@@ -484,6 +661,11 @@ restants, additif sur un nom spécifique en toutes lettres (même schéma que le
 - `ar-dialog` : `close` → `part="close-button action-button"`
 - `ar-table-sort` : `button` → `part="sort-button action-button"` (+ `button--pending` →
   `sort-button--pending`)
+
+Complète aussi `ar-stepper`, oublié lors de l'audit du lot 2 :
+- Part racine `nav` → `stepper` (remplacement, comme tous les autres composants du lot 2)
+- `step-link` → rôle `control` additif
+- `bullet` → rôle `indicator` additif
 
 `ar-tooltip` et `ar-dropdown` ne sont pas concernés (cf. spec — la racine ne peut porter aucun
 second rôle, et `ar-dropdown` est déjà conforme). Le thème par défaut (`themes/default.css`) est
