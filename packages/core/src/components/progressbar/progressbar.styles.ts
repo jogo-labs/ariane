@@ -8,7 +8,7 @@ export default css`
         max-width: var(--ar-progressbar-max-width, 500px);
     }
 
-    [part='container'] {
+    [part='progressbar'] {
         display: flex;
         flex-direction: column;
     }
