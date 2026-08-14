@@ -309,6 +309,13 @@ describe('ArAlert', () => {
             expect(requirePart(el, 'close').getAttribute('aria-label')).toBe("Fermer l'alerte");
         });
 
+        it('porte le part combiné "close-button action-button"', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(requirePart(el, 'close').getAttribute('part')).toBe(
+                'close-button action-button',
+            );
+        });
+
         it('reflète next-focus en attribut HTML', async () => {
             el = await fixture('<ar-alert></ar-alert>');
             el.nextFocus = 'mon-bouton';

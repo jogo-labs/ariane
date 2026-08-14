@@ -20,12 +20,12 @@ export default css`
 
     @media (prefers-reduced-motion: reduce) {
         :host([hiding]),
-        [part='close'] {
+        [part~='close-button'] {
             transition: none;
         }
     }
 
-    [part='close'] {
+    [part~='close-button'] {
         order: 1;
         align-self: flex-start;
         flex-shrink: 0;
