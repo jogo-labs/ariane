@@ -13,7 +13,7 @@ export default css`
         font-weight: normal;
     }
 
-    [part~='button'] {
+    [part~='sort-button'] {
         display: inline-flex;
         align-items: center;
         background: none;
@@ -25,7 +25,7 @@ export default css`
         text-align: inherit;
     }
 
-    [part~='button']:focus-visible {
+    [part~='sort-button']:focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 2px;
         border-radius: 2px;

@@ -99,10 +99,12 @@ describe('ar-table-sort — accessibilité', () => {
 
         it('aria-disabled="true" pendant pending', async () => {
             const el = await fixture<ArTableSort>(html`<ar-table-sort>Nom</ar-table-sort>`);
-            el.shadowRoot!.querySelector<HTMLElement>('[part="button"]')!.click();
+            el.shadowRoot!.querySelector<HTMLElement>('[part~="sort-button"]')!.click();
             await el.updateComplete;
             expect(
-                el.shadowRoot!.querySelector('[part~="button"]')!.getAttribute('aria-disabled'),
+                el
+                    .shadowRoot!.querySelector('[part~="sort-button"]')!
+                    .getAttribute('aria-disabled'),
             ).to.equal('true');
         });
     });

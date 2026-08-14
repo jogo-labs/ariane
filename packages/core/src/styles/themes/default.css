@@ -1229,11 +1229,11 @@
     }
 
     ar-table-sort {
-        &::part(button) {
+        &::part(sort-button) {
             gap: 0.375rem;
         }
 
-        &::part(button--pending) {
+        &::part(sort-button--pending) {
             cursor: wait;
         }
 
