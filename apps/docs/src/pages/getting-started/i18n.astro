@@ -3,11 +3,11 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
-    { id: 'principe',        label: 'Principe : lang',                level: 1 as const },
-    { id: 'limite',           label: 'Limite : pas d’héritage',        level: 1 as const },
-    { id: 'fr-en',            label: 'fr/en : rien à importer',        level: 1 as const },
-    { id: 'traductions',      label: 'Fournir sa propre traduction',   level: 1 as const },
-    { id: 'composants',       label: 'Composants concernés',           level: 1 as const },
+    { id: 'principe',           label: 'Fonctionnement',                level: 1 as const },
+    { id: 'locale-resolution',  label: 'Résolution de la langue',       level: 2 as const },
+    { id: 'default-imports',    label: 'Imports par défaut',            level: 2 as const },
+    { id: 'traductions',        label: 'Fournir sa propre traduction',   level: 1 as const },
+    { id: 'composants',          label: 'Composants concernés',           level: 1 as const },
 ];
 
 const codeChangeLang = `<!-- Langue par défaut de la page -->
@@ -20,22 +20,30 @@ const codeCustomTranslation = `// es.ts — copie de fr.ts, traduite terme par t
 import { registerTranslation } from '@ariane-ui/core';
 import type { Translation } from '@ariane-ui/core';
 
-const es: Translation = {
+const translation: Translation = {
     $code: 'es',
     $name: 'Español',
     $dir: 'ltr',
-    sortAscending: (type) => /* ... */,
+
     // ... tous les termes de fr.ts, traduits
-    today: 'Hoy',
-    close: 'Cerrar',
+    term1: '...',
+    term2: '...',
 };
 
-registerTranslation(es);
+registerTranslation(translation);
 
-export default es;`;
+export default translation;`;
 
-const codeCustomTranslationCdn = `<!-- es.js : le fichier ci-dessus, compilé, hébergé par vous -->
-<script type="module" src="/es.js"></script>`;
+const codeCustomTranslationCdn = `<html lang="es">
+  <head>
+    <script type="module" src="/path/to/es.js"></script>
+  </head>
+
+  <body>
+    ...
+  </body>
+</html>
+`;
 ---
 
 <Layout title="Internationalisation (i18n)" currentPath="/getting-started/i18n" showToc={true}>
@@ -51,24 +59,23 @@ const codeCustomTranslationCdn = `<!-- es.js : le fichier ci-dessus, compilé, h
 
         <section id="principe" class="main-section">
             <div>
-                <h3 class="section-title">Principe : l'attribut <code>lang</code></h3>
+                <h3 class="section-title">Fonctionnement</h3>
                 <p>
-                    Ariane s'appuie sur <a href="https://github.com/shoelace-style/localize"
-                    target="_blank" rel="noopener">@shoelace-style/localize</a> : la langue
-                    effective d'un composant vient de son propre attribut <code>lang</code>, à
-                    défaut de <code>&lt;html lang&gt;</code>, et sinon de la langue du navigateur
-                    (<code>navigator.language</code>). Le français sert de traduction de repli si
-                    la langue résolue n'a pas de traduction enregistrée — ce n'est pas une langue
-                    par défaut au sens strict : un navigateur en anglais sans <code>lang</code>
-                    explicite affichera les libellés en anglais.
+                    Ariane s'appuie sur la micro-librairie{' '}
+                    <a href="https://github.com/shoelace-style/localize"
+                    target="_blank" rel="noopener">@shoelace-style/localize</a> pour fournir un mécanisme de traduction de ses composants.
+                </p>
+            </div>
+
+            <section id="locale-resolution" class="subsection">
+                <h4 class="subsection-title">Résolution de la langue</h4>
+                <p>
+                    La langue par défaut est déterminée par la valeur de l'attribut <code>&lt;html lang&gt;</code>, mais l'ajout d'un attribut <code>lang</code> sur un composant permet une surcharge locale.<br>
+                    Si aucun des deux attributs n'est présent, c'est la langue du navigateur
+                    (<code>navigator.language</code>) qui est utilisé.<br>
+                    Dans tous les cas s'il n'existe pas de traduction pour la langue identifiée, c'est le français qui sera utilisé.
                 </p>
                 <pre><code class="language-html" set:text={codeChangeLang} /></pre>
-            </div>
-        </section>
-
-        <section id="limite" class="main-section">
-            <div>
-                <h3 class="section-title">Limite : pas d'héritage via un ancêtre intermédiaire</h3>
                 <ar-alert variant="warning" without-notification class="doc-callout-alert">
                     <p class="doc-callout-alert-title">À savoir</p>
                     <div class="doc-callout-alert-content">
@@ -81,12 +88,10 @@ const codeCustomTranslationCdn = `<!-- es.js : le fichier ci-dessus, compilé, h
                         </p>
                     </div>
                 </ar-alert>
-            </div>
-        </section>
+            </section>
 
-        <section id="fr-en" class="main-section">
-            <div>
-                <h3 class="section-title"><code>fr</code>/<code>en</code> : rien à importer</h3>
+            <section id="default-imports" class="subsection">
+                <h4 class="subsection-title">Imports par défaut</h4>
                 <p>
                     Contrairement à d'autres bibliothèques qui publient un fichier par langue à
                     charger à la demande, les traductions <code>fr</code> (défaut) et
@@ -95,32 +100,38 @@ const codeCustomTranslationCdn = `<!-- es.js : le fichier ci-dessus, compilé, h
                     <code>ar-datepicker</code> suffit — les deux langues sont déjà enregistrées,
                     aucun import supplémentaire n'est nécessaire pour les utiliser.
                 </p>
-            </div>
+            </section>
         </section>
+
 
         <section id="traductions" class="main-section">
             <div>
-                <h3 class="section-title">Fournir sa propre traduction</h3>
+                <h3 class="section-title">Créer votre propre traduction</h3>
                 <p>
-                    Pour une langue tierce, copiez{' '}
+                    Que vous souhaitiez surcharger une langue fournie, ou disposer sans attendre d'une
+                    traduction non disponible pour votre propre langue, le mécanisme à utiliser est très
+                    simple.<br>
+                    Commencez par copier{' '}
                     <a
                         href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                         target="_blank"
                         rel="noopener"
                     >
-                        <code>fr.ts</code>
+                        <code>/core/src/translations/fr.ts</code>
                     </a>{' '}
                     (la traduction source du package, la plus à jour) dans votre projet et traduisez
-                    chaque terme. Le type <code>Translation</code>, exporté par le package, vous
+                    chaque terme.<br>
+                    Le type <code>Translation</code>, exporté par le package, vous
                     force à fournir tous les termes attendus. Cette fois l'import est à votre
                     charge — c'est votre fichier, pas un fichier livré par Ariane.
                 </p>
-                <pre><code class="language-js" set:text={codeCustomTranslation} /></pre>
+                <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslation} /></pre>
+            </div>
+            <div>
                 <p>
-                    Via CDN, enregistrez-la avec un <code>&lt;script type="module"&gt;</code>
-                    pointant vers votre propre fichier compilé :
+                    Une fois votre fichier compilé en JS, importez la traduction ainsi :
                 </p>
-                <pre><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
+                <pre style="margin-top: 0.85rem"><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
             </div>
         </section>
 
