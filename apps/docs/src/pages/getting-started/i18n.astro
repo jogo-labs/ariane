@@ -7,7 +7,7 @@ const tocEntries = [
     { id: 'locale-resolution',  label: 'Résolution de la langue',       level: 2 as const },
     { id: 'default-imports',    label: 'Imports par défaut',            level: 2 as const },
     { id: 'traductions',        label: 'Fournir sa propre traduction',   level: 1 as const },
-    { id: 'composants',          label: 'Composants concernés',           level: 1 as const },
+    { id: 'traductions-disponibles', label: 'Traductions disponibles',  level: 1 as const },
 ];
 
 const codeChangeLang = `<!-- Langue par défaut de la page -->
@@ -135,30 +135,24 @@ const codeCustomTranslationCdn = `<html lang="es">
             </div>
         </section>
 
-        <section id="composants" class="main-section">
+        <section id="traductions-disponibles" class="main-section">
             <div>
-                <h3 class="section-title">Composants concernés</h3>
+                <h3 class="section-title">Traductions disponibles</h3>
                 <p>
-                    <code>ar-table-sort</code> (labels de tri, annonces aria-live) et
-                    <code>ar-datepicker</code> (déclencheur, panel, navigation du calendrier,
-                    jour sélectionné, boutons « Aujourd'hui » / « Fermer »). Le texte du hint par
-                    défaut d'<code>ar-datepicker</code> ("Format attendu :", plage min/max) reste
-                    en français quel que soit <code>lang</code> — à traduire via le slot
-                    <code>hint</code>, cf. la documentation du composant. D'autres composants
-                    rejoindront ce mécanisme au fil des prochaines versions.
+                    Chaque composant concerné documente son propre support i18n dans sa page — pas
+                    de liste centralisée ici, qui se désynchroniserait à chaque composant migré.
+                    Le détail des termes (par composant, groupés par commentaire{' '}
+                    <code>// ar-&lt;nom&gt;</code>) vit directement dans les fichiers de
+                    traduction :
                 </p>
                 <p>
-                    La liste exacte des termes disponibles par composant n'est pas dupliquée ici —
-                    elle est commentée directement dans{' '}
                     <a
-                        href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
+                        href="https://github.com/jogo-labs/ariane/tree/main/packages/core/src/translations"
                         target="_blank"
                         rel="noopener"
                     >
-                        <code>fr.ts</code>
-                    </a>{' '}
-                    (un commentaire <code>// ar-&lt;nom&gt;</code> délimite chaque groupe), pour
-                    éviter une doc qui se désynchronise à chaque composant migré.
+                        <code>packages/core/src/translations/</code>
+                    </a>
                 </p>
             </div>
         </section>
