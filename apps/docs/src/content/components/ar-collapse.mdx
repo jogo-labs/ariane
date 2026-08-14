@@ -118,7 +118,7 @@ Les critères WCAG suivants sont implémentés :
 - L'animation `height` via `--ar-collapse-duration` n'est pas automatique — vous devez activer la transition dans votre thème :
 
 ```css
-ar-collapse::part(panel) {
+ar-collapse::part(collapsible) {
     transition: height var(--ar-collapse-duration, 0s) var(--ar-collapse-easing, ease);
 }
 ```
