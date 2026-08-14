@@ -3,6 +3,12 @@ import { fixture, html, expect } from '@open-wc/testing';
 import type { ArTableSort } from './table-sort.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (le Chromium headless de CI n'est pas garanti
+// en fr-FR). En production, le site de doc pose lang="fr" sur <html> ; on
+// reproduit ça ici pour que les assertions FR par défaut restent valides.
+document.documentElement.lang = 'fr';
+
 function btn(el: ArTableSort): HTMLButtonElement {
     const b = el.shadowRoot?.querySelector<HTMLButtonElement>('[part~="sort-button"]');
     if (!b) throw new Error('part="sort-button" introuvable');

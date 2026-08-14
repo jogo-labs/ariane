@@ -3,6 +3,9 @@ import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+import '../../translations/fr.js';
+import '../../translations/en.js';
 import '../tooltip/index.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
@@ -12,37 +15,6 @@ const CYCLE: TableSortOrder[] = ['none', 'asc', 'desc'];
 
 function nextOrder(current: TableSortOrder): TableSortOrder {
     return CYCLE[(CYCLE.indexOf(current) + 1) % CYCLE.length];
-}
-
-const ACTION_LABELS: Record<TableSortType, Record<'asc' | 'desc' | 'reset', string>> = {
-    alpha: {
-        asc: 'Trier de A à Z',
-        desc: 'Trier de Z à A',
-        reset: 'Supprimer le tri alphabétique',
-    },
-    numeric: {
-        asc: 'Trier par ordre croissant',
-        desc: 'Trier par ordre décroissant',
-        reset: 'Supprimer le tri numérique',
-    },
-    date: {
-        asc: 'Trier du plus ancien au plus récent',
-        desc: 'Trier du plus récent au plus ancien',
-        reset: 'Supprimer le tri chronologique',
-    },
-};
-
-const APPLIED_LABELS: Record<TableSortOrder, string> = {
-    none: 'tri supprimé',
-    asc: 'tri croissant appliqué',
-    desc: 'tri décroissant appliqué',
-};
-
-function getActionLabel(type: TableSortType, order: TableSortOrder, pending: boolean): string {
-    if (pending) return 'Tri en cours…';
-    if (order === 'none') return ACTION_LABELS[type].asc;
-    if (order === 'asc') return ACTION_LABELS[type].desc;
-    return ACTION_LABELS[type].reset;
 }
 
 /**
@@ -83,6 +55,7 @@ export class ArTableSort extends LitElement {
 
     private _pendingOrder: TableSortOrder | null = null;
     private readonly _buttonId = `ar-ts-btn-${crypto.randomUUID().slice(0, 8)}`;
+    private readonly localize = new LocalizeController(this);
 
     override connectedCallback(): void {
         super.connectedCallback();
@@ -100,14 +73,14 @@ export class ArTableSort extends LitElement {
         this._pendingOrder = null;
         this.pending = false;
         this.order = newOrder;
-        announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS[newOrder]}`);
+        announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), newOrder));
     }
 
     /** Remet le tri à "none" et annonce le reset aux lecteurs d'écran. Sans effet si déjà "none". */
     reset(): void {
         if (this.order === 'none') return;
         this.order = 'none';
-        announceA11y(`${this._getColumnLabel()} : ${APPLIED_LABELS.none}`);
+        announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), 'none'));
     }
 
     /**
@@ -118,7 +91,7 @@ export class ArTableSort extends LitElement {
         if (!this._pendingOrder) return;
         this._pendingOrder = null;
         this.pending = false;
-        announceA11y(reason ?? `${this._getColumnLabel()} : échec du tri.`);
+        announceA11y(reason ?? this.localize.term('sortFailed', this._getColumnLabel()));
     }
 
     private _syncParentTh(): void {
@@ -149,7 +122,7 @@ export class ArTableSort extends LitElement {
 
     private _handleClick(): void {
         if (this.pending) {
-            announceA11y('Tri en cours, veuillez patienter.');
+            announceA11y(this.localize.term('sortInProgress'));
             return;
         }
         const requestedOrder = nextOrder(this.order);
@@ -169,8 +142,15 @@ export class ArTableSort extends LitElement {
         );
     }
 
+    private _getActionLabel(): string {
+        if (this.pending) return this.localize.term('sortPending');
+        if (this.order === 'none') return this.localize.term('sortAscending', this.type);
+        if (this.order === 'asc') return this.localize.term('sortDescending', this.type);
+        return this.localize.term('sortReset', this.type);
+    }
+
     override render() {
-        const label = getActionLabel(this.type, this.order, this.pending);
+        const label = this._getActionLabel();
         return html`
             <button
                 part="sort-button action-button${this.pending ? ' sort-button--pending' : ''}"
