@@ -226,3 +226,21 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
       `today`/`close` dans ce lot).
     - `ar-progressbar` — audité, **écarté** : le label vient entièrement du slot fourni par le
       consommateur, aucune chaîne FR hardcodée dans le composant.
+- **Trouvé lors de la revue finale de branche (2026-08-14), pas de l'audit initial** — chaînes FR
+  hardcodées supplémentaires, manquées par le brainstorming original, à couvrir en lot 2 :
+    - `ar-datepicker` lui-même (au-delà de `today`/`close`, déjà migrés dans ce lot) —
+      `packages/core/src/components/datepicker/datepicker.ts` :
+      `aria-label="Ouvrir le calendrier"` (ligne 265), `aria-label="Sélectionner une date"` du
+      dialog (ligne 303), et les 4 libellés de navigation `Année précédente` (ligne 338),
+      `Mois précédent` (ligne 346), `Mois suivant` (ligne 355), `Année suivante` (ligne 363).
+    - `ar-dialog` — `packages/core/src/components/dialog/dialog.ts` :
+      `DEFAULT_DIALOG_LABEL = 'Dialogue'` (ligne 34) et le défaut de la prop `closeLabel = 'Fermer'`
+      (ligne 178). À noter : `apps/docs/src/content/components/ar-dialog.mdx` documente encore
+      `close-label` comme prop de traduction manuelle par instance — le même anti-pattern retiré
+      d'`ar-datepicker` dans ce lot (`today-label`/`close-label`). Décision à trancher en lot 2 :
+      retirer la prop `ar-dialog` de la même façon, ou choisir explicitement de la garder et
+      documenter pourquoi.
+    - `ar-alert` — `packages/core/src/components/alert/alert.ts` :
+      `aria-label="Fermer l'alerte"` (ligne 205).
+    - `ar-breadcrumb` — `packages/core/src/components/breadcrumb/breadcrumb.ts` :
+      `Vous êtes ici` (ligne 219), `Afficher le fil d'ariane` (ligne 228).

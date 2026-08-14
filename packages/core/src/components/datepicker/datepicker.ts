@@ -8,6 +8,7 @@ import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
 

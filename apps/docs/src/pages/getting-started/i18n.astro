@@ -122,6 +122,67 @@ const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, com
                     <code>ar-datepicker</code> (boutons « Aujourd'hui » / « Fermer »). D'autres
                     composants rejoindront ce mécanisme au fil des prochaines versions.
                 </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Terme</th>
+                                <th scope="col">Signature</th>
+                                <th scope="col">Composant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>sortAscending</code></td>
+                                <td><code>(type: 'alpha' | 'numeric' | 'date') =&gt; string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortDescending</code></td>
+                                <td><code>(type: 'alpha' | 'numeric' | 'date') =&gt; string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortReset</code></td>
+                                <td><code>(type: 'alpha' | 'numeric' | 'date') =&gt; string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortPending</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortInProgress</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortApplied</code></td>
+                                <td>
+                                    <code>(columnLabel: string, order: 'none' | 'asc' | 'desc') =&gt;
+                                    string</code>
+                                </td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>sortFailed</code></td>
+                                <td><code>(columnLabel: string) =&gt; string</code></td>
+                                <td><code>ar-table-sort</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>today</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>close</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
     </div>
@@ -131,4 +192,5 @@ const codeCustomTranslationCdn = `<!-- mon-app-es.js : le fichier ci-dessus, com
 
 <style>
     @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
 </style>

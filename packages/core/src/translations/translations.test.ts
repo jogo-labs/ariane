@@ -31,4 +31,12 @@ describe('traductions', () => {
     it('en.sortApplied interpole columnLabel et order', () => {
         expect(en.sortApplied('Price', 'desc')).toBe('Price: descending sort applied');
     });
+
+    it('fr.sortFailed interpole columnLabel', () => {
+        expect(fr.sortFailed('Prix')).toBe('Prix : échec du tri.');
+    });
+
+    it('fr.sortInProgress est un terme statique', () => {
+        expect(fr.sortInProgress).toBe('Tri en cours, veuillez patienter.');
+    });
 });

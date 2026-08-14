@@ -247,7 +247,8 @@ IMask(picker.inputElement, { mask: Date });
 
 Ces deux textes suivent le mécanisme i18n du package (attribut `lang`, cf.
 [Internationalisation](/getting-started/i18n)) — pas `locale`, qui ne pilote que le formatage des
-dates. Par défaut (aucun `lang` posé nulle part), les boutons sont en français.
+dates. Sans `lang` explicite, la langue vient de `<html lang>` puis de `navigator.language` ; le
+français sert de repli quand la langue résolue n'a pas de traduction enregistrée.
 
 ```html
 <ar-datepicker label="Date of birth" lang="en"></ar-datepicker>
