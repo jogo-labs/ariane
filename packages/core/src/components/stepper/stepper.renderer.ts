@@ -30,7 +30,7 @@ function isGroupCurrent(node: NavigationNode, mode: NavigationMode): boolean {
     );
 }
 
-/** Compose la valeur `part=` d'un élément avec sa variante d'état "current" (convention BEM `--`). */
+/** Compose la valeur `part=` d'un élément avec son rôle transverse et sa variante d'état "current" (convention BEM `--`). */
 function withCurrentPart(base: string, isCurrent: boolean, role: string): string {
     return isCurrent ? `${base} ${role} ${base}--current` : `${base} ${role}`;
 }

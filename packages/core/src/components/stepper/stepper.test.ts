@@ -62,6 +62,8 @@ describe('ArStepper', () => {
         });
 
         it('step-link porte aussi le rôle transverse "control"', async () => {
+            // mode="edit" est requis pour que le renderer produise un vrai <a part="step-link ...">
+            // (sans ce mode, la garde de stepper.renderer.ts rend un simple <div>, sans part testable).
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
