@@ -48,6 +48,13 @@ const translation: Translation = {
     nextMonth: 'Mois suivant',
     nextYear: 'Année suivante',
     daySelected: (formattedDate) => `${formattedDate}, sélectionné`,
+    expectedFormat: (fmt, example) => `Format attendu : ${fmt} (ex. ${example})`,
+    availableDates: (range) => `Dates disponibles : ${range}`,
+    dateRangeBetween: (from, to) => `entre le ${from} et le ${to}`,
+    dateRangeFrom: (from) => `à partir du ${from}`,
+    dateRangeUntil: (to) => `jusqu'au ${to}`,
+    formatOrdinalDate: (date, monthYearText, fullDateText) =>
+        date.getDate() === 1 ? `1er ${monthYearText}` : fullDateText,
 };
 
 registerTranslation(translation);

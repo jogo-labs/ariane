@@ -245,9 +245,15 @@ reconnues.
     - ~~`ar-datepicker` lui-même (au-delà de `today`/`close`)~~ — **traité dans ce lot**, pas
       reporté en lot 2 : `openCalendar`, `selectDate`, `previousYear`, `previousMonth`,
       `nextMonth`, `nextYear`, `daySelected` ajoutés à `Translation`
-      (`packages/core/src/types/translation.ts`) et migrés dans `datepicker.ts`. Le texte du hint
-      par défaut (`_rangeText`/`_formatOrdinalDate`, "Format attendu :", plage min/max) reste hors
-      scope — déjà couvert par le mécanisme de slot `hint` existant, documenté comme tel.
+      (`packages/core/src/types/translation.ts`) et migrés dans `datepicker.ts`.
+    - ~~Le texte du hint par défaut (`_rangeText`/`_formatOrdinalDate`, "Format attendu :", plage
+      min/max)~~ — **également traité**, décision revue en cours de branche (2026-08-14) : un hint
+      par défaut fiable même sans surcharge du slot vaut la peine pour l'accessibilité par défaut.
+      Six termes ajoutés : `expectedFormat`, `availableDates`, `dateRangeBetween`, `dateRangeFrom`,
+      `dateRangeUntil`, `formatOrdinalDate`. Ce dernier reçoit la date brute et les deux formats
+      Intl déjà calculés (locale-aware) — c'est le terme qui décide d'un marqueur ordinal (ex.
+      « 1er » en français), pas le composant. Le slot `hint` reste disponible pour un contenu
+      personnalisé ou une langue non couverte par le package.
     - `ar-dialog` — `packages/core/src/components/dialog/dialog.ts` :
       `DEFAULT_DIALOG_LABEL = 'Dialogue'` (ligne 34) et le défaut de la prop `closeLabel = 'Fermer'`
       (ligne 178). À noter : `apps/docs/src/content/components/ar-dialog.mdx` documente encore

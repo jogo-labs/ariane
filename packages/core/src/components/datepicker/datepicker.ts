@@ -235,11 +235,15 @@ export class ArDatepicker extends LitElement {
         const todayLabel = this.localize.term('today');
         const closeLabel = this.localize.term('close');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
-        const formatLine = `Format attendu : ${this.format} (ex. ${format(exampleDate, this.format)})`;
+        const formatLine = this.localize.term(
+            'expectedFormat',
+            this.format,
+            format(exampleDate, this.format),
+        );
         const rangeText = this._rangeText(locale);
         const defaultHint = rangeText
             ? html`${formatLine}<br />
-                  Dates disponibles : ${rangeText}`
+                  ${this.localize.term('availableDates', rangeText)}`
             : formatLine;
 
         return html`
@@ -529,26 +533,36 @@ export class ArDatepicker extends LitElement {
         if (!minDate && !maxDate) return '';
 
         if (minDate && maxDate) {
-            return `entre le ${this._formatOrdinalDate(minDate, locale)} et le ${this._formatOrdinalDate(maxDate, locale)}`;
+            return this.localize.term(
+                'dateRangeBetween',
+                this._formatOrdinalDate(minDate, locale),
+                this._formatOrdinalDate(maxDate, locale),
+            );
         }
-        if (minDate) return `à partir du ${this._formatOrdinalDate(minDate, locale)}`;
-        return `jusqu'au ${this._formatOrdinalDate(maxDate as Date, locale)}`;
+        if (minDate)
+            return this.localize.term('dateRangeFrom', this._formatOrdinalDate(minDate, locale));
+        return this.localize.term(
+            'dateRangeUntil',
+            this._formatOrdinalDate(maxDate as Date, locale),
+        );
     }
 
-    /** Formate une date longue en respectant l'ordinal du 1er du mois en français ("1er janvier 2026"). */
+    /**
+     * Formate une date longue, en laissant le terme `formatOrdinalDate` décider d'un marqueur
+     * ordinal (ex. « 1er janvier 2026 » en français) — les deux formats Intl (mois/année,
+     * jour/mois/année) sont locale-aware et calculés ici, le terme choisit lequel utiliser.
+     */
     private _formatOrdinalDate(date: Date, locale: string): string {
-        if (locale.toLowerCase().startsWith('fr') && date.getDate() === 1) {
-            const monthYear = this._getFormatter(locale, 'month-year', {
-                month: 'long',
-                year: 'numeric',
-            }).format(date);
-            return `1er ${monthYear}`;
-        }
-        return this._getFormatter(locale, 'day-month-year', {
+        const monthYearText = this._getFormatter(locale, 'month-year', {
+            month: 'long',
+            year: 'numeric',
+        }).format(date);
+        const fullDateText = this._getFormatter(locale, 'day-month-year', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         }).format(date);
+        return this.localize.term('formatOrdinalDate', date, monthYearText, fullDateText);
     }
 
     /** Cache des Intl.DateTimeFormat par locale — évite de reconstruire un formatter à chaque render. */

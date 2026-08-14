@@ -28,4 +28,12 @@ export interface Translation extends BaseTranslation {
     nextMonth: string;
     nextYear: string;
     daySelected: (formattedDate: string) => string;
+    expectedFormat: (format: string, example: string) => string;
+    availableDates: (range: string) => string;
+    dateRangeBetween: (from: string, to: string) => string;
+    dateRangeFrom: (from: string) => string;
+    dateRangeUntil: (to: string) => string;
+    /** `monthYearText`/`fullDateText` sont déjà formatés via Intl (locale-aware) — le terme
+     *  décide seulement s'il faut un marqueur ordinal (ex. « 1er » en français). */
+    formatOrdinalDate: (date: Date, monthYearText: string, fullDateText: string) => string;
 }

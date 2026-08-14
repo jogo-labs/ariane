@@ -325,6 +325,19 @@ describe('ArDatepicker', () => {
             expect(hint?.textContent).not.toContain('1er');
         });
 
+        it('le hint par défaut (format + plage) est intégralement traduit via lang="en"', async () => {
+            el = await fixture(
+                '<ar-datepicker lang="en" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+            );
+            await waitForUpdate(el);
+            const year = new Date().getFullYear();
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).toContain(`Expected format: dd/MM/yyyy (e.g. 31/12/${year})`);
+            expect(hint?.textContent).toContain(
+                'Available dates: between January 1, 2026 and December 31, 2026',
+            );
+        });
+
         it('slot hint personnalisé remplace le hint par défaut (plage incluse)', async () => {
             el = await fixture(`
                 <ar-datepicker min="2026-01-01">
