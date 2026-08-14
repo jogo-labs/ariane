@@ -11,6 +11,7 @@ const translation: Translation = {
     $name: 'English',
     $dir: 'ltr',
 
+    // ── ar-table-sort ────────────────────────────────────────────────────
     sortAscending: (type) =>
         sortLabel(type, {
             alpha: 'Sort A to Z',
@@ -42,6 +43,7 @@ const translation: Translation = {
     },
     sortFailed: (columnLabel) => `${columnLabel}: sort failed.`,
 
+    // ── ar-datepicker ────────────────────────────────────────────────────
     today: 'Today',
     close: 'Close',
     openCalendar: 'Open calendar',

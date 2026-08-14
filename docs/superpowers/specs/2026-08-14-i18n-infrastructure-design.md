@@ -194,8 +194,11 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
   propre traduction en partant de `en.ts` comme référence typée, limite documentée sur
   l'héritage `lang` (pas de propagation via un ancêtre intermédiaire), lien vers
   `@shoelace-style/localize` et vers WebAwesome comme référence générale du projet.
-- Table des termes disponibles (au moins `table-sort` et `datepicker` pour cette livraison), pour
-  que les composants futurs sachent où ajouter les leurs.
+- **Revu après la revue finale (2026-08-14)** : pas de table des termes dupliquée dans la doc —
+  décision inversée après un premier essai (`i18n.astro`, corrigé en revue finale puis retiré sur
+  demande explicite). La liste exacte vit dans `src/translations/fr.ts`/`en.ts`, groupée par
+  composant via des commentaires (`// ar-<nom>`) — éviter une doc qui se désynchronise à chaque
+  composant migré plutôt que la dupliquer.
 
 **Tests** :
 

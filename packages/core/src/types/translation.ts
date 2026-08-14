@@ -4,7 +4,9 @@ import type { TableSortType, TableSortOrder } from '../components/table-sort/tab
 /**
  * Contrat de traduction d'Ariane — étend le type de base de @shoelace-style/localize.
  * Un seul type plat regroupant les termes de tous les composants traduits (pas d'augmentation
- * par composant), à l'image du modèle Shoelace/WebAwesome.
+ * par composant), à l'image du modèle Shoelace/WebAwesome. Groupé par composant en commentaire
+ * ci-dessous (et dans src/translations/{fr,en}.ts) — si des termes finissent par être partagés
+ * entre plusieurs composants, les regrouper sous un commentaire dédié plutôt que de les dupliquer.
  */
 export interface Translation extends BaseTranslation {
     // ar-table-sort
