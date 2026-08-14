@@ -31,8 +31,8 @@ function isGroupCurrent(node: NavigationNode, mode: NavigationMode): boolean {
 }
 
 /** Compose la valeur `part=` d'un élément avec sa variante d'état "current" (convention BEM `--`). */
-function withCurrentPart(base: string, isCurrent: boolean): string {
-    return isCurrent ? `${base} ${base}--current` : base;
+function withCurrentPart(base: string, isCurrent: boolean, role: string): string {
+    return isCurrent ? `${base} ${role} ${base}--current` : `${base} ${role}`;
 }
 
 function renderStepText(
@@ -41,7 +41,7 @@ function renderStepText(
     isCurrent: boolean,
     isSubstep = false,
 ): TemplateResult {
-    const bulletPart = withCurrentPart('bullet', isCurrent);
+    const bulletPart = withCurrentPart('bullet', isCurrent, 'indicator');
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
@@ -74,7 +74,7 @@ function renderSubStep(
                 ? html`
                       <a
                           class="item-header"
-                          part=${withCurrentPart('step-link', isCurrent)}
+                          part=${withCurrentPart('step-link', isCurrent, 'control')}
                           data-substep-order=${order}
                           data-path=${sub.path}
                           href=${sub.href ?? '#'}
@@ -114,7 +114,7 @@ function renderStep(
                 ? html`
                       <a
                           class="item-header"
-                          part=${withCurrentPart('step-link', isCurrent)}
+                          part=${withCurrentPart('step-link', isCurrent, 'control')}
                           data-path=${step.path}
                           href=${step.href ?? '#'}
                           @click=${onClickLink}

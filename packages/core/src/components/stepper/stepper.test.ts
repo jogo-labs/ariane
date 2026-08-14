@@ -51,14 +51,36 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('nav')).toBeNull();
         });
 
-        it('rend un <nav> avec part="nav" quand les items sont enregistrés', async () => {
+        it('rend un <nav> avec part="stepper" quand les items sont enregistrés', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(shadow(el).querySelector('[part="nav"]')).not.toBeNull();
+            expect(shadow(el).querySelector('[part="stepper"]')).not.toBeNull();
+        });
+
+        it('step-link porte aussi le rôle transverse "control"', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const link = shadow(el).querySelector('a[part~="step-link"]');
+            expect(link?.getAttribute('part')?.split(/\s+/)).toContain('control');
+        });
+
+        it('bullet porte aussi le rôle transverse "indicator"', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/a">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const bullet = shadow(el).querySelector('[part~="bullet"]');
+            expect(bullet?.getAttribute('part')?.split(/\s+/)).toContain('indicator');
         });
 
         it('rend part="list" sur la liste des étapes', async () => {
@@ -113,7 +135,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(shadow(el).querySelector('[part="bullet"]')).not.toBeNull();
+            expect(shadow(el).querySelector('[part~="bullet"]')).not.toBeNull();
         });
 
         it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape courante', async () => {
@@ -127,10 +149,10 @@ describe('ArStepper', () => {
             expect(steps.length).toBe(2);
 
             const bulletA = requireQuery<HTMLElement>(steps[0]!, '[part~="bullet"]');
-            expect(bulletA.getAttribute('part')).toBe('bullet bullet--current');
+            expect(bulletA.getAttribute('part')).toBe('bullet indicator bullet--current');
 
             const bulletB = requireQuery<HTMLElement>(steps[1]!, '[part~="bullet"]');
-            expect(bulletB.getAttribute('part')).toBe('bullet');
+            expect(bulletB.getAttribute('part')).toBe('bullet indicator');
         });
 
         it('rend le part d\'état "step-link--current" sur le lien de la sous-étape courante en mode edit', async () => {
@@ -153,8 +175,8 @@ describe('ArStepper', () => {
 
             const link1 = [...links].find((l) => l.getAttribute('data-path') === '/a/1');
             const link2 = [...links].find((l) => l.getAttribute('data-path') === '/a/2');
-            expect(link1?.getAttribute('part')).toBe('step-link');
-            expect(link2?.getAttribute('part')).toBe('step-link step-link--current');
+            expect(link1?.getAttribute('part')).toBe('step-link control');
+            expect(link2?.getAttribute('part')).toBe('step-link control step-link--current');
         });
 
         it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {
@@ -171,8 +193,8 @@ describe('ArStepper', () => {
             );
             expect(substepBullets.length).toBe(2);
             const [bullet1, bullet2] = substepBullets;
-            expect(bullet1?.getAttribute('part')).toBe('bullet bullet--current');
-            expect(bullet2?.getAttribute('part')).toBe('bullet');
+            expect(bullet1?.getAttribute('part')).toBe('bullet indicator bullet--current');
+            expect(bullet2?.getAttribute('part')).toBe('bullet indicator');
         });
     });
 

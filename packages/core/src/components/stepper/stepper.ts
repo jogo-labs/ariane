@@ -48,13 +48,15 @@ export interface ArStepperStepChangeDetail {
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
- * @csspart nav          - L'élément `<nav>` englobant.
+ * @csspart stepper      - Racine du composant.
  * @csspart list         - La liste des étapes.
  * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
  * @csspart step         - Une étape de premier niveau.
  * @csspart substep      - Une sous-étape.
  * @csspart step-link    - Le lien d'une étape.
+ * @csspart control      - Porté par `step-link` : élément interactif générique.
  * @csspart bullet       - La puce numérotée d'une étape.
+ * @csspart indicator    - Porté par `bullet` : marqueur/indicateur visuel.
  * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
  * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
@@ -342,7 +344,7 @@ export class ArStepper extends LitElement {
                   this.onClickLink,
               );
 
-        return html` <nav part="nav" role="navigation" aria-labelledby="label-nav">
+        return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
             <p id="label-nav" class="sr-only">Étapes du formulaire</p>
             ${content}
             <slot></slot>
