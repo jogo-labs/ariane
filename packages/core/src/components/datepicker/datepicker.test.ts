@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDatepicker } from './datepicker.js';
-import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
+import { fixture, getPart, mockPopoverPanel, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 
 // LocalizeController résout la langue via document.documentElement.lang, avec
@@ -402,6 +402,64 @@ describe('ArDatepicker', () => {
             await waitForUpdate(el);
             const closeBtn = getPart(el, 'close-button');
             expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
+        });
+    });
+
+    describe('aria-label traduits (trigger, panel, navigation, jour sélectionné)', () => {
+        it('trigger et panel affichent les libellés fr par défaut', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(getPart(el, 'trigger')?.getAttribute('aria-label')).toBe('Ouvrir le calendrier');
+            expect(getPart(el, 'panel')?.getAttribute('aria-label')).toBe('Sélectionner une date');
+        });
+
+        it('les 4 boutons de navigation affichent les libellés fr par défaut', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(
+                el.shadowRoot?.querySelector('[part~="prev-year"]')?.getAttribute('aria-label'),
+            ).toBe('Année précédente');
+            expect(
+                el.shadowRoot?.querySelector('[part~="prev-month"]')?.getAttribute('aria-label'),
+            ).toBe('Mois précédent');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-month"]')?.getAttribute('aria-label'),
+            ).toBe('Mois suivant');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-year"]')?.getAttribute('aria-label'),
+            ).toBe('Année suivante');
+        });
+
+        it('trigger, panel et navigation sont traduits en anglais via lang="en"', async () => {
+            el = await fixture('<ar-datepicker lang="en"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(getPart(el, 'trigger')?.getAttribute('aria-label')).toBe('Open calendar');
+            expect(getPart(el, 'panel')?.getAttribute('aria-label')).toBe('Select a date');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-year"]')?.getAttribute('aria-label'),
+            ).toBe('Next year');
+        });
+
+        it('le jour sélectionné porte le suffixe traduit dans son aria-label', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            // happy-dom n'implémente pas l'API Popover : sans ce mock, _anchored.show()
+            // lève (showPopover manquant) et la navigation du calendrier vers la date
+            // sélectionnée (dans _show(), avant l'await sur _anchored.show()) tourne court.
+            mockPopoverPanel(el);
+            el.open = true;
+            await waitForUpdate(el);
+            // _show() termine son flow async (this._anchored.show() + this.updateComplete)
+            // après le premier cycle de rendu déclenché par `open` — des awaits supplémentaires
+            // sont nécessaires pour que le calendrier ait fini de naviguer vers la date sélectionnée.
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            const selectedCell = el.shadowRoot?.querySelector(
+                '[role="gridcell"][aria-selected="true"] [part~="day"]',
+            );
+            expect(selectedCell?.getAttribute('aria-label')).toContain(', sélectionné');
         });
     });
 

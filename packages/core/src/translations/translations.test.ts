@@ -39,4 +39,21 @@ describe('traductions', () => {
     it('fr.sortInProgress est un terme statique', () => {
         expect(fr.sortInProgress).toBe('Tri en cours, veuillez patienter.');
     });
+
+    it('fr.daySelected interpole la date formatée', () => {
+        expect(fr.daySelected('12 juin 2026')).toBe('12 juin 2026, sélectionné');
+    });
+
+    it('en.daySelected interpole la date formatée', () => {
+        expect(en.daySelected('June 12, 2026')).toBe('June 12, 2026, selected');
+    });
+
+    it('fr expose les libellés de navigation du calendrier', () => {
+        expect(fr.openCalendar).toBe('Ouvrir le calendrier');
+        expect(fr.selectDate).toBe('Sélectionner une date');
+        expect(fr.previousYear).toBe('Année précédente');
+        expect(fr.previousMonth).toBe('Mois précédent');
+        expect(fr.nextMonth).toBe('Mois suivant');
+        expect(fr.nextYear).toBe('Année suivante');
+    });
 });

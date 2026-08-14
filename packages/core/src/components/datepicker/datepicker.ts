@@ -267,7 +267,7 @@ export class ArDatepicker extends LitElement {
                         part="trigger"
                         type="button"
                         ?disabled=${this.disabled || this.readonly}
-                        aria-label="Ouvrir le calendrier"
+                        aria-label=${this.localize.term('openCalendar')}
                         aria-haspopup="dialog"
                         aria-expanded=${this.open}
                         @click=${this._handleTriggerClick}
@@ -305,7 +305,7 @@ export class ArDatepicker extends LitElement {
                     popover="auto"
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Sélectionner une date"
+                    aria-label=${this.localize.term('selectDate')}
                     aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
@@ -340,7 +340,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button prev-year action-button"
                     type="button"
-                    aria-label="Année précédente"
+                    aria-label=${this.localize.term('previousYear')}
                     @click=${() => this._nav(() => this._calendar.previousYear())}
                 >
                     «
@@ -348,7 +348,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button prev-month action-button"
                     type="button"
-                    aria-label="Mois précédent"
+                    aria-label=${this.localize.term('previousMonth')}
                     @click=${() => this._nav(() => this._calendar.previousMonth())}
                 >
                     ‹
@@ -357,7 +357,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button next-month action-button"
                     type="button"
-                    aria-label="Mois suivant"
+                    aria-label=${this.localize.term('nextMonth')}
                     @click=${() => this._nav(() => this._calendar.nextMonth())}
                 >
                     ›
@@ -365,7 +365,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button next-year action-button"
                     type="button"
-                    aria-label="Année suivante"
+                    aria-label=${this.localize.term('nextYear')}
                     @click=${() => this._nav(() => this._calendar.nextYear())}
                 >
                     »
@@ -425,7 +425,7 @@ export class ArDatepicker extends LitElement {
         const otherMonth = !this._calendar.isSameMonth(day);
 
         const ariaLabel = selected
-            ? `${dayLabelFormat.format(day)}, sélectionné`
+            ? this.localize.term('daySelected', dayLabelFormat.format(day))
             : dayLabelFormat.format(day);
 
         const classes = [

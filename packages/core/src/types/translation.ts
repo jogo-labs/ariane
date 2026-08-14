@@ -19,4 +19,11 @@ export interface Translation extends BaseTranslation {
     // ar-datepicker
     today: string;
     close: string;
+    openCalendar: string;
+    selectDate: string;
+    previousYear: string;
+    previousMonth: string;
+    nextMonth: string;
+    nextYear: string;
+    daySelected: (formattedDate: string) => string;
 }

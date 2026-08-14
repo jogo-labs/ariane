@@ -44,6 +44,13 @@ const translation: Translation = {
 
     today: 'Today',
     close: 'Close',
+    openCalendar: 'Open calendar',
+    selectDate: 'Select a date',
+    previousYear: 'Previous year',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
+    nextYear: 'Next year',
+    daySelected: (formattedDate) => `${formattedDate}, selected`,
 };
 
 registerTranslation(translation);

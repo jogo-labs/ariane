@@ -140,8 +140,12 @@ const codeCustomTranslationCdn = `<html lang="es">
                 <h3 class="section-title">Composants concernés</h3>
                 <p>
                     <code>ar-table-sort</code> (labels de tri, annonces aria-live) et
-                    <code>ar-datepicker</code> (boutons « Aujourd'hui » / « Fermer »). D'autres
-                    composants rejoindront ce mécanisme au fil des prochaines versions.
+                    <code>ar-datepicker</code> (déclencheur, panel, navigation du calendrier,
+                    jour sélectionné, boutons « Aujourd'hui » / « Fermer »). Le texte du hint par
+                    défaut d'<code>ar-datepicker</code> ("Format attendu :", plage min/max) reste
+                    en français quel que soit <code>lang</code> — à traduire via le slot
+                    <code>hint</code>, cf. la documentation du composant. D'autres composants
+                    rejoindront ce mécanisme au fil des prochaines versions.
                 </p>
                 <div class="table-wrap">
                     <table>
@@ -199,6 +203,41 @@ const codeCustomTranslationCdn = `<html lang="es">
                             <tr>
                                 <td><code>close</code></td>
                                 <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>openCalendar</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>selectDate</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>previousYear</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>previousMonth</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>nextMonth</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>nextYear</code></td>
+                                <td><code>string</code></td>
+                                <td><code>ar-datepicker</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>daySelected</code></td>
+                                <td><code>(formattedDate: string) =&gt; string</code></td>
                                 <td><code>ar-datepicker</code></td>
                             </tr>
                         </tbody>

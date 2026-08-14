@@ -227,12 +227,13 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
     - `ar-progressbar` — audité, **écarté** : le label vient entièrement du slot fourni par le
       consommateur, aucune chaîne FR hardcodée dans le composant.
 - **Trouvé lors de la revue finale de branche (2026-08-14), pas de l'audit initial** — chaînes FR
-  hardcodées supplémentaires, manquées par le brainstorming original, à couvrir en lot 2 :
-    - `ar-datepicker` lui-même (au-delà de `today`/`close`, déjà migrés dans ce lot) —
-      `packages/core/src/components/datepicker/datepicker.ts` :
-      `aria-label="Ouvrir le calendrier"` (ligne 265), `aria-label="Sélectionner une date"` du
-      dialog (ligne 303), et les 4 libellés de navigation `Année précédente` (ligne 338),
-      `Mois précédent` (ligne 346), `Mois suivant` (ligne 355), `Année suivante` (ligne 363).
+  hardcodées supplémentaires, manquées par le brainstorming original :
+    - ~~`ar-datepicker` lui-même (au-delà de `today`/`close`)~~ — **traité dans ce lot**, pas
+      reporté en lot 2 : `openCalendar`, `selectDate`, `previousYear`, `previousMonth`,
+      `nextMonth`, `nextYear`, `daySelected` ajoutés à `Translation`
+      (`packages/core/src/types/translation.ts`) et migrés dans `datepicker.ts`. Le texte du hint
+      par défaut (`_rangeText`/`_formatOrdinalDate`, "Format attendu :", plage min/max) reste hors
+      scope — déjà couvert par le mécanisme de slot `hint` existant, documenté comme tel.
     - `ar-dialog` — `packages/core/src/components/dialog/dialog.ts` :
       `DEFAULT_DIALOG_LABEL = 'Dialogue'` (ligne 34) et le défaut de la prop `closeLabel = 'Fermer'`
       (ligne 178). À noter : `apps/docs/src/content/components/ar-dialog.mdx` documente encore
