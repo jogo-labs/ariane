@@ -149,7 +149,7 @@ export default [
             justify-content: flex-end;
         }
 
-        [part='close'] {
+        [part~='close-button'] {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,7 +164,7 @@ export default [
             transition: background-color var(--ar-dialog-close-transition-duration);
         }
 
-        [part='close']:focus-visible {
+        [part~='close-button']:focus-visible {
             outline: 2px solid currentColor;
             outline-offset: 2px;
         }
@@ -206,7 +206,7 @@ export default [
         @media (prefers-reduced-motion: reduce) {
             dialog,
             dialog::backdrop,
-            [part='close'] {
+            [part~='close-button'] {
                 animation: none !important;
                 transition: none !important;
             }
