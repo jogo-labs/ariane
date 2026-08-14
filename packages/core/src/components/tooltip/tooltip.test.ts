@@ -12,23 +12,23 @@ describe('ArTooltip', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
             el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
-            mockPopoverPanel(el, 'bubble');
+            mockPopoverPanel(el, 'tooltip');
         });
 
         it('monte un shadow DOM', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un bubble avec part="bubble"', () => {
-            expect(getPart(el, 'bubble')).not.toBeNull();
+        it('contient un part="tooltip"', () => {
+            expect(getPart(el, 'tooltip')).not.toBeNull();
         });
 
         it('bubble a role="tooltip"', () => {
-            expect(getPart(el, 'bubble')?.getAttribute('role')).toBe('tooltip');
+            expect(getPart(el, 'tooltip')?.getAttribute('role')).toBe('tooltip');
         });
 
         it('bubble a popover="manual"', () => {
-            expect(getPart(el, 'bubble')?.getAttribute('popover')).toBe('manual');
+            expect(getPart(el, 'tooltip')?.getAttribute('popover')).toBe('manual');
         });
 
         it('affiche le caret par défaut', () => {
@@ -114,10 +114,10 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>(
                 '<ar-tooltip for="btn" disabled show-delay="0">Aide</ar-tooltip>',
             );
-            mockPopoverPanel(el, 'bubble');
+            mockPopoverPanel(el, 'tooltip');
             document.getElementById('btn')!.dispatchEvent(new Event('mouseenter'));
             await new Promise((r) => setTimeout(r, 10));
-            expect((getPart(el, 'bubble') as any).showPopover).not.toHaveBeenCalled();
+            expect((getPart(el, 'tooltip') as any).showPopover).not.toHaveBeenCalled();
         });
     });
 
@@ -127,7 +127,7 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>(
                 '<ar-tooltip id="my-tooltip" for="btn" show-delay="0">Aide</ar-tooltip>',
             );
-            mockPopoverPanel(el, 'bubble');
+            mockPopoverPanel(el, 'tooltip');
         });
 
         it('émet ar-tooltip-shown avec detail.id après affichage', async () => {

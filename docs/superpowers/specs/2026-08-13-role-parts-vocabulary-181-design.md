@@ -155,13 +155,20 @@ transverse confirmé. Seul `ar-collapse` renomme son ancien `panel` (libéré po
 cf. ci-dessus) en `body`.
 
 **Racine du composant — cas particulier.** Contrairement aux autres rôles (additifs), la racine
-n'accumule pas ancien nom + nouveau : le part générique existant (`base` ou `container`) est
-**remplacé** par le nom du composant, sur le modèle Web Awesome. C'est le seul renommage non-additif
-du chantier, justifié par l'absence de valeur d'un doublon `part="container <nom-composant>"` (la
-racine n'a jamais eu de rôle "spécifique" distinct à préserver — `base`/`container` étaient déjà
-eux-mêmes génériques) et par la nécessité d'éviter la collision `exportparts` dès maintenant plutôt
-que de la reporter à un futur renommage. Composants sans aucun part racine actuellement (spinner,
-pagination, dialog) : le part est simplement ajouté, pas de migration.
+n'accumule jamais ancien nom + nouveau, **même quand le nom existant est sémantiquement
+significatif** (`nav` sur un `<nav>`, `bubble` pour une bulle) plutôt qu'un filler générique
+(`base`, `container`) : le part racine est toujours **remplacé** par le nom du composant, sur le
+modèle Web Awesome. Un lot 2 (`ar-breadcrumb`/`ar-tooltip`) et le lot 1 (`ar-pagination`) ont un
+temps dérogé à cette règle en gardant `nav`/`bubble` en plus du nom du composant — corrigé
+rétroactivement (lot 2 étendu) après revue : un doublon sur la racine n'ouvre aucun usage
+transverse (contrairement à `control`/`field`/`action-button`, qui permettent de cibler une
+famille d'éléments à travers plusieurs composants, la racine est unique par composant et
+n'a donc rien à gagner à conserver un second nom). Composants sans aucun part racine actuellement
+(spinner, dialog) : le part est simplement ajouté, pas de migration.
+
+**JSDoc de la racine — description minimale.** `@csspart <nom> - Racine du composant.`, sans
+qualificatif ni mention de ce qu'elle remplace ou porte — même formulation partout, alignée sur
+le lot 1 (`ar-pagination`, `ar-datepicker`, `ar-charcounter`).
 
 **JSDoc `@csspart`.** Une ligne dédiée par rôle transverse (même convention que les parts d'état
 `--current`/`--pending`), avec une description normale — **sans** marqueur « Rôle transverse (voir
@@ -210,13 +217,14 @@ absente). Le correctif de slot `ar-charcounter` (`icon-warning`/`icon-error` →
 `warning-icon`/`error-icon`) est indépendant du reste — peut être fait dans n'importe quel lot,
 y compris le premier. Ordre des lots suivants à affiner au moment d'écrire le premier plan.
 
-**Lot 2** : renommage du part racine `base`/`container` → nom du composant, gratuit (élément
-wrapper déjà existant, simple renommage de chaîne) sur `ar-breadcrumb` (additif : `nav breadcrumb`,
-`nav` gardé car sémantiquement significatif — même schéma que `nav pagination` au lot 1),
-`ar-collapse`, `ar-progressbar`, `ar-tab`, `ar-tab-panel`, `ar-tab-group`, `ar-tooltip` (additif :
-`bubble tooltip`). `ar-alert`, `ar-dropdown`, `ar-table-sort` et `ar-spinner` n'ont pas de wrapper
-existant pour porter ce rôle sans en ajouter un — exclus du lot 2 par la politique retenue
-ci-dessus (pas de wrapper ajouté sans besoin concret). Le lot 2 inclut aussi 2 correctifs propres à
+**Lot 2** : renommage du part racine `base`/`container`/`nav`/`bubble` → nom du composant, gratuit
+(élément wrapper déjà existant, simple renommage de chaîne, toujours en remplacement — jamais
+additif, cf. règle ci-dessus) sur `ar-breadcrumb`, `ar-collapse`, `ar-progressbar`, `ar-tab`,
+`ar-tab-panel`, `ar-tab-group`, `ar-tooltip`. Inclut aussi la correction rétroactive de
+`ar-pagination` (lot 1) : `nav pagination` → `pagination` seul, pour la même raison. `ar-alert`,
+`ar-dropdown`, `ar-table-sort` et `ar-spinner` n'ont pas de wrapper existant pour porter ce rôle
+sans en ajouter un — exclus du lot 2 par la politique retenue ci-dessus (pas de wrapper ajouté sans
+besoin concret). Le lot 2 inclut aussi 2 correctifs propres à
 `ar-collapse` : `content` → `body` (aligne sur le rôle transverse retenu) et `panel` → `collapsible`
 (le wrapper animé overflow/hauteur n'est pas un conteneur flottant, collision de sens à lever avec
 le rôle `panel`).

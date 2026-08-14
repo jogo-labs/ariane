@@ -8,7 +8,7 @@ export default css`
 
     /* ── Nav / item ──────────────────────────────────────────── */
 
-    [part='nav'] {
+    [part='breadcrumb'] {
         padding-inline-end: 0.25rem;
     }
 

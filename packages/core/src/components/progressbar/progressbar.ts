@@ -19,7 +19,7 @@ export class ArProgressbarConfig {
  *
  * @slot - Label décrivant ce que mesure la barre (ex: "Chargement du fichier").
  *
- * @csspart container    - Le `<div>` englobant l'ensemble du composant.
+ * @csspart progressbar  - Racine du composant.
  * @csspart label        - Le `<p>` contenant le slot et le pourcentage.
  * @csspart label-text   - Le `<span>` autour du slot.
  * @csspart percent      - Le `<strong>` affichant la valeur numérique du pourcentage.
@@ -57,7 +57,7 @@ export class ArProgressbar extends LitElement {
         // Clamp défensif : même si la propriété est bornée, une valeur HTML arbitraire peut passer
         const percentValue = Math.max(0, Math.min(100, this.percent));
 
-        return html` <div part="container">
+        return html` <div part="progressbar">
             <p part="label" id="progressbar-label">
                 <span part="label-text">
                     <slot></slot>

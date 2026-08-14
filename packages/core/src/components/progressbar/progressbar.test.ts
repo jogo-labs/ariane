@@ -19,8 +19,8 @@ describe('ArProgressbar', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un part="container"', () => {
-            expect(getPart(el, 'container')).not.toBeNull();
+        it('contient un part="progressbar"', () => {
+            expect(getPart(el, 'progressbar')).not.toBeNull();
         });
 
         it('contient un part="track"', () => {

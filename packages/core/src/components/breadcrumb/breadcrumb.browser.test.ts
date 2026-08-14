@@ -156,15 +156,15 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('propriétés logiques (RTL)', () => {
-        it('[part="nav"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
+        it('[part="breadcrumb"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
             el = await fixture<ArBreadcrumb>(html`
                 <ar-breadcrumb dir="rtl">
                     <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>
                     <ar-breadcrumb-item current label="Page"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="nav"]');
-            if (!nav) throw new Error('[part="nav"] introuvable');
+            const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="breadcrumb"]');
+            if (!nav) throw new Error('[part="breadcrumb"] introuvable');
             const style = getComputedStyle(nav);
             // padding-inline-end sous dir="rtl" se résout physiquement à GAUCHE — un
             // padding-right physique resterait à droite quel que soit dir. Seule une

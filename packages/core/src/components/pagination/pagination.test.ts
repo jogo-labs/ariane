@@ -44,16 +44,12 @@ describe('ArPagination', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un part="nav"', () => {
-            expect(getPart(el, 'nav')).not.toBeNull();
+        it('contient un part="pagination"', () => {
+            expect(getPart(el, 'pagination')).not.toBeNull();
         });
 
         it('contient un part="list"', () => {
             expect(getPart(el, 'list')).not.toBeNull();
-        });
-
-        it('la racine <nav> porte aussi le part transverse "pagination"', () => {
-            expect(partContains(requirePart(el, 'nav'), 'pagination')).toBe(true);
         });
 
         it('contient un part="prev"', () => {
@@ -164,7 +160,7 @@ describe('ArPagination', () => {
     describe('accessibilité', () => {
         it('le nav a role="navigation"', async () => {
             el = await fixture('<ar-pagination></ar-pagination>');
-            expect(requirePart(el, 'nav').getAttribute('role')).toBe('navigation');
+            expect(requirePart(el, 'pagination').getAttribute('role')).toBe('navigation');
         });
 
         it('prev est aria-disabled="true" en page 1', async () => {
@@ -1090,7 +1086,7 @@ describe('ArPagination', () => {
 
         it('total négatif : render() reste fonctionnel et ne montre aucun numéro de page négatif', async () => {
             el = await fixture('<ar-pagination total="-3"></ar-pagination>');
-            expect(el.shadowRoot?.querySelector('[part~="nav"]')).not.toBeNull();
+            expect(el.shadowRoot?.querySelector('[part="pagination"]')).not.toBeNull();
 
             const prevLabel = el.shadowRoot?.querySelector('[part~="prev"] .sr-only')?.textContent;
             const nextLabel = el.shadowRoot?.querySelector('[part~="next"] .sr-only')?.textContent;

@@ -40,16 +40,16 @@ describe('ArTab', () => {
             expect(el.hasAttribute('active')).toBe(true);
         });
 
-        it('émet part="base" quand active est false', async () => {
+        it('n\'émet pas part="tab--selected" quand active est false', async () => {
             el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
-            expect(getPart(el, 'base--selected')).toBeNull();
+            expect(getPart(el, 'tab--selected')).toBeNull();
         });
 
-        it('émet part="base base--selected" quand active est true', async () => {
+        it('émet part="tab tab--selected" quand active est true', async () => {
             el = await fixture('<ar-tab panel="a">Tab</ar-tab>');
             el.active = true;
             await waitForUpdate(el);
-            expect(getPart(el, 'base--selected')).not.toBeNull();
+            expect(getPart(el, 'tab--selected')).not.toBeNull();
         });
     });
 

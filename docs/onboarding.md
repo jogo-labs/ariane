@@ -120,8 +120,8 @@ export class ArSpinner extends LitElement {
     label: string = 'Chargement…';
 
     override render() {
-        // part="base" expose cet élément via ::part(base) pour le styling externe
-        return html`<span part="base" role="status" aria-label=${this.label}></span>`;
+        // part="spinner" expose cet élément via ::part(spinner) pour le styling externe
+        return html`<span part="spinner" role="status" aria-label=${this.label}></span>`;
     }
 }
 

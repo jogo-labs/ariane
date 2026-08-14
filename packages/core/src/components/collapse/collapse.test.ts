@@ -82,13 +82,13 @@ describe('ArCollapse', () => {
             el = await fixture('<ar-collapse></ar-collapse>');
         });
 
-        it('contient part="base"', () => expect(getPart(el, 'base')).not.toBeNull());
+        it('contient part="collapse"', () => expect(getPart(el, 'collapse')).not.toBeNull());
         it('contient part="trigger-container"', () =>
             expect(getPart(el, 'trigger-container')).not.toBeNull());
-        it('contient part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());
-        it('contient part="content"', () => expect(getPart(el, 'content')).not.toBeNull());
+        it('contient part="collapsible"', () => expect(getPart(el, 'collapsible')).not.toBeNull());
+        it('contient part="body"', () => expect(getPart(el, 'body')).not.toBeNull());
         it('panel a hidden au départ', () => {
-            expect(requirePart(el, 'panel').hasAttribute('hidden')).toBe(true);
+            expect(requirePart(el, 'collapsible').hasAttribute('hidden')).toBe(true);
         });
     });
 
@@ -122,7 +122,7 @@ describe('ArCollapse', () => {
         it('show() retire hidden du panel', async () => {
             el.show();
             await waitForUpdate(el);
-            expect(requirePart(el, 'panel').hasAttribute('hidden')).toBe(false);
+            expect(requirePart(el, 'collapsible').hasAttribute('hidden')).toBe(false);
         });
 
         it('hide() passe open à false et repose hidden', async () => {
@@ -131,7 +131,7 @@ describe('ArCollapse', () => {
             el.hide();
             await waitForUpdate(el);
             expect(el.open).toBe(false);
-            expect(requirePart(el, 'panel').hasAttribute('hidden')).toBe(true);
+            expect(requirePart(el, 'collapsible').hasAttribute('hidden')).toBe(true);
         });
 
         it('show() est no-op si déjà open', async () => {
@@ -539,12 +539,12 @@ describe('ArCollapse', () => {
                     <button slot="trigger">T</button>
                 </ar-collapse>
             `);
-            const base = requirePart(el, 'base');
+            const base = requirePart(el, 'collapse');
             const children = Array.from(base.children);
             const triggerIdx = children.findIndex(
                 (c) => c.getAttribute('part') === 'trigger-container',
             );
-            const panelIdx = children.findIndex((c) => c.getAttribute('part') === 'panel');
+            const panelIdx = children.findIndex((c) => c.getAttribute('part') === 'collapsible');
             expect(triggerIdx).toBeLessThan(panelIdx);
         });
 
@@ -554,12 +554,12 @@ describe('ArCollapse', () => {
                     <button slot="trigger">T</button>
                 </ar-collapse>
             `);
-            const base = requirePart(el, 'base');
+            const base = requirePart(el, 'collapse');
             const children = Array.from(base.children);
             const triggerIdx = children.findIndex(
                 (c) => c.getAttribute('part') === 'trigger-container',
             );
-            const panelIdx = children.findIndex((c) => c.getAttribute('part') === 'panel');
+            const panelIdx = children.findIndex((c) => c.getAttribute('part') === 'collapsible');
             expect(panelIdx).toBeLessThan(triggerIdx);
         });
     });

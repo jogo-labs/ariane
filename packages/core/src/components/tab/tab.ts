@@ -11,16 +11,16 @@ import styles from './tab.styles.js';
  *
  * @slot - Libellé de l'onglet.
  *
- * @csspart base - Wrapper du slot — padding, box-shadow actif.
- * @csspart base--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `base`, propriété `active` pilotée par ar-tab-group).
+ * @csspart tab - Racine du composant.
+ * @csspart tab--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `tab`, propriété `active` pilotée par ar-tab-group).
  *
  * @cssprop --ar-tab-padding-x - Padding horizontal.
  * @cssprop --ar-tab-padding-y - Padding vertical.
- * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
+ * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="tab--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  *
- * Note d'implémentation : la mise en page de [part~='base'] compense la bordure de son parent
+ * Note d'implémentation : la mise en page de [part~='tab'] compense la bordure de son parent
  * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
  * (déclarés et documentés sur ar-tab-group, cf. tab-group.ts) — pas des tokens propres à ar-tab.
  * Le fallback 0px est structurel (évite un décalage visuel si ar-tab est utilisé hors d'un
@@ -82,6 +82,6 @@ export class ArTab extends LitElement {
     };
 
     override render() {
-        return html`<div part="base${this.active ? ' base--selected' : ''}"><slot></slot></div>`;
+        return html`<div part="tab${this.active ? ' tab--selected' : ''}"><slot></slot></div>`;
     }
 }

@@ -13,10 +13,11 @@ import styles from './collapse.styles.js';
  * @slot trigger - Élément déclencheur (ignoré si `for` est défini).
  * @slot         - Contenu collapsible.
  *
- * @csspart base              - Conteneur racine.
+ * @csspart collapse          - Racine du composant.
  * @csspart trigger-container - Wrapper du slot trigger.
- * @csspart panel             - Zone animée (overflow hidden, height 0 → auto).
- * @csspart content           - Wrapper interne du contenu.
+ * @csspart collapsible       - Zone animée (overflow hidden, height 0 → auto). Nom distinct de
+ *   `panel` (rôle transverse = conteneur flottant) : ce wrapper n'est jamais flottant.
+ * @csspart body              - Wrapper interne du contenu.
  *
  * @cssprop --ar-collapse-duration - Durée de la transition height.
  * @cssprop --ar-collapse-easing - Easing de la transition height.
@@ -62,7 +63,7 @@ export class ArCollapse extends LitElement {
     /** Désactive le composant — le trigger ne répond plus aux clics. */
     @property({ reflect: true, type: Boolean }) disabled = false;
 
-    @query('[part="panel"]') private _panel!: HTMLElement;
+    @query('[part="collapsible"]') private _panel!: HTMLElement;
 
     private _animating = false;
     private _initialized = false;
@@ -139,14 +140,14 @@ export class ArCollapse extends LitElement {
             ></slot>
         `;
         const panel = html`
-            <div part="panel" hidden>
-                <div part="content">
+            <div part="collapsible" hidden>
+                <div part="body">
                     <slot></slot>
                 </div>
             </div>
         `;
         return html`
-            <div part="base">
+            <div part="collapse">
                 ${this.triggerPosition === 'after'
                     ? html`${panel}${trigger}`
                     : html`${trigger}${panel}`}

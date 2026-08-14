@@ -5,7 +5,7 @@ export default css`
         display: block;
     }
 
-    [part='base'] {
+    [part='tab-group'] {
         display: flex;
         flex-direction: column;
     }

@@ -11,7 +11,7 @@ import styles from './tab-panel.styles.js';
  *
  * @slot - Contenu du panel.
  *
- * @csspart base - Wrapper du slot.
+ * @csspart tab-panel - Racine du composant.
  */
 export class ArTabPanel extends LitElement {
     static override styles = [styles];
@@ -42,6 +42,6 @@ export class ArTabPanel extends LitElement {
     }
 
     override render() {
-        return html`<div part="base"><slot></slot></div>`;
+        return html`<div part="tab-panel"><slot></slot></div>`;
     }
 }

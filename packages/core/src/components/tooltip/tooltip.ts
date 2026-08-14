@@ -29,8 +29,8 @@ export type ArTooltipPlacement =
  *
  * @slot - Texte du tooltip.
  *
- * @csspart bubble - Le panel flottant (largeur maximale pilotable via `::part(bubble)`).
- * @csspart arrow  - Le caret directionnel.
+ * @csspart tooltip - Racine du composant.
+ * @csspart arrow   - Le caret directionnel.
  *
  * @cssprop --ar-tooltip-bg - Fond de la bulle (repli système `Canvas` si aucun thème n'est chargé).
  * @cssprop --ar-tooltip-color - Couleur du texte (repli système `CanvasText` si aucun thème n'est chargé).
@@ -86,7 +86,7 @@ export class ArTooltip extends LitElement {
     /** Désactive complètement le tooltip. */
     @property({ reflect: true, type: Boolean }) disabled = false;
 
-    @query('[part="bubble"]') private _bubble!: HTMLElement;
+    @query('[part="tooltip"]') private _bubble!: HTMLElement;
 
     private readonly _tooltip = new TooltipController(this, {
         placement: 'top',
@@ -132,7 +132,7 @@ export class ArTooltip extends LitElement {
     override render(): TemplateResult {
         return html`
             <div
-                part="bubble"
+                part="tooltip"
                 popover="manual"
                 role="tooltip"
                 @mouseenter=${this._handleBubbleMouseEnter}

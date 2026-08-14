@@ -5,18 +5,18 @@ import './index.js';
 
 const ANIM_MS = 400;
 
-// La transition est sur ::part(panel) dans le thème consommateur.
+// La transition est sur ::part(collapsible) dans le thème consommateur.
 // On l'injecte globalement pour que _shouldAnimate() retourne true.
 let styleEl: HTMLStyleElement;
 before(() => {
     styleEl = document.createElement('style');
-    styleEl.textContent = 'ar-collapse::part(panel) { transition: height 100ms ease; }';
+    styleEl.textContent = 'ar-collapse::part(collapsible) { transition: height 100ms ease; }';
     document.head.appendChild(styleEl);
 });
 after(() => styleEl.remove());
 
 function getPanel(el: ArCollapse): HTMLElement {
-    const p = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+    const p = el.shadowRoot?.querySelector<HTMLElement>('[part="collapsible"]');
     if (!p) throw new Error('panel introuvable');
     return p;
 }
@@ -178,9 +178,9 @@ describe('ar-collapse — browser', () => {
     // ── Largeur du panel ────────────────────────────────────────────────────
 
     describe('largeur du panel', () => {
-        it('[part="panel"] s\'étire sur toute la largeur du host, indépendamment de la largeur du trigger', async () => {
-            // [part='base'] utilise align-items: flex-start (garde le trigger à sa largeur
-            // naturelle) — sans align-self: stretch sur [part='panel'], ce même align-items
+        it('[part="collapsible"] s\'étire sur toute la largeur du host, indépendamment de la largeur du trigger', async () => {
+            // [part='collapse'] utilise align-items: flex-start (garde le trigger à sa largeur
+            // naturelle) — sans align-self: stretch sur [part='collapsible'], ce même align-items
             // rétrécit aussi le panel (et tout contenu large qu'il contient, ex. un bloc de
             // code) à la largeur de son propre contenu au lieu de la largeur du host.
             const wrapper = await fixture(html`
