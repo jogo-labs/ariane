@@ -138,13 +138,28 @@ close: string;
 `this.locale || navigator.language`) :
 
 ```ts
-this.locale || this.lang || document.documentElement.lang || navigator.language;
+this.locale || this.localize.lang();
 ```
 
 `locale` garde la priorité explicite (peut différer de la langue UI — ex. format de date US avec
-UI en français). `lang`/`<html lang>` deviennent le fallback intermédiaire, cohérent avec le reste
-de la lib. `navigator.language` reste le dernier recours, pour ne pas régresser brutalement les
-consommateurs qui ne posent jamais `lang`.
+UI en français). `this.localize.lang()` fournit le fallback intermédiaire — vérifié dans le code
+source de la lib, cette méthode résout déjà `this.lang || document.documentElement.lang ||
+navigator.language`, donc pas de raison de dupliquer cette chaîne à la main.
+
+**`.date()`/`.number()` de la lib non adoptés pour le formatage interne du calendrier** — évalué et
+écarté après lecture du code source :
+
+- `date(dateToFormat, options)` résout toujours la locale via `this.lang()` en interne, sans
+  paramètre pour lui passer un `locale` explicite différent — incompatible avec la priorité de
+  `locale` sur `lang` actée ci-dessus.
+- Pas de cache interne, contrairement à `_getFormatter()`/`_formatterCache`/`_dayNamesCache`
+  (`datepicker.ts:539` et environs), qui évitent de reconstruire un `Intl.DateTimeFormat` à chaque
+  cellule de la grille calendrier (jusqu'à ~35 par rendu).
+- Le format/parse du champ texte (`dd/MM/yyyy`, `date-parser.ts`) est un parsing par tokens custom,
+  sans rapport avec `Intl.DateTimeFormat` — hors du périmètre de `.date()` de toute façon.
+
+Seule `this.localize.lang()` est réutilisée (résolution de la locale par défaut) ; `.date()`,
+`.number()`, `.dir()` ne sont pas utilisés dans ce lot.
 
 ### 5. Attribution
 
