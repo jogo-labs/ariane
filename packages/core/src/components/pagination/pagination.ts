@@ -30,7 +30,6 @@ export interface ArPaginationPageChangeDetail {
  * Les pages intermédiaires sont calculées automatiquement selon le nombre total.
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
  *
- * @csspart nav      - L'élément `<nav>` englobant.
  * @csspart pagination - Racine du composant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
  * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
@@ -129,7 +128,7 @@ export class ArPagination extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         // `_initialized` reste faux ici au tout premier montage (le shadow DOM n'existe pas
-        // encore, `_setupResizeObserver` ne trouverait pas `[part~="nav"]`) — ce n'est donc PAS un
+        // encore, `_setupResizeObserver` ne trouverait pas `[part="pagination"]`) — ce n'est donc PAS un
         // doublon avec l'appel dans `firstUpdated()` ci-dessous, qui gère ce premier montage une
         // fois le rendu initial fait. Cet appel-ci ne joue que lors d'une reconnexion ultérieure
         // (élément déplacé/réinséré dans le DOM après un premier montage), pour réattacher
@@ -153,7 +152,7 @@ export class ArPagination extends LitElement {
 
     private _setupResizeObserver(): void {
         this._resizeObserver?.disconnect();
-        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part~="nav"]');
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="pagination"]');
         if (!nav) return;
         this._resizeObserver = new ResizeObserver(() => this._recalculateBudget());
         this._resizeObserver.observe(nav);
@@ -181,7 +180,7 @@ export class ArPagination extends LitElement {
     }
 
     private _recalculateBudget(): void {
-        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part~="nav"]');
+        const nav = this.shadowRoot?.querySelector<HTMLElement>('[part="pagination"]');
         const list = this.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
         const prev = this.shadowRoot?.querySelector<HTMLElement>('[part~="prev"]');
         const next = this.shadowRoot?.querySelector<HTMLElement>('[part~="next"]');
@@ -327,7 +326,7 @@ export class ArPagination extends LitElement {
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
 
-        return html` <nav part="nav pagination" role="navigation" aria-labelledby="ar-pagination">
+        return html` <nav part="pagination" role="navigation" aria-labelledby="ar-pagination">
             <p id="ar-pagination" class="sr-only">Pagination, page ${current} sur ${total}</p>
             <ul part="list" @click=${this._onPageChange}>
                 ${this.compact ? this.renderCompactLabel(current, total) : nothing}

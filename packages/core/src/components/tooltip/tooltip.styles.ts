@@ -6,7 +6,7 @@ const tooltipStyles = css`
         display: contents;
     }
 
-    [part~='bubble'] {
+    [part='tooltip'] {
         /* Popover positioning reset */
         position: absolute;
         inset: 0 auto auto 0;
@@ -19,7 +19,7 @@ const tooltipStyles = css`
 
         /* a11y-fallback: évite un débordement horizontal (WCAG 1.4.10 Reflow) sur un viewport
            étroit, avec ou sans thème chargé — calc(100vw - 2rem) borne la largeur sur mobile.
-           Personnalisable via ::part(bubble) { max-width: ... } si besoin. */
+           Personnalisable via ::part(tooltip) { max-width: ... } si besoin. */
         max-width: min(18rem, calc(100vw - 2rem));
 
         /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
@@ -36,16 +36,16 @@ const tooltipStyles = css`
         line-height: var(--ar-tooltip-line-height);
     }
 
-    [part~='bubble']:not(:popover-open) {
+    [part='tooltip']:not(:popover-open) {
         display: none;
     }
 
-    [part~='bubble']:popover-open {
+    [part='tooltip']:popover-open {
         animation: arPanelShow var(--ar-tooltip-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {
-        [part~='bubble']:popover-open {
+        [part='tooltip']:popover-open {
             animation: none;
         }
     }

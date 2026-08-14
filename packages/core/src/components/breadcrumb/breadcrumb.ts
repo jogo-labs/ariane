@@ -27,8 +27,7 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  * derrière un dropdown. Le premier lien reste toujours visible sous forme d'un bouton
  * "Retour".
  *
- * @csspart nav        - L'élément `<nav>` englobant.
- * @csspart breadcrumb - Porté par `nav` : racine du composant.
+ * @csspart breadcrumb - Racine du composant.
  * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
@@ -216,7 +215,7 @@ export class ArBreadcrumb extends LitElement {
         });
 
         return html`
-            <nav part="nav breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
+            <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
                 <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
                 ${this.isMobile
                     ? html`<div class="dropdown">

@@ -180,16 +180,14 @@ describe('ArBreadcrumb', () => {
             expect(firstItem?.hasAttribute('aria-current')).toBe(false);
         });
 
-        it('contient un part="nav breadcrumb"', async () => {
+        it('contient un part="breadcrumb"', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const nav = getPart(el, 'nav');
-            expect(nav).not.toBeNull();
-            expect(nav?.getAttribute('part')).toBe('nav breadcrumb');
+            expect(getPart(el, 'breadcrumb')).not.toBeNull();
         });
     });
 
@@ -604,7 +602,7 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'nav')?.getAttribute('role')).toBe('navigation');
+            expect(getPart(el, 'breadcrumb')?.getAttribute('role')).toBe('navigation');
         });
 
         it('le nav a aria-labelledby="breadcrumb-label"', async () => {
@@ -614,7 +612,9 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            expect(getPart(el, 'nav')?.getAttribute('aria-labelledby')).toBe('breadcrumb-label');
+            expect(getPart(el, 'breadcrumb')?.getAttribute('aria-labelledby')).toBe(
+                'breadcrumb-label',
+            );
         });
 
         it('un label sr-only "Vous êtes ici" est présent', async () => {
