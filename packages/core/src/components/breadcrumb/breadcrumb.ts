@@ -18,10 +18,15 @@ import styles from './breadcrumb.styles.js';
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /**
  * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
  * @display demo
+ * @localized
  *
  * En dessous de 768px de largeur de viewport, les liens intermédiaires sont masqués
  * derrière un dropdown. Le premier lien reste toujours visible sous forme d'un bouton
@@ -72,6 +77,8 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
  */
 export class ArBreadcrumb extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, panelStyles, styles];
+
+    private readonly localize = new LocalizeController(this);
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
@@ -216,7 +223,9 @@ export class ArBreadcrumb extends LitElement {
 
         return html`
             <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-                <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
+                <p id="breadcrumb-label" class="sr-only">
+                    ${this.localize.term('breadcrumbNavLabel')}
+                </p>
                 ${this.isMobile
                     ? html`<div class="dropdown">
                           <a part="home" href="${items[0]?.href}">
@@ -225,7 +234,7 @@ export class ArBreadcrumb extends LitElement {
                           </a>
                           <button @click=${this._handleTriggerClick} type="button" part="trigger">
                               <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
-                              <span class="sr-only">Afficher le fil d'ariane</span>
+                              <span class="sr-only">${this.localize.term('showBreadcrumb')}</span>
                           </button>
                           <div part="panel" popover="auto" tabindex="-1">
                               <ol part="list list--mobile">
