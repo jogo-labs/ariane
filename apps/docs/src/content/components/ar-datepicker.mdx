@@ -41,11 +41,8 @@ variants:
           ></ar-datepicker>
     - name: Langue et format
       description: >
-          `lang` pilote à la fois les noms de mois/jours, les libellés des boutons «
-          Aujourd'hui » / « Fermer » et le hint par défaut ("Format attendu :", "Dates
-          disponibles :") — une seule source de vérité, jamais de composant à moitié traduit.
-          `format` définit, séparément, le motif de saisie/affichage attendu dans l'input
-          (indépendant de la langue).
+          L'attribut `lang` pilote la totalité des textes et formats — y compris les textes par
+          défaut des slots — à l'exception du label de l'input.
       html: |
           <ar-datepicker
             label="Date of birth"
