@@ -337,8 +337,11 @@ export class ArStepper extends LitElement {
             return html`<slot></slot>`;
         }
 
+        const stepLabel = (order: number, isSubstep: boolean): string =>
+            this.localize.term('stepLabel', order, isSubstep);
+
         const content = this._isDesktop
-            ? renderDesktop(steps, this.mode, this.onClickLink)
+            ? renderDesktop(steps, this.mode, this.onClickLink, stepLabel)
             : renderMobile(
                   steps,
                   {
@@ -349,6 +352,7 @@ export class ArStepper extends LitElement {
                   },
                   this.mode,
                   this.onClickLink,
+                  stepLabel,
               );
 
         return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">

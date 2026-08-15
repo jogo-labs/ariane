@@ -66,6 +66,7 @@ const translation: Translation = {
 
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Form steps',
+    stepLabel: (order, isSubstep) => `${isSubstep ? 'sub-' : ''}step ${order}:`,
 
     // ── ar-breadcrumb ────────────────────────────────────────────────────
     breadcrumbNavLabel: 'You are here',

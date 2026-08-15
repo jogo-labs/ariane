@@ -1063,6 +1063,16 @@ describe('ArStepper', () => {
             expect(label?.textContent).toBe('Form steps');
             el.remove();
         });
+
+        it('lang="en" traduit le label sr-only de chaque étape', async () => {
+            const el = await fixture<ArStepper>(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+            await waitForUpdate(el);
+            const srOnly = el.shadowRoot?.querySelector('.item .sr-only');
+            expect(srOnly?.textContent).toBe('step 1:');
+            el.remove();
+        });
     });
 
     describe('régressions change-in-update', () => {

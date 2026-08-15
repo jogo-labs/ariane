@@ -151,6 +151,13 @@ describe('traductions', () => {
         expect(en.stepperNavLabel).toBe('Form steps');
     });
 
+    it('fr/en exposent stepLabel', () => {
+        expect(fr.stepLabel(1, false)).toBe('étape 1:');
+        expect(fr.stepLabel(1, true)).toBe('sous-étape 1:');
+        expect(en.stepLabel(1, false)).toBe('step 1:');
+        expect(en.stepLabel(1, true)).toBe('sub-step 1:');
+    });
+
     it('fr/en exposent les termes de breadcrumb', () => {
         expect(fr.breadcrumbNavLabel).toBe('Vous êtes ici');
         expect(fr.showBreadcrumb).toBe("Afficher le fil d'ariane");
