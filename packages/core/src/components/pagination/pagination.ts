@@ -332,14 +332,12 @@ export class ArPagination extends LitElement {
         const isPreviousDisabled = current <= 1;
         const previousPageNumber = _clamp(current - 1, 1, total > 1 ? total - 1 : 1);
         const nextPageNumber = _clamp(current + 1, 1, total);
+        const landmarkLabel = this.localize.term('paginationLandmark', current, total);
+        const previousPageSrOnly = this.localize.term('previousPage', previousPageNumber, total);
+        const nextPageSrOnly = this.localize.term('nextPage', nextPageNumber, total);
 
         return html` <nav part="pagination" role="navigation" aria-labelledby="ar-pagination">
-            <!-- prettier-ignore -->
-            <p id="ar-pagination" class="sr-only">${this.localize.term(
-                'paginationLandmark',
-                current,
-                total,
-            )}</p>
+            <p id="ar-pagination" class="sr-only">${landmarkLabel}</p>
             <ul part="list" @click=${this._onPageChange}>
                 ${this.compact ? this.renderCompactLabel(current, total) : nothing}
 
@@ -353,9 +351,7 @@ export class ArPagination extends LitElement {
                         @click=${this._onPreviousPage}
                     >
                         <slot name="prev-icon">${this._defaultPrevIcon()}</slot>
-                        <span class="sr-only"
-                            >${this.localize.term('previousPage', previousPageNumber, total)}</span
-                        >
+                        <span class="sr-only">${previousPageSrOnly}</span>
                     </a>
                 </li>
 
@@ -371,9 +367,7 @@ export class ArPagination extends LitElement {
                         @click=${this._onNextPage}
                     >
                         <slot name="next-icon">${this._defaultNextIcon()}</slot>
-                        <span class="sr-only"
-                            >${this.localize.term('nextPage', nextPageNumber, total)}</span
-                        >
+                        <span class="sr-only">${nextPageSrOnly}</span>
                     </a>
                 </li>
             </ul>
@@ -457,8 +451,8 @@ export class ArPagination extends LitElement {
      * eux (voir garde globale sur les bindings adjacents dans un conteneur flex).
      */
     protected renderPageLabel(page: number, total: number): TemplateResult {
-        return html`<span class="sr-only">${this.localize.term('pageStatus', page, total)}</span
-            ><span aria-hidden="true">${page}</span>`;
+        const status = this.localize.term('pageStatus', page, total);
+        return html`<span class="sr-only">${status}</span><span aria-hidden="true">${page}</span>`;
     }
 
     /**
@@ -473,10 +467,9 @@ export class ArPagination extends LitElement {
      * desktop, seulement rendu différemment.
      */
     protected renderPageSelect(current: number, total: number): TemplateResult {
+        const goToPageLabel = this.localize.term('goToPage');
         return html`<li part="item page-select">
-            <span class="sr-only" id="ar-pagination-select-label"
-                >${this.localize.term('goToPage')}</span
-            >
+            <span class="sr-only" id="ar-pagination-select-label">${goToPageLabel}</span>
             <select
                 part="select field"
                 aria-labelledby="ar-pagination-select-label"
@@ -485,7 +478,9 @@ export class ArPagination extends LitElement {
                 ${_calculatePages(current, total).map((page) =>
                     page === -1 || page === -2
                         ? html`<option disabled value="">…</option>`
-                        : html`<option value=${page} ?selected=${page === current}>
+                        : // Pas besoin d'idiome anti-whitespace ici : le navigateur collapse les espaces
+                          // dans le label texte d'un <option>, contrairement à .textContent d'un <p>/<span>.
+                          html`<option value=${page} ?selected=${page === current}>
                               ${this.localize.term('pageStatus', page, total)}
                           </option>`,
                 )}

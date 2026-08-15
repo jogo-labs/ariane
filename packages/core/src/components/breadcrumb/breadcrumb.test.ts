@@ -647,5 +647,18 @@ describe('ArBreadcrumb', () => {
             const label = el.shadowRoot?.querySelector('#breadcrumb-label');
             expect(label?.textContent).toBe('You are here');
         });
+
+        it('lang="en" traduit le texte du trigger mobile', async () => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(true);
+            document.body.innerHTML = `
+            <ar-breadcrumb lang="en">
+                <ar-breadcrumb-item href="/" label="Home"></ar-breadcrumb-item>
+                <ar-breadcrumb-item label="Current"></ar-breadcrumb-item>
+            </ar-breadcrumb>`;
+            const el = document.querySelector('ar-breadcrumb') as ArBreadcrumb & LitEl;
+            await el.updateComplete;
+            const trigger = el.shadowRoot?.querySelector('[part="trigger"] .sr-only');
+            expect(trigger?.textContent).toBe('Show breadcrumb');
+        });
     });
 });

@@ -14,6 +14,7 @@ Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorep
 - Toujours `import type` pour les imports de types
 - Conventional Commits (commitlint + Husky)
 - CSS tokens `--doc-*` (`apps/docs/`) ne forcent jamais un ajout dans `packages/core`
+- Un `${expr}` seul contenu d'un élément texte (sr-only, label…) dans un template Lit : si la ligne dépasse 100 caractères, Prettier peut le wrapper d'une façon qui insère des nœuds de texte (espaces) dans le DOM rendu, corrompant `textContent`/le nom accessible. Extraire la valeur en `const` avant le template plutôt que d'inliner un appel long.
 
 ## Philosophie de conception
 

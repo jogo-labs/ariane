@@ -1112,14 +1112,26 @@ describe('ArPagination', () => {
             const nextSrOnly = requirePart(el, 'next').querySelector('.sr-only');
             expect(prevSrOnly?.textContent).toBe('Previous page (page 7 of 15)');
             expect(nextSrOnly?.textContent).toBe('Next page (page 9 of 15)');
+
+            // @ts-expect-error accès à un champ privé pour forcer le palier select
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+            const selectLabel = el.shadowRoot?.querySelector('#ar-pagination-select-label');
+            expect(selectLabel?.textContent).toBe('Go to page');
         });
 
         it('lang="en" traduit le label compact', async () => {
             el = await fixture(
                 '<ar-pagination current="2" total="5" compact lang="en"></ar-pagination>',
             );
-            const label = getPart(el, 'label');
-            expect(label?.textContent?.trim()).toBe('Page 2 / 5');
+            // Qualifié par balise (`span[part~="label"]`, pas `getPart`/`[part~="label"]` seul) :
+            // happy-dom scinde aussi sur les tirets dans son implémentation de `~=`, donc
+            // "label" matcherait aussi à tort le `<li part="item page-label">` ancêtre (retourné
+            // en premier par querySelector, avant le `<span part="label">` imbriqué) — cf. mise
+            // en garde dans test-utils.ts.
+            const label = el.shadowRoot?.querySelector('span[part~="label"]');
+            expect(label?.textContent).toBe('Page 2 / 5');
         });
 
         it('lang="en" traduit le label du landmark nav', async () => {

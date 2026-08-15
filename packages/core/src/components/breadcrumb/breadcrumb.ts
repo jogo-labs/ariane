@@ -221,12 +221,11 @@ export class ArBreadcrumb extends LitElement {
             </li>`;
         });
 
+        const navLabel = this.localize.term('breadcrumbNavLabel');
+
         return html`
             <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-                <!-- prettier-ignore -->
-                <p id="breadcrumb-label" class="sr-only">${this.localize.term(
-                    'breadcrumbNavLabel',
-                )}</p>
+                <p id="breadcrumb-label" class="sr-only">${navLabel}</p>
                 ${this.isMobile
                     ? html`<div class="dropdown">
                           <a part="home" href="${items[0]?.href}">

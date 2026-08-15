@@ -604,5 +604,20 @@ describe('ArCharcounter', () => {
                 'Limit exceeded by 1 character',
             );
         });
+
+        it('lang="en" traduit l\'annonce warning', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="5" lang="en"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = '123456'; // remaining = 4, <= warnThreshold(5) → état warning
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                '4 characters remaining',
+            );
+        });
     });
 });
