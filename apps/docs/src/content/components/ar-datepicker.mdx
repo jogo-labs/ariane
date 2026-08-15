@@ -240,10 +240,7 @@ IMask(picker.inputElement, { mask: Date });
 ### Libellés des boutons « Aujourd'hui » et « Fermer »
 
 Ces deux textes suivent le mécanisme i18n du package (attribut `lang`, cf.
-[Internationalisation](/getting-started/i18n)) — le même attribut que celui qui pilote les noms de
-mois/jours du calendrier (pas de prop `locale` séparée : une seule langue pour tout le composant).
-Sans `lang` explicite, la langue vient de `<html lang>` puis de `navigator.language` ; le français
-sert de repli quand la langue résolue n'a pas de traduction enregistrée.
+[Internationalisation](/getting-started/i18n)).
 
 ```html
 <ar-datepicker label="Date of birth" lang="en"></ar-datepicker>
