@@ -334,9 +334,7 @@ export class ArPagination extends LitElement {
         const nextPageNumber = _clamp(current + 1, 1, total);
 
         return html` <nav part="pagination" role="navigation" aria-labelledby="ar-pagination">
-            <p id="ar-pagination" class="sr-only">
-                ${this.localize.term('paginationLandmark', current, total)}
-            </p>
+            <p id="ar-pagination" class="sr-only">${this.localize.term('paginationLandmark', current, total)}</p>
             <ul part="list" @click=${this._onPageChange}>
                 ${this.compact ? this.renderCompactLabel(current, total) : nothing}
 
