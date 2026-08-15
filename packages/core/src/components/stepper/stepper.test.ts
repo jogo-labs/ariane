@@ -5,9 +5,10 @@ import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
 
-// ─── Localization ────────────────────────────────────────────────────────────
-// Défaut : français. Les tests monolangues (la plupart) l'utiliseront.
-// Les tests multilingues (traduction) peuvent surcharger dynamiquement.
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
 document.documentElement.lang = 'fr';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
