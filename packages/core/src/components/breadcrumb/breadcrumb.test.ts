@@ -631,7 +631,7 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             const label = getShadow(el).querySelector('#breadcrumb-label');
-            expect(label?.textContent?.trim()).toBe('Vous êtes ici');
+            expect(label?.textContent).toBe('Vous êtes ici');
         });
     });
 
@@ -645,7 +645,7 @@ describe('ArBreadcrumb', () => {
             const el = document.querySelector('ar-breadcrumb') as ArBreadcrumb & LitEl;
             await el.updateComplete;
             const label = el.shadowRoot?.querySelector('#breadcrumb-label');
-            expect(label?.textContent?.trim()).toBe('You are here');
+            expect(label?.textContent).toBe('You are here');
         });
     });
 });
