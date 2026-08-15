@@ -3,6 +3,12 @@ import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
 import type { ArCharcounter } from './charcounter.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ArCharcounter', () => {
     let el: ArCharcounter;
     afterEach(() => {
@@ -19,8 +25,8 @@ describe('ArCharcounter', () => {
         });
 
         it('warnThreshold vaut 20', () => expect(el.warnThreshold).toBe(20));
-        it('label vaut "caractère restant|caractères restants"', () =>
-            expect(el.label).toBe('caractère restant|caractères restants'));
+        it('label vaut undefined par défaut (traduit dynamiquement)', () =>
+            expect(el.label).toBeUndefined());
         it('state vaut "normal"', () => expect(el.state).toBe('normal'));
         it('state="normal" est réfléchi comme attribut', () =>
             expect(el.getAttribute('state')).toBe('normal'));
@@ -578,6 +584,25 @@ describe('ArCharcounter', () => {
             const field = document.getElementById('f') as HTMLTextAreaElement;
             el.remove();
             expect(field.getAttribute('aria-describedby')).toBe('hint-1');
+        });
+    });
+
+    // ── Traduction ────────────────────────────────────────────────────────
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label et le message de dépassement', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="5" lang="en"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            expect(getPart(el, 'label')?.textContent?.trim()).toBe('characters remaining');
+
+            field.value = '123456';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
+                'Limit exceeded by 1 character',
+            );
         });
     });
 });

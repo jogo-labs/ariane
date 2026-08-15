@@ -3,6 +3,12 @@ import { fixture, html, expect } from '@open-wc/testing';
 import type { ArCharcounter } from './charcounter.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (le runner Chromium peut différer selon l'environnement CI).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ar-charcounter — accessibilité', () => {
     // ── Audit axe ─────────────────────────────────────────────────────────
 

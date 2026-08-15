@@ -3,6 +3,10 @@ import { property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
 
@@ -14,6 +18,7 @@ function pluralize(count: number, label: string): string {
 
 /**
  * @summary Compteur de caractères restants pour un champ texte accessible.
+ * @localized
  *
  * Observe un `<textarea>` ou `<input>` via `for="id"` et affiche le décompte.
  * Passe en état `warning` puis `error` quand la limite approche ou est dépassée.
@@ -35,6 +40,7 @@ function pluralize(count: number, label: string): string {
 export class ArCharcounter extends LitElement {
     static override styles = [styles];
     private static _idCounter = 0;
+    private readonly localize = new LocalizeController(this);
 
     /** ID du champ observé. Requis. */
     @property({ reflect: true }) for: string | undefined;
@@ -45,8 +51,13 @@ export class ArCharcounter extends LitElement {
     /** Nombre de caractères restants déclenchant l'état warning. */
     @property({ attribute: 'warn-threshold', reflect: true, type: Number }) warnThreshold = 20;
 
-    /** Texte affiché après le chiffre. Accepte "singulier|pluriel". */
-    @property({ reflect: true }) label = 'caractère restant|caractères restants';
+    /**
+     * Texte affiché après le chiffre. Accepte "singulier|pluriel". Traduit automatiquement selon
+     * `lang` si non personnalisé.
+     * @attr label
+     */
+    @property({ reflect: true, useDefault: true })
+    label: string | undefined = undefined;
 
     private _count = 0;
     private _state: CharcounterState = 'normal';
@@ -196,13 +207,11 @@ export class ArCharcounter extends LitElement {
     private _announceTransition(state: CharcounterState, remaining: number): void {
         if (state === 'warning') {
             clearA11yRegion('assertive');
-            announceA11y(`${remaining} ${pluralize(remaining, this.label)}`, 'polite');
+            const label = this.label?.trim() || this.localize.term('remainingLabel');
+            announceA11y(`${remaining} ${pluralize(remaining, label)}`, 'polite');
         } else if (state === 'error') {
             const excess = Math.abs(remaining);
-            announceA11y(
-                `Limite dépassée de ${excess} ${pluralize(excess, 'caractère|caractères')}`,
-                'assertive',
-            );
+            announceA11y(this.localize.term('excessMessage', excess), 'assertive');
         } else {
             clearA11yRegion('assertive');
             clearA11yRegion('polite');
@@ -234,7 +243,12 @@ export class ArCharcounter extends LitElement {
                 <slot name="error-icon"></slot>
                 <span part="count${this._state !== 'normal' ? ` count--${this._state}` : ''}">
                     <span part="remaining">${remaining}</span>
-                    <span part="label"> ${pluralize(remaining, this.label)}</span>
+                    <span part="label">
+                        ${pluralize(
+                            remaining,
+                            this.label?.trim() || this.localize.term('remainingLabel'),
+                        )}
+                    </span>
                 </span>
             </span>
         `;
