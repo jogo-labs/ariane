@@ -5,6 +5,11 @@ import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
 
+// ─── Localization ────────────────────────────────────────────────────────────
+// Défaut : français. Les tests monolangues (la plupart) l'utiliseront.
+// Les tests multilingues (traduction) peuvent surcharger dynamiquement.
+document.documentElement.lang = 'fr';
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Retourne le shadowRoot ou lance une erreur de test. */
@@ -1044,6 +1049,18 @@ describe('ArStepper', () => {
             expect(spy).toHaveBeenCalled();
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-stepper]'));
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('conteneur-inexistant'));
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label de navigation', async () => {
+            const el = await fixture<ArStepper>(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+            await waitForUpdate(el);
+            const label = el.shadowRoot?.querySelector('#label-nav');
+            expect(label?.textContent).toBe('Form steps');
+            el.remove();
         });
     });
 
