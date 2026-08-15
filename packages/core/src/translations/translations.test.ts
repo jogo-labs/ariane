@@ -141,6 +141,11 @@ describe('traductions', () => {
         expect(en.goToPage).toBe('Go to page');
     });
 
+    it('fr/en exposent paginationLandmark', () => {
+        expect(fr.paginationLandmark(4, 5)).toBe('Pagination, page 4 sur 5');
+        expect(en.paginationLandmark(4, 5)).toBe('Pagination, page 4 of 5');
+    });
+
     it('fr/en exposent stepperNavLabel', () => {
         expect(fr.stepperNavLabel).toBe('Étapes du formulaire');
         expect(en.stepperNavLabel).toBe('Form steps');

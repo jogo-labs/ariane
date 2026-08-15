@@ -44,6 +44,7 @@ export interface Translation extends BaseTranslation {
     pageStatus: (page: number, total: number) => string;
     compactPageStatus: (current: number, total: number) => string;
     goToPage: string;
+    paginationLandmark: (page: number, total: number) => string;
 
     // ar-stepper
     stepperNavLabel: string;

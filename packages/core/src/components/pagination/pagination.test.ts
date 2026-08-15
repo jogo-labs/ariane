@@ -1121,5 +1121,11 @@ describe('ArPagination', () => {
             const label = getPart(el, 'label');
             expect(label?.textContent?.trim()).toBe('Page 2 / 5');
         });
+
+        it('lang="en" traduit le label du landmark nav', async () => {
+            el = await fixture('<ar-pagination current="8" total="15" lang="en"></ar-pagination>');
+            const landmark = el.shadowRoot?.querySelector('#ar-pagination');
+            expect(landmark?.textContent).toBe('Pagination, page 8 of 15');
+        });
     });
 });

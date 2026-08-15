@@ -62,6 +62,7 @@ const translation: Translation = {
     pageStatus: (page, total) => `Page ${page} of ${total}`,
     compactPageStatus: (current, total) => `Page ${current} / ${total}`,
     goToPage: 'Go to page',
+    paginationLandmark: (page, total) => `Pagination, page ${page} of ${total}`,
 
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Form steps',
