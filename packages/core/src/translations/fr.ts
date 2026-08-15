@@ -68,6 +68,7 @@ const translation: Translation = {
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Étapes du formulaire',
     stepLabel: (order, isSubstep) => `${isSubstep ? 'sous-' : ''}étape ${order}:`,
+    currentStepStatus: (current, total) => `Étape ${current} / ${total} (en cours)`,
 
     // ── ar-breadcrumb ────────────────────────────────────────────────────
     breadcrumbNavLabel: 'Vous êtes ici',

@@ -158,6 +158,11 @@ describe('traductions', () => {
         expect(en.stepLabel(1, true)).toBe('sub-step 1:');
     });
 
+    it('fr/en exposent currentStepStatus', () => {
+        expect(fr.currentStepStatus(2, 5)).toBe('Étape 2 / 5 (en cours)');
+        expect(en.currentStepStatus(2, 5)).toBe('Step 2 / 5 (in progress)');
+    });
+
     it('fr/en exposent les termes de breadcrumb', () => {
         expect(fr.breadcrumbNavLabel).toBe('Vous êtes ici');
         expect(fr.showBreadcrumb).toBe("Afficher le fil d'ariane");

@@ -348,6 +348,11 @@ export class ArStepper extends LitElement {
                       currentStepIndex: this._currentStepIndex,
                       currentStepLabel: this.getCurrentStepLabel(),
                       currentSubStepLabel: this.getCurrentSubStepLabel(),
+                      currentStepStatus: this.localize.term(
+                          'currentStepStatus',
+                          this._currentStepIndex + 1,
+                          steps.length,
+                      ),
                       onToggle: this._onDropdownToggle,
                   },
                   this.mode,

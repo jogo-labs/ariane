@@ -1073,6 +1073,22 @@ describe('ArStepper', () => {
             expect(srOnly?.textContent).toBe('step 1:');
             el.remove();
         });
+
+        it('lang="en" traduit le statut du trigger mobile', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+
+            const trigger = el.shadowRoot?.querySelector('[part="trigger"] span');
+            expect(trigger?.textContent).toBe(' Step 1 / 1 (in progress) ');
+            el.remove();
+        });
     });
 
     describe('régressions change-in-update', () => {

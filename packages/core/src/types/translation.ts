@@ -49,6 +49,7 @@ export interface Translation extends BaseTranslation {
     // ar-stepper
     stepperNavLabel: string;
     stepLabel: (order: number, isSubstep: boolean) => string;
+    currentStepStatus: (current: number, total: number) => string;
 
     // ar-breadcrumb
     breadcrumbNavLabel: string;

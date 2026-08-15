@@ -12,6 +12,7 @@ export interface MobileRenderContext {
     currentStepIndex: number;
     currentStepLabel: string | undefined;
     currentSubStepLabel: string | undefined;
+    currentStepStatus: string;
     onToggle: () => void;
 }
 
@@ -199,7 +200,7 @@ export function renderMobile(
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span> Étape ${ctx.currentStepIndex + 1} / ${steps.length} (en cours) </span>
+                <span> ${ctx.currentStepStatus} </span>
                 <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
             </button>
 
