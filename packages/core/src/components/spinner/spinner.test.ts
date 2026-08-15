@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ArSpinner } from './spinner.js';
+import { type ArSpinner } from './spinner.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './index.js';
+
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
 
 describe('ArSpinner', () => {
     let el: ArSpinner;
@@ -39,12 +45,12 @@ describe('ArSpinner', () => {
             expect(el.done).toBe(false);
         });
 
-        it('loadingLabel vaut la constante DEFAULT_LOADING_LABEL', () => {
-            expect(el.loadingLabel).toBe(ArSpinner.DEFAULT_LOADING_LABEL);
+        it('loadingLabel vaut undefined par défaut (traduit dynamiquement)', () => {
+            expect(el.loadingLabel).toBeUndefined();
         });
 
-        it('doneLabel vaut la constante DEFAULT_DONE_LABEL', () => {
-            expect(el.doneLabel).toBe(ArSpinner.DEFAULT_DONE_LABEL);
+        it('doneLabel vaut undefined par défaut (traduit dynamiquement)', () => {
+            expect(el.doneLabel).toBeUndefined();
         });
 
         it('size est undefined par défaut', () => {
@@ -70,7 +76,7 @@ describe('ArSpinner', () => {
         // happy-dom ne sérialise pas les Text nodes dynamiques de Lit en textContent.
         // On teste la propriété JS directement — c'est ce que le template consomme.
         it('la propriété loadingLabel contient le texte annoncé en chargement', () => {
-            expect(el.loadingLabel).toBe(ArSpinner.DEFAULT_LOADING_LABEL);
+            expect(el.loadingLabel).toBeUndefined();
         });
     });
 
@@ -86,7 +92,7 @@ describe('ArSpinner', () => {
         });
 
         it('la propriété doneLabel contient le texte annoncé à la fin', () => {
-            expect(el.doneLabel).toBe(ArSpinner.DEFAULT_DONE_LABEL);
+            expect(el.doneLabel).toBeUndefined();
         });
     });
 
@@ -197,6 +203,18 @@ describe('ArSpinner', () => {
             await fixture('<ar-spinner></ar-spinner>');
 
             expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le texte en chargement', async () => {
+            el = await fixture('<ar-spinner lang="en"></ar-spinner>');
+            expect(getPart(el, 'status')?.textContent?.trim()).toBe('Content is loading');
+        });
+
+        it('lang="en" traduit le texte terminé', async () => {
+            el = await fixture('<ar-spinner done lang="en"></ar-spinner>');
+            expect(getPart(el, 'status')?.textContent?.trim()).toBe('Loading complete');
         });
     });
 });

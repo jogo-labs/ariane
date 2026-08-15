@@ -41,6 +41,7 @@ const translation: Translation = {
     // ── ar-datepicker ────────────────────────────────────────────────────
     today: "Aujourd'hui",
     close: 'Fermer',
+    closeCalendar: 'Fermer le calendrier',
     openCalendar: 'Ouvrir le calendrier',
     selectDate: 'Sélectionner une date',
     previousYear: 'Année précédente',
@@ -55,6 +56,40 @@ const translation: Translation = {
     dateRangeUntil: (to) => `jusqu'au ${to}`,
     formatOrdinalDate: (date, monthYearText, fullDateText) =>
         date.getDate() === 1 ? `1er ${monthYearText}` : fullDateText,
+
+    // ── ar-pagination ────────────────────────────────────────────────────
+    previousPage: (page, total) => `Page précédente (page ${page} sur ${total})`,
+    nextPage: (page, total) => `Page suivante (page ${page} sur ${total})`,
+    pageStatus: (page, total) => `Page ${page} sur ${total}`,
+    compactPageStatus: (current, total) => `Page ${current} / ${total}`,
+    goToPage: 'Aller à la page',
+    paginationLandmark: (page, total) => `Pagination, page ${page} sur ${total}`,
+
+    // ── ar-stepper ───────────────────────────────────────────────────────
+    stepperNavLabel: 'Étapes du formulaire',
+    stepLabel: (order, isSubstep) => `${isSubstep ? 'sous-' : ''}étape ${order}:`,
+    currentStepStatus: (current, total) => `Étape ${current} / ${total} (en cours)`,
+
+    // ── ar-breadcrumb ────────────────────────────────────────────────────
+    breadcrumbNavLabel: 'Vous êtes ici',
+    showBreadcrumb: "Afficher le fil d'ariane",
+
+    // ── ar-charcounter ───────────────────────────────────────────────────
+    remainingLabel: 'caractère restant|caractères restants',
+    excessMessage: (count) =>
+        `Limite dépassée de ${count} ${count === 1 ? 'caractère' : 'caractères'}`,
+
+    // ── ar-spinner ───────────────────────────────────────────────────────
+    loading: 'Contenu en cours de chargement',
+    loadingDone: 'Chargement terminé',
+
+    // ── ar-dialog ────────────────────────────────────────────────────────
+    closeDialog: 'Fermer la boîte de dialogue',
+    closingBlocked: 'Fermeture bloquée.',
+    dialogDefaultLabel: 'Dialogue',
+
+    // ── ar-alert ─────────────────────────────────────────────────────────
+    closeAlert: "Fermer l'alerte",
 };
 
 registerTranslation(translation);

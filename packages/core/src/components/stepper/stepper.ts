@@ -21,6 +21,10 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile } from './stepper.renderer.js';
 import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail {
@@ -37,6 +41,7 @@ export interface ArStepperStepChangeDetail {
 /**
  * @summary Stepper de navigation accessible avec téléportation DOM adaptive.
  * @display demo
+ * @localized
  *
  * Les étapes sont déclarées via des éléments `<ar-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
@@ -98,6 +103,8 @@ export interface ArStepperStepChangeDetail {
  */
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
+
+    private readonly localize = new LocalizeController(this);
 
     /**
      * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
@@ -330,22 +337,31 @@ export class ArStepper extends LitElement {
             return html`<slot></slot>`;
         }
 
+        const stepLabel = (order: number, isSubstep: boolean): string =>
+            this.localize.term('stepLabel', order, isSubstep);
+
         const content = this._isDesktop
-            ? renderDesktop(steps, this.mode, this.onClickLink)
+            ? renderDesktop(steps, this.mode, this.onClickLink, stepLabel)
             : renderMobile(
                   steps,
                   {
                       currentStepIndex: this._currentStepIndex,
                       currentStepLabel: this.getCurrentStepLabel(),
                       currentSubStepLabel: this.getCurrentSubStepLabel(),
+                      currentStepStatus: this.localize.term(
+                          'currentStepStatus',
+                          this._currentStepIndex + 1,
+                          steps.length,
+                      ),
                       onToggle: this._onDropdownToggle,
                   },
                   this.mode,
                   this.onClickLink,
+                  stepLabel,
               );
 
         return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
-            <p id="label-nav" class="sr-only">Étapes du formulaire</p>
+            <p id="label-nav" class="sr-only">${this.localize.term('stepperNavLabel')}</p>
             ${content}
             <slot></slot>
         </nav>`;

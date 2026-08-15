@@ -12,6 +12,7 @@ export interface MobileRenderContext {
     currentStepIndex: number;
     currentStepLabel: string | undefined;
     currentSubStepLabel: string | undefined;
+    currentStepStatus: string;
     onToggle: () => void;
 }
 
@@ -39,12 +40,13 @@ function renderStepText(
     label: string,
     order: number,
     isCurrent: boolean,
-    isSubstep = false,
+    isSubstep: boolean,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const bulletPart = withCurrentPart('bullet', isCurrent, 'indicator');
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
-        <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
+        <span class="sr-only">${stepLabel(order, isSubstep)}</span>
         <span class="item-label">${label}</span>
     `;
 }
@@ -58,6 +60,7 @@ function renderSubStep(
     index: number,
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const order = index + 1;
     const isCurrent = sub.state === 'current';
@@ -80,12 +83,12 @@ function renderSubStep(
                           href=${sub.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(sub.label, order, isCurrent, true)}
+                          ${renderStepText(sub.label, order, isCurrent, true, stepLabel)}
                       </a>
                   `
                 : html`
                       <div class="item-header" data-path=${sub.path} tabindex="-1">
-                          ${renderStepText(sub.label, order, isCurrent, true)}
+                          ${renderStepText(sub.label, order, isCurrent, true, stepLabel)}
                       </div>
                   `}
         </li>
@@ -97,6 +100,7 @@ function renderStep(
     index: number,
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const order = index + 1;
     const isCurrent = isGroupCurrent(step, mode);
@@ -119,18 +123,20 @@ function renderStep(
                           href=${step.href ?? '#'}
                           @click=${onClickLink}
                       >
-                          ${renderStepText(step.label, order, isCurrent)}
+                          ${renderStepText(step.label, order, isCurrent, false, stepLabel)}
                       </a>
                   `
                 : html`
                       <div class="item-header" data-path=${step.path} tabindex="-1">
-                          ${renderStepText(step.label, order, isCurrent)}
+                          ${renderStepText(step.label, order, isCurrent, false, stepLabel)}
                       </div>
                   `}
             ${(isCurrent || mode === 'edit') && step.children.length
                 ? html`
                       <ol class="list-unstyled" part="list list--substep">
-                          ${step.children.map((sub, i) => renderSubStep(sub, i, mode, onClickLink))}
+                          ${step.children.map((sub, i) =>
+                              renderSubStep(sub, i, mode, onClickLink, stepLabel),
+                          )}
                       </ol>
                   `
                 : nothing}
@@ -147,13 +153,14 @@ function renderStepList(
     cssClass: string,
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     return html`
         <ol class="list-unstyled ${cssClass}" part="list">
             ${repeat(
                 steps,
                 (step) => step.path,
-                (step, index) => renderStep(step, index, mode, onClickLink),
+                (step, index) => renderStep(step, index, mode, onClickLink, stepLabel),
             )}
         </ol>
     `;
@@ -167,8 +174,9 @@ export function renderDesktop(
     steps: NavigationNode[],
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
-    return renderStepList(steps, 'desktop', mode, onClickLink);
+    return renderStepList(steps, 'desktop', mode, onClickLink, stepLabel);
 }
 
 /* ------------------------------------------------ */
@@ -180,6 +188,7 @@ export function renderMobile(
     ctx: MobileRenderContext,
     mode: NavigationMode,
     onClickLink: (e: MouseEvent) => void,
+    stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const subLabel = ctx.currentSubStepLabel ? ` | ${ctx.currentSubStepLabel}` : '';
 
@@ -191,12 +200,12 @@ export function renderMobile(
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span> Étape ${ctx.currentStepIndex + 1} / ${steps.length} (en cours) </span>
+                <span> ${ctx.currentStepStatus} </span>
                 <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
             </button>
 
             <div id="stepper-dropdown-menu" part="panel">
-                ${renderStepList(steps, 'mobile', mode, onClickLink)}
+                ${renderStepList(steps, 'mobile', mode, onClickLink, stepLabel)}
             </div>
         </div>
     `;

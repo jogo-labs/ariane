@@ -3,6 +3,12 @@ import { type ArAlert } from './alert.js';
 import { fixture, waitForUpdate, getPart, requirePart, requireShadow } from '../../test-utils.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ArAlert', () => {
     let el: ArAlert;
 
@@ -519,6 +525,14 @@ describe('ArAlert', () => {
             expect(document.activeElement).toBe(target);
 
             target.remove();
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit aria-label du bouton close', async () => {
+            document.body.innerHTML = '<div id="target"></div>';
+            el = await fixture('<ar-alert next-focus="target" lang="en">Message</ar-alert>');
+            expect(requirePart(el, 'close-button').getAttribute('aria-label')).toBe('Close alert');
         });
     });
 });

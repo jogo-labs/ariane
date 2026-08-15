@@ -5,6 +5,12 @@ import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Retourne le shadowRoot ou lance une erreur de test. */
@@ -1044,6 +1050,44 @@ describe('ArStepper', () => {
             expect(spy).toHaveBeenCalled();
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-stepper]'));
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('conteneur-inexistant'));
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label de navigation', async () => {
+            const el = await fixture<ArStepper>(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+            await waitForUpdate(el);
+            const label = el.shadowRoot?.querySelector('#label-nav');
+            expect(label?.textContent).toBe('Form steps');
+            el.remove();
+        });
+
+        it('lang="en" traduit le label sr-only de chaque étape', async () => {
+            const el = await fixture<ArStepper>(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+            await waitForUpdate(el);
+            const srOnly = el.shadowRoot?.querySelector('.item .sr-only');
+            expect(srOnly?.textContent).toBe('step 1:');
+            el.remove();
+        });
+
+        it('lang="en" traduit le statut du trigger mobile', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(
+                '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+
+            const trigger = el.shadowRoot?.querySelector('[part="trigger"] span');
+            expect(trigger?.textContent).toBe(' Step 1 / 1 (in progress) ');
+            el.remove();
         });
     });
 

@@ -362,7 +362,7 @@ describe('ArDatepicker', () => {
             expect(todayBtn?.textContent?.trim()).toBe("Aujourd'hui");
             expect(todayBtn?.getAttribute('aria-label')).toBe("Aujourd'hui");
             expect(closeBtn?.textContent?.trim()).toBe('Fermer');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
         });
 
         it('today-button et close-button sont traduits en anglais via lang="en"', async () => {
@@ -414,7 +414,7 @@ describe('ArDatepicker', () => {
             el.open = true;
             await waitForUpdate(el);
             const closeBtn = getPart(el, 'close-button');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
         });
     });
 

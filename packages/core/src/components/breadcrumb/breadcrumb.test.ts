@@ -4,6 +4,12 @@ import { getPart, mockPopoverPanel } from '../../test-utils.js';
 import './index.js';
 import '../breadcrumb-item/index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 type LitEl = { updateComplete: Promise<boolean> };
 
 /**
@@ -625,7 +631,34 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             const label = getShadow(el).querySelector('#breadcrumb-label');
-            expect(label?.textContent?.trim()).toBe('Vous êtes ici');
+            expect(label?.textContent).toBe('Vous êtes ici');
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label de navigation', async () => {
+            document.body.innerHTML = `
+            <ar-breadcrumb lang="en">
+                <ar-breadcrumb-item href="/" label="Home"></ar-breadcrumb-item>
+                <ar-breadcrumb-item label="Current"></ar-breadcrumb-item>
+            </ar-breadcrumb>`;
+            const el = document.querySelector('ar-breadcrumb') as ArBreadcrumb & LitEl;
+            await el.updateComplete;
+            const label = el.shadowRoot?.querySelector('#breadcrumb-label');
+            expect(label?.textContent).toBe('You are here');
+        });
+
+        it('lang="en" traduit le texte du trigger mobile', async () => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(true);
+            document.body.innerHTML = `
+            <ar-breadcrumb lang="en">
+                <ar-breadcrumb-item href="/" label="Home"></ar-breadcrumb-item>
+                <ar-breadcrumb-item label="Current"></ar-breadcrumb-item>
+            </ar-breadcrumb>`;
+            const el = document.querySelector('ar-breadcrumb') as ArBreadcrumb & LitEl;
+            await el.updateComplete;
+            const trigger = el.shadowRoot?.querySelector('[part="trigger"] .sr-only');
+            expect(trigger?.textContent).toBe('Show breadcrumb');
         });
     });
 });

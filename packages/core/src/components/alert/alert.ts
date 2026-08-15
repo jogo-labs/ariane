@@ -3,6 +3,10 @@ import { property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
@@ -20,6 +24,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 /**
  * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
  * @display demo
+ * @localized
  *
  * @slot              - Contenu de l'alerte (texte, titre, liens…).
  * @slot icon         - Icône de l'alerte. Remplace l'icône par défaut si fourni.
@@ -48,6 +53,8 @@ export class ArAlert extends LitElement {
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
+
+    private readonly localize = new LocalizeController(this);
 
     /**
      * ID de l'élément à focus après la fermeture de l'alerte.
@@ -202,7 +209,7 @@ export class ArAlert extends LitElement {
                       part="close-button action-button"
                       @click=${this._hide}
                       type="button"
-                      aria-label="Fermer l'alerte"
+                      aria-label=${this.localize.term('closeAlert')}
                   >
                       <slot name="close-icon">${this._defaultCloseIcon()}</slot>
                   </button>`
