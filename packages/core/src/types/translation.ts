@@ -20,7 +20,7 @@ export interface Translation extends BaseTranslation {
 
     // ar-datepicker
     today: string;
-    close: string;
+    closeCalendar: string;
     openCalendar: string;
     selectDate: string;
     previousYear: string;
@@ -36,4 +36,34 @@ export interface Translation extends BaseTranslation {
     /** `monthYearText`/`fullDateText` sont déjà formatés via Intl (locale-aware) — le terme
      *  décide seulement s'il faut un marqueur ordinal (ex. « 1er » en français). */
     formatOrdinalDate: (date: Date, monthYearText: string, fullDateText: string) => string;
+
+    // ar-pagination
+    previousPage: (page: number, total: number) => string;
+    nextPage: (page: number, total: number) => string;
+    pageStatus: (page: number, total: number) => string;
+    compactPageStatus: (current: number, total: number) => string;
+    goToPage: string;
+
+    // ar-stepper
+    stepperNavLabel: string;
+
+    // ar-breadcrumb
+    breadcrumbNavLabel: string;
+    showBreadcrumb: string;
+
+    // ar-charcounter
+    remainingLabel: string;
+    excessMessage: (count: number) => string;
+
+    // ar-spinner
+    loading: string;
+    loadingDone: string;
+
+    // ar-dialog
+    closeDialog: string;
+    closingBlocked: string;
+    dialogDefaultLabel: string;
+
+    // ar-alert
+    closeAlert: string;
 }

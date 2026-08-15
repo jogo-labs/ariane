@@ -233,7 +233,7 @@ export class ArDatepicker extends LitElement {
         // régionale n'est enregistrée.
         const locale = this.localize.lang();
         const todayLabel = this.localize.term('today');
-        const closeLabel = this.localize.term('close');
+        const closeLabel = this.localize.term('closeCalendar');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
         const formatLine = this.localize.term(
             'expectedFormat',

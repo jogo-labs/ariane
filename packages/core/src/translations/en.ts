@@ -40,7 +40,7 @@ const translation: Translation = {
 
     // ── ar-datepicker ────────────────────────────────────────────────────
     today: 'Today',
-    close: 'Close',
+    closeCalendar: 'Close calendar',
     openCalendar: 'Open calendar',
     selectDate: 'Select a date',
     previousYear: 'Previous year',
@@ -54,6 +54,37 @@ const translation: Translation = {
     dateRangeFrom: (from) => `from ${from}`,
     dateRangeUntil: (to) => `until ${to}`,
     formatOrdinalDate: (_date, _monthYearText, fullDateText) => fullDateText,
+
+    // ── ar-pagination ────────────────────────────────────────────────────
+    previousPage: (page, total) => `Previous page (page ${page} of ${total})`,
+    nextPage: (page, total) => `Next page (page ${page} of ${total})`,
+    pageStatus: (page, total) => `Page ${page} of ${total}`,
+    compactPageStatus: (current, total) => `Page ${current} / ${total}`,
+    goToPage: 'Go to page',
+
+    // ── ar-stepper ───────────────────────────────────────────────────────
+    stepperNavLabel: 'Form steps',
+
+    // ── ar-breadcrumb ────────────────────────────────────────────────────
+    breadcrumbNavLabel: 'You are here',
+    showBreadcrumb: 'Show breadcrumb',
+
+    // ── ar-charcounter ───────────────────────────────────────────────────
+    remainingLabel: 'character remaining|characters remaining',
+    excessMessage: (count) =>
+        `Limit exceeded by ${count} ${count === 1 ? 'character' : 'characters'}`,
+
+    // ── ar-spinner ───────────────────────────────────────────────────────
+    loading: 'Content is loading',
+    loadingDone: 'Loading complete',
+
+    // ── ar-dialog ────────────────────────────────────────────────────────
+    closeDialog: 'Close dialog',
+    closingBlocked: 'Closing blocked.',
+    dialogDefaultLabel: 'Dialog',
+
+    // ── ar-alert ─────────────────────────────────────────────────────────
+    closeAlert: 'Close alert',
 };
 
 registerTranslation(translation);
