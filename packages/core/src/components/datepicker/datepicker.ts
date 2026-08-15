@@ -233,7 +233,8 @@ export class ArDatepicker extends LitElement {
         // régionale n'est enregistrée.
         const locale = this.localize.lang();
         const todayLabel = this.localize.term('today');
-        const closeLabel = this.localize.term('closeCalendar');
+        const closeLabel = this.localize.term('close');
+        const closeAriaLabel = this.localize.term('closeCalendar');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
         const formatLine = this.localize.term(
             'expectedFormat',
@@ -315,7 +316,9 @@ export class ArDatepicker extends LitElement {
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
                 >
-                    ${this.open ? this._renderCalendar(locale, todayLabel, closeLabel) : nothing}
+                    ${this.open
+                        ? this._renderCalendar(locale, todayLabel, closeLabel, closeAriaLabel)
+                        : nothing}
                 </div>
             </div>
         `;
@@ -325,6 +328,7 @@ export class ArDatepicker extends LitElement {
         locale: string,
         todayLabel: string,
         closeLabel: string,
+        closeAriaLabel: string,
     ): TemplateResult {
         const viewDate = this._calendar.currentViewMonth;
         const monthLabel = this._getFormatter(locale, 'month-year', {
@@ -411,7 +415,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="footer-button close-button action-button"
                     type="button"
-                    aria-label=${closeLabel}
+                    aria-label=${closeAriaLabel}
                     @click=${this._handleCloseClick}
                 >
                     <slot name="close-label">${closeLabel}</slot>

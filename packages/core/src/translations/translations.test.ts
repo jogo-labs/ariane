@@ -57,6 +57,14 @@ describe('traductions', () => {
         expect(fr.nextYear).toBe('Année suivante');
     });
 
+    it('fr.close est traduit', () => {
+        expect(fr.close).toBe('Fermer');
+    });
+
+    it('en.close est traduit', () => {
+        expect(en.close).toBe('Close');
+    });
+
     it('fr.closeCalendar est traduit', () => {
         expect(fr.closeCalendar).toBe('Fermer le calendrier');
     });

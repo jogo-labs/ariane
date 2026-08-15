@@ -40,6 +40,7 @@ const translation: Translation = {
 
     // ── ar-datepicker ────────────────────────────────────────────────────
     today: "Aujourd'hui",
+    close: 'Fermer',
     closeCalendar: 'Fermer le calendrier',
     openCalendar: 'Ouvrir le calendrier',
     selectDate: 'Sélectionner une date',

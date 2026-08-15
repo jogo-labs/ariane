@@ -20,6 +20,7 @@ export interface Translation extends BaseTranslation {
 
     // ar-datepicker
     today: string;
+    close: string;
     closeCalendar: string;
     openCalendar: string;
     selectDate: string;
