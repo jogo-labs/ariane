@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDatepicker } from './datepicker.js';
-import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
+import { fixture, getPart, mockPopoverPanel, waitForUpdate } from '../../test-utils.js';
 import './index.js';
+
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
 
 describe('ArDatepicker', () => {
     let el: ArDatepicker;
@@ -281,7 +287,7 @@ describe('ArDatepicker', () => {
 
         it('hint par défaut mentionne la plage quand min et max sont définis', async () => {
             el = await fixture(
-                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+                '<ar-datepicker lang="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
             );
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
@@ -290,7 +296,7 @@ describe('ArDatepicker', () => {
 
         it('la ligne de plage ne colle pas au texte du format (séparateur non vide entre les deux)', async () => {
             el = await fixture(
-                '<ar-datepicker locale="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+                '<ar-datepicker lang="fr-FR" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
             );
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
@@ -298,25 +304,38 @@ describe('ArDatepicker', () => {
         });
 
         it('hint par défaut mentionne uniquement min quand max est absent', async () => {
-            el = await fixture('<ar-datepicker locale="fr-FR" min="2026-01-01"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="fr-FR" min="2026-01-01"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain('à partir du 1er janvier 2026');
         });
 
         it('hint par défaut mentionne uniquement max quand min est absent', async () => {
-            el = await fixture('<ar-datepicker locale="fr-FR" max="2026-12-31"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="fr-FR" max="2026-12-31"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain("jusqu'au 31 décembre 2026");
         });
 
         it("l'ordinal « 1er » ne s'applique qu'en français", async () => {
-            el = await fixture('<ar-datepicker locale="en-US" min="2026-01-01"></ar-datepicker>');
+            el = await fixture('<ar-datepicker lang="en-US" min="2026-01-01"></ar-datepicker>');
             await waitForUpdate(el);
             const hint = getPart(el, 'hint');
             expect(hint?.textContent).toContain('January 1, 2026');
             expect(hint?.textContent).not.toContain('1er');
+        });
+
+        it('le hint par défaut (format + plage) est intégralement traduit via lang="en"', async () => {
+            el = await fixture(
+                '<ar-datepicker lang="en" min="2026-01-01" max="2026-12-31"></ar-datepicker>',
+            );
+            await waitForUpdate(el);
+            const year = new Date().getFullYear();
+            const hint = getPart(el, 'hint');
+            expect(hint?.textContent).toContain(`Expected format: dd/MM/yyyy (e.g. 31/12/${year})`);
+            expect(hint?.textContent).toContain(
+                'Available dates: between January 1, 2026 and December 31, 2026',
+            );
         });
 
         it('slot hint personnalisé remplace le hint par défaut (plage incluse)', async () => {
@@ -334,24 +353,26 @@ describe('ArDatepicker', () => {
     });
 
     describe('libellés today/close', () => {
-        it('todayLabel et closeLabel valent "Aujourd\'hui" / "Fermer" par défaut', async () => {
+        it('today-button et close-button affichent "Aujourd\'hui" / "Fermer" par défaut (fr)', async () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
-            expect(el.todayLabel).toBe("Aujourd'hui");
-            expect(el.closeLabel).toBe('Fermer');
+            el.open = true;
+            await waitForUpdate(el);
+            const todayBtn = getPart(el, 'today-button');
+            const closeBtn = getPart(el, 'close-button');
+            expect(todayBtn?.textContent?.trim()).toBe("Aujourd'hui");
+            expect(todayBtn?.getAttribute('aria-label')).toBe("Aujourd'hui");
+            expect(closeBtn?.textContent?.trim()).toBe('Fermer');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
         });
 
-        it('les props todayLabel/closeLabel changent le texte des boutons', async () => {
-            el = await fixture(
-                '<ar-datepicker today-label="Today" close-label="Close"></ar-datepicker>',
-            );
+        it('today-button et close-button sont traduits en anglais via lang="en"', async () => {
+            el = await fixture('<ar-datepicker lang="en"></ar-datepicker>');
             el.open = true;
             await waitForUpdate(el);
             const todayBtn = getPart(el, 'today-button');
             const closeBtn = getPart(el, 'close-button');
             expect(todayBtn?.textContent?.trim()).toBe('Today');
-            expect(todayBtn?.getAttribute('aria-label')).toBe('Today');
             expect(closeBtn?.textContent?.trim()).toBe('Close');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
         });
 
         it('nav-button et footer-button portent le rôle transverse "action-button"', async () => {
@@ -386,14 +407,72 @@ describe('ArDatepicker', () => {
 
         it('aria-label reste posé sur le bouton même quand le slot est utilisé (icône seule)', async () => {
             el = await fixture(`
-                <ar-datepicker close-label="Fermer le calendrier">
+                <ar-datepicker>
                     <span slot="close-label" aria-hidden="true">✕</span>
                 </ar-datepicker>
             `);
             el.open = true;
             await waitForUpdate(el);
             const closeBtn = getPart(el, 'close-button');
-            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer le calendrier');
+            expect(closeBtn?.getAttribute('aria-label')).toBe('Fermer');
+        });
+    });
+
+    describe('aria-label traduits (trigger, panel, navigation, jour sélectionné)', () => {
+        it('trigger et panel affichent les libellés fr par défaut', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(getPart(el, 'trigger')?.getAttribute('aria-label')).toBe('Ouvrir le calendrier');
+            expect(getPart(el, 'panel')?.getAttribute('aria-label')).toBe('Sélectionner une date');
+        });
+
+        it('les 4 boutons de navigation affichent les libellés fr par défaut', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(
+                el.shadowRoot?.querySelector('[part~="prev-year"]')?.getAttribute('aria-label'),
+            ).toBe('Année précédente');
+            expect(
+                el.shadowRoot?.querySelector('[part~="prev-month"]')?.getAttribute('aria-label'),
+            ).toBe('Mois précédent');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-month"]')?.getAttribute('aria-label'),
+            ).toBe('Mois suivant');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-year"]')?.getAttribute('aria-label'),
+            ).toBe('Année suivante');
+        });
+
+        it('trigger, panel et navigation sont traduits en anglais via lang="en"', async () => {
+            el = await fixture('<ar-datepicker lang="en"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            expect(getPart(el, 'trigger')?.getAttribute('aria-label')).toBe('Open calendar');
+            expect(getPart(el, 'panel')?.getAttribute('aria-label')).toBe('Select a date');
+            expect(
+                el.shadowRoot?.querySelector('[part~="next-year"]')?.getAttribute('aria-label'),
+            ).toBe('Next year');
+        });
+
+        it('le jour sélectionné porte le suffixe traduit dans son aria-label', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            // happy-dom n'implémente pas l'API Popover : sans ce mock, _anchored.show()
+            // lève (showPopover manquant) et la navigation du calendrier vers la date
+            // sélectionnée (dans _show(), avant l'await sur _anchored.show()) tourne court.
+            mockPopoverPanel(el);
+            el.open = true;
+            await waitForUpdate(el);
+            // _show() termine son flow async (this._anchored.show() + this.updateComplete)
+            // après le premier cycle de rendu déclenché par `open` — des awaits supplémentaires
+            // sont nécessaires pour que le calendrier ait fini de naviguer vers la date sélectionnée.
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            const selectedCell = el.shadowRoot?.querySelector(
+                '[role="gridcell"][aria-selected="true"] [part~="day"]',
+            );
+            expect(selectedCell?.getAttribute('aria-label')).toContain(', sélectionné');
         });
     });
 

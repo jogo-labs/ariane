@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+
+const tocEntries = [
+    { id: 'principe',           label: 'Fonctionnement',                level: 1 as const },
+    { id: 'locale-resolution',  label: 'Résolution de la langue',       level: 2 as const },
+    { id: 'default-imports',    label: 'Imports par défaut',            level: 2 as const },
+    { id: 'traductions',        label: 'Fournir sa propre traduction',   level: 1 as const },
+    { id: 'traductions-disponibles', label: 'Traductions disponibles',  level: 1 as const },
+];
+
+const codeChangeLang = `<!-- Langue par défaut de la page -->
+<html lang="en">
+
+<!-- Ou par composant, en surcharge -->
+<ar-table-sort lang="es">Prix</ar-table-sort>`;
+
+const codeCustomTranslation = `// es.ts — copie de fr.ts, traduite terme par terme
+import { registerTranslation } from '@ariane-ui/core';
+import type { Translation } from '@ariane-ui/core';
+
+const translation: Translation = {
+    $code: 'es',
+    $name: 'Español',
+    $dir: 'ltr',
+
+    // ... tous les termes de fr.ts, traduits
+    term1: '...',
+    term2: '...',
+};
+
+registerTranslation(translation);
+
+export default translation;`;
+
+const codeCustomTranslationCdn = `<html lang="es">
+  <head>
+    <script type="module" src="/path/to/es.js"></script>
+  </head>
+
+  <body>
+    ...
+  </body>
+</html>
+`;
+---
+
+<Layout title="Internationalisation (i18n)" currentPath="/getting-started/i18n" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Internationalisation</h2>
+            <p class="summary">
+                Certains composants Ariane embarquent des libellés accessibles (annonces
+                aria-live, aria-label). Ce mécanisme permet de les traduire sans surcharger
+                chaque instance manuellement.
+            </p>
+        </div>
+
+        <section id="principe" class="main-section">
+            <div>
+                <h3 class="section-title">Fonctionnement</h3>
+                <p>
+                    Ariane s'appuie sur la micro-librairie{' '}
+                    <a href="https://github.com/shoelace-style/localize"
+                    target="_blank" rel="noopener">@shoelace-style/localize</a> pour fournir un mécanisme de traduction de ses composants.
+                </p>
+            </div>
+
+            <section id="locale-resolution" class="subsection">
+                <h4 class="subsection-title">Résolution de la langue</h4>
+                <p>
+                    La langue par défaut est déterminée par la valeur de l'attribut <code>&lt;html lang&gt;</code>, mais l'ajout d'un attribut <code>lang</code> sur un composant permet une surcharge locale.<br>
+                    Si aucun des deux attributs n'est présent, c'est la langue du navigateur
+                    (<code>navigator.language</code>) qui est utilisé.<br>
+                    Dans tous les cas s'il n'existe pas de traduction pour la langue identifiée, c'est le français qui sera utilisé.
+                </p>
+                <pre><code class="language-html" set:text={codeChangeLang} /></pre>
+                <ar-alert variant="warning" without-notification class="doc-callout-alert">
+                    <p class="doc-callout-alert-title">À savoir</p>
+                    <div class="doc-callout-alert-content">
+                        <p>
+                            Seuls <code>&lt;html lang&gt;</code> et le <code>lang</code> posé
+                            directement sur le composant sont pris en compte — un
+                            <code>&lt;div lang="es"&gt;</code> autour d'un composant Ariane n'a
+                            aucun effet. C'est une limite assumée de la librairie, pour des
+                            raisons de performance (pas de traversée du DOM à chaque rendu).
+                        </p>
+                    </div>
+                </ar-alert>
+            </section>
+
+            <section id="default-imports" class="subsection">
+                <h4 class="subsection-title">Imports par défaut</h4>
+                <p>
+                    Contrairement à d'autres bibliothèques qui publient un fichier par langue à
+                    charger à la demande, les traductions <code>fr</code> (défaut) et
+                    <code>en</code> sont embarquées directement dans chaque composant qui en a
+                    besoin (CDN ou npm). Charger <code>ar-table-sort</code> ou
+                    <code>ar-datepicker</code> suffit — les deux langues sont déjà enregistrées,
+                    aucun import supplémentaire n'est nécessaire pour les utiliser.
+                </p>
+            </section>
+        </section>
+
+
+        <section id="traductions" class="main-section">
+            <div>
+                <h3 class="section-title">Créer votre propre traduction</h3>
+                <p>
+                    Que vous souhaitiez surcharger une langue fournie, ou disposer sans attendre d'une
+                    traduction non disponible pour votre propre langue, le mécanisme à utiliser est très
+                    simple.<br>
+                    Commencez par copier{' '}
+                    <a
+                        href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        <code>/core/src/translations/fr.ts</code>
+                    </a>{' '}
+                    (la traduction source du package, la plus à jour) dans votre projet et traduisez
+                    chaque terme.<br>
+                    Le type <code>Translation</code>, exporté par le package, vous
+                    force à fournir tous les termes attendus. Cette fois l'import est à votre
+                    charge — c'est votre fichier, pas un fichier livré par Ariane.
+                </p>
+                <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslation} /></pre>
+            </div>
+            <div>
+                <p>
+                    Une fois votre fichier compilé en JS, importez la traduction ainsi :
+                </p>
+                <pre style="margin-top: 0.85rem"><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
+            </div>
+        </section>
+
+        <section id="traductions-disponibles" class="main-section">
+            <div>
+                <h3 class="section-title">Traductions disponibles</h3>
+                <p>
+                    Chaque composant concerné documente son propre support i18n dans sa page — pas
+                    de liste centralisée ici, qui se désynchroniserait à chaque composant migré.
+                    Le détail des termes (par composant, groupés par commentaire{' '}
+                    <code>// ar-&lt;nom&gt;</code>) vit directement dans les fichiers de
+                    traduction :
+                </p>
+                <p>
+                    <a
+                        href="https://github.com/jogo-labs/ariane/tree/main/packages/core/src/translations"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        <code>packages/core/src/translations/</code>
+                    </a>
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>

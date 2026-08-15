@@ -178,6 +178,7 @@ Le fichier `custom-elements.json` est généré automatiquement par
  * @summary Description courte du composant.
  * @display demo              ← mode d'affichage dans la doc (demo | docs)
  * @parent ar-stepper         ← déclare ce composant comme enfant de ar-stepper
+ * @localized                 ← affiche la section "Traduction" (mécanisme lang/LocalizeController)
  *
  * @slot                      ← slot par défaut
  * @slot prefix               ← slot nommé
@@ -223,6 +224,15 @@ async function fixture<T extends HTMLElement>(html: string): Promise<T> {
     return el;
 }
 ```
+
+---
+
+## Crédits
+
+L'infrastructure i18n s'appuie sur [`@shoelace-style/localize`](https://github.com/shoelace-style/localize)
+(MIT), la micro-librairie de traduction de Shoelace. Ariane s'inspire plus largement de
+[WebAwesome](https://webawesome.com/) (successeur de Shoelace) comme référence de conception pour
+plusieurs de ses composants et mécanismes.
 
 ---
 

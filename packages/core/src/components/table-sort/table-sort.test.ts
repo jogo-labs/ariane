@@ -3,6 +3,12 @@ import type { ArTableSort } from './table-sort.js';
 import { fixture, getPart, requirePart, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ArTableSort', () => {
     let el: ArTableSort;
     afterEach(() => el?.remove());
@@ -346,6 +352,15 @@ describe('ArTableSort', () => {
             await waitForUpdate(sort);
             expect(th.getAttribute('aria-sort')).toBe('none');
             th.remove();
+        });
+    });
+
+    // ── i18n ──────────────────────────────────────────────────────────────
+
+    describe('i18n', () => {
+        it('tooltip traduit en anglais via lang="en"', async () => {
+            el = await fixture('<ar-table-sort type="alpha" lang="en"></ar-table-sort>');
+            expect(tooltipLabel(el)).toBe('Sort A to Z');
         });
     });
 });

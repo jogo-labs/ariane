@@ -3,14 +3,19 @@ import { property, query } from 'lit/decorators.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /**
  * @summary Champ de saisie de date avec calendrier popover accessible.
  * @display demo
+ * @localized
  *
  * @slot label       - Contenu riche du label (remplace le prop `label`).
  * @slot after-label - Éléments après le label (bouton d'aide, tooltip…).
@@ -19,10 +24,10 @@ import { warn } from '../../utils/warn.js';
  *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
  *                     si nécessaire.
  * @slot error       - Message d'erreur. Déclenche has-error sur le host.
- * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le prop
- *                     `todayLabel`).
- * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le prop
- *                     `closeLabel`).
+ * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le texte
+ *                     traduit par défaut).
+ * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le texte
+ *                     traduit par défaut).
  *
  * @csspart datepicker - Racine du composant.
  * @csspart input      - Le champ texte.
@@ -123,12 +128,12 @@ export class ArDatepicker extends LitElement {
         },
     });
 
+    private readonly localize = new LocalizeController(this);
+
     /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
     @property({ reflect: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
     @property() format = 'dd/MM/yyyy';
-    /** Locale BCP 47 pour les noms de jours et mois. Défaut : `navigator.language`. */
-    @property() locale = '';
     /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */
     @property() min = '';
     /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
@@ -141,10 +146,6 @@ export class ArDatepicker extends LitElement {
     @property() autocomplete = '';
     /** Label du champ (alternative au slot `label`). */
     @property() label = '';
-    /** Libellé du bouton « Aujourd'hui » (alternative au slot `today-label`). */
-    @property({ attribute: 'today-label' }) todayLabel = "Aujourd'hui";
-    /** Libellé du bouton « Fermer » (alternative au slot `close-label`). */
-    @property({ attribute: 'close-label' }) closeLabel = 'Fermer';
     /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
@@ -222,13 +223,27 @@ export class ArDatepicker extends LitElement {
     }
 
     override render(): TemplateResult {
-        const locale = this.locale || navigator.language;
+        // Une seule source de vérité pour la langue : this.localize.lang() (this.lang ||
+        // <html lang> || navigator.language). Pas de prop locale séparée — un Intl.DateTimeFormat
+        // dont la locale diverge de la langue des libellés produirait un composant à moitié
+        // traduit (ex. boutons en français, noms de mois en anglais). Un consommateur voulant un
+        // format de date régional différent sans changer la langue affichée peut poser un lang
+        // avec région (ex. lang="en-GB") : Intl.DateTimeFormat le respecte nativement, et
+        // LocalizeController retombe sur la traduction de base (en) si aucune variante
+        // régionale n'est enregistrée.
+        const locale = this.localize.lang();
+        const todayLabel = this.localize.term('today');
+        const closeLabel = this.localize.term('close');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
-        const formatLine = `Format attendu : ${this.format} (ex. ${format(exampleDate, this.format)})`;
+        const formatLine = this.localize.term(
+            'expectedFormat',
+            this.format,
+            format(exampleDate, this.format),
+        );
         const rangeText = this._rangeText(locale);
         const defaultHint = rangeText
             ? html`${formatLine}<br />
-                  Dates disponibles : ${rangeText}`
+                  ${this.localize.term('availableDates', rangeText)}`
             : formatLine;
 
         return html`
@@ -257,7 +272,7 @@ export class ArDatepicker extends LitElement {
                         part="trigger"
                         type="button"
                         ?disabled=${this.disabled || this.readonly}
-                        aria-label="Ouvrir le calendrier"
+                        aria-label=${this.localize.term('openCalendar')}
                         aria-haspopup="dialog"
                         aria-expanded=${this.open}
                         @click=${this._handleTriggerClick}
@@ -295,18 +310,22 @@ export class ArDatepicker extends LitElement {
                     popover="auto"
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Sélectionner une date"
+                    aria-label=${this.localize.term('selectDate')}
                     aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
                 >
-                    ${this.open ? this._renderCalendar(locale) : nothing}
+                    ${this.open ? this._renderCalendar(locale, todayLabel, closeLabel) : nothing}
                 </div>
             </div>
         `;
     }
 
-    private _renderCalendar(locale: string): TemplateResult {
+    private _renderCalendar(
+        locale: string,
+        todayLabel: string,
+        closeLabel: string,
+    ): TemplateResult {
         const viewDate = this._calendar.currentViewMonth;
         const monthLabel = this._getFormatter(locale, 'month-year', {
             month: 'long',
@@ -326,7 +345,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button prev-year action-button"
                     type="button"
-                    aria-label="Année précédente"
+                    aria-label=${this.localize.term('previousYear')}
                     @click=${() => this._nav(() => this._calendar.previousYear())}
                 >
                     «
@@ -334,7 +353,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button prev-month action-button"
                     type="button"
-                    aria-label="Mois précédent"
+                    aria-label=${this.localize.term('previousMonth')}
                     @click=${() => this._nav(() => this._calendar.previousMonth())}
                 >
                     ‹
@@ -343,7 +362,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button next-month action-button"
                     type="button"
-                    aria-label="Mois suivant"
+                    aria-label=${this.localize.term('nextMonth')}
                     @click=${() => this._nav(() => this._calendar.nextMonth())}
                 >
                     ›
@@ -351,7 +370,7 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="nav-button next-year action-button"
                     type="button"
-                    aria-label="Année suivante"
+                    aria-label=${this.localize.term('nextYear')}
                     @click=${() => this._nav(() => this._calendar.nextYear())}
                 >
                     »
@@ -384,18 +403,18 @@ export class ArDatepicker extends LitElement {
                 <button
                     part="footer-button today-button action-button"
                     type="button"
-                    aria-label=${this.todayLabel}
+                    aria-label=${todayLabel}
                     @click=${this._handleTodayClick}
                 >
-                    <slot name="today-label">${this.todayLabel}</slot>
+                    <slot name="today-label">${todayLabel}</slot>
                 </button>
                 <button
                     part="footer-button close-button action-button"
                     type="button"
-                    aria-label=${this.closeLabel}
+                    aria-label=${closeLabel}
                     @click=${this._handleCloseClick}
                 >
-                    <slot name="close-label">${this.closeLabel}</slot>
+                    <slot name="close-label">${closeLabel}</slot>
                 </button>
             </div>
         `;
@@ -411,7 +430,7 @@ export class ArDatepicker extends LitElement {
         const otherMonth = !this._calendar.isSameMonth(day);
 
         const ariaLabel = selected
-            ? `${dayLabelFormat.format(day)}, sélectionné`
+            ? this.localize.term('daySelected', dayLabelFormat.format(day))
             : dayLabelFormat.format(day);
 
         const classes = [
@@ -514,26 +533,36 @@ export class ArDatepicker extends LitElement {
         if (!minDate && !maxDate) return '';
 
         if (minDate && maxDate) {
-            return `entre le ${this._formatOrdinalDate(minDate, locale)} et le ${this._formatOrdinalDate(maxDate, locale)}`;
+            return this.localize.term(
+                'dateRangeBetween',
+                this._formatOrdinalDate(minDate, locale),
+                this._formatOrdinalDate(maxDate, locale),
+            );
         }
-        if (minDate) return `à partir du ${this._formatOrdinalDate(minDate, locale)}`;
-        return `jusqu'au ${this._formatOrdinalDate(maxDate as Date, locale)}`;
+        if (minDate)
+            return this.localize.term('dateRangeFrom', this._formatOrdinalDate(minDate, locale));
+        return this.localize.term(
+            'dateRangeUntil',
+            this._formatOrdinalDate(maxDate as Date, locale),
+        );
     }
 
-    /** Formate une date longue en respectant l'ordinal du 1er du mois en français ("1er janvier 2026"). */
+    /**
+     * Formate une date longue, en laissant le terme `formatOrdinalDate` décider d'un marqueur
+     * ordinal (ex. « 1er janvier 2026 » en français) — les deux formats Intl (mois/année,
+     * jour/mois/année) sont locale-aware et calculés ici, le terme choisit lequel utiliser.
+     */
     private _formatOrdinalDate(date: Date, locale: string): string {
-        if (locale.toLowerCase().startsWith('fr') && date.getDate() === 1) {
-            const monthYear = this._getFormatter(locale, 'month-year', {
-                month: 'long',
-                year: 'numeric',
-            }).format(date);
-            return `1er ${monthYear}`;
-        }
-        return this._getFormatter(locale, 'day-month-year', {
+        const monthYearText = this._getFormatter(locale, 'month-year', {
+            month: 'long',
+            year: 'numeric',
+        }).format(date);
+        const fullDateText = this._getFormatter(locale, 'day-month-year', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         }).format(date);
+        return this.localize.term('formatOrdinalDate', date, monthYearText, fullDateText);
     }
 
     /** Cache des Intl.DateTimeFormat par locale — évite de reconstruire un formatter à chaque render. */

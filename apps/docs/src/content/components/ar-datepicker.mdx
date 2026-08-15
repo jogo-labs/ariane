@@ -11,7 +11,7 @@ variants:
           <ar-datepicker
             label="Date de naissance"
             format="dd/MM/yyyy"
-            locale="fr-FR"
+            lang="fr-FR"
           ></ar-datepicker>
     - name: Avec erreur
       description: État d'erreur visible via le slot error.
@@ -37,24 +37,18 @@ variants:
             label="Date de rendez-vous"
             min="2026-01-01"
             max="2026-12-31"
-            locale="fr-FR"
+            lang="fr-FR"
           ></ar-datepicker>
-    - name: Locale et format
+    - name: Langue et format
       description: >
-          `locale` pilote les noms de mois/jours ; `format` définit le motif de saisie/affichage
-          attendu dans l'input. Le texte du hint par défaut ("Format attendu :", "ex.") reste en
-          français quelle que soit `locale` — à traduire via le slot `hint`, comme les libellés
-          des boutons « Aujourd'hui » / « Fermer » via `today-label` / `close-label`.
+          L'attribut `lang` pilote la totalité des textes et formats — y compris les textes par
+          défaut des slots — à l'exception du label de l'input.
       html: |
           <ar-datepicker
             label="Date of birth"
             format="MM/dd/yyyy"
-            locale="en-US"
-            today-label="Today"
-            close-label="Close"
-          >
-            <span slot="hint">Expected format: mm/dd/yyyy (e.g. 12/31/2026)</span>
-          </ar-datepicker>
+            lang="en-US"
+          ></ar-datepicker>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -124,7 +118,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 ### À votre charge
 
 - **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
-- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. **Le texte du hint par défaut ne suit pas `locale`** (contrairement aux noms de mois/jours) : dans une interface non francophone, fournir un slot `hint` traduit.
+- **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. Le hint par défaut suit `lang` comme le reste du composant (mécanisme i18n) — le slot reste utile pour un contenu personnalisé ou une langue non traduite par le package.
 - **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
 - **Focus des jours** : l'indicateur de focus visible sur la grille (<WcagRef criterion="2.4.7" summary="Focus Visible : le composant recevant le focus clavier doit être visuellement identifiable." />) est porté par `--ar-datepicker-day-focus-ring-color`/`-width`/`-offset`, avec leurs propres replis. `--ar-datepicker-day-focus-border-color` est un token distinct, purement cosmétique — il ne garantit rien à lui seul. Un consommateur qui personnalise l'apparence du focus sans conserver l'anneau (en s'appuyant uniquement sur cette bordure) est responsable du contraste de son propre design.
 
@@ -245,16 +239,17 @@ IMask(picker.inputElement, { mask: Date });
 
 ### Libellés des boutons « Aujourd'hui » et « Fermer »
 
-Ces deux textes ne sont pas dérivés de `locale` (contrairement aux noms de mois/jours) : à traduire manuellement via les props `today-label` / `close-label`.
+Ces deux textes suivent le mécanisme i18n du package (attribut `lang`, cf.
+[Internationalisation](/getting-started/i18n)).
 
 ```html
-<ar-datepicker label="Date of birth" today-label="Today" close-label="Close"></ar-datepicker>
+<ar-datepicker label="Date of birth" lang="en"></ar-datepicker>
 ```
 
-Pour un contenu plus riche (icône + texte), les slots `today-label` / `close-label` remplacent le contenu du bouton. La prop reste alors la source du `aria-label` posé sur le `<button>`, ce qui garantit un nom accessible même si le slot ne contient qu'une icône :
+Pour un contenu plus riche (icône + texte), les slots `today-label` / `close-label` remplacent le contenu du bouton. Le texte traduit reste alors la source du `aria-label` posé sur le `<button>`, ce qui garantit un nom accessible même si le slot ne contient qu'une icône :
 
 ```html
-<ar-datepicker close-label="Fermer le calendrier">
+<ar-datepicker lang="en">
     <span slot="close-label" aria-hidden="true">✕</span>
 </ar-datepicker>
 ```

@@ -35,6 +35,24 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
 
 <div class="component-api">
 
+    {/* ── Traduction ── */}
+    {component['x-localized'] && (
+        <section>
+            <h4 id="api-traduction" class="subsection-title">Traduction</h4>
+            <p>
+                La langue de ce composant suit l'attribut <code>lang</code> de la page
+                (<code>&lt;html lang&gt;</code>).<br> Vous pouvez appliquer une langue différente à une
+                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br> Voir la
+                page <a href="/getting-started/i18n">Internationalisation</a> pour le détail du
+                mécanisme et la liste des traductions disponibles.
+            </p>
+            <p>
+                <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
+                « Attributs &amp; Propriétés » ci-dessous.
+            </p>
+        </section>
+    )}
+
     {/* ── Attributs & Propriétés ── */}
     {component.attributes && component.attributes.length > 0 && (
         <section>

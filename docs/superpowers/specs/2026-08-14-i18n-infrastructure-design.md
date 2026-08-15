@@ -169,6 +169,17 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
   pas spécifique à l'i18n) — à formuler dans le README/doc en cohérence avec cette portée plus
   large plutôt que de la limiter à ce chantier.
 
+### 6. Annotation `@localized` (ajouté après la revue finale, 2026-08-14)
+
+Plutôt qu'une liste centralisée des composants/termes dans la doc i18n (retirée, voir section
+Docs ci-dessous), un tag JSDoc `@localized` (booléen, sans valeur) sur la classe du composant —
+même pattern que `@display`/`@parent` déjà en place dans `cem.config.js` — déclenche l'affichage
+d'une section "Traduction" générique dans la Référence API générée
+(`apps/docs/src/components/ComponentApi.astro`), expliquant le mécanisme `lang` et signalant que
+`lang` (attribut HTML natif) n'apparaît pas dans le tableau Attributs & Propriétés. Ajouté sur
+`ar-table-sort` et `ar-datepicker`. Documenté dans `packages/core/README.md` § Annotations JSDoc
+reconnues.
+
 ## Impact
 
 **Composants** :
@@ -194,8 +205,11 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
   propre traduction en partant de `en.ts` comme référence typée, limite documentée sur
   l'héritage `lang` (pas de propagation via un ancêtre intermédiaire), lien vers
   `@shoelace-style/localize` et vers WebAwesome comme référence générale du projet.
-- Table des termes disponibles (au moins `table-sort` et `datepicker` pour cette livraison), pour
-  que les composants futurs sachent où ajouter les leurs.
+- **Revu après la revue finale (2026-08-14)** : pas de table des termes dupliquée dans la doc —
+  décision inversée après un premier essai (`i18n.astro`, corrigé en revue finale puis retiré sur
+  demande explicite). La liste exacte vit dans `src/translations/fr.ts`/`en.ts`, groupée par
+  composant via des commentaires (`// ar-<nom>`) — éviter une doc qui se désynchronise à chaque
+  composant migré plutôt que la dupliquer.
 
 **Tests** :
 
@@ -226,3 +240,28 @@ Seule `this.localize.lang()` est réutilisée (résolution de la locale par déf
       `today`/`close` dans ce lot).
     - `ar-progressbar` — audité, **écarté** : le label vient entièrement du slot fourni par le
       consommateur, aucune chaîne FR hardcodée dans le composant.
+- **Trouvé lors de la revue finale de branche (2026-08-14), pas de l'audit initial** — chaînes FR
+  hardcodées supplémentaires, manquées par le brainstorming original :
+    - ~~`ar-datepicker` lui-même (au-delà de `today`/`close`)~~ — **traité dans ce lot**, pas
+      reporté en lot 2 : `openCalendar`, `selectDate`, `previousYear`, `previousMonth`,
+      `nextMonth`, `nextYear`, `daySelected` ajoutés à `Translation`
+      (`packages/core/src/types/translation.ts`) et migrés dans `datepicker.ts`.
+    - ~~Le texte du hint par défaut (`_rangeText`/`_formatOrdinalDate`, "Format attendu :", plage
+      min/max)~~ — **également traité**, décision revue en cours de branche (2026-08-14) : un hint
+      par défaut fiable même sans surcharge du slot vaut la peine pour l'accessibilité par défaut.
+      Six termes ajoutés : `expectedFormat`, `availableDates`, `dateRangeBetween`, `dateRangeFrom`,
+      `dateRangeUntil`, `formatOrdinalDate`. Ce dernier reçoit la date brute et les deux formats
+      Intl déjà calculés (locale-aware) — c'est le terme qui décide d'un marqueur ordinal (ex.
+      « 1er » en français), pas le composant. Le slot `hint` reste disponible pour un contenu
+      personnalisé ou une langue non couverte par le package.
+    - `ar-dialog` — `packages/core/src/components/dialog/dialog.ts` :
+      `DEFAULT_DIALOG_LABEL = 'Dialogue'` (ligne 34) et le défaut de la prop `closeLabel = 'Fermer'`
+      (ligne 178). À noter : `apps/docs/src/content/components/ar-dialog.mdx` documente encore
+      `close-label` comme prop de traduction manuelle par instance — le même anti-pattern retiré
+      d'`ar-datepicker` dans ce lot (`today-label`/`close-label`). Décision à trancher en lot 2 :
+      retirer la prop `ar-dialog` de la même façon, ou choisir explicitement de la garder et
+      documenter pourquoi.
+    - `ar-alert` — `packages/core/src/components/alert/alert.ts` :
+      `aria-label="Fermer l'alerte"` (ligne 205).
+    - `ar-breadcrumb` — `packages/core/src/components/breadcrumb/breadcrumb.ts` :
+      `Vous êtes ici` (ligne 219), `Afficher le fil d'ariane` (ligne 228).
