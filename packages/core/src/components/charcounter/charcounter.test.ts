@@ -66,7 +66,7 @@ describe('ArCharcounter', () => {
         it('contient part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
         it('affiche "200 caractères restants" au départ (champ vide)', () => {
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('200');
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
+            expect(getPart(el, 'label')?.textContent).toBe('caractères restants');
         });
     });
 
@@ -187,7 +187,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
             );
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractère restant');
+            expect(getPart(el, 'label')?.textContent).toBe('caractère restant');
         });
 
         it('affiche la forme pluriel quand remaining = 0', async () => {
@@ -195,7 +195,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
             );
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
+            expect(getPart(el, 'label')?.textContent).toBe('caractères restants');
         });
 
         it('affiche la forme pluriel quand remaining = 5', async () => {
@@ -203,7 +203,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
             );
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractères restants');
+            expect(getPart(el, 'label')?.textContent).toBe('caractères restants');
         });
 
         it('affiche la forme singulier quand remaining = -1 (dépassement de 1)', async () => {
@@ -211,7 +211,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="200" label="caractère restant|caractères restants"></ar-charcounter>',
             );
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('caractère restant');
+            expect(getPart(el, 'label')?.textContent).toBe('caractère restant');
         });
 
         it('utilise le label tel quel si pas de pipe (compat descendante)', async () => {
@@ -219,7 +219,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="200" label="restants"></ar-charcounter>',
             );
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('restants');
+            expect(getPart(el, 'label')?.textContent).toBe('restants');
         });
     });
 
@@ -594,7 +594,7 @@ describe('ArCharcounter', () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f" max="5" lang="en"></ar-charcounter>');
             const field = document.getElementById('f') as HTMLTextAreaElement;
-            expect(getPart(el, 'label')?.textContent?.trim()).toBe('characters remaining');
+            expect(getPart(el, 'label')?.textContent).toBe('characters remaining');
 
             field.value = '123456';
             field.dispatchEvent(new Event('input'));

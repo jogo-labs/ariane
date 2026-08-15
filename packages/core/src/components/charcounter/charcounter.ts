@@ -237,18 +237,17 @@ export class ArCharcounter extends LitElement {
     override render(): TemplateResult | typeof nothing {
         if (this.max === undefined) return nothing;
         const remaining = this.max - this._count;
+        const label = pluralize(
+            remaining,
+            this.label?.trim() || this.localize.term('remainingLabel'),
+        );
         return html`
             <span part="charcounter">
                 <slot name="warning-icon"></slot>
                 <slot name="error-icon"></slot>
                 <span part="count${this._state !== 'normal' ? ` count--${this._state}` : ''}">
                     <span part="remaining">${remaining}</span>
-                    <span part="label">
-                        ${pluralize(
-                            remaining,
-                            this.label?.trim() || this.localize.term('remainingLabel'),
-                        )}
-                    </span>
+                    <span part="label">${label}</span>
                 </span>
             </span>
         `;
