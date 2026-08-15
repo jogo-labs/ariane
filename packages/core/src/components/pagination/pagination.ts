@@ -8,6 +8,10 @@ import { _calculatePages, _clamp } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
 export class ArPaginationConfig {
@@ -26,6 +30,7 @@ export interface ArPaginationPageChangeDetail {
 /**
  * @summary Pagination accessible avec numérotation dynamique et ellipses automatiques.
  * @display demo
+ * @localized
  *
  * Les pages intermédiaires sont calculées automatiquement selon le nombre total.
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
@@ -74,6 +79,8 @@ export interface ArPaginationPageChangeDetail {
  */
 export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
+
+    private readonly localize = new LocalizeController(this);
 
     static readonly DEFAULT_CURRENT: number = 1;
     static readonly DEFAULT_TOTAL: number = 5;
@@ -342,7 +349,7 @@ export class ArPagination extends LitElement {
                     >
                         <slot name="prev-icon">${this._defaultPrevIcon()}</slot>
                         <span class="sr-only"
-                            >Page précédente (page ${previousPageNumber} sur ${total})</span
+                            >${this.localize.term('previousPage', previousPageNumber, total)}</span
                         >
                     </a>
                 </li>
@@ -360,7 +367,7 @@ export class ArPagination extends LitElement {
                     >
                         <slot name="next-icon">${this._defaultNextIcon()}</slot>
                         <span class="sr-only"
-                            >Page suivante (page ${nextPageNumber} sur ${total})</span
+                            >${this.localize.term('nextPage', nextPageNumber, total)}</span
                         >
                     </a>
                 </li>
@@ -445,7 +452,7 @@ export class ArPagination extends LitElement {
      * eux (voir garde globale sur les bindings adjacents dans un conteneur flex).
      */
     protected renderPageLabel(page: number, total: number): TemplateResult {
-        return html`<span class="sr-only">Page ${page} sur ${total}</span
+        return html`<span class="sr-only">${this.localize.term('pageStatus', page, total)}</span
             ><span aria-hidden="true">${page}</span>`;
     }
 
@@ -462,7 +469,9 @@ export class ArPagination extends LitElement {
      */
     protected renderPageSelect(current: number, total: number): TemplateResult {
         return html`<li part="item page-select">
-            <span class="sr-only" id="ar-pagination-select-label">Aller à la page</span>
+            <span class="sr-only" id="ar-pagination-select-label"
+                >${this.localize.term('goToPage')}</span
+            >
             <select
                 part="select field"
                 aria-labelledby="ar-pagination-select-label"
@@ -472,7 +481,7 @@ export class ArPagination extends LitElement {
                     page === -1 || page === -2
                         ? html`<option disabled value="">…</option>`
                         : html`<option value=${page} ?selected=${page === current}>
-                              Page ${page} sur ${total}
+                              ${this.localize.term('pageStatus', page, total)}
                           </option>`,
                 )}
             </select>
@@ -488,7 +497,7 @@ export class ArPagination extends LitElement {
      */
     protected renderCompactLabel(current: number, total: number): TemplateResult {
         return html`<li part="item page-label" aria-hidden="true">
-            <span part="label">Page ${current} / ${total}</span>
+            <span part="label">${this.localize.term('compactPageStatus', current, total)}</span>
         </li>`;
     }
 
@@ -555,6 +564,6 @@ export class ArPagination extends LitElement {
     }
 
     private _announcePageChange(): void {
-        announceA11y(`Page ${this.current} sur ${this.total}`, 'polite');
+        announceA11y(this.localize.term('pageStatus', this.current, this.total), 'polite');
     }
 }

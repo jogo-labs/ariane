@@ -3,6 +3,12 @@ import { ArPagination, type ArPaginationPageChangeDetail } from './pagination.js
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 /**
  * Vérifie qu'un token est présent dans l'attribut `part` d'un élément, sans dépendre
  * de l'ordre de sérialisation. `Element.part` (DOMTokenList) n'est pas supporté par
@@ -1092,6 +1098,28 @@ describe('ArPagination', () => {
             const nextLabel = el.shadowRoot?.querySelector('[part~="next"] .sr-only')?.textContent;
             expect(prevLabel).not.toMatch(/-\d/);
             expect(nextLabel).not.toMatch(/-\d/);
+        });
+    });
+
+    describe('traduction', () => {
+        afterEach(() => {
+            el.removeAttribute('lang');
+        });
+
+        it('lang="en" traduit les sr-only prev/next et le label du select', async () => {
+            el = await fixture('<ar-pagination current="8" total="15" lang="en"></ar-pagination>');
+            const prevSrOnly = requirePart(el, 'prev').querySelector('.sr-only');
+            const nextSrOnly = requirePart(el, 'next').querySelector('.sr-only');
+            expect(prevSrOnly?.textContent).toBe('Previous page (page 7 of 15)');
+            expect(nextSrOnly?.textContent).toBe('Next page (page 9 of 15)');
+        });
+
+        it('lang="en" traduit le label compact', async () => {
+            el = await fixture(
+                '<ar-pagination current="2" total="5" compact lang="en"></ar-pagination>',
+            );
+            const label = getPart(el, 'label');
+            expect(label?.textContent?.trim()).toBe('Page 2 / 5');
         });
     });
 });
