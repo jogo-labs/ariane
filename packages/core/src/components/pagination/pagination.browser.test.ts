@@ -10,6 +10,12 @@
 import { fixture, html, expect, elementUpdated } from '@open-wc/testing';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (le runner Chromium peut différer selon l'environnement CI).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 describe('ar-pagination — browser', () => {
     describe('focus après activation, confirmée par le consommateur (#154, #161)', () => {
         // Vérifie que le focus atterrit sur le nouvel élément part="current" et que
