@@ -3,6 +3,12 @@ import type { ArDialog } from './dialog.js';
 import { fixture, waitForUpdate, getPart, requireShadow } from '../../test-utils.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getDialogEl(el: ArDialog): HTMLDialogElement {
@@ -81,8 +87,8 @@ describe('ArDialog', () => {
         it('mode est modal', () => expect(el.mode).toBe('modal'));
         it('placement est right', () => expect(el.placement).toBe('right'));
         it('size est md', () => expect(el.size).toBe('md'));
-        it('preventedMessage a sa valeur par défaut', () =>
-            expect(el.preventedMessage).toBe('Fermeture bloquée.'));
+        it('preventedMessage vaut undefined par défaut (traduit dynamiquement)', () =>
+            expect(el.preventedMessage).toBeUndefined());
     });
 
     // ── Propriétés reflect ────────────────────────────────────────────────────
@@ -986,6 +992,37 @@ describe('ArDialog', () => {
 
             const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
             expect(closeWarns.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label accessible du bouton de fermeture', async () => {
+            el = await fixture('<ar-dialog label="Titre" lang="en"></ar-dialog>');
+            const closeLabel = requireShadow(el).querySelector('[part~="close-button"] .sr-only');
+            expect(closeLabel?.textContent).toBe('Close dialog');
+        });
+
+        it('closeLabel personnalisé prend le pas sur la traduction', async () => {
+            el = await fixture('<ar-dialog label="Titre" close-label="Annuler"></ar-dialog>');
+            const closeLabel = requireShadow(el).querySelector('[part~="close-button"] .sr-only');
+            expect(closeLabel?.textContent).toBe('Annuler');
+        });
+
+        it('lang="en" traduit le message de fermeture bloquée', async () => {
+            el = await fixture('<ar-dialog label="Titre" open lang="en"></ar-dialog>');
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
+            el.open = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
+                'Closing blocked.',
+            );
+        });
+
+        it('lang="en" traduit le titre de repli quand label est vide', async () => {
+            el = await fixture('<ar-dialog open lang="en"></ar-dialog>');
+            const heading = requireShadow(el).querySelector('#dialog-heading');
+            expect(heading?.textContent?.trim()).toBe('Dialog');
         });
     });
 });

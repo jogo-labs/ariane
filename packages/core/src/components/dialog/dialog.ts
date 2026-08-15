@@ -15,6 +15,10 @@ import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
@@ -30,8 +34,6 @@ export type ArDialogEvents =
     | 'ar-dialog-accepted-prevented';
 
 const _dialogStack: ArDialog[] = [];
-
-const DEFAULT_DIALOG_LABEL = 'Dialogue';
 
 if (typeof document !== 'undefined') {
     document.addEventListener(
@@ -49,6 +51,7 @@ if (typeof document !== 'undefined') {
 
 /**
  * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
+ * @localized
  *
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.
  * @slot header-actions - Actions additionnelles dans le header, positionnées avant le bouton de fermeture (ex. bouton plein écran, menu). Retiré du DOM si `without-header` est actif.
@@ -91,6 +94,8 @@ export class ArDialog extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     // ── Public properties ──────────────────────────────────────────────────────
+
+    private readonly localize = new LocalizeController(this);
 
     /**
      * Visibilité du composant.
@@ -162,20 +167,21 @@ export class ArDialog extends LitElement {
     /**
      * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
      * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
+     * Traduit automatiquement selon `lang` si non personnalisé.
      *
      * @attr prevented-message
-     * @default 'Fermeture bloquée.'
      */
-    @property({ reflect: true, attribute: 'prevented-message' }) preventedMessage =
-        'Fermeture bloquée.';
+    @property({ reflect: true, useDefault: true, attribute: 'prevented-message' })
+    preventedMessage: string | undefined = undefined;
 
     /**
-     * Label accessible du bouton de fermeture. À adapter pour la langue de l'interface.
+     * Label accessible du bouton de fermeture. Traduit automatiquement selon `lang` si non
+     * personnalisé.
      *
      * @attr close-label
-     * @default 'Fermer'
      */
-    @property({ reflect: true, attribute: 'close-label' }) closeLabel = 'Fermer';
+    @property({ reflect: true, useDefault: true, attribute: 'close-label' })
+    closeLabel: string | undefined = undefined;
 
     // ── Private state ──────────────────────────────────────────────────────────
 
@@ -205,7 +211,7 @@ export class ArDialog extends LitElement {
     private _hasWarnedNoCloseMechanism = false;
 
     private _getHeadingLabel(): string {
-        return (this.label ?? '').trim() || DEFAULT_DIALOG_LABEL;
+        return (this.label ?? '').trim() || this.localize.term('dialogDefaultLabel');
     }
 
     private _warnIfMissingLabel(): void {
@@ -282,6 +288,7 @@ export class ArDialog extends LitElement {
 
     override render(): TemplateResult {
         const headingLabel = this._getHeadingLabel();
+        const closeButtonLabel = this.closeLabel?.trim() || this.localize.term('closeDialog');
 
         return html`
             <dialog
@@ -326,7 +333,7 @@ export class ArDialog extends LitElement {
                                       ></path>
                                   </svg>
                               </slot>
-                              <span class="sr-only">${this.closeLabel}</span>
+                              <span class="sr-only">${closeButtonLabel}</span>
                           </button>
                       </header>`}
                 <div part="body" id="dialog-body">
@@ -373,7 +380,7 @@ export class ArDialog extends LitElement {
     }
 
     private _announcePrevented(): void {
-        const message = this.preventedMessage.trim() || 'Fermeture bloquée.';
+        const message = this.preventedMessage?.trim() || this.localize.term('closingBlocked');
         announceA11y(message, 'assertive');
     }
 

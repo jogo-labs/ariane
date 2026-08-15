@@ -10,6 +10,12 @@ import { fixture, html, expect } from '@open-wc/testing';
 import type { ArDialog } from './dialog.js';
 import './index.js';
 
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (le runner Chromium peut différer selon l'environnement CI).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
+
 function requireShadow(el: Element): ShadowRoot {
     if (!el.shadowRoot) throw new Error(`shadowRoot absent sur <${el.tagName.toLowerCase()}>`);
     return el.shadowRoot;
@@ -59,7 +65,7 @@ describe('ar-dialog — accessibilité', () => {
         const label = closeBtn.querySelector('.sr-only');
         expect(label).not.to.equal(null);
         if (!label) throw new Error('.sr-only introuvable');
-        expect(label.textContent?.trim()).to.equal('Fermer');
+        expect(label.textContent?.trim()).to.equal('Fermer la boîte de dialogue');
     });
 
     it('le fallback de titre fournit un nom accessible par défaut', async () => {
