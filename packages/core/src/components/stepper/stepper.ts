@@ -98,8 +98,8 @@ export interface ArStepperStepChangeDetail {
  *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
  *   `currentPath` ne change pas. Contient `from` et `to`. @cancelable
  * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
- *   `currentPath` a réellement changé (réassignation externe suite à la confirmation du
- *   consommateur, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
+ *   `currentPath` a réellement changé (réassignation externe en réponse à
+ *   `ar-stepper-step-change`, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
  */
 export class ArStepper extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
@@ -109,7 +109,6 @@ export class ArStepper extends LitElement {
     /**
      * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
-     * @attr current-path
      */
     @property({ type: String, attribute: 'current-path' })
     currentPath = '';
@@ -117,7 +116,6 @@ export class ArStepper extends LitElement {
     /**
      * Mode de navigation : `create` (formulaire de création) ou `edit` (modification).
      * Détermine quelles étapes sont accessibles au clic.
-     * @attr mode
      */
     @property({ type: String, attribute: 'mode', useDefault: true })
     mode: 'create' | 'edit' = 'create';
@@ -125,21 +123,18 @@ export class ArStepper extends LitElement {
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
      * automatiquement quand l'utilisateur scrolle vers une section de la page.
-     * @attr follow-scroll
      */
     @property({ type: Boolean, attribute: 'follow-scroll' })
     followScroll = false;
 
     /**
      * ID de l'élément cible qui accueille le stepper en mode desktop.
-     * @attr desktop-target
      */
     @property({ type: String, attribute: 'desktop-target', reflect: true })
     desktopTarget?: string;
 
     /**
      * Breakpoint desktop à partir duquel la téléportation est activée.
-     * @attr desktop-from
      */
     @property({ type: Number, attribute: 'desktop-from', reflect: true })
     desktopFrom = 992;
@@ -147,16 +142,12 @@ export class ArStepper extends LitElement {
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
      * Sans effet en mode desktop.
-     * @attr open
-     * @default false
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     /**
      * Inverse l'alignement de la liste d'étapes en mode desktop. Sans effet en mode
      * mobile (dropdown).
-     * @attr reverse-align
-     * @default false
      */
     @property({ attribute: 'reverse-align', reflect: true, type: Boolean })
     reverseAlign: boolean = false;

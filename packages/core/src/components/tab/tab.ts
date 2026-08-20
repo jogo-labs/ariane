@@ -19,12 +19,6 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="tab--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
- *
- * Note d'implémentation : la mise en page de [part~='tab'] compense la bordure de son parent
- * ar-tab-group via les tokens --ar-tab-group-border-top-width / --ar-tab-group-border-bottom-width
- * (déclarés et documentés sur ar-tab-group, cf. tab-group.ts) — pas des tokens propres à ar-tab.
- * Le fallback 0px est structurel (évite un décalage visuel si ar-tab est utilisé hors d'un
- * ar-tab-group) et reste volontaire.
  */
 export class ArTab extends LitElement {
     static override styles = [styles];

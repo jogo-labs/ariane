@@ -54,7 +54,6 @@ export class ArCharcounter extends LitElement {
     /**
      * Texte affiché après le chiffre. Accepte "singulier|pluriel". Traduit automatiquement selon
      * `lang` si non personnalisé.
-     * @attr label
      */
     @property({ reflect: true, useDefault: true })
     label: string | undefined = undefined;

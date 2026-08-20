@@ -31,8 +31,6 @@ export class ArSpinner extends LitElement {
 
     /**
      * Passe le spinner en état "terminé" : masque le SVG et met à jour l'annonce ARIA.
-     * @attr done
-     * @default false
      */
     @property({ reflect: true, useDefault: true, type: Boolean })
     done: boolean = ArSpinner.DEFAULT_DONE;
@@ -40,7 +38,6 @@ export class ArSpinner extends LitElement {
     /**
      * Texte annoncé aux lecteurs d'écran pendant le chargement. Traduit automatiquement selon
      * `lang` si non personnalisé.
-     * @attr loading-label
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'loading-label' })
     loadingLabel: string | undefined = undefined;
@@ -48,7 +45,6 @@ export class ArSpinner extends LitElement {
     /**
      * Texte annoncé aux lecteurs d'écran quand le chargement est terminé. Traduit automatiquement
      * selon `lang` si non personnalisé.
-     * @attr done-label
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'done-label' })
     doneLabel: string | undefined = undefined;

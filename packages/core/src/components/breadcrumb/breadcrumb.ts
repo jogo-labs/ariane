@@ -87,7 +87,6 @@ export class ArBreadcrumb extends LitElement {
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
      * Sans effet en mode desktop.
-     * @attr open
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 

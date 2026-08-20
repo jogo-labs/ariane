@@ -27,7 +27,7 @@ export class ArProgressbarConfig {
  * @csspart bar          - Le `<div>` représentant la progression (la partie remplie).
  *
  * @cssprop --ar-progressbar-track-color - Couleur du rail (fond). Repli `ButtonFace` si aucun thème n'est chargé (WCAG 1.4.11).
- * @cssprop --ar-progressbar-fill-color - Couleur de la progression. Repli `ButtonText` si aucun thème n'est chargé (WCAG 1.4.11) — distinct de `ButtonFace` pour garder rail et remplissage contrastés entre eux.
+ * @cssprop --ar-progressbar-fill-color - Couleur de la progression. Repli `ButtonText` si aucun thème n'est chargé (WCAG 1.4.11).
  * @cssprop --ar-progressbar-max-width - Largeur maximale du composant. Repli `500px` si aucun thème n'est chargé — sans plafond, le pourcentage peut s'éloigner visuellement de son label sur un conteneur très large.
  */
 export class ArProgressbar extends LitElement {
@@ -35,7 +35,6 @@ export class ArProgressbar extends LitElement {
 
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
-     * @attr percent
      */
     @property({ reflect: true, useDefault: true, type: Number })
     percent = 0;

@@ -74,8 +74,8 @@ export interface ArPaginationPageChangeDetail {
  *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
  *   change pas. Contient `from` et `to`. @cancelable
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
- *   `current` a réellement changé (réassignation externe suite à la confirmation du
- *   consommateur, ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
+ *   `current` a réellement changé (réassignation externe en réponse à `ar-pagination-page-change`,
+ *   ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
  */
 export class ArPagination extends LitElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
@@ -87,16 +87,12 @@ export class ArPagination extends LitElement {
 
     /**
      * Numéro de la page courante (commence à 1).
-     * @attr current
-     * @default 1
      */
     @property({ reflect: true, type: Number, useDefault: true })
     current: number = ArPagination.DEFAULT_CURRENT;
 
     /**
      * Nombre total de pages.
-     * @attr total
-     * @default 5
      */
     @property({ reflect: true, type: Number, useDefault: true })
     total: number = ArPagination.DEFAULT_TOTAL;
@@ -105,8 +101,6 @@ export class ArPagination extends LitElement {
      * Mode compact : uniquement les boutons précédent/suivant et un label de position
      * ("Page X / Y"), navigation strictement séquentielle (pas de saut direct à une page).
      * Rendu identique quelle que soit la largeur du conteneur (pas de repli en `<select>`).
-     * @attr compact
-     * @default false
      */
     @property({ reflect: true, type: Boolean })
     compact: boolean = false;

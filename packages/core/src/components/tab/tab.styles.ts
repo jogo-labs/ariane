@@ -14,6 +14,7 @@ export default css`
         /* a11y-fallback: sans thème, le fond de l'onglet reste transparent par défaut (couleur/fond posés par le thème via ::part()) — le padding est le seul mécanisme séparant visuellement des onglets adjacents ; sans lui les libellés se collent les uns aux autres */
         padding: var(--ar-tab-padding-y, 1rem) var(--ar-tab-padding-x, 1.5rem);
         border-radius: inherit;
+        /* Compense la bordure du parent ar-tab-group (tokens déclarés sur ar-tab-group, cf. tab-group.ts) — repli 0px volontaire pour un ar-tab utilisé hors d'un ar-tab-group. */
         margin-block-start: calc(-1 * var(--ar-tab-group-border-top-width, 0px));
         margin-block-end: calc(-1 * var(--ar-tab-group-border-bottom-width, 0px));
     }

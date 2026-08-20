@@ -63,7 +63,7 @@ import '../../translations/en.js';
  * @cssprop --ar-datepicker-nav-button-border-color - Couleur de bordure des boutons nav.
  * @cssprop --ar-datepicker-footer-button-border-color - Couleur de bordure des boutons footer.
  * @cssprop --ar-datepicker-day-size - Taille des cellules jour (repli `2.5rem` si aucun thème n'est chargé — cible tactile WCAG 2.5.8 Target Size Minimum, la grille utilisant border-collapse: collapse qui supprime l'espacement natif du <table>).
- * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (préserve l'absence de bordure voulue par défaut ; sans ce repli, une propriété longhand `border-color` isolée dégraderait vers `currentcolor`, une bordure non désirée sur chaque cellule).
+ * @cssprop --ar-datepicker-day-border-color - Couleur de bordure par défaut des cellules jour. Repli `transparent` si aucun thème n'est chargé (aucune bordure par défaut).
  * @cssprop --ar-datepicker-day-color - Couleur du texte des cellules jour (cascade vers --ar-color-text).
  * @cssprop --ar-datepicker-day-bg - Fond des cellules jour.
  * @cssprop --ar-datepicker-day-other-month-color - Couleur des jours hors du mois affiché. Repli `GrayText` si aucun thème n'est chargé.
@@ -71,11 +71,11 @@ import '../../translations/en.js';
  * @cssprop --ar-datepicker-day-today-color - Couleur texte du jour actuel.
  * @cssprop --ar-datepicker-day-today-border - Couleur de bordure du jour actuel. Repli `GrayText` si aucun thème n'est chargé (garde une distinction visible du reste de la grille).
  * @cssprop --ar-datepicker-day-hover-bg - Fond au survol d'un jour. Repli `ButtonFace` si aucun thème n'est chargé.
- * @cssprop --ar-datepicker-day-hover-color - Couleur texte au survol d'un jour. Repli `ButtonText` si aucun thème n'est chargé (pairé avec le repli de --ar-datepicker-day-hover-bg pour garantir le contraste).
+ * @cssprop --ar-datepicker-day-hover-color - Couleur texte au survol d'un jour. Repli `ButtonText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-focus-ring-color - Couleur du focus ring des jours. Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-day-focus-ring-width - Épaisseur du focus ring des jours.
  * @cssprop --ar-datepicker-day-focus-ring-offset - Décalage du focus ring des jours.
- * @cssprop --ar-datepicker-day-focus-border-color - Couleur de bordure de la cellule jour en focus (roving tabindex). Repli transparent si aucun thème n'est chargé. Purement cosmétique : l'indicateur de focus visible (WCAG 2.4.7) reste garanti indépendamment par --ar-datepicker-day-focus-ring-color/-width/-offset. Dans le thème fourni, reprend --ar-panel-bg pour fondre la bordure dans le fond du panel ; un consommateur qui s'appuierait uniquement sur cette bordure (sans l'anneau) pour son propre design de focus est responsable du contraste WCAG 2.4.7.
+ * @cssprop --ar-datepicker-day-focus-border-color - Couleur de bordure de la cellule jour en focus (roving tabindex). Purement cosmétique : l'indicateur de focus WCAG 2.4.7 est garanti indépendamment par --ar-datepicker-day-focus-ring-color/-width/-offset. Repli transparent si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné. Repli `Highlight` si aucun thème n'est chargé (sinon indiscernable des jours non sélectionnés).
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
