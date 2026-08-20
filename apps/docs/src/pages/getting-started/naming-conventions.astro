@@ -144,11 +144,6 @@ const tocEntries = [
                     présent, l'état s'ajoute en second part sur le même attribut (ex.
                     <code>part="bullet bullet--current"</code>).
                 </p>
-                <p style="margin-top: 1rem">
-                    Une règle sur <code>::part(x--current)</code> écrite une seule fois
-                    s'applique à tout composant qui expose cet état, sans redécouvrir une
-                    convention différente à chaque composant.
-                </p>
             </div>
 
             <section id="states-table" class="subsection">
@@ -158,54 +153,54 @@ const tocEntries = [
                             <tr>
                                 <th scope="col">État</th>
                                 <th scope="col">Signification</th>
-                                <th scope="col">Équivalent natif</th>
+                                <th scope="col">Exemples</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><code>--current</code></td>
                                 <td>Position atteinte par navigation.</td>
-                                <td><code>aria-current</code></td>
+                                <td><code>ar-pagination::part(item--current)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--selected</code></td>
                                 <td>Choix actif de l'utilisateur.</td>
-                                <td><code>aria-selected</code></td>
+                                <td><code>ar-tab::part(tab--selected)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--disabled</code></td>
                                 <td>Désactivé.</td>
-                                <td><code>aria-disabled</code> / <code>:disabled</code></td>
+                                <td><code>ar-pagination::part(nav-button--disabled)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--pending</code></td>
                                 <td>Traitement en cours.</td>
-                                <td>—</td>
+                                <td><code>ar-table-sort::part(sort-button--pending)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--warning</code></td>
                                 <td>État d'avertissement.</td>
-                                <td>—</td>
+                                <td><code>ar-charcounter::part(count--warning)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--error</code></td>
                                 <td>État d'erreur.</td>
-                                <td>—</td>
+                                <td><code>ar-charcounter::part(count--error)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--desktop</code></td>
-                                <td>Affichage desktop d'une liste ayant une variante mobile.</td>
-                                <td>—</td>
+                                <td>Affichage desktop d'un élément ayant une variante mobile.</td>
+                                <td><code>ar-breadcrumb::part(list--desktop)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--mobile</code></td>
-                                <td>Affichage mobile d'une liste ayant une variante desktop.</td>
-                                <td>—</td>
+                                <td>Affichage mobile d'un élément ayant une variante desktop.</td>
+                                <td><code>ar-breadcrumb::part(list--mobile)</code></td>
                             </tr>
                             <tr>
                                 <td><code>--substep</code></td>
-                                <td>Sous-liste imbriquée dans une liste parente.</td>
-                                <td>—</td>
+                                <td>Sous-liste d'étape imbriquée dans une liste d'étape parente.</td>
+                                <td><code>ar-stepper::part(list--substep)</code></td>
                             </tr>
                         </tbody>
                     </table>
