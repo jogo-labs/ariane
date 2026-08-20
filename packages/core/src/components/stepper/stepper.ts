@@ -39,7 +39,7 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Stepper de navigation accessible avec téléportation DOM adaptive.
+ * @summary Stepper de navigation accessible, adapté au mobile et au desktop.
  * @display demo
  * @localized
  *

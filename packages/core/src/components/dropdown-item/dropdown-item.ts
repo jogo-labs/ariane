@@ -3,7 +3,7 @@ import { LitElement, html, css, type TemplateResult } from 'lit';
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 /**
- * @summary Élément enfant de ar-dropdown. Active le mode menu et pose les attributs ARIA sur son enfant focusable.
+ * @summary Élément enfant de ar-dropdown, utilisé pour activer le mode menu.
  * @parent ar-dropdown
  * @display docs
  *

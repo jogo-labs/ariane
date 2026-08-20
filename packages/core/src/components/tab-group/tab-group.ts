@@ -8,7 +8,7 @@ import { warn } from '../../utils/warn.js';
 import styles from './tab-group.styles.js';
 
 /**
- * @summary Groupe d'onglets accessibles — pattern WAI-ARIA Tabs complet.
+ * @summary Groupe d'onglets accessible.
  * @display demo
  *
  * @slot - ar-tab et ar-tab-panel enfants.

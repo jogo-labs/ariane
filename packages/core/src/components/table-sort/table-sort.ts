@@ -19,7 +19,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 }
 
 /**
- * @summary Entête de colonne triable accessible — indicateur visuel ↑↓ et aria-sort automatique.
+ * @summary Entête de colonne triable accessible, avec indicateur visuel de la direction de tri.
  * @display demo
  * @localized
  *
