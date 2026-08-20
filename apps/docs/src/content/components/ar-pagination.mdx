@@ -65,9 +65,8 @@ import WcagRef from '../../components/WcagRef.astro';
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
 - **`current` ne change que si vous le réassignez.** Le focus et l'annonce aria-live suivent
-  cette réassignation — mettez `current` à jour de façon synchrone (ou quasi-synchrone) dans le
-  handler de `ar-pagination-page-change` pour qu'ils restent cohérents avec l'action de
-  l'utilisateur.
+  cette réassignation — mettez-la à jour de façon synchrone (voir la section Utilisation) pour
+  qu'ils restent cohérents avec l'action de l'utilisateur.
 
 ## Comportement responsive
 

@@ -79,11 +79,9 @@ variants:
           </script>
     - name: multi
       label: Multi-colonnes
-      description: |
-          Plusieurs colonnes triables — le consommateur gère la coordination.
-          Appeler `reset()` sur les autres colonnes avant de confirmer la colonne active :
-          les lecteurs d'écran sont informés des réinitialisations, sans bruit si une colonne
-          était déjà à `none`.
+      description: >-
+          Plusieurs colonnes triables — la coordination entre elles est manuelle
+          (voir la section « Multi-colonnes »).
       html: |
           <table style="border-collapse:collapse;font-family:inherit;" id="demo-multi">
               <thead>

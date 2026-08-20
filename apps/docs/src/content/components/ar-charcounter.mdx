@@ -93,4 +93,4 @@ form.addEventListener('submit', (e) => {
 });
 ```
 
-- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="4.1.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire (icône, symbole) à côté du compteur. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
+- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="1.4.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
