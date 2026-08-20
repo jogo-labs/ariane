@@ -10,6 +10,7 @@ import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
+import { isStatePart } from '../utils/state-parts.ts';
 
 interface RelatedTokens {
     component:   string;
@@ -31,6 +32,7 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 const hasTransverseParts = (component.cssParts ?? []).some((p) =>
     isTransversePart(p.name, component.tagName ?? ''),
 );
+const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name));
 ---
 
 <div class="component-api">
@@ -160,6 +162,12 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
                     <>
                         <br>Certaines parts ci-dessous indiquent un rôle transverse, partagé avec
                         d'autres composants — voir les <a href="/getting-started/naming-conventions">conventions de nommage</a>.
+                    </>
+                )}
+                {hasStateParts && (
+                    <>
+                        <br>Certaines parts ci-dessous portent un modificateur d'état (<code>--</code>) — voir
+                        les <a href="/getting-started/naming-conventions#state-parts">conventions de nommage</a>.
                     </>
                 )}
             </p>
