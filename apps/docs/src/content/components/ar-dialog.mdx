@@ -230,13 +230,13 @@ ar-dialog::part(header) {
 
 Le slot n'est pas limité à des boutons isolés — un seul enfant slotté peut lui-même porter son
 propre layout interne (actions à gauche, pagination à droite, titre sr-only…). Voir la variante
-« Header avancé » ci-dessus pour une démonstration complète.
+« Header avancé » pour une démonstration complète.
 
-Pour retirer entièrement le header, voir la variante « Sans header » ci-dessus.
+Pour retirer entièrement le header, voir la variante « Sans header ».
 
 ### Cycle d'événements
 
-Tous les événements portent `detail: { id }` (l'id du dialog). `data-ar-dismiss` et `data-ar-accept` sont deux conventions distinctes de `ar-dialog-hide` : elles permettent de distinguer une annulation ("Annuler") d'une confirmation ("Confirmer") sur le même geste de fermeture. La liste complète des événements, avec leur annulabilité, est dans la [Référence API](#reference-api) ci-dessous.
+Tous les événements portent `detail: { id }` (l'id du dialog). `data-ar-dismiss` et `data-ar-accept` sont deux conventions distinctes de `ar-dialog-hide` : elles permettent de distinguer une annulation ("Annuler") d'une confirmation ("Confirmer") sur le même geste de fermeture. La liste complète des événements, avec leur annulabilité, est dans la [Référence API](#reference-api).
 
 ```js
 document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted', (e) => {
@@ -247,4 +247,4 @@ document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted',
 
 ### Dialogs empilés
 
-Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme. Voir la variante « Dialogs empilés » ci-dessus pour le comportement de `Escape` et la coordination du focus.
+Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme. Voir la variante « Dialogs empilés » pour le comportement de `Escape` et la coordination du focus.

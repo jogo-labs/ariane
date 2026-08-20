@@ -116,7 +116,7 @@ variants:
           </div>
     - name: scroll-hints
       label: Scroll hints
-      description: Les classes `has-overflow-start` et `has-overflow-end` sont posées automatiquement sur l'hôte. La démo ci-dessous branche un `mask-image` CSS sur ces classes pour signaler l'overflow en temps réel — aucun attribut requis.
+      description: Les classes `has-overflow-start` et `has-overflow-end` sont posées automatiquement sur l'hôte. Cette démo branche un `mask-image` CSS sur ces classes pour signaler l'overflow en temps réel — aucun attribut requis.
       html: |
           <style>
               .demo-scroll ar-tab-group.has-overflow-start:not(.has-overflow-end)::part(nav) {
@@ -227,7 +227,7 @@ Le tablist utilise un scroll horizontal natif (`overflow-x: auto`). Les onglets 
 
 **Recommandations pour votre design system :**
 
-- Les techniques de signalement d'overflow (`mask-image`, boutons de scroll via `scrollNav()`) sont démontrées dans les variantes _Scroll hints_ et _Boutons de scroll_ ci-dessus.
+- Les techniques de signalement d'overflow (`mask-image`, boutons de scroll via `scrollNav()`) sont démontrées dans les variantes _Scroll hints_ et _Boutons de scroll_.
 - Si une scrollbar visible est souhaitée, stylez `ar-tab-group::part(nav)::-webkit-scrollbar` et `scrollbar-width`.
 
 ### À votre charge
@@ -251,4 +251,4 @@ L'événement se déclenche aussi automatiquement quand l'onglet actif est retir
 
 ### Activation manuelle vs automatique
 
-Par défaut (`manual-activation` absent), les flèches déplacent le focus **et** activent immédiatement l'onglet ciblé — `ar-tab-group-change` se déclenche à chaque flèche. Voir la variante _Activation manuelle_ ci-dessus pour le comportement avec `manual-activation`.
+Par défaut (`manual-activation` absent), les flèches déplacent le focus **et** activent immédiatement l'onglet ciblé — `ar-tab-group-change` se déclenche à chaque flèche. Voir la variante _Activation manuelle_ pour le comportement avec `manual-activation`.

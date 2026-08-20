@@ -167,7 +167,7 @@ Les critères WCAG suivants sont implémentés :
 - **`reset()`** — à utiliser en réponse à une action utilisateur. Remet `order` à `none`, annonce _"tri supprimé"_ aux lecteurs d'écran si la colonne était triée, et est sans effet si elle était déjà à `none`. C'est le chemin à privilégier dans un handler `ar-table-sort-change` pour éviter les tris cumulatifs.
 - **`element.order = 'none'`** — silencieux, pour les réinitialisations programmatiques (rafraîchissement de données, changement de contexte) où une annonce AT ne serait pas pertinente.
 
-Voir la variante **Multi-colonnes** ci-dessous pour un exemple complet. Pour permettre un tri sur plusieurs axes simultanément, ne pas appeler `reset()` sur les autres colonnes — chaque `aria-sort` reflètera alors son état réel, et l'utilisateur peut naviguer entre les en-têtes pour connaître l'état de chaque colonne.
+Voir la variante **Multi-colonnes** pour un exemple complet. Pour permettre un tri sur plusieurs axes simultanément, ne pas appeler `reset()` sur les autres colonnes — chaque `aria-sort` reflètera alors son état réel, et l'utilisateur peut naviguer entre les en-têtes pour connaître l'état de chaque colonne.
 
 ### Localisation
 
@@ -186,4 +186,4 @@ L'événement `ar-table-sort-change` porte un objet `detail` structuré ainsi :
 | `requestedOrder` | `'none' \| 'asc' \| 'desc'`      | Ordre demandé — le cycle suivant dans la séquence.            |
 | `columnLabel`    | `string`                         | Libellé textuel de la colonne (contenu du slot du composant). |
 
-Consulter les variantes **Alphabétique**, **Numérique** et **Date** ci-dessous pour un exemple d'écouteur `ar-table-sort-change`.
+Consulter les variantes **Alphabétique**, **Numérique** et **Date** pour un exemple d'écouteur `ar-table-sort-change`.

@@ -50,7 +50,7 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
             </p>
             <p>
                 <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
-                « Attributs &amp; Propriétés » ci-dessous.
+                « Attributs &amp; Propriétés ».
             </p>
         </section>
     )}
@@ -160,13 +160,13 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
                 {hasTransverseParts && (
                     <>
-                        <br>Certaines parts ci-dessous indiquent un rôle transverse, partagé avec
+                        <br>Certaines parts indiquent un rôle transverse, partagé avec
                         d'autres composants — voir les <a href="/getting-started/naming-conventions#semantic-parts">conventions de nommage</a>.
                     </>
                 )}
                 {hasStateParts && (
                     <>
-                        <br>Certaines parts ci-dessous portent un modificateur d'état (<code>--</code>) — voir
+                        <br>Certaines parts portent un modificateur d'état (<code>--</code>) — voir
                         les <a href="/getting-started/naming-conventions#state-parts">conventions de nommage</a>.
                     </>
                 )}
@@ -200,7 +200,7 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
             {panelProps.length > 0 && (
                 <p>
                     Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br>
-                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composants comme ci-dessous.
+                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
                 </p>
                 <div class="token-example">
                     <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
