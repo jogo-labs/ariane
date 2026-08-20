@@ -4,6 +4,7 @@ import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
     { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
+    { id: 'state-parts', label: 'Parts d\'état', level: 1 as const },
     { id: 'slots', label: 'Conventions de slot', level: 1 as const },
 ];
 ---
@@ -126,6 +127,70 @@ const tocEntries = [
                                 <td><code>icon</code></td>
                                 <td>Icône.</td>
                                 <td><code>ar-alert::part(icon)</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <section id="state-parts" class="main-section">
+            <div>
+                <h3 class="section-title">Parts d'état</h3>
+                <p>
+                    Certains <code>::part()</code> portent en plus un <strong>modificateur
+                        d'état</strong>, selon la convention
+                    <code>&lt;élément&gt;--&lt;état&gt;</code> : l'élément de base reste
+                    présent, l'état s'ajoute en second part sur le même attribut (ex.
+                    <code>part="bullet bullet--current"</code>).
+                </p>
+                <p style="margin-top: 1rem">
+                    Une règle sur <code>::part(x--current)</code> écrite une seule fois
+                    s'applique à tout composant qui expose cet état, sans redécouvrir une
+                    convention différente à chaque composant.
+                </p>
+            </div>
+
+            <section id="states-table" class="subsection">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">État</th>
+                                <th scope="col">Signification</th>
+                                <th scope="col">Équivalent natif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>--current</code></td>
+                                <td>Position atteinte par navigation.</td>
+                                <td><code>aria-current</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--selected</code></td>
+                                <td>Choix actif de l'utilisateur.</td>
+                                <td><code>aria-selected</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--disabled</code></td>
+                                <td>Désactivé.</td>
+                                <td><code>aria-disabled</code> / <code>:disabled</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--pending</code></td>
+                                <td>Traitement en cours.</td>
+                                <td>—</td>
+                            </tr>
+                            <tr>
+                                <td><code>--warning</code></td>
+                                <td>État d'avertissement.</td>
+                                <td>—</td>
+                            </tr>
+                            <tr>
+                                <td><code>--error</code></td>
+                                <td>État d'erreur.</td>
+                                <td>—</td>
                             </tr>
                         </tbody>
                     </table>
