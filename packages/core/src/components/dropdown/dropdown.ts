@@ -23,7 +23,7 @@ export type ArDropdownPlacement =
     | 'left-end';
 
 /**
- * @summary Panneau contextuel accessible, affiché au clic sur un bouton déclencheur.
+ * @summary Panneau contextuel affiché au clic sur un bouton déclencheur.
  * @display demo
  *
  * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).

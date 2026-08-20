@@ -28,7 +28,7 @@ export interface ArPaginationPageChangeDetail {
 }
 
 /**
- * @summary Pagination accessible avec numérotation dynamique et ellipses automatiques.
+ * @summary Pagination avec numérotation dynamique et ellipses automatiques.
  * @display demo
  * @localized
  *

@@ -11,7 +11,7 @@ export class ArProgressbarConfig {
 }
 
 /**
- * @summary Barre de progression accessible avec label et affichage du pourcentage.
+ * @summary Barre de progression avec label et affichage du pourcentage.
  * @display demo
  *
  * La valeur de `percent` est automatiquement bornée entre 0 et 100.

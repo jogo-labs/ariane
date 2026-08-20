@@ -17,7 +17,7 @@ function pluralize(count: number, label: string): string {
 }
 
 /**
- * @summary Compteur de caractères restants pour un champ texte accessible.
+ * @summary Compteur de caractères restants pour un champ texte.
  * @localized
  *
  * Observe un `<textarea>` ou `<input>` via `for="id"` et affiche le décompte.

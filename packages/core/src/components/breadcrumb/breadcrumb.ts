@@ -24,7 +24,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
+ * @summary Fil d'ariane avec affichage adaptatif mobile/desktop.
  * @display demo
  * @localized
  *

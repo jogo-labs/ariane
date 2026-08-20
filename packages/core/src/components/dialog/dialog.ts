@@ -50,7 +50,7 @@ if (typeof document !== 'undefined') {
 }
 
 /**
- * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
+ * @summary Boîte de dialogue modale ou panneau latéral (drawer), animée.
  * @localized
  *
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.

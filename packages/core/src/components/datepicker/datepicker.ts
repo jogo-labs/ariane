@@ -13,7 +13,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Champ de saisie de date avec calendrier accessible.
+ * @summary Champ de saisie de date avec calendrier.
  * @display demo
  * @localized
  *

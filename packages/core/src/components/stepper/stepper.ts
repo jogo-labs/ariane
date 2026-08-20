@@ -39,7 +39,7 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Stepper de navigation accessible, adapté au mobile et au desktop.
+ * @summary Stepper de navigation, adapté au mobile et au desktop.
  * @display demo
  * @localized
  *

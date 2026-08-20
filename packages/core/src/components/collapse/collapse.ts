@@ -7,7 +7,7 @@ import { emitToggleEvent } from '../../utils/toggle-events.js';
 import styles from './collapse.styles.js';
 
 /**
- * @summary Panneau pliable/dépliable accessible.
+ * @summary Panneau pliable/dépliable.
  * @display demo
  *
  * @slot trigger - Élément déclencheur (ignoré si `for` est défini).

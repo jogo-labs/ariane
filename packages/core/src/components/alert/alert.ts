@@ -22,7 +22,7 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
- * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+ * @summary Affiche un message d'alerte avec différents niveaux de sévérité.
  * @display demo
  * @localized
  *

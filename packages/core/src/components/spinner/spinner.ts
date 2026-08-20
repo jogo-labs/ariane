@@ -10,7 +10,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Indicateur de chargement accessible avec états "en cours" et "terminé".
+ * @summary Indicateur de chargement avec états "en cours" et "terminé".
  * @display demo
  * @localized
  *
