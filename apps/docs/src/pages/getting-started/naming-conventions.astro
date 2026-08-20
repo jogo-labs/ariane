@@ -4,13 +4,14 @@ import TableOfContents from '../../components/TableOfContents.astro';
 
 const tocEntries = [
     { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
+    { id: 'state-parts', label: 'Parts d\'état', level: 1 as const },
     { id: 'slots', label: 'Conventions de slot', level: 1 as const },
 ];
 ---
 
 <Layout
     title="Conventions de nommage"
-    description="Vocabulaire de CSS part sémantiques et conventions de slot partagés par tous les composants Ariane."
+    description="Vocabulaire de CSS part sémantiques, parts d'état et conventions de slot partagés par tous les composants Ariane."
     currentPath="/getting-started/naming-conventions"
     showToc={true}
 >
@@ -126,6 +127,80 @@ const tocEntries = [
                                 <td><code>icon</code></td>
                                 <td>Icône.</td>
                                 <td><code>ar-alert::part(icon)</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <section id="state-parts" class="main-section">
+            <div>
+                <h3 class="section-title">Parts d'état</h3>
+                <p>
+                    Certains <code>::part()</code> portent en plus un <strong>modificateur
+                        d'état</strong>, selon la convention
+                    <code>&lt;élément&gt;--&lt;état&gt;</code> : l'élément de base reste
+                    présent, l'état s'ajoute en second part sur le même attribut (ex.
+                    <code>part="bullet bullet--current"</code>).
+                </p>
+            </div>
+
+            <section id="states-table" class="subsection">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">État</th>
+                                <th scope="col">Signification</th>
+                                <th scope="col">Exemples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>--current</code></td>
+                                <td>Position atteinte par navigation.</td>
+                                <td><code>ar-pagination::part(item--current)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--selected</code></td>
+                                <td>Choix actif de l'utilisateur.</td>
+                                <td><code>ar-tab::part(tab--selected)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--disabled</code></td>
+                                <td>Désactivé.</td>
+                                <td><code>ar-pagination::part(nav-button--disabled)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--pending</code></td>
+                                <td>Traitement en cours.</td>
+                                <td><code>ar-table-sort::part(sort-button--pending)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--warning</code></td>
+                                <td>État d'avertissement.</td>
+                                <td><code>ar-charcounter::part(count--warning)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--error</code></td>
+                                <td>État d'erreur.</td>
+                                <td><code>ar-charcounter::part(count--error)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--desktop</code></td>
+                                <td>Affichage desktop d'un élément ayant une variante mobile.</td>
+                                <td><code>ar-breadcrumb::part(list--desktop)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--mobile</code></td>
+                                <td>Affichage mobile d'un élément ayant une variante desktop.</td>
+                                <td><code>ar-breadcrumb::part(list--mobile)</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--substep</code></td>
+                                <td>Sous-liste d'étape imbriquée dans une liste d'étape parente.</td>
+                                <td><code>ar-stepper::part(list--substep)</code></td>
                             </tr>
                         </tbody>
                     </table>
