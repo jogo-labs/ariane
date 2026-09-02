@@ -8,7 +8,7 @@
  *
  * Tout le rendu des composants est server-side (Fragment set:html).
  * La coloration syntaxique est assurée par highlight.js (client-side, uniforme).
- * Le JS client gère la copie du code, les contrôles du playground et le toggle preview.
+ * Le JS client gère la copie du code et les contrôles du playground.
  */
 
 import ComponentApi from './ComponentApi.astro';
@@ -54,15 +54,12 @@ const showPlayground = displayMode === 'demo';
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section id="exemples">
-        <h3 class="section-title">Exemples</h3>
-        {/* ── Encart thème de démo ── */}
-        {/* Ariane est headless : aucun style n'est intégré au composant. Les previews
-            ci-dessous chargent le thème de démo `default.css` fourni avec la librairie —
-            à ne pas confondre avec un style par défaut intrinsèque au composant. */}
-        <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1rem">
-            <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.<br>
-            Un composant headless n'a aucun style intégré — remplacez ce thème par le vôtre pour un rendu différent.</p>
-        </ar-alert>
+        <h3 class="section-title">
+            Exemples
+            <a href="/getting-started/utilisation#personnalisation" class="theme-badge">
+                Thème de démo
+            </a>
+        </h3>
         <div class="main-section">
             {variants.map((variant) => (
                 <section id={`exemple-${variant.name}`}>
@@ -264,27 +261,23 @@ const showPlayground = displayMode === 'demo';
         position: relative;
     }
 
-    .preview-theme-toggle {
-        position:        absolute;
-        top:             0.5rem;
-        right:           0.5rem;
-        z-index:         10;
-        display:         flex;
+    .theme-badge {
+        display:         inline-flex;
         align-items:     center;
-        justify-content: center;
-        width:           1.75rem;
-        height:          1.75rem;
-        background:      color-mix(in srgb, var(--doc-bg) 75%, transparent);
-        backdrop-filter: blur(4px);
-        border:          1px solid var(--doc-border);
-        border-radius:   0.375rem;
-        cursor:          pointer;
+        padding:         0.125rem 0.5rem;
+        font-size:       0.75rem;
+        font-weight:     400;
         color:           var(--doc-text-muted);
-        transition:      background 0.15s;
+        background:      var(--doc-code-bg);
+        border:          1px solid var(--doc-border);
+        border-radius:   999px;
+        text-decoration: none;
+        vertical-align:  middle;
     }
 
-    .preview-theme-toggle:hover {
-        background: var(--doc-bg);
+    .theme-badge:hover {
+        color:      var(--doc-text);
+        border-color: var(--doc-text-muted);
     }
 
     .preview {
