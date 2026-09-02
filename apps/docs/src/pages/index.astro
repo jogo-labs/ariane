@@ -30,10 +30,10 @@ const firstComponentHref = rootComponents[0]?.tagName
         </p>
 
         <div class="hero-badges">
-            <span class="badge"><span class="badge-dot"></span>v{version}</span>
-            <span class="badge"><span class="badge-dot green"></span>{componentCount} composants</span>
-            <span class="badge"><span class="badge-dot gray"></span>Licence MIT</span>
-            <span class="badge"><span class="badge-dot gray"></span>Lit 3 · TypeScript</span>
+            <span class="hero-badge"><span class="hero-badge-dot"></span>v{version}</span>
+            <span class="hero-badge"><span class="hero-badge-dot green"></span>{componentCount} composants</span>
+            <span class="hero-badge"><span class="hero-badge-dot gray"></span>Licence MIT</span>
+            <span class="hero-badge"><span class="hero-badge-dot gray"></span>Lit 3 · TypeScript</span>
         </div>
 
         <div class="hero-ctas">
@@ -165,7 +165,7 @@ const firstComponentHref = rootComponents[0]?.tagName
         margin-bottom:   2.25rem;
     }
 
-    .badge {
+    .hero-badge {
         display:       inline-flex;
         align-items:   center;
         gap:           0.35rem;
@@ -178,7 +178,7 @@ const firstComponentHref = rootComponents[0]?.tagName
         border-radius: 20px;
     }
 
-    .badge-dot {
+    .hero-badge-dot {
         width:         6px;
         height:        6px;
         border-radius: 50%;
@@ -186,8 +186,8 @@ const firstComponentHref = rootComponents[0]?.tagName
         flex-shrink:   0;
     }
 
-    .badge-dot.green { background: #16a34a; }
-    .badge-dot.gray  { background: #9ca3af; }
+    .hero-badge-dot.green { background: #16a34a; }
+    .hero-badge-dot.gray  { background: #9ca3af; }
 
     .hero-ctas {
         display:         flex;
@@ -401,6 +401,10 @@ const firstComponentHref = rootComponents[0]?.tagName
     }
 
     /* ── Responsive ─────────────────────────────────────── */
+    /* Seuils propres au tuning du hero/selling-grid de cette page (860px/480px),
+       distincts du 768px utilisé ailleurs (Layout, TableOfContents, [slug]) —
+       pas de token de breakpoint partagé pour l'instant. À réévaluer avec la
+       refonte visuelle de la home (#110). */
 
     @media (max-width: 860px) {
         .hero { padding: 4rem 1.5rem 3rem; }
