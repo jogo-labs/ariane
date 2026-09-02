@@ -3,7 +3,7 @@ import { LitElement, html, css, type TemplateResult } from 'lit';
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 /**
- * @summary Élément enfant de ar-dropdown, utilisé pour activer le mode menu.
+ * @summary Représente une action individuelle dans un panneau ar-dropdown utilisé en mode menu.
  * @parent ar-dropdown
  * @display docs
  *

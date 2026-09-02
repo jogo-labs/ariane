@@ -5,7 +5,7 @@ import { ContextConsumer } from '@lit/context';
 import { breadcrumbContext, type BreadcrumbRegistry } from '../../context/breadcrumb.context.js';
 
 /**
- * @summary Élément enfant de ar-breadcrumb.
+ * @summary Représente un lien individuel dans un fil d'ariane.
  * @parent ar-breadcrumb
  * @display docs
  */

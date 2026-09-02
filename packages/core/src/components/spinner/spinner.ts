@@ -10,7 +10,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Indicateur de chargement avec états "en cours" et "terminé".
+ * @summary Indique qu'une opération est en cours quand sa durée est inconnue.
  * @display demo
  * @localized
  *

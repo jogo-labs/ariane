@@ -5,7 +5,7 @@ import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.conte
 import styles from './tab.styles.js';
 
 /**
- * @summary Onglet déclencheur pour ar-tab-group.
+ * @summary Nomme et active un panneau individuel dans un groupe d'onglets.
  * @parent ar-tab-group
  * @display docs
  *

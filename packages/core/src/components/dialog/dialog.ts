@@ -50,7 +50,7 @@ if (typeof document !== 'undefined') {
 }
 
 /**
- * @summary Boîte de dialogue modale ou panneau latéral (drawer), animée.
+ * @summary Apparaît au-dessus de la page (modal) ou glisse depuis le bord de l'écran (drawer) pour capter l'attention.
  * @localized
  *
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.

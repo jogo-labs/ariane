@@ -19,7 +19,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 }
 
 /**
- * @summary Entête de colonne triable, avec indicateur visuel de la direction de tri.
+ * @summary Affiche un indicateur de tri sur un entête de colonne, avec confirmation asynchrone du résultat.
  * @display demo
  * @localized
  *

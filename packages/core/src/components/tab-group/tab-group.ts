@@ -8,7 +8,7 @@ import { warn } from '../../utils/warn.js';
 import styles from './tab-group.styles.js';
 
 /**
- * @summary Groupe d'onglets, avec défilement horizontal si le contenu déborde.
+ * @summary Organise du contenu associé dans un conteneur affichant un panneau à la fois, avec des onglets pour naviguer.
  * @display demo
  *
  * @slot - ar-tab et ar-tab-panel enfants.

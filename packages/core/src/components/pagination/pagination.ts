@@ -28,7 +28,7 @@ export interface ArPaginationPageChangeDetail {
 }
 
 /**
- * @summary Pagination avec numérotation dynamique et ellipses automatiques.
+ * @summary Découpe une longue liste de contenu en pages, avec numérotation dynamique et ellipses automatiques.
  * @display demo
  * @localized
  *

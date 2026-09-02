@@ -5,7 +5,7 @@ import { ContextConsumer } from '@lit/context';
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
 
 /**
- * @summary Élément enfant de ar-stepper.
+ * @summary Représente une étape ou sous-étape individuelle dans un ar-stepper.
  * @parent ar-stepper
  * @display docs
  */

@@ -39,7 +39,7 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Stepper de navigation, adapté au mobile et au desktop.
+ * @summary Affiche la progression à travers une séquence d'étapes, avec prise en charge des sous-étapes.
  * @display demo
  * @localized
  *

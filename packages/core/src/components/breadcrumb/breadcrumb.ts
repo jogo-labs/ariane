@@ -24,7 +24,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Fil d'ariane avec affichage adaptatif mobile/desktop.
+ * @summary Affiche un fil de liens montrant la position dans la hiérarchie du site, avec affichage adaptatif mobile/desktop.
  * @display demo
  * @localized
  *
