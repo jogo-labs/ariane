@@ -54,12 +54,10 @@ const showPlayground = displayMode === 'demo';
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section id="exemples">
-        <h3 class="section-title">
-            Exemples
-            <a href="/getting-started/utilisation#personnalisation" class="theme-badge">
-                Thème de démo
-            </a>
-        </h3>
+        <h3 class="section-title">Exemples</h3>
+        <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1rem">
+            <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.</p>
+        </ar-alert>
         <div class="main-section">
             {variants.map((variant) => (
                 <section id={`exemple-${variant.name}`}>
@@ -259,25 +257,6 @@ const showPlayground = displayMode === 'demo';
 
     .preview-wrap {
         position: relative;
-    }
-
-    .theme-badge {
-        display:         inline-flex;
-        align-items:     center;
-        padding:         0.125rem 0.5rem;
-        font-size:       0.75rem;
-        font-weight:     400;
-        color:           var(--doc-text-muted);
-        background:      var(--doc-code-bg);
-        border:          1px solid var(--doc-border);
-        border-radius:   999px;
-        text-decoration: none;
-        vertical-align:  middle;
-    }
-
-    .theme-badge:hover {
-        color:      var(--doc-text);
-        border-color: var(--doc-text-muted);
     }
 
     .preview {
