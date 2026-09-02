@@ -31,6 +31,7 @@ interface Props {
     tagName:        string;
     displayMode:    'demo' | 'docs';
     parentTag?:     string;
+    parentUsage?:   string;
     playgroundHtml: string;
     controls:       CemControl[];
     component:      CemDeclaration;
@@ -42,6 +43,7 @@ const {
     tagName,
     displayMode = 'demo',
     parentTag,
+    parentUsage,
     playgroundHtml,
     controls,
     component,
@@ -93,11 +95,10 @@ const showPlayground = displayMode === 'demo';
 {/* ── Encart parent pour les sous-composants ── */}
 {parentTag && (
     <div class="parent-notice">
-        {/* <span class="parent-notice-icon">&#8593;</span> */}
         Ce composant est un sous-composant de
-        <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>
-            <code>&lt;{parentTag}&gt;</code>
-        </a>
+        <a href={`/components/${parentTag.replace(/^ar-/, '')}`}
+            ><code>&lt;{parentTag}&gt;</code></a
+        >{parentUsage ? `, ${parentUsage}.` : '.'}
     </div>
 )}
 

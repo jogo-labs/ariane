@@ -39,12 +39,17 @@ const { component, mdx } = Astro.props as {
 };
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
+// Certaines pages sous-composant n'ont pas de contenu narratif (uniquement le frontmatter :
+// description + parentUsage) — éviter une <section class="narrative"> vide qui ouvrirait quand
+// même un row-gap dans .page-container (flex column).
+const hasNarrative = !!mdx?.body?.trim();
 
 const variants      = mdx?.data.variants ?? [];
 const pageTitle     = mdx?.data.title ?? component.name;
 const pageDesc      = mdx?.data.description ?? component.summary;
 const displayMode   = component['x-display'] ?? 'demo';
 const parentTag     = component['x-parent'];
+const parentUsage   = mdx?.data.parentUsage;
 const relatedTokens = mdx?.data.relatedTokens ?? [];
 const pageScript = mdx?.data.pageScript;
 
@@ -164,7 +169,7 @@ const tocEntries = [
           *   - ul → NarrativeList      : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
           * Voir apps/docs/CONTRIBUTING.md § "Contenu narratif MDX" pour la documentation complète.
           */}
-        {Content && (
+        {Content && hasNarrative && (
             <section class="narrative">
                 <Content
                     components={{
@@ -181,6 +186,7 @@ const tocEntries = [
             tagName={component.tagName!}
             displayMode={displayMode}
             parentTag={parentTag}
+            parentUsage={parentUsage}
             playgroundHtml={playgroundHtml}
             controls={controls}
             component={component}
