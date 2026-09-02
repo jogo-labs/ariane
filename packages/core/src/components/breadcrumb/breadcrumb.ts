@@ -24,7 +24,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Affiche un fil de liens montrant la position dans la hiérarchie du site, avec affichage adaptatif mobile/desktop.
+ * @summary Affiche un fil de liens qui montre à l'utilisateur sa position dans la hiérarchie du site, avec un affichage adapté au mobile et au desktop.
  * @display demo
  * @localized
  *

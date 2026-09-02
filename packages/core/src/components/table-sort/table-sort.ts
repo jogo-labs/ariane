@@ -19,7 +19,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 }
 
 /**
- * @summary Affiche un indicateur de tri sur un entête de colonne, avec confirmation asynchrone du résultat.
+ * @summary Affiche un indicateur de tri sur un entête de colonne, avec confirmation asynchrone du résultat. À utiliser pour trier une liste de données côté serveur ou après un traitement asynchrone.
  * @display demo
  * @localized
  *

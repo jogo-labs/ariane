@@ -39,7 +39,7 @@ export interface ArStepperStepChangeDetail {
 }
 
 /**
- * @summary Affiche la progression à travers une séquence d'étapes, avec prise en charge des sous-étapes.
+ * @summary Affiche la progression de l'utilisateur à travers une séquence d'étapes, avec prise en charge des sous-étapes. À utiliser pour des parcours de création ou de modification en plusieurs étapes.
  * @display demo
  * @localized
  *

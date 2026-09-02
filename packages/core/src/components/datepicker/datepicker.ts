@@ -13,7 +13,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Champ de saisie de date synchronisé avec un calendrier popover.
+ * @summary Affiche un champ de saisie de date synchronisé avec un calendrier popover, pour combiner saisie libre au clavier et sélection visuelle.
  * @display demo
  * @localized
  *

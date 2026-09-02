@@ -10,7 +10,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Indique qu'une opération est en cours quand sa durée est inconnue.
+ * @summary Indique qu'une opération est en cours quand sa durée est inconnue. À utiliser pour un état de chargement là où une barre de progression déterminée n'est pas pertinente.
  * @display demo
  * @localized
  *

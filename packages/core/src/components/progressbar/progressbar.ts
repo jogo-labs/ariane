@@ -11,7 +11,7 @@ export class ArProgressbarConfig {
 }
 
 /**
- * @summary Affiche l'avancement d'une opération en cours sous forme de barre horizontale.
+ * @summary Affiche l'avancement d'une opération en cours sous forme de barre horizontale. À utiliser pour un upload de fichier, un parcours en plusieurs étapes, ou toute tâche à progression mesurable.
  * @display demo
  *
  * La valeur de `percent` est automatiquement bornée entre 0 et 100.

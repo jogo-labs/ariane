@@ -28,7 +28,7 @@ export interface ArPaginationPageChangeDetail {
 }
 
 /**
- * @summary Découpe une longue liste de contenu en pages, avec numérotation dynamique et ellipses automatiques.
+ * @summary Découpe une longue liste de contenu en pages, et permet à l'utilisateur de naviguer entre elles.
  * @display demo
  * @localized
  *

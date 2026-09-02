@@ -22,7 +22,7 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
- * @summary Affiche un message important intégré au contenu environnant, avec différents niveaux de sévérité.
+ * @summary Affiche un message important intégré au contenu environnant. À utiliser pour des confirmations, avertissements, erreurs, ou toute information que l'utilisateur ne doit pas manquer.
  * @display demo
  * @localized
  *

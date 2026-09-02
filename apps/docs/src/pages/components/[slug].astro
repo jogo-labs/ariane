@@ -46,7 +46,7 @@ const hasNarrative = !!mdx?.body?.trim();
 
 const variants      = mdx?.data.variants ?? [];
 const pageTitle     = mdx?.data.title ?? component.name;
-const pageDesc      = mdx?.data.description ?? component.summary;
+const pageDesc      = component.summary;
 const displayMode   = component['x-display'] ?? 'demo';
 const parentTag     = component['x-parent'];
 const relatedTokens = mdx?.data.relatedTokens ?? [];
@@ -140,6 +140,7 @@ const tocEntries = [
 
 <Layout
     title={pageTitle}
+    description={pageDesc}
     currentPath={'/components/' + getSlug(component.tagName!)}
     showToc={true}
 >
@@ -210,17 +211,8 @@ const tocEntries = [
     /* ── Encart parent ───────────────────────────────── */
 
     .parent-notice {
-        color:         var(--doc-text);
         margin:        1rem 0 0;
     }
-
-    .parent-notice a {
-        color:           var(--ar-color-interactive, #2563eb);
-        text-decoration: none;
-        font-weight:     600;
-    }
-
-    .parent-notice a:hover { text-decoration: underline; }
 
     /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
     .toc-mobile-inline { display: none; }
