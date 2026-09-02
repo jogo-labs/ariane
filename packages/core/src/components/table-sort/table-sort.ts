@@ -19,7 +19,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
 }
 
 /**
- * @summary Entête de colonne triable accessible — indicateur visuel ↑↓ et aria-sort automatique.
+ * @summary Affiche un indicateur de tri sur un entête de colonne, avec confirmation asynchrone du résultat. À utiliser pour trier une liste de données côté serveur ou après un traitement asynchrone.
  * @display demo
  * @localized
  *

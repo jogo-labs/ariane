@@ -69,7 +69,7 @@ customElements.define('mon-app', MonApp);`;
             <p class="summary">
                 Si votre application encapsule sa propre page ou une partie de
                 son contenu dans un <em>web component</em> avec son propre shadow DOM, le thème CSS
-                ne s'appliquera que partiellement à vos composants.<br>
+                ne s'appliquera que partiellement à vos composants.<br />
                 Il s'agit là d'une contrainte inhérente au shadow DOM, mais cette page vous guidera
                 pour vous aider à afficher vos composants correctement.
             </p>
@@ -80,10 +80,10 @@ customElements.define('mon-app', MonApp);`;
                 <h3 class="section-title">Un style appliqué partiellement ?</h3>
                 <p>
                     Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
-                    traversent la frontière du shadow DOM par héritage CSS natif.<br>
+                    traversent la frontière du shadow DOM par héritage CSS natif.<br />
                     Les règles utilisant <code>::part()</code> par contre ne peuvent pas
                     traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
-                    donc pas.<br>
+                    donc pas.<br />
                     C'est la raison pour laquelle votre thème ne s'applique que partiellement.
                 </p>
             </div>
@@ -97,7 +97,7 @@ customElements.define('mon-app', MonApp);`;
                     <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet"
                     target="_blank" rel="noopener" title="Visiter la page dédiée sur MDN (nouvel onglet)"><code>CSSStyleSheet</code></a>.
                     Elle peut ensuite être "adoptée" par chaque composant qui en a besoin, chacun partageant
-                    une même instance chargée et parsée une seule fois.<br>
+                    une même instance chargée et parsée une seule fois.<br />
                     Contrairement au chargement du CSS via une balise <code>&lt;link&gt;</code>,
                     les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
                 </p>
@@ -118,7 +118,7 @@ customElements.define('mon-app', MonApp);`;
                 <h4 class="subsection-title">Préparez votre thème</h4>
                 <p>
                     Le plus souvent votre application a déjà son propre thème, local à votre code
-                    — la technique est la même quel que soit le CSS.<br>
+                    — la technique est la même quel que soit le CSS.<br />
                     Il s'agit de créer à partir de votre fichier CSS une version <code>*.js</code>
                     qui sera utilisée en complément de votre fichier CSS.
                 </p>

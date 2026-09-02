@@ -39,10 +39,14 @@ const { component, mdx } = Astro.props as {
 };
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
+// Certaines pages sous-composant n'ont pas de contenu narratif (uniquement le frontmatter :
+// description + parentUsage) — éviter une <section class="narrative"> vide qui ouvrirait quand
+// même un row-gap dans .page-container (flex column).
+const hasNarrative = !!mdx?.body?.trim();
 
 const variants      = mdx?.data.variants ?? [];
 const pageTitle     = mdx?.data.title ?? component.name;
-const pageDesc      = mdx?.data.description ?? component.summary;
+const pageDesc      = component.summary;
 const displayMode   = component['x-display'] ?? 'demo';
 const parentTag     = component['x-parent'];
 const relatedTokens = mdx?.data.relatedTokens ?? [];
@@ -136,6 +140,7 @@ const tocEntries = [
 
 <Layout
     title={pageTitle}
+    description={pageDesc}
     currentPath={'/components/' + getSlug(component.tagName!)}
     showToc={true}
 >
@@ -153,6 +158,14 @@ const tocEntries = [
             </div>
 
             {pageDesc && <p class="summary">{pageDesc}</p>}
+
+            {/* ── Encart parent pour les sous-composants ── */}
+            {parentTag && (
+                <p class="parent-notice">
+                    Ce composant doit être utilisé en tant qu'enfant de <code>&lt;{parentTag}&gt;</code>.<br />
+                    Merci de voir la <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>documentation du composant {parentTag}</a> pour voir les exemples d'utilisation.
+                </p>
+            )}
         </div>
 
         {/*
@@ -164,7 +177,7 @@ const tocEntries = [
           *   - ul → NarrativeList      : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
           * Voir apps/docs/CONTRIBUTING.md § "Contenu narratif MDX" pour la documentation complète.
           */}
-        {Content && (
+        {Content && hasNarrative && (
             <section class="narrative">
                 <Content
                     components={{
@@ -194,6 +207,12 @@ const tocEntries = [
 
 <style>
     @import '../../styles/doc-prose.css';
+
+    /* ── Encart parent ───────────────────────────────── */
+
+    .parent-notice {
+        margin:        1rem 0 0;
+    }
 
     /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
     .toc-mobile-inline { display: none; }

@@ -1,7 +1,6 @@
 ---
 tagName: ar-dialog
 title: Dialog
-description: Boîte de dialogue modale ou panneau latéral, accessible et animée.
 playgroundTemplate: default
 variants:
     - name: default
@@ -199,16 +198,7 @@ Plutôt que de piloter `open` en JavaScript, un élément cliquable peut ouvrir 
 
 ### Personnaliser le header
 
-Le slot `header-actions` place des actions additionnelles entre le titre et le bouton de fermeture :
-
-```html
-<ar-dialog label="Rapport mensuel">
-    <button slot="header-actions" aria-label="Plein écran">⤢</button>
-    <p>Contenu du dialog.</p>
-</ar-dialog>
-```
-
-Le conteneur des actions expose son propre `::part(header-actions)`, indépendant du layout titre/fermeture — utile pour définir un espacement entre plusieurs actions sans affecter le reste du header :
+Le conteneur du slot `header-actions` expose son propre `::part(header-actions)`, indépendant du layout titre/fermeture — utile pour définir un espacement entre plusieurs actions sans affecter le reste du header :
 
 ```css
 ar-dialog::part(header-actions) {
@@ -238,20 +228,14 @@ ar-dialog::part(header) {
 ```
 
 Le slot n'est pas limité à des boutons isolés — un seul enfant slotté peut lui-même porter son
-propre layout interne (actions à gauche, pagination à droite, titre sr-only…). Voir l'exemple
-« Actions + pagination dans le header » ci-dessus pour une démonstration complète.
+propre layout interne (actions à gauche, pagination à droite, titre sr-only…). Voir la variante
+« Header avancé » pour une démonstration complète.
 
-Pour retirer entièrement le header (titre, actions, bouton de fermeture), utilisez `without-header`. `label` devient alors requis, et un moyen de fermeture doit rester disponible (ici `close-on-backdrop`) :
-
-```html
-<ar-dialog label="Aperçu image" without-header close-on-backdrop>
-    <img src="/apercu.jpg" alt="Aperçu" />
-</ar-dialog>
-```
+Pour retirer entièrement le header, voir la variante « Sans header ».
 
 ### Cycle d'événements
 
-Tous les événements portent `detail: { id }` (l'id du dialog). `data-ar-dismiss` et `data-ar-accept` sont deux conventions distinctes de `ar-dialog-hide` : elles permettent de distinguer une annulation ("Annuler") d'une confirmation ("Confirmer") sur le même geste de fermeture. La liste complète des événements, avec leur annulabilité, est dans la [Référence API](#reference-api) ci-dessous.
+Tous les événements portent `detail: { id }` (l'id du dialog). `data-ar-dismiss` et `data-ar-accept` sont deux conventions distinctes de `ar-dialog-hide` : elles permettent de distinguer une annulation ("Annuler") d'une confirmation ("Confirmer") sur le même geste de fermeture. La liste complète des événements, avec leur annulabilité, est dans la [Référence API](#reference-api).
 
 ```js
 document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted', (e) => {
@@ -262,4 +246,4 @@ document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted',
 
 ### Dialogs empilés
 
-Plusieurs `ar-dialog` peuvent être ouverts simultanément (un dialog ouvert depuis un autre, par exemple). Seul le dialog du dessus de la pile intercepte la touche `Escape` — les dialogs en dessous restent ouverts et inertes tant qu'il n'est pas fermé. Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme.
+Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme. Voir la variante « Dialogs empilés » pour le comportement de `Escape` et la coordination du focus.

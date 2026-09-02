@@ -24,7 +24,7 @@ import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /**
- * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
+ * @summary Affiche un fil de liens qui montre à l'utilisateur sa position dans la hiérarchie du site, avec un affichage adapté au mobile et au desktop.
  * @display demo
  * @localized
  *
@@ -87,7 +87,6 @@ export class ArBreadcrumb extends LitElement {
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
      * Sans effet en mode desktop.
-     * @attr open
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 

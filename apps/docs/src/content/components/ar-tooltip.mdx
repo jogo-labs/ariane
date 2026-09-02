@@ -1,7 +1,6 @@
 ---
 tagName: ar-tooltip
 title: Tooltip
-description: Bulle d'aide non-interactive déclenchée sur hover et focus, conforme WCAG 1.4.13.
 playgroundTemplate: default
 variants:
     - name: default
@@ -88,4 +87,4 @@ import WcagRef from '../../components/WcagRef.astro';
 - **Le trigger doit rester accessible sans le tooltip.** Le tooltip est une description supplémentaire, pas le seul libellé. Un bouton icône doit toujours porter un `aria-label`.
 - **Les éléments non-interactifs doivent être focusables.** Si le trigger est un `<abbr>`, une `<span>` ou tout élément sans focus natif, ajoutez `tabindex="0"` pour que le tooltip soit atteignable au clavier.
 - **Le contenu de la bulle doit rester non-interactif.** Pour un contenu riche (liens, boutons), utilisez `ar-dropdown` à la place.
-- **Adapter les délais à vos besoins.** Les valeurs par défaut (300 ms / 150 ms) sont un bon équilibre WCAG. Évitez `show-delay="0"` sur des déclencheurs très proches les uns des autres — des tooltips qui surgissent à chaque micro-survol dégradent l'expérience.
+- **Adapter les délais à vos besoins** (voir la variante « Délais personnalisés »). Évitez `show-delay="0"` sur des déclencheurs très proches les uns des autres — des tooltips qui surgissent à chaque micro-survol dégradent l'expérience.

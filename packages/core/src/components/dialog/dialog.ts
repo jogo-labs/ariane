@@ -50,7 +50,7 @@ if (typeof document !== 'undefined') {
 }
 
 /**
- * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
+ * @summary Apparaît au-dessus de la page (modal) ou glisse depuis le bord de l'écran (drawer) pour capter l'attention de l'utilisateur. À utiliser pour des confirmations, formulaires, menus de navigation, ou toute tâche focalisée qui interrompt le flux principal.
  * @localized
  *
  * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.
@@ -99,26 +99,18 @@ export class ArDialog extends LitElement {
 
     /**
      * Visibilité du composant.
-     * @attr open
-     * @default false
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     /**
      * Si présent, un clic sur le backdrop ferme le dialog.
      * Par défaut, le backdrop est statique et ne déclenche pas la fermeture.
-     *
-     * @attr close-on-backdrop
-     * @default false
      */
     @property({ reflect: true, type: Boolean, attribute: 'close-on-backdrop' })
     closeOnBackdrop: boolean = false;
 
     /**
      * Titre affiché dans le header. Pour du HTML, utiliser `slot="label"`.
-     *
-     * @attr label
-     * @default ''
      */
     @property({ reflect: true }) label = '';
 
@@ -126,27 +118,18 @@ export class ArDialog extends LitElement {
      * Si présent, retire entièrement le header (titre, actions, bouton de fermeture) du DOM.
      * La propriété `label` devient alors le seul nom accessible du dialog (`aria-label`) —
      * elle est requise dans ce mode, le slot `label` (HTML) est sans effet.
-     *
-     * @attr without-header
-     * @default false
      */
     @property({ reflect: true, type: Boolean, attribute: 'without-header' })
     withoutHeader: boolean = false;
 
     /**
      * Mode d'affichage : `modal` (centré avec backdrop) ou `drawer` (panneau latéral).
-     *
-     * @attr mode
-     * @default 'modal'
      */
     @property({ reflect: true, type: String })
     mode: 'modal' | 'drawer' = 'modal';
 
     /**
      * Côté d'affichage du drawer. Sans effet en mode `modal`.
-     *
-     * @attr placement
-     * @default 'right'
      */
     @property({ reflect: true, type: String })
     placement: 'left' | 'right' = 'right';
@@ -157,9 +140,6 @@ export class ArDialog extends LitElement {
      * Utilisez `--ar-dialog-width` pour une valeur personnalisée. Un `ar-dialog { }` non qualifié
      * doit néanmoins être au moins aussi spécifique que `[size='...']` (ou utiliser `!important`,
      * ou omettre `size`) pour l'emporter de façon fiable sur un palier de thème.
-     *
-     * @attr size
-     * @default 'md'
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
@@ -168,8 +148,6 @@ export class ArDialog extends LitElement {
      * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
      * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
      * Traduit automatiquement selon `lang` si non personnalisé.
-     *
-     * @attr prevented-message
      */
     @property({ reflect: true, useDefault: true, attribute: 'prevented-message' })
     preventedMessage: string | undefined = undefined;
@@ -177,8 +155,6 @@ export class ArDialog extends LitElement {
     /**
      * Label accessible du bouton de fermeture. Traduit automatiquement selon `lang` si non
      * personnalisé.
-     *
-     * @attr close-label
      */
     @property({ reflect: true, useDefault: true, attribute: 'close-label' })
     closeLabel: string | undefined = undefined;

@@ -5,7 +5,7 @@ import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.conte
 import styles from './tab-panel.styles.js';
 
 /**
- * @summary Panneau de contenu pour ar-tab-group.
+ * @summary Contient le contenu affiché pour un onglet donné dans un groupe d'onglets.
  * @parent ar-tab-group
  * @display docs
  *

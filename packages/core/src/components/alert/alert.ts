@@ -22,7 +22,7 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
- * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+ * @summary Affiche un message important intégré au contenu environnant. À utiliser pour des confirmations, avertissements, erreurs, ou toute information que l'utilisateur ne doit pas manquer.
  * @display demo
  * @localized
  *
@@ -59,8 +59,6 @@ export class ArAlert extends LitElement {
     /**
      * ID de l'élément à focus après la fermeture de l'alerte.
      * Quand défini, affiche le bouton de fermeture.
-     * @attr next-focus
-     * @default undefined
      */
     @property({ reflect: true, type: String, attribute: 'next-focus' })
     nextFocus?: string;
@@ -68,7 +66,6 @@ export class ArAlert extends LitElement {
     /**
      * Désactive la notification ARIA lors de l'apparition de l'alerte.
      * Par défaut, les lecteurs d'écran sont notifiés via `role="alert"` ou `role="status"`.
-     * @attr without-notification
      */
     @property({ reflect: true, type: Boolean, attribute: 'without-notification' })
     withoutNotification = false;
@@ -77,8 +74,6 @@ export class ArAlert extends LitElement {
      * Force le niveau d'urgence ARIA indépendamment de `variant` : `role="alert"` si présent,
      * sinon déduit de `variant` via une table de correspondance interne (`error`/`warning` →
      * `alert`, `success`/`info` → `status`, tout autre variant → `status`).
-     * @attr urgent
-     * @default undefined
      */
     @property({
         converter: {
@@ -90,7 +85,6 @@ export class ArAlert extends LitElement {
 
     /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
-     * @attr variant
      */
     @property({ reflect: true, type: String })
     variant: ArAlertVariant | (string & {}) = 'error';

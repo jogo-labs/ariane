@@ -1,7 +1,6 @@
 ---
 tagName: ar-datepicker
 title: Datepicker
-description: Champ de saisie de date avec calendrier popover accessible — saisie libre et sélection visuelle synchronisées.
 variants:
     - name: Par défaut
       description: >
@@ -120,7 +119,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 - **Label** : toujours fournir un label via la prop `label` ou le slot `label`.
 - **Hint** : utiliser le slot `hint` pour communiquer le format attendu — ne pas utiliser `placeholder` à cet effet (il disparaît à la saisie). Un contenu personnalisé remplace entièrement le hint par défaut, y compris l'exemple de date et la mention de la plage `min`/`max` : à répéter manuellement si nécessaire. Le hint par défaut suit `lang` comme le reste du composant (mécanisme i18n) — le slot reste utile pour un contenu personnalisé ou une langue non traduite par le package.
 - **Erreur** : injecter du contenu dans le slot `error` pour déclencher l'état d'erreur ; le slot est enveloppé dans un `role="alert"` et s'annonce automatiquement.
-- **Focus des jours** : l'indicateur de focus visible sur la grille (<WcagRef criterion="2.4.7" summary="Focus Visible : le composant recevant le focus clavier doit être visuellement identifiable." />) est porté par `--ar-datepicker-day-focus-ring-color`/`-width`/`-offset`, avec leurs propres replis. `--ar-datepicker-day-focus-border-color` est un token distinct, purement cosmétique — il ne garantit rien à lui seul. Un consommateur qui personnalise l'apparence du focus sans conserver l'anneau (en s'appuyant uniquement sur cette bordure) est responsable du contraste de son propre design.
+- **Focus des jours** : l'indicateur de focus visible sur la grille (<WcagRef criterion="2.4.7" summary="Focus Visible : le composant recevant le focus clavier doit être visuellement identifiable." />) est porté par `--ar-datepicker-day-focus-ring-color`/`-width`/`-offset`, avec leurs propres replis. `--ar-datepicker-day-focus-border-color` est un token distinct, purement cosmétique — le redéfinir ou le supprimer n'affecte pas la garantie WCAG 2.4.7, portée uniquement par l'anneau de focus.
 
 ## Utilisation
 
@@ -164,22 +163,17 @@ el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
 
 ### Dates désactivées
 
-Trois mécanismes complémentaires :
-
-- `min` / `max` — valeurs ISO `yyyy-MM-dd` définissant la plage sélectionnable.
-- `isDateDisabled` — callback `(date: Date) => boolean` pour des règles arbitraires (week-ends, jours fériés…).
-
-```html
-<ar-datepicker min="2026-01-01" max="2026-12-31" label="Date de rendez-vous"></ar-datepicker>
-```
+En complément de `min`/`max` (voir la variante « Plage de dates »), le callback `isDateDisabled`
+couvre des règles arbitraires (week-ends, jours fériés…) :
 
 ```js
 el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
 ```
 
-Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour rester dans la grille de navigation).
-
-`min` et `max` sont en plus reflétés sur une seconde ligne du hint par défaut (ex. "Dates disponibles : entre le 1er janvier 2026 et le 31 décembre 2026"), pour que la plage soit connue avant toute navigation dans la grille. `isDateDisabled` n'est pas décrit dans le hint : ses règles étant arbitraires, il n'existe pas de formulation générique — à documenter via le slot `hint` si nécessaire.
+Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut natif `disabled`, pour
+rester dans la grille de navigation). Contrairement à `min`/`max`, `isDateDisabled` n'est pas décrit
+dans le hint par défaut : ses règles étant arbitraires, il n'existe pas de formulation générique — à
+documenter via le slot `hint` si nécessaire.
 
 ### Formulaires
 

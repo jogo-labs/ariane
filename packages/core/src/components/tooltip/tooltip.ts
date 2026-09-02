@@ -19,7 +19,7 @@ export type ArTooltipPlacement =
     | 'left-end';
 
 /**
- * @summary Bulle d'information non-interactive déclenchée sur hover et focus.
+ * @summary Affiche une information contextuelle brève, non interactive, quand l'utilisateur survole ou focus un élément cible.
  *
  * Implémente WCAG 1.4.13 (Content on Hover or Focus) : la bulle reste
  * accessible quand le pointeur se déplace du trigger vers la bulle.

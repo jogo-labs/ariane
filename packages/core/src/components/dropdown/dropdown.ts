@@ -23,7 +23,7 @@ export type ArDropdownPlacement =
     | 'left-end';
 
 /**
- * @summary Mécanisme de disclosure accessible basé sur l'API popover native.
+ * @summary Affiche un panneau contextuel déclenché par un bouton, positionné automatiquement autour de lui. À utiliser pour des menus d'actions, des filtres, ou tout contenu additionnel qui ne justifie pas un dialog.
  * @display demo
  *
  * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).

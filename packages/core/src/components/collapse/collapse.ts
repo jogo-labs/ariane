@@ -7,7 +7,7 @@ import { emitToggleEvent } from '../../utils/toggle-events.js';
 import styles from './collapse.styles.js';
 
 /**
- * @summary Panneau pliable/dépliable accessible avec animation de hauteur.
+ * @summary Affiche un résumé et se déplie pour révéler du contenu additionnel. À utiliser pour divulguer progressivement de l'information, grouper des FAQ, ou masquer des options avancées — combinez plusieurs instances pour un comportement accordéon.
  * @display demo
  *
  * @slot trigger - Élément déclencheur (ignoré si `for` est défini).

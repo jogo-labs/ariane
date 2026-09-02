@@ -1,7 +1,6 @@
 ---
 tagName: ar-dropdown
 title: Dropdown
-description: Mécanisme de disclosure accessible basé sur l'API Popover native, avec positionnement via Floating UI.
 playgroundTemplate: menu
 variants:
     - name: menu
@@ -77,10 +76,9 @@ variants:
     - name: disabled
       label: Désactivé
       description: |
-          Posez `disabled` sur `ar-dropdown` pour bloquer la logique JS, et `aria-disabled="true"`
-          (pas l'attribut natif `disabled`) sur le trigger pour qu'il reste focusable — les technologies
-          d'assistance annoncent l'état et peuvent lire la raison via `aria-describedby`.
-          WCAG exempte les composants désactivés des exigences de contraste : `opacity: .5` est donc conforme.
+          Combine `disabled` sur `ar-dropdown` et `aria-disabled="true"` sur le trigger — voir la
+          section Accessibilité pour le détail. WCAG exempte les composants désactivés des
+          exigences de contraste : `opacity: .5` est donc conforme.
       html: |
           <ar-dropdown disabled>
               <button

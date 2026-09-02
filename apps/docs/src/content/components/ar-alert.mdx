@@ -1,9 +1,6 @@
 ---
 tagName: ar-alert
 title: Alert
-description: >
-    Destiné aux messages qui nécessitent l'attention de l'utilisateur : confirmations,
-    avertissements, erreurs. Pour les messages informatifs non urgents, préférer `variant="info"`.
 variants:
     - name: default
       label: Défaut
@@ -50,7 +47,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - La prop `urgent` permet de forcer ce niveau indépendamment de `variant` : sa seule
   présence (`<ar-alert urgent>`, pas besoin de `="true"`) force `role="alert"`. Elle
   n'est jamais forcée par son absence — sans elle, le rôle retombe sur la déduction
-  ci-dessus.
+  depuis `variant`.
 - `role` est entièrement calculé par le composant. Toute tentative de le poser manuellement
   en markup (`<ar-alert role="banner">`) sera écrasée : le composant émet un avertissement
   en dev et applique sa propre logique. Pour contrôler le rôle ARIA, utilisez `urgent` ou

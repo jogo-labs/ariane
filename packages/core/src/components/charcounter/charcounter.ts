@@ -17,7 +17,7 @@ function pluralize(count: number, label: string): string {
 }
 
 /**
- * @summary Compteur de caractères restants pour un champ texte accessible.
+ * @summary Affiche le nombre de caractères restants pour un champ de texte, et prévient avant d'atteindre la limite.
  * @localized
  *
  * Observe un `<textarea>` ou `<input>` via `for="id"` et affiche le décompte.
@@ -54,7 +54,6 @@ export class ArCharcounter extends LitElement {
     /**
      * Texte affiché après le chiffre. Accepte "singulier|pluriel". Traduit automatiquement selon
      * `lang` si non personnalisé.
-     * @attr label
      */
     @property({ reflect: true, useDefault: true })
     label: string | undefined = undefined;

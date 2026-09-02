@@ -43,14 +43,14 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
             <h4 id="api-traduction" class="subsection-title">Traduction</h4>
             <p>
                 La langue de ce composant suit l'attribut <code>lang</code> de la page
-                (<code>&lt;html lang&gt;</code>).<br> Vous pouvez appliquer une langue différente à une
-                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br> Voir la
+                (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
+                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
                 page <a href="/getting-started/i18n">Internationalisation</a> pour le détail du
                 mécanisme et la liste des traductions disponibles.
             </p>
             <p>
                 <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
-                « Attributs &amp; Propriétés » ci-dessous.
+                « Attributs &amp; Propriétés ».
             </p>
         </section>
     )}
@@ -160,13 +160,13 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
                 Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
                 {hasTransverseParts && (
                     <>
-                        <br>Certaines parts ci-dessous indiquent un rôle transverse, partagé avec
+                        <br />Certaines parts indiquent un rôle transverse, partagé avec
                         d'autres composants — voir les <a href="/getting-started/naming-conventions#semantic-parts">conventions de nommage</a>.
                     </>
                 )}
                 {hasStateParts && (
                     <>
-                        <br>Certaines parts ci-dessous portent un modificateur d'état (<code>--</code>) — voir
+                        <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir
                         les <a href="/getting-started/naming-conventions#state-parts">conventions de nommage</a>.
                     </>
                 )}
@@ -199,8 +199,8 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
             {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
             {panelProps.length > 0 && (
                 <p>
-                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br>
-                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composants comme ci-dessous.
+                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br />
+                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
                 </p>
                 <div class="token-example">
                     <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
@@ -253,7 +253,7 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
                     <div class="doc-callout-alert-content">
                         {relatedTokens.map((rt) => (
                             <p>
-                                {rt.description}{' '}<br>
+                                {rt.description}{' '}<br />
                                 <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
                             </p>
                         ))}

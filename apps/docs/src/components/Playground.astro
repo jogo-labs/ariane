@@ -8,7 +8,7 @@
  *
  * Tout le rendu des composants est server-side (Fragment set:html).
  * La coloration syntaxique est assurée par highlight.js (client-side, uniforme).
- * Le JS client gère la copie du code, les contrôles du playground et le toggle preview.
+ * Le JS client gère la copie du code et les contrôles du playground.
  */
 
 import ComponentApi from './ComponentApi.astro';
@@ -55,13 +55,8 @@ const showPlayground = displayMode === 'demo';
 {variants.length > 0 && (
     <section id="exemples">
         <h3 class="section-title">Exemples</h3>
-        {/* ── Encart thème de démo ── */}
-        {/* Ariane est headless : aucun style n'est intégré au composant. Les previews
-            ci-dessous chargent le thème de démo `default.css` fourni avec la librairie —
-            à ne pas confondre avec un style par défaut intrinsèque au composant. */}
         <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1rem">
-            <p style="margin: 0">Les exemples ci-dessous sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.<br>
-            Un composant headless n'a aucun style intégré — remplacez ce thème par le vôtre pour un rendu différent.</p>
+            <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.</p>
         </ar-alert>
         <div class="main-section">
             {variants.map((variant) => (
@@ -93,17 +88,6 @@ const showPlayground = displayMode === 'demo';
             ))}
         </div>
     </section>
-)}
-
-{/* ── Encart parent pour les sous-composants ── */}
-{parentTag && (
-    <div class="parent-notice">
-        {/* <span class="parent-notice-icon">&#8593;</span> */}
-        Ce composant est un sous-composant de
-        <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>
-            <code>&lt;{parentTag}&gt;</code>
-        </a>
-    </div>
 )}
 
 {/* ── Playground interactif ── */}
@@ -262,29 +246,6 @@ const showPlayground = displayMode === 'demo';
 
     .preview-wrap {
         position: relative;
-    }
-
-    .preview-theme-toggle {
-        position:        absolute;
-        top:             0.5rem;
-        right:           0.5rem;
-        z-index:         10;
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        width:           1.75rem;
-        height:          1.75rem;
-        background:      color-mix(in srgb, var(--doc-bg) 75%, transparent);
-        backdrop-filter: blur(4px);
-        border:          1px solid var(--doc-border);
-        border-radius:   0.375rem;
-        cursor:          pointer;
-        color:           var(--doc-text-muted);
-        transition:      background 0.15s;
-    }
-
-    .preview-theme-toggle:hover {
-        background: var(--doc-bg);
     }
 
     .preview {
@@ -462,35 +423,6 @@ const showPlayground = displayMode === 'demo';
         cursor:     pointer;
         margin-top: 0.2rem;
     }
-
-    /* ── Encart parent ───────────────────────────────── */
-
-    .parent-notice {
-        display:       flex;
-        align-items:   center;
-        gap:           0.5rem;
-        padding:       0.75rem 1rem;
-        background:    color-mix(in srgb, var(--ar-color-interactive, #2563eb) 8%, transparent);
-        border:        1px solid color-mix(in srgb, var(--ar-color-interactive, #2563eb) 20%, transparent);
-        border-radius: 0.5rem;
-        font-size:     0.875rem;
-        color:         var(--doc-text);
-        margin:        1rem 0;
-    }
-
-    .parent-notice-icon {
-        font-size:   1.1rem;
-        font-weight: 700;
-        color:       var(--ar-color-interactive, #2563eb);
-    }
-
-    .parent-notice a {
-        color:           var(--ar-color-interactive, #2563eb);
-        text-decoration: none;
-        font-weight:     600;
-    }
-
-    .parent-notice a:hover { text-decoration: underline; }
 
     /* ── Boutons dans la preview (trigger + slotted)
      * :global() nécessaire : les boutons sont injectés via set:html et n'ont pas
