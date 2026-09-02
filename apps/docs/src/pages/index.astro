@@ -16,72 +16,103 @@ const firstComponentHref = rootComponents[0]?.tagName
 <Layout title="Accueil" showNav={false}>
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-eyebrow">Web Components accessibles</div>
-
-        <h1 class="hero-title">
-            Des composants qui<br />
-            <em>fonctionnent vraiment</em>
-        </h1>
+        <h1 class="hero-title">Un fil pour construire<br />des interfaces accessibles.</h1>
 
         <p class="hero-pitch">
-            Ariane est une fondation pour construire des interfaces accessibles.
-            Des Custom Elements natifs, thémables, compatibles avec tous les frameworks —
-            sans imposer un look à ta place.
+            Ariane est une fondation de Custom Elements natifs, thémables et compatibles
+            avec tous les frameworks — sans imposer un look à ta place.
         </p>
 
-        <div class="hero-badges">
-            <span class="hero-badge"><span class="hero-badge-dot"></span>v{version}</span>
-            <span class="hero-badge"><span class="hero-badge-dot green"></span>{componentCount} composants</span>
-            <span class="hero-badge"><span class="hero-badge-dot gray"></span>Licence MIT</span>
-            <span class="hero-badge"><span class="hero-badge-dot gray"></span>Lit 3 · TypeScript</span>
-        </div>
-
         <div class="hero-ctas">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
+            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
             <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
         </div>
+
+        <ul class="hero-facts">
+            <li>v{version}</li>
+            <li>{componentCount} composants</li>
+            <li>Licence MIT</li>
+            <li>Lit 3 · TypeScript</li>
+        </ul>
     </section>
 
-    <hr class="divider" />
+    <div class="thread-divider" aria-hidden="true"></div>
 
-    <!-- Selling points -->
-    <section class="selling-section">
-        <div class="selling-header">
-            <h2>Pourquoi Ariane ?</h2>
-            <p>Une bibliothèque qui résout les vrais problèmes d'accessibilité, sans te dicter le reste.</p>
+    <!-- Démo live -->
+    <section class="demo-section">
+        <h2 class="demo-title">Des composants qui fonctionnent, pas des maquettes</h2>
+        <p class="demo-pitch">
+            Accessibilité, thème, positionnement — tout est déjà branché. Essayez.
+        </p>
+
+        <div class="demo-panel">
+            <ar-tab-group active="alertes">
+                <ar-tab panel="alertes">Alertes</ar-tab>
+                <ar-tab panel="tooltip">Info-bulle</ar-tab>
+                <ar-tab panel="progress">Progrès</ar-tab>
+
+                <ar-tab-panel name="alertes" style="padding: 1.5rem">
+                    <ar-alert variant="success">
+                        <strong>Succès de l'opération</strong><br />
+                        Le statut est annoncé automatiquement aux lecteurs d'écran.
+                    </ar-alert>
+                </ar-tab-panel>
+
+                <ar-tab-panel name="tooltip" style="padding: 2.5rem 1.5rem; text-align: center">
+                    <button id="home-demo-tooltip" class="btn-secondary" type="button">
+                        Survolez-moi
+                    </button>
+                    <ar-tooltip for="home-demo-tooltip">
+                        Positionné automatiquement par Floating UI
+                    </ar-tooltip>
+                </ar-tab-panel>
+
+                <ar-tab-panel name="progress" style="padding: 1.5rem">
+                    <ar-progressbar percent="66"></ar-progressbar>
+                </ar-tab-panel>
+            </ar-tab-group>
         </div>
+    </section>
 
-        <div class="selling-grid">
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">♿</div>
+    <div class="thread-divider" aria-hidden="true"></div>
+
+    <!-- Pourquoi Ariane -->
+    <section class="why-section">
+        <h2 class="why-title">Pourquoi Ariane</h2>
+
+        <ul class="why-list">
+            <li>
                 <h3>Accessible par défaut</h3>
-                <p>ARIA, navigation clavier et rôles sémantiques intégrés dans chaque composant. Pas une option — une exigence de base.</p>
-            </div>
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">⚡</div>
+                <p>
+                    ARIA, navigation clavier et rôles sémantiques intégrés dans chaque
+                    composant. Pas une option — une exigence de base.
+                </p>
+            </li>
+            <li>
                 <h3>Indépendant du framework</h3>
-                <p>Custom Elements natifs : ça fonctionne avec React, Vue, Svelte, Angular ou du HTML pur. Une seule librairie, partout.</p>
-            </div>
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">🏗</div>
-                <h3>Fondation pour ton Design System</h3>
-                <p>CSS Custom Properties exposés sur chaque composant. Ariane pose les fondations ; toi tu définis l'identité visuelle.</p>
-            </div>
-        </div>
-
-        <!-- Placeholder différentiation -->
-        <!-- <div class="placeholder-section">
-            <p><strong>Section à venir</strong></p>
-            <p>Comparaison avec Web Awesome, Radix UI, Headless UI — ce qu'Ariane fait différemment et pour qui.</p>
-        </div> -->
+                <p>
+                    Custom Elements natifs : ça fonctionne avec React, Vue, Svelte, Angular
+                    ou du HTML pur. Une seule librairie, partout.
+                </p>
+            </li>
+            <li>
+                <h3>Fondation pour ton design system</h3>
+                <p>
+                    CSS Custom Properties exposées sur chaque composant. Ariane pose les
+                    fondations ; toi tu définis l'identité visuelle.
+                </p>
+            </li>
+        </ul>
     </section>
+
+    <div class="thread-divider" aria-hidden="true"></div>
 
     <!-- CTA bas de page -->
     <div class="cta-bottom">
         <h2>Prêt à commencer ?</h2>
         <p>Parcourez la documentation et le catalogue de composants.</p>
         <div class="cta-bottom-actions">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
+            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
             <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
         </div>
     </div>
@@ -90,330 +121,276 @@ const firstComponentHref = rootComponents[0]?.tagName
     <footer class="landing-footer">
         <p>Ariane — Licence MIT</p>
         <p>
-            Construit avec
-            <a href="https://lit.dev" target="_blank" rel="noopener noreferrer">Lit 3</a>
-            ·
-            <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Construit avec <a href="https://lit.dev" target="_blank" rel="noopener noreferrer">Lit 3</a>
+            · <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
         </p>
     </footer>
 </Layout>
 
 <style>
+    /* ── Colonne partagée ────────────────────────────────── */
+
+    .hero,
+    .demo-section,
+    .why-section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 3.5rem 2.5rem;
+    }
+
     /* ── Hero ─────────────────────────────────────────────── */
 
     .hero {
-        max-width:   760px;
-        margin:      0 auto;
-        padding:     6rem 2rem 5rem;
-        text-align:  center;
-    }
-
-    .hero-eyebrow {
-        display:        inline-flex;
-        align-items:    center;
-        gap:            0.4rem;
-        font-size:      0.75rem;
-        font-weight:    600;
-        color:          var(--doc-accent);
-        background:     var(--doc-accent-bg);
-        border:         1px solid var(--doc-accent-border);
-        padding:        0.25rem 0.85rem;
-        border-radius:  20px;
-        margin-bottom:  1.75rem;
-        letter-spacing: 0.02em;
-    }
-
-    .hero-eyebrow::before {
-        content:       '';
-        width:         6px;
-        height:        6px;
-        background:    var(--doc-accent);
-        border-radius: 50%;
-        display:       inline-block;
+        padding-bottom: 2.5rem;
     }
 
     .hero-title {
-        font-size:      3.25rem;
-        font-weight:    800;
-        letter-spacing: -0.04em;
-        line-height:    1.1;
-        color:          var(--doc-text);
-        margin-bottom:  1.25rem;
-    }
-
-    .hero-title em {
-        font-style:              normal;
-        background:              linear-gradient(135deg, #7c3aed, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip:         text;
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-weight: 700;
+        font-size: clamp(1.85rem, 4.5vw, 2.85rem);
+        line-height: 1.2;
+        color: var(--doc-text);
+        max-width: 18ch;
+        margin: 0 0 1.25rem;
     }
 
     .hero-pitch {
-        font-size:    1.05rem;
-        color:        var(--doc-text-subtle);
-        line-height:  1.75;
-        max-width:    560px;
-        margin:       0 auto 2rem;
+        font-size: 1.05rem;
+        color: var(--doc-text-subtle);
+        line-height: 1.75;
+        max-width: 52ch;
+        margin: 0 0 2rem;
     }
-
-    .hero-badges {
-        display:         flex;
-        justify-content: center;
-        gap:             0.5rem;
-        flex-wrap:       wrap;
-        margin-bottom:   2.25rem;
-    }
-
-    .hero-badge {
-        display:       inline-flex;
-        align-items:   center;
-        gap:           0.35rem;
-        font-size:     0.72rem;
-        font-weight:   500;
-        color:         var(--doc-text-muted);
-        background:    var(--doc-bg);
-        border:        1px solid var(--doc-border);
-        padding:       0.25rem 0.75rem;
-        border-radius: 20px;
-    }
-
-    .hero-badge-dot {
-        width:         6px;
-        height:        6px;
-        border-radius: 50%;
-        background:    var(--doc-accent);
-        flex-shrink:   0;
-    }
-
-    .hero-badge-dot.green { background: #16a34a; }
-    .hero-badge-dot.gray  { background: #9ca3af; }
 
     .hero-ctas {
-        display:         flex;
-        justify-content: center;
-        gap:             0.75rem;
-        flex-wrap:       wrap;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .hero-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 0.8rem;
+        color: var(--doc-text-muted);
+    }
+
+    .hero-facts li + li {
+        border-left: 1px solid var(--doc-border);
+        padding-left: 1.25rem;
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
 
     .btn-primary {
-        display:         inline-flex;
-        align-items:     center;
-        gap:             0.4rem;
-        background:      #7c3aed;
-        color:           #fff;
-        font-family:     inherit;
-        font-size:       0.9rem;
-        font-weight:     600;
-        padding:         0.65rem 1.5rem;
-        border-radius:   8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--doc-accent);
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
         text-decoration: none;
-        border:          none;
-        cursor:          pointer;
-        box-shadow:      0 1px 3px rgba(124,58,237,0.3);
-        transition:      background 0.15s;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
     }
 
-    .btn-primary:hover { background: #6d28d9; }
+    .btn-primary:hover {
+        background: var(--doc-accent-hover);
+    }
 
     .btn-secondary {
-        display:         inline-flex;
-        align-items:     center;
-        gap:             0.4rem;
-        background:      transparent;
-        color:           var(--doc-text);
-        font-family:     inherit;
-        font-size:       0.9rem;
-        font-weight:     600;
-        padding:         0.65rem 1.5rem;
-        border-radius:   8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: transparent;
+        color: var(--doc-text);
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
         text-decoration: none;
-        border:          1.5px solid var(--doc-border);
-        cursor:          pointer;
-        transition:      border-color 0.15s, color 0.15s;
+        border: 1.5px solid var(--doc-border);
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
     }
 
     .btn-secondary:hover {
         border-color: var(--doc-accent);
-        color:        var(--doc-accent);
-    }
-
-    /* ── Séparateur ────────────────────────────────────────── */
-
-    .divider {
-        border:     none;
-        border-top: 1px solid var(--doc-border);
-        margin:     0;
-    }
-
-    /* ── Selling points ─────────────────────────────────── */
-
-    .selling-section {
-        max-width: 1100px;
-        margin:    0 auto;
-        padding:   5rem 2.5rem;
-    }
-
-    .selling-header {
-        text-align:    center;
-        margin-bottom: 3.5rem;
-    }
-
-    .selling-header h2 {
-        font-size:      1.85rem;
-        font-weight:    700;
-        letter-spacing: -0.03em;
-        color:          var(--doc-text);
-        margin-bottom:  0.6rem;
-    }
-
-    .selling-header p {
-        font-size:  0.95rem;
-        color:      var(--doc-text-muted);
-        max-width:  480px;
-        margin:     0 auto;
-    }
-
-    .selling-grid {
-        display:               grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap:                   1.5rem;
-        margin-bottom:         3rem;
-    }
-
-    .selling-card {
-        background:    var(--doc-bg);
-        border:        1px solid var(--doc-border);
-        border-radius: 12px;
-        padding:       1.75rem;
-        transition:    border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .selling-card:hover {
-        border-color: #c4b5fd;
-        box-shadow:   0 4px 16px rgba(124,58,237,0.06);
-    }
-
-    .selling-icon {
-        width:           40px;
-        height:          40px;
-        background:      var(--doc-accent-bg);
-        border-radius:   10px;
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        font-size:       1.2rem;
-        margin-bottom:   1rem;
-    }
-
-    .selling-card h3 {
-        font-size:      0.95rem;
-        font-weight:    700;
-        color:          var(--doc-text);
-        letter-spacing: -0.01em;
-        margin-bottom:  0.4rem;
-    }
-
-    .selling-card p {
-        font-size:   0.82rem;
-        color:       var(--doc-text-muted);
-        line-height: 1.7;
-        margin:      0;
-    }
-
-    /* ── Placeholder différentiation ────────────────────── */
-
-    .placeholder-section {
-        border:        2px dashed var(--doc-accent-border);
-        border-radius: 12px;
-        padding:       2rem;
-        text-align:    center;
-        background:    color-mix(in srgb, var(--doc-accent-bg) 30%, transparent);
-        margin-bottom: 0;
-    }
-
-    .placeholder-section p {
-        font-size:   0.82rem;
-        color:       var(--doc-text-muted);
-        margin:      0 0 0.25rem;
-    }
-
-    .placeholder-section strong {
         color: var(--doc-accent);
+    }
+
+    /* ── Fil d'Ariane — séparateur ──────────────────────── */
+
+    .thread-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 2.5rem;
+    }
+
+    .thread-divider::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--doc-thread);
+        flex-shrink: 0;
+    }
+
+    .thread-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--doc-thread);
+        opacity: 0.35;
+    }
+
+    /* ── Démo live ──────────────────────────────────────── */
+
+    .demo-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--doc-text);
+        margin: 0 0 0.5rem;
+        max-width: 32ch;
+    }
+
+    .demo-pitch {
+        font-size: 0.95rem;
+        color: var(--doc-text-muted);
+        margin: 0 0 2rem;
+    }
+
+    .demo-panel {
+        background: var(--doc-code-bg);
+        border: 1px solid var(--doc-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    /* ── Pourquoi Ariane ────────────────────────────────── */
+
+    .why-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--doc-text);
+        margin: 0 0 2rem;
+    }
+
+    .why-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+    }
+
+    .why-list li {
+        border-left: 2px solid var(--doc-border);
+        padding-left: 1.25rem;
+    }
+
+    .why-list h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--doc-text);
+        letter-spacing: -0.01em;
+        margin: 0 0 0.4rem;
+    }
+
+    .why-list p {
+        font-size: 0.9rem;
+        color: var(--doc-text-muted);
+        line-height: 1.7;
+        margin: 0;
+        max-width: 60ch;
     }
 
     /* ── CTA bas de page ────────────────────────────────── */
 
     .cta-bottom {
-        background:    var(--doc-cta-bg);
-        border-top:    1px solid var(--doc-cta-border);
+        background: var(--doc-cta-bg);
+        border-top: 1px solid var(--doc-cta-border);
         border-bottom: 1px solid var(--doc-cta-border);
-        text-align:    center;
-        padding:       4rem 2rem;
+        text-align: center;
+        padding: 4rem 2rem;
     }
 
     .cta-bottom h2 {
-        font-size:      1.6rem;
-        font-weight:    700;
+        font-size: 1.6rem;
+        font-weight: 700;
         letter-spacing: -0.03em;
-        color:          var(--doc-text);
-        margin-bottom:  0.5rem;
+        color: var(--doc-text);
+        margin-bottom: 0.5rem;
     }
 
     .cta-bottom p {
-        font-size:     0.9rem;
+        font-size: 0.9rem;
         /* var(--doc-text-muted) échoue le contraste AA sur ce fond (axe-core) */
-        color:         var(--doc-text);
+        color: var(--doc-text);
         margin-bottom: 1.75rem;
     }
 
     .cta-bottom-actions {
-        display:         flex;
+        display: flex;
         justify-content: center;
-        gap:             0.75rem;
-        flex-wrap:       wrap;
+        gap: 0.75rem;
+        flex-wrap: wrap;
     }
 
     /* ── Footer ─────────────────────────────────────────── */
 
     .landing-footer {
-        padding:         2rem 2.5rem;
-        border-top:      1px solid var(--doc-border);
-        display:         flex;
+        padding: 2rem 2.5rem;
+        border-top: 1px solid var(--doc-border);
+        display: flex;
         justify-content: space-between;
-        align-items:     center;
-        flex-wrap:       wrap;
-        gap:             0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .landing-footer p {
         font-size: 0.78rem;
-        color:     var(--doc-text-muted);
-        margin:    0;
+        color: var(--doc-text-muted);
+        margin: 0;
     }
 
     .landing-footer a {
-        color:           var(--doc-accent);
+        color: var(--doc-accent);
         text-decoration: underline;
         text-underline-offset: 2px;
     }
 
     /* ── Responsive ─────────────────────────────────────── */
-    /* Seuils propres au tuning du hero/selling-grid de cette page (860px/480px),
-       distincts du 768px utilisé ailleurs (Layout, TableOfContents, [slug]) —
-       pas de token de breakpoint partagé pour l'instant. À réévaluer avec la
-       refonte visuelle de la home (#110). */
 
-    @media (max-width: 860px) {
-        .hero { padding: 4rem 1.5rem 3rem; }
-        .hero-title { font-size: 2.25rem; }
-        .selling-section { padding: 3rem 1.5rem; }
-        .selling-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 640px) {
+        .hero,
+        .demo-section,
+        .why-section {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
 
-    @media (max-width: 480px) {
-        .hero-title { font-size: 1.85rem; }
+        .thread-divider {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
     }
 </style>

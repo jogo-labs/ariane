@@ -31,7 +31,7 @@ const {
         <!-- Inter — haute probabilité de cache navigateur -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@500;600;700&display=swap" rel="stylesheet" />
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
@@ -149,6 +149,9 @@ const {
                 --doc-header-h:       3.25rem;
                 --doc-alpha-banner-h: 2rem;
                 --doc-nav-bg-hover: #f3efff;
+                /* Fil d'Ariane — motif de la page d'accueil (#110), décoratif uniquement,
+                   jamais utilisé pour du texte porteur de sens (contraste non garanti). */
+                --doc-thread: #b8863b;
             }
 
             [data-theme="dark"] {
@@ -172,6 +175,7 @@ const {
                 --doc-code-bg:        #1e1e2e;
                 --doc-code-block-bg:  #0d1219;
                 --doc-nav-bg-hover: #21262d;
+                --doc-thread: #d2a259;
             }
 
             html {
