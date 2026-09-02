@@ -45,10 +45,6 @@ const components = defineCollection({
         description: z.string().optional(),
         /** Nom de la variante dont le HTML initialise le playground interactif. Si absent, la première variante est utilisée. */
         playgroundTemplate: z.string().optional(),
-        /** Complète l'encart "sous-composant de X" (généré depuis @parent) avec la contrainte
-         *  d'usage propre à ce sous-composant (ex. "à utiliser exclusivement comme enfant direct").
-         *  Sans article/majuscule initiale ni point final — inséré dans une phrase existante. */
-        parentUsage: z.string().optional(),
         /** Variantes pré-configurées affichées dans le playground */
         // variants: z.array(variantSchema).default([]),
         // coerce : si le champ est absent ou null dans le MDX, on force un array vide

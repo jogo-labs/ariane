@@ -31,7 +31,6 @@ interface Props {
     tagName:        string;
     displayMode:    'demo' | 'docs';
     parentTag?:     string;
-    parentUsage?:   string;
     playgroundHtml: string;
     controls:       CemControl[];
     component:      CemDeclaration;
@@ -43,7 +42,6 @@ const {
     tagName,
     displayMode = 'demo',
     parentTag,
-    parentUsage,
     playgroundHtml,
     controls,
     component,
@@ -90,16 +88,6 @@ const showPlayground = displayMode === 'demo';
             ))}
         </div>
     </section>
-)}
-
-{/* ── Encart parent pour les sous-composants ── */}
-{parentTag && (
-    <div class="parent-notice">
-        Ce composant est un sous-composant de
-        <a href={`/components/${parentTag.replace(/^ar-/, '')}`}
-            ><code>&lt;{parentTag}&gt;</code></a
-        >{parentUsage ? `, ${parentUsage}.` : '.'}
-    </div>
 )}
 
 {/* ── Playground interactif ── */}
@@ -435,35 +423,6 @@ const showPlayground = displayMode === 'demo';
         cursor:     pointer;
         margin-top: 0.2rem;
     }
-
-    /* ── Encart parent ───────────────────────────────── */
-
-    .parent-notice {
-        display:       flex;
-        align-items:   center;
-        gap:           0.5rem;
-        padding:       0.75rem 1rem;
-        background:    color-mix(in srgb, var(--ar-color-interactive, #2563eb) 8%, transparent);
-        border:        1px solid color-mix(in srgb, var(--ar-color-interactive, #2563eb) 20%, transparent);
-        border-radius: 0.5rem;
-        font-size:     0.875rem;
-        color:         var(--doc-text);
-        margin:        1rem 0;
-    }
-
-    .parent-notice-icon {
-        font-size:   1.1rem;
-        font-weight: 700;
-        color:       var(--ar-color-interactive, #2563eb);
-    }
-
-    .parent-notice a {
-        color:           var(--ar-color-interactive, #2563eb);
-        text-decoration: none;
-        font-weight:     600;
-    }
-
-    .parent-notice a:hover { text-decoration: underline; }
 
     /* ── Boutons dans la preview (trigger + slotted)
      * :global() nécessaire : les boutons sont injectés via set:html et n'ont pas

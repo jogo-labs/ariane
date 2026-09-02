@@ -70,9 +70,9 @@ const codeCustomTranslationCdn = `<html lang="es">
             <section id="locale-resolution" class="subsection">
                 <h4 class="subsection-title">Résolution de la langue</h4>
                 <p>
-                    La langue par défaut est déterminée par la valeur de l'attribut <code>&lt;html lang&gt;</code>, mais l'ajout d'un attribut <code>lang</code> sur un composant permet une surcharge locale.<br>
+                    La langue par défaut est déterminée par la valeur de l'attribut <code>&lt;html lang&gt;</code>, mais l'ajout d'un attribut <code>lang</code> sur un composant permet une surcharge locale.<br />
                     Si aucun des deux attributs n'est présent, c'est la langue du navigateur
-                    (<code>navigator.language</code>) qui est utilisé.<br>
+                    (<code>navigator.language</code>) qui est utilisé.<br />
                     Dans tous les cas s'il n'existe pas de traduction pour la langue identifiée, c'est le français qui sera utilisé.
                 </p>
                 <pre><code class="language-html" set:text={codeChangeLang} /></pre>
@@ -110,7 +110,7 @@ const codeCustomTranslationCdn = `<html lang="es">
                 <p>
                     Que vous souhaitiez surcharger une langue fournie, ou disposer sans attendre d'une
                     traduction non disponible pour votre propre langue, le mécanisme à utiliser est très
-                    simple.<br>
+                    simple.<br />
                     Commencez par copier{' '}
                     <a
                         href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
@@ -120,7 +120,7 @@ const codeCustomTranslationCdn = `<html lang="es">
                         <code>/core/src/translations/fr.ts</code>
                     </a>{' '}
                     (la traduction source du package, la plus à jour) dans votre projet et traduisez
-                    chaque terme.<br>
+                    chaque terme.<br />
                     Le type <code>Translation</code>, exporté par le package, vous
                     force à fournir tous les termes attendus. Cette fois l'import est à votre
                     charge — c'est votre fichier, pas un fichier livré par Ariane.
