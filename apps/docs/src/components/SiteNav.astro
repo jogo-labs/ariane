@@ -10,7 +10,6 @@ import { getCollection } from 'astro:content';
 import { getSlug } from '../utils/tag-name.ts';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
-import rootPkg from '../../../../package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
 
 interface Props {
@@ -125,6 +124,8 @@ const componentItems: NavItem[] = allComponents
             </ul>
         </div>
     </div>
+
+    <p class="nav-footer-version">v{version}</p>
 </nav>
 
 <style>
@@ -233,44 +234,15 @@ const componentItems: NavItem[] = allComponents
         color:     var(--doc-text-subtle);
     }
 
-    /* ── Footer nav (theme toggle dans le drawer mobile uniquement) ── */
-
     /* ── Footer nav ──────────────────────────────────────────── */
 
-    /* .nav-footer {
-        display: flex;
-        flex-direction: column;
-        row-gap: .5rem;
-        padding:     1rem 0.75rem 0;
-        border-top:  1px solid var(--doc-border);
-        flex-shrink: 0;
-    }
-
-    .nav-footer-social {
-        min-height: 0;
-    }
-
-    .nav-footer-meta {
-        display:     flex;
-        align-items: center;
-    }
-
-    .nav-footer-link {
-        display:         flex;
-        align-items:     center;
-        gap:             0.3rem;
-        color:           var(--doc-text-muted);
-        text-decoration: none;
-        font-size:       0.8rem;
-        transition:      color 0.12s;
-    }
-
-    .nav-footer-link:hover { color: var(--doc-text); }
-
     .nav-footer-version {
+        flex-shrink: 0;
+        margin:      0;
+        padding:     0.75rem 0.75rem 0.5rem;
+        border-top:  1px solid var(--doc-border);
         font-size:   0.7rem;
-        margin: 0;
         font-family: 'Fira Code', 'Cascadia Code', monospace;
         color:       var(--doc-text-muted);
-    } */
+    }
 </style>

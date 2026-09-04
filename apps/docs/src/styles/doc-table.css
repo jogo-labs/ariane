@@ -2,7 +2,7 @@
  * doc-table.css
  *
  * Styles partagés pour les tableaux et titres de section de la documentation :
- * utilisés par ComponentApi.astro et tokens.astro.
+ * utilisés par ComponentApi.astro et naming-conventions.astro.
  */
 
 .table-wrap {
@@ -52,15 +52,4 @@ code {
     color: var(--doc-accent);
     padding: 0.1em 0.35em;
     border-radius: 0.25em;
-}
-
-.swatch {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 4px;
-    outline: var(--doc-swatch-outline);
-    outline-offset: 1px;
-    vertical-align: middle;
-    margin-right: 0.5rem;
 }
