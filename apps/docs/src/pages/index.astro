@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import HomeLayout from '../layouts/HomeLayout.astro';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
@@ -11,106 +11,257 @@ const componentCount = rootComponents.length;
 const firstComponentHref = rootComponents[0]?.tagName
     ? '/components/' + getSlug(rootComponents[0].tagName)
     : '/components/button';
+
+const codeInstall = `<!-- L'autoloader détecte les composants présents pour ne charger que le nécessaire -->
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
+
+<!-- Le thème permet d'adapter le look des composants à votre charte -->
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />`;
+
+const codeDropdown = `<ar-dropdown>
+    <button slot="trigger">Actions</button>
+    <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+    <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+    <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+</ar-dropdown>`;
+
+const codeDialog = `<button data-ar-dialog-open="mon-dialog">Ouvrir la fenêtre</button>
+<ar-dialog id="mon-dialog" label="Informations importantes">
+    <p>Votre session expirera dans 5 minutes.</p>
+</ar-dialog>`;
+
+const codeDatepicker = `<ar-datepicker
+    label="Date de naissance"
+    format="dd/MM/yyyy"
+    lang="fr-FR"
+></ar-datepicker>`;
 ---
 
-<Layout title="Accueil" showNav={false}>
+<HomeLayout title="Accueil">
     <!-- Hero -->
     <section class="hero">
-        <h1 class="hero-title">Un fil pour construire<br />des interfaces accessibles.</h1>
+        <div class="hero-pattern" aria-hidden="true"></div>
 
-        <p class="hero-pitch">
-            Ariane est une fondation de Custom Elements natifs, thémables et compatibles
-            avec tous les frameworks — sans imposer un look à ta place.
-        </p>
+        <div class="hero-inner">
+            <h1 class="hero-title">Accessible. Personnalisable.<br />Sans compromis.</h1>
 
-        <div class="hero-ctas">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
-            <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
-        </div>
+            <p class="hero-pitch">
+                Des composants web accessibles et headless, qui s'intégrent facilement à vos projets ou votre design system.
+            </p>
 
-        <ul class="hero-facts">
-            <li>v{version}</li>
-            <li>{componentCount} composants</li>
-            <li>Licence MIT</li>
-            <li>Lit 3 · TypeScript</li>
-        </ul>
-    </section>
+            <div class="hero-ctas">
+                <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
+                <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
+            </div>
 
-    <div class="thread-divider" aria-hidden="true"></div>
-
-    <!-- Démo live -->
-    <section class="demo-section">
-        <h2 class="demo-title">Des composants qui fonctionnent, pas des maquettes</h2>
-        <p class="demo-pitch">
-            Accessibilité, thème, positionnement — tout est déjà branché. Essayez.
-        </p>
-
-        <div class="demo-panel">
-            <ar-tab-group active="alertes">
-                <ar-tab panel="alertes">Alertes</ar-tab>
-                <ar-tab panel="tooltip">Info-bulle</ar-tab>
-                <ar-tab panel="progress">Progrès</ar-tab>
-
-                <ar-tab-panel name="alertes" style="padding: 1.5rem">
-                    <ar-alert variant="success">
-                        <strong>Succès de l'opération</strong><br />
-                        Le statut est annoncé automatiquement aux lecteurs d'écran.
-                    </ar-alert>
-                </ar-tab-panel>
-
-                <ar-tab-panel name="tooltip" style="padding: 2.5rem 1.5rem; text-align: center">
-                    <button id="home-demo-tooltip" class="btn-secondary" type="button">
-                        Survolez-moi
-                    </button>
-                    <ar-tooltip for="home-demo-tooltip">
-                        Positionné automatiquement par Floating UI
-                    </ar-tooltip>
-                </ar-tab-panel>
-
-                <ar-tab-panel name="progress" style="padding: 1.5rem">
-                    <ar-progressbar percent="66"></ar-progressbar>
-                </ar-tab-panel>
-            </ar-tab-group>
+            <ul class="hero-facts">
+                <li>v{version}</li>
+                <li>{componentCount} composants</li>
+                <li>Licence MIT</li>
+                <li>Lit 3 · TypeScript</li>
+            </ul>
         </div>
     </section>
 
-    <div class="thread-divider" aria-hidden="true"></div>
+    <!-- La promesse d'Ariane -->
+    <section class="benefits-section">
+        <h2 class="benefits-title">Ariane c'est..</h2>
 
-    <!-- Pourquoi Ariane -->
-    <section class="why-section">
-        <h2 class="why-title">Pourquoi Ariane</h2>
-
-        <ul class="why-list">
-            <li>
+        <div class="benefits-grid">
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m8.5 12.5 2.5 2.5 5-5" />
+                </svg>
                 <h3>Accessible par défaut</h3>
                 <p>
-                    ARIA, navigation clavier et rôles sémantiques intégrés dans chaque
-                    composant. Pas une option — une exigence de base.
+                    Navigation clavier, rôles ARIA et annonces aux lecteurs d'écran sont
+                    intégrés à chaque composant, et vérifiés par des tests d'accessibilité
+                    automatisés.
                 </p>
-            </li>
-            <li>
-                <h3>Indépendant du framework</h3>
+            </div>
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="11" width="16" height="10" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 7.5-2" />
+                </svg>
+                <h3>Zéro framework imposé</h3>
                 <p>
-                    Custom Elements natifs : ça fonctionne avec React, Vue, Svelte, Angular
-                    ou du HTML pur. Une seule librairie, partout.
+                    Composants web natifs, utilisables avec n'importe quel framework front-end,
+                    ou sans framework du tout.
                 </p>
-            </li>
-            <li>
-                <h3>Fondation pour ton design system</h3>
+            </div>
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2s7 7.58 7 12a7 7 0 1 1-14 0c0-4.42 7-12 7-12Z" />
+                </svg>
+                <h3>Votre style avant tout</h3>
                 <p>
-                    CSS Custom Properties exposées sur chaque composant. Ariane pose les
-                    fondations ; toi tu définis l'identité visuelle.
+                    Chaque composant est livré sans habillage visuel par défaut. <a href="getting-started/utilisation#personnalisation">Créez votre thème</a> pour qu'ils s'adaptent à votre projet.
                 </p>
-            </li>
-        </ul>
+            </div>
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="2" width="12" height="20" rx="2" />
+                    <path d="M11 18h2" />
+                </svg>
+                <h3>Pensé pour le mobile</h3>
+                <p>
+                    Chaque composant est pensé pour le mobile et intégre des mécanismes pour s'adapter.
+                </p>
+            </div>
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+                </svg>
+                <h3>Pour tous types de projets</h3>
+                <p>
+                    Chargez l'autoloader d'Ariane en une seule ligne <a href="getting-started/quickstart#cdn">depuis un CDN</a> ou <a href="getting-started/quickstart#cdn">intégrez le à votre workflow</a> et configurez-le selon vos besoins.
+                </p>
+            </div>
+            <div class="benefit">
+                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M3 12h18" />
+                    <path d="M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9Z" />
+                </svg>
+                <h3>Traduction intégrée</h3>
+                <p>
+                    Français et anglais sont inclus, mais Ariane peut <a href="getting-started/i18n">s'adapter facilement à n'importe quelle langue</a>.
+                </p>
+            </div>
+        </div>
     </section>
 
-    <div class="thread-divider" aria-hidden="true"></div>
+    <!-- Essayez-le -->
+    <section class="try-section">
+        <div class="try-inner">
+            <h2 class="try-title">Testez en quelques secondes</h2>
+            <p class="try-pitch">Deux étapes, zero configuration.</p>
+
+            <div class="try-card">
+                <div class="try-card-step">
+                    <div class="try-step-header">
+                        <span class="try-step-number">1</span>
+                        <p class="try-step-label">Ajoutez le script et le thème</p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                        <pre><code class="language-html" set:text={codeInstall} /></pre>
+                    </div>
+                </div>
+
+                <div class="try-card-step">
+                    <div class="try-step-header">
+                        <span class="try-step-number">2</span>
+                        <p class="try-step-label">Copiez le composant de votre choix</p>
+                    </div>
+
+                    <ar-tab-group class="try-tabs" active="dropdown">
+                        <ar-tab class="try-tab" panel="dropdown">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h10" />
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Dropdown</span>
+                        </ar-tab>
+                        <ar-tab class="try-tab" panel="dialog">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18" />
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Modale</span>
+                        </ar-tab>
+                        <ar-tab class="try-tab" panel="datepicker">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                                    <path d="M8 3v4" /><path d="M16 3v4" /><path d="M3 11h18" />
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Calendrier</span>
+                        </ar-tab>
+
+                        <ar-tab-panel name="dropdown">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                    <pre><code class="language-html" set:text={codeDropdown} /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <ar-dropdown>
+                                            <button slot="trigger">Actions</button>
+                                            <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+                                            <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+                                            <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+                                        </ar-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+
+                        <ar-tab-panel name="dialog">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                    <pre><code class="language-html" set:text={codeDialog} /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <button data-ar-dialog-open="mon-dialog">Ouvrir la fenêtre</button>
+                                        <ar-dialog id="mon-dialog" label="Informations importantes">
+                                            <p>Votre session expirera dans 5 minutes.</p>
+                                        </ar-dialog>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+
+                        <ar-tab-panel name="datepicker">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                    <pre><code class="language-html" set:text={codeDatepicker} /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <ar-datepicker
+                                            label="Date de naissance"
+                                            format="dd/MM/yyyy"
+                                            lang="fr-FR"
+                                        ></ar-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+                    </ar-tab-group>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- CTA bas de page -->
     <div class="cta-bottom">
         <h2>Prêt à commencer ?</h2>
-        <p>Parcourez la documentation et le catalogue de composants.</p>
+        <p>Installez Ariane en quelques minutes et explorez le catalogue de composants.</p>
         <div class="cta-bottom-actions">
             <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
             <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
@@ -125,225 +276,600 @@ const firstComponentHref = rootComponents[0]?.tagName
             · <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
         </p>
     </footer>
-</Layout>
+</HomeLayout>
 
 <style>
-    /* ── Colonne partagée ────────────────────────────────── */
-
-    .hero,
-    .demo-section,
-    .why-section {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 3.5rem 2.5rem;
-    }
-
     /* ── Hero ─────────────────────────────────────────────── */
 
+    /* Le hero ne se dissout plus vers une page claire : toute la page est sombre,
+       il se dissout donc vers sa propre couleur de fond, qui est exactement celle
+       de la section suivante (--doc-bg).
+
+       Empilement (du dessus vers le dessous) :
+       1. Une garantie de couture : une ellipse pleine --doc-bg dont le centre est
+          posé SOUS la boîte (130% — donc invisible en tant que « spot », on n'en
+          voit que le bord). Son plateau opaque couvre toute la largeur du bas de
+          la section (vérifié aux coins, pas seulement au centre) avant de
+          s'estomper vers le haut : le bas de la section est ainsi garanti
+          identique à --doc-bg quoi que fassent les halos en dessous, sans avoir
+          à ajuster leur géométrie un par un.
+       2-5. Quatre halos radiaux (cyan / bleu / violet) concentrés dans la moitié
+          haute, là où vit le texte — aucun n'est positionné assez bas pour
+          atteindre la garantie de couture avant de s'éteindre.
+       6. Un lavis linéaire qui assombrit le sommet puis rejoint --doc-bg : la
+          couleur de fond de base sur laquelle les halos se posent.
+
+       Les stops de fin sont écrits en rgba(…, 0) — ou dans la couleur littérale
+       de --doc-bg pour la garantie de couture — et non `transparent`, qui
+       interpolerait vers du noir transparent et grisrait le dégradé. */
     .hero {
-        padding-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        background-color: var(--doc-bg);
+        background-image:
+            radial-gradient(ellipse 170% 57% at 91% 117%,
+                var(--doc-bg) -41%,
+                var(--doc-bg) 72%,
+                #080b1700 100%),
+            radial-gradient(ellipse 83vw 46vw at 114% 0%,
+                #38e8936b,
+                #38d6e800 72%),
+            radial-gradient(ellipse 80vw 71vw at -14% 6%,
+                #45aee280,
+                #5068ff00 70%),
+            radial-gradient(ellipse 102vw 68.5vw at 124% 55%,
+                #f2545470,
+                #8654f200 66%),
+            radial-gradient(ellipse 40vw 54.5vw at 21% 71%,
+                #704ae870,
+                #704ae800 108%),
+            linear-gradient(253deg, #161c40 -63%,
+                #111731 29%,
+                #0b1022 64%,
+                var(--doc-bg) 45%,
+                var(--doc-bg) 277%
+            );
+    }
+
+    /* Trame de points : concentrée sur le haut coloré, éteinte bien avant le bas. */
+    .hero-pattern {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+        background-size: 26px 26px;
+        mask-image: radial-gradient(ellipse 90% 62% at 50% 4%, black 15%, transparent 78%);
+        pointer-events: none;
+    }
+
+    .hero-inner {
+        position: relative;
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 7.5rem 1.5rem 7.5rem;
+        text-align: center;
     }
 
     .hero-title {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--font-display);
+        font-size: clamp(2.4rem, 5.5vw, 3.6rem);
         font-weight: 700;
-        font-size: clamp(1.85rem, 4.5vw, 2.85rem);
-        line-height: 1.2;
-        color: var(--doc-text);
-        max-width: 18ch;
-        margin: 0 0 1.25rem;
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+        color: #fff;
+        margin: 0 0 1.5rem;
     }
 
     .hero-pitch {
-        font-size: 1.05rem;
-        color: var(--doc-text-subtle);
-        line-height: 1.75;
-        max-width: 52ch;
-        margin: 0 0 2rem;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.7;
+        max-width: 53ch;
+        margin: 0 auto 2.25rem;
     }
 
     .hero-ctas {
         display: flex;
+        justify-content: center;
         gap: 0.75rem;
         flex-wrap: wrap;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
     }
 
     .hero-facts {
         display: flex;
+        justify-content: center;
         flex-wrap: wrap;
         gap: 1.25rem;
         list-style: none;
         margin: 0;
         padding: 0;
         font-size: 0.8rem;
-        color: var(--doc-text-muted);
+        color: rgba(255, 255, 255, 0.62);
     }
 
     .hero-facts li + li {
-        border-left: 1px solid var(--doc-border);
+        border-left: 1px solid rgba(255, 255, 255, 0.22);
         padding-left: 1.25rem;
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
 
+    /* Hero et page partagent désormais la même palette sombre : les variantes
+       « inversées » d'avant n'ont plus lieu d'être, un seul couple de boutons
+       fonctionne partout. */
     .btn-primary {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
         background: var(--doc-accent);
-        color: #fff;
+        color: var(--doc-accent-ink);
         font-family: inherit;
         font-size: 0.9rem;
         font-weight: 600;
         padding: 0.65rem 1.5rem;
-        border-radius: 8px;
+        border-radius: 999px;
         text-decoration: none;
         border: none;
         cursor: pointer;
-        transition: background 0.15s;
+        box-shadow: 0 10px 30px -12px rgba(79, 216, 234, 0.65);
+        transition:
+            background 0.15s,
+            box-shadow 0.2s,
+            transform 0.15s;
     }
 
     .btn-primary:hover {
         background: var(--doc-accent-hover);
+        box-shadow: 0 12px 34px -10px rgba(79, 216, 234, 0.75);
+        transform: translateY(-1px);
     }
 
     .btn-secondary {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        background: transparent;
+        background: rgba(255, 255, 255, 0.04);
         color: var(--doc-text);
         font-family: inherit;
         font-size: 0.9rem;
         font-weight: 600;
         padding: 0.65rem 1.5rem;
-        border-radius: 8px;
+        border-radius: 999px;
         text-decoration: none;
-        border: 1.5px solid var(--doc-border);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         cursor: pointer;
-        transition: border-color 0.15s, color 0.15s;
+        transition:
+            background 0.15s,
+            border-color 0.15s,
+            transform 0.15s;
     }
 
     .btn-secondary:hover {
-        border-color: var(--doc-accent);
-        color: var(--doc-accent);
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.34);
+        transform: translateY(-1px);
     }
 
-    /* ── Fil d'Ariane — séparateur ──────────────────────── */
 
-    .thread-divider {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 0 2.5rem;
-    }
-
-    .thread-divider::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--doc-thread);
-        flex-shrink: 0;
-    }
-
-    .thread-divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--doc-thread);
-        opacity: 0.35;
-    }
-
-    /* ── Démo live ──────────────────────────────────────── */
-
-    .demo-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: var(--doc-text);
-        margin: 0 0 0.5rem;
-        max-width: 32ch;
-    }
-
-    .demo-pitch {
-        font-size: 0.95rem;
-        color: var(--doc-text-muted);
-        margin: 0 0 2rem;
-    }
-
-    .demo-panel {
-        background: var(--doc-code-bg);
+    /* Boutons dans les previews live — présentation seulement, pas le code copié */
+    .try-preview button {
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 0.55rem 1.1rem;
+        border-radius: 8px;
         border: 1px solid var(--doc-border);
-        border-radius: 12px;
-        padding: 1.5rem;
-    }
-
-    /* ── Pourquoi Ariane ────────────────────────────────── */
-
-    .why-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        background: var(--doc-surface-2);
         color: var(--doc-text);
-        margin: 0 0 2rem;
+        cursor: pointer;
     }
 
-    .why-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 1.75rem;
+    .try-preview ar-dropdown {
+        --ar-panel-bg: var(--doc-surface-2);
+        --ar-panel-border-color: var(--doc-border);
     }
 
-    .why-list li {
-        border-left: 2px solid var(--doc-border);
-        padding-left: 1.25rem;
+    .try-preview ar-dropdown-item button {
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        width: 100%;
+        display: block;
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        transition: background 0.12s;
     }
 
-    .why-list h3 {
-        font-size: 1rem;
+    /* La librairie est headless : elle ne style pas les boutons slottés, l'état
+       survol de la démo se pose donc au niveau de la page. */
+    .try-preview ar-dropdown-item button:hover {
+        background: var(--doc-code-block-bg);
+    }
+
+    /* ── La promesse d'Ariane ──────────────────────── */
+
+    /* La section prolonge la descente du hero : un halo violet très dilué évite le
+       pavé noir plat entre deux blocs colorés. Son centre est à 45% (pas au ras
+       du bord haut) : mesuré au pixel, un centre proche de la couture faisait
+       réapparaître la couleur d'un coup juste sous la ligne de contact avec le
+       hero (qui, lui, est parfaitement plat) — la couleur doit monter en
+       douceur en s'éloignant de la couture, pas y démarrer déjà à moitié
+       visible. */
+    .benefits-section {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+        background:
+            radial-gradient(
+                488px 498px at 57% 62%,
+                #7c5ceb24, #7c5ceb00 57%
+            ),
+            radial-gradient(
+                400px 500px at 35% 47%,
+                #5eeb5c17,
+                #7c5ceb00 56%
+            );
+    }
+
+    .benefits-title {
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--doc-text);
+        text-align: center;
+        margin: 0 0 2.25rem;
+    }
+
+    /* Trois paliers explicites (1 × 6, puis 2 × 3, puis 3 × 2) plutôt qu'un
+       auto-fit, dont le nombre de colonnes dépendait de la largeur disponible et
+       laissait des lignes déséquilibrées (4 + 2). Mobile d'abord : une colonne. */
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 26rem;
+        margin-inline: auto;
+    }
+
+    .benefit-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--doc-accent);
+        /* Léger halo : sur fond sombre un trait de 2px en aplat paraît fragile. */
+        filter: drop-shadow(0 0 10px rgba(79, 216, 234, 0.35));
+        margin-bottom: 0.75rem;
+    }
+
+    .benefit h3 {
+        font-size: 0.98rem;
         font-weight: 700;
         color: var(--doc-text);
         letter-spacing: -0.01em;
-        margin: 0 0 0.4rem;
+        margin: 0 0 0.35rem;
     }
 
-    .why-list p {
-        font-size: 0.9rem;
+    .benefit p {
+        font-size: 0.85rem;
         color: var(--doc-text-muted);
-        line-height: 1.7;
+        line-height: 1.6;
         margin: 0;
-        max-width: 60ch;
+    }
+
+    /* ── Essayez-le ─────────────────────────────────────── */
+
+    /* Bande à peine relevée par rapport au fond de page, avec un halo froid très
+       diffus dans l'axe de la carte : le contraste entre sections vient de la
+       lumière, pas d'un aplat franc. */
+    .try-section {
+        position: relative;
+        background:
+            radial-gradient(
+                ellipse 70% 60% at 50% 33%,
+                rgba(99, 118, 255, 0.13),
+                rgba(99, 118, 255, 0) 70%
+            ),
+            var(--doc-bg-soft);
+        border-block: 1px solid var(--doc-border-soft);
+    }
+
+    .try-inner {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 5rem 1.5rem;
+    }
+
+    .try-title {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--doc-text);
+        margin: 0 0 0.5rem;
+        text-align: center;
+    }
+
+    .try-pitch {
+        font-size: 0.95rem;
+        color: var(--doc-text-muted);
+        text-align: center;
+        margin: 0 0 3rem;
+    }
+
+    /* Les deux étapes forment une seule carte continue, séparées par un filet. */
+    .try-card {
+        position: relative;
+        background: var(--doc-surface);
+        border: 1px solid var(--doc-border);
+        border-radius: 16px;
+        box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+    }
+
+    .try-card-step {
+        padding: 1.5rem;
+    }
+
+    .try-card-step + .try-card-step {
+        border-top: 1px solid var(--doc-border);
+    }
+
+    .try-step-header {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        margin: 0 0 1.25rem;
+    }
+
+    .try-step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        border: 1.5px solid var(--doc-accent);
+        color: var(--doc-accent);
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Sélecteur de composant : pastilles, pas une barre d'onglets ──────
+       Le tab-group est entièrement rhabillé depuis la page (ses styles de thème
+       vivent dans @layer ariane.theme, les règles ci-dessous les emportent sans
+       !important) : le filet du groupe et le soulignement de l'onglet actif sont
+       neutralisés, chaque onglet devient une pastille autonome icône + libellé.
+       Le rayon est posé sur l'hôte : c'est lui que suit l'anneau de focus, et
+       [part~='tab'] en hérite. */
+    ar-tab-group.try-tabs {
+        --ar-tab-group-border-top-width: 0px;
+        --ar-tab-group-border-bottom-width: 0px;
+    }
+
+    ar-tab-group.try-tabs.has-overflow-start:not(.has-overflow-end)::part(nav) {
+        mask-image: linear-gradient(to right, transparent, black 3rem);
+    }
+    ar-tab-group.try-tabs.has-overflow-end:not(.has-overflow-start)::part(nav) {
+        mask-image: linear-gradient(to left, transparent, black 3rem);
+    }
+    ar-tab-group.try-tabs.has-overflow-start.has-overflow-end::part(nav) {
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 3rem,
+            black calc(100% - 3rem),
+            transparent
+        );
+    }
+
+    ar-tab-group.try-tabs::part(nav) {
+        padding: 1.5rem;
+        margin-inline-start: -1.5rem;
+    }
+
+    ar-tab-group.try-tabs::part(tabs) {
+        gap: 0.6rem;
+    }
+
+    ar-tab.try-tab {
+        --ar-tab-padding-x: 0.5rem;
+        --ar-tab-padding-y: 0.5rem;
+        --ar-tab-active-shadow: none;
+        --ar-tab-focus-ring-offset: -3px;
+        --ar-tab-focus-ring-color: var(--doc-accent);
+        border-radius: 999px;
+    }
+
+    ar-tab.try-tab::part(tab) {
+        gap: 0.6rem;
+        padding-inline-end: 1.05rem;
+        border: 1px solid var(--doc-border);
+        background: var(--doc-surface-2);
+        color: var(--doc-text-muted);
+        transition:
+            background 0.15s,
+            border-color 0.15s,
+            color 0.15s,
+            box-shadow 0.2s;
+    }
+
+    ar-tab.try-tab:not([active]):hover::part(tab) {
+        border-color: var(--doc-accent-border);
+        background: var(--doc-accent-bg);
+        color: var(--doc-text);
+    }
+
+    ar-tab.try-tab[active]::part(tab--selected) {
+        border-color: var(--doc-accent);
+        background: var(--doc-accent);
+        color: var(--doc-accent-ink);
+        box-shadow: 0 10px 26px -10px rgba(79, 216, 234, 0.7);
+    }
+
+    /* La pastille active est un aplat cyan clair : son anneau de focus doit être
+       sombre, un anneau blanc n'y aurait que 1,7:1. */
+    ar-tab.try-tab[active] {
+        --ar-tab-focus-ring-color: var(--doc-accent-ink);
+    }
+
+    /* Contenu slotté : il vit dans le light DOM, les règles de page l'atteignent
+       directement — le badge fixe sa propre couleur, l'icône suit currentColor. */
+    .try-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.85rem;
+        height: 1.85rem;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--doc-accent-bg);
+        color: var(--doc-accent);
+        transition:
+            background 0.15s,
+            color 0.15s;
+    }
+
+    ar-tab.try-tab[active] .try-tab-badge {
+        background: rgba(4, 20, 27, 0.16);
+        color: var(--doc-accent-ink);
+    }
+
+    .try-tab-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .try-tab-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+
+    .try-step-label {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--doc-text);
+        margin: 0;
+    }
+
+    .code-block {
+        position: relative;
+        background: var(--doc-code-block-bg);
+        border: 1px solid var(--doc-border);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .try-grid .code-block {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .code-block pre {
+        margin: 0;
+        padding: 1.25rem 1.5rem;
+        overflow-x: auto;
+    }
+
+    .code-block code {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        background: transparent;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 0.65rem;
+        right: 0.65rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-family: inherit;
+        padding: 0.3rem 0.65rem;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        z-index: 1;
+        transition: opacity .3s;
+    }
+
+    .copy-btn.copied {
+        background: var(--doc-accent);
+        color: var(--doc-accent-ink);
+        border-color: var(--doc-accent);
+    }
+
+    .try-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        column-gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    /* Fenêtre de navigateur simulée autour de la démo live */
+    .try-preview {
+        display: flex;
+        flex-direction: column;
+        background: var(--doc-bg-soft);
+        border: 1px solid var(--doc-border);
+        border-radius: 0 0 10px 10px;
+    }
+
+    .try-preview-stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.75rem 1.5rem;
+        min-height: 7.5rem;
+    }
+
+    .try-preview ar-dropdown {
+        margin: auto;
     }
 
     /* ── CTA bas de page ────────────────────────────────── */
 
+    /* Dernier halo de la page, cyan cette fois : il ramène la couleur du hero en
+       milieu de section — son centre est remonté à 30% et son rayon calibré pour
+       s'éteindre avant le bas, plutôt que d'être posé sur la couture avec le pied
+       de page comme précédemment (le halo y était le plus intense pile là où il
+       fallait un raccord franc). Une seconde ellipse, posée sous la boîte comme
+       pour le hero, fait glisser le ton de fond de --doc-bg vers --doc-bg-deep
+       (celui du footer) sur le dernier tiers de la section : la couture est ainsi
+       garantie plutôt qu'espérée. */
     .cta-bottom {
-        background: var(--doc-cta-bg);
-        border-top: 1px solid var(--doc-cta-border);
-        border-bottom: 1px solid var(--doc-cta-border);
+        position: relative;
         text-align: center;
-        padding: 4rem 2rem;
+        padding: 5.5rem 2rem;
+        background:
+            radial-gradient(
+                350px 250px at 50% 50%,
+                #38d7e82e,
+                #38d6e800 60%
+            ),
+            radial-gradient(
+                ellipse 154% 55% at 50% 130%,
+                var(--doc-bg-deep) -10%,
+                var(--doc-bg-deep) 58%,
+                #05070f00 115%
+            ),
+            var(--doc-bg)
     }
 
     .cta-bottom h2 {
-        font-size: 1.6rem;
+        font-family: var(--font-display);
+        font-size: 1.7rem;
         font-weight: 700;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.01em;
         color: var(--doc-text);
         margin-bottom: 0.5rem;
     }
 
     .cta-bottom p {
         font-size: 0.9rem;
-        /* var(--doc-text-muted) échoue le contraste AA sur ce fond (axe-core) */
-        color: var(--doc-text);
+        color: var(--doc-text-muted);
         margin-bottom: 1.75rem;
     }
 
@@ -358,7 +884,8 @@ const firstComponentHref = rootComponents[0]?.tagName
 
     .landing-footer {
         padding: 2rem 2.5rem;
-        border-top: 1px solid var(--doc-border);
+        background: var(--doc-bg-deep);
+        border-top: 1px solid var(--doc-border-soft);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -372,25 +899,166 @@ const firstComponentHref = rootComponents[0]?.tagName
         margin: 0;
     }
 
-    .landing-footer a {
+    a {
         color: var(--doc-accent);
         text-decoration: underline;
         text-underline-offset: 2px;
     }
 
-    /* ── Responsive ─────────────────────────────────────── */
+    /* ── Responsive — mobile d'abord ───────────────────────
+       Les règles ci-dessus posent la base mobile (une colonne, gouttières et
+       tailles resserrées). Les paliers suivants ENRICHISSENT vers le desktop,
+       ils ne le corrigent pas. */
 
-    @media (max-width: 640px) {
-        .hero,
-        .demo-section,
-        .why-section {
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
+    /* Palier intermédiaire : la grille des selling points passe à 2 × 3 et se
+       desserre un peu, sans encore atteindre les tailles desktop. */
+    @media (min-width: 601px) {
+        .benefits-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.25rem 2rem;
+            max-width: 44rem;
+        }
+        .hero {
+            background-image:
+                radial-gradient(ellipse 155% 66% at 110% 108%,
+                    var(--doc-bg) -8%,
+                    var(--doc-bg) 28%,
+                    #080b1700 100%),
+                radial-gradient(ellipse 29vw 29vw at 85% 0%,
+                    #38e8936b,
+                    #38d6e800 72%),
+                radial-gradient(ellipse 32vw 29vw at 2% 22%,
+                    #45aee280,
+                    #5068ff00 70%),
+                radial-gradient(ellipse 53vw 25.5vw at 73% 50%,
+                    #f2545470,
+                    #8654f200 66%),
+                radial-gradient(ellipse 32vw 28.5vw at 32% 50%,
+                    #704ae870,
+                    #704ae800 60%),
+                linear-gradient(219deg, #161c40 -44%,
+                    #111731 46%,
+                    #0b1022 64%,
+                    var(--doc-bg) 64%,
+                    var(--doc-bg) 172%
+                );
+        }
+    }
+
+
+
+    /* Palier desktop. */
+    @media (min-width: 901px) {
+        .hero-inner {
+            padding: 9rem 2.5rem 9.5rem;
         }
 
-        .thread-divider {
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
+        .benefits-section {
+            padding: 5.5rem 2.5rem;
+        }
+
+        .benefits-title {
+            font-size: 1.8rem;
+            margin-bottom: 3rem;
+        }
+
+        .benefits-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem 2.5rem;
+            max-width: none;
+            margin-inline: 0;
+        }
+
+        .benefit-icon {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 1rem;
+        }
+
+        .benefit h3 {
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .copy-btn {
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .code-block:hover .copy-btn,
+        .code-block:has(pre:focus) .copy-btn,
+        .code-block:has(code:focus) .copy-btn,
+        .copy-btn:focus {
+            transition: opacity .3s;
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        .try-inner {
+            padding: 5rem 2.5rem;
+        }
+
+        .try-card-step {
+            padding: 2rem;
+        }
+
+        .try-grid {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+
+        .try-preview {
+            margin-block-start: -4.5rem;
+        }
+
+        .try-preview-stage {
+            min-height: 9rem;
+        }
+
+        .try-grid .code-block,
+        .try-preview {
+            border-radius: 10px;
+        }
+
+        /* Pas d'overflow: hidden ici — les couches flottantes (menu, calendrier)
+       débordent volontairement de la fenêtre simulée. */
+        .try-browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 0.75rem;
+            background: var(--doc-surface-2);
+            border-bottom: 1px solid var(--doc-border);
+            border-radius: 9px 9px 0 0;
+            flex-shrink: 0;
+        }
+
+        /* Sur fond sombre, les trois pastilles « feu tricolore » saturées font tache :
+        une teinte neutre suffit à lire la métaphore de fenêtre. */
+        .try-browser-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 50%;
+
+            &:first-child {
+                background-color: #FF605C;
+            }
+
+            &:nth-child(2) {
+                background-color: #FFBD44;
+            }
+
+            &:last-child {
+                background-color: #00CA4E;
+            }
         }
     }
 </style>

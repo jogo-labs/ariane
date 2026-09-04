@@ -1,7 +1,6 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
 import rootPkg from '../../../../package.json';
-import { version } from '../../../../packages/core/package.json';
 
 interface Props {
     title: string;
@@ -130,28 +129,25 @@ const {
             }
 
             :root {
-                /* Palette light — crème/violet */
-                --doc-bg:             #fafaf8;
-                --doc-nav-bg:         #fafaf8;
-                --doc-text:           #1a1a1a;
+                /* Palette light — blanc froid/cobalt */
+                --doc-bg:             #fafbfc;
+                --doc-nav-bg:         #fafbfc;
+                --doc-text:           #14181f;
                 --doc-text-muted:     #6b7280;
                 --doc-text-subtle:    #4b5563;
-                --doc-border:         #e8e6e0;
-                --doc-nav-border:     #e8e6e0;
-                --doc-accent:         #7c3aed;
-                --doc-accent-hover:   #6d28d9;
-                --doc-accent-bg:      #f3efff;
-                --doc-accent-border:  #e0d0ff;
-                --doc-link-visited:   #6d28d9;
+                --doc-border:         #e4e7ec;
+                --doc-nav-border:     #e4e7ec;
+                --doc-accent:         #2955a8;
+                --doc-accent-hover:   #21437f;
+                --doc-accent-bg:      #eaf1fb;
+                --doc-accent-border:  #c7d9f0;
+                --doc-link-visited:   #1f3b73;
                 --doc-code-bg:        #f3f4f6;
                 --doc-code-block-bg:  #0d1219;
-                --doc-header-bg:      rgba(250,250,248,0.92);
+                --doc-header-bg:      rgba(250,251,252,0.92);
                 --doc-header-h:       3.25rem;
                 --doc-alpha-banner-h: 2rem;
-                --doc-nav-bg-hover: #f3efff;
-                /* Fil d'Ariane — motif de la page d'accueil (#110), décoratif uniquement,
-                   jamais utilisé pour du texte porteur de sens (contraste non garanti). */
-                --doc-thread: #b8863b;
+                --doc-nav-bg-hover: #eaf1fb;
             }
 
             [data-theme="dark"] {
@@ -163,19 +159,18 @@ const {
                 --doc-border:         #30363d;
                 --doc-nav-border:     #30363d;
                 --doc-header-bg:      rgba(22,27,34,0.92);
-                --doc-accent:         #a78bfa;
-                --doc-accent-hover:   #8b5cf6;
-                --doc-accent-bg:      #2d2040;
-                --doc-accent-border:  #4c3280;
-                /* #8b5cf6 (--doc-accent-hover) échoue l'AA sur ce fond (4.09:1) —
-                   teinte plus claire dédiée aux liens visités (9.37:1) */
-                --doc-link-visited:   #c4b5fd;
-                --doc-cta-bg:         #2d2040;
-                --doc-cta-border:     #30215a;
+                --doc-accent:         #6fa0e0;
+                --doc-accent-hover:   #4c86d6;
+                --doc-accent-bg:      #1b2a40;
+                --doc-accent-border:  #2c4568;
+                /* Teinte dédiée, plus claire, pour garantir l'AA texte (9.63:1) —
+                   --doc-accent-hover ne vise que le contraste UI (3:1), pas texte. */
+                --doc-link-visited:   #9cc5f5;
+                --doc-cta-bg:         #16233a;
+                --doc-cta-border:     #223655;
                 --doc-code-bg:        #1e1e2e;
                 --doc-code-block-bg:  #0d1219;
-                --doc-nav-bg-hover: #21262d;
-                --doc-thread: #d2a259;
+                --doc-nav-bg-hover: #1b2a40;
             }
 
             html {
@@ -311,29 +306,6 @@ const {
             .theme-menu-item[aria-current="true"] {
                 color:       var(--doc-accent);
                 font-weight: 600;
-            }
-
-            .brand-dot {
-                display:        inline-block;
-                font-size:      0.55rem;
-                color:          var(--doc-accent);
-                margin-left:    3px;
-                vertical-align: middle;
-                position:       relative;
-                top:            -2px;
-            }
-
-            .header-version {
-                font-size:     0.7rem;
-                font-weight:   500;
-                /* var(--doc-text-muted) échoue le contraste AA (4.28:1) sur ce fond en
-                   thème clair — même paire que .badge (var(--doc-accent)/-bg), conforme
-                   dans les deux thèmes (5.05:1 clair, 5.54:1 sombre). */
-                color:         var(--doc-accent);
-                background:    var(--doc-accent-bg);
-                border:        1px solid var(--doc-accent-border);
-                padding:       1px 8px;
-                border-radius: 20px;
             }
 
             /* ── Overlay drawer ─────────────────────────── */
@@ -492,10 +464,9 @@ const {
                 )}
                 <h1>
                     <a href="/" class="header-brand">
-                        {rootPkg.config.displayName}<span class="brand-dot">●</span>
+                        {rootPkg.config.displayName}
                     </a>
                 </h1>
-                <span class="header-version">v{version}</span>
             </div>
             <div class="header-actions">
                 <!-- Lien GitHub -->

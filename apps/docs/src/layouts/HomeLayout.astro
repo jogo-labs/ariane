@@ -1,0 +1,207 @@
+---
+import rootPkg from '../../../../package.json';
+
+interface Props {
+    title: string;
+    description?: string;
+}
+
+const { title, description = 'Accessible web components library' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content={description} />
+        <title>{title} — {rootPkg.config.displayName}</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Familjen+Grotesk:wght@500;600;700&family=Fira+Code:wght@500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        {/* ── highlight.js — colore les blocs de code de la section « Essayez-le » ── */}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
+        <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+
+        <!-- Thème par défaut de la librairie (nécessaire pour les démos live) -->
+        <link rel="stylesheet" href="/themes/default.css" />
+
+        <!-- Composants web du DS -->
+        <script type="module" src="/cdn/index.js"></script>
+        <script src="/js/playground.js" is:inline></script>
+
+        <style is:global>
+            a:focus-visible,
+            button:focus-visible {
+                outline: 2px solid var(--doc-accent);
+                outline-offset: 2px;
+                border-radius: 2px;
+            }
+
+            /* Évite le flash de contenu slotté non stylé le temps que /cdn/index.js
+               définisse les custom elements utilisés par la section « Essayez-le ». */
+            *:not(:defined) {
+                visibility: hidden;
+            }
+        </style>
+        <style>
+            *, *::before, *::after { box-sizing: border-box; }
+
+            /* Page d'accueil : palette sombre fixe, indépendante du reste du site
+               de doc (Layout.astro a son propre couple clair/sombre). Le fond est
+               un bleu-noir profond ; les surfaces montent par paliers très courts
+               pour rester dans la même famille plutôt que de virer au gris. */
+            :root {
+                --doc-bg:            #080b17;
+                --doc-bg-soft:       #0b0f1e;
+                --doc-bg-deep:       #05070f;
+                --doc-surface:       #10162a;
+                --doc-surface-2:     #161d33;
+                --doc-text:          #eef1f7;
+                --doc-text-muted:    #9aa5bd;
+                --doc-text-subtle:   #c3ccdd;
+                --doc-border:        #212a42;
+                --doc-border-soft:   rgba(255, 255, 255, 0.08);
+                --doc-accent:        #4fd8ea;
+                --doc-accent-hover:  #7fe6f3;
+                /* Encre posée sur un aplat d'accent : le blanc n'y passe pas (1,7:1). */
+                --doc-accent-ink:    #04141b;
+                --doc-accent-bg:     rgba(79, 216, 234, 0.1);
+                --doc-accent-border: rgba(79, 216, 234, 0.26);
+                --doc-code-bg:       #0d1425;
+                --doc-code-block-bg: #0b1020;
+                --font-display:      'Familjen Grotesk', 'Inter', sans-serif;
+            }
+
+            html, body {
+                margin:      0;
+                min-height:  100vh;
+                background:  var(--doc-bg);
+                color:       var(--doc-text);
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            }
+
+            .skip-link {
+                position:        absolute;
+                top:             -3rem;
+                left:            0.5rem;
+                z-index:         1000;
+                padding:         0.5rem 1rem;
+                background:      var(--doc-accent);
+                color:           var(--doc-accent-ink);
+                border-radius:   0 0 0.4rem 0.4rem;
+                text-decoration: none;
+                font-size:       0.85rem;
+                font-weight:     600;
+                transition:      top 0.15s ease;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            .alpha-banner {
+                position:       relative;
+                z-index:        20;
+                width:          100%;
+                background:      #2a1e06;
+                color:           #fcd34d;
+                border-bottom:   1px solid rgba(252, 211, 77, 0.16);
+                text-align:     center;
+                font-size:      0.8rem;
+                padding:        0.4rem 1rem;
+                letter-spacing: 0.01em;
+            }
+
+            .alpha-banner a {
+                color:                  inherit;
+                font-weight:            600;
+                text-underline-offset:  2px;
+            }
+
+            .home-shell {
+                position: relative;
+            }
+
+            .home-header {
+                position: absolute;
+                top:      0;
+                left:     0;
+                right:    0;
+                z-index:  10;
+                display:  flex;
+                align-items:     center;
+                justify-content: space-between;
+                max-width: 1240px;
+                margin:    0 auto;
+                padding:   1.25rem 1.5rem 0;
+            }
+
+            .home-logo {
+                font-family:     var(--font-display);
+                font-size:       2rem;
+                font-weight:     600;
+                letter-spacing:  -0.01em;
+                color:           #fff;
+                text-decoration: none;
+            }
+
+            .home-header-github {
+                display:         flex;
+                align-items:     center;
+                justify-content: center;
+                width:           3rem;
+                height:          3rem;
+                border-radius:   0.4rem;
+                color:           rgba(255, 255, 255, 0.85);
+                transition:      background 0.3s, box-shadow 0.3s;
+            }
+
+            .home-header-github:hover {
+                transition:      background 0.3s, box-shadow 0.3s;
+                background: rgba(0, 0, 0, 0.12);
+                color:      #fff;
+                box-shadow: 0 10px 26px -10px rgba(79, 216, 234, 0.7);
+            }
+
+            @media (min-width: 641px) {
+                .home-header {
+                    padding: 1.5rem 2.5rem 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+        <div class="alpha-banner" role="status">
+            Librairie en cours de développement — API instable, ne pas utiliser en production.&nbsp;
+            <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
+        </div>
+
+        <div class="home-shell">
+            <header class="home-header">
+                <a href="/" class="home-logo">{rootPkg.config.displayName}</a>
+                <a
+                    href="https://github.com/jogo-labs/ariane"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="home-header-github"
+                    aria-label="Code source sur GitHub (nouvel onglet)"
+                    title="Code source sur GitHub (nouvel onglet)"
+                >
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/></svg>
+                </a>
+            </header>
+
+            <main id="main-content" tabindex="-1">
+                <slot />
+            </main>
+        </div>
+    </body>
+</html>
