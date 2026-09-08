@@ -51,7 +51,10 @@ const { title, description = 'Accessible web components library' } = Astro.props
             }
 
             a:focus-visible,
-            button:focus-visible {
+            button:focus-visible,
+            input:focus-visible,
+            select:focus-visible,
+            summary:focus-visible {
                 outline: 2px solid var(--doc-focus);
                 outline-offset: 2px;
                 border-radius: 2px;
@@ -76,12 +79,9 @@ const { title, description = 'Accessible web components library' } = Astro.props
             :root {
                 --doc-paper: #ffffff;
                 --doc-stone: #f5f5f5;
-                /* --doc-stone-2: #ebebeb; */
                 --doc-forest: #313a2e;
                 --doc-forest-dark: #252826;
-                /* --doc-forest-deep: #181b19; */
                 --doc-ink: #141414;
-                /* --doc-ink-2: #1f1f1f; */
                 /* 6,7:1 sur --doc-stone, 7,4:1 sur --doc-paper */
                 --doc-ink-muted: #565656;
                 /* Traits du motif « fil » : le trait plein pour les contours
@@ -95,7 +95,6 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 --doc-on-dark: #f5f5f5;
                 --doc-on-dark-muted: #b9bdba;
                 --doc-on-dark-line: rgba(245, 245, 245, 0.18);
-                /* --doc-code-block-bg: #181b19; */
                 --doc-code-block-bg: var(--doc-forest-dark);
 
                 /* L'anneau de focus suit le fond : l'ambre ne passe pas sur blanc. */

@@ -682,7 +682,7 @@ const codeDatepicker = `<ar-datepicker
     }
 
     .hero-ctas {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
 
     .hero-facts {
@@ -723,10 +723,6 @@ const codeDatepicker = `<ar-datepicker
             color 0.35s var(--ease),
             box-shadow 0.3s var(--ease),
             opacity 0.3s var(--ease);
-
-        /* &:hover {
-            box-shadow: 0 12px 10px -10px var(--doc-ink);
-        } */
     }
 
     .btn-primary {
@@ -875,7 +871,6 @@ const codeDatepicker = `<ar-datepicker
         display: flex;
         align-items: center;
         column-gap: var(--step-header-column-gap);
-        /* margin-block-end: 1.25rem; */
     }
 
     .step-node {
@@ -934,7 +929,6 @@ const codeDatepicker = `<ar-datepicker
         &::part(tabs) {
             gap: 0.5rem;
             border: 1px solid var(--doc-on-dark-line);
-            /* box-shadow: inset 0px 1px 20px 3px var(--doc-ink); */
             width: fit-content;
             min-width: fit-content;
             padding: .35rem;
@@ -1070,19 +1064,8 @@ const codeDatepicker = `<ar-datepicker
         background: var(--doc-paper);
         border-radius: 0 0 var(--r-micro) var(--r-micro);
         color: var(--doc-ink);
-    }
 
-    .try-preview-stage {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.75rem 1.5rem;
-        min-height: 7.5rem;
-    }
-
-    .try-preview {
-            ar-dropdown {
+        ar-dropdown {
             margin: auto;
         }
 
@@ -1116,6 +1099,15 @@ const codeDatepicker = `<ar-datepicker
         ar-dropdown-item button:hover {
             background: var(--doc-stone);
         }
+    }
+
+    .try-preview-stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.75rem 1.5rem;
+        min-height: 7.5rem;
     }
 
     /* ── CTA bas de page ──────────────────────────────────── */
@@ -1356,12 +1348,9 @@ const codeDatepicker = `<ar-datepicker
             border-radius: var(--r-micro) var(--r-micro) 0 0;
         }
 
-        /* Trois contours vides plutôt que le feu tricolore saturé : la fenêtre se
-           lit toujours, et le motif de trait reste celui de la page. */
         .try-browser-dot {
             width: 0.75rem;
             height: 0.75rem;
-            /* border: 1px solid var(--doc-line-soft); */
             border-radius: 50%;
 
             &:first-child {
@@ -1377,24 +1366,29 @@ const codeDatepicker = `<ar-datepicker
             }
         }
 
-        .copy-btn {
-            opacity: 0;
-        }
-
         .code-block pre {
             padding-block-start: 1.25rem;
         }
 
-        .code-block:hover .copy-btn,
-        .code-block:has(pre:focus) .copy-btn,
-        .code-block:has(code:focus) .copy-btn,
-        .copy-btn:focus {
-            opacity: 1;
-        }
+        /* Masquer le bouton derrière le survol suppose qu'un survol existe : sur
+           tactile (tablette/laptop tactile ≥901px), il n'y en a pas, et rien ne
+           le focus automatiquement — il resterait invisible en permanence. */
+        @media (hover: hover) and (pointer: fine) {
+            .copy-btn {
+                opacity: 0;
 
-        .copy-btn:hover {
-            background: var(--doc-paper);
-            color: var(--doc-ink);
+                &:hover {
+                    background: var(--doc-paper);
+                    color: var(--doc-ink);
+                }
+            }
+
+            .code-block:hover .copy-btn,
+            .code-block:has(pre:focus) .copy-btn,
+            .code-block:has(code:focus) .copy-btn,
+            .copy-btn:focus {
+                opacity: 1;
+            }
         }
     }
 </style>
