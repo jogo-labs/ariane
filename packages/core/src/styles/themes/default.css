@@ -1,7 +1,7 @@
 /**
  * Thème par défaut — à inclure dans le <head> ou importer globalement.
  * Utilise @layer pour éviter les conflits de spécificité avec les styles utilisateur.
- * Le bloc `:root` de base doit être déclaré avant toute surcharge dark mode (`:root[data-theme='dark']` ou `@media (prefers-color-scheme: dark)`), car `packages/core/cem.config.js` valide les `@cssprop` en s'y fiant.
+ * Le bloc `:root` de base doit être déclaré avant les règles `[data-theme='dark']`/`[data-theme='light']` qui suivent (voir plus bas), car `packages/core/cem.config.js` valide les `@cssprop` en s'y fiant.
  *
  * Usage :
  *   <link rel="stylesheet" href="@ariane-ui/core/themes/default.css">
@@ -10,6 +10,12 @@
  */
 @layer ariane.theme {
     :root {
+        /* Suit prefers-color-scheme par défaut ; [data-theme] (ci-dessous)
+           le fige explicitement sur light ou dark, à :root comme sur tout
+           conteneur descendant — c'est ce qui pilote la résolution de
+           chaque light-dark() de ce fichier. */
+        color-scheme: light dark;
+
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * 1. PALETTE BRUTE
          * Couleurs de base — ne pas utiliser directement dans les composants.
@@ -228,40 +234,55 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* Interaction */
-        --ar-color-interactive: var(--ar-color-primary-40);
-        --ar-color-interactive-hover: var(--ar-color-primary-30);
-        --ar-color-interactive-active: var(--ar-color-primary-20);
-        --ar-color-interactive-subtle: var(--ar-color-primary-95);
+        --ar-color-interactive: light-dark(var(--ar-color-primary-40), var(--ar-color-primary-70));
+        --ar-color-interactive-hover: light-dark(
+            var(--ar-color-primary-30),
+            var(--ar-color-primary-80)
+        );
+        --ar-color-interactive-active: light-dark(
+            var(--ar-color-primary-20),
+            var(--ar-color-primary-80)
+        );
+        --ar-color-interactive-subtle: light-dark(
+            var(--ar-color-primary-95),
+            var(--ar-color-primary-20)
+        );
 
         /* Texte */
-        --ar-color-text: #2e2e31;
-        --ar-color-text-muted: var(--ar-color-neutral-40);
-        --ar-color-text-inverse: var(--ar-color-white);
+        --ar-color-text: light-dark(#2e2e31, var(--ar-color-neutral-95));
+        --ar-color-text-muted: light-dark(var(--ar-color-neutral-40), var(--ar-color-neutral-80));
+        --ar-color-text-inverse: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
 
         /* Surface */
-        --ar-color-bg: var(--ar-color-white);
-        --ar-color-bg-subtle: var(--ar-color-neutral-95);
+        --ar-color-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
+        --ar-color-bg-subtle: light-dark(var(--ar-color-neutral-95), var(--ar-color-neutral-30));
 
         /* Bordure */
-        --ar-color-border: var(--ar-color-neutral-90);
+        --ar-color-border: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-40));
 
         /* Focus */
         --ar-focus-ring-color: var(--ar-color-interactive);
         --ar-focus-ring-offset: 2px;
 
-        /* États — tokens d'usage (light mode) */
-        --ar-color-success-bg: var(--ar-color-success-95);
-        --ar-color-success-text: var(--ar-color-success-40);
-        --ar-color-success-border: var(--ar-color-success-90);
-        --ar-color-warning-bg: var(--ar-color-warning-95);
-        --ar-color-warning-text: var(--ar-color-warning-40);
-        --ar-color-warning-border: var(--ar-color-warning-90);
-        --ar-color-danger-bg: var(--ar-color-danger-95);
-        --ar-color-danger-text: var(--ar-color-danger-40);
-        --ar-color-danger-border: var(--ar-color-danger-90);
-        --ar-color-info-bg: var(--ar-color-info-95);
-        --ar-color-info-text: var(--ar-color-info-40);
-        --ar-color-info-border: var(--ar-color-info-90);
+        /* États — tokens d'usage */
+        --ar-color-success-bg: light-dark(var(--ar-color-success-95), var(--ar-color-success-10));
+        --ar-color-success-text: light-dark(var(--ar-color-success-40), var(--ar-color-success-70));
+        --ar-color-success-border: light-dark(
+            var(--ar-color-success-90),
+            var(--ar-color-success-40)
+        );
+        --ar-color-warning-bg: light-dark(var(--ar-color-warning-95), var(--ar-color-warning-10));
+        --ar-color-warning-text: light-dark(var(--ar-color-warning-40), var(--ar-color-warning-70));
+        --ar-color-warning-border: light-dark(
+            var(--ar-color-warning-90),
+            var(--ar-color-warning-40)
+        );
+        --ar-color-danger-bg: light-dark(var(--ar-color-danger-95), var(--ar-color-danger-10));
+        --ar-color-danger-text: light-dark(var(--ar-color-danger-40), var(--ar-color-danger-70));
+        --ar-color-danger-border: light-dark(var(--ar-color-danger-90), var(--ar-color-danger-40));
+        --ar-color-info-bg: light-dark(var(--ar-color-info-95), var(--ar-color-info-10));
+        --ar-color-info-text: light-dark(var(--ar-color-info-40), var(--ar-color-info-70));
+        --ar-color-info-border: light-dark(var(--ar-color-info-90), var(--ar-color-info-40));
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * 4. TOKENS GLOBAUX — TYPOGRAPHIE
@@ -327,16 +348,25 @@
         --ar-button-border-color: var(--ar-color-interactive);
         --ar-button-danger-bg: var(--ar-color-danger-50);
         --ar-button-danger-color: var(--ar-color-text-inverse);
-        --ar-button-secondary-bg: var(--ar-color-white);
-        --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
-        --ar-button-disabled-bg: var(--ar-color-neutral-90);
-        --ar-button-disabled-border: var(--ar-color-neutral-80);
+        --ar-button-secondary-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-30));
+        --ar-button-secondary-bg-hover: light-dark(
+            var(--ar-color-neutral-40),
+            var(--ar-color-neutral-40)
+        );
+        --ar-button-disabled-bg: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-30));
+        --ar-button-disabled-border: light-dark(
+            var(--ar-color-neutral-80),
+            var(--ar-color-neutral-40)
+        );
         --ar-button-disabled-color: #71747f;
         --ar-button-disabled-icon-color: #9ea2b3;
-        --ar-button-tertiary-bg: rgba(26, 26, 26, 0.05);
-        --ar-button-tertiary-bg-hover: rgba(18, 20, 55, 0.7);
-        --ar-button-tertiary-bg-active: rgba(18, 20, 55, 0.8);
-        --ar-button-tertiary-bg-focus: rgba(26, 26, 26, 0.05);
+        --ar-button-tertiary-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+        --ar-button-tertiary-bg-hover: light-dark(rgba(18, 20, 55, 0.7), rgba(255, 255, 255, 0.15));
+        --ar-button-tertiary-bg-active: light-dark(rgba(18, 20, 55, 0.8), rgba(255, 255, 255, 0.2));
+        --ar-button-tertiary-bg-focus: light-dark(
+            rgba(26, 26, 26, 0.05),
+            rgba(255, 255, 255, 0.08)
+        );
         --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
         --ar-button-link-color: #2458e5;
         --ar-button-focus-ring-color: var(--ar-color-neutral-20);
@@ -363,10 +393,19 @@
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
         --ar-breadcrumb-offset: var(--ar-anchor-offset);
         --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
-        --ar-breadcrumb-toggle-bg: rgba(26, 26, 26, 0.05);
-        --ar-breadcrumb-toggle-bg-hover: rgba(18, 20, 55, 0.7);
-        --ar-breadcrumb-toggle-bg-pressed: rgba(18, 20, 55, 0.8);
-        --ar-breadcrumb-toggle-bg-focus: rgba(26, 26, 26, 0.05);
+        --ar-breadcrumb-toggle-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+        --ar-breadcrumb-toggle-bg-hover: light-dark(
+            rgba(18, 20, 55, 0.7),
+            rgba(255, 255, 255, 0.15)
+        );
+        --ar-breadcrumb-toggle-bg-pressed: light-dark(
+            rgba(18, 20, 55, 0.8),
+            rgba(255, 255, 255, 0.2)
+        );
+        --ar-breadcrumb-toggle-bg-focus: light-dark(
+            rgba(26, 26, 26, 0.05),
+            rgba(255, 255, 255, 0.08)
+        );
         --ar-breadcrumb-toggle-min-size: 2.5rem;
         --ar-breadcrumb-toggle-transition-duration: 0.15s;
 
@@ -414,8 +453,8 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-tooltip-distance: 10px;
         --ar-tooltip-offset: var(--ar-anchor-offset);
-        --ar-tooltip-bg: var(--ar-color-neutral-20);
-        --ar-tooltip-color: var(--ar-color-white);
+        --ar-tooltip-bg: light-dark(var(--ar-color-neutral-20), var(--ar-color-neutral-80));
+        --ar-tooltip-color: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
         --ar-tooltip-arrow-size: 6px;
         --ar-tooltip-show-duration: var(--ar-panel-show-duration);
         --ar-tooltip-radius: var(--ar-border-radius-sm);
@@ -488,7 +527,10 @@
         --ar-datepicker-offset: var(--ar-anchor-offset);
         /* --ar-color-danger-text (pas red-50 directement) : même convention que
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
-        --ar-datepicker-error-color: var(--ar-color-danger-text);
+        --ar-datepicker-error-color: light-dark(
+            var(--ar-color-danger-text),
+            var(--ar-color-red-40)
+        );
 
         /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
            dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
@@ -506,12 +548,24 @@
 
         --ar-datepicker-day-size: 2.5rem;
 
-        --ar-datepicker-day-today-color: var(--ar-color-primary-40);
-        --ar-datepicker-day-today-border: var(--ar-color-primary-50);
+        --ar-datepicker-day-today-color: light-dark(
+            var(--ar-color-primary-40),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-today-border: light-dark(
+            var(--ar-color-primary-50),
+            var(--ar-color-primary-70)
+        );
         --ar-datepicker-day-today-bg: var(--ar-panel-bg);
 
-        --ar-datepicker-day-hover-bg: var(--ar-color-primary-50);
-        --ar-datepicker-day-hover-color: var(--ar-color-white);
+        --ar-datepicker-day-hover-bg: light-dark(
+            var(--ar-color-primary-50),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-hover-color: light-dark(
+            var(--ar-color-white),
+            var(--ar-color-text-inverse)
+        );
 
         --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
         --ar-datepicker-day-focus-ring-width: 2px;
@@ -521,146 +575,45 @@
         --ar-datepicker-day-color: var(--ar-color-text);
         --ar-datepicker-day-bg: transparent;
 
-        --ar-datepicker-day-selected-bg: var(--ar-color-primary-40);
-        --ar-datepicker-day-selected-color: var(--ar-color-white);
+        --ar-datepicker-day-selected-bg: light-dark(
+            var(--ar-color-primary-40),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-selected-color: light-dark(
+            var(--ar-color-white),
+            var(--ar-color-text-inverse)
+        );
 
-        --ar-datepicker-input-error-border-color: var(--ar-color-red-50);
+        --ar-datepicker-input-error-border-color: light-dark(
+            var(--ar-color-red-50),
+            var(--ar-color-red-40)
+        );
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * THÈME SOMBRE
-     * Override des tokens sémantiques uniquement.
-     * Les composants héritent automatiquement.
+     * Les tokens qui varient entre clair et sombre sont directement
+     * déclarés via light-dark() ci-dessus, piloté par color-scheme.
+     * Les deux règles ci-dessous ne posent que color-scheme — c'est ce
+     * qui fait choisir à light-dark() sa branche claire ou sombre.
+     * Elles s'appliquent à :root (racine du document) mais aussi à tout
+     * conteneur portant data-theme, ce qui scope les tokens --ar-* à ce
+     * seul sous-arbre (issue #203) : un consommateur peut ainsi forcer
+     * un widget, une prévisualisation ou toute portion de page en clair
+     * ou en sombre indépendamment du reste du document.
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    /* Thème dark actif manuellement */
-    :root[data-theme='dark'] {
-        /* Surface */
-        --ar-color-text: var(--ar-color-neutral-95);
-        --ar-color-text-muted: var(--ar-color-neutral-80);
-        --ar-color-text-inverse: var(--ar-color-neutral-10);
-        --ar-color-bg: var(--ar-color-neutral-10);
-        --ar-color-bg-subtle: var(--ar-color-neutral-30);
-        --ar-color-border: var(--ar-color-neutral-40);
-
-        /* Interaction — teinte claire pour contraste sur fond sombre */
-        --ar-color-interactive: var(--ar-color-primary-70);
-        --ar-color-interactive-hover: var(--ar-color-primary-80);
-        --ar-color-interactive-active: var(--ar-color-primary-80);
-        --ar-color-interactive-subtle: var(--ar-color-primary-20);
-
-        /* États — bg sombre, texte clair */
-        --ar-color-success-bg: var(--ar-color-success-10);
-        --ar-color-success-text: var(--ar-color-success-70);
-        --ar-color-success-border: var(--ar-color-success-40);
-        --ar-color-warning-bg: var(--ar-color-warning-10);
-        --ar-color-warning-text: var(--ar-color-warning-70);
-        --ar-color-warning-border: var(--ar-color-warning-40);
-        --ar-color-danger-bg: var(--ar-color-danger-10);
-        --ar-color-danger-text: var(--ar-color-danger-70);
-        --ar-color-danger-border: var(--ar-color-danger-40);
-        --ar-color-info-bg: var(--ar-color-info-10);
-        --ar-color-info-text: var(--ar-color-info-70);
-        --ar-color-info-border: var(--ar-color-info-40);
-
-        /* Button — surfaces adaptées au fond sombre */
-        --ar-button-secondary-bg: var(--ar-color-neutral-30);
-        --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
-        --ar-button-disabled-bg: var(--ar-color-neutral-30);
-        --ar-button-disabled-border: var(--ar-color-neutral-40);
-        --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
-        --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
-        --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
-        --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
-
-        /* Breadcrumb — surfaces adaptées au fond sombre */
-        --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
-        --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
-        --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
-        --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
-
-        /* Tooltip — fond clair sur fond de page sombre */
-        --ar-tooltip-bg: var(--ar-color-neutral-80);
-        --ar-tooltip-color: var(--ar-color-neutral-10);
-
-        /* Datepicker */
-        --ar-datepicker-error-color: var(--ar-color-red-40);
-
-        --ar-datepicker-day-today-color: var(--ar-color-primary-70);
-        --ar-datepicker-day-today-border: var(--ar-color-primary-70);
-        --ar-datepicker-day-hover-bg: var(--ar-color-primary-70);
-        --ar-datepicker-day-hover-color: var(--ar-color-text-inverse);
-
-        --ar-datepicker-day-selected-bg: var(--ar-color-primary-70);
-        --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
-
-        --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
+    /* Thème sombre actif manuellement */
+    :root[data-theme='dark'],
+    [data-theme='dark'] {
+        color-scheme: dark;
     }
 
-    /* Thème dark activé automatiquement par les préférence utilisateur */
-    @media (prefers-color-scheme: dark) {
-        :root:not([data-theme='light']) {
-            /* Surface */
-            --ar-color-text: var(--ar-color-neutral-95);
-            --ar-color-text-muted: var(--ar-color-neutral-80);
-            --ar-color-text-inverse: var(--ar-color-neutral-10);
-            --ar-color-bg: var(--ar-color-neutral-10);
-            --ar-color-bg-subtle: var(--ar-color-neutral-30);
-            --ar-color-border: var(--ar-color-neutral-40);
-
-            /* Interaction — teinte claire pour contraste sur fond sombre */
-            --ar-color-interactive: var(--ar-color-primary-70);
-            --ar-color-interactive-hover: var(--ar-color-primary-80);
-            --ar-color-interactive-active: var(--ar-color-primary-80);
-            --ar-color-interactive-subtle: var(--ar-color-primary-20);
-
-            /* États — bg sombre, texte clair */
-            --ar-color-success-bg: var(--ar-color-success-10);
-            --ar-color-success-text: var(--ar-color-success-70);
-            --ar-color-success-border: var(--ar-color-success-40);
-            --ar-color-warning-bg: var(--ar-color-warning-10);
-            --ar-color-warning-text: var(--ar-color-warning-70);
-            --ar-color-warning-border: var(--ar-color-warning-40);
-            --ar-color-danger-bg: var(--ar-color-danger-10);
-            --ar-color-danger-text: var(--ar-color-danger-70);
-            --ar-color-danger-border: var(--ar-color-danger-40);
-            --ar-color-info-bg: var(--ar-color-info-10);
-            --ar-color-info-text: var(--ar-color-info-70);
-            --ar-color-info-border: var(--ar-color-info-40);
-
-            /* Button — surfaces adaptées au fond sombre */
-            --ar-button-secondary-bg: var(--ar-color-neutral-30);
-            --ar-button-secondary-bg-hover: var(--ar-color-neutral-40);
-            --ar-button-disabled-bg: var(--ar-color-neutral-30);
-            --ar-button-disabled-border: var(--ar-color-neutral-40);
-            --ar-button-tertiary-bg: rgba(255, 255, 255, 0.1);
-            --ar-button-tertiary-bg-hover: rgba(255, 255, 255, 0.15);
-            --ar-button-tertiary-bg-active: rgba(255, 255, 255, 0.2);
-            --ar-button-tertiary-bg-focus: rgba(255, 255, 255, 0.08);
-
-            /* Breadcrumb — surfaces adaptées au fond sombre */
-            --ar-breadcrumb-toggle-bg: rgba(255, 255, 255, 0.1);
-            --ar-breadcrumb-toggle-bg-hover: rgba(255, 255, 255, 0.15);
-            --ar-breadcrumb-toggle-bg-pressed: rgba(255, 255, 255, 0.2);
-            --ar-breadcrumb-toggle-bg-focus: rgba(255, 255, 255, 0.08);
-
-            /* Tooltip — fond clair sur fond de page sombre */
-            --ar-tooltip-bg: var(--ar-color-neutral-80);
-            --ar-tooltip-color: var(--ar-color-neutral-10);
-
-            /* Datepicker */
-            --ar-datepicker-error-color: var(--ar-color-red-40);
-
-            --ar-datepicker-day-today-color: var(--ar-color-primary-70);
-            --ar-datepicker-day-today-border: var(--ar-color-primary-70);
-            --ar-datepicker-day-hover-bg: var(--ar-color-primary-60);
-            --ar-datepicker-day-hover-color: var(--ar-color-text-inverse);
-
-            --ar-datepicker-day-selected-bg: var(--ar-color-primary-60);
-            --ar-datepicker-day-selected-color: var(--ar-color-text-inverse);
-
-            --ar-datepicker-input-error-border-color: var(--ar-color-red-40);
-        }
+    /* Thème clair forcé — utile pour s'extraire d'un sombre ambiant
+       (ancêtre en data-theme="dark", ou prefers-color-scheme: dark) */
+    :root[data-theme='light'],
+    [data-theme='light'] {
+        color-scheme: light;
     }
 
     /* build-split-anchor: components — ne pas renommer, cf. scripts/build-css.js */
