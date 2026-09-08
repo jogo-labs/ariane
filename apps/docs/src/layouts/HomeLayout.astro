@@ -1,0 +1,259 @@
+---
+import rootPkg from '../../../../package.json';
+
+interface Props {
+    title: string;
+    description?: string;
+}
+
+const { title, description = 'Accessible web components library' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content={description} />
+        <title>{title} — {rootPkg.config.displayName}</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Fira+Code:wght@500;600&display=swap"
+            rel="stylesheet"
+        />
+
+        {/* ── highlight.js — colore les blocs de code de la section « Essayez-le » ── */}
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css"
+        />
+        <script
+            is:inline
+            src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+
+        <!-- Thème par défaut de la librairie (nécessaire pour les démos live) -->
+        <link rel="stylesheet" href="/themes/default.css" />
+
+        <!-- Composants web du DS -->
+        <script type="module" src="/cdn/index.js"></script>
+        <script type="module" src="/js/playground.js" is:inline></script>
+
+        <style is:global>
+            /* Doit rester global : un bloc <style> scopé compilerait `*` en
+               `*[data-astro-cid-…]`, qui ne toucherait que le gabarit et laisserait
+               les pages en content-box. */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+
+            a:focus-visible,
+            button:focus-visible,
+            input:focus-visible,
+            select:focus-visible,
+            summary:focus-visible {
+                outline: 2px solid var(--doc-focus);
+                outline-offset: 2px;
+                border-radius: 2px;
+            }
+
+            /* Évite le flash de contenu slotté non stylé le temps que /cdn/index.js
+               définisse les custom elements utilisés par la section « Essayez-le ». */
+            *:not(:defined) {
+                visibility: hidden;
+            }
+        </style>
+        <style>
+            /* Page d'accueil : palette claire chaude, indépendante du reste du site
+               de doc (Layout.astro a son propre couple clair/sombre).
+
+               Deux familles de neutres seulement, et jamais mélangées dans un même
+               bloc : « stone » (neutres purs) porte les zones claires, « forest »
+               (vert-noir chaud désaturé) porte les deux bandes sombres. L'ambre
+               n'est jamais une couleur de fond de zone ni une couleur de texte sur
+               fond clair (1,9:1) : uniquement des aplats de bouton, des pastilles
+               et le point terminal du fil. */
+            :root {
+                --doc-paper: #ffffff;
+                --doc-stone: #f5f5f5;
+                --doc-forest: #313a2e;
+                --doc-forest-dark: #252826;
+                --doc-ink: #141414;
+                /* 6,7:1 sur --doc-stone, 7,4:1 sur --doc-paper */
+                --doc-ink-muted: #565656;
+                /* Traits du motif « fil » : le trait plein pour les contours
+                   porteurs, la version diluée pour les filets de structure. */
+                --doc-line: #141414;
+                --doc-line-soft: rgba(20, 20, 20, 0.16);
+                --doc-accent: #ffaa00;
+                --doc-accent-hi: #ffbd2e;
+                --doc-accent-wash: #fff3d6;
+                /* Sur fond sombre : 13,5:1 et 7,6:1 sur --doc-forest */
+                --doc-on-dark: #f5f5f5;
+                --doc-on-dark-muted: #b9bdba;
+                --doc-on-dark-line: rgba(245, 245, 245, 0.18);
+                --doc-code-block-bg: var(--doc-forest-dark);
+
+                /* L'anneau de focus suit le fond : l'ambre ne passe pas sur blanc. */
+                --doc-focus: #141414;
+
+                --font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+                --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+                /* Rayons systématiques : 4 / 12 / 20 / 40. */
+                --r-nano: 4px;
+                --r-micro: 12px;
+                --r-macro: 20px;
+                --r-mega: 40px;
+
+                /* Courbe unique pour tout ce qui réagit au pointeur ou au clavier. */
+                --ease: cubic-bezier(0.83, 0, 0.17, 1);
+            }
+
+            html,
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background: var(--doc-paper);
+                color: var(--doc-ink);
+                font-family: var(--font-body);
+                letter-spacing: -0.01em;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .skip-link {
+                position: absolute;
+                top: -3rem;
+                left: 0.5rem;
+                z-index: 1000;
+                padding: 0.5rem 1rem;
+                background: var(--doc-ink);
+                color: var(--doc-paper);
+                border-radius: 0 0 var(--r-nano) var(--r-nano);
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: top 0.25s var(--ease);
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            .alpha-banner {
+                position: relative;
+                z-index: 20;
+                width: 100%;
+                background: var(--doc-accent-wash);
+                color: var(--doc-ink);
+                border-bottom: 1px solid rgba(20, 20, 20, 0.1);
+                text-align: center;
+                font-size: 0.8rem;
+                padding: 0.45rem 1rem;
+            }
+
+            .alpha-banner a {
+                color: inherit;
+                font-weight: 600;
+                text-underline-offset: 2px;
+            }
+
+            .home-shell {
+                position: relative;
+            }
+
+            .home-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                max-width: 1240px;
+                margin: 0 auto;
+                padding: 1.1rem 1.25rem 0;
+            }
+
+            .home-logo {
+                font-family: var(--font-display);
+                font-size: 1.75rem;
+                font-weight: 600;
+                letter-spacing: -0.03em;
+                color: var(--doc-ink);
+                text-decoration: none;
+            }
+
+            .home-header-github {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 3rem;
+                height: 3rem;
+                color: var(--doc-ink);
+                border: 1.5px solid transparent;
+                transition:
+                    border-color 0.35s var(--ease),
+                    box-shadow 0.3s var(--ease),
+                    background 0.35s var(--ease);
+
+                &:hover {
+                    color: var(--doc-forest);
+                }
+            }
+
+            .home-header-github svg {
+                width: 2rem;
+                height: 2rem;
+            }
+
+            @media (min-width: 641px) {
+                .home-header {
+                    padding: 1.5rem 2.25rem 0;
+                }
+
+                .home-logo {
+                    font-size: 2rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+        <div class="alpha-banner" role="status">
+            Librairie en cours de développement — API instable, ne pas utiliser en production.&nbsp;
+            <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer"
+                >Signaler un problème</a
+            >
+        </div>
+
+        <div class="home-shell">
+            <header class="home-header">
+                <a href="/" class="home-logo">{rootPkg.config.displayName}</a>
+                <a
+                    href="https://github.com/jogo-labs/ariane"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="home-header-github"
+                    aria-label="Code source sur GitHub (nouvel onglet)"
+                    title="Code source sur GitHub (nouvel onglet)"
+                >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+                        ><path
+                            d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"
+                        ></path></svg
+                    >
+                </a>
+            </header>
+
+            <main id="main-content" tabindex="-1">
+                <slot />
+            </main>
+        </div>
+    </body>
+</html>

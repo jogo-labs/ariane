@@ -6,7 +6,12 @@
  * 2. Boutons "Copier" — copie le contenu du bloc code adjacent
  * 3. Playground interactif — les contrôles modifient les attributs du composant en live
  * 4. Accessibilité clavier des blocs de code qui débordent horizontalement
+ *
+ * Chargé en <script type="module"> (cf. Layout.astro/HomeLayout.astro) pour pouvoir
+ * importer announceA11y du bundle /cdn/index.js, déjà chargé sur la même page.
  */
+
+import { announceA11y } from '/cdn/index.js';
 
 document.addEventListener('DOMContentLoaded', function () {
     // ── Coloration syntaxique (highlight.js) ────────────────────────────────────
@@ -30,6 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ── Boutons Copier (blocs variantes) ────────────────────────────────────────
+    // Les boutons changent leur propre texte visuellement ("Copié !"), mais un
+    // changement de libellé sur l'élément qui a le focus n'est pas annoncé de
+    // façon fiable par tous les lecteurs d'écran — announceA11y (packages/core)
+    // rend l'annonce explicite via une zone aria-live partagée, indépendamment
+    // du focus.
 
     document.querySelectorAll('[data-copy]').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -43,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(function () {
                     btn.textContent = 'Copié !';
                     btn.classList.add('copied');
+                    announceA11y('Code copié dans le presse-papiers.');
                     setTimeout(function () {
                         btn.textContent = 'Copier';
                         btn.classList.remove('copied');
@@ -167,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(function () {
                         copyBtn.textContent = 'Copié !';
                         copyBtn.classList.add('copied');
+                        announceA11y('Code copié dans le presse-papiers.');
                         setTimeout(function () {
                             copyBtn.textContent = 'Copier';
                             copyBtn.classList.remove('copied');

@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import HomeLayout from '../layouts/HomeLayout.astro';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
@@ -11,405 +11,1384 @@ const componentCount = rootComponents.length;
 const firstComponentHref = rootComponents[0]?.tagName
     ? '/components/' + getSlug(rootComponents[0].tagName)
     : '/components/button';
+
+const codeInstall = `<!-- L'autoloader détecte les composants présents pour ne charger que le nécessaire -->
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
+
+<!-- Le thème permet d'adapter le look des composants à votre charte -->
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />`;
+
+const codeDropdown = `<ar-dropdown>
+    <button slot="trigger">Actions</button>
+    <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
+    <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
+    <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+</ar-dropdown>`;
+
+const codeDialog = `<button data-ar-dialog-open="mon-dialog">Ouvrir la fenêtre</button>
+<ar-dialog id="mon-dialog" label="Informations importantes">
+    <p>Votre session expirera dans 5 minutes.</p>
+</ar-dialog>`;
+
+const codeDatepicker = `<ar-datepicker
+    label="Date de naissance"
+    format="dd/MM/yyyy"
+    lang="fr-FR"
+></ar-datepicker>`;
 ---
 
-<Layout title="Accueil" showNav={false}>
-    <!-- Hero -->
+<HomeLayout title="Accueil">
+    <!-- Hero — le fil entre par la droite, boucle dans le vide à droite du texte,
+         puis ressort par la gauche en débordant sous le hero : il se termine dans
+         le coin supérieur gauche du bloc « Ariane c'est.. ». Le calque
+         `.thread-layer` déborde volontairement de la section (overflow visible)
+         pour que le tracé reste d'un seul tenant. -->
     <section class="hero">
-        <div class="hero-eyebrow">Web Components accessibles</div>
-
-        <h1 class="hero-title">
-            Des composants qui<br />
-            <em>fonctionnent vraiment</em>
-        </h1>
-
-        <p class="hero-pitch">
-            Ariane est une fondation pour construire des interfaces accessibles.
-            Des Custom Elements natifs, thémables, compatibles avec tous les frameworks —
-            sans imposer un look à ta place.
-        </p>
-
-        <div class="hero-badges">
-            <span class="badge"><span class="badge-dot"></span>v{version}</span>
-            <span class="badge"><span class="badge-dot green"></span>{componentCount} composants</span>
-            <span class="badge"><span class="badge-dot gray"></span>Licence MIT</span>
-            <span class="badge"><span class="badge-dot gray"></span>Lit 3 · TypeScript</span>
+        <div class="thread-layer thread-layer--top-wide" aria-hidden="true">
+            <svg
+                class="thread thread--wide"
+                viewBox="0 0 1440 1064"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M1470 113 C1200 157, 1072 235, 1142 356 C1212 492, 1400 511, 1372 643 C1345 772, 1120 834, 880 788 C620 740, 400 838, 230 918 C130 966, 50 1000, -20 1052"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M1460 149 C1230 190, 1105 244, 1170 345 C1235 471, 1420 494, 1395 626 C1372 747, 1130 795, 900 753 C640 705, 420 800, 250 880 C150 928, 60 960, -20 1010"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M1450 186 C1262 221, 1140 246, 1200 335 C1260 452, 1440 480, 1416 611 C1394 726, 1140 767, 918 726 C660 672, 440 764, 270 842 C170 890, 80 920, -20 968"
+                ></path>
+            </svg>
+            <span class="thread-bead thread-bead--wide"></span>
         </div>
 
-        <div class="hero-ctas">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
-            <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
+        <!-- Mobile : c'est le filet dilué qui longe le titre « Ariane c'est.. »,
+             pas l'ambre — un aplat saturé collé au texte se lit moins bien qu'un
+             gris à 16 %. L'ordre des trois traits y est donc inversé par rapport
+             au desktop, où le fil passe loin de tout texte. Les trois départs
+             restent dans la plage y >= 0 avant x = 390 : sinon le tracé du haut
+             serait rogné par le bord supérieur du viewBox et n'atteindrait pas
+             le bord droit de la section. -->
+        <div class="thread-layer thread-layer--top-narrow" aria-hidden="true">
+            <svg
+                class="thread thread--narrow"
+                viewBox="0 0 390 340"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 40 C308 40, 312 122, 206 130 C144 135, 118 172, 88 212 C58 250, 20 264, -10 278"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 10 C300 10, 300 96, 200 104 C140 109, 115 145, 85 185 C55 222, 20 236, -10 250"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 4 C300 4, 288 70, 196 78 C138 83, 116 120, 88 160 C58 200, 22 212, -10 228"
+                ></path>
+            </svg>
+            <span class="thread-bead thread-bead--narrow"></span>
+        </div>
+
+        <div class="hero-inner">
+            <h1 class="hero-title">Accessible. Personnalisable.<br />Sans compromis.</h1>
+
+            <p class="hero-pitch">
+                Des composants web natifs et accessibles au maximum, qui s'intégrent facilement à vos projets
+                ou votre design system.
+            </p>
+
+            <div class="hero-ctas">
+                <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
+                <a href={firstComponentHref} class="btn-secondary">Voir les composants</a>
+            </div>
+
+            <ul class="hero-facts">
+                <li><strong>v{version}</strong></li>
+                <li>{componentCount} composants</li>
+                <li><a href="https://lit.dev" target="_blank" rel="noopener noreferrer"
+                >Lit 3</a> - Typescript</li>
+            </ul>
         </div>
     </section>
 
-    <hr class="divider" />
+    <!-- La promesse d'Ariane — six points enfilés sur des filets horizontaux :
+         le fil du hero se prolonge en lignes de structure. -->
+    <section class="promise">
+        <h2 class="promise-title">Ariane c'est..</h2>
 
-    <!-- Selling points -->
-    <section class="selling-section">
-        <div class="selling-header">
-            <h2>Pourquoi Ariane ?</h2>
-            <p>Une bibliothèque qui résout les vrais problèmes d'accessibilité, sans te dicter le reste.</p>
+        <div class="promise-grid">
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg aria-hidden="true" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                        <!-- Anneau extérieur : cercle unique tracé au rayon moyen (18-22),
+                             avec un stroke-width couvrant exactement l'épaisseur d'origine. -->
+                        <circle cx="24" cy="24" r="20" stroke-width="4"></circle>
+                        <!-- Tête : un disque plein (comme l'original) tracé en stroke —
+                             rayon du tracé = rayon cible / 2, épaisseur = rayon cible,
+                             le trait remplit alors tout le disque au lieu de le creuser. -->
+                        <circle cx="24" cy="13" r="1.5" stroke-width="3"></circle>
+                        <!-- Bras + torse + jambes : tracé original inchangé, rempli comme
+                             à l'origine (une silhouette pleine n'a pas d'équivalent stroke
+                             fidèle — la contourner en creux changerait sa lecture). -->
+                        <path
+                            fill="currentColor"
+                            stroke="none"
+                            d="M35,17H13a2,2,0,0,0,0,4h7v4.8l-2,9.8A2.1,2.1,0,0,0,19.6,38H20a2.1,2.1,0,0,0,2-1.6L23.8,27h.4L26,36.4A2.1,2.1,0,0,0,28,38h.4A2.1,2.1,0,0,0,30,35.6l-2-9.8V21h7a2,2,0,0,0,0-4Z"
+                        ></path>
+                    </svg>
+                </span>
+                <h3>Une accessiblité maximisée</h3>
+                <p>
+                    Navigation clavier, rôles ARIA et annonces aux lecteurs d'écran : les composants gèrent un maximum de cas pour vous laisser un minimum de travail.
+                </p>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M12 2s7 7.58 7 12a7 7 0 1 1-14 0c0-4.42 7-12 7-12Z"></path>
+                    </svg>
+                </span>
+                <h3>Votre style avant tout</h3>
+                <p>
+                    Chaque composant est livré sans habillage visuel par défaut. <a
+                        href="getting-started/utilisation#personnalisation">Créez votre thème</a
+                    > pour qu'ils s'adaptent à votre projet.
+                </p>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+                        <path d="M8 11V7a4 4 0 0 1 7.5-2"></path>
+                    </svg>
+                </span>
+                <h3>Zéro framework imposé</h3>
+                <p>
+                    Chaque composant est un custom element natif utilisable avec n'importe quel framework front-end.. ou
+                    sans framework du tout.
+                </p>
+            </article>
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="6" y="2" width="12" height="20" rx="2"></rect>
+                        <path d="M11 18h2"></path>
+                    </svg>
+                </span>
+                <h3>Pensé pour le mobile</h3>
+                <p>
+                    Chaque composant est pensé pour le mobile et intégre des mécanismes utiles pour
+                    s'adapter à tous les usages.
+                </p>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"></path>
+                    </svg>
+                </span>
+                <h3>Pour tous vos projets</h3>
+                <p>
+                    Chargez l'autoloader d'Ariane en une seule ligne <a
+                        href="getting-started/quickstart#cdn">depuis un CDN</a
+                    > ou <a href="getting-started/quickstart#cdn">intégrez le à votre workflow</a> et
+                    configurez-le selon vos besoins.
+                </p>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M3 12h18"></path>
+                        <path d="M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9Z"
+                        ></path>
+                    </svg>
+                </span>
+                <h3>Traduction intégrée</h3>
+                <p>
+                    Le français et l'anglais sont inclus, mais Ariane peut <a href="getting-started/i18n"
+                        >s'adapter facilement et rapidement à n'importe quelle langue</a
+                    >.
+                </p>
+            </article>
         </div>
-
-        <div class="selling-grid">
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">♿</div>
-                <h3>Accessible par défaut</h3>
-                <p>ARIA, navigation clavier et rôles sémantiques intégrés dans chaque composant. Pas une option — une exigence de base.</p>
-            </div>
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">⚡</div>
-                <h3>Indépendant du framework</h3>
-                <p>Custom Elements natifs : ça fonctionne avec React, Vue, Svelte, Angular ou du HTML pur. Une seule librairie, partout.</p>
-            </div>
-            <div class="selling-card">
-                <div class="selling-icon" aria-hidden="true">🏗</div>
-                <h3>Fondation pour ton Design System</h3>
-                <p>CSS Custom Properties exposés sur chaque composant. Ariane pose les fondations ; toi tu définis l'identité visuelle.</p>
-            </div>
-        </div>
-
-        <!-- Placeholder différentiation -->
-        <!-- <div class="placeholder-section">
-            <p><strong>Section à venir</strong></p>
-            <p>Comparaison avec Web Awesome, Radix UI, Headless UI — ce qu'Ariane fait différemment et pour qui.</p>
-        </div> -->
     </section>
 
-    <!-- CTA bas de page -->
-    <div class="cta-bottom">
-        <h2>Prêt à commencer ?</h2>
-        <p>Parcourez la documentation et le catalogue de composants.</p>
-        <div class="cta-bottom-actions">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide →</a>
-            <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
+    <!-- Essayez-le — bande sombre, deux étapes reliées par un fil vertical.
+         Le fil du bas repart du coin inférieur gauche de cette bande et déborde
+         sur « Prêt à commencer ? » : un seul tracé pour deux fonds, dont l'encre
+         bascule du clair au sombre via un dégradé calé sur la frontière. -->
+    <section class="try">
+        <div class="thread-layer thread-layer--bottom" aria-hidden="true">
+            <svg
+                class="thread thread--bottom"
+                viewBox="0 0 1440 380"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <defs>
+                    <linearGradient
+                        id="thread-bottom-ink"
+                        gradientUnits="userSpaceOnUse"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="380"
+                    >
+                        <stop offset="0.395" stop-color="var(--doc-on-dark)"></stop>
+                        <stop offset="0.46" stop-color="var(--doc-line)"></stop>
+                    </linearGradient>
+                    <linearGradient
+                        id="thread-bottom-veil"
+                        gradientUnits="userSpaceOnUse"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="380"
+                    >
+                        <stop offset="0.395" stop-color="var(--doc-on-dark-line)"></stop>
+                        <stop offset="0.46" stop-color="var(--doc-line-soft)"></stop>
+                    </linearGradient>
+                </defs>
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 24 C196 24, 330 92, 508 142 C686 192, 884 226, 1072 218 C1244 211, 1374 244, 1460 292"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 52 C190 52, 320 118, 500 168 C680 218, 880 252, 1070 244 C1240 237, 1370 268, 1460 316"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 80 C184 80, 312 144, 494 194 C674 244, 876 278, 1068 270 C1236 263, 1366 292, 1460 340"
+                ></path>
+            </svg>
         </div>
-    </div>
 
-    <!-- Footer -->
+        <div class="try-inner">
+            <h2 class="try-title">Testez en quelques secondes</h2>
+            <p class="try-pitch">Deux étapes, zéro configuration.</p>
+
+            <ol class="steps">
+                <li class="step">
+                    <div class="step-header">
+                        <span class="step-node" aria-hidden="true">1</span>
+                        <p class="step-label">Copiez script et thème dans le <code>&lt;head&gt;</code></p>
+                    </div>
+                    <div class="code-block">
+                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button
+                        >
+                        <pre><code class="language-html" set:text={codeInstall} /></pre>
+                    </div>
+                </li>
+
+                <li class="step">
+                    <div class="step-header">
+                        <span class="step-node" aria-hidden="true">2</span>
+                        <p class="step-label">Copiez le composant dans le <code>&lt;body&gt;</code></p>
+                    </div>
+
+                    <ar-tab-group class="try-tabs" active="dropdown">
+                        <ar-tab class="try-tab" panel="dropdown">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M4 6h16"></path><path d="M4 12h16"></path><path
+                                        d="M4 18h10"></path>
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Dropdown</span>
+                        </ar-tab>
+                        <ar-tab class="try-tab" panel="dialog">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect x="3" y="4" width="18" height="16" rx="2"></rect><path
+                                        d="M3 9h18"></path>
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Modale</span>
+                        </ar-tab>
+                        <ar-tab class="try-tab" panel="datepicker">
+                            <span class="try-tab-badge" aria-hidden="true">
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+                                    <path d="M8 3v4"></path><path d="M16 3v4"></path><path
+                                        d="M3 11h18"></path>
+                                </svg>
+                            </span>
+                            <span class="try-tab-label">Calendrier</span>
+                        </ar-tab>
+
+                        <ar-tab-panel name="dropdown">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
+                                    <pre><code class="language-html" set:text={codeDropdown} /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <ar-dropdown>
+                                            <button slot="trigger">Actions</button>
+                                            <ar-dropdown-item><button>Modifier</button
+                                                ></ar-dropdown-item
+                                            >
+                                            <ar-dropdown-item><button>Dupliquer</button
+                                                ></ar-dropdown-item
+                                            >
+                                            <ar-dropdown-item><button>Supprimer</button
+                                                ></ar-dropdown-item
+                                            >
+                                        </ar-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+
+                        <ar-tab-panel name="dialog">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
+                                    <pre><code class="language-html" set:text={codeDialog} /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <button data-ar-dialog-open="mon-dialog"
+                                            >Ouvrir la fenêtre</button
+                                        >
+                                        <ar-dialog id="mon-dialog" label="Informations importantes">
+                                            <p>Votre session expirera dans 5 minutes.</p>
+                                        </ar-dialog>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+
+                        <ar-tab-panel name="datepicker">
+                            <div class="try-grid">
+                                <div class="code-block">
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
+                                    <pre><code
+                                            class="language-html"
+                                            set:text={codeDatepicker}
+                                        /></pre>
+                                </div>
+                                <div class="try-preview">
+                                    <div class="try-browser-bar" aria-hidden="true">
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                        <span class="try-browser-dot"></span>
+                                    </div>
+                                    <div class="try-preview-stage">
+                                        <ar-datepicker
+                                            label="Date de naissance"
+                                            format="dd/MM/yyyy"
+                                            lang="fr-FR"></ar-datepicker>
+                                    </div>
+                                </div>
+                            </div>
+                        </ar-tab-panel>
+                    </ar-tab-group>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- CTA bas de page — le fil ressort une dernière fois et s'arrête net. -->
+    <section class="outro">
+
+        <div class="outro-inner">
+            <h2>Prêt à commencer ?</h2>
+            <p>Installez Ariane en quelques minutes ou explorez le catalogue de composants.</p>
+            <div class="outro-actions">
+                <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
+                <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
+            </div>
+        </div>
+    </section>
+
     <footer class="landing-footer">
         <p>Ariane — Licence MIT</p>
         <p>
-            Construit avec
-            <a href="https://lit.dev" target="_blank" rel="noopener noreferrer">Lit 3</a>
-            ·
-            <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Construit avec <a href="https://lit.dev" target="_blank" rel="noopener noreferrer"
+                >Lit 3</a
+            >
+            · <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer"
+                >GitHub</a
+            >
         </p>
     </footer>
-</Layout>
+</HomeLayout>
 
 <style>
+    /* ── Le fil ────────────────────────────────────────────
+       Un seul trait porteur, doublé de deux lignes de niveau (une diluée, une
+       ambre) qui le suivent sans jamais le concurrencer. Les tracés sont
+       étirés avec preserveAspectRatio="none" : `vector-effect` garde une
+       épaisseur constante quelle que soit la déformation, et les perles sont
+       des éléments HTML positionnés en pourcentage — un <circle> deviendrait
+       une ellipse. */
+    /* Le calque porte la géométrie (donc le débordement d'une section sur la
+       suivante), le SVG le remplit et la perle se place en pourcentage du même
+       repère : viewBox et pourcentages restent alignés sans calcul. Les calques
+       débordent de leur section, ils ne peuvent donc pas passer en z-index
+       négatif (ils disparaîtraient sous le fond opaque de la section suivante) :
+       ce sont les contenus traversés qui repassent devant, en position:relative. */
+    .thread-layer {
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .thread {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        fill: none;
+        stroke-linecap: round;
+    }
+
+    .thread-layer--top-wide {
+        display: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: -175px;
+    }
+
+    .thread-layer--top-narrow {
+        left: 0;
+        right: 0;
+        bottom: -150px;
+        height: 340px;
+    }
+
+    /* Le débordement sur « Prêt à commencer ? » vaut toujours 57,8 % de la
+       hauteur du calque : la frontière des deux fonds tombe donc au même endroit
+       du viewBox quelle que soit la taille, et les arrêts de dégradé restent
+       calés dessus. */
+    .thread-layer--bottom {
+        --thread-bottom-height: 240px;
+
+        left: 0;
+        right: 0;
+        height: var(--thread-bottom-height);
+        bottom: calc(var(--thread-bottom-height) * -0.578);
+    }
+
+    .thread-main {
+        stroke: var(--doc-line);
+        stroke-width: 1.5;
+    }
+
+    .thread-echo {
+        stroke: var(--doc-line-soft);
+        stroke-width: 1;
+    }
+
+    .thread-accent {
+        stroke: var(--doc-accent);
+        stroke-width: 1.25;
+    }
+
+    /* Le fil du bas traverse le vert-noir puis le gris clair : l'encre pleine et
+       le filet dilué basculent au passage, seul l'ambre reste lisible sur les
+       deux fonds sans changer. */
+    .thread--bottom .thread-main {
+        stroke: url(#thread-bottom-ink);
+    }
+
+    .thread--bottom .thread-echo {
+        stroke: url(#thread-bottom-veil);
+    }
+
+    /* Le halo de la couleur du fond découpe le trait autour de la perle : elle se
+       lit comme un nœud sur le fil, pas comme une pastille posée dessus. */
+    .thread-bead {
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--doc-accent);
+        box-shadow: 0 0 0 5px var(--doc-stone);
+        pointer-events: none;
+    }
+
+    /* Perle posée exactement sur le point (1170, 345) du tracé porteur, exprimé
+       en pourcentage du viewBox (1440 × 1064). */
+    .thread-bead--wide {
+        left: 81.25%;
+        top: 32.4%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Point (200, 104) du viewBox 390 × 340. */
+    .thread-bead--narrow {
+        left: 51.3%;
+        top: 30.6%;
+        transform: translate(-50%, -50%);
+    }
+
     /* ── Hero ─────────────────────────────────────────────── */
 
+    /* Pas d'overflow: hidden — le fil doit sortir par le bas de la section. Les
+       tracés qui débordent latéralement sont déjà découpés par le viewport du
+       SVG lui-même, la page ne défile donc pas horizontalement. */
     .hero {
-        max-width:   760px;
-        margin:      0 auto;
-        padding:     6rem 2rem 5rem;
-        text-align:  center;
+        position: relative;
+        background: var(--doc-stone);
     }
 
-    .hero-eyebrow {
-        display:        inline-flex;
-        align-items:    center;
-        gap:            0.4rem;
-        font-size:      0.75rem;
-        font-weight:    600;
-        color:          var(--doc-accent);
-        background:     var(--doc-accent-bg);
-        border:         1px solid var(--doc-accent-border);
-        padding:        0.25rem 0.85rem;
-        border-radius:  20px;
-        margin-bottom:  1.75rem;
-        letter-spacing: 0.02em;
-    }
-
-    .hero-eyebrow::before {
-        content:       '';
-        width:         6px;
-        height:        6px;
-        background:    var(--doc-accent);
-        border-radius: 50%;
-        display:       inline-block;
+    .hero-inner {
+        position: relative;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 6.5rem 1.25rem 12rem;
     }
 
     .hero-title {
-        font-size:      3.25rem;
-        font-weight:    800;
-        letter-spacing: -0.04em;
-        line-height:    1.1;
-        color:          var(--doc-text);
-        margin-bottom:  1.25rem;
-    }
-
-    .hero-title em {
-        font-style:              normal;
-        background:              linear-gradient(135deg, #7c3aed, #a855f7);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip:         text;
+        font-family: var(--font-display);
+        font-size: clamp(2.6rem, 11vw, 4rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 0.96;
+        color: var(--doc-ink);
+        margin: 0 0 1.5rem;
+        max-width: 15ch;
     }
 
     .hero-pitch {
-        font-size:    1.05rem;
-        color:        var(--doc-text-subtle);
-        line-height:  1.75;
-        max-width:    560px;
-        margin:       0 auto 2rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--doc-ink-muted);
+        max-width: 40ch;
+        margin: 0 0 2.25rem;
     }
 
-    .hero-badges {
-        display:         flex;
-        justify-content: center;
-        gap:             0.5rem;
-        flex-wrap:       wrap;
-        margin-bottom:   2.25rem;
+    /* Mobile : les deux actions ne tiennent pas côte à côte, elles s'empilent en
+       pleine largeur plutôt que de se répartir en drapeau irrégulier. */
+    .hero-ctas,
+    .outro-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
     }
-
-    .badge {
-        display:       inline-flex;
-        align-items:   center;
-        gap:           0.35rem;
-        font-size:     0.72rem;
-        font-weight:   500;
-        color:         var(--doc-text-muted);
-        background:    var(--doc-bg);
-        border:        1px solid var(--doc-border);
-        padding:       0.25rem 0.75rem;
-        border-radius: 20px;
-    }
-
-    .badge-dot {
-        width:         6px;
-        height:        6px;
-        border-radius: 50%;
-        background:    var(--doc-accent);
-        flex-shrink:   0;
-    }
-
-    .badge-dot.green { background: #16a34a; }
-    .badge-dot.gray  { background: #9ca3af; }
 
     .hero-ctas {
-        display:         flex;
-        justify-content: center;
-        gap:             0.75rem;
-        flex-wrap:       wrap;
+        margin-bottom: 2rem;
+    }
+
+    .hero-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.75rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 0.82rem;
+        color: var(--doc-ink-muted);
+    }
+
+    .hero-facts strong {
+        color: var(--doc-ink);
+        font-weight: 600;
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
 
-    .btn-primary {
-        display:         inline-flex;
-        align-items:     center;
-        gap:             0.4rem;
-        background:      #7c3aed;
-        color:           #fff;
-        font-family:     inherit;
-        font-size:       0.9rem;
-        font-weight:     600;
-        padding:         0.65rem 1.5rem;
-        border-radius:   8px;
+    .btn-primary,
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        padding: 0.7rem 1.5rem;
+        border-radius: 999px;
         text-decoration: none;
-        border:          none;
-        cursor:          pointer;
-        box-shadow:      0 1px 3px rgba(124,58,237,0.3);
-        transition:      background 0.15s;
+        cursor: pointer;
+        border: 1.5px solid transparent;
+        transition:
+            background 0.35s var(--ease),
+            border-color 0.35s var(--ease),
+            color 0.35s var(--ease),
+            box-shadow 0.3s var(--ease),
+            opacity 0.3s var(--ease);
     }
 
-    .btn-primary:hover { background: #6d28d9; }
+    .btn-primary {
+        background: var(--doc-accent);
+        border-color: var(--doc-accent);
+        color: var(--doc-ink);
+
+        &:hover {
+            background: var(--doc-accent-hi);
+        }
+    }
+
 
     .btn-secondary {
-        display:         inline-flex;
-        align-items:     center;
-        gap:             0.4rem;
-        background:      transparent;
-        color:           var(--doc-text);
-        font-family:     inherit;
-        font-size:       0.9rem;
-        font-weight:     600;
-        padding:         0.65rem 1.5rem;
-        border-radius:   8px;
-        text-decoration: none;
-        border:          1.5px solid var(--doc-border);
-        cursor:          pointer;
-        transition:      border-color 0.15s, color 0.15s;
+        background: var(--doc-ink);
+        color: var(--doc-paper);
+        border-color: var(--doc-line);
+
+        &:hover {
+            background: var(--doc-forest-dark);
+        }
     }
 
-    .btn-secondary:hover {
-        border-color: var(--doc-accent);
-        color:        var(--doc-accent);
+
+    /* ── La promesse d'Ariane ─────────────────────────────── */
+
+    .promise {
+        --gutter: 1.25rem;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 5rem var(--gutter);
+        overflow-x: clip;
+        background: var(--doc-paper);
     }
 
-    /* ── Séparateur ────────────────────────────────────────── */
-
-    .divider {
-        border:     none;
-        border-top: 1px solid var(--doc-border);
-        margin:     0;
+    /* Le fil du hero déborde sur le haut de ce bloc : son contenu repasse devant
+       en se positionnant (il est plus loin dans l'arbre que le calque). */
+    .promise-title,
+    .promise-grid {
+        position: relative;
     }
 
-    /* ── Selling points ─────────────────────────────────── */
-
-    .selling-section {
-        max-width: 1100px;
-        margin:    0 auto;
-        padding:   5rem 2.5rem;
+    .promise-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        color: var(--doc-ink);
+        margin: 0 0 3rem;
     }
 
-    .selling-header {
-        text-align:    center;
-        margin-bottom: 3.5rem;
+    /* Gouttière de colonne nulle et espacement pris en padding : les filets
+       supérieurs se rejoignent alors d'une colonne à l'autre et forment une
+       ligne continue, sur laquelle les pastilles viennent s'enfiler. */
+    .promise-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        row-gap: 2rem;
     }
 
-    .selling-header h2 {
-        font-size:      1.85rem;
-        font-weight:    700;
-        letter-spacing: -0.03em;
-        color:          var(--doc-text);
-        margin-bottom:  0.6rem;
-    }
-
-    .selling-header p {
-        font-size:  0.95rem;
-        color:      var(--doc-text-muted);
-        max-width:  480px;
-        margin:     0 auto;
-    }
-
-    .selling-grid {
-        display:               grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap:                   1.5rem;
-        margin-bottom:         3rem;
-    }
-
-    .selling-card {
-        background:    var(--doc-bg);
-        border:        1px solid var(--doc-border);
-        border-radius: 12px;
-        padding:       1.75rem;
-        transition:    border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .selling-card:hover {
-        border-color: #c4b5fd;
-        box-shadow:   0 4px 16px rgba(124,58,237,0.06);
-    }
-
-    .selling-icon {
-        width:           40px;
-        height:          40px;
-        background:      var(--doc-accent-bg);
-        border-radius:   10px;
-        display:         flex;
-        align-items:     center;
+    .promise-node {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
-        font-size:       1.2rem;
-        margin-bottom:   1rem;
-    }
-
-    .selling-card h3 {
-        font-size:      0.95rem;
-        font-weight:    700;
-        color:          var(--doc-text);
-        letter-spacing: -0.01em;
-        margin-bottom:  0.4rem;
-    }
-
-    .selling-card p {
-        font-size:   0.82rem;
-        color:       var(--doc-text-muted);
-        line-height: 1.7;
-        margin:      0;
-    }
-
-    /* ── Placeholder différentiation ────────────────────── */
-
-    .placeholder-section {
-        border:        2px dashed var(--doc-accent-border);
-        border-radius: 12px;
-        padding:       2rem;
-        text-align:    center;
-        background:    color-mix(in srgb, var(--doc-accent-bg) 30%, transparent);
-        margin-bottom: 0;
-    }
-
-    .placeholder-section p {
-        font-size:   0.82rem;
-        color:       var(--doc-text-muted);
-        margin:      0 0 0.25rem;
-    }
-
-    .placeholder-section strong {
+        margin-block-end: 1rem;
         color: var(--doc-accent);
     }
 
-    /* ── CTA bas de page ────────────────────────────────── */
-
-    .cta-bottom {
-        background:    var(--doc-cta-bg);
-        border-top:    1px solid var(--doc-cta-border);
-        border-bottom: 1px solid var(--doc-cta-border);
-        text-align:    center;
-        padding:       4rem 2rem;
+    .promise-node svg {
+        width: 2.5rem;
+        height: 2.5rem;
     }
 
-    .cta-bottom h2 {
-        font-size:      1.6rem;
-        font-weight:    700;
-        letter-spacing: -0.03em;
-        color:          var(--doc-text);
-        margin-bottom:  0.5rem;
+    .promise-item h3 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--doc-ink);
+        margin: 0 0 0.4rem;
     }
 
-    .cta-bottom p {
-        font-size:     0.9rem;
-        /* var(--doc-text-muted) échoue le contraste AA sur ce fond (axe-core) */
-        color:         var(--doc-text);
-        margin-bottom: 1.75rem;
+    .promise-item p {
+        font-size: 0.9rem;
+        line-height: 1.65;
+        color: var(--doc-ink-muted);
+        margin: 0;
     }
 
-    .cta-bottom-actions {
-        display:         flex;
+    /* ── Essayez-le ───────────────────────────────────────── */
+
+    .try {
+        position: relative;
+        background: var(--doc-forest);
+        color: var(--doc-on-dark);
+        /* L'ambre est lisible sur le vert-noir (7,5:1) : c'est l'anneau de
+           focus de la bande, le noir de la page y serait invisible. */
+        --doc-focus: var(--doc-accent-hi);
+    }
+
+    .try-inner {
+        position: relative;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 5rem 1.25rem;
+    }
+
+    .try-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        margin: 0 0 0.6rem;
+    }
+
+    .try-pitch {
+        font-size: 1rem;
+        color: var(--doc-on-dark-muted);
+        margin: 0 0 3.5rem;
+    }
+
+    .steps {
+        display: flex;
+        flex-direction: column;
+        row-gap: 3rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Le fil vertical relie la perle 1 à la perle 2 : les deux étapes sont une
+       séquence, c'est la seule numérotation de la page. */
+    .step {
+        --step-node-size: 3rem;
+
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem;
+        position: relative;
+    }
+
+    .step-header {
+        --step-header-column-gap: 1rem;
+        display: flex;
+        align-items: center;
+        column-gap: var(--step-header-column-gap);
+    }
+
+    .step-node {
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
-        gap:             0.75rem;
-        flex-wrap:       wrap;
+        width: var(--step-node-size);
+        height: var(--step-node-size);
+        border: 1.5px solid var(--doc-accent);
+        background-color: var(--doc-accent);
+        color: var(--doc-ink);
+        border-radius: 50%;
+        font-family: var(--font-display);
+        font-weight: 600;
     }
 
-    /* ── Footer ─────────────────────────────────────────── */
+    .step-label {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
+    /* ── Sélecteur de composant ───────────────────────────────
+       Le tab-group est rhabillé depuis la page (ses styles de thème vivent
+       dans @layer ariane.theme, les règles ci-dessous les emportent sans
+       !important) : filet du groupe et soulignement de l'onglet actif
+       neutralisés, chaque onglet devient une pastille contour autonome. */
+    ar-tab-group.try-tabs {
+        --ar-tab-group-border-top-width: 0px;
+        --ar-tab-group-border-bottom-width: 0px;
+        display: block;
+
+        &.has-overflow-start:not(.has-overflow-end)::part(nav) {
+            mask-image: linear-gradient(to right, transparent, black 3rem);
+        }
+
+        &.has-overflow-end:not(.has-overflow-start)::part(nav) {
+            mask-image: linear-gradient(to left, transparent, black 3rem);
+        }
+        &.has-overflow-start.has-overflow-end::part(nav) {
+            mask-image: linear-gradient(
+                to right,
+                transparent,
+                black 3rem,
+                black calc(100% - 3rem),
+                transparent
+            );
+        }
+
+        &::part(tab-group) {
+            row-gap: .5rem;
+        }
+
+        &::part(tabs) {
+            gap: 0.5rem;
+            border: 1px solid var(--doc-on-dark-line);
+            width: fit-content;
+            min-width: fit-content;
+            padding: .35rem;
+            border-radius: 50px;
+        }
+    }
+
+
+
+
+    ar-tab.try-tab {
+        --ar-tab-padding-x: 0.45rem;
+        --ar-tab-padding-y: 0.45rem;
+        --ar-tab-active-shadow: none;
+        --ar-tab-focus-ring-offset: -3px;
+        --ar-tab-focus-ring-color: var(--doc-accent-hi);
+        border-radius: 50px;
+
+        &::part(tab) {
+            gap: 0.25rem;
+            padding: .25rem 1rem .25rem .75rem;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--doc-on-dark);
+            transition:
+                background 0.35s var(--ease),
+                color 0.35s var(--ease);
+        }
+
+        &:not([active]):hover::part(tab) {
+            border: 1px solid var(--doc-on-dark-line);
+        }
+
+        &[active]::part(tab--selected) {
+            background: var(--doc-paper);
+            color: var(--doc-ink);
+        }
+
+        /* Pastille active : aplat ambre, l'anneau de focus doit y repasser en encre. */
+        &[active] {
+            --ar-tab-focus-ring-color: var(--doc-ink);
+        }
+    }
+
+    /* Contenu slotté : il vit dans le light DOM, les règles de page l'atteignent
+       directement — l'icône suit currentColor. */
+    .try-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .try-tab-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .try-tab-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+
+    .try-grid .code-block {
+        border-radius: var(--r-micro) var(--r-micro) 0 0;
+        margin-left: 0;
+    }
+
+    .code-block {
+        position: relative;
+        background: var(--doc-code-block-bg);
+        border: 1px solid var(--doc-on-dark-line);
+        border-radius: var(--r-micro);
+        overflow: hidden;
+
+        pre {
+            margin: 0;
+            padding: 2rem 1.35rem 1.25rem ;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.78rem;
+            line-height: 1.65;
+            background: transparent;
+        }
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        background: transparent;
+        color: var(--doc-paper);
+        border: 1px solid var(--doc-on-dark-line);
+        border-radius: 50px;
+        font-size: .9rem;
+        font-weight: 600;
+        font-family: inherit;
+        padding: 0.28rem 0.7rem;
+        cursor: pointer;
+        z-index: 1;
+        transition:
+            background 0.35s var(--ease),
+            color 0.35s var(--ease),
+            opacity 0.35s var(--ease);
+
+        &.copied,
+        &.copied:hover {
+            background: var(--doc-accent);
+            border-color: var(--doc-accent);
+            color: var(--doc-ink);
+        }
+    }
+
+    .try-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        column-gap: 1rem;
+        align-items: stretch;
+    }
+
+    /* Fenêtre claire posée sur la bande sombre : les démos vivent dans le thème
+       clair de la librairie, comme dans une vraie page hôte. */
+    .try-preview {
+        display: flex;
+        flex-direction: column;
+        background: var(--doc-paper);
+        border-radius: 0 0 var(--r-micro) var(--r-micro);
+        color: var(--doc-ink);
+
+        ar-dropdown {
+            margin: auto;
+        }
+
+        /* Boutons dans les previews live — présentation seulement, pas le code copié */
+        button {
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1.1rem;
+            border-radius: 999px;
+            border: 1.5px solid var(--doc-line);
+            background: transparent;
+            color: var(--doc-ink);
+            cursor: pointer;
+        }
+
+        ar-dropdown-item button {
+            border: none;
+            border-radius: var(--r-nano);
+            background: transparent;
+            font-weight: 500;
+            width: 100%;
+            display: block;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            transition: background 0.25s var(--ease);
+        }
+
+        /* La librairie est headless : elle ne style pas les boutons slottés, l'état
+        survol de la démo se pose donc au niveau de la page. */
+        ar-dropdown-item button:hover {
+            background: var(--doc-stone);
+        }
+    }
+
+    .try-preview-stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.75rem 1.5rem;
+        min-height: 7.5rem;
+    }
+
+    /* ── CTA bas de page ──────────────────────────────────── */
+
+    .outro {
+        overflow: hidden;
+        background: var(--doc-stone);
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 7vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1;
+            color: var(--doc-ink);
+            margin: 0 0 0.6rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--doc-ink-muted);
+            margin: 0 0 2rem;
+            max-width: 46ch;
+        }
+    }
+
+    /* Idem : le fil de la bande sombre déborde sur le haut de ce bloc. */
+    .outro-inner {
+        position: relative;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 5rem 1.25rem;
+    }
+
+
+    /* ── Footer ───────────────────────────────────────────── */
 
     .landing-footer {
-        padding:         2rem 2.5rem;
-        border-top:      1px solid var(--doc-border);
-        display:         flex;
+        padding: 2rem 1.25rem;
+        background: var(--doc-forest-dark);
+        color: var(--doc-on-dark-muted);
+        font-size: .9rem;
+        display: flex;
         justify-content: space-between;
-        align-items:     center;
-        flex-wrap:       wrap;
-        gap:             0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        --doc-focus: var(--doc-accent-hi);
+
+        p {
+            margin: 0;
+        }
+
+        a {
+            color: var(--doc-on-dark);
+            text-decoration-color: var(--doc-accent);
+        }
     }
 
-    .landing-footer p {
-        font-size: 0.78rem;
-        color:     var(--doc-text-muted);
-        margin:    0;
-    }
 
-    .landing-footer a {
-        color:           var(--doc-accent);
+
+    /* Le lien de prose garde l'encre du texte : l'ambre ne passerait pas en
+       couleur de texte sur fond clair (1,9:1), il ne sert que de soulignement. */
+    a {
+        color: inherit;
         text-decoration: underline;
-        text-underline-offset: 2px;
+        text-decoration-color: var(--doc-accent);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
     }
 
-    /* ── Responsive ─────────────────────────────────────── */
-
-    @media (max-width: 860px) {
-        .hero { padding: 4rem 1.5rem 3rem; }
-        .hero-title { font-size: 2.25rem; }
-        .selling-section { padding: 3rem 1.5rem; }
-        .selling-grid { grid-template-columns: 1fr; }
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+        }
     }
 
-    @media (max-width: 480px) {
-        .hero-title { font-size: 1.85rem; }
+    /* ── Responsive — mobile d'abord ───────────────────────
+       Les règles ci-dessus posent la base mobile. Les paliers suivants
+       ENRICHISSENT vers le desktop, ils ne le corrigent pas. */
+
+    @media (min-width: 601px) {
+        .hero-ctas,
+        .outro-actions {
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-inner,
+        .try-inner,
+        .outro-inner,
+        .landing-footer {
+            padding-inline: 2.25rem;
+        }
+
+        .promise {
+            --gutter: 2.25rem;
+        }
+
+        .promise-grid {
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 1rem;
+            row-gap: 3rem;
+        }
+
+
+        .try-grid .code-block {
+            border-radius: var(--r-micro);
+        }
+
+        .outro-actions {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    @media (min-width: 901px) {
+        .step {
+            --step-node-size: 2.5rem;
+        }
+
+        .hero-inner {
+            padding-top: 9.5rem;
+            padding-bottom: 9.5rem;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 6.4vw, 5.5rem);
+        }
+
+        .hero-pitch {
+            font-size: 1.15rem;
+        }
+
+        .thread-layer--top-wide {
+            display: block;
+        }
+
+        .thread-layer--top-narrow {
+            display: none;
+        }
+
+        .thread-layer--bottom {
+            --thread-bottom-height: 380px;
+        }
+
+        .promise {
+            padding-block: 7rem 4.5rem;
+        }
+
+        .promise-title {
+            margin-bottom: 3.5rem;
+        }
+
+        .promise-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .promise-item {
+            padding-bottom: 3rem;
+            padding-inline-end: 2.5rem;
+        }
+
+        .try-inner,
+        .outro-inner {
+            padding-block: 7rem;
+        }
+
+        .step {
+            row-gap: 0.5rem;
+        }
+
+        .step-header {
+            --step-header-column-gap: 2rem;
+        }
+
+        .step:first-child::before {
+            content: '';
+            position: absolute;
+            inset-inline-start: calc(var(--step-node-size) / 2);
+            top: var(--step-node-size);
+            bottom: calc(-1 * var(--step-node-size));
+            width: 1px;
+            background: var(--doc-on-dark-line);
+        }
+
+        .step-node {
+            width: var(--step-node-size);
+            height: var(--step-node-size);
+            font-size: 1.3rem;
+            font-weight: 700;
+            background-color: transparent;
+            color: var(--doc-accent);
+
+        }
+
+        .step:hover {
+            .step-node {
+                border-color: var(--doc-accent-hi);
+                background-color: var(--doc-accent);
+                color: var(--doc-ink);
+            }
+        }
+
+        .step-label {
+            font-size: 1.3rem;
+        }
+
+        .code-block,
+        .try ar-tab-group {
+            margin-inline-start: 4.5rem;
+        }
+
+        .try-preview {
+            border-radius: var(--r-micro);
+            margin-block-start: -4rem;
+        }
+
+        .try-preview-stage {
+            min-height: 9rem;
+        }
+
+        .try-grid {
+            grid-template-columns: 1.2fr 0.8fr;
+        }
+
+        /* Pas d'overflow: hidden ici — les couches flottantes (menu, calendrier)
+           débordent volontairement de la fenêtre simulée. */
+        .try-browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--doc-line-soft);
+            background-color: var(--doc-stone);
+            flex-shrink: 0;
+            border-radius: var(--r-micro) var(--r-micro) 0 0;
+        }
+
+        .try-browser-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+
+            &:first-child {
+                background-color: #FF605C;
+            }
+
+            &:nth-child(2) {
+                background-color: #FFBD44;
+            }
+
+            &:last-child {
+                background-color: #00CA4E;
+            }
+        }
+
+        .code-block pre {
+            padding-block-start: 1.25rem;
+        }
+
+        /* Masquer le bouton derrière le survol suppose qu'un survol existe : sur
+           tactile (tablette/laptop tactile ≥901px), il n'y en a pas, et rien ne
+           le focus automatiquement — il resterait invisible en permanence. */
+        @media (hover: hover) and (pointer: fine) {
+            .copy-btn {
+                opacity: 0;
+
+                &:hover {
+                    background: var(--doc-paper);
+                    color: var(--doc-ink);
+                }
+            }
+
+            .code-block:hover .copy-btn,
+            .code-block:has(pre:focus) .copy-btn,
+            .code-block:has(code:focus) .copy-btn,
+            .copy-btn:focus {
+                opacity: 1;
+            }
+        }
     }
 </style>
