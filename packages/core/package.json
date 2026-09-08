@@ -18,6 +18,7 @@
     "./cdn/autoloader.prod": "./cdn/autoloader.prod.js",
     "./themes/*.css": "./dist/styles/themes/*.css",
     "./themes/*.js": "./dist/styles/themes/*.js",
+    "./presets/*.css": "./dist/styles/presets/*.css",
     "./custom-elements.json": "./dist/custom-elements.json",
     "./dist/*": "./dist/*"
   },

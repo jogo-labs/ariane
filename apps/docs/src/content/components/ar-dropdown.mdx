@@ -8,7 +8,7 @@ variants:
       description: Avec des ar-dropdown-item, le panel reçoit automatiquement role="menu" et la navigation clavier est activée (↑↓ Home End Escape Tab).
       html: |
           <ar-dropdown>
-              <button class="btn btn-secondary" slot="trigger">Actions ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Actions ▾</button>
               <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
               <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
@@ -20,7 +20,7 @@ variants:
           Stylez-le avec votre propre CSS — ici via une variable CSS du token de bordure.
       html: |
           <ar-dropdown>
-              <button class="btn btn-secondary" slot="trigger">Actions ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Actions ▾</button>
               <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
               <hr style="border:none;border-top:1px solid var(--ar-color-border,#e5e7eb);margin:.25rem 0;">
@@ -31,7 +31,7 @@ variants:
       description: Sans ar-dropdown-item, le panel est un conteneur libre — aucun role ni navigation clavier n'est ajouté.
       html: |
           <ar-dropdown>
-              <button class="btn btn-secondary" slot="trigger">Options ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Options ▾</button>
               <p style="padding: .5rem .75rem; margin: 0; color: var(--ar-color-text, inherit);">Contenu libre — formulaire, liste, texte…</p>
           </ar-dropdown>
     - name: placement-top
@@ -39,7 +39,7 @@ variants:
       description: Le panel s'ouvre au-dessus du trigger, aligné à droite.
       html: |
           <ar-dropdown placement="top-end">
-              <button class="btn btn-secondary" slot="trigger">Placement ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Placement ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
           </ar-dropdown>
@@ -48,7 +48,7 @@ variants:
       description: 'Espacement en pixels entre le trigger et le panel (axe principal), piloté par la custom property CSS `--ar-dropdown-distance` (défaut : `var(--ar-anchor-distance)`, 4px).'
       html: |
           <ar-dropdown style="--ar-dropdown-distance: 16px">
-              <button class="btn btn-secondary" slot="trigger">Distance 16px ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Distance 16px ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 3</button></ar-dropdown-item>
@@ -58,7 +58,7 @@ variants:
       description: 'Décalage latéral en pixels du panel par rapport au trigger (axe transversal), piloté par la custom property CSS `--ar-dropdown-offset` (défaut : `var(--ar-anchor-offset)`, 0).'
       html: |
           <ar-dropdown style="--ar-dropdown-offset: 32px">
-              <button class="btn btn-secondary" slot="trigger">Offset 32px ▾</button>
+              <button class="ar-btn ar-btn-secondary" slot="trigger">Offset 32px ▾</button>
               <ar-dropdown-item><button>Item 1</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 2</button></ar-dropdown-item>
               <ar-dropdown-item><button>Item 3</button></ar-dropdown-item>
@@ -67,7 +67,7 @@ variants:
       label: Trigger externe
       description: "L'attribut `for` accepte l'ID d'un élément déclencheur situé en dehors du composant. Utile pour les boutons dans une barre d'outils ou une autre zone de la page."
       html: |
-          <button class="btn btn-secondary" id="ar-doc-ext-trigger">Trigger externe ▾</button>
+          <button class="ar-btn ar-btn-secondary" id="ar-doc-ext-trigger">Trigger externe ▾</button>
           <ar-dropdown for="ar-doc-ext-trigger">
               <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
               <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
@@ -82,7 +82,7 @@ variants:
       html: |
           <ar-dropdown disabled>
               <button
-                  class="btn btn-secondary"
+                  class="ar-btn ar-btn-secondary"
                   slot="trigger"
                   aria-disabled="true"
                   aria-describedby="disabled-reason"

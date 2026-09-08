@@ -425,7 +425,9 @@ const codeDatepicker = `<ar-datepicker
                                     </div>
                                     <div class="try-preview-stage">
                                         <ar-dropdown>
-                                            <button slot="trigger">Actions</button>
+                                            <button slot="trigger" class="ar-btn ar-btn-secondary"
+                                                >Actions</button
+                                            >
                                             <ar-dropdown-item><button>Modifier</button
                                                 ></ar-dropdown-item
                                             >
@@ -456,7 +458,9 @@ const codeDatepicker = `<ar-datepicker
                                         <span class="try-browser-dot"></span>
                                     </div>
                                     <div class="try-preview-stage">
-                                        <button data-ar-dialog-open="mon-dialog"
+                                        <button
+                                            data-ar-dialog-open="mon-dialog"
+                                            class="ar-btn ar-btn-secondary"
                                             >Ouvrir la fenêtre</button
                                         >
                                         <ar-dialog id="mon-dialog" label="Informations importantes">
@@ -1069,20 +1073,18 @@ const codeDatepicker = `<ar-datepicker
             margin: auto;
         }
 
-        /* Boutons dans les previews live — présentation seulement, pas le code copié */
-        button {
+        /* Les boutons autonomes (trigger, ouverture de dialog) portent
+           .ar-btn/.ar-btn-secondary (presets/buttons.css, #200) — plus besoin
+           de les styliser ici. */
+
+        /* Boutons slottés dans ar-dropdown-item : la librairie est headless,
+           elle ne les stylise pas (#199 doit corriger ça au niveau du
+           composant) — layout d'intégration en menu géré ici en attendant. */
+        ar-dropdown-item button {
             font-family: inherit;
             font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0.5rem 1.1rem;
-            border-radius: 999px;
-            border: 1.5px solid var(--doc-line);
-            background: transparent;
-            color: var(--doc-ink);
             cursor: pointer;
-        }
-
-        ar-dropdown-item button {
+            color: var(--doc-ink);
             border: none;
             border-radius: var(--r-nano);
             background: transparent;

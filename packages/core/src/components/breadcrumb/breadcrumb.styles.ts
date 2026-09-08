@@ -98,7 +98,7 @@ export default css`
         position: relative;
     }
 
-    /* ── Boutons home/trigger mobile (découplés de button.styles.ts) ────── */
+    /* ── Boutons home/trigger mobile ──────────────────────────────────── */
 
     [part='home'],
     [part='trigger'] {

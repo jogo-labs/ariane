@@ -6,6 +6,7 @@ const tocEntries = [
     { id: 'composants',       label: 'Utiliser les composants',   level: 1 as const },
     { id: 'chargement',       label: 'Attendre le chargement',    level: 1 as const },
     { id: 'personnalisation', label: 'Thème et personnalisation', level: 1 as const },
+    { id: 'presets',          label: 'Classes prêtes à l\'emploi', level: 1 as const },
 ];
 
 const codeHtml = `<ar-alert version="success">
@@ -45,6 +46,11 @@ const codeTokensAlias = `:root {
     --ar-color-interactive: var(--mon-ds-color-primary);
     --ar-color-text:        var(--mon-ds-color-text);
 }`;
+
+const codePresetsLink = `<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />`;
+
+const codePresetsHtml = `<button class="ar-btn ar-btn-primary">Valider</button>
+<button class="ar-btn ar-btn-secondary">Annuler</button>`;
 ---
 
 <Layout
@@ -154,6 +160,25 @@ const codeTokensAlias = `:root {
                     <strong>Référence API</strong> de chaque page de composant.
                 </p>
             </section>
+        </section>
+
+        <section id="presets" class="main-section">
+            <div>
+                <h3 class="section-title">Classes prêtes à l'emploi</h3>
+                <p>
+                    Ariane expose aussi des classes CSS <strong>opt-in</strong> pour du HTML que
+                    vous écrivez vous-même (un bouton slotté dans un composant, par exemple) —
+                    distinctes des tokens/<code>::part()</code> qui stylisent le contrat des
+                    composants <code>ar-*</code>. Chaque famille de classes vit dans son propre
+                    fichier, à charger séparément de <code>themes/default.css</code> :
+                </p>
+                <pre><code class="language-html" set:text={codePresetsLink} /></pre>
+                <pre><code class="language-html" set:text={codePresetsHtml} /></pre>
+                <p class="hint">
+                    Rien n'est appliqué sans poser la classe explicitement — un
+                    <code>&lt;button&gt;</code> sans <code>ar-btn</code> reste dans son état natif.
+                </p>
+            </div>
         </section>
     </div>
 
