@@ -43,6 +43,7 @@ export class ArTabGroup extends LitElement {
     private _panels: ArTabPanel[] = [];
     private readonly _prefix = Math.random().toString(36).slice(2, 9);
     private _initialized = false;
+    private _hasUpdatedOnce = false;
     private _resizeObserver?: ResizeObserver | undefined;
     private _scrollHintsUnlisten?: (() => void) | undefined;
 
@@ -105,8 +106,13 @@ export class ArTabGroup extends LitElement {
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('active')) {
             this._syncAll();
-            this._scrollActiveTabIntoView();
+            // Ne pas scroller au tout premier rendu : `changed.has('active')` est déjà vrai
+            // dès ce cycle si l'attribut initial diffère de la valeur par défaut.
+            if (this._hasUpdatedOnce) {
+                this._scrollActiveTabIntoView();
+            }
         }
+        this._hasUpdatedOnce = true;
     }
 
     override connectedCallback(): void {

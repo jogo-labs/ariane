@@ -57,6 +57,57 @@ describe('ar-tab-group — browser', () => {
         });
     });
 
+    // ── Scroll de l'onglet actif en vue ─────────────────────────────────────
+
+    describe("scroll de l'onglet actif en vue", () => {
+        it("ne scrolle pas au premier rendu quand active est défini via l'attribut", async () => {
+            let scrollCalls = 0;
+            const original = HTMLElement.prototype.scrollIntoView;
+            HTMLElement.prototype.scrollIntoView = function (...args: unknown[]) {
+                scrollCalls++;
+                return (original as (...a: unknown[]) => void).apply(this, args);
+            };
+            try {
+                await fixture<ArTabGroup>(html`
+                    <ar-tab-group active="b">
+                        <ar-tab panel="a">A</ar-tab>
+                        <ar-tab panel="b">B</ar-tab>
+                        <ar-tab-panel name="a">Panel A</ar-tab-panel>
+                        <ar-tab-panel name="b">Panel B</ar-tab-panel>
+                    </ar-tab-group>
+                `);
+                await aTimeout(0);
+                expect(scrollCalls).to.equal(0);
+            } finally {
+                HTMLElement.prototype.scrollIntoView = original;
+            }
+        });
+
+        it("scrolle l'onglet activé en vue lors d'une activation ultérieure par clic", async () => {
+            const el = await fixture<ArTabGroup>(html`
+                <ar-tab-group active="a">
+                    <ar-tab panel="a">A</ar-tab>
+                    <ar-tab panel="b">B</ar-tab>
+                    <ar-tab-panel name="a">Panel A</ar-tab-panel>
+                    <ar-tab-panel name="b">Panel B</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            let scrollCalls = 0;
+            const original = HTMLElement.prototype.scrollIntoView;
+            HTMLElement.prototype.scrollIntoView = function (...args: unknown[]) {
+                scrollCalls++;
+                return (original as (...a: unknown[]) => void).apply(this, args);
+            };
+            try {
+                getTab(el, 'b').click();
+                await el.updateComplete;
+                expect(scrollCalls).to.be.greaterThan(0);
+            } finally {
+                HTMLElement.prototype.scrollIntoView = original;
+            }
+        });
+    });
+
     // ── Navigation clavier — activation automatique ────────────────────────
 
     describe('navigation clavier — mode automatique', () => {
