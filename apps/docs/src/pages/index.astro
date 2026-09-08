@@ -38,15 +38,79 @@ const codeDatepicker = `<ar-datepicker
 ---
 
 <HomeLayout title="Accueil">
-    <!-- Hero -->
+    <!-- Hero — le fil entre par la droite, boucle dans le vide à droite du texte,
+         puis ressort par la gauche en débordant sous le hero : il se termine dans
+         le coin supérieur gauche du bloc « Ariane c'est.. ». Le calque
+         `.thread-layer` déborde volontairement de la section (overflow visible)
+         pour que le tracé reste d'un seul tenant. -->
     <section class="hero">
-        <div class="hero-pattern" aria-hidden="true"></div>
+        <div class="thread-layer thread-layer--top-wide" aria-hidden="true">
+            <svg
+                class="thread thread--wide"
+                viewBox="0 0 1440 1064"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M1470 113 C1200 157, 1072 235, 1142 356 C1212 492, 1400 511, 1372 643 C1345 772, 1120 834, 880 788 C620 740, 400 838, 230 918 C130 966, 50 1000, -20 1052"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M1460 149 C1230 190, 1105 244, 1170 345 C1235 471, 1420 494, 1395 626 C1372 747, 1130 795, 900 753 C640 705, 420 800, 250 880 C150 928, 60 960, -20 1010"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M1450 186 C1262 221, 1140 246, 1200 335 C1260 452, 1440 480, 1416 611 C1394 726, 1140 767, 918 726 C660 672, 440 764, 270 842 C170 890, 80 920, -20 968"
+                ></path>
+            </svg>
+            <span class="thread-bead thread-bead--wide"></span>
+        </div>
+
+        <!-- Mobile : c'est le filet dilué qui longe le titre « Ariane c'est.. »,
+             pas l'ambre — un aplat saturé collé au texte se lit moins bien qu'un
+             gris à 16 %. L'ordre des trois traits y est donc inversé par rapport
+             au desktop, où le fil passe loin de tout texte. Les trois départs
+             restent dans la plage y >= 0 avant x = 390 : sinon le tracé du haut
+             serait rogné par le bord supérieur du viewBox et n'atteindrait pas
+             le bord droit de la section. -->
+        <div class="thread-layer thread-layer--top-narrow" aria-hidden="true">
+            <svg
+                class="thread thread--narrow"
+                viewBox="0 0 390 340"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 40 C308 40, 312 122, 206 130 C144 135, 118 172, 88 212 C58 250, 20 264, -10 278"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 10 C300 10, 300 96, 200 104 C140 109, 115 145, 85 185 C55 222, 20 236, -10 250"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M400 4 C300 4, 288 70, 196 78 C138 83, 116 120, 88 160 C58 200, 22 212, -10 228"
+                ></path>
+            </svg>
+            <span class="thread-bead thread-bead--narrow"></span>
+        </div>
 
         <div class="hero-inner">
             <h1 class="hero-title">Accessible. Personnalisable.<br />Sans compromis.</h1>
 
             <p class="hero-pitch">
-                Des composants web accessibles et headless, qui s'intégrent facilement à vos projets ou votre design system.
+                Des composants web natifs et accessibles au maximum, qui s'intégrent facilement à vos projets
+                ou votre design system.
             </p>
 
             <div class="hero-ctas">
@@ -55,130 +119,291 @@ const codeDatepicker = `<ar-datepicker
             </div>
 
             <ul class="hero-facts">
-                <li>v{version}</li>
+                <li><strong>v{version}</strong></li>
                 <li>{componentCount} composants</li>
-                <li>Licence MIT</li>
-                <li>Lit 3 · TypeScript</li>
+                <li><a href="https://lit.dev" target="_blank" rel="noopener noreferrer"
+                >Lit 3</a> - Typescript</li>
             </ul>
         </div>
     </section>
 
-    <!-- La promesse d'Ariane -->
-    <section class="benefits-section">
-        <h2 class="benefits-title">Ariane c'est..</h2>
+    <!-- La promesse d'Ariane — six points enfilés sur des filets horizontaux :
+         le fil du hero se prolonge en lignes de structure. -->
+    <section class="promise">
+        <h2 class="promise-title">Ariane c'est..</h2>
 
-        <div class="benefits-grid">
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="m8.5 12.5 2.5 2.5 5-5" />
-                </svg>
-                <h3>Accessible par défaut</h3>
+        <div class="promise-grid">
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg aria-hidden="true" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                        <!-- Anneau extérieur : cercle unique tracé au rayon moyen (18-22),
+                             avec un stroke-width couvrant exactement l'épaisseur d'origine. -->
+                        <circle cx="24" cy="24" r="20" stroke-width="4"></circle>
+                        <!-- Tête : un disque plein (comme l'original) tracé en stroke —
+                             rayon du tracé = rayon cible / 2, épaisseur = rayon cible,
+                             le trait remplit alors tout le disque au lieu de le creuser. -->
+                        <circle cx="24" cy="13" r="1.5" stroke-width="3"></circle>
+                        <!-- Bras + torse + jambes : tracé original inchangé, rempli comme
+                             à l'origine (une silhouette pleine n'a pas d'équivalent stroke
+                             fidèle — la contourner en creux changerait sa lecture). -->
+                        <path
+                            fill="currentColor"
+                            stroke="none"
+                            d="M35,17H13a2,2,0,0,0,0,4h7v4.8l-2,9.8A2.1,2.1,0,0,0,19.6,38H20a2.1,2.1,0,0,0,2-1.6L23.8,27h.4L26,36.4A2.1,2.1,0,0,0,28,38h.4A2.1,2.1,0,0,0,30,35.6l-2-9.8V21h7a2,2,0,0,0,0-4Z"
+                        ></path>
+                    </svg>
+                </span>
+                <h3>Une accessiblité maximisée</h3>
                 <p>
-                    Navigation clavier, rôles ARIA et annonces aux lecteurs d'écran sont
-                    intégrés à chaque composant, et vérifiés par des tests d'accessibilité
-                    automatisés.
+                    Navigation clavier, rôles ARIA et annonces aux lecteurs d'écran : les composants gèrent un maximum de cas pour vous laisser un minimum de travail.
                 </p>
-            </div>
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="11" width="16" height="10" rx="2" />
-                    <path d="M8 11V7a4 4 0 0 1 7.5-2" />
-                </svg>
-                <h3>Zéro framework imposé</h3>
-                <p>
-                    Composants web natifs, utilisables avec n'importe quel framework front-end,
-                    ou sans framework du tout.
-                </p>
-            </div>
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2s7 7.58 7 12a7 7 0 1 1-14 0c0-4.42 7-12 7-12Z" />
-                </svg>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M12 2s7 7.58 7 12a7 7 0 1 1-14 0c0-4.42 7-12 7-12Z"></path>
+                    </svg>
+                </span>
                 <h3>Votre style avant tout</h3>
                 <p>
-                    Chaque composant est livré sans habillage visuel par défaut. <a href="getting-started/utilisation#personnalisation">Créez votre thème</a> pour qu'ils s'adaptent à votre projet.
+                    Chaque composant est livré sans habillage visuel par défaut. <a
+                        href="getting-started/utilisation#personnalisation">Créez votre thème</a
+                    > pour qu'ils s'adaptent à votre projet.
                 </p>
-            </div>
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="6" y="2" width="12" height="20" rx="2" />
-                    <path d="M11 18h2" />
-                </svg>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+                        <path d="M8 11V7a4 4 0 0 1 7.5-2"></path>
+                    </svg>
+                </span>
+                <h3>Zéro framework imposé</h3>
+                <p>
+                    Chaque composant est un custom element natif utilisable avec n'importe quel framework front-end.. ou
+                    sans framework du tout.
+                </p>
+            </article>
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="6" y="2" width="12" height="20" rx="2"></rect>
+                        <path d="M11 18h2"></path>
+                    </svg>
+                </span>
                 <h3>Pensé pour le mobile</h3>
                 <p>
-                    Chaque composant est pensé pour le mobile et intégre des mécanismes pour s'adapter.
+                    Chaque composant est pensé pour le mobile et intégre des mécanismes utiles pour
+                    s'adapter à tous les usages.
                 </p>
-            </div>
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
-                </svg>
-                <h3>Pour tous types de projets</h3>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"></path>
+                    </svg>
+                </span>
+                <h3>Pour tous vos projets</h3>
                 <p>
-                    Chargez l'autoloader d'Ariane en une seule ligne <a href="getting-started/quickstart#cdn">depuis un CDN</a> ou <a href="getting-started/quickstart#cdn">intégrez le à votre workflow</a> et configurez-le selon vos besoins.
+                    Chargez l'autoloader d'Ariane en une seule ligne <a
+                        href="getting-started/quickstart#cdn">depuis un CDN</a
+                    > ou <a href="getting-started/quickstart#cdn">intégrez le à votre workflow</a> et
+                    configurez-le selon vos besoins.
                 </p>
-            </div>
-            <div class="benefit">
-                <svg class="benefit-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M3 12h18" />
-                    <path d="M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9Z" />
-                </svg>
+            </article>
+
+            <article class="promise-item">
+                <span class="promise-node" aria-hidden="true">
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M3 12h18"></path>
+                        <path d="M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9Z"
+                        ></path>
+                    </svg>
+                </span>
                 <h3>Traduction intégrée</h3>
                 <p>
-                    Français et anglais sont inclus, mais Ariane peut <a href="getting-started/i18n">s'adapter facilement à n'importe quelle langue</a>.
+                    Le français et l'anglais sont inclus, mais Ariane peut <a href="getting-started/i18n"
+                        >s'adapter facilement et rapidement à n'importe quelle langue</a
+                    >.
                 </p>
-            </div>
+            </article>
         </div>
     </section>
 
-    <!-- Essayez-le -->
-    <section class="try-section">
+    <!-- Essayez-le — bande sombre, deux étapes reliées par un fil vertical.
+         Le fil du bas repart du coin inférieur gauche de cette bande et déborde
+         sur « Prêt à commencer ? » : un seul tracé pour deux fonds, dont l'encre
+         bascule du clair au sombre via un dégradé calé sur la frontière. -->
+    <section class="try">
+        <div class="thread-layer thread-layer--bottom" aria-hidden="true">
+            <svg
+                class="thread thread--bottom"
+                viewBox="0 0 1440 380"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <defs>
+                    <linearGradient
+                        id="thread-bottom-ink"
+                        gradientUnits="userSpaceOnUse"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="380"
+                    >
+                        <stop offset="0.395" stop-color="var(--doc-on-dark)"></stop>
+                        <stop offset="0.46" stop-color="var(--doc-line)"></stop>
+                    </linearGradient>
+                    <linearGradient
+                        id="thread-bottom-veil"
+                        gradientUnits="userSpaceOnUse"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="380"
+                    >
+                        <stop offset="0.395" stop-color="var(--doc-on-dark-line)"></stop>
+                        <stop offset="0.46" stop-color="var(--doc-line-soft)"></stop>
+                    </linearGradient>
+                </defs>
+                <path
+                    class="thread-echo"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 24 C196 24, 330 92, 508 142 C686 192, 884 226, 1072 218 C1244 211, 1374 244, 1460 292"
+                ></path>
+                <path
+                    class="thread-main"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 52 C190 52, 320 118, 500 168 C680 218, 880 252, 1070 244 C1240 237, 1370 268, 1460 316"
+                ></path>
+                <path
+                    class="thread-accent"
+                    vector-effect="non-scaling-stroke"
+                    d="M-20 80 C184 80, 312 144, 494 194 C674 244, 876 278, 1068 270 C1236 263, 1366 292, 1460 340"
+                ></path>
+            </svg>
+        </div>
+
         <div class="try-inner">
             <h2 class="try-title">Testez en quelques secondes</h2>
-            <p class="try-pitch">Deux étapes, zero configuration.</p>
+            <p class="try-pitch">Deux étapes, zéro configuration.</p>
 
-            <div class="try-card">
-                <div class="try-card-step">
-                    <div class="try-step-header">
-                        <span class="try-step-number">1</span>
-                        <p class="try-step-label">Ajoutez le script et le thème</p>
+            <ol class="steps">
+                <li class="step">
+                    <div class="step-header">
+                        <span class="step-node" aria-hidden="true">1</span>
+                        <p class="step-label">Copiez script et thème dans le <code>&lt;head&gt;</code></p>
                     </div>
                     <div class="code-block">
-                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button
+                        >
                         <pre><code class="language-html" set:text={codeInstall} /></pre>
                     </div>
-                </div>
+                </li>
 
-                <div class="try-card-step">
-                    <div class="try-step-header">
-                        <span class="try-step-number">2</span>
-                        <p class="try-step-label">Copiez le composant de votre choix</p>
+                <li class="step">
+                    <div class="step-header">
+                        <span class="step-node" aria-hidden="true">2</span>
+                        <p class="step-label">Copiez le composant dans le <code>&lt;body&gt;</code></p>
                     </div>
 
                     <ar-tab-group class="try-tabs" active="dropdown">
                         <ar-tab class="try-tab" panel="dropdown">
                             <span class="try-tab-badge" aria-hidden="true">
-                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h10" />
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M4 6h16"></path><path d="M4 12h16"></path><path
+                                        d="M4 18h10"></path>
                                 </svg>
                             </span>
                             <span class="try-tab-label">Dropdown</span>
                         </ar-tab>
                         <ar-tab class="try-tab" panel="dialog">
                             <span class="try-tab-badge" aria-hidden="true">
-                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18" />
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect x="3" y="4" width="18" height="16" rx="2"></rect><path
+                                        d="M3 9h18"></path>
                                 </svg>
                             </span>
                             <span class="try-tab-label">Modale</span>
                         </ar-tab>
                         <ar-tab class="try-tab" panel="datepicker">
                             <span class="try-tab-badge" aria-hidden="true">
-                                <svg class="try-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="5" width="18" height="16" rx="2" />
-                                    <path d="M8 3v4" /><path d="M16 3v4" /><path d="M3 11h18" />
+                                <svg
+                                    class="try-tab-icon"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.75"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+                                    <path d="M8 3v4"></path><path d="M16 3v4"></path><path
+                                        d="M3 11h18"></path>
                                 </svg>
                             </span>
                             <span class="try-tab-label">Calendrier</span>
@@ -187,7 +412,9 @@ const codeDatepicker = `<ar-datepicker
                         <ar-tab-panel name="dropdown">
                             <div class="try-grid">
                                 <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
                                     <pre><code class="language-html" set:text={codeDropdown} /></pre>
                                 </div>
                                 <div class="try-preview">
@@ -199,9 +426,15 @@ const codeDatepicker = `<ar-datepicker
                                     <div class="try-preview-stage">
                                         <ar-dropdown>
                                             <button slot="trigger">Actions</button>
-                                            <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
-                                            <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
-                                            <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
+                                            <ar-dropdown-item><button>Modifier</button
+                                                ></ar-dropdown-item
+                                            >
+                                            <ar-dropdown-item><button>Dupliquer</button
+                                                ></ar-dropdown-item
+                                            >
+                                            <ar-dropdown-item><button>Supprimer</button
+                                                ></ar-dropdown-item
+                                            >
                                         </ar-dropdown>
                                     </div>
                                 </div>
@@ -211,7 +444,9 @@ const codeDatepicker = `<ar-datepicker
                         <ar-tab-panel name="dialog">
                             <div class="try-grid">
                                 <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
                                     <pre><code class="language-html" set:text={codeDialog} /></pre>
                                 </div>
                                 <div class="try-preview">
@@ -221,7 +456,9 @@ const codeDatepicker = `<ar-datepicker
                                         <span class="try-browser-dot"></span>
                                     </div>
                                     <div class="try-preview-stage">
-                                        <button data-ar-dialog-open="mon-dialog">Ouvrir la fenêtre</button>
+                                        <button data-ar-dialog-open="mon-dialog"
+                                            >Ouvrir la fenêtre</button
+                                        >
                                         <ar-dialog id="mon-dialog" label="Informations importantes">
                                             <p>Votre session expirera dans 5 minutes.</p>
                                         </ar-dialog>
@@ -233,8 +470,13 @@ const codeDatepicker = `<ar-datepicker
                         <ar-tab-panel name="datepicker">
                             <div class="try-grid">
                                 <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
-                                    <pre><code class="language-html" set:text={codeDatepicker} /></pre>
+                                    <button class="copy-btn" data-copy aria-label="Copier le code"
+                                        >Copier</button
+                                    >
+                                    <pre><code
+                                            class="language-html"
+                                            set:text={codeDatepicker}
+                                        /></pre>
                                 </div>
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
@@ -246,574 +488,588 @@ const codeDatepicker = `<ar-datepicker
                                         <ar-datepicker
                                             label="Date de naissance"
                                             format="dd/MM/yyyy"
-                                            lang="fr-FR"
-                                        ></ar-datepicker>
+                                            lang="fr-FR"></ar-datepicker>
                                     </div>
                                 </div>
                             </div>
                         </ar-tab-panel>
                     </ar-tab-group>
-                </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- CTA bas de page — le fil ressort une dernière fois et s'arrête net. -->
+    <section class="outro">
+
+        <div class="outro-inner">
+            <h2>Prêt à commencer ?</h2>
+            <p>Installez Ariane en quelques minutes ou explorez le catalogue de composants.</p>
+            <div class="outro-actions">
+                <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
+                <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
             </div>
         </div>
     </section>
 
-    <!-- CTA bas de page -->
-    <div class="cta-bottom">
-        <h2>Prêt à commencer ?</h2>
-        <p>Installez Ariane en quelques minutes et explorez le catalogue de composants.</p>
-        <div class="cta-bottom-actions">
-            <a href="/getting-started/quickstart" class="btn-primary">Démarrage rapide</a>
-            <a href={firstComponentHref} class="btn-secondary">Explorer les composants</a>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer class="landing-footer">
         <p>Ariane — Licence MIT</p>
         <p>
-            Construit avec <a href="https://lit.dev" target="_blank" rel="noopener noreferrer">Lit 3</a>
-            · <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer">GitHub</a>
+            Construit avec <a href="https://lit.dev" target="_blank" rel="noopener noreferrer"
+                >Lit 3</a
+            >
+            · <a href="https://github.com/jogo-labs/ariane" target="_blank" rel="noopener noreferrer"
+                >GitHub</a
+            >
         </p>
     </footer>
 </HomeLayout>
 
 <style>
-    /* ── Hero ─────────────────────────────────────────────── */
-
-    /* Le hero ne se dissout plus vers une page claire : toute la page est sombre,
-       il se dissout donc vers sa propre couleur de fond, qui est exactement celle
-       de la section suivante (--doc-bg).
-
-       Empilement (du dessus vers le dessous) :
-       1. Une garantie de couture : une ellipse pleine --doc-bg dont le centre est
-          posé SOUS la boîte (130% — donc invisible en tant que « spot », on n'en
-          voit que le bord). Son plateau opaque couvre toute la largeur du bas de
-          la section (vérifié aux coins, pas seulement au centre) avant de
-          s'estomper vers le haut : le bas de la section est ainsi garanti
-          identique à --doc-bg quoi que fassent les halos en dessous, sans avoir
-          à ajuster leur géométrie un par un.
-       2-5. Quatre halos radiaux (cyan / bleu / violet) concentrés dans la moitié
-          haute, là où vit le texte — aucun n'est positionné assez bas pour
-          atteindre la garantie de couture avant de s'éteindre.
-       6. Un lavis linéaire qui assombrit le sommet puis rejoint --doc-bg : la
-          couleur de fond de base sur laquelle les halos se posent.
-
-       Les stops de fin sont écrits en rgba(…, 0) — ou dans la couleur littérale
-       de --doc-bg pour la garantie de couture — et non `transparent`, qui
-       interpolerait vers du noir transparent et grisrait le dégradé. */
-    .hero {
-        position: relative;
-        overflow: hidden;
-        background-color: var(--doc-bg);
-        background-image:
-            radial-gradient(ellipse 170% 57% at 91% 117%,
-                var(--doc-bg) -41%,
-                var(--doc-bg) 72%,
-                #080b1700 100%),
-            radial-gradient(ellipse 83vw 46vw at 114% 0%,
-                #38e8936b,
-                #38d6e800 72%),
-            radial-gradient(ellipse 80vw 71vw at -14% 6%,
-                #45aee280,
-                #5068ff00 70%),
-            radial-gradient(ellipse 102vw 68.5vw at 124% 55%,
-                #f2545470,
-                #8654f200 66%),
-            radial-gradient(ellipse 40vw 54.5vw at 21% 71%,
-                #704ae870,
-                #704ae800 108%),
-            linear-gradient(253deg, #161c40 -63%,
-                #111731 29%,
-                #0b1022 64%,
-                var(--doc-bg) 45%,
-                var(--doc-bg) 277%
-            );
+    /* ── Le fil ────────────────────────────────────────────
+       Un seul trait porteur, doublé de deux lignes de niveau (une diluée, une
+       ambre) qui le suivent sans jamais le concurrencer. Les tracés sont
+       étirés avec preserveAspectRatio="none" : `vector-effect` garde une
+       épaisseur constante quelle que soit la déformation, et les perles sont
+       des éléments HTML positionnés en pourcentage — un <circle> deviendrait
+       une ellipse. */
+    /* Le calque porte la géométrie (donc le débordement d'une section sur la
+       suivante), le SVG le remplit et la perle se place en pourcentage du même
+       repère : viewBox et pourcentages restent alignés sans calcul. Les calques
+       débordent de leur section, ils ne peuvent donc pas passer en z-index
+       négatif (ils disparaîtraient sous le fond opaque de la section suivante) :
+       ce sont les contenus traversés qui repassent devant, en position:relative. */
+    .thread-layer {
+        position: absolute;
+        pointer-events: none;
     }
 
-    /* Trame de points : concentrée sur le haut coloré, éteinte bien avant le bas. */
-    .hero-pattern {
+    .thread {
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
-        background-size: 26px 26px;
-        mask-image: radial-gradient(ellipse 90% 62% at 50% 4%, black 15%, transparent 78%);
+        width: 100%;
+        height: 100%;
         pointer-events: none;
+        fill: none;
+        stroke-linecap: round;
+    }
+
+    .thread-layer--top-wide {
+        display: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: -175px;
+    }
+
+    .thread-layer--top-narrow {
+        left: 0;
+        right: 0;
+        bottom: -150px;
+        height: 340px;
+    }
+
+    /* Le débordement sur « Prêt à commencer ? » vaut toujours 57,8 % de la
+       hauteur du calque : la frontière des deux fonds tombe donc au même endroit
+       du viewBox quelle que soit la taille, et les arrêts de dégradé restent
+       calés dessus. */
+    .thread-layer--bottom {
+        --thread-bottom-height: 240px;
+
+        left: 0;
+        right: 0;
+        height: var(--thread-bottom-height);
+        bottom: calc(var(--thread-bottom-height) * -0.578);
+    }
+
+    .thread-main {
+        stroke: var(--doc-line);
+        stroke-width: 1.5;
+    }
+
+    .thread-echo {
+        stroke: var(--doc-line-soft);
+        stroke-width: 1;
+    }
+
+    .thread-accent {
+        stroke: var(--doc-accent);
+        stroke-width: 1.25;
+    }
+
+    /* Le fil du bas traverse le vert-noir puis le gris clair : l'encre pleine et
+       le filet dilué basculent au passage, seul l'ambre reste lisible sur les
+       deux fonds sans changer. */
+    .thread--bottom .thread-main {
+        stroke: url(#thread-bottom-ink);
+    }
+
+    .thread--bottom .thread-echo {
+        stroke: url(#thread-bottom-veil);
+    }
+
+    /* Le halo de la couleur du fond découpe le trait autour de la perle : elle se
+       lit comme un nœud sur le fil, pas comme une pastille posée dessus. */
+    .thread-bead {
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--doc-accent);
+        box-shadow: 0 0 0 5px var(--doc-stone);
+        pointer-events: none;
+    }
+
+    /* Perle posée exactement sur le point (1170, 345) du tracé porteur, exprimé
+       en pourcentage du viewBox (1440 × 1064). */
+    .thread-bead--wide {
+        left: 81.25%;
+        top: 32.4%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Point (200, 104) du viewBox 390 × 340. */
+    .thread-bead--narrow {
+        left: 51.3%;
+        top: 30.6%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+
+    /* Pas d'overflow: hidden — le fil doit sortir par le bas de la section. Les
+       tracés qui débordent latéralement sont déjà découpés par le viewport du
+       SVG lui-même, la page ne défile donc pas horizontalement. */
+    .hero {
+        position: relative;
+        background: var(--doc-stone);
     }
 
     .hero-inner {
         position: relative;
-        max-width: 780px;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 7.5rem 1.5rem 7.5rem;
-        text-align: center;
+        padding: 6.5rem 1.25rem 12rem;
     }
 
     .hero-title {
         font-family: var(--font-display);
-        font-size: clamp(2.4rem, 5.5vw, 3.6rem);
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        line-height: 1.12;
-        color: #fff;
+        font-size: clamp(2.6rem, 11vw, 4rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 0.96;
+        color: var(--doc-ink);
         margin: 0 0 1.5rem;
+        max-width: 15ch;
     }
 
     .hero-pitch {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.8);
-        line-height: 1.7;
-        max-width: 53ch;
-        margin: 0 auto 2.25rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--doc-ink-muted);
+        max-width: 40ch;
+        margin: 0 0 2.25rem;
+    }
+
+    /* Mobile : les deux actions ne tiennent pas côte à côte, elles s'empilent en
+       pleine largeur plutôt que de se répartir en drapeau irrégulier. */
+    .hero-ctas,
+    .outro-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
     }
 
     .hero-ctas {
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
         margin-bottom: 2.5rem;
     }
 
     .hero-facts {
         display: flex;
-        justify-content: center;
         flex-wrap: wrap;
-        gap: 1.25rem;
+        gap: 0.5rem 1.75rem;
         list-style: none;
         margin: 0;
         padding: 0;
-        font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.62);
+        font-size: 0.82rem;
+        color: var(--doc-ink-muted);
     }
 
-    .hero-facts li + li {
-        border-left: 1px solid rgba(255, 255, 255, 0.22);
-        padding-left: 1.25rem;
+    .hero-facts strong {
+        color: var(--doc-ink);
+        font-weight: 600;
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
 
-    /* Hero et page partagent désormais la même palette sombre : les variantes
-       « inversées » d'avant n'ont plus lieu d'être, un seul couple de boutons
-       fonctionne partout. */
-    .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        background: var(--doc-accent);
-        color: var(--doc-accent-ink);
-        font-family: inherit;
-        font-size: 0.9rem;
-        font-weight: 600;
-        padding: 0.65rem 1.5rem;
-        border-radius: 999px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 10px 30px -12px rgba(79, 216, 234, 0.65);
-        transition:
-            background 0.15s,
-            box-shadow 0.2s,
-            transform 0.15s;
-    }
-
-    .btn-primary:hover {
-        background: var(--doc-accent-hover);
-        box-shadow: 0 12px 34px -10px rgba(79, 216, 234, 0.75);
-        transform: translateY(-1px);
-    }
-
+    .btn-primary,
     .btn-secondary {
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--doc-text);
+        justify-content: center;
         font-family: inherit;
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         font-weight: 600;
-        padding: 0.65rem 1.5rem;
+        letter-spacing: -0.01em;
+        padding: 0.7rem 1.5rem;
         border-radius: 999px;
         text-decoration: none;
-        border: 1px solid rgba(255, 255, 255, 0.18);
         cursor: pointer;
+        border: 1.5px solid transparent;
         transition:
-            background 0.15s,
-            border-color 0.15s,
-            transform 0.15s;
+            background 0.35s var(--ease),
+            border-color 0.35s var(--ease),
+            color 0.35s var(--ease),
+            box-shadow 0.3s var(--ease),
+            opacity 0.3s var(--ease);
+
+        /* &:hover {
+            box-shadow: 0 12px 10px -10px var(--doc-ink);
+        } */
     }
 
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.09);
-        border-color: rgba(255, 255, 255, 0.34);
-        transform: translateY(-1px);
+    .btn-primary {
+        background: var(--doc-accent);
+        border-color: var(--doc-accent);
+        color: var(--doc-ink);
+
+        &:hover {
+            background: var(--doc-accent-hi);
+        }
     }
 
 
-    /* Boutons dans les previews live — présentation seulement, pas le code copié */
-    .try-preview button {
-        font-family: inherit;
-        font-size: 0.85rem;
-        font-weight: 600;
-        padding: 0.55rem 1.1rem;
-        border-radius: 8px;
-        border: 1px solid var(--doc-border);
-        background: var(--doc-surface-2);
-        color: var(--doc-text);
-        cursor: pointer;
+    .btn-secondary {
+        background: var(--doc-ink);
+        color: var(--doc-paper);
+        border-color: var(--doc-line);
+
+        &:hover {
+            background: var(--doc-forest-dark);
+        }
     }
 
-    .try-preview ar-dropdown {
-        --ar-panel-bg: var(--doc-surface-2);
-        --ar-panel-border-color: var(--doc-border);
-    }
 
-    .try-preview ar-dropdown-item button {
-        border: none;
-        background: transparent;
-        font-weight: 500;
-        width: 100%;
-        display: block;
-        text-align: left;
-        padding: 0.5rem 0.75rem;
-        transition: background 0.12s;
-    }
+    /* ── La promesse d'Ariane ─────────────────────────────── */
 
-    /* La librairie est headless : elle ne style pas les boutons slottés, l'état
-       survol de la démo se pose donc au niveau de la page. */
-    .try-preview ar-dropdown-item button:hover {
-        background: var(--doc-code-block-bg);
-    }
-
-    /* ── La promesse d'Ariane ──────────────────────── */
-
-    /* La section prolonge la descente du hero : un halo violet très dilué évite le
-       pavé noir plat entre deux blocs colorés. Son centre est à 45% (pas au ras
-       du bord haut) : mesuré au pixel, un centre proche de la couture faisait
-       réapparaître la couleur d'un coup juste sous la ligne de contact avec le
-       hero (qui, lui, est parfaitement plat) — la couleur doit monter en
-       douceur en s'éloignant de la couture, pas y démarrer déjà à moitié
-       visible. */
-    .benefits-section {
-        max-width: 1160px;
+    .promise {
+        --gutter: 1.25rem;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 4rem 1.5rem;
-        background:
-            radial-gradient(
-                488px 498px at 57% 62%,
-                #7c5ceb24, #7c5ceb00 57%
-            ),
-            radial-gradient(
-                400px 500px at 35% 47%,
-                #5eeb5c17,
-                #7c5ceb00 56%
-            );
+        padding: 5rem var(--gutter);
+        overflow-x: clip;
+        background: var(--doc-paper);
     }
 
-    .benefits-title {
+    /* Le fil du hero déborde sur le haut de ce bloc : son contenu repasse devant
+       en se positionnant (il est plus loin dans l'arbre que le calque). */
+    .promise-title,
+    .promise-grid {
+        position: relative;
+    }
+
+    .promise-title {
         font-family: var(--font-display);
-        font-size: 1.6rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        color: var(--doc-text);
-        text-align: center;
-        margin: 0 0 2.25rem;
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        color: var(--doc-ink);
+        margin: 0 0 3rem;
     }
 
-    /* Trois paliers explicites (1 × 6, puis 2 × 3, puis 3 × 2) plutôt qu'un
-       auto-fit, dont le nombre de colonnes dépendait de la largeur disponible et
-       laissait des lignes déséquilibrées (4 + 2). Mobile d'abord : une colonne. */
-    .benefits-grid {
+    /* Gouttière de colonne nulle et espacement pris en padding : les filets
+       supérieurs se rejoignent alors d'une colonne à l'autre et forment une
+       ligne continue, sur laquelle les pastilles viennent s'enfiler. */
+    .promise-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem;
-        max-width: 26rem;
-        margin-inline: auto;
+        row-gap: 2rem;
     }
 
-    .benefit-icon {
-        width: 24px;
-        height: 24px;
+    .promise-node {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-block-end: 1rem;
         color: var(--doc-accent);
-        /* Léger halo : sur fond sombre un trait de 2px en aplat paraît fragile. */
-        filter: drop-shadow(0 0 10px rgba(79, 216, 234, 0.35));
-        margin-bottom: 0.75rem;
     }
 
-    .benefit h3 {
-        font-size: 0.98rem;
-        font-weight: 700;
-        color: var(--doc-text);
-        letter-spacing: -0.01em;
-        margin: 0 0 0.35rem;
+    .promise-node svg {
+        width: 2.5rem;
+        height: 2.5rem;
     }
 
-    .benefit p {
-        font-size: 0.85rem;
-        color: var(--doc-text-muted);
-        line-height: 1.6;
+    .promise-item h3 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--doc-ink);
+        margin: 0 0 0.4rem;
+    }
+
+    .promise-item p {
+        font-size: 0.9rem;
+        line-height: 1.65;
+        color: var(--doc-ink-muted);
         margin: 0;
     }
 
-    /* ── Essayez-le ─────────────────────────────────────── */
+    /* ── Essayez-le ───────────────────────────────────────── */
 
-    /* Bande à peine relevée par rapport au fond de page, avec un halo froid très
-       diffus dans l'axe de la carte : le contraste entre sections vient de la
-       lumière, pas d'un aplat franc. */
-    .try-section {
+    .try {
         position: relative;
-        background:
-            radial-gradient(
-                ellipse 70% 60% at 50% 33%,
-                rgba(99, 118, 255, 0.13),
-                rgba(99, 118, 255, 0) 70%
-            ),
-            var(--doc-bg-soft);
-        border-block: 1px solid var(--doc-border-soft);
+        background: var(--doc-forest);
+        color: var(--doc-on-dark);
+        /* L'ambre est lisible sur le vert-noir (7,5:1) : c'est l'anneau de
+           focus de la bande, le noir de la page y serait invisible. */
+        --doc-focus: var(--doc-accent-hi);
     }
 
     .try-inner {
-        max-width: 1160px;
+        position: relative;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 5rem 1.5rem;
+        padding: 5rem 1.25rem;
     }
 
     .try-title {
         font-family: var(--font-display);
-        font-size: 1.8rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        color: var(--doc-text);
-        margin: 0 0 0.5rem;
-        text-align: center;
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        margin: 0 0 0.6rem;
     }
 
     .try-pitch {
-        font-size: 0.95rem;
-        color: var(--doc-text-muted);
-        text-align: center;
-        margin: 0 0 3rem;
+        font-size: 1rem;
+        color: var(--doc-on-dark-muted);
+        margin: 0 0 3.5rem;
     }
 
-    /* Les deux étapes forment une seule carte continue, séparées par un filet. */
-    .try-card {
+    .steps {
+        display: flex;
+        flex-direction: column;
+        row-gap: 3rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Le fil vertical relie la perle 1 à la perle 2 : les deux étapes sont une
+       séquence, c'est la seule numérotation de la page. */
+    .step {
+        --step-node-size: 3rem;
+
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem;
         position: relative;
-        background: var(--doc-surface);
-        border: 1px solid var(--doc-border);
-        border-radius: 16px;
-        box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9);
     }
 
-    .try-card-step {
-        padding: 1.5rem;
-    }
-
-    .try-card-step + .try-card-step {
-        border-top: 1px solid var(--doc-border);
-    }
-
-    .try-step-header {
+    .step-header {
+        --step-header-column-gap: 1rem;
         display: flex;
         align-items: center;
-        gap: 0.85rem;
-        margin: 0 0 1.25rem;
+        column-gap: var(--step-header-column-gap);
+        /* margin-block-end: 1.25rem; */
     }
 
-    .try-step-number {
+    .step-node {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--step-node-size);
+        height: var(--step-node-size);
+        border: 1.5px solid var(--doc-accent);
+        background-color: var(--doc-accent);
+        color: var(--doc-ink);
+        border-radius: 50%;
+        font-family: var(--font-display);
+        font-weight: 600;
+    }
+
+    .step-label {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
+    /* ── Sélecteur de composant ───────────────────────────────
+       Le tab-group est rhabillé depuis la page (ses styles de thème vivent
+       dans @layer ariane.theme, les règles ci-dessous les emportent sans
+       !important) : filet du groupe et soulignement de l'onglet actif
+       neutralisés, chaque onglet devient une pastille contour autonome. */
+    ar-tab-group.try-tabs {
+        --ar-tab-group-border-top-width: 0px;
+        --ar-tab-group-border-bottom-width: 0px;
+        display: block;
+
+        &.has-overflow-start:not(.has-overflow-end)::part(nav) {
+            mask-image: linear-gradient(to right, transparent, black 3rem);
+        }
+
+        &.has-overflow-end:not(.has-overflow-start)::part(nav) {
+            mask-image: linear-gradient(to left, transparent, black 3rem);
+        }
+        &.has-overflow-start.has-overflow-end::part(nav) {
+            mask-image: linear-gradient(
+                to right,
+                transparent,
+                black 3rem,
+                black calc(100% - 3rem),
+                transparent
+            );
+        }
+
+        &::part(tab-group) {
+            row-gap: .5rem;
+        }
+
+        &::part(tabs) {
+            gap: 0.5rem;
+            border: 1px solid var(--doc-on-dark-line);
+            /* box-shadow: inset 0px 1px 20px 3px var(--doc-ink); */
+            width: fit-content;
+            min-width: fit-content;
+            padding: .35rem;
+            border-radius: 50px;
+        }
+    }
+
+
+
+
+    ar-tab.try-tab {
+        --ar-tab-padding-x: 0.45rem;
+        --ar-tab-padding-y: 0.45rem;
+        --ar-tab-active-shadow: none;
+        --ar-tab-focus-ring-offset: -3px;
+        --ar-tab-focus-ring-color: var(--doc-accent-hi);
+        border-radius: 50px;
+
+        &::part(tab) {
+            gap: 0.25rem;
+            padding: .25rem 1rem .25rem .75rem;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--doc-on-dark);
+            transition:
+                background 0.35s var(--ease),
+                color 0.35s var(--ease);
+        }
+
+        &:not([active]):hover::part(tab) {
+            border: 1px solid var(--doc-on-dark-line);
+        }
+
+        &[active]::part(tab--selected) {
+            background: var(--doc-paper);
+            color: var(--doc-ink);
+        }
+
+        /* Pastille active : aplat ambre, l'anneau de focus doit y repasser en encre. */
+        &[active] {
+            --ar-tab-focus-ring-color: var(--doc-ink);
+        }
+    }
+
+    /* Contenu slotté : il vit dans le light DOM, les règles de page l'atteignent
+       directement — l'icône suit currentColor. */
+    .try-tab-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 2rem;
         height: 2rem;
         border-radius: 50%;
-        border: 1.5px solid var(--doc-accent);
-        color: var(--doc-accent);
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 1rem;
         flex-shrink: 0;
-    }
-
-    /* ── Sélecteur de composant : pastilles, pas une barre d'onglets ──────
-       Le tab-group est entièrement rhabillé depuis la page (ses styles de thème
-       vivent dans @layer ariane.theme, les règles ci-dessous les emportent sans
-       !important) : le filet du groupe et le soulignement de l'onglet actif sont
-       neutralisés, chaque onglet devient une pastille autonome icône + libellé.
-       Le rayon est posé sur l'hôte : c'est lui que suit l'anneau de focus, et
-       [part~='tab'] en hérite. */
-    ar-tab-group.try-tabs {
-        --ar-tab-group-border-top-width: 0px;
-        --ar-tab-group-border-bottom-width: 0px;
-    }
-
-    ar-tab-group.try-tabs.has-overflow-start:not(.has-overflow-end)::part(nav) {
-        mask-image: linear-gradient(to right, transparent, black 3rem);
-    }
-    ar-tab-group.try-tabs.has-overflow-end:not(.has-overflow-start)::part(nav) {
-        mask-image: linear-gradient(to left, transparent, black 3rem);
-    }
-    ar-tab-group.try-tabs.has-overflow-start.has-overflow-end::part(nav) {
-        mask-image: linear-gradient(
-            to right,
-            transparent,
-            black 3rem,
-            black calc(100% - 3rem),
-            transparent
-        );
-    }
-
-    ar-tab-group.try-tabs::part(nav) {
-        padding: 1.5rem;
-        margin-inline-start: -1.5rem;
-    }
-
-    ar-tab-group.try-tabs::part(tabs) {
-        gap: 0.6rem;
-    }
-
-    ar-tab.try-tab {
-        --ar-tab-padding-x: 0.5rem;
-        --ar-tab-padding-y: 0.5rem;
-        --ar-tab-active-shadow: none;
-        --ar-tab-focus-ring-offset: -3px;
-        --ar-tab-focus-ring-color: var(--doc-accent);
-        border-radius: 999px;
-    }
-
-    ar-tab.try-tab::part(tab) {
-        gap: 0.6rem;
-        padding-inline-end: 1.05rem;
-        border: 1px solid var(--doc-border);
-        background: var(--doc-surface-2);
-        color: var(--doc-text-muted);
-        transition:
-            background 0.15s,
-            border-color 0.15s,
-            color 0.15s,
-            box-shadow 0.2s;
-    }
-
-    ar-tab.try-tab:not([active]):hover::part(tab) {
-        border-color: var(--doc-accent-border);
-        background: var(--doc-accent-bg);
-        color: var(--doc-text);
-    }
-
-    ar-tab.try-tab[active]::part(tab--selected) {
-        border-color: var(--doc-accent);
-        background: var(--doc-accent);
-        color: var(--doc-accent-ink);
-        box-shadow: 0 10px 26px -10px rgba(79, 216, 234, 0.7);
-    }
-
-    /* La pastille active est un aplat cyan clair : son anneau de focus doit être
-       sombre, un anneau blanc n'y aurait que 1,7:1. */
-    ar-tab.try-tab[active] {
-        --ar-tab-focus-ring-color: var(--doc-accent-ink);
-    }
-
-    /* Contenu slotté : il vit dans le light DOM, les règles de page l'atteignent
-       directement — le badge fixe sa propre couleur, l'icône suit currentColor. */
-    .try-tab-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 1.85rem;
-        height: 1.85rem;
-        border-radius: 50%;
-        flex-shrink: 0;
-        background: var(--doc-accent-bg);
-        color: var(--doc-accent);
-        transition:
-            background 0.15s,
-            color 0.15s;
-    }
-
-    ar-tab.try-tab[active] .try-tab-badge {
-        background: rgba(4, 20, 27, 0.16);
-        color: var(--doc-accent-ink);
     }
 
     .try-tab-icon {
-        width: 16px;
-        height: 16px;
+        width: 1.5rem;
+        height: 1.5rem;
     }
 
     .try-tab-label {
-        font-size: 0.88rem;
+        font-size: 0.9rem;
         font-weight: 600;
     }
 
-    .try-step-label {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--doc-text);
-        margin: 0;
+
+    .try-grid .code-block {
+        border-radius: var(--r-micro) var(--r-micro) 0 0;
+        margin-left: 0;
     }
 
     .code-block {
         position: relative;
         background: var(--doc-code-block-bg);
-        border: 1px solid var(--doc-border);
-        border-radius: 10px;
+        border: 1px solid var(--doc-on-dark-line);
+        border-radius: var(--r-micro);
         overflow: hidden;
-    }
 
-    .try-grid .code-block {
-        border-radius: 10px 10px 0 0;
-    }
+        pre {
+            margin: 0;
+            padding: 2rem 1.35rem 1.25rem ;
+            overflow-x: auto;
+        }
 
-    .code-block pre {
-        margin: 0;
-        padding: 1.25rem 1.5rem;
-        overflow-x: auto;
-    }
-
-    .code-block code {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 0.8rem;
-        line-height: 1.6;
-        background: transparent;
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.78rem;
+            line-height: 1.65;
+            background: transparent;
+        }
     }
 
     .copy-btn {
         position: absolute;
-        top: 0.65rem;
-        right: 0.65rem;
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 6px;
-        font-size: 0.72rem;
+        top: 0.6rem;
+        right: 0.6rem;
+        background: transparent;
+        color: var(--doc-paper);
+        border: 1px solid var(--doc-on-dark-line);
+        border-radius: 50px;
+        font-size: .9rem;
+        font-weight: 600;
         font-family: inherit;
-        padding: 0.3rem 0.65rem;
+        padding: 0.28rem 0.7rem;
         cursor: pointer;
-        transition: background 0.15s, color 0.15s;
         z-index: 1;
-        transition: opacity .3s;
-    }
+        transition:
+            background 0.35s var(--ease),
+            color 0.35s var(--ease),
+            opacity 0.35s var(--ease);
 
-    .copy-btn.copied {
-        background: var(--doc-accent);
-        color: var(--doc-accent-ink);
-        border-color: var(--doc-accent);
+        &.copied,
+        &.copied:hover {
+            background: var(--doc-accent);
+            border-color: var(--doc-accent);
+            color: var(--doc-ink);
+        }
     }
 
     .try-grid {
         display: grid;
         grid-template-columns: 1fr;
-        column-gap: 1.5rem;
+        column-gap: 1rem;
         align-items: stretch;
     }
 
-    /* Fenêtre de navigateur simulée autour de la démo live */
+    /* Fenêtre claire posée sur la bande sombre : les démos vivent dans le thème
+       clair de la librairie, comme dans une vraie page hôte. */
     .try-preview {
         display: flex;
         flex-direction: column;
-        background: var(--doc-bg-soft);
-        border: 1px solid var(--doc-border);
-        border-radius: 0 0 10px 10px;
+        background: var(--doc-paper);
+        border-radius: 0 0 var(--r-micro) var(--r-micro);
+        color: var(--doc-ink);
     }
 
     .try-preview-stage {
@@ -825,227 +1081,287 @@ const codeDatepicker = `<ar-datepicker
         min-height: 7.5rem;
     }
 
-    .try-preview ar-dropdown {
-        margin: auto;
+    .try-preview {
+            ar-dropdown {
+            margin: auto;
+        }
+
+        /* Boutons dans les previews live — présentation seulement, pas le code copié */
+        button {
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1.1rem;
+            border-radius: 999px;
+            border: 1.5px solid var(--doc-line);
+            background: transparent;
+            color: var(--doc-ink);
+            cursor: pointer;
+        }
+
+        ar-dropdown-item button {
+            border: none;
+            border-radius: var(--r-nano);
+            background: transparent;
+            font-weight: 500;
+            width: 100%;
+            display: block;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            transition: background 0.25s var(--ease);
+        }
+
+        /* La librairie est headless : elle ne style pas les boutons slottés, l'état
+        survol de la démo se pose donc au niveau de la page. */
+        ar-dropdown-item button:hover {
+            background: var(--doc-stone);
+        }
     }
 
-    /* ── CTA bas de page ────────────────────────────────── */
+    /* ── CTA bas de page ──────────────────────────────────── */
 
-    /* Dernier halo de la page, cyan cette fois : il ramène la couleur du hero en
-       milieu de section — son centre est remonté à 30% et son rayon calibré pour
-       s'éteindre avant le bas, plutôt que d'être posé sur la couture avec le pied
-       de page comme précédemment (le halo y était le plus intense pile là où il
-       fallait un raccord franc). Une seconde ellipse, posée sous la boîte comme
-       pour le hero, fait glisser le ton de fond de --doc-bg vers --doc-bg-deep
-       (celui du footer) sur le dernier tiers de la section : la couture est ainsi
-       garantie plutôt qu'espérée. */
-    .cta-bottom {
+    .outro {
+        overflow: hidden;
+        background: var(--doc-stone);
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 7vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1;
+            color: var(--doc-ink);
+            margin: 0 0 0.6rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--doc-ink-muted);
+            margin: 0 0 2rem;
+            max-width: 46ch;
+        }
+    }
+
+    /* Idem : le fil de la bande sombre déborde sur le haut de ce bloc. */
+    .outro-inner {
         position: relative;
-        text-align: center;
-        padding: 5.5rem 2rem;
-        background:
-            radial-gradient(
-                350px 250px at 50% 50%,
-                #38d7e82e,
-                #38d6e800 60%
-            ),
-            radial-gradient(
-                ellipse 154% 55% at 50% 130%,
-                var(--doc-bg-deep) -10%,
-                var(--doc-bg-deep) 58%,
-                #05070f00 115%
-            ),
-            var(--doc-bg)
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 5rem 1.25rem;
     }
 
-    .cta-bottom h2 {
-        font-family: var(--font-display);
-        font-size: 1.7rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        color: var(--doc-text);
-        margin-bottom: 0.5rem;
-    }
 
-    .cta-bottom p {
-        font-size: 0.9rem;
-        color: var(--doc-text-muted);
-        margin-bottom: 1.75rem;
-    }
-
-    .cta-bottom-actions {
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    /* ── Footer ─────────────────────────────────────────── */
+    /* ── Footer ───────────────────────────────────────────── */
 
     .landing-footer {
-        padding: 2rem 2.5rem;
-        background: var(--doc-bg-deep);
-        border-top: 1px solid var(--doc-border-soft);
+        padding: 2rem 1.25rem;
+        background: var(--doc-forest-dark);
+        color: var(--doc-on-dark-muted);
+        font-size: .9rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 0.5rem;
+        --doc-focus: var(--doc-accent-hi);
+
+        p {
+            margin: 0;
+        }
+
+        a {
+            color: var(--doc-on-dark);
+            text-decoration-color: var(--doc-accent);
+        }
     }
 
-    .landing-footer p {
-        font-size: 0.78rem;
-        color: var(--doc-text-muted);
-        margin: 0;
-    }
 
+
+    /* Le lien de prose garde l'encre du texte : l'ambre ne passerait pas en
+       couleur de texte sur fond clair (1,9:1), il ne sert que de soulignement. */
     a {
-        color: var(--doc-accent);
+        color: inherit;
         text-decoration: underline;
-        text-underline-offset: 2px;
+        text-decoration-color: var(--doc-accent);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+        }
     }
 
     /* ── Responsive — mobile d'abord ───────────────────────
-       Les règles ci-dessus posent la base mobile (une colonne, gouttières et
-       tailles resserrées). Les paliers suivants ENRICHISSENT vers le desktop,
-       ils ne le corrigent pas. */
+       Les règles ci-dessus posent la base mobile. Les paliers suivants
+       ENRICHISSENT vers le desktop, ils ne le corrigent pas. */
 
-    /* Palier intermédiaire : la grille des selling points passe à 2 × 3 et se
-       desserre un peu, sans encore atteindre les tailles desktop. */
     @media (min-width: 601px) {
-        .benefits-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2.25rem 2rem;
-            max-width: 44rem;
+        .hero-ctas,
+        .outro-actions {
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        .hero {
-            background-image:
-                radial-gradient(ellipse 155% 66% at 110% 108%,
-                    var(--doc-bg) -8%,
-                    var(--doc-bg) 28%,
-                    #080b1700 100%),
-                radial-gradient(ellipse 29vw 29vw at 85% 0%,
-                    #38e8936b,
-                    #38d6e800 72%),
-                radial-gradient(ellipse 32vw 29vw at 2% 22%,
-                    #45aee280,
-                    #5068ff00 70%),
-                radial-gradient(ellipse 53vw 25.5vw at 73% 50%,
-                    #f2545470,
-                    #8654f200 66%),
-                radial-gradient(ellipse 32vw 28.5vw at 32% 50%,
-                    #704ae870,
-                    #704ae800 60%),
-                linear-gradient(219deg, #161c40 -44%,
-                    #111731 46%,
-                    #0b1022 64%,
-                    var(--doc-bg) 64%,
-                    var(--doc-bg) 172%
-                );
+
+        .hero-inner,
+        .try-inner,
+        .outro-inner,
+        .landing-footer {
+            padding-inline: 2.25rem;
+        }
+
+        .promise {
+            --gutter: 2.25rem;
+        }
+
+        .promise-grid {
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 1rem;
+            row-gap: 3rem;
+        }
+
+
+        .try-grid .code-block {
+            border-radius: var(--r-micro);
+        }
+
+        .outro-actions {
+            position: relative;
+            z-index: 1;
         }
     }
 
-
-
-    /* Palier desktop. */
     @media (min-width: 901px) {
+        .step {
+            --step-node-size: 2.5rem;
+        }
+
         .hero-inner {
-            padding: 9rem 2.5rem 9.5rem;
+            padding-top: 9.5rem;
+            padding-bottom: 9.5rem;
         }
 
-        .benefits-section {
-            padding: 5.5rem 2.5rem;
+        .hero-title {
+            font-size: clamp(4rem, 6.4vw, 5.5rem);
         }
 
-        .benefits-title {
-            font-size: 1.8rem;
-            margin-bottom: 3rem;
+        .hero-pitch {
+            font-size: 1.15rem;
         }
 
-        .benefits-grid {
+        .thread-layer--top-wide {
+            display: block;
+        }
+
+        .thread-layer--top-narrow {
+            display: none;
+        }
+
+        .thread-layer--bottom {
+            --thread-bottom-height: 380px;
+        }
+
+        .promise {
+            padding-block: 7rem 4.5rem;
+        }
+
+        .promise-title {
+            margin-bottom: 3.5rem;
+        }
+
+        .promise-grid {
             grid-template-columns: repeat(3, 1fr);
-            gap: 3rem 2.5rem;
-            max-width: none;
-            margin-inline: 0;
         }
 
-        .benefit-icon {
-            width: 28px;
-            height: 28px;
-            margin-bottom: 1rem;
+        .promise-item {
+            padding-bottom: 3rem;
+            padding-inline-end: 2.5rem;
         }
 
-        .benefit h3 {
-            font-size: 1.05rem;
-            margin-bottom: 0.5rem;
+        .try-inner,
+        .outro-inner {
+            padding-block: 7rem;
         }
 
-        .benefit p {
-            font-size: 0.9rem;
-            line-height: 1.7;
+        .step {
+            row-gap: 0.5rem;
         }
 
-        .copy-btn {
-            opacity: 0;
-            transition: opacity .3s;
+        .step-header {
+            --step-header-column-gap: 2rem;
         }
 
-        .code-block:hover .copy-btn,
-        .code-block:has(pre:focus) .copy-btn,
-        .code-block:has(code:focus) .copy-btn,
-        .copy-btn:focus {
-            transition: opacity .3s;
-            opacity: 1;
+        .step:first-child::before {
+            content: '';
+            position: absolute;
+            inset-inline-start: calc(var(--step-node-size) / 2);
+            top: var(--step-node-size);
+            bottom: calc(-1 * var(--step-node-size));
+            width: 1px;
+            background: var(--doc-on-dark-line);
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-            color: #fff;
+        .step-node {
+            width: var(--step-node-size);
+            height: var(--step-node-size);
+            font-size: 1.3rem;
+            font-weight: 700;
+            background-color: transparent;
+            color: var(--doc-accent);
+
         }
 
-        .try-inner {
-            padding: 5rem 2.5rem;
+        .step:hover {
+            .step-node {
+                border-color: var(--doc-accent-hi);
+                background-color: var(--doc-accent);
+                color: var(--doc-ink);
+            }
         }
 
-        .try-card-step {
-            padding: 2rem;
+        .step-label {
+            font-size: 1.3rem;
         }
 
-        .try-grid {
-            grid-template-columns: 1.1fr 0.9fr;
+        .code-block,
+        .try ar-tab-group {
+            margin-inline-start: 4.5rem;
         }
 
         .try-preview {
-            margin-block-start: -4.5rem;
+            border-radius: var(--r-micro);
+            margin-block-start: -4rem;
         }
 
         .try-preview-stage {
             min-height: 9rem;
         }
 
-        .try-grid .code-block,
-        .try-preview {
-            border-radius: 10px;
+        .try-grid {
+            grid-template-columns: 1.2fr 0.8fr;
         }
 
         /* Pas d'overflow: hidden ici — les couches flottantes (menu, calendrier)
-       débordent volontairement de la fenêtre simulée. */
+           débordent volontairement de la fenêtre simulée. */
         .try-browser-bar {
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            padding: 0.55rem 0.75rem;
-            background: var(--doc-surface-2);
-            border-bottom: 1px solid var(--doc-border);
-            border-radius: 9px 9px 0 0;
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid var(--doc-line-soft);
+            background-color: var(--doc-stone);
             flex-shrink: 0;
+            border-radius: var(--r-micro) var(--r-micro) 0 0;
         }
 
-        /* Sur fond sombre, les trois pastilles « feu tricolore » saturées font tache :
-        une teinte neutre suffit à lire la métaphore de fenêtre. */
+        /* Trois contours vides plutôt que le feu tricolore saturé : la fenêtre se
+           lit toujours, et le motif de trait reste celui de la page. */
         .try-browser-dot {
-            width: 0.55rem;
-            height: 0.55rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            /* border: 1px solid var(--doc-line-soft); */
             border-radius: 50%;
 
             &:first-child {
@@ -1059,6 +1375,26 @@ const codeDatepicker = `<ar-datepicker
             &:last-child {
                 background-color: #00CA4E;
             }
+        }
+
+        .copy-btn {
+            opacity: 0;
+        }
+
+        .code-block pre {
+            padding-block-start: 1.25rem;
+        }
+
+        .code-block:hover .copy-btn,
+        .code-block:has(pre:focus) .copy-btn,
+        .code-block:has(code:focus) .copy-btn,
+        .copy-btn:focus {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--doc-paper);
+            color: var(--doc-ink);
         }
     }
 </style>
