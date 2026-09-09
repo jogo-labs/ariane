@@ -64,28 +64,6 @@
     gap: 0.5rem;
 }
 
-.main-section,
-.subsection {
-    display: flex;
-    flex-direction: column;
-}
-
-.main-section {
-    gap: 2rem;
-
-    > div p {
-        margin: 0;
-    }
-}
-
-.subsection {
-    gap: 1rem;
-
-    p {
-        margin: 0;
-    }
-}
-
 .narrative :global(p) {
     font-size: var(--doc-font-size-sm);
     line-height: 1.75;

@@ -1,0 +1,239 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+
+const tocEntries = [
+    { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
+    { id: 'state-parts', label: 'Parts d\'état', level: 1 as const },
+    { id: 'slots', label: 'Conventions de slot', level: 1 as const },
+];
+---
+
+<Layout
+    title="Parts & Slots"
+    description="Vocabulaire de CSS part sémantiques, parts d'état et conventions de slot partagés par tous les composants Ariane."
+    currentPath="/theming/parts-and-slots"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Parts & Slots</h2>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="semantic-parts">CSS Part sémantiques</NarrativeHeading>
+            <p>
+                En plus de <code>CSS part</code> propres à chacun, les composants Ariane
+                exposent des CSS part qui ont un rôle <strong>sémantique et transverse</strong>.<br />
+                Un même élément expose souvent plusieurs CSS part complémentaires, par exemple
+                <code>control</code> (sémantique) et <code>link</code> (spécifique).
+            </p>
+            <p style="margin-top: 1rem">
+                Ces <code>::part()</code> sémantiques facilitent la personnalisation des éléments communs à
+                chacun des composants, permettant une meilleure intégration à un Design System.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Part sémantique</th>
+                            <th scope="col">Signification</th>
+                            <th scope="col">Exemples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>(nom du composant)</code></td>
+                            <td>Racine du composant.</td>
+                            <td>
+                                <code>ar-charcounter::part(charcounter)</code>,
+                                <code>ar-datepicker::part(datepicker)</code>,
+                                <code>ar-breadcrumb::part(breadcrumb)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>panel</code></td>
+                            <td>Conteneur flottant secondaire (datepicker, dropdown...).</td>
+                            <td><code>ar-datepicker::part(panel)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>trigger</code></td>
+                            <td>Ouvre/ferme un panel ou une zone repliable.</td>
+                            <td><code>ar-datepicker::part(trigger)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>header</code> / <code>footer</code></td>
+                            <td>En-tête / pied de composant.</td>
+                            <td><code>ar-datepicker::part(header)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>body</code></td>
+                            <td>Zone de contenu principal.</td>
+                            <td>
+                                <code>ar-dialog::part(body)</code>,
+                                <code>ar-alert::part(body)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>control</code></td>
+                            <td>
+                                Élément interactif générique (hors
+                                field/action-button/trigger).
+                            </td>
+                            <td>
+                                <code>ar-pagination::part(link)</code>,
+                                <code>ar-datepicker::part(day)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>field</code></td>
+                            <td>
+                                Élément qui reçoit une saisie. Deux sous-rôles standard,
+                                réutilisables par tout futur composant :
+                                <code>input</code> (champ texte/textarea) et
+                                <code>select</code> (liste déroulante).
+                            </td>
+                            <td>
+                                <code>ar-datepicker::part(input)</code>,
+                                <code>ar-pagination::part(select)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>action-button</code></td>
+                            <td>
+                                Bouton qui déclenche une action ponctuelle (pas un toggle de
+                                panel).
+                            </td>
+                            <td>
+                                <code>ar-pagination::part(prev)</code>,
+                                <code>ar-datepicker::part(today-button)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>indicator</code></td>
+                            <td>Marqueur/indicateur visuel.</td>
+                            <td><code>ar-table-sort::part(indicator)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>label</code></td>
+                            <td>Texte descriptif.</td>
+                            <td><code>ar-datepicker::part(label)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>icon</code></td>
+                            <td>Icône.</td>
+                            <td><code>ar-alert::part(icon)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <NarrativeHeading id="state-parts">Parts d'état</NarrativeHeading>
+            <p>
+                Certains <code>::part()</code> portent en plus un <strong>modificateur
+                    d'état</strong>, selon la convention
+                <code>&lt;élément&gt;--&lt;état&gt;</code> : l'élément de base reste
+                présent, l'état s'ajoute en second part sur le même attribut (ex.
+                <code>part="bullet bullet--current"</code>). <br />
+                Ces parts d'état permettent une customisation avancée des composants dans leur différents états.
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">État</th>
+                            <th scope="col">Signification</th>
+                            <th scope="col">Exemples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>--current</code></td>
+                            <td>Position atteinte par navigation.</td>
+                            <td><code>ar-pagination::part(item--current)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--selected</code></td>
+                            <td>Choix actif de l'utilisateur.</td>
+                            <td><code>ar-tab::part(tab--selected)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--disabled</code></td>
+                            <td>Désactivé.</td>
+                            <td><code>ar-pagination::part(nav-button--disabled)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--pending</code></td>
+                            <td>Traitement en cours.</td>
+                            <td><code>ar-table-sort::part(sort-button--pending)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--warning</code></td>
+                            <td>État d'avertissement.</td>
+                            <td><code>ar-charcounter::part(count--warning)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--error</code></td>
+                            <td>État d'erreur.</td>
+                            <td><code>ar-charcounter::part(count--error)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--desktop</code></td>
+                            <td>Affichage desktop d'un élément ayant une variante mobile.</td>
+                            <td><code>ar-breadcrumb::part(list--desktop)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--mobile</code></td>
+                            <td>Affichage mobile d'un élément ayant une variante desktop.</td>
+                            <td><code>ar-breadcrumb::part(list--mobile)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>--substep</code></td>
+                            <td>Sous-liste d'étape imbriquée dans une liste d'étape parente.</td>
+                            <td><code>ar-stepper::part(list--substep)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <NarrativeHeading id="slots">Conventions de slot</NarrativeHeading>
+            <p>
+                Les <code>&lt;slot&gt;</code> suivent des conventions déjà cohérentes sur
+                toute la librairie, sans qu'un nouveau vocabulaire ait été nécessaire :
+            </p>
+            <ul>
+                <li>
+                    <strong>Slot par défaut (sans nom)</strong> — contenu principal du
+                    composant.
+                </li>
+                <li>
+                    <strong><code>trigger</code></strong> — même sens que le rôle
+                    <code>trigger</code> des part : élément qui ouvre/ferme le composant.
+                </li>
+                <li>
+                    <strong>Suffixe <code>&lt;rôle&gt;-icon</code></strong> — icône
+                    remplaçable associée à un élément précis (<code>close-icon</code>,
+                    <code>home-icon</code>, <code>trigger-icon</code>,
+                    <code>prev-icon</code>/<code>next-icon</code>,
+                    <code>warning-icon</code>/<code>error-icon</code>).
+                </li>
+                <li>
+                    <strong><code>header-actions</code></strong>,
+                    <strong><code>footer</code></strong> — reprennent le nom des rôles
+                    <code>::part()</code> homonymes.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
+</style>

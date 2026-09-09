@@ -57,6 +57,10 @@ function getContentType(filePath) {
 export default defineConfig({
     integrations: [mdx()],
 
+    redirects: {
+        '/getting-started/naming-conventions': '/theming/parts-and-slots',
+    },
+
     vite: {
         resolve: {
             alias: {
