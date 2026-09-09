@@ -6,6 +6,7 @@ const tocEntries = [
     { id: 'composants',       label: 'Utiliser les composants',   level: 1 as const },
     { id: 'chargement',       label: 'Attendre le chargement',    level: 1 as const },
     { id: 'personnalisation', label: 'Thème et personnalisation', level: 1 as const },
+    { id: 'presets',          label: 'Styles prêts à l\'emploi', level: 1 as const },
 ];
 
 const codeHtml = `<ar-alert version="success">
@@ -45,6 +46,14 @@ const codeTokensAlias = `:root {
     --ar-color-interactive: var(--mon-ds-color-primary);
     --ar-color-text:        var(--mon-ds-color-text);
 }`;
+
+const codePresets = `<!-- Charger le CSS dans le <head> -->
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />
+
+<!-- Utilisez les classes dans votre HTML -->
+<button class="ar-btn ar-btn-primary">Valider</button>
+<button class="ar-btn ar-btn-secondary">Annuler</button>
+`;
 ---
 
 <Layout
@@ -154,6 +163,22 @@ const codeTokensAlias = `:root {
                     <strong>Référence API</strong> de chaque page de composant.
                 </p>
             </section>
+        </section>
+
+        <section id="presets" class="main-section">
+            <div>
+                <h3 class="section-title">Styles prêts à l'emploi</h3>
+                <p style="margin-bottom: 1rem">
+                    Ariane propose — de manière optionnelle — des feuilles de styles comportant
+                    des classes CSS prêtes à l'emploi.<br />
+                    Elles peuvent s'appliquer au HTML qui se trouve dans le Light DOM
+                    (un bouton slotté dans un composant, par exemple) — distinctes des tokens /
+                    <code>::part()</code> du thème qui s'appliquent aux composants <code>ar-*</code>. <br />
+                    Chaque famille de classes vit dans son propre fichier,
+                    à charger séparément de <code>themes/default.css</code> :
+                </p>
+                <pre><code class="language-html" set:text={codePresets} /></pre>
+            </div>
         </section>
     </div>
 

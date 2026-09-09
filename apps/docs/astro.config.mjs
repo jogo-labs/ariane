@@ -26,6 +26,13 @@ const ASSET_MAPPINGS = [
             resolve(CORE_ROOT, 'src/styles/themes'), // fallback : CSS source brut
         ],
     },
+    {
+        prefix: '/presets/',
+        dirs: [
+            resolve(CORE_ROOT, 'dist/styles/presets'), // prioritaire : CSS minifié
+            resolve(CORE_ROOT, 'src/styles/presets'), // fallback : CSS source brut
+        ],
+    },
 ];
 
 /**

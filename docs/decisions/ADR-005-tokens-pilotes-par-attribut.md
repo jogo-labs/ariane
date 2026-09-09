@@ -787,3 +787,49 @@ indivisible avec un autre token, lui, bloqué.
 `button--pending` d'`ar-table-sort`, et les parts d'état `count--warning`/`count--error`
 d'`ar-charcounter` — à mentionner car ce chantier n'avait pas jusqu'ici explicitement signalé la
 couverture de tests des parts d'état comme faisant partie de sa mémoire institutionnelle.
+
+## Amendement (2026-09-08) : `@layer ariane.presets`, un second rôle pour `default.css`
+
+Jusqu'ici, tout le CSS publié par la librairie stylise le contrat intrinsèque des composants
+`ar-*` — tokens et `::part()` de `themes/default.css`, sous `@layer ariane.theme`. L'issue #200
+(tokens `--ar-button-tertiary-*`/`disabled` déclarés dans `default.css` mais jamais consommés
+nulle part dans le thème publié — code mort trouvé en même temps que `button.styles.ts`, une
+feuille interne partagée qui n'était plus importée par aucun composant, supprimée par la même
+occasion) formalise un second rôle, jusqu'ici non écrit : des classes CSS **opt-in** qui
+stylisent du HTML que le consommateur écrit lui-même (un `<button>` slotté, par exemple), pas le
+composant.
+
+**Décision** : ce second rôle vit dans des fichiers séparés de `themes/default.css` — un par
+famille (`styles/presets/buttons.css` en premier, un futur `styles/presets/*.css` pour les
+inputs texte évoqués par #200), chacun exposé par son propre export npm
+(`./presets/*.css` → `dist/styles/presets/*.css`) et chargé via un `<link>` indépendant, sur le
+modèle de WebAwesome plutôt qu'un unique fichier fourre-tout. Un consommateur qui n'a besoin que
+des tokens/composants n'a rien de plus à charger que `themes/default.css`.
+
+Toutes ces classes partagent néanmoins **une seule couche de cascade**, `@layer ariane.presets`
+— déclarée dans chaque fichier séparément (`@layer` avec le même nom dans plusieurs fichiers
+liés fusionne dans le même panier de cascade, sans collision), plutôt qu'une couche dédiée par
+famille (`ariane.forms`, `ariane.buttons`...). Choix YAGNI : rien n'indique aujourd'hui un besoin
+de précédence entre familles de presets, introduire une hiérarchie de couches sans cas d'usage
+concret ajouterait de la complexité sans bénéfice — à reconsidérer si un vrai conflit de cascade
+apparaît entre deux fichiers presets.
+
+**Nommage** : `.ar-btn-*` plutôt que `.btn-*` (déjà pris par Bootstrap/Bulma/Foundation/etc. —
+un consommateur chargeant `default.css` depuis un CDN à côté d'un de ces frameworks verrait ses
+propres boutons restylisés silencieusement) et `presets` plutôt que `utility`/`utilitaires` :
+`.ar-btn-primary` compose plusieurs propriétés sous un nom sémantique (base + variantes), à
+l'opposé d'une classe utilitaire atomique (une propriété = une classe, ex. `.mt-4`) — le terme
+retenu dans l'outillage CSS pour cette forme (base + variantes nommées) est _recipe_, francisé
+ici en « preset ».
+
+**Application** : `.ar-btn`/`.ar-btn-primary`/`.ar-btn-secondary`/`.ar-btn-danger`/
+`.ar-btn-tertiary` dans `styles/presets/buttons.css`, consommant les tokens `--ar-button-*`
+existants. Aucun token dédié pour le hover de `.ar-btn-danger` (jamais consommé jusqu'ici) —
+repli direct sur `--ar-color-danger-40`, déjà public, plutôt qu'introduire un token dont le
+calibrage sera revisité par la refonte d'identité visuelle #201. Migration de `Playground.astro`
+(`.btn-primary`/`.btn-secondary`/`.btn-danger` propres à la doc, dupliquant déjà les mêmes
+tokens avec repli) et des boutons autonomes de la home page (`index.astro`) vers ces classes.
+Les boutons slottés dans `ar-dropdown-item` de la home page restent volontairement en dehors du
+périmètre — leur absence de style par défaut est exactement le trou que l'issue #199 doit
+combler au niveau du composant ; leur ajouter `.ar-btn-tertiary` maintenant aurait anticipé sur
+ce ticket et masqué le manque qu'il doit corriger.
