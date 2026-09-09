@@ -320,6 +320,42 @@ describe('ar-datepicker — browser', () => {
         });
     });
 
+    // ── Affichage conditionnel du slot error (#210) ──────────────────────────
+
+    describe('affichage conditionnel du slot error', () => {
+        it("part=error est masqué quand le slot est vide (pas d'espace superflu dans le gap)", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('none');
+        });
+
+        it('part=error redevient visible quand le slot error est rempli au montage', async () => {
+            el = await fixture(
+                html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
+            );
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('block');
+        });
+
+        it('part=error redevient visible quand le slot error est rempli dynamiquement après coup', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('none');
+
+            const span = document.createElement('span');
+            span.slot = 'error';
+            span.textContent = 'Date invalide';
+            el.appendChild(span);
+            // slotchange est asynchrone (pas garanti avant le prochain tick) —
+            // attendre son passage avant de vérifier le requestUpdate() qu'il déclenche.
+            await aTimeout(0);
+            await el.updateComplete;
+
+            expect(getComputedStyle(error!).display).to.equal('block');
+            expect(el.hasAttribute('has-error')).to.equal(true);
+        });
+    });
+
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
 
     describe('fallback CSS sans thème chargé', () => {
