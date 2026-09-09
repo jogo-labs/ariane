@@ -82,26 +82,49 @@
 /* Owl-selector overrides — déclarées après les règles de base ci-dessus
  * (qui posent margin: 0 sur les titres/le contenu narratif) : elles
  * doivent gagner la cascade pour ces mêmes éléments. `:where()` reste
- * utilisé pour les parties qui ne ciblent pas l'élément stylé lui-même
- * (contexte ancêtre `.narrative`, sélecteur générique `+ *`, matcher du
- * sibling précédent) — leur spécificité n'a pas besoin d'être renforcée.
- * `:is()` est utilisé pour la partie qui cible l'élément stylé lui-même
- * (`.section-title`/`h3`, `.subsection-title`/`h4`, et le membre droit de
- * la règle d'adjacence p/ul/ol/pre/table) : `:is()` propage la
+ * utilisé pour la partie qui ne cible pas l'élément stylé lui-même
+ * (matcher du sibling précédent — `.page-title`, `.section-title`,
+ * `.subsection-title`, contexte ancêtre `.narrative`) — sa spécificité n'a
+ * pas besoin d'être renforcée. `:is()` est en revanche systématiquement
+ * utilisé pour la partie qui cible l'élément stylé lui-même, à gauche du
+ * `>` (`.section-title`/`h3`, `.subsection-title`/`h4`) COMME à droite du
+ * `+` (liste explicite des éléments de contenu légitimes — jamais de `*`
+ * générique, qui retombe à spécificité nulle) : `:is()` propage la
  * spécificité du sélecteur le plus spécifique de sa liste, contrairement
- * à `:where()` qui est toujours à spécificité nulle — nécessaire ici pour
- * battre `.section-title { margin: 0 }`, `.narrative .narrative-list
- * { margin: 0 }`, etc. sur le même élément. */
+ * à `:where()` et à `*` qui sont toujours à spécificité nulle — nécessaire
+ * ici pour battre `.section-title { margin: 0 }`, `.narrative p
+ * { margin: 0 }`, `.narrative .narrative-list { margin: 0 }`, etc. sur le
+ * même élément. */
 
-:global(:where(.page-title) + *) {
+/* Préfixe ancêtre (`.page-header` / `.narrative`) laissé HORS de `:global()` :
+ * Astro le scope (attribut data-astro-cid-*) comme n'importe quel sélecteur
+ * de style local, ce qui ajoute la spécificité nécessaire pour battre les
+ * règles de base scopées ci-dessus (`.summary[data-astro-cid] { margin: 0 }`,
+ * `.narrative[data-astro-cid] p { margin: 0 }`, etc.) — un `:global()` pur,
+ * sans préfixe scopé, reste à spécificité quasi nulle et ne peut pas gagner
+ * la cascade face à ces règles. */
+
+.page-header
+    :global(
+        :where(.page-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
     margin-top: var(--doc-space-paragraph);
 }
 
-:global(:where(.section-title) + *) {
+.narrative
+    :global(
+        :where(.section-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
     margin-top: var(--doc-space-subsection);
 }
 
-:global(:where(.subsection-title) + *) {
+.narrative
+    :global(
+        :where(.subsection-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
     margin-top: var(--doc-space-paragraph);
 }
 
@@ -117,7 +140,11 @@
     margin-top: var(--doc-space-subsection);
 }
 
-.narrative :global(:where(p, ul, ol, pre, table) + :is(p, ul, ol, pre, table, .narrative-list)) {
+.narrative
+    :global(
+        :where(p, ul, ol, pre, table, .table-wrap)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap)
+    ) {
     margin-top: var(--doc-space-paragraph);
 }
 
