@@ -75,7 +75,19 @@ Ratios vérifiés par Opus (AAA sur toutes les paires critiques) : `chalk`/`vaul
 
 Chaque token sémantique est déclaré **une seule fois** avec `light-dark()`, jamais redéclaré dans un bloc `[data-theme='dark']` séparé — élimine la duplication qui a causé la collision initiale.
 
-Rayons (`--r-nano/micro/macro/mega`, 4/12/20/40), easing (`--ease`) et typo (`--font-display`/`--font-body`) restent inchangés, repris tels quels de `HomeLayout.astro` (aucun équivalent dans `Layout.astro` à réconcilier).
+**Vocabulaire rationalisé sur `default.css`** — les deux systèmes de tokens (`--doc-*`/`--ar-*`) n'ont aucun lien fonctionnel, mais aligner leur terminologie facilite la lecture pour un mainteneur qui passe de l'un à l'autre. Renommage des tokens non-couleur de `HomeLayout.astro`, valeurs inchangées :
+
+| Rôle   | Ancien nom                               | Nouveau nom                            | Équivalent `default.css`                                                                                   |
+| ------ | ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Rayons | `--r-nano/micro/macro/mega` (4/12/20/40) | `--doc-radius-sm/md/lg/xl`             | `--ar-border-radius-sm/md/lg/xl`                                                                           |
+| Easing | `--ease`                                 | `--doc-ease`                           | _(pas d'équivalent générique — chaque composant a sa propre durée, cf. `--ar-button-transition-duration`)_ |
+| Typo   | `--font-display`/`--font-body`           | `--doc-font-display`/`--doc-font-body` | —                                                                                                          |
+
+Tous les tokens `--doc-*` portent désormais systématiquement le préfixe `--doc-` (`--ease`/`--font-display`/`--font-body` n'en avaient pas dans `HomeLayout.astro` — incohérence corrigée au passage).
+
+**Échelle typographique** (nouvelle, absente aujourd'hui) : `--doc-font-size-sm/md/lg/xl` et `--doc-font-weight-normal/medium/bold`, même style de nommage que `--ar-font-size-sm/md/lg`/`--ar-font-weight-normal/medium/bold`. Remplace les tailles littérales actuelles de `doc-prose.css` (`2rem`, `1.25rem`, `1.05rem`, `0.95rem`, `0.9rem`, `0.875rem`, `0.82rem`, `0.7rem`...) par une échelle nommée — les valeurs exactes des paliers sont un détail d'implémentation, pas fixées ici.
+
+**Espacement — écart assumé au style `--ar-spacing-*`** : `default.css` a une échelle générique (`--ar-spacing-xs/sm/md/lg/xl`) qui n'est en réalité **consommée nulle part** dans le fichier (constat déjà noté au backlog du projet) — signe que l'abstraction pure « quelle taille pour quel usage » est insuffisamment guidante en pratique. Les tokens de rythme vertical (section 2 ci-dessous) restent donc nommés par rôle sémantique (`--doc-space-section`/`--doc-space-subsection`/`--doc-space-paragraph`) plutôt que par taille abstraite — écart délibéré au style `--ar-spacing-*`, pas un oubli de rationalisation.
 
 **Simplification JS du toggle** : le toggle 3 états (clair/sombre/système) reste dans `Layout.astro`, mais sa logique change — « système » devient l'absence de l'attribut `data-theme` (résolution native via `color-scheme: light dark` + `prefers-color-scheme`, réactive sans listener). Le listener JS `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` est retiré ; seul le calcul de l'icône affichée (clair/sombre/système) dans le menu reste nécessaire côté JS.
 
