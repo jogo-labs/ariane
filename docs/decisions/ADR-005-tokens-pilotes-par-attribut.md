@@ -833,3 +833,37 @@ Les boutons slottés dans `ar-dropdown-item` de la home page restent volontairem
 périmètre — leur absence de style par défaut est exactement le trou que l'issue #199 doit
 combler au niveau du composant ; leur ajouter `.ar-btn-tertiary` maintenant aurait anticipé sur
 ce ticket et masqué le manque qu'il doit corriger.
+
+## Application — `ar-dropdown-item` (2026-09-08, issue #199)
+
+`ar-dropdown-item` n'a aucun style interne (`:host { display: contents }`) : le bouton/lien
+slotté est un vrai nœud du light DOM, jamais un élément du shadow DOM du composant. Ni `::part()`
+ni `::slotted()` ne peuvent l'atteindre depuis `default.css` — `::part()` ne cible que des
+éléments du shadow tree portant un `part`, et `::slotted()` n'est valide que depuis la feuille de
+style _propriétaire_ du slot (le composant lui-même, qui n'en a pas). Seul un sélecteur de
+descendance classique (`ar-dropdown-item button`) depuis le light DOM peut le styliser — branche
+4 d'ADR-005 par construction, pas par choix.
+
+**Périmètre initialement proposé par l'issue (hover seul) écarté** : la démo home page portait
+déjà une règle non-`@layer` (`ar-dropdown-item button { background: transparent; ... }`,
+issue #200) qui aurait neutralisé silencieusement tout hover ajouté dans `default.css`
+(`@layer ariane.theme`) — une règle hors couche l'emporte toujours sur une règle dans un
+`@layer`, quel que soit l'état pseudo-classe. Se limiter au hover aurait donc laissé la démo de
+reproduction elle-même inchangée. **Décision du mainteneur** : `default.css` reprend tout le
+reset de base (`display: block`, `width: 100%`, `border: none`, `background: transparent`,
+`text-align: left`, curseur, padding) en plus de `:hover`/`:focus-visible` — la règle ad-hoc de
+la home page disparaît intégralement, pas seulement sa portion `:hover`.
+
+**Deux nouveaux tokens** (`--ar-dropdown-item-hover-bg`, `--ar-dropdown-item-hover-color`),
+consommés uniquement par cette règle externe (jamais par le composant, aucun `.styles.ts` créé)
+— dérogation délibérée au critère 4 habituel (« pas de token sans consommation interne ») :
+le mainteneur a explicitement demandé des tokens nommés plutôt qu'une valeur littérale ou une
+classe externalisée à la `.ar-btn-*`, pour qu'un consommateur voie immédiatement comment
+personnaliser le dropdown dans son ensemble via `default.css` seul, sans dépendre d'un fichier
+presets séparé. Valeurs reprises du vocabulaire déjà établi (`--ar-color-neutral-40` + texte
+blanc), même convention que `.ar-btn-secondary:hover` et `ar-datepicker::part(trigger):hover`.
+
+`:active` volontairement omis (aucun précédent ne l'exige pour ce type de surface, contrairement
+à `.ar-btn-tertiary`) ; `:focus-visible` pose l'anneau complet (`outline` + `outline-offset`),
+pas seulement l'offset comme pour d'autres composants — ceux-ci ont une base interne au shadow
+DOM qui pose déjà la couleur/largeur, `ar-dropdown-item` n'en a aucune.

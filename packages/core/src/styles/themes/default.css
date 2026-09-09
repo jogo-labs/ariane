@@ -469,6 +469,14 @@
         --ar-dropdown-offset: var(--ar-anchor-offset);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dropdown item
+         * Bouton/lien slotté — ar-dropdown-item n'a aucun style interne
+         * (:host { display: contents }), tout vient d'ici.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-dropdown-item-hover-bg: var(--ar-color-neutral-40);
+        --ar-dropdown-item-hover-color: var(--ar-color-white);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Dialog
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-dialog-spacing: 1.25rem;
@@ -1037,6 +1045,36 @@
                dropdown reste lisible plus étroit qu'un panel de disclosure générique
                (breadcrumb, stepper). */
             min-width: 10rem;
+        }
+    }
+
+    /* ar-dropdown-item n'a aucun style interne (:host { display: contents }) : le
+       bouton/lien slotté est un vrai nœud du light DOM, ciblé ici directement
+       (::slotted() est hors de portée depuis une feuille externe au shadow root
+       propriétaire du slot). */
+    ar-dropdown-item {
+        :is(button, a):not(:disabled):not([aria-disabled='true']) {
+            display: block;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font: inherit;
+            color: var(--ar-color-text);
+            text-align: left;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--ar-border-radius-sm);
+            transition: background-color var(--ar-button-transition-duration);
+
+            &:hover {
+                background-color: var(--ar-dropdown-item-hover-bg);
+                color: var(--ar-dropdown-item-hover-color);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--ar-focus-ring-color);
+                outline-offset: var(--ar-focus-ring-offset);
+            }
         }
     }
 
