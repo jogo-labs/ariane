@@ -341,6 +341,11 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Button
          * Partagé - stepper
+         * Mutualisation de thème pure : jamais consommé dans un .styles.ts
+         * (contrairement à panel.styles.ts) — ce n'est pas un contrat de
+         * composant, seulement le point d'entrée public du preset
+         * buttons.css, réutilisé ici pour garder les ::part() du thème
+         * visuellement cohérents avec lui.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
@@ -380,7 +385,10 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Input
-         * Consommé par datepicker (interne) et le preset fields.css (externe)
+         * Même nature que Button ci-dessus : mutualisation de thème pure,
+         * jamais consommé dans un .styles.ts. Point d'entrée public du
+         * preset fields.css, réutilisé par ar-datepicker::part(input) pour
+         * garder l'input interne visuellement cohérent avec .ar-input.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-input-border-color: var(--ar-color-border);
         --ar-input-radius: var(--ar-border-radius-md);
@@ -392,7 +400,10 @@
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Field gap
-         * Consommé par datepicker (interne) et le preset fields.css (externe)
+         * Même nature que Input ci-dessus. Point d'entrée public de
+         * .ar-field-group (fields.css), réutilisé par le gap interne
+         * d'ar-datepicker::part(datepicker) pour un espacement uniforme
+         * entre les composants et le light DOM.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-field-gap: 0.5rem;
 
