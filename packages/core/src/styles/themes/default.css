@@ -473,8 +473,8 @@
          * Bouton/lien slotté — ar-dropdown-item n'a aucun style interne
          * (:host { display: contents }), tout vient d'ici.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-dropdown-item-hover-bg: var(--ar-color-neutral-40);
-        --ar-dropdown-item-hover-color: var(--ar-color-white);
+        --ar-dropdown-item-hover-bg: var(--ar-color-bg-subtle);
+        --ar-dropdown-item-hover-color: var(--ar-color-text);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Dialog
