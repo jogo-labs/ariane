@@ -35,14 +35,14 @@
  * margin-bottom fixe ; (5) le premier titre après .page-title n'a pas de
  * double espace. */
 
-.page-title {
+:global(.page-title) {
     color: var(--doc-text);
     font-size: var(--doc-font-size-xl);
     font-weight: var(--doc-font-weight-bold);
     margin: 0;
 }
 
-.section-title {
+:global(.section-title) {
     font-size: var(--doc-font-size-lg);
     font-weight: var(--doc-font-weight-semibold);
     border-bottom: 2px solid var(--doc-border);
@@ -54,7 +54,7 @@
     gap: 0.5rem;
 }
 
-.subsection-title {
+:global(.subsection-title) {
     font-size: var(--doc-font-size-md);
     font-weight: var(--doc-font-weight-semibold);
     color: var(--doc-text-subtle);
@@ -62,34 +62,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-:where(.page-title) + * {
-    margin-top: var(--doc-space-paragraph);
-}
-
-:where(.section-title) + * {
-    margin-top: var(--doc-space-subsection);
-}
-
-:where(.subsection-title) + * {
-    margin-top: var(--doc-space-paragraph);
-}
-
-:where(.narrative) > :where(.section-title, h3) {
-    margin-top: var(--doc-space-section);
-}
-
-:where(.narrative) > :where(.section-title, h3):first-child {
-    margin-top: 0;
-}
-
-:where(.narrative) :where(.subsection-title, h4) {
-    margin-top: var(--doc-space-subsection);
-}
-
-:where(.narrative) :where(p, ul, ol, pre, table) + :where(p, ul, ol, pre, table) {
-    margin-top: var(--doc-space-paragraph);
 }
 
 .main-section,
@@ -114,19 +86,61 @@
     }
 }
 
-.narrative p {
+.narrative :global(p) {
     font-size: var(--doc-font-size-sm);
     line-height: 1.75;
     color: var(--doc-text);
     margin: 0;
 }
 
-.narrative .narrative-list {
+.narrative :global(.narrative-list) {
     font-size: var(--doc-font-size-sm);
     line-height: 1.75;
     color: var(--doc-text);
     margin: 0;
     padding-left: 1.25rem;
+}
+
+/* Owl-selector overrides — déclarées après les règles de base ci-dessus
+ * (qui posent margin: 0 sur les titres/le contenu narratif) : elles
+ * doivent gagner la cascade pour ces mêmes éléments. `:where()` reste
+ * utilisé pour les parties qui ne ciblent pas l'élément stylé lui-même
+ * (contexte ancêtre `.narrative`, sélecteur générique `+ *`, matcher du
+ * sibling précédent) — leur spécificité n'a pas besoin d'être renforcée.
+ * `:is()` est utilisé pour la partie qui cible l'élément stylé lui-même
+ * (`.section-title`/`h3`, `.subsection-title`/`h4`, et le membre droit de
+ * la règle d'adjacence p/ul/ol/pre/table) : `:is()` propage la
+ * spécificité du sélecteur le plus spécifique de sa liste, contrairement
+ * à `:where()` qui est toujours à spécificité nulle — nécessaire ici pour
+ * battre `.section-title { margin: 0 }`, `.narrative .narrative-list
+ * { margin: 0 }`, etc. sur le même élément. */
+
+:global(:where(.page-title) + *) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+:global(:where(.section-title) + *) {
+    margin-top: var(--doc-space-subsection);
+}
+
+:global(:where(.subsection-title) + *) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+:global(.narrative > :is(.section-title, h3)) {
+    margin-top: var(--doc-space-section);
+}
+
+:global(.narrative > :is(.section-title, h3):first-child) {
+    margin-top: 0;
+}
+
+:global(.narrative :is(.subsection-title, h4)) {
+    margin-top: var(--doc-space-subsection);
+}
+
+.narrative :global(:where(p, ul, ol, pre, table) + :is(p, ul, ol, pre, table, .narrative-list)) {
+    margin-top: var(--doc-space-paragraph);
 }
 
 .summary {
