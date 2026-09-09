@@ -10,10 +10,9 @@ variants:
           Passe en état `warning` quand il reste ≤ 20 % de la limite (seuil par défaut),
           puis en état `error` quand la limite est dépassée.
       html: |
-          <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
-              <label for="cc-default">Message</label>
-              <textarea id="cc-default" rows="3"
-                  style="width:100%;resize:vertical;"></textarea>
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-default">Message</label>
+              <textarea class="ar-input" id="cc-default" rows="3"></textarea>
               <ar-charcounter id="cc-default-counter" for="cc-default" max="100"></ar-charcounter>
           </div>
     - name: warning
@@ -22,10 +21,9 @@ variants:
           `warn-threshold="15"` déclenche l'état `warning` quand il reste ≤ 15 caractères.
           La zone de texte est pré-remplie pour illustrer l'état d'avertissement (45 caractères sur 60).
       html: |
-          <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
-              <label for="cc-warn">Description</label>
-              <textarea id="cc-warn" rows="3"
-                  style="width:100%;resize:vertical;">Voici un exemple de texte assez long pour déclencher</textarea>
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-warn">Description</label>
+              <textarea class="ar-input" id="cc-warn" rows="3">Voici un exemple de texte assez long pour déclencher</textarea>
               <ar-charcounter id="cc-warn-counter" for="cc-warn" max="60" warn-threshold="15"></ar-charcounter>
           </div>
     - name: icon
@@ -34,10 +32,9 @@ variants:
           Les slots `warning-icon` et `error-icon` permettent d'ajouter un signal non-couleur
           conforme WCAG 1.4.1. Le contenu du slot est rendu à côté du compteur dans l'état correspondant.
       html: |
-          <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
-              <label for="cc-icon">Commentaire</label>
-              <textarea id="cc-icon" rows="3"
-                  style="width:100%;resize:vertical;"></textarea>
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-icon">Commentaire</label>
+              <textarea class="ar-input" id="cc-icon" rows="3"></textarea>
               <ar-charcounter id="cc-icon-counter" for="cc-icon" max="80">
                   <span slot="warning-icon" aria-hidden="true">⚠️</span>
                   <span slot="error-icon" aria-hidden="true">❌</span>
@@ -52,10 +49,9 @@ variants:
           dit par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
           Sans pipe, le label est utilisé tel quel (compatibilité descendante).
       html: |
-          <div style="display:flex;flex-direction:column;gap:0.5rem;max-width:400px;">
-              <label for="cc-label">Bio</label>
-              <textarea id="cc-label" rows="3"
-                  style="width:100%;resize:vertical;"></textarea>
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-label">Bio</label>
+              <textarea class="ar-input" id="cc-label" rows="3"></textarea>
               <ar-charcounter id="cc-label-counter" for="cc-label" max="150" label="character remaining|characters remaining"></ar-charcounter>
           </div>
 ---

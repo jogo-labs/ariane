@@ -313,35 +313,16 @@
         --ar-border-radius-full: 9999px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 6. TOKENS COMPOSANTS
+         * 6. TOKENS GÉNÉRIQUES MUTUALISÉS
+         * Mutualisation de thème pure : jamais consommés dans un .styles.ts
+         * ou un .ts de composant (contrairement à panel.styles.ts ou
+         * --ar-anchor-*, qui pilotent un mécanisme interne). Chacun est le
+         * point d'entrée public d'un preset externe (buttons.css,
+         * fields.css), réutilisé ici pour garder les ::part() du thème
+         * visuellement cohérents avec lui.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Panel
-         * Partagé - dropdown, breadcrumb, stepper, datepicker
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-panel-bg: var(--ar-color-bg);
-        --ar-panel-text: var(--ar-color-text);
-        --ar-panel-border-color: var(--ar-color-border);
-        --ar-panel-radius: var(--ar-border-radius-md);
-        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
-        --ar-panel-padding: 0.25rem;
-        --ar-panel-min-width: 18rem;
-        --ar-panel-max-width: 18rem;
-        --ar-panel-show-duration: 0.2s;
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Anchor
-         * Partagé — positionnement des composants ancrés / popovers)
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        /* anchor ( */
-        --ar-anchor-distance: 4px;
-        --ar-anchor-offset: 0px;
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Button
-         * Partagé - stepper
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* Button — Partagé (stepper) */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
         --ar-button-color: var(--ar-color-text-inverse);
@@ -377,6 +358,45 @@
         --ar-button-border-radius-pill: 0.75rem;
         --ar-button-ratio-square-width: 2.5rem;
         --ar-button-transition-duration: 0.15s;
+
+        /* Input — preset fields.css, réutilisé par ar-datepicker::part(input) */
+        --ar-input-border-color: var(--ar-color-border);
+        --ar-input-radius: var(--ar-border-radius-md);
+        --ar-input-bg: var(--ar-color-bg);
+        --ar-input-color: var(--ar-color-text);
+        --ar-input-font-size: var(--ar-font-size-md);
+        --ar-input-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-input-disabled-bg: var(--ar-color-bg-subtle);
+
+        /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
+           interne d'ar-datepicker::part(datepicker) */
+        --ar-field-gap: 0.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 7. TOKENS COMPOSANTS
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Panel
+         * Partagé - dropdown, breadcrumb, stepper, datepicker
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+        --ar-panel-show-duration: 0.2s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Anchor
+         * Partagé — positionnement des composants ancrés / popovers)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* anchor ( */
+        --ar-anchor-distance: 4px;
+        --ar-anchor-offset: 0px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Alert
@@ -624,14 +644,8 @@
 
     /* Datepicker */
     ar-datepicker {
-        /* Variable locale à ce bloc thème, pas un token public du composant (pas de
-         * préfixe --ar-datepicker-*) : couple gap (::part(datepicker) ci-dessous) et
-         * margin-bottom de ::part(label) plus bas sans exposer d'API. Un autre thème
-         * peut reproduire la même technique avec sa propre variable. */
-        --field-gap: 0.35rem;
-
         &::part(datepicker) {
-            gap: var(--field-gap);
+            gap: var(--ar-field-gap);
         }
 
         &::part(panel) {
@@ -701,9 +715,6 @@
             font-size: var(--ar-font-size-sm);
             font-weight: var(--ar-font-weight-medium);
             color: var(--ar-color-text);
-            /* Complète le --field-gap du :host pour un espacement visuel total de
-             * 0.5rem sous le label — recalculé automatiquement si --field-gap change. */
-            margin-bottom: calc(0.5rem - var(--field-gap));
         }
 
         &::part(hint) {
@@ -720,20 +731,20 @@
             height: var(--ar-button-height);
             box-sizing: border-box;
             padding: 0 0.75rem;
-            border: 1px solid var(--ar-color-border);
+            border: 1px solid var(--ar-input-border-color);
             border-inline-end: none;
-            border-start-start-radius: var(--ar-border-radius-md);
-            border-end-start-radius: var(--ar-border-radius-md);
-            background: var(--ar-color-bg);
-            color: var(--ar-color-text);
-            font-size: var(--ar-font-size-md);
+            border-start-start-radius: var(--ar-input-radius);
+            border-end-start-radius: var(--ar-input-radius);
+            background: var(--ar-input-bg);
+            color: var(--ar-input-color);
+            font-size: var(--ar-input-font-size);
             font-family: inherit;
             outline: none;
             transition: border-color 0.15s ease;
         }
 
         &::part(input):focus-visible {
-            outline: 2px solid var(--ar-focus-ring-color);
+            outline: 2px solid var(--ar-input-focus-ring-color);
             outline-offset: var(--ar-focus-ring-offset);
             border-color: var(--ar-color-interactive);
         }
@@ -746,7 +757,7 @@
         &::part(input):disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background: var(--ar-color-bg-subtle);
+            background: var(--ar-input-disabled-bg);
         }
 
         &::part(trigger) {
