@@ -22,13 +22,13 @@ const codeInstall = `<!-- L'autoloader détecte les composants présents pour ne
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />`;
 
 const codeDropdown = `<ar-dropdown>
-    <button slot="trigger">Actions</button>
+    <button slot="trigger" class="ar-btn ar-btn-secondary">Actions</button>
     <ar-dropdown-item><button>Modifier</button></ar-dropdown-item>
     <ar-dropdown-item><button>Dupliquer</button></ar-dropdown-item>
     <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
 </ar-dropdown>`;
 
-const codeDialog = `<button data-ar-dialog-open="mon-dialog">Ouvrir la fenêtre</button>
+const codeDialog = `<button data-ar-dialog-open="mon-dialog" class="ar-btn ar-btn-secondary">Ouvrir la fenêtre</button>
 <ar-dialog id="mon-dialog" label="Informations importantes">
     <p>Votre session expirera dans 5 minutes.</p>
 </ar-dialog>`;
