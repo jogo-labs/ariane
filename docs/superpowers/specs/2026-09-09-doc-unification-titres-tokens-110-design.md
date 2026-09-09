@@ -36,16 +36,19 @@ Ce document couvre le premier des deux sous-chantiers décidés pour finir #110 
 
 **Fichier unique** `apps/docs/src/styles/doc-tokens.css`, importé par `HomeLayout.astro` et `Layout.astro` — remplace les deux blocs `<style>` actuellement dupliqués/divergents.
 
-**Palette** : reprend telle quelle celle de `HomeLayout.astro` (seule identité validée, 2 itérations de design) — `paper/stone/forest/forest-dark/ink/ink-muted/line/line-soft/accent/accent-hi/accent-wash/on-dark/on-dark-muted/on-dark-line/focus`, `--font-display`/`--font-body`, rayons `--r-nano/micro/macro/mega` (4/12/20/40), `--ease`.
+**Structure à 2 niveaux**, proportionnée à la taille réelle du besoin (~15-20 tokens, pas la dizaine de composants de `packages/core`) — pas de 3ᵉ niveau « tokens composants » comme `default.css`, les pages Astro consomment directement le sémantique :
+
+1. **Palette brute** — un nom par teinte réellement utilisée (neutre clair, accent ambre, teinte sombre à définir), vocabulaire d'objets/matières **propre à Ariane**, pas les mots exacts de Rivian (`stone`/`forest`/`paper`/`ink`) — inspiration, pas copie. Idéalement ancré dans le thème de l'aventure/la découverte/le fil guide déjà porté par le nom du projet. Noms et valeurs de cette échelle **délégués à un brainstorming visuel Opus** (cf. ci-dessous) plutôt que fixés dans cette spec.
+2. **Tokens sémantiques** — `bg`/`text`/`text-muted`/`border`/`accent`/`code-block-bg`/`focus`, chacun aliasé une seule fois via `light-dark(<primitif-clair>, <primitif-sombre>)`.
 
 **Mécanisme dark mode** — même pattern que `packages/core/src/styles/themes/default.css` :
 
 ```css
 :root {
     color-scheme: light dark;
-    --doc-bg: light-dark(var(--doc-paper), var(--doc-forest));
-    --doc-text: light-dark(var(--doc-ink), var(--doc-on-dark));
-    /* ... un token par rôle sémantique, jamais de bloc dupliqué */
+    --doc-bg: light-dark(var(--doc-<primitif-clair>), var(--doc-<primitif-sombre>));
+    --doc-text: light-dark(var(--doc-<primitif-clair>), var(--doc-<primitif-sombre>));
+    /* ... un token sémantique par rôle, jamais de bloc dupliqué */
 }
 :root[data-theme='dark'] {
     color-scheme: dark;
@@ -55,9 +58,9 @@ Ce document couvre le premier des deux sous-chantiers décidés pour finir #110 
 }
 ```
 
-Chaque token sémantique (bg/text/border/accent/code-block-bg...) est déclaré **une seule fois** avec `light-dark()`, jamais redéclaré dans un bloc `[data-theme='dark']` séparé.
+Chaque token sémantique est déclaré **une seule fois** avec `light-dark()`, jamais redéclaré dans un bloc `[data-theme='dark']` séparé.
 
-**Palette dark à calibrer** : `HomeLayout.astro` n'a actuellement qu'une palette claire — la moitié sombre de chaque `light-dark()` est à définir pendant l'implémentation (contraste WCAG AA à vérifier, cf. précédent `ar-datepicker-error-color` trouvé en #109). Point de vigilance à traiter dans le plan d'implémentation, pas dans cette spec.
+**Palette sombre — brainstorming Opus dédié** : `HomeLayout.astro` n'a actuellement qu'une palette claire (ambre/stone/forest). Direction thématique retenue pour le mode sombre : bleu nuit/indigo ou vert profond, évoquant l'aventure/la découverte/le guidage par le fil — à explorer visuellement (plusieurs directions comparées, contraste WCAG AA vérifié) avant intégration dans `doc-tokens.css`. Rayons (`--r-nano/micro/macro/mega`, 4/12/20/40), easing (`--ease`) et typo (`--font-display`/`--font-body`) restent inchangés, repris tels quels de `HomeLayout.astro`.
 
 **Simplification JS du toggle** : le toggle 3 états (clair/sombre/système) reste dans `Layout.astro`, mais sa logique change — « système » devient l'absence de l'attribut `data-theme` (résolution native via `color-scheme: light dark` + `prefers-color-scheme`, réactive sans listener). Le listener JS `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` est retiré ; seul le calcul de l'icône affichée (clair/sombre/système) dans le menu reste nécessaire côté JS.
 
