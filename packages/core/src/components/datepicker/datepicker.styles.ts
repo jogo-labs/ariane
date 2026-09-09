@@ -41,6 +41,18 @@ export default css`
         border-color: var(--ar-datepicker-input-error-border-color);
     }
 
+    /* Masqué (pas retiré du DOM) quand le slot error est vide : évite un espace
+       vide superflu dans le gap de [part~='datepicker'], tout en gardant le
+       <slot> présent pour que HasSlotController détecte un ajout dynamique
+       ultérieur (ex. validation au blur/submit, cf. ar-charcounter). */
+    [part='error'] {
+        display: none;
+    }
+
+    :host([has-error]) [part='error'] {
+        display: block;
+    }
+
     [part='panel'] {
         /* a11y-fallback: évite que la grille de ~35 jours s'étale sur toute la largeur de la page sans thème chargé */
         max-width: var(--ar-datepicker-panel-max-width, 25rem);
