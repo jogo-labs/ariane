@@ -78,4 +78,34 @@ describe('presets/buttons.css', () => {
         btn.disabled = true;
         expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(230, 231, 236)');
     });
+
+    // :hover ne peut pas être forcé de façon fiable en JS pur (pas de vrai pointeur) —
+    // on inspecte donc la règle CSS elle-même plutôt que le style calculé.
+    function* walkRules(rules: CSSRuleList): Generator<CSSRule> {
+        for (const rule of rules) {
+            yield rule;
+            if ('cssRules' in rule) yield* walkRules((rule as CSSGroupingRule).cssRules);
+        }
+    }
+
+    function findHoverRule(selectorFragment: string): CSSStyleRule | undefined {
+        for (const sheet of document.styleSheets) {
+            for (const rule of walkRules(sheet.cssRules)) {
+                if (
+                    rule instanceof CSSStyleRule &&
+                    rule.selectorText.includes(selectorFragment) &&
+                    rule.selectorText.includes(':hover')
+                ) {
+                    return rule;
+                }
+            }
+        }
+        return undefined;
+    }
+
+    it('ar-btn-secondary:hover repasse le texte en clair (fond gris moyen, sinon illisible)', () => {
+        const rule = findHoverRule('.ar-btn-secondary');
+        expect(rule).to.not.equal(undefined, 'règle .ar-btn-secondary:hover introuvable');
+        expect(rule?.style.color).to.equal('var(--ar-color-white)');
+    });
 });
