@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const tocEntries = [
     { id: 'pourquoi',         label: 'Un style appliqué partiellement',   level: 1 as const },
@@ -75,79 +77,69 @@ customElements.define('mon-app', MonApp);`;
             </p>
         </div>
 
-        <section id="pourquoi" class="main-section">
-            <div>
-                <h3 class="section-title">Un style appliqué partiellement ?</h3>
-                <p>
-                    Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
-                    traversent la frontière du shadow DOM par héritage CSS natif.<br />
-                    Les règles utilisant <code>::part()</code> par contre ne peuvent pas
-                    traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
-                    donc pas.<br />
-                    C'est la raison pour laquelle votre thème ne s'applique que partiellement.
-                </p>
-            </div>
-        </section>
+        <div class="narrative">
+            <NarrativeHeading id="pourquoi">Un style appliqué partiellement ?</NarrativeHeading>
+            <p>
+                Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
+                traversent la frontière du shadow DOM par héritage CSS natif.<br />
+                Les règles utilisant <code>::part()</code> par contre ne peuvent pas
+                traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
+                donc pas.<br />
+                C'est la raison pour laquelle votre thème ne s'applique que partiellement.
+            </p>
 
-        <section id="charger-un-theme" class="main-section">
-            <div>
-                <h3 class="section-title">Charger un thème</h3>
-                <p>
-                    N'importe quelle feuille de style peut être transformée en
-                    <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet"
-                    target="_blank" rel="noopener" title="Visiter la page dédiée sur MDN (nouvel onglet)"><code>CSSStyleSheet</code></a>.
-                    Elle peut ensuite être "adoptée" par chaque composant qui en a besoin, chacun partageant
-                    une même instance chargée et parsée une seule fois.<br />
-                    Contrairement au chargement du CSS via une balise <code>&lt;link&gt;</code>,
-                    les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
-                </p>
+            <NarrativeHeading id="charger-un-theme">Charger un thème</NarrativeHeading>
+            <p>
+                N'importe quelle feuille de style peut être transformée en
+                <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet"
+                target="_blank" rel="noopener" title="Visiter la page dédiée sur MDN (nouvel onglet)"><code>CSSStyleSheet</code></a>.
+                Elle peut ensuite être "adoptée" par chaque composant qui en a besoin, chacun partageant
+                une même instance chargée et parsée une seule fois.<br />
+                Contrairement au chargement du CSS via une balise <code>&lt;link&gt;</code>,
+                les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
+            </p>
 
-                <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-top: 1rem">
-                    <p class="doc-callout-alert-title">Compatibilité</p>
-                    <div class="doc-callout-alert-content">
-                        <p>
-                            <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
-                            sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
-                            2023).
-                        </p>
-                    </div>
-                </ar-alert>
-            </div>
+            <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-top: 1rem">
+                <p class="doc-callout-alert-title">Compatibilité</p>
+                <div class="doc-callout-alert-content">
+                    <p>
+                        <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
+                        sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
+                        2023).
+                    </p>
+                </div>
+            </ar-alert>
 
-            <section id="preparez-theme" class="subsection">
-                <h4 class="subsection-title">Préparez votre thème</h4>
-                <p>
-                    Le plus souvent votre application a déjà son propre thème, local à votre code
-                    — la technique est la même quel que soit le CSS.<br />
-                    Il s'agit de créer à partir de votre fichier CSS une version <code>*.js</code>
-                    qui sera utilisée en complément de votre fichier CSS.
-                </p>
-                <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
-                <ar-alert variant="info" without-notification class="doc-callout-alert">
-                    <p class="doc-callout-alert-title">N'importez pas les tokens</p>
-                    <div class="doc-callout-alert-content">
-                        <p>
-                            Les CSS Custom properties n'ont pas besoin d'être incluses dans cette version JS,
-                            le sélecteur <code>:root</code> ne s'appliquant pas dans le contexte du shadow DOM.
-                        </p>
-                    </div>
-                </ar-alert>
-            </section>
+            <NarrativeSubheading id="preparez-theme">Préparez votre thème</NarrativeSubheading>
+            <p>
+                Le plus souvent votre application a déjà son propre thème, local à votre code
+                — la technique est la même quel que soit le CSS.<br />
+                Il s'agit de créer à partir de votre fichier CSS une version <code>*.js</code>
+                qui sera utilisée en complément de votre fichier CSS.
+            </p>
+            <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
+            <ar-alert variant="info" without-notification class="doc-callout-alert">
+                <p class="doc-callout-alert-title">N'importez pas les tokens</p>
+                <div class="doc-callout-alert-content">
+                    <p>
+                        Les CSS Custom properties n'ont pas besoin d'être incluses dans cette version JS,
+                        le sélecteur <code>:root</code> ne s'appliquant pas dans le contexte du shadow DOM.
+                    </p>
+                </div>
+            </ar-alert>
 
-            <section id="theme-defaut" class="subsection">
-                <h4 class="subsection-title">Utiliser le thème par défaut</h4>
-                <p>
-                    Si vous utilisez le thème Ariane dans votre projet, celui-ci est packagé en JS
-                    et utilisable via le CDN ou le paquet npm.
-                </p>
+            <NarrativeSubheading id="theme-defaut">Utiliser le thème par défaut</NarrativeSubheading>
+            <p>
+                Si vous utilisez le thème Ariane dans votre projet, celui-ci est packagé en JS
+                et utilisable via le CDN ou le paquet npm.
+            </p>
 
-                <p><strong>Via CDN :</strong></p>
-                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsCdnComponent} /></pre>
+            <p><strong>Via CDN :</strong></p>
+            <pre><code class="language-js" set:text={codeAdoptedStyleSheetsCdnComponent} /></pre>
 
-                <p><strong>Via npm :</strong></p>
-                <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmComponent} /></pre>
-            </section>
-        </section>
+            <p><strong>Via npm :</strong></p>
+            <pre><code class="language-js" set:text={codeAdoptedStyleSheetsNpmComponent} /></pre>
+        </div>
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
