@@ -313,40 +313,16 @@
         --ar-border-radius-full: 9999px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 6. TOKENS COMPOSANTS
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Panel
-         * Partagé - dropdown, breadcrumb, stepper, datepicker
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-panel-bg: var(--ar-color-bg);
-        --ar-panel-text: var(--ar-color-text);
-        --ar-panel-border-color: var(--ar-color-border);
-        --ar-panel-radius: var(--ar-border-radius-md);
-        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
-        --ar-panel-padding: 0.25rem;
-        --ar-panel-min-width: 18rem;
-        --ar-panel-max-width: 18rem;
-        --ar-panel-show-duration: 0.2s;
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Anchor
-         * Partagé — positionnement des composants ancrés / popovers)
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        /* anchor ( */
-        --ar-anchor-distance: 4px;
-        --ar-anchor-offset: 0px;
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Button
-         * Partagé - stepper
-         * Mutualisation de thème pure : jamais consommé dans un .styles.ts
-         * (contrairement à panel.styles.ts) — ce n'est pas un contrat de
-         * composant, seulement le point d'entrée public du preset
-         * buttons.css, réutilisé ici pour garder les ::part() du thème
+         * 6. TOKENS GÉNÉRIQUES MUTUALISÉS
+         * Mutualisation de thème pure : jamais consommés dans un .styles.ts
+         * ou un .ts de composant (contrairement à panel.styles.ts ou
+         * --ar-anchor-*, qui pilotent un mécanisme interne). Chacun est le
+         * point d'entrée public d'un preset externe (buttons.css,
+         * fields.css), réutilisé ici pour garder les ::part() du thème
          * visuellement cohérents avec lui.
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Button — Partagé (stepper) */
         --ar-button-bg: var(--ar-color-interactive);
         --ar-button-bg-hover: var(--ar-color-interactive-hover);
         --ar-button-color: var(--ar-color-text-inverse);
@@ -383,13 +359,7 @@
         --ar-button-ratio-square-width: 2.5rem;
         --ar-button-transition-duration: 0.15s;
 
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Input
-         * Même nature que Button ci-dessus : mutualisation de thème pure,
-         * jamais consommé dans un .styles.ts. Point d'entrée public du
-         * preset fields.css, réutilisé par ar-datepicker::part(input) pour
-         * garder l'input interne visuellement cohérent avec .ar-input.
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* Input — preset fields.css, réutilisé par ar-datepicker::part(input) */
         --ar-input-border-color: var(--ar-color-border);
         --ar-input-radius: var(--ar-border-radius-md);
         --ar-input-bg: var(--ar-color-bg);
@@ -398,14 +368,35 @@
         --ar-input-focus-ring-color: var(--ar-focus-ring-color);
         --ar-input-disabled-bg: var(--ar-color-bg-subtle);
 
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Field gap
-         * Même nature que Input ci-dessus. Point d'entrée public de
-         * .ar-field-group (fields.css), réutilisé par le gap interne
-         * d'ar-datepicker::part(datepicker) pour un espacement uniforme
-         * entre les composants et le light DOM.
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
+           interne d'ar-datepicker::part(datepicker) */
         --ar-field-gap: 0.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 7. TOKENS COMPOSANTS
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Panel
+         * Partagé - dropdown, breadcrumb, stepper, datepicker
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+        --ar-panel-show-duration: 0.2s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Anchor
+         * Partagé — positionnement des composants ancrés / popovers)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* anchor ( */
+        --ar-anchor-distance: 4px;
+        --ar-anchor-offset: 0px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Alert
