@@ -53,13 +53,16 @@
     --doc-text-subtle: var(--doc-text-muted);
     --doc-border: light-dark(var(--doc-line-soft), var(--doc-thread-soft));
     --doc-nav-border: var(--doc-border);
-    --doc-accent: var(--doc-ember);
-    --doc-accent-hover: light-dark(#cc8800, var(--doc-ember-hi));
+    --doc-accent: light-dark(#8f5f00, var(--doc-ember));
+    --doc-accent-hover: light-dark(#805500, var(--doc-ember-hi));
     --doc-accent-bg: light-dark(
         var(--doc-ember-wash),
         color-mix(in srgb, var(--doc-ember) 16%, var(--doc-vault))
     );
-    --doc-accent-border: color-mix(in srgb, var(--doc-ember) 45%, transparent);
+    --doc-accent-border: light-dark(
+        color-mix(in srgb, var(--doc-accent) 80%, transparent),
+        color-mix(in srgb, var(--doc-ember) 45%, transparent)
+    );
     --doc-link-visited: light-dark(
         color-mix(in srgb, var(--doc-ember) 60%, black),
         color-mix(in srgb, var(--doc-ember) 70%, white)
