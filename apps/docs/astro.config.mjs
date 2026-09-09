@@ -57,9 +57,10 @@ function getContentType(filePath) {
 export default defineConfig({
     integrations: [mdx()],
 
-    redirects: {
-        '/getting-started/naming-conventions': '/theming/parts-and-slots',
-    },
+    // '/getting-started/naming-conventions' → '/theming/parts-and-slots' n'est PAS
+    // déclaré ici : la redirection statique d'Astro perd le fragment d'URL
+    // (#semantic-parts, etc.). Page stub dédiée à la place, cf.
+    // src/pages/getting-started/naming-conventions.astro.
 
     vite: {
         resolve: {

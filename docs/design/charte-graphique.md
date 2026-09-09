@@ -32,6 +32,32 @@ Ratios de contraste vérifiés (AAA) : `chalk`/`vault` 13,91:1, `chalk-muted`/`v
 deux modes — inutilisable en texte sur fond clair (1,9:1), il sert de lien et
 d'anneau de focus en sombre.
 
+### Sémantiques
+
+Un seul token par rôle, résolu via `light-dark(clair, sombre)` à partir des
+primitifs ci-dessus.
+
+| Nom                                 | Formule (`light-dark(clair, sombre)`)                                               | Rôle                                          |
+| ----------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------- |
+| `--doc-bg` / `--doc-nav-bg`         | `light-dark(paper, vault)`                                                          | Fond de page / nav                            |
+| `--doc-text`                        | `light-dark(ink, chalk)`                                                            | Texte principal                               |
+| `--doc-text-muted`                  | `light-dark(ink-muted, chalk-muted)`                                                | Texte secondaire                              |
+| `--doc-border` / `--doc-nav-border` | `light-dark(line-soft, thread-soft)`                                                | Traits                                        |
+| `--doc-accent`                      | `light-dark(#8f5f00, ember)`                                                        | Couleur d'accent (liens, focus texte, icônes) |
+| `--doc-accent-hover`                | `light-dark(#805500, ember-hi)`                                                     | Accent au survol                              |
+| `--doc-accent-border`               | `light-dark(color-mix(accent 80%, transparent), color-mix(ember 45%, transparent))` | Bordure d'accent                              |
+| `--doc-focus`                       | `light-dark(ink, ember)`                                                            | Anneau de focus                               |
+| `--doc-link-visited`                | `light-dark(color-mix(ember 60%, black), color-mix(ember 70%, white))`              | Lien visité                                   |
+| `--doc-code-block-bg`               | `light-dark(grove-deep, vault-deep)`                                                | Fond des blocs de code                        |
+| `--doc-header-bg`                   | `light-dark(rgba(255,255,255,.92), rgba(25,29,46,.92))`                             | Fond de header (flouté)                       |
+
+En mode clair, `--doc-accent` vaut `#8f5f00` — un ambre assombri, distinct du
+primitif brut `--doc-ember` (`#ffaa00`), vérifié WCAG AA comme couleur de
+texte. `--doc-ember` échoue le contraste en texte sur fond clair (1,9:1, cf.
+ci-dessus) ; ne jamais « simplifier » `--doc-accent` vers `var(--doc-ember)`
+en mode clair, ça re-casse silencieusement le contraste du texte sur tout le
+site.
+
 ## Typographie
 
 Familles : `--doc-font-display` (Instrument Sans), `--doc-font-body` (Inter).
