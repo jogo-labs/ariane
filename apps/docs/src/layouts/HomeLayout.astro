@@ -70,51 +70,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
             }
         </style>
         <style>
-            /* Page d'accueil : palette claire chaude, indépendante du reste du site
-               de doc (Layout.astro a son propre couple clair/sombre).
-
-               Deux familles de neutres seulement, et jamais mélangées dans un même
-               bloc : « stone » (neutres purs) porte les zones claires, « forest »
-               (vert-noir chaud désaturé) porte les deux bandes sombres. L'ambre
-               n'est jamais une couleur de fond de zone ni une couleur de texte sur
-               fond clair (1,9:1) : uniquement des aplats de bouton, des pastilles
-               et le point terminal du fil. */
-            :root {
-                --doc-paper: #ffffff;
-                --doc-stone: #f5f5f5;
-                --doc-forest: #313a2e;
-                --doc-forest-dark: #252826;
-                --doc-ink: #141414;
-                /* 6,7:1 sur --doc-stone, 7,4:1 sur --doc-paper */
-                --doc-ink-muted: #565656;
-                /* Traits du motif « fil » : le trait plein pour les contours
-                   porteurs, la version diluée pour les filets de structure. */
-                --doc-line: #141414;
-                --doc-line-soft: rgba(20, 20, 20, 0.16);
-                --doc-accent: #ffaa00;
-                --doc-accent-hi: #ffbd2e;
-                --doc-accent-wash: #fff3d6;
-                /* Sur fond sombre : 13,5:1 et 7,6:1 sur --doc-forest */
-                --doc-on-dark: #f5f5f5;
-                --doc-on-dark-muted: #b9bdba;
-                --doc-on-dark-line: rgba(245, 245, 245, 0.18);
-                --doc-code-block-bg: var(--doc-forest-dark);
-
-                /* L'anneau de focus suit le fond : l'ambre ne passe pas sur blanc. */
-                --doc-focus: #141414;
-
-                --font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
-                --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-
-                /* Rayons systématiques : 4 / 12 / 20 / 40. */
-                --r-nano: 4px;
-                --r-micro: 12px;
-                --r-macro: 20px;
-                --r-mega: 40px;
-
-                /* Courbe unique pour tout ce qui réagit au pointeur ou au clavier. */
-                --ease: cubic-bezier(0.83, 0, 0.17, 1);
-            }
+            @import '../styles/doc-tokens.css';
 
             html,
             body {
@@ -122,7 +78,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 min-height: 100vh;
                 background: var(--doc-paper);
                 color: var(--doc-ink);
-                font-family: var(--font-body);
+                font-family: var(--doc-font-body);
                 letter-spacing: -0.01em;
                 -webkit-font-smoothing: antialiased;
             }
@@ -135,11 +91,11 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 padding: 0.5rem 1rem;
                 background: var(--doc-ink);
                 color: var(--doc-paper);
-                border-radius: 0 0 var(--r-nano) var(--r-nano);
+                border-radius: 0 0 var(--doc-radius-sm) var(--doc-radius-sm);
                 text-decoration: none;
                 font-size: 0.85rem;
                 font-weight: 600;
-                transition: top 0.25s var(--ease);
+                transition: top 0.25s var(--doc-ease);
             }
 
             .skip-link:focus {
@@ -150,7 +106,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 position: relative;
                 z-index: 20;
                 width: 100%;
-                background: var(--doc-accent-wash);
+                background: var(--doc-ember-wash);
                 color: var(--doc-ink);
                 border-bottom: 1px solid rgba(20, 20, 20, 0.1);
                 text-align: center;
@@ -183,7 +139,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
             }
 
             .home-logo {
-                font-family: var(--font-display);
+                font-family: var(--doc-font-display);
                 font-size: 1.75rem;
                 font-weight: 600;
                 letter-spacing: -0.03em;
@@ -200,12 +156,12 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 color: var(--doc-ink);
                 border: 1.5px solid transparent;
                 transition:
-                    border-color 0.35s var(--ease),
-                    box-shadow 0.3s var(--ease),
-                    background 0.35s var(--ease);
+                    border-color 0.35s var(--doc-ease),
+                    box-shadow 0.3s var(--doc-ease),
+                    background 0.35s var(--doc-ease);
 
                 &:hover {
-                    color: var(--doc-forest);
+                    color: var(--doc-grove);
                 }
             }
 
