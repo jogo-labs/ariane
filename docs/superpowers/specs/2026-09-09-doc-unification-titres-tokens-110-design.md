@@ -36,18 +36,33 @@ Ce document couvre le premier des deux sous-chantiers décidés pour finir #110 
 
 **Fichier unique** `apps/docs/src/styles/doc-tokens.css`, importé par `HomeLayout.astro` et `Layout.astro` — remplace les deux blocs `<style>` actuellement dupliqués/divergents.
 
-**Structure à 2 niveaux**, proportionnée à la taille réelle du besoin (~15-20 tokens, pas la dizaine de composants de `packages/core`) — pas de 3ᵉ niveau « tokens composants » comme `default.css`, les pages Astro consomment directement le sémantique :
+**Structure à 2 niveaux**, proportionnée à la taille réelle du besoin (~15-20 tokens, pas la dizaine de composants de `packages/core`) — pas de 3ᵉ niveau « tokens composants » comme `default.css`, les pages Astro consomment directement le sémantique.
 
-1. **Palette brute** — un nom par teinte réellement utilisée (neutre clair, accent ambre, teinte sombre à définir), vocabulaire d'objets/matières **propre à Ariane**, pas les mots exacts de Rivian (`stone`/`forest`/`paper`/`ink`) — inspiration, pas copie. Idéalement ancré dans le thème de l'aventure/la découverte/le fil guide déjà porté par le nom du projet. Noms et valeurs de cette échelle **délégués à un brainstorming visuel Opus** (cf. ci-dessous) plutôt que fixés dans cette spec.
-2. **Tokens sémantiques** — `bg`/`text`/`text-muted`/`border`/`accent`/`code-block-bg`/`focus`, chacun aliasé une seule fois via `light-dark(<primitif-clair>, <primitif-sombre>)`.
+**Palette brute** — brainstorming visuel mené avec Opus (3 directions sombres comparées, contraste WCAG calculé). Direction retenue : **Voûte** (indigo nuit) — seule direction où l'on _se guide_ (ciel nocturne) plutôt que de subir l'obscurité, cohérente avec la métaphore du fil d'Ariane, et suffisamment distincte du `forest` déjà utilisé côté clair pour ne pas se lire comme un bug de rendu. Les primitifs clairs qui échoïaient explicitement le vocabulaire Rivian (`stone`, `forest` — cités comme tels dans le commentaire d'origine de `HomeLayout.astro`) sont renommés pour cohérence avec le nouveau vocabulaire sombre ; `paper`/`ink` restent inchangés (déjà suffisamment génériques) :
 
-**Mécanisme dark mode** — même pattern que `packages/core/src/styles/themes/default.css` :
+| Rôle                                           | Primitif clair                                                                                | Valeur                            | Primitif sombre                            | Valeur                                  |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------ | --------------------------------------- |
+| Sol neutre 1                                   | `--doc-paper`                                                                                 | `#ffffff`                         | `--doc-vault`                              | `#191d2e`                               |
+| Sol neutre 2                                   | `--doc-slate` (ex `stone`)                                                                    | `#f5f5f5`                         | `--doc-vault-deep`                         | `#10131f`                               |
+| Bande sombre (zones dédiées, clair uniquement) | `--doc-grove` / `--doc-grove-deep` (ex `forest`/`forest-dark`)                                | `#313a2e` / `#252826`             | —                                          | —                                       |
+| Texte                                          | `--doc-ink` / `--doc-ink-muted`                                                               | `#141414` / `#565656`             | `--doc-chalk` / `--doc-chalk-muted`        | `#e8eaf2` / `#a2a7bd`                   |
+| Traits                                         | `--doc-line` / `--doc-line-soft`                                                              | `#141414` / 16 %                  | `--doc-thread` / `--doc-thread-soft`       | traits porteurs ~37 %, décoratifs ~14 % |
+| Accent                                         | `--doc-ember` / `--doc-ember-hi` / `--doc-ember-wash` (ex `accent`/`accent-hi`/`accent-wash`) | `#ffaa00` / `#ffbd2e` / `#fff3d6` | _(mêmes primitifs, réutilisés tels quels)_ | —                                       |
+
+Ratios vérifiés par Opus (AAA sur toutes les paires critiques) : `chalk`/`vault` 13,91:1, `chalk-muted`/`vault` 7,00:1, `ember`/`vault` 8,76:1, `ink`/`ember` (texte sur bouton plein) 9,65:1. L'ambre ne nécessite aucun recalibrage entre les deux modes — inutilisable en texte sur fond clair (1,9:1), il devient en sombre la couleur de lien et l'anneau de focus (`--doc-focus` : `ink` en clair, `ember` en sombre — l'ambre ne passe pas sur blanc, cf. rationale déjà présent dans `HomeLayout.astro`).
+
+**Tokens sémantiques** — `bg`/`text`/`text-muted`/`border`/`accent`/`code-block-bg`/`focus`, chacun aliasé une seule fois via `light-dark(<primitif-clair>, <primitif-sombre>)` :
 
 ```css
 :root {
     color-scheme: light dark;
-    --doc-bg: light-dark(var(--doc-<primitif-clair>), var(--doc-<primitif-sombre>));
-    --doc-text: light-dark(var(--doc-<primitif-clair>), var(--doc-<primitif-sombre>));
+    --doc-bg: light-dark(var(--doc-paper), var(--doc-vault));
+    --doc-text: light-dark(var(--doc-ink), var(--doc-chalk));
+    --doc-text-muted: light-dark(var(--doc-ink-muted), var(--doc-chalk-muted));
+    --doc-border: light-dark(var(--doc-line-soft), var(--doc-thread-soft));
+    --doc-accent: var(--doc-ember);
+    --doc-code-block-bg: light-dark(var(--doc-grove-deep), var(--doc-vault-deep));
+    --doc-focus: light-dark(var(--doc-ink), var(--doc-ember));
     /* ... un token sémantique par rôle, jamais de bloc dupliqué */
 }
 :root[data-theme='dark'] {
@@ -58,9 +73,9 @@ Ce document couvre le premier des deux sous-chantiers décidés pour finir #110 
 }
 ```
 
-Chaque token sémantique est déclaré **une seule fois** avec `light-dark()`, jamais redéclaré dans un bloc `[data-theme='dark']` séparé.
+Chaque token sémantique est déclaré **une seule fois** avec `light-dark()`, jamais redéclaré dans un bloc `[data-theme='dark']` séparé — élimine la duplication qui a causé la collision initiale.
 
-**Palette sombre — brainstorming Opus dédié** : `HomeLayout.astro` n'a actuellement qu'une palette claire (ambre/stone/forest). Direction thématique retenue pour le mode sombre : bleu nuit/indigo ou vert profond, évoquant l'aventure/la découverte/le guidage par le fil — à explorer visuellement (plusieurs directions comparées, contraste WCAG AA vérifié) avant intégration dans `doc-tokens.css`. Rayons (`--r-nano/micro/macro/mega`, 4/12/20/40), easing (`--ease`) et typo (`--font-display`/`--font-body`) restent inchangés, repris tels quels de `HomeLayout.astro`.
+Rayons (`--r-nano/micro/macro/mega`, 4/12/20/40), easing (`--ease`) et typo (`--font-display`/`--font-body`) restent inchangés, repris tels quels de `HomeLayout.astro` (aucun équivalent dans `Layout.astro` à réconcilier).
 
 **Simplification JS du toggle** : le toggle 3 états (clair/sombre/système) reste dans `Layout.astro`, mais sa logique change — « système » devient l'absence de l'attribut `data-theme` (résolution native via `color-scheme: light dark` + `prefers-color-scheme`, réactive sans listener). Le listener JS `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)` est retiré ; seul le calcul de l'icône affichée (clair/sombre/système) dans le menu reste nécessaire côté JS.
 
