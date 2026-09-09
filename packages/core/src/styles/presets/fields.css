@@ -12,21 +12,23 @@
  * Usage :
  *   <link rel="stylesheet" href="@ariane-ui/core/presets/fields.css">
  *
- *   <label class="ar-label" for="bio">Bio</label>
- *   <textarea class="ar-input" id="bio"></textarea>
- *   <ar-charcounter for="bio" max="150"></ar-charcounter>
+ *   <div class="ar-field-group">
+ *       <label class="ar-label" for="bio">Bio</label>
+ *       <textarea class="ar-input" id="bio"></textarea>
+ *       <ar-charcounter for="bio" max="150"></ar-charcounter>
+ *   </div>
  */
 @layer ariane.presets {
     .ar-input {
         display: block;
         width: 100%;
         padding: 0.5rem 0.75rem;
-        border: 1px solid var(--ar-color-border);
-        border-radius: var(--ar-border-radius-md);
-        background-color: var(--ar-color-bg);
-        color: var(--ar-color-text);
+        border: 1px solid var(--ar-input-border-color);
+        border-radius: var(--ar-input-radius);
+        background-color: var(--ar-input-bg);
+        color: var(--ar-input-color);
         font-family: inherit;
-        font-size: var(--ar-font-size-md);
+        font-size: var(--ar-input-font-size);
         transition: border-color 0.15s;
     }
 
@@ -36,13 +38,14 @@
     }
 
     .ar-input:focus-visible {
-        outline: 2px solid var(--ar-focus-ring-color);
+        outline: 2px solid var(--ar-input-focus-ring-color);
         outline-offset: 1px;
     }
 
     .ar-input:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
+        background-color: var(--ar-input-disabled-bg);
     }
 
     .ar-input[aria-invalid='true'] {
@@ -65,5 +68,17 @@
 
     .ar-label[data-ar-char-state='error'] {
         color: var(--ar-color-danger-text);
+    }
+
+    /* Empile label + champ + éléments liés (compteur, hint…) avec un espacement
+       cohérent avec ar-datepicker (--ar-field-gap, même token). */
+    .ar-field-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--ar-field-gap);
+    }
+
+    .ar-field-group .ar-label {
+        margin-block-end: 0;
     }
 }

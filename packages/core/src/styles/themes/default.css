@@ -379,6 +379,24 @@
         --ar-button-transition-duration: 0.15s;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Input
+         * Consommé par datepicker (interne) et le preset fields.css (externe)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-input-border-color: var(--ar-color-border);
+        --ar-input-radius: var(--ar-border-radius-md);
+        --ar-input-bg: var(--ar-color-bg);
+        --ar-input-color: var(--ar-color-text);
+        --ar-input-font-size: var(--ar-font-size-md);
+        --ar-input-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-input-disabled-bg: var(--ar-color-bg-subtle);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Field gap
+         * Consommé par datepicker (interne) et le preset fields.css (externe)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-field-gap: 0.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Alert
          * Voir les règles complémentaires pour les variants ci-dessous
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -624,14 +642,8 @@
 
     /* Datepicker */
     ar-datepicker {
-        /* Variable locale à ce bloc thème, pas un token public du composant (pas de
-         * préfixe --ar-datepicker-*) : couple gap (::part(datepicker) ci-dessous) et
-         * margin-bottom de ::part(label) plus bas sans exposer d'API. Un autre thème
-         * peut reproduire la même technique avec sa propre variable. */
-        --field-gap: 0.35rem;
-
         &::part(datepicker) {
-            gap: var(--field-gap);
+            gap: var(--ar-field-gap);
         }
 
         &::part(panel) {
@@ -701,9 +713,6 @@
             font-size: var(--ar-font-size-sm);
             font-weight: var(--ar-font-weight-medium);
             color: var(--ar-color-text);
-            /* Complète le --field-gap du :host pour un espacement visuel total de
-             * 0.5rem sous le label — recalculé automatiquement si --field-gap change. */
-            margin-bottom: calc(0.5rem - var(--field-gap));
         }
 
         &::part(hint) {
@@ -720,20 +729,20 @@
             height: var(--ar-button-height);
             box-sizing: border-box;
             padding: 0 0.75rem;
-            border: 1px solid var(--ar-color-border);
+            border: 1px solid var(--ar-input-border-color);
             border-inline-end: none;
-            border-start-start-radius: var(--ar-border-radius-md);
-            border-end-start-radius: var(--ar-border-radius-md);
-            background: var(--ar-color-bg);
-            color: var(--ar-color-text);
-            font-size: var(--ar-font-size-md);
+            border-start-start-radius: var(--ar-input-radius);
+            border-end-start-radius: var(--ar-input-radius);
+            background: var(--ar-input-bg);
+            color: var(--ar-input-color);
+            font-size: var(--ar-input-font-size);
             font-family: inherit;
             outline: none;
             transition: border-color 0.15s ease;
         }
 
         &::part(input):focus-visible {
-            outline: 2px solid var(--ar-focus-ring-color);
+            outline: 2px solid var(--ar-input-focus-ring-color);
             outline-offset: var(--ar-focus-ring-offset);
             border-color: var(--ar-color-interactive);
         }
@@ -746,7 +755,7 @@
         &::part(input):disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background: var(--ar-color-bg-subtle);
+            background: var(--ar-input-disabled-bg);
         }
 
         &::part(trigger) {

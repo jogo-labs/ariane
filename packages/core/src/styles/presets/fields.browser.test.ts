@@ -101,4 +101,24 @@ describe('presets/fields.css', () => {
         input.disabled = true;
         expect(getComputedStyle(input).cursor).to.equal('not-allowed');
     });
+
+    it('ar-field-group empile ses enfants avec le gap --ar-field-gap', () => {
+        const group = document.createElement('div');
+        group.className = 'ar-field-group';
+        container.appendChild(group);
+        const style = getComputedStyle(group);
+        expect(style.display).to.equal('flex');
+        expect(style.flexDirection).to.equal('column');
+        expect(style.gap).to.equal('8px');
+    });
+
+    it('ar-field-group .ar-label neutralise sa marge (gap du groupe suffit)', () => {
+        const group = document.createElement('div');
+        group.className = 'ar-field-group';
+        container.appendChild(group);
+        const label = document.createElement('label');
+        label.className = 'ar-label';
+        group.appendChild(label);
+        expect(getComputedStyle(label).marginBottom).to.equal('0px');
+    });
 });
