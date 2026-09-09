@@ -854,14 +854,16 @@ reset de base (`display: block`, `width: 100%`, `border: none`, `background: tra
 `text-align: left`, curseur, padding) en plus de `:hover`/`:focus-visible` — la règle ad-hoc de
 la home page disparaît intégralement, pas seulement sa portion `:hover`.
 
-**Deux nouveaux tokens** (`--ar-dropdown-item-hover-bg`, `--ar-dropdown-item-hover-color`),
-consommés uniquement par cette règle externe (jamais par le composant, aucun `.styles.ts` créé)
-— dérogation délibérée au critère 4 habituel (« pas de token sans consommation interne ») :
-le mainteneur a explicitement demandé des tokens nommés plutôt qu'une valeur littérale ou une
-classe externalisée à la `.ar-btn-*`, pour qu'un consommateur voie immédiatement comment
-personnaliser le dropdown dans son ensemble via `default.css` seul, sans dépendre d'un fichier
-presets séparé. Valeurs reprises du vocabulaire déjà établi (`--ar-color-neutral-40` + texte
-blanc), même convention que `.ar-btn-secondary:hover` et `ar-datepicker::part(trigger):hover`.
+**Pas de nouveau token, correction après une première version qui en introduisait deux**
+(`--ar-dropdown-item-hover-bg`/`-hover-color`) : revu en relecture de PR — consommés uniquement
+par cette règle externe, jamais par le composant (aucun `.styles.ts` créé pour
+`ar-dropdown-item`), utilisés une seule fois chacun, et référençant déjà un token existant sans
+y ajouter de valeur propre. Aucune des conditions du critère 4 (consommation interne, lecture JS,
+réutilisation ≥ 2 fois) n'est remplie — pas de dérogation, le critère s'applique normalement.
+La règle référence directement `var(--ar-color-bg-subtle)` (fond) — le même token que celui déjà
+utilisé pour un survol subtil ailleurs dans ce fichier (ex. `ar-datepicker::part(input):read-only`).
+Pas de changement de `color` au survol : `--ar-color-text` y est déjà la valeur de base, une
+redéclaration identique sur `:hover` était une déclaration morte, retirée à la même occasion.
 
 `:active` volontairement omis (aucun précédent ne l'exige pour ce type de surface, contrairement
 à `.ar-btn-tertiary`) ; `:focus-visible` pose l'anneau complet (`outline` + `outline-offset`),

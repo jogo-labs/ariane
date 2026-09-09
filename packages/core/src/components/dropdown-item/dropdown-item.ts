@@ -8,9 +8,6 @@ const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1
  * @display docs
  *
  * @slot - Un bouton ou un lien — reçoit automatiquement role="menuitem" et tabIndex=-1.
- *
- * @cssprop --ar-dropdown-item-hover-bg - Couleur de fond du bouton/lien slotté au survol.
- * @cssprop --ar-dropdown-item-hover-color - Couleur du texte du bouton/lien slotté au survol.
  */
 export class ArDropdownItem extends LitElement {
     static override styles = [

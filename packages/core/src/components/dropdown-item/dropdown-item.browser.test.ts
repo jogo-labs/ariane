@@ -85,11 +85,10 @@ describe('ar-dropdown-item — thème par défaut (button slotté)', () => {
     // :hover/:focus-visible ne peuvent pas être forcés de façon fiable en JS pur
     // (pas de vrai pointeur) — on inspecte les règles CSS elles-mêmes.
 
-    it('consomme --ar-dropdown-item-hover-bg/-color au survol', () => {
+    it('consomme --ar-color-bg-subtle au survol', () => {
         const hoverRule = findRule(':hover');
         expect(hoverRule).to.not.equal(undefined, 'règle :hover introuvable');
-        expect(hoverRule?.style.backgroundColor).to.equal('var(--ar-dropdown-item-hover-bg)');
-        expect(hoverRule?.style.color).to.equal('var(--ar-dropdown-item-hover-color)');
+        expect(hoverRule?.style.backgroundColor).to.equal('var(--ar-color-bg-subtle)');
     });
 
     it('pose un anneau de focus visible sur :focus-visible', () => {

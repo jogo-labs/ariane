@@ -469,14 +469,6 @@
         --ar-dropdown-offset: var(--ar-anchor-offset);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Dropdown item
-         * Bouton/lien slotté — ar-dropdown-item n'a aucun style interne
-         * (:host { display: contents }), tout vient d'ici.
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-dropdown-item-hover-bg: var(--ar-color-bg-subtle);
-        --ar-dropdown-item-hover-color: var(--ar-color-text);
-
-        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Dialog
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-dialog-spacing: 1.25rem;
@@ -1067,8 +1059,7 @@
             transition: background-color var(--ar-button-transition-duration);
 
             &:hover {
-                background-color: var(--ar-dropdown-item-hover-bg);
-                color: var(--ar-dropdown-item-hover-color);
+                background-color: var(--ar-color-bg-subtle);
             }
 
             &:focus-visible {
