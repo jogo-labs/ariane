@@ -1040,6 +1040,35 @@
         }
     }
 
+    /* ar-dropdown-item n'a aucun style interne (:host { display: contents }) : le
+       bouton/lien slotté est un vrai nœud du light DOM, ciblé ici directement
+       (::slotted() est hors de portée depuis une feuille externe au shadow root
+       propriétaire du slot). */
+    ar-dropdown-item {
+        :is(button, a):not(:disabled):not([aria-disabled='true']) {
+            display: block;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font: inherit;
+            color: var(--ar-color-text);
+            text-align: left;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--ar-border-radius-sm);
+            transition: background-color var(--ar-button-transition-duration);
+
+            &:hover {
+                background-color: var(--ar-color-bg-subtle);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--ar-focus-ring-color);
+                outline-offset: var(--ar-focus-ring-offset);
+            }
+        }
+    }
+
     ar-pagination {
         &:not([compact])::part(list) {
             column-gap: 0.25rem;

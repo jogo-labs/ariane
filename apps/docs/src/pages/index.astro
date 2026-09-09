@@ -1078,32 +1078,9 @@ const codeDatepicker = `<ar-datepicker
 
         /* Les boutons autonomes (trigger, ouverture de dialog) portent
            .ar-btn/.ar-btn-secondary (presets/buttons.css, #200) — plus besoin
-           de les styliser ici. */
-
-        /* Boutons slottés dans ar-dropdown-item : la librairie est headless,
-           elle ne les stylise pas (#199 doit corriger ça au niveau du
-           composant) — layout d'intégration en menu géré ici en attendant. */
-        ar-dropdown-item button {
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: var(--doc-ink);
-            border: none;
-            border-radius: var(--r-nano);
-            background: transparent;
-            font-weight: 500;
-            width: 100%;
-            display: block;
-            text-align: left;
-            padding: 0.5rem 0.75rem;
-            transition: background 0.25s var(--ease);
-        }
-
-        /* La librairie est headless : elle ne style pas les boutons slottés, l'état
-        survol de la démo se pose donc au niveau de la page. */
-        ar-dropdown-item button:hover {
-            background: var(--doc-stone);
-        }
+           de les styliser ici. Les boutons slottés dans ar-dropdown-item sont
+           désormais stylisés (reset + hover + focus-visible) directement par
+           default.css (#199) — plus rien à faire ici non plus. */
     }
 
     .try-preview-stage {
