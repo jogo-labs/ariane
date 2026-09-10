@@ -545,7 +545,11 @@ git commit -m "refactor(docs): renomme Parts & Slots en Personnalisation avancé
 - Create: `apps/docs/src/components/NextStep.astro`
 - Create: `apps/docs/src/pages/theming/appliquer-un-theme.astro`
 - Modify: `apps/docs/src/styles/doc-prose.css`
-- Modify: `apps/docs/src/pages/getting-started/utilisation.astro` (retrait uniquement — l'ajout des 4 nouvelles sections est fait en Task 6, pour garder cette tâche testable indépendamment sans page à moitié migrée)
+
+Note : cette tâche ne touche pas `utilisation.astro` — son ancien bloc
+"Thème et personnalisation"/"Styles prêts à l'emploi" reste en place jusqu'à
+la réécriture complète du fichier en Task 6, qui retire l'ancien contenu et
+ajoute les 4 nouvelles sections en une seule passe.
 
 **Interfaces:**
 
