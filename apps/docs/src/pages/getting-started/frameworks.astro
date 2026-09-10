@@ -1,0 +1,170 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+
+const tocEntries = [
+    { id: 'react',   label: 'React',   level: 1 as const },
+    { id: 'vue',     label: 'Vue',     level: 1 as const },
+    { id: 'angular', label: 'Angular', level: 1 as const },
+    { id: 'svelte',  label: 'Svelte',  level: 1 as const },
+];
+
+const codeReactUsage = `import { useEffect, useRef } from 'react';
+import '@ariane-ui/core';
+
+function Pagination() {
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const el = ref.current;
+        const onChanged = (event) => console.log(event.detail.to);
+        el.addEventListener('ar-pagination-page-changed', onChanged);
+        return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
+    }, []);
+
+    return <ar-pagination ref={ref} current={1} total={10} />;
+}`;
+
+const codeReactProperty = `// Propriété JS complexe : passe par une ref, comme pour tout DOM node.
+useEffect(() => {
+    if (datepickerRef.current) {
+        datepickerRef.current.isDateDisabled = (date) => date.getDay() === 0;
+    }
+}, []);`;
+
+const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
+<ar-datepicker :is-date-disabled="(date) => date.getDay() === 0" />`;
+
+const codeVueScript = `function onChanged(event) {
+    console.log(event.detail.to);
+}`;
+
+const codeViteConfig = `// vite.config.ts — indique à Vue de ne pas traiter les tags ar-* comme des
+// composants Vue
+export default defineConfig({
+    plugins: [
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag.startsWith('ar-'),
+                },
+            },
+        }),
+    ],
+});`;
+
+const codeAngularTemplate = `<ar-pagination [current]="1" [total]="10" (ar-pagination-page-changed)="onChanged($event)">
+</ar-pagination>
+<ar-datepicker [isDateDisabled]="isSunday"></ar-datepicker>`;
+
+const codeAngularModule = `@NgModule({
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class AppModule {}`;
+
+const codeAngularHandler = `onChanged(event: CustomEvent<{ from: number; to: number }>) {
+    console.log(event.detail.to);
+}
+
+isSunday = (date: Date) => date.getDay() === 0;`;
+
+const codeSvelteScript = `import '@ariane-ui/core';
+
+function onChanged(event) {
+    console.log(event.detail.to);
+}`;
+
+const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination-page-changed={onChanged} />
+<ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
+---
+
+<Layout
+    title="Frameworks"
+    description="Utiliser les composants Ariane avec React, Vue, Angular ou Svelte."
+    currentPath="/getting-started/frameworks"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Frameworks</h2>
+            <p class="summary">
+                Ariane est bâtie sur les Custom Elements natifs — elle fonctionne donc
+                avec n'importe quel framework, sans wrapper dédié. Chaque framework a
+                cependant ses spécificités pour la liaison de propriétés complexes et
+                l'écoute d'événements personnalisés, détaillées ci-dessous.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="react">React</NarrativeHeading>
+            <p>
+                Installez le paquet (<code>npm install @ariane-ui/core</code>) puis
+                importez-le une fois à un point d'entrée global — React ne rend pas les
+                Custom Elements utilisables sans que leur classe soit enregistrée.
+            </p>
+            <pre><code class="language-javascript" set:text={codeReactUsage} /></pre>
+            <p>
+                Une propriété JS complexe (objet, fonction) passe par une ref, comme pour
+                tout DOM node :
+            </p>
+            <pre><code class="language-javascript" set:text={codeReactProperty} /></pre>
+            <p class="hint">
+                React ne convertit pas automatiquement un événement custom kebab-case en
+                prop <code>onX</code> — l'écoute passe toujours par
+                <code>addEventListener</code> via une ref, quelle que soit la version de
+                React.
+            </p>
+
+            <NarrativeHeading id="vue">Vue</NarrativeHeading>
+            <p>
+                Déclarez les tags <code>ar-*</code> comme éléments personnalisés dans la
+                configuration Vite, pour que Vue ne tente pas de les résoudre comme ses
+                propres composants :
+            </p>
+            <pre><code class="language-javascript" set:text={codeViteConfig} /></pre>
+            <p>Dans le template :</p>
+            <pre><code class="language-html" set:text={codeVueTemplate} /></pre>
+            <p>Et le script associé :</p>
+            <pre><code class="language-javascript" set:text={codeVueScript} /></pre>
+            <p class="hint">
+                Vue détecte automatiquement les propriétés JS existantes sur l'élément
+                (comme <code>isDateDisabled</code>) et les affecte directement — pas de
+                binding <code>.prop</code> à ajouter.
+            </p>
+
+            <NarrativeHeading id="angular">Angular</NarrativeHeading>
+            <p>
+                Ajoutez <code>CUSTOM_ELEMENTS_SCHEMA</code> au module qui utilise des
+                composants Ariane, pour qu'Angular accepte des tags inconnus de son
+                compilateur de template :
+            </p>
+            <pre><code class="language-typescript" set:text={codeAngularModule} /></pre>
+            <p>Dans le template :</p>
+            <pre><code class="language-html" set:text={codeAngularTemplate} /></pre>
+            <p>Et le gestionnaire associé :</p>
+            <pre><code class="language-typescript" set:text={codeAngularHandler} /></pre>
+            <p class="hint">
+                Le binding <code>[prop]</code> affecte toujours une propriété JS (jamais
+                un attribut), donc les valeurs complexes passent sans configuration
+                additionnelle.
+            </p>
+
+            <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
+            <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
+            <pre><code class="language-javascript" set:text={codeSvelteScript} /></pre>
+            <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
+            <p class="hint">
+                Svelte reconnaît les tags contenant un tiret comme des custom elements et
+                affecte automatiquement les valeurs non-textuelles en propriété JS plutôt
+                qu'en attribut.
+            </p>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>
