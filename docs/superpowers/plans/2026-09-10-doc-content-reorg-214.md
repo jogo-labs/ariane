@@ -273,6 +273,8 @@ git commit -m "refactor(docs): renomme i18n en Traductions, met à jour tous les
 - Modify: `apps/docs/src/utils/transverse-roles.ts`
 - Modify: `apps/docs/src/components/ComponentApi.astro` (2 liens `/theming/parts-and-slots#semantic-parts`/`#state-parts`, texte "Parts & Slots" — trouvés en implémentation, absents du grep initial de la spec)
 - Modify: `apps/docs/src/styles/doc-table.css` (commentaire référençant `parts-and-slots.astro`)
+- Modify: `apps/docs/src/components/SiteNav.astro` (remplacement du lien `/theming/parts-and-slots` par `/theming/personnalisation-avancee` dans `themingLinks` — trouvé en implémentation ; le reste de la restructuration de nav reste réservé à la Task 8)
+- Commit (contenu déjà correct, jamais committé) : `apps/docs/src/pages/theming/tag-customization.astro` — fichier non tracké depuis le travail exploratoire, désormais référencé par le `SiteNav.astro` fraîchement committé ci-dessus ; doit exister dans l'arbre committé pour éviter un lien mort
 
 **Interfaces:**
 
@@ -1421,13 +1423,17 @@ const gettingStartedLinks: NavLink[] = withCurrent([
 ]);
 
 const themingLinks: NavLink[] = withCurrent([
-    { href: '/theming/parts-and-slots', label: 'Parts & Slots' },
+    { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
     { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
     { href: '/theming/tag-customization', label: 'Personaliser le préfixe des tags' },
 ]);
 
 const resourcesLinks: NavLink[] = withCurrent([]);
 ```
+
+(Le lien `/theming/parts-and-slots` a déjà été corrigé en
+`/theming/personnalisation-avancee` par la Task 3, en même temps que ses
+propres corrections — d'où son absence ici.)
 
 par :
 
