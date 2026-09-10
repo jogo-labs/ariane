@@ -283,3 +283,28 @@ pre code {
     color: var(--doc-text);
     letter-spacing: 0.02em;
 }
+
+/* ── NextStep ──────────────────────────────────────────────────────────
+ * .next-step est rendu par un composant séparé (NextStep.astro) : comme
+ * pour .section-title/.subsection-title, `:global()` est nécessaire pour
+ * que la règle matche à travers la frontière de scope Astro. Le préfixe
+ * `.page-container` reste HORS `:global()` — il est écrit directement dans
+ * chaque page important ce fichier, donc porte bien le scope de CETTE
+ * page, ce qui ajoute la spécificité nécessaire sans rien casser. */
+
+.page-container :global(.next-step) {
+    margin-top: var(--doc-space-section);
+    padding-top: var(--doc-space-subsection);
+    border-top: 1px solid var(--doc-border);
+    font-size: var(--doc-font-size-sm);
+    color: var(--doc-text);
+}
+
+.page-container :global(.next-step ul) {
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+}
+
+.page-container :global(.next-step li + li) {
+    margin-top: 0.35rem;
+}

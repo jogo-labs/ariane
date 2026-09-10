@@ -1,0 +1,34 @@
+---
+/**
+ * NextStep.astro
+ *
+ * Bloc de navigation contextuelle en pied de page narrative — "Prochaine
+ * étape :" suivi d'un lien unique ou d'une liste de liens. Toujours en
+ * sibling de .narrative, à l'intérieur de .page-container (jamais dans
+ * slot="toc").
+ */
+interface StepLink {
+    href:  string;
+    label: string;
+}
+
+interface Props {
+    label: string;
+    links: StepLink[];
+}
+
+const { label, links } = Astro.props;
+---
+
+<p class="next-step">
+    <strong>{label}</strong>
+    {links.length === 1 ? (
+        <a href={links[0].href}>{links[0].label}</a>
+    ) : (
+        <ul>
+            {links.map((link) => (
+                <li><a href={link.href}>{link.label}</a></li>
+            ))}
+        </ul>
+    )}
+</p>
