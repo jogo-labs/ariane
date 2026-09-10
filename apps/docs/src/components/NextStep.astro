@@ -20,7 +20,7 @@ interface Props {
 const { label, links } = Astro.props;
 ---
 
-<p class="next-step">
+<div class="next-step">
     <strong>{label}</strong>
     {links.length === 1 ? (
         <a href={links[0].href}>{links[0].label}</a>
@@ -31,4 +31,4 @@ const { label, links } = Astro.props;
             ))}
         </ul>
     )}
-</p>
+</div>

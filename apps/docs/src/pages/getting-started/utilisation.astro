@@ -14,16 +14,15 @@ const tocEntries = [
     { id: 'methodes',    label: 'Méthodes',                  level: 1 as const },
 ];
 
-const codeHtml = `<ar-alert version="success">
-  <span slot="title">Succès</span>
-  <span slot="content">Votre message a bien été envoyé.</span>
+const codeHtml = `<ar-alert variant="success">
+  Votre message a bien été envoyé.
 </ar-alert>
 
 <ar-spinner></ar-spinner>`;
 
 const codeWhenDefined = `await customElements.whenDefined('ar-alert');
 const alert = document.querySelector('ar-alert');
-alert.setAttribute('version', 'success');`;
+alert.setAttribute('variant', 'success');`;
 
 const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
 await whenAllDefined();
@@ -74,6 +73,7 @@ collapse.show();`;
 
 <Layout
     title="Utilisation"
+    description="Configurer un composant Ariane : attributs, propriétés, slots, événements, méthodes."
     currentPath="/getting-started/utilisation"
     showToc={true}
 >
@@ -112,7 +112,7 @@ collapse.show();`;
 
             <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
             <p>
-                Comme tout élément HTML, les composants Ariane s'configurent par
+                Comme tout élément HTML, les composants Ariane se configurent par
                 <strong>attributs</strong> (valeur texte, visible dans le HTML) ou par
                 <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
                 y compris un objet ou une fonction).

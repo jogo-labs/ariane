@@ -13,14 +13,13 @@ const tocEntries = [
     { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
 ];
 
-const codeAutoloader = `<!-- Charge automatiquement les composants utilisé dans la page ou ses shadow-dom. -->
+const codeAutoloader = `<!-- Charge automatiquement les composants utilisés dans la page ou ses shadow DOM. -->
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
 
 const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></scr` + `ipt>`;
 
-const codeUsage = `<ar-alert version="success">
-  <span slot="title">Succès</span>
-  <span slot="content">Opération réussie.</span>
+const codeUsage = `<ar-alert variant="success">
+  Opération réussie.
 </ar-alert>`;
 
 const codeNpmInstall = `npm install @ariane-ui/core`;
@@ -89,6 +88,10 @@ const codeVsCodeSettings = `{
                 Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
             </p>
             <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
+            <p class="hint">
+                Les composants sont fonctionnels mais visuellement indéfinis sans thème chargé — voir
+                <a href="/theming/appliquer-un-theme">Appliquer un thème</a> pour l'étape suivante.
+            </p>
         </div>
     </div>
 

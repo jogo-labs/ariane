@@ -34,10 +34,14 @@ useEffect(() => {
 }, []);`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
-<ar-datepicker :is-date-disabled="(date) => date.getDay() === 0" />`;
+<ar-datepicker :isDateDisabled="isSunday" />`;
 
 const codeVueScript = `function onChanged(event) {
     console.log(event.detail.to);
+}
+
+function isSunday(date) {
+    return date.getDay() === 0;
 }`;
 
 const codeViteConfig = `// vite.config.ts — indique à Vue de ne pas traiter les tags ar-* comme des
@@ -103,12 +107,12 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
                 importez-le une fois à un point d'entrée global — React ne rend pas les
                 Custom Elements utilisables sans que leur classe soit enregistrée.
             </p>
-            <pre><code class="language-javascript" set:text={codeReactUsage} /></pre>
+            <pre><code class="language-js" set:text={codeReactUsage} /></pre>
             <p>
                 Une propriété JS complexe (objet, fonction) passe par une ref, comme pour
                 tout DOM node :
             </p>
-            <pre><code class="language-javascript" set:text={codeReactProperty} /></pre>
+            <pre><code class="language-js" set:text={codeReactProperty} /></pre>
             <p class="hint">
                 React ne convertit pas automatiquement un événement custom kebab-case en
                 prop <code>onX</code> — l'écoute passe toujours par
@@ -122,15 +126,15 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
                 configuration Vite, pour que Vue ne tente pas de les résoudre comme ses
                 propres composants :
             </p>
-            <pre><code class="language-javascript" set:text={codeViteConfig} /></pre>
+            <pre><code class="language-js" set:text={codeViteConfig} /></pre>
             <p>Dans le template :</p>
             <pre><code class="language-html" set:text={codeVueTemplate} /></pre>
             <p>Et le script associé :</p>
-            <pre><code class="language-javascript" set:text={codeVueScript} /></pre>
+            <pre><code class="language-js" set:text={codeVueScript} /></pre>
             <p class="hint">
-                Vue détecte automatiquement les propriétés JS existantes sur l'élément
-                (comme <code>isDateDisabled</code>) et les affecte directement — pas de
-                binding <code>.prop</code> à ajouter.
+                Vue affecte un binding en propriété JS (plutôt qu'en attribut) uniquement si sa clé
+                correspond exactement à un nom déjà présent sur l'élément — d'où <code>:isDateDisabled</code>
+                en camelCase, et non <code>:is-date-disabled</code>.
             </p>
 
             <NarrativeHeading id="angular">Angular</NarrativeHeading>
@@ -152,14 +156,12 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
 
             <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
             <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
-            <pre><code class="language-javascript" set:text={codeSvelteScript} /></pre>
+            <pre><code class="language-js" set:text={codeSvelteScript} /></pre>
             <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
             <p class="hint">
                 Svelte reconnaît les tags contenant un tiret comme des custom elements et
                 affecte automatiquement les valeurs non-textuelles en propriété JS plutôt
-                qu'en attribut (comportement observé par analogie avec le reste de
-                l'écosystème custom elements ; à vérifier empiriquement avant publication
-                pour une valeur de type fonction comme <code>isDateDisabled</code>).
+                qu'en attribut.
             </p>
         </div>
     </div>
