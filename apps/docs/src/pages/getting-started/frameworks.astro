@@ -76,8 +76,6 @@ function onChanged(event) {
 }`;
 
 const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination-page-changed={onChanged} />
-<!-- à vérifier : affectation en propriété JS pour une fonction (comportement par
-     analogie avec le reste de l'écosystème custom elements, non testé en projet réel) -->
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
 ---
 
@@ -159,7 +157,9 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
             <p class="hint">
                 Svelte reconnaît les tags contenant un tiret comme des custom elements et
                 affecte automatiquement les valeurs non-textuelles en propriété JS plutôt
-                qu'en attribut.
+                qu'en attribut (comportement observé par analogie avec le reste de
+                l'écosystème custom elements ; à vérifier empiriquement avant publication
+                pour une valeur de type fonction comme <code>isDateDisabled</code>).
             </p>
         </div>
     </div>
