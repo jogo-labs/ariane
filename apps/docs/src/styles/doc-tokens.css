@@ -1,0 +1,117 @@
+/**
+ * doc-tokens.css
+ *
+ * Tokens --doc-* unifiés pour tout apps/docs (home + pages de contenu + pages
+ * composant). Structure à 2 niveaux : primitifs (palette brute nommée par
+ * objet/matière) → sémantique (light-dark(), un seul token par rôle).
+ *
+ * Palette sombre "Voûte" (indigo nuit) choisie après brainstorming visuel
+ * (3 directions comparées, contraste WCAG vérifié) — cf.
+ * docs/superpowers/specs/2026-09-09-doc-unification-titres-tokens-110-design.md
+ * section 1. Les primitifs qui échoïaient explicitement le vocabulaire Rivian
+ * (stone/forest) sont renommés (slate/grove) ; paper/ink restent inchangés.
+ */
+
+:root {
+    color-scheme: light dark;
+
+    /* ─── Primitifs clairs ──────────────────────────────────────────── */
+    --doc-paper: #ffffff;
+    --doc-slate: #f5f5f5;
+    --doc-grove: #313a2e;
+    --doc-grove-deep: #252826;
+    --doc-ink: #141414;
+    --doc-ink-muted: #565656;
+    --doc-line: #141414;
+    --doc-line-soft: rgba(20, 20, 20, 0.16);
+    --doc-ember: #ffaa00;
+    --doc-ember-hi: #ffbd2e;
+    --doc-ember-wash: #fff3d6;
+    /* Texte sur les bandes .doc-grove (zones sombres dédiées du thème clair,
+       ex. footer home) — distinct du mode sombre du site. */
+    --doc-on-dark: #f5f5f5;
+    --doc-on-dark-muted: #b9bdba;
+    --doc-on-dark-line: rgba(245, 245, 245, 0.18);
+
+    /* ─── Primitifs sombres (Voûte) ─────────────────────────────────── */
+    --doc-vault: #191d2e;
+    --doc-vault-deep: #10131f;
+    --doc-chalk: #e8eaf2;
+    --doc-chalk-muted: #a2a7bd;
+    /* Traits porteurs (bordure de champ, séparateur actif) : ~37% opacité
+       pour rester ≥3:1. Traits décoratifs : ~14%, purement visuel. */
+    --doc-thread: rgba(232, 234, 242, 0.37);
+    --doc-thread-soft: rgba(232, 234, 242, 0.14);
+
+    /* ─── Tokens sémantiques ────────────────────────────────────────── */
+    --doc-bg: light-dark(var(--doc-paper), var(--doc-vault));
+    --doc-nav-bg: var(--doc-bg);
+    --doc-text: light-dark(var(--doc-ink), var(--doc-chalk));
+    --doc-text-muted: light-dark(var(--doc-ink-muted), var(--doc-chalk-muted));
+    /* Fusionné avec text-muted : les deux rôles n'étaient distingués que par
+       une nuance de gris, pas assez pour justifier un 3e ton de texte. */
+    --doc-text-subtle: var(--doc-text-muted);
+    --doc-border: light-dark(var(--doc-line-soft), var(--doc-thread-soft));
+    --doc-nav-border: var(--doc-border);
+    --doc-accent: light-dark(#8f5f00, var(--doc-ember));
+    --doc-accent-hover: light-dark(#805500, var(--doc-ember-hi));
+    --doc-accent-bg: light-dark(
+        var(--doc-ember-wash),
+        color-mix(in srgb, var(--doc-ember) 16%, var(--doc-vault))
+    );
+    --doc-accent-border: light-dark(
+        color-mix(in srgb, var(--doc-accent) 80%, transparent),
+        color-mix(in srgb, var(--doc-ember) 45%, transparent)
+    );
+    --doc-link-visited: light-dark(
+        color-mix(in srgb, var(--doc-ember) 60%, black),
+        color-mix(in srgb, var(--doc-ember) 70%, white)
+    );
+    --doc-code-block-bg: light-dark(var(--doc-grove-deep), var(--doc-vault-deep));
+    --doc-nav-bg-hover: light-dark(var(--doc-slate), var(--doc-vault-deep));
+    --doc-focus: light-dark(var(--doc-ink), var(--doc-ember));
+    --doc-header-bg: light-dark(rgba(255, 255, 255, 0.92), rgba(25, 29, 46, 0.92));
+    --doc-header-h: 3.25rem;
+    --doc-alpha-banner-h: 2rem;
+
+    /* ─── Rayons (vocabulaire rationalisé sur --ar-border-radius-*) ────── */
+    --doc-radius-sm: 4px;
+    --doc-radius-md: 12px;
+    --doc-radius-lg: 20px;
+    --doc-radius-xl: 40px;
+
+    /* ─── Easing / typo ─────────────────────────────────────────────── */
+    --doc-ease: cubic-bezier(0.83, 0, 0.17, 1);
+    --doc-font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+    --doc-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* ─── Échelle typographique (vocabulaire rationalisé sur --ar-font-size-* et --ar-font-weight-*) ─── */
+    --doc-font-size-xs: 0.75rem;
+    --doc-font-size-sm: 0.9rem;
+    --doc-font-size-md: 1.05rem;
+    --doc-font-size-lg: 1.25rem;
+    --doc-font-size-xl: 2rem;
+    --doc-font-weight-normal: 400;
+    --doc-font-weight-medium: 500;
+    /* 4e palier (absent de --ar-font-weight-*) : c'est la graisse réellement
+       utilisée par tous les titres existants (section-title, subsection-title,
+       narrative h3/h4) — un choix fidèle aux valeurs réelles prime sur le
+       calque exact de default.css (qui n'en a pas besoin, aucun composant
+       n'utilise 600). */
+    --doc-font-weight-semibold: 600;
+    --doc-font-weight-bold: 700;
+
+    /* ─── Rythme vertical (rôles sémantiques, pas une échelle abstraite —
+       cf. spec section 1, écart assumé à --ar-spacing-*) ────────────── */
+    --doc-space-paragraph: 1rem;
+    --doc-space-subsection: 1.5rem;
+    --doc-space-section: 2.5rem;
+}
+
+:root[data-theme='dark'] {
+    color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+    color-scheme: light;
+}

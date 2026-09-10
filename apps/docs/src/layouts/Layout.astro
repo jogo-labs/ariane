@@ -36,10 +36,9 @@ const {
         <script is:inline>
             (function () {
                 var stored = localStorage.getItem('ariane-theme') || 'system';
-                var theme = stored === 'system'
-                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-                    : stored;
-                document.documentElement.setAttribute('data-theme', theme);
+                if (stored === 'light' || stored === 'dark') {
+                    document.documentElement.setAttribute('data-theme', stored);
+                }
                 document.documentElement.dataset.themeMode = stored;
             })();
         </script>
@@ -113,6 +112,8 @@ const {
             }
         </style>
         <style>
+            @import '../styles/doc-tokens.css';
+
             *, *::before, *::after { box-sizing: border-box; }
 
             .alpha-banner {
@@ -132,51 +133,6 @@ const {
                 color:           inherit;
                 font-weight:     600;
                 text-underline-offset: 2px;
-            }
-
-            :root {
-                /* Palette light — blanc froid/cobalt */
-                --doc-bg:             #fafbfc;
-                --doc-nav-bg:         #fafbfc;
-                --doc-text:           #14181f;
-                --doc-text-muted:     #6b7280;
-                --doc-text-subtle:    #4b5563;
-                --doc-border:         #e4e7ec;
-                --doc-nav-border:     #e4e7ec;
-                --doc-accent:         #2955a8;
-                --doc-accent-hover:   #21437f;
-                --doc-accent-bg:      #eaf1fb;
-                --doc-accent-border:  #c7d9f0;
-                --doc-link-visited:   #1f3b73;
-                --doc-code-bg:        #f3f4f6;
-                --doc-code-block-bg:  #0d1219;
-                --doc-header-bg:      rgba(250,251,252,0.92);
-                --doc-header-h:       3.25rem;
-                --doc-alpha-banner-h: 2rem;
-                --doc-nav-bg-hover: #eaf1fb;
-            }
-
-            [data-theme="dark"] {
-                --doc-bg:             #161b22;
-                --doc-nav-bg:         #161b22;
-                --doc-text:           #e6edf3;
-                --doc-text-muted:     #8b949e;
-                --doc-text-subtle:    #cdd6f4;
-                --doc-border:         #30363d;
-                --doc-nav-border:     #30363d;
-                --doc-header-bg:      rgba(22,27,34,0.92);
-                --doc-accent:         #6fa0e0;
-                --doc-accent-hover:   #4c86d6;
-                --doc-accent-bg:      #1b2a40;
-                --doc-accent-border:  #2c4568;
-                /* Teinte dédiée, plus claire, pour garantir l'AA texte (9.63:1) —
-                   --doc-accent-hover ne vise que le contraste UI (3:1), pas texte. */
-                --doc-link-visited:   #9cc5f5;
-                --doc-cta-bg:         #16233a;
-                --doc-cta-border:     #223655;
-                --doc-code-bg:        #1e1e2e;
-                --doc-code-block-bg:  #0d1219;
-                --doc-nav-bg-hover: #1b2a40;
             }
 
             html {
@@ -550,12 +506,6 @@ const {
         <script>
             // ── Thème (Light / Auto / Dark) ────────────────────────────────────────
 
-            function resolveTheme(mode: string): 'light' | 'dark' {
-                if (mode === 'dark')  return 'dark';
-                if (mode === 'light') return 'light';
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-
             const THEME_ICONS: Record<string, string> = {
                 light:  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
                 dark:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>',
@@ -580,8 +530,11 @@ const {
             }
 
             function applyMode(mode: string) {
-                const theme = resolveTheme(mode);
-                document.documentElement.setAttribute('data-theme', theme);
+                if (mode === 'light' || mode === 'dark') {
+                    document.documentElement.setAttribute('data-theme', mode);
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
                 document.documentElement.dataset.themeMode = mode;
                 setTriggerIcon(mode);
                 document.querySelectorAll<HTMLElement>('ar-dropdown-item[data-theme-mode]').forEach((item) => {
@@ -606,12 +559,6 @@ const {
                     const dd = document.getElementById('theme-dropdown') as HTMLElement & { open?: boolean };
                     if (dd) dd.open = false;
                 });
-            });
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
-                    applyMode('system');
-                }
             });
 
             // ── Nav burger ─────────────────────────────────────────────────────────

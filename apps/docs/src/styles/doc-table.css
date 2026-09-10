@@ -2,7 +2,7 @@
  * doc-table.css
  *
  * Styles partagés pour les tableaux et titres de section de la documentation :
- * utilisés par ComponentApi.astro et naming-conventions.astro.
+ * utilisés par ComponentApi.astro et parts-and-slots.astro.
  */
 
 .table-wrap {

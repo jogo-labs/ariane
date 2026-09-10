@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const tocEntries = [
     { id: 'prerequis',      label: 'Prérequis',         level: 1 as const },
@@ -79,112 +81,88 @@ const codeVsCodeSettings = `{
         </div>
 
 
-        <section id="cdn" class="main-section">
-            <div>
-                <h3 class="section-title">Via CDN <span class="badge">Recommandé</span></h3>
-                <p>
-                    La méthode la plus rapide — aucun outil requis. Ajoutez les deux balises dans
-                    votre <code>&lt;head&gt;</code> et utilisez les composants directement en HTML.
-                </p>
-            </div>
+        <div class="narrative">
+            <NarrativeHeading id="cdn">Via CDN <span class="badge">Recommandé</span></NarrativeHeading>
+            <p>
+                La méthode la plus rapide — aucun outil requis. Ajoutez les deux balises dans
+                votre <code>&lt;head&gt;</code> et utilisez les composants directement en HTML.
+            </p>
 
-            <section id="autoloader" class="subsection">
-                <h4 class="subsection-title">Autoloader <span class="badge badge-subtle">À privilégier</span></h4>
-                <p>
-                    Ne charge chaque composant que lorsqu'il est utilisé dans la page.
-                    Idéal pour la plupart des projets CDN.
-                </p>
-                <pre><code class="language-html" set:text={codeAutoloader} /></pre>
-                <p class="hint">
-                    Les deux balises sont requises : le script enregistre les composants,
-                    le CSS fournit le thème.
-                </p>
-                <p class="hint">
-                    En développement local, remplacez <code>autoloader.prod.js</code> par
-                    <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
-                </p>
-                <p>Les composants sont ensuite utilisables directement :</p>
-                <pre><code class="language-html" set:text={codeUsage} /></pre>
-            </section>
+            <NarrativeSubheading id="autoloader">Autoloader <span class="badge badge-subtle">À privilégier</span></NarrativeSubheading>
+            <p>
+                Ne charge chaque composant que lorsqu'il est utilisé dans la page.
+                Idéal pour la plupart des projets CDN.
+            </p>
+            <pre><code class="language-html" set:text={codeAutoloader} /></pre>
+            <p class="hint">
+                Les deux balises sont requises : le script enregistre les composants,
+                le CSS fournit le thème.
+            </p>
+            <p class="hint">
+                En développement local, remplacez <code>autoloader.prod.js</code> par
+                <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
+            </p>
+            <p>Les composants sont ensuite utilisables directement :</p>
+            <pre><code class="language-html" set:text={codeUsage} /></pre>
 
-            <section id="bundle" class="subsection">
-                <h4 class="subsection-title">Bundle complet</h4>
-                <p>
-                    Charge tous les composants en une seule requête. Adapté si vous utilisez
-                    beaucoup de composants ou souhaitez éviter les imports dynamiques.
-                </p>
-                <pre><code class="language-html" set:text={codeBundle} /></pre>
-            </section>
+            <NarrativeSubheading id="bundle">Bundle complet</NarrativeSubheading>
+            <p>
+                Charge tous les composants en une seule requête. Adapté si vous utilisez
+                beaucoup de composants ou souhaitez éviter les imports dynamiques.
+            </p>
+            <pre><code class="language-html" set:text={codeBundle} /></pre>
 
-            <section id="prefix" class="subsection">
-                <h4 class="subsection-title">Renommer les tags</h4>
-                <p>
-                    Pour éviter toute collision avec une autre librairie, ou adopter votre propre
-                    convention de nommage, définissez <code>window.ARIANE_CONFIG.prefix</code>
-                    <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
-                </p>
-                <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
-                <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
-                <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
-                <p class="hint">
-                    Le préfixe par défaut est <code>ar</code>. Un seul préfixe global s'applique
-                    à tous les composants — pour un renommage libre par composant, voir
-                    l'<a href="#headless-import">import headless</a> côté npm.
-                </p>
-            </section>
-        </section>
+            <NarrativeSubheading id="prefix">Renommer les tags</NarrativeSubheading>
+            <p>
+                Pour éviter toute collision avec une autre librairie, ou adopter votre propre
+                convention de nommage, définissez <code>window.ARIANE_CONFIG.prefix</code>
+                <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
+            </p>
+            <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
+            <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
+            <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
+            <p class="hint">
+                Le préfixe par défaut est <code>ar</code>. Un seul préfixe global s'applique
+                à tous les composants — pour un renommage libre par composant, voir
+                l'<a href="#headless-import">import headless</a> côté npm.
+            </p>
 
-        <section id="npm" class="main-section">
-            <div>
-                <h3 class="section-title">Setup avancé <span class="badge">Avec bundler</span></h3>
-                <p>
-                    Pour les projets utilisant Vite, Webpack, Rollup ou tout autre bundler.
-                </p>
-                <pre><code class="language-bash" set:text={codeNpmInstall} /></pre>
-            </div>
+            <NarrativeHeading id="npm">Setup avancé <span class="badge">Avec bundler</span></NarrativeHeading>
+            <p>
+                Pour les projets utilisant Vite, Webpack, Rollup ou tout autre bundler.
+            </p>
+            <pre><code class="language-bash" set:text={codeNpmInstall} /></pre>
 
-            <section class="subsection">
-                <h4 class="subsection-title">Import global</h4>
-                <p>Enregistre tous les composants en une seule ligne :</p>
-                <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
-            </section>
+            <NarrativeSubheading>Import global</NarrativeSubheading>
+            <p>Enregistre tous les composants en une seule ligne :</p>
+            <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
 
-            <section class="subsection">
-                <h4 class="subsection-title">
-                    Import individuel <span class="badge badge-subtle">Tree-shaking</span>
-                </h4>
-                <p>Pour inclure uniquement les composants effectivement utilisés :</p>
-                <pre><code class="language-typescript" set:text={codeNpmIndividuel} /></pre>
-            </section>
+            <NarrativeSubheading>Import individuel <span class="badge badge-subtle">Tree-shaking</span></NarrativeSubheading>
+            <p>Pour inclure uniquement les composants effectivement utilisés :</p>
+            <pre><code class="language-typescript" set:text={codeNpmIndividuel} /></pre>
 
-            <section id="headless-import" class="subsection">
-                <h4 class="subsection-title">
-                    Import headless <span class="badge badge-subtle">Renommage libre</span>
-                </h4>
-                <p>
-                    Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
-                    tags <code>ar-*</code> par défaut, importez les classes depuis
-                    <code>@ariane-ui/core/headless</code> — aucun enregistrement automatique,
-                    vous appelez <code>customElements.define()</code> vous-même :
-                </p>
-                <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
-                <p class="hint">
-                    Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
-                    composant individuellement.
-                </p>
-            </section>
+            <NarrativeSubheading id="headless-import">Import headless <span class="badge badge-subtle">Renommage libre</span></NarrativeSubheading>
+            <p>
+                Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
+                tags <code>ar-*</code> par défaut, importez les classes depuis
+                <code>@ariane-ui/core/headless</code> — aucun enregistrement automatique,
+                vous appelez <code>customElements.define()</code> vous-même :
+            </p>
+            <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
+            <p class="hint">
+                Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
+                composant individuellement.
+            </p>
 
-            <section id="ide-autocomplete" class="subsection">
-                <h4 class="subsection-title">Autocomplétion IDE</h4>
-                <p>
-                    Le paquet npm publie des fichiers de données VS Code générés automatiquement
-                    depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
-                    de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
-                    Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
-                </p>
-                <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
-            </section>
-        </section>
+            <NarrativeSubheading id="ide-autocomplete">Autocomplétion IDE</NarrativeSubheading>
+            <p>
+                Le paquet npm publie des fichiers de données VS Code générés automatiquement
+                depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
+                de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
+                Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
+            </p>
+            <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
+        </div>
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
@@ -192,8 +170,4 @@ const codeVsCodeSettings = `{
 
 <style>
     @import '../../styles/doc-prose.css';
-
-    .hint {
-        margin-top: -0.5rem;
-    }
 </style>

@@ -25,58 +25,127 @@
     }
 }
 
-.page-title {
+/* ── Rythme vertical ──────────────────────────────────────────────────
+ * Règles : (1) séparation (avant un titre) vs groupement (entre éléments
+ * de contenu liés) sont deux natures d'espacement distinctes ; (2) le
+ * margin-top d'un titre est toujours strictement supérieur à son
+ * margin-bottom (un titre colle à ce qu'il introduit) ; (3) le poids de
+ * la coupure suit le niveau (section > sous-section) ; (4) owl-selector :
+ * l'espacement ne s'applique qu'entre éléments adjacents, jamais en
+ * margin-bottom fixe ; (5) le premier titre après .page-title n'a pas de
+ * double espace. */
+
+:global(.page-title) {
     color: var(--doc-text);
-    font-size: 2rem;
+    font-size: var(--doc-font-size-xl);
+    font-weight: var(--doc-font-weight-bold);
     margin: 0;
 }
 
-.page-title + .page-content {
-    margin-top: 1.5rem;
-}
-
-.main-section,
-.subsection {
-    display: flex;
-    flex-direction: column;
-}
-
-.main-section {
-    gap: 2rem;
-
-    > div p {
-        margin: 0;
-    }
-}
-
-.subsection {
-    gap: 1rem;
-
-    p {
-        margin: 0;
-    }
-}
-
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+:global(.section-title) {
+    font-size: var(--doc-font-size-lg);
+    font-weight: var(--doc-font-weight-semibold);
     border-bottom: 2px solid var(--doc-border);
     padding-bottom: 1rem;
-    margin: 0 0 2rem;
+    margin: 0;
     color: var(--doc-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.subsection-title {
-    font-size: 1.05rem;
-    font-weight: 600;
+:global(.subsection-title) {
+    font-size: var(--doc-font-size-md);
+    font-weight: var(--doc-font-weight-semibold);
     color: var(--doc-text-subtle);
     margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.narrative :global(p) {
+    font-size: var(--doc-font-size-sm);
+    line-height: 1.75;
+    color: var(--doc-text);
+    margin: 0;
+}
+
+.narrative :global(.narrative-list) {
+    font-size: var(--doc-font-size-sm);
+    line-height: 1.75;
+    color: var(--doc-text);
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+/* Owl-selector overrides — déclarées après les règles de base ci-dessus
+ * (qui posent margin: 0 sur les titres/le contenu narratif) : elles
+ * doivent gagner la cascade pour ces mêmes éléments. `:where()` reste
+ * utilisé pour la partie qui ne cible pas l'élément stylé lui-même
+ * (matcher du sibling précédent — `.page-title`, `.section-title`,
+ * `.subsection-title`, contexte ancêtre `.narrative`) — sa spécificité n'a
+ * pas besoin d'être renforcée. `:is()` est en revanche systématiquement
+ * utilisé pour la partie qui cible l'élément stylé lui-même, à gauche du
+ * `>` (`.section-title`/`h3`, `.subsection-title`/`h4`) COMME à droite du
+ * `+` (liste explicite des éléments de contenu légitimes — jamais de `*`
+ * générique, qui retombe à spécificité nulle) : `:is()` propage la
+ * spécificité du sélecteur le plus spécifique de sa liste, contrairement
+ * à `:where()` et à `*` qui sont toujours à spécificité nulle — nécessaire
+ * ici pour battre `.section-title { margin: 0 }`, `.narrative p
+ * { margin: 0 }`, `.narrative .narrative-list { margin: 0 }`, etc. sur le
+ * même élément. */
+
+/* Préfixe ancêtre (`.page-header` / `.narrative`) laissé HORS de `:global()` :
+ * Astro le scope (attribut data-astro-cid-*) comme n'importe quel sélecteur
+ * de style local, ce qui ajoute la spécificité nécessaire pour battre les
+ * règles de base scopées ci-dessus (`.summary[data-astro-cid] { margin: 0 }`,
+ * `.narrative[data-astro-cid] p { margin: 0 }`, etc.) — un `:global()` pur,
+ * sans préfixe scopé, reste à spécificité quasi nulle et ne peut pas gagner
+ * la cascade face à ces règles. */
+
+.page-header
+    :global(
+        :where(.page-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+.narrative
+    :global(
+        :where(.section-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-subsection);
+}
+
+.narrative
+    :global(
+        :where(.subsection-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+:global(.narrative > :is(.section-title, h3)) {
+    margin-top: var(--doc-space-section);
+}
+
+:global(.narrative > :is(.section-title, h3):first-child) {
+    margin-top: 0;
+}
+
+:global(.narrative :is(.subsection-title, h4)) {
+    margin-top: var(--doc-space-subsection);
+}
+
+.narrative
+    :global(
+        :where(p, ul, ol, pre, table, .table-wrap)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap)
+    ) {
+    margin-top: var(--doc-space-paragraph);
 }
 
 .summary {

@@ -28,4 +28,4 @@ const text = await Astro.slots.render('default');
 const plainText = text.replace(/<[^>]+>/g, '').trim();
 const slug = id ?? new GithubSlugger().slug(plainText);
 ---
-<h3 id={slug} {...rest}><slot /></h3>
+<h3 id={slug} class="section-title" {...rest}><slot /></h3>
