@@ -269,6 +269,11 @@ datepicker.isDateDisabled = (date) => date.getDay() === 0;`;
     Les slots disponibles pour chaque composant sont documentés dans sa
     Référence API, section « Slots ».
 </p>
+<p class="hint">
+    Pour plus d'information sur ce sujet, voir la
+    <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_templates_and_slots"
+    target="_blank" rel="noopener">documentation complète sur MDN</a>.
+</p>
 ```
 
 ```js
@@ -302,6 +307,11 @@ const codeNamedSlot = `<ar-collapse>
     La liste complète des événements de chaque composant, avec le type de
     leur <code>detail</code>, est documentée dans sa Référence API, section
     « Événements ».
+</p>
+<p class="hint">
+    Pour plus d'information sur ce sujet, voir la
+    <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
+    target="_blank" rel="noopener">documentation complète sur MDN</a>.
 </p>
 ```
 
@@ -659,6 +669,17 @@ sous l'entrée `personnalisation`/tokens existante.
 ## Contraintes globales
 
 - Tout le contenu reste en français (site 100% français).
+- Motif "documentation complète" : quand un concept de la page Utilisation
+  (§3) correspond à une page MDN de référence claire et univoque, fermer la
+  section par un `<p class="hint">Pour plus d'information sur ce sujet, voir
+la <a href="..." target="_blank" rel="noopener">documentation complète sur
+MDN</a>.</p>` — cible `developer.mozilla.org/fr/...` (version française).
+  Retenu pour **Slots** (`Web/API/Web_components/Using_templates_and_slots`)
+  et **Événements** (`Web/API/CustomEvent`). Volontairement absent
+  d'**Attributs & propriétés** et **Méthodes** : aucune page MDN unique ne
+  couvre la distinction attribut/propriété ou l'appel de méthode sur un
+  élément de façon aussi ciblée — à ne pas forcer un lien qui ne serait
+  qu'approximatif.
 - Chaque nouvelle page importe `doc-prose.css` (et `doc-table.css` si elle
   contient un tableau), suit le patron `Layout` + `.page-container` +
   `.page-header` + `.narrative` déjà en place partout (cf. #110).
