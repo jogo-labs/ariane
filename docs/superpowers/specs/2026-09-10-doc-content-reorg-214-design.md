@@ -49,8 +49,8 @@ Bien démarrer
 
 Thème & Personnalisation
   ├─ Overview                    /theming/overview                 (nouvelle, §4)
-  ├─ Appliquer un thème          /theming/appliquer-un-theme        (nouvelle, contenu extrait d'Utilisation)
-  ├─ Styles prêts à l'emploi     /theming/styles-prets-a-l-emploi   (nouvelle, contenu extrait d'Utilisation)
+  ├─ Appliquer un thème          /theming/appliquer-un-theme        (nouvelle, contenu extrait d'Utilisation
+  │                                                                   + sous-section Styles prêts à l'emploi, §9)
   ├─ Personnalisation avancée    /theming/personnalisation-avancee  (ex parts-and-slots.astro, renommée, §6)
   └─ Dans un shadow DOM applicatif /theming/shadow-dom              (déjà déplacée, corrections §Contexte)
 
@@ -84,7 +84,6 @@ const gettingStartedLinks: NavLink[] = withCurrent([
 const themingLinks: NavLink[] = withCurrent([
     { href: '/theming/overview', label: 'Overview' },
     { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
-    { href: '/theming/styles-prets-a-l-emploi', label: "Styles prêts à l'emploi" },
     { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
     { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
 ]);
@@ -104,8 +103,8 @@ inséré entre le bloc Theming et le bloc Resources.
 
 ## 2. Motif "Prochaine étape"
 
-Nouveau motif réutilisé sur 4 pages (Utilisation, Overview, Appliquer un
-thème, Styles prêts à l'emploi) : un bloc de navigation contextuelle placé
+Nouveau motif réutilisé sur 3 pages (Utilisation, Overview, Appliquer un
+thème) : un bloc de navigation contextuelle placé
 en sibling de `.narrative`, à l'intérieur de `.page-container` (donc dans le
 flux principal, hors TOC — qui reste dans `slot="toc"`). Composant dédié
 `NextStep.astro` :
@@ -170,7 +169,6 @@ Usage en fin de page Overview (liste) :
     label="Prochaine étape : choisissez votre point d'entrée"
     links={[
         { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
-        { href: '/theming/styles-prets-a-l-emploi', label: 'Styles prêts à l\'emploi' },
         { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
         { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
     ]}
@@ -193,10 +191,10 @@ Plan final de la page, dans l'ordre :
 
 Les blocs "Thème et personnalisation" et "Styles prêts à l'emploi" actuels
 (lignes 99–158 du fichier actuel) sont **retirés** de cette page — leur
-contenu migre tel quel vers `theming/appliquer-un-theme.astro` et
-`theming/styles-prets-a-l-emploi.astro` (§9), `tocEntries` mis à jour en
-conséquence (entrées `personnalisation`/`presets` retirées, `attributs`,
-`slots`, `evenements`, `methodes` ajoutées).
+contenu migre tel quel vers `theming/appliquer-un-theme.astro`, le second
+comme sous-section du premier (§9), `tocEntries` mis à jour en conséquence
+(entrées `personnalisation`/`presets` retirées, `attributs`, `slots`,
+`evenements`, `methodes` ajoutées).
 
 Ton : chaque section part d'une phrase générale (le concept, valable pour
 tout custom element) puis l'illustre avec un composant Ariane réel, et
@@ -403,6 +401,11 @@ d'expérimenté peut sauter directement à la page qui l'intéresse.
             </div>
 
             <p class="hint">
+                Les tokens et les <code>::part()</code> couvrent l'intérieur des composants —
+                les styles prêts à l'emploi sont documentés comme complément, dans la page
+                <a href="/theming/appliquer-un-theme#presets">Appliquer un thème</a>.
+            </p>
+            <p class="hint">
                 Si vous découvrez tout juste les Custom Elements, commencez par
                 <a href="/theming/appliquer-un-theme">Appliquer un thème</a> — les autres
                 pages partent du principe que le thème par défaut est chargé.
@@ -413,7 +416,6 @@ d'expérimenté peut sauter directement à la page qui l'intéresse.
             label="Prochaine étape : choisissez votre point d'entrée"
             links={[
                 { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
-                { href: '/theming/styles-prets-a-l-emploi', label: 'Styles prêts à l\'emploi' },
                 { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
                 { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
             ]}
@@ -613,9 +615,7 @@ changement de contenu ni d'URL**, uniquement un changement de groupe de nav
 sous `theming/` (son URL ne change pas) : seule l'entrée dans
 `SiteNav.astro` change de tableau (`themingLinks` → `advancedUsageLinks`).
 
-## 9. Pages extraites d'Utilisation
-
-### 9.1 Appliquer un thème
+## 9. Page Appliquer un thème (extraite d'Utilisation)
 
 Fichier : `apps/docs/src/pages/theming/appliquer-un-theme.astro` (nouveau).
 Contenu repris à l'identique du bloc "Thème et personnalisation" actuel de
@@ -623,23 +623,31 @@ Contenu repris à l'identique du bloc "Thème et personnalisation" actuel de
 paragraphe headless, sous-sections "Charger un thème", "Personnaliser une
 instance", "Personnaliser toute la librairie") — seul l'habillage change
 (`h2.page-title` = "Appliquer un thème à vos composants",
-`currentPath="/theming/appliquer-un-theme"`), plus un `<NextStep>` en pied
-de page :
+`currentPath="/theming/appliquer-un-theme"`).
+
+Le bloc "Styles prêts à l'emploi" actuel de `utilisation.astro`
+(lignes 148–158) n'a **pas** sa propre page : il devient une sous-section de
+celle-ci, positionnée après "Personnaliser toute la librairie". Une phrase
+de transition l'introduit, absente du contenu actuel :
 
 ```astro
-<NextStep
-    label="Prochaine étape :"
-    links={[{ href: '/theming/styles-prets-a-l-emploi', label: 'Styles prêts à l\'emploi' }]}
-/>
+<NarrativeSubheading id="tokens-globaux">Personnaliser toute la librairie</NarrativeSubheading>
+{/* … contenu inchangé … */}
+
+<p style="margin-top: 1rem">
+    Ces mécanismes — tokens et <code>::part()</code> — couvrent l'intérieur des composants.
+    Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
+    hors de leur portée : c'est ce que couvrent les styles prêts à l'emploi ci-dessous.
+</p>
+
+<NarrativeSubheading id="presets">Styles prêts à l'emploi</NarrativeSubheading>
+{/* … contenu inchangé du bloc "Styles prêts à l'emploi" actuel … */}
 ```
 
-### 9.2 Styles prêts à l'emploi
+`tocEntries` de la page : ajouter une entrée `{ id: 'presets', label: 'Styles prêts à l\'emploi', level: 2 as const }`
+sous l'entrée `personnalisation`/tokens existante.
 
-Fichier : `apps/docs/src/pages/theming/styles-prets-a-l-emploi.astro`
-(nouveau). Contenu repris à l'identique du bloc "Styles prêts à l'emploi"
-actuel de `utilisation.astro` (lignes 148–158) — `h2.page-title` = "Styles
-prêts à l'emploi", `currentPath="/theming/styles-prets-a-l-emploi"`, plus un
-`<NextStep>` :
+`<NextStep>` en pied de page :
 
 ```astro
 <NextStep
@@ -675,9 +683,9 @@ prêts à l'emploi", `currentPath="/theming/styles-prets-a-l-emploi"`, plus un
   doivent apparaître dans la sortie de build.
 - `apps/docs/scripts/check-build.js` : `EXPECTED_PAGES` mis à jour avec
   toutes les nouvelles URLs (`theming/overview`, `theming/appliquer-un-theme`,
-  `theming/styles-prets-a-l-emploi`, `theming/personnalisation-avancee`,
-  `getting-started/frameworks`, `getting-started/traductions`) et sans les
-  anciennes (`getting-started/i18n`).
+  `theming/personnalisation-avancee`, `getting-started/frameworks`,
+  `getting-started/traductions`) et sans les anciennes
+  (`getting-started/i18n`).
 - Suite a11y/axe-core existante : doit rester verte sur toutes les pages,
   nouvelles incluses (tableaux, liens, contraste des blocs `.hint`/`.summary`
   déjà couverts par les tokens `--doc-*` issus de #110).
