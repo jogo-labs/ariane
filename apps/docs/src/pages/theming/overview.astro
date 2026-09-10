@@ -1,0 +1,85 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NextStep from '../../components/NextStep.astro';
+---
+
+<Layout
+    title="Overview"
+    description="Comprendre le modèle headless d'Ariane et les leviers disponibles pour le personnaliser."
+    currentPath="/theming/overview"
+    showToc={false}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Personnaliser vos composants</h2>
+            <p class="summary">
+                Ariane est une librairie <strong>headless</strong> : aucun style visuel par
+                défaut. Sans thème, les composants fonctionnent pleinement (accessibilité,
+                interactions, slots) mais leur rendu est indéfini — c'est une fondation sur
+                laquelle construire un design system, pas un kit d'UI clé en main.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="leviers">Trois leviers de personnalisation</NarrativeHeading>
+            <p>
+                Selon ce que vous cherchez à faire, un de ces trois mécanismes s'applique :
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Levier</th>
+                            <th scope="col">Portée</th>
+                            <th scope="col">Quand l'utiliser</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tokens CSS (<code>--ar-*</code>)</td>
+                            <td>Toute la librairie, ou une instance via une classe</td>
+                            <td>Couleurs, espacements, typographie — la majorité des besoins</td>
+                        </tr>
+                        <tr>
+                            <td><code>::part()</code></td>
+                            <td>Une partie interne précise d'un composant</td>
+                            <td>Layout ou styles non couverts par un token</td>
+                        </tr>
+                        <tr>
+                            <td>Styles prêts à l'emploi (presets)</td>
+                            <td>Éléments HTML natifs slottés (pas les composants <code>ar-*</code>)</td>
+                            <td>Un bouton ou un champ que vous slottez doit ressembler aux composants Ariane</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="hint">
+                Les tokens et les <code>::part()</code> couvrent l'intérieur des composants —
+                les styles prêts à l'emploi sont documentés comme complément, dans la page
+                <a href="/theming/appliquer-un-theme#presets">Appliquer un thème</a>.
+            </p>
+            <p class="hint">
+                Si vous découvrez tout juste les Custom Elements, commencez par
+                <a href="/theming/appliquer-un-theme">Appliquer un thème</a> — les autres
+                pages partent du principe que le thème par défaut est chargé.
+            </p>
+        </div>
+
+        <NextStep
+            label="Prochaine étape : choisissez votre point d'entrée"
+            links={[
+                { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
+                { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
+                { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
+            ]}
+        />
+    </div>
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
+</style>
