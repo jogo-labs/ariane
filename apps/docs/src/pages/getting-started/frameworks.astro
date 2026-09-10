@@ -76,6 +76,8 @@ function onChanged(event) {
 }`;
 
 const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination-page-changed={onChanged} />
+<!-- à vérifier : affectation en propriété JS pour une fonction (comportement par
+     analogie avec le reste de l'écosystème custom elements, non testé en projet réel) -->
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
 ---
 
