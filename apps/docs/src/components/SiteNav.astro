@@ -36,13 +36,19 @@ function withCurrent(links: Omit<NavLink, 'ariaCurrent'>[]): NavLink[] {
 const gettingStartedLinks: NavLink[] = withCurrent([
     { href: '/getting-started/quickstart', label: 'Démarrage rapide' },
     { href: '/getting-started/utilisation', label: 'Utilisation' },
-    { href: '/getting-started/i18n', label: 'Internationalisation' },
+    { href: '/getting-started/frameworks', label: 'Frameworks' },
 ]);
 
 const themingLinks: NavLink[] = withCurrent([
+    { href: '/theming/overview', label: 'Overview' },
+    { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
     { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },
     { href: '/theming/shadow-dom', label: 'Dans un shadow DOM applicatif' },
-    { href: '/theming/tag-customization', label: 'Personaliser le préfixe des tags' },
+]);
+
+const advancedUsageLinks: NavLink[] = withCurrent([
+    { href: '/getting-started/traductions', label: 'Traductions' },
+    { href: '/theming/tag-customization', label: 'Personnaliser le préfixe des tags' },
 ]);
 
 const resourcesLinks: NavLink[] = withCurrent([]);
@@ -122,6 +128,19 @@ const componentItems: NavItem[] = allComponents
                 ))}
             </ul>
         </div>
+
+        {advancedUsageLinks.length > 0 && (
+            <div class="nav-section">
+                <h2>Utilisations avancées</h2>
+                <ul class="nav-list">
+                    {advancedUsageLinks.map((link) => (
+                        <li>
+                            <a href={link.href} aria-current={link.ariaCurrent}>{link.label}</a>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        )}
 
         {resourcesLinks.length > 0 && (
             <div class="nav-section">
