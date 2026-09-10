@@ -104,13 +104,14 @@ le surlignage de nav étaient incohérents.)
 Dans `apps/docs/src/pages/getting-started/quickstart.astro`, remplacer le
 bloc `tocEntries` :
 
-```ts
+<!-- prettier-ignore -->
+```
 const tocEntries = [
-    { id: 'cdn', label: 'Via CDN', level: 1 as const },
-    { id: 'autoloader', label: 'Autoloader', level: 2 as const },
-    { id: 'bundle', label: 'Bundle complet', level: 2 as const },
+    { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
+    { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
+    { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
     // { id: 'prefix',         label: 'Renommer les tags',  level: 2 as const },
-    { id: 'npm', label: 'Installation avec NPM', level: 1 as const },
+    { id: 'npm',            label: 'Installation avec NPM', level: 1 as const },
     // { id: 'headless-import', label: 'Import headless',   level: 2 as const },
     { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
 ];
@@ -118,12 +119,13 @@ const tocEntries = [
 
 par :
 
-```ts
+<!-- prettier-ignore -->
+```
 const tocEntries = [
-    { id: 'cdn', label: 'Via CDN', level: 1 as const },
-    { id: 'autoloader', label: 'Autoloader', level: 2 as const },
-    { id: 'bundle', label: 'Bundle complet', level: 2 as const },
-    { id: 'npm', label: 'Installation avec NPM', level: 1 as const },
+    { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
+    { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
+    { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
+    { id: 'npm',            label: 'Installation avec NPM', level: 1 as const },
     { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
 ];
 ```
