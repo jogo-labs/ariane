@@ -271,6 +271,8 @@ git commit -m "refactor(docs): renomme i18n en Traductions, met à jour tous les
 - Create: `apps/docs/src/pages/theming/personnalisation-avancee.astro`
 - Delete: `apps/docs/src/pages/theming/parts-and-slots.astro`
 - Modify: `apps/docs/src/utils/transverse-roles.ts`
+- Modify: `apps/docs/src/components/ComponentApi.astro` (2 liens `/theming/parts-and-slots#semantic-parts`/`#state-parts`, texte "Parts & Slots" — trouvés en implémentation, absents du grep initial de la spec)
+- Modify: `apps/docs/src/styles/doc-table.css` (commentaire référençant `parts-and-slots.astro`)
 
 **Interfaces:**
 
