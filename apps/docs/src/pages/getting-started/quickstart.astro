@@ -9,47 +9,25 @@ const tocEntries = [
     { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
     { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
     { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
-    { id: 'prefix',         label: 'Renommer les tags',  level: 2 as const },
-    { id: 'npm',            label: 'Setup avancé (npm)', level: 1 as const },
-    { id: 'headless-import', label: 'Import headless',   level: 2 as const },
+    { id: 'npm',            label: 'Installation avec NPM', level: 1 as const },
     { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
 ];
 
-const codeAutoloader = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />`;
+const codeAutoloader = `<!-- Charge automatiquement les composants utilisé dans la page ou ses shadow-dom. -->
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
 
-const codeAutoloaderDev = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />`;
-
-const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></scr` + `ipt>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css" />`;
+const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></scr` + `ipt>`;
 
 const codeUsage = `<ar-alert version="success">
   <span slot="title">Succès</span>
   <span slot="content">Opération réussie.</span>
 </ar-alert>`;
 
-const codePrefixConfig = `<script>
-  window.ARIANE_CONFIG = { prefix: 'acme' };
-</script>
-<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
-
-const codePrefixUsage = `<acme-alert version="success">
-  <span slot="title">Succès</span>
-  <span slot="content">Opération réussie.</span>
-</acme-alert>`;
-
 const codeNpmInstall = `npm install @ariane-ui/core`;
 
-const codeNpmGlobal = `import '@ariane-ui/core';
-import '@ariane-ui/core/themes/default.css';`;
+const codeNpmGlobal = `import '@ariane-ui/core';`;
 
-const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.js';
-import '@ariane-ui/core/themes/default.css';`;
-
-const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
-
-customElements.define('acme-alert', ArAlert);`;
+const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.js';`;
 
 const codeVsCodeSettings = `{
   "html.customData": ["node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
@@ -65,94 +43,43 @@ const codeVsCodeSettings = `{
     <div class="page-container">
         <div class="page-header">
             <h2 class="page-title">Démarrage rapide</h2>
-            <ar-alert variant="info" without-notification id="prerequis" class="doc-callout-alert">
-                <p class="doc-callout-alert-title">Prérequis</p>
-                <ul>
-                    <li>
-                        Un navigateur moderne supportant les
-                        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components"
-                        target="_blank" rel="noopener">Web Components</a>
-                        (Chrome, Firefox, Safari, Edge)
-                    </li>
-                    <li>Aucune dépendance framework — fonctionne avec Vue, React, Svelte, ou HTML pur</li>
-                    <li><em>Si intégration npm uniquement :</em> Node ≥ 24, npm ≥ 11</li>
-                </ul>
-            </ar-alert>
+            <p class="summary">
+                Vous pouvez charger les composants via CDN, ou en les installant en local dans votre projet.<br />
+                Il s'agit de <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_custom_elements" target="_blank" rel="noopener">Custom Elements natifs</a>, ils devraient donc fonctionner de manière transparente avec n'importe quel framework.
+                Cependant certains framework peuvent nécessiter une configuration préalable.
+            </p>
         </div>
 
 
         <div class="narrative">
             <NarrativeHeading id="cdn">Via CDN <span class="badge">Recommandé</span></NarrativeHeading>
             <p>
-                La méthode la plus rapide — aucun outil requis. Ajoutez les deux balises dans
-                votre <code>&lt;head&gt;</code> et utilisez les composants directement en HTML.
+                La méthode la plus rapide pour ajouter Ariane à votre projet. <br />
+                Aucun outil requis : ajoutez les deux balises dans votre <code>&lt;head&gt;</code> et utilisez les composants directement en HTML.
             </p>
 
-            <NarrativeSubheading id="autoloader">Autoloader <span class="badge badge-subtle">À privilégier</span></NarrativeSubheading>
-            <p>
-                Ne charge chaque composant que lorsqu'il est utilisé dans la page.
-                Idéal pour la plupart des projets CDN.
-            </p>
+            <NarrativeSubheading id="autoloader">Autoloader (le plus simple)</NarrativeSubheading>
             <pre><code class="language-html" set:text={codeAutoloader} /></pre>
             <p class="hint">
-                Les deux balises sont requises : le script enregistre les composants,
-                le CSS fournit le thème.
+                En développement local, remplacez <code>autoloader.prod.js</code> par <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
             </p>
-            <p class="hint">
-                En développement local, remplacez <code>autoloader.prod.js</code> par
-                <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
-            </p>
-            <p>Les composants sont ensuite utilisables directement :</p>
+            <p>Les composants sont ensuite utilisables directement, par exemple un composant Alerte :</p>
             <pre><code class="language-html" set:text={codeUsage} /></pre>
 
-            <NarrativeSubheading id="bundle">Bundle complet</NarrativeSubheading>
             <p>
-                Charge tous les composants en une seule requête. Adapté si vous utilisez
-                beaucoup de composants ou souhaitez éviter les imports dynamiques.
+                Si vous utilisez beaucoup de composants ou souhaitez éviter les imports dynamiques, vous pouvez également charger tous les composants en une seule requête.
             </p>
             <pre><code class="language-html" set:text={codeBundle} /></pre>
 
-            <NarrativeSubheading id="prefix">Renommer les tags</NarrativeSubheading>
-            <p>
-                Pour éviter toute collision avec une autre librairie, ou adopter votre propre
-                convention de nommage, définissez <code>window.ARIANE_CONFIG.prefix</code>
-                <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
-            </p>
-            <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
-            <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
-            <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
-            <p class="hint">
-                Le préfixe par défaut est <code>ar</code>. Un seul préfixe global s'applique
-                à tous les composants — pour un renommage libre par composant, voir
-                l'<a href="#headless-import">import headless</a> côté npm.
-            </p>
-
-            <NarrativeHeading id="npm">Setup avancé <span class="badge">Avec bundler</span></NarrativeHeading>
-            <p>
-                Pour les projets utilisant Vite, Webpack, Rollup ou tout autre bundler.
-            </p>
+            <NarrativeHeading id="npm">Installation avec NPM</NarrativeHeading>
+            <p>Installez d'abord le paquet d'Ariane</p>
             <pre><code class="language-bash" set:text={codeNpmInstall} /></pre>
 
-            <NarrativeSubheading>Import global</NarrativeSubheading>
-            <p>Enregistre tous les composants en une seule ligne :</p>
-            <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
-
-            <NarrativeSubheading>Import individuel <span class="badge badge-subtle">Tree-shaking</span></NarrativeSubheading>
-            <p>Pour inclure uniquement les composants effectivement utilisés :</p>
+            <p>Puis importez les composants individuellement :</p>
             <pre><code class="language-typescript" set:text={codeNpmIndividuel} /></pre>
 
-            <NarrativeSubheading id="headless-import">Import headless <span class="badge badge-subtle">Renommage libre</span></NarrativeSubheading>
-            <p>
-                Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
-                tags <code>ar-*</code> par défaut, importez les classes depuis
-                <code>@ariane-ui/core/headless</code> — aucun enregistrement automatique,
-                vous appelez <code>customElements.define()</code> vous-même :
-            </p>
-            <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
-            <p class="hint">
-                Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
-                composant individuellement.
-            </p>
+            <p>Vous pouvez aussi importer tous les composants en une seule ligne :</p>
+            <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
 
             <NarrativeSubheading id="ide-autocomplete">Autocomplétion IDE</NarrativeSubheading>
             <p>
