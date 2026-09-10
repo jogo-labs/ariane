@@ -2,24 +2,22 @@
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
-import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const tocEntries = [
     { id: 'semantic-parts', label: 'CSS Part sémantiques', level: 1 as const },
     { id: 'state-parts', label: 'Parts d\'état', level: 1 as const },
-    { id: 'slots', label: 'Conventions de slot', level: 1 as const },
 ];
 ---
 
 <Layout
-    title="Parts & Slots"
-    description="Vocabulaire de CSS part sémantiques, parts d'état et conventions de slot partagés par tous les composants Ariane."
-    currentPath="/theming/parts-and-slots"
+    title="Personnalisation avancée"
+    description="Vocabulaire de CSS part sémantiques et parts d'état partagés par tous les composants Ariane."
+    currentPath="/theming/personnalisation-avancee"
     showToc={true}
 >
     <div class="page-container">
         <div class="page-header">
-            <h2 class="page-title">Parts & Slots</h2>
+            <h2 class="page-title">Personnalisation avancée</h2>
         </div>
 
         <div class="narrative">
@@ -199,34 +197,6 @@ const tocEntries = [
                     </tbody>
                 </table>
             </div>
-
-            <NarrativeHeading id="slots">Conventions de slot</NarrativeHeading>
-            <p>
-                Les <code>&lt;slot&gt;</code> suivent des conventions déjà cohérentes sur
-                toute la librairie, sans qu'un nouveau vocabulaire ait été nécessaire :
-            </p>
-            <ul>
-                <li>
-                    <strong>Slot par défaut (sans nom)</strong> — contenu principal du
-                    composant.
-                </li>
-                <li>
-                    <strong><code>trigger</code></strong> — même sens que le rôle
-                    <code>trigger</code> des part : élément qui ouvre/ferme le composant.
-                </li>
-                <li>
-                    <strong>Suffixe <code>&lt;rôle&gt;-icon</code></strong> — icône
-                    remplaçable associée à un élément précis (<code>close-icon</code>,
-                    <code>home-icon</code>, <code>trigger-icon</code>,
-                    <code>prev-icon</code>/<code>next-icon</code>,
-                    <code>warning-icon</code>/<code>error-icon</code>).
-                </li>
-                <li>
-                    <strong><code>header-actions</code></strong>,
-                    <strong><code>footer</code></strong> — reprennent le nom des rôles
-                    <code>::part()</code> homonymes.
-                </li>
-            </ul>
         </div>
     </div>
 
