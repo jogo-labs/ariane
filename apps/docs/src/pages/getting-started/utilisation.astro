@@ -3,12 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
 import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+import NextStep from '../../components/NextStep.astro';
 
 const tocEntries = [
-    { id: 'composants',       label: 'Utiliser les composants',   level: 1 as const },
-    { id: 'chargement',       label: 'Attendre le chargement',    level: 1 as const },
-    { id: 'personnalisation', label: 'Thème et personnalisation', level: 1 as const },
-    { id: 'presets',          label: 'Styles prêts à l\'emploi', level: 1 as const },
+    { id: 'composants',  label: 'Utiliser les composants',  level: 1 as const },
+    { id: 'chargement',  label: 'Attendre le chargement',   level: 1 as const },
+    { id: 'attributs',   label: 'Attributs & propriétés',   level: 1 as const },
+    { id: 'slots',       label: 'Slots',                    level: 1 as const },
+    { id: 'evenements',  label: 'Événements',                level: 1 as const },
+    { id: 'methodes',    label: 'Méthodes',                  level: 1 as const },
 ];
 
 const codeHtml = `<ar-alert version="success">
@@ -34,28 +37,39 @@ const codeWhenAllDefinedCdn = `const tags = [...new Set(
 await Promise.all(tags.map(tag => customElements.whenDefined(tag)));
 // Tous les composants ar-* sont prêts`;
 
-const codeCustomProps = `.alerte-succes-perso {
-    --ar-alert-bg:   #f5f0ff;
-    --ar-alert-icon: #7c3aed;
-}`;
+const codeAttribute = `<ar-pagination current="1" total="10"></ar-pagination>`;
 
-const codeTokens = `:root {
-    --ar-color-interactive: #7c3aed;
-    --ar-border-radius-md:  0.75rem;
-}`;
+const codeBooleanAttribute = `<!-- Ces deux écritures activent "compact" -->
+<ar-pagination compact></ar-pagination>
+<ar-pagination compact="false"></ar-pagination>
 
-const codeTokensAlias = `:root {
-    --ar-color-interactive: var(--mon-ds-color-primary);
-    --ar-color-text:        var(--mon-ds-color-text);
-}`;
+<!-- Seule l'absence de l'attribut le désactive -->
+<ar-pagination></ar-pagination>`;
 
-const codePresets = `<!-- Charger le CSS dans le <head> -->
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />
+const codeJsProperty = `const datepicker = document.querySelector('ar-datepicker');
 
-<!-- Utilisez les classes dans votre HTML -->
-<button class="ar-btn ar-btn-primary">Valider</button>
-<button class="ar-btn ar-btn-secondary">Annuler</button>
-`;
+// Désactive les dimanches
+datepicker.isDateDisabled = (date) => date.getDay() === 0;`;
+
+const codeDefaultSlot = `<ar-dialog label="Confirmation">
+  <p>Voulez-vous vraiment supprimer cet élément ?</p>
+</ar-dialog>`;
+
+const codeNamedSlot = `<ar-collapse>
+  <button slot="trigger">Afficher les détails</button>
+  <p>Contenu affiché/masqué au clic sur le déclencheur.</p>
+</ar-collapse>`;
+
+const codeEventListener = `const pagination = document.querySelector('ar-pagination');
+
+pagination.addEventListener('ar-pagination-page-changed', (event) => {
+    console.log(\`Page changée : \${event.detail.from} → \${event.detail.to}\`);
+});`;
+
+const codeMethodCall = `const collapse = document.querySelector('ar-collapse');
+
+await customElements.whenDefined('ar-collapse');
+collapse.show();`;
 ---
 
 <Layout
@@ -67,8 +81,7 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
         <div class="page-header">
             <h2 class="page-title">Utilisation</h2>
             <p class="summary">
-                Ces exemples supposent que vous avez suivi le
-                <a href="/getting-started/quickstart">Démarrage rapide</a>.
+                Ces exemples supposent que vous avez suivi le guide de <a href="/getting-started/quickstart">Démarrage rapide</a>.<br />
                 Ils s'appliquent quel que soit le mode d'intégration (CDN ou npm).
             </p>
         </div>
@@ -97,67 +110,99 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
             <p>Via CDN (sans import) :</p>
             <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
 
-            <NarrativeHeading id="personnalisation">Thème et personnalisation</NarrativeHeading>
+            <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
             <p>
-                Ariane est une librairie <strong>headless</strong> : les composants ne portent
-                aucun style visuel par défaut. Sans thème, ils fonctionnent (accessibilité,
-                interactions, slots) mais leur rendu visuel est indéfini — c'est intentionnel,
-                Ariane est une fondation sur laquelle construire un design system, pas un kit
-                d'UI clé en main. Couleurs, espacements et typographie proviennent exclusivement
-                d'un fichier de thème chargé séparément.
+                Comme tout élément HTML, les composants Ariane s'configurent par
+                <strong>attributs</strong> (valeur texte, visible dans le HTML) ou par
+                <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
+                y compris un objet ou une fonction).
             </p>
-
-            <NarrativeSubheading>Charger un thème</NarrativeSubheading>
+            <pre><code class="language-html" set:text={codeAttribute} /></pre>
             <p>
-                Les exemples de cette documentation utilisent <code>themes/default.css</code>,
-                un thème de démo fourni avec Ariane (modes clair et sombre inclus) — pas les
-                valeurs par défaut intrinsèques des composants. Utilisez-le comme point de
-                départ pour construire votre propre thème :
+                Les attributs booléens suivent la convention native : leur simple
+                présence suffit à activer le comportement, peu importe leur valeur.
             </p>
-            <p>
-                <a class="download-theme" href="/themes/default.css" download>
-                    Télécharger default.css
-                </a>
-            </p>
-
-            <NarrativeSubheading>Personnaliser une instance</NarrativeSubheading>
-            <p>
-                Chaque composant expose des <strong>CSS Custom Properties</strong>. Pour
-                personnaliser une instance précise, ajoutez-lui une classe et surchargez ses
-                propriétés sur cette classe :
-            </p>
-            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
-
-            <NarrativeSubheading>Personnaliser toute la librairie</NarrativeSubheading>
-            <p>
-                Pour modifier l'ensemble de la librairie, surchargez plutôt les tokens
-                globaux (couleurs, espacements, typographie) sur <code>:root</code> :
-            </p>
-            <pre><code class="language-css" set:text={codeTokens} /></pre>
-            <p>
-                Si vous avez déjà votre propre design system, pointez les tokens Ariane vers
-                les vôtres au lieu de dupliquer les valeurs — le nom du token Ariane reste
-                stable, sa valeur suit la vôtre (y compris un éventuel mode sombre déjà géré
-                de votre côté) :
-            </p>
-            <pre><code class="language-css" set:text={codeTokensAlias} /></pre>
+            <pre><code class="language-html" set:text={codeBooleanAttribute} /></pre>
             <p class="hint">
-                Les propriétés disponibles par composant sont listées dans la section
-                <strong>Référence API</strong> de chaque page de composant.
+                Une <strong>propriété</strong> ne se pose qu'en JavaScript, jamais en
+                attribut HTML — c'est le cas dès que la valeur n'est pas une chaîne de
+                caractères (fonction, tableau, objet). Par exemple,
+                <code>ar-datepicker</code> expose une propriété
+                <code>isDateDisabled</code> pour désactiver certaines dates :
+            </p>
+            <pre><code class="language-js" set:text={codeJsProperty} /></pre>
+            <p class="hint">
+                La liste complète des attributs et propriétés de chaque composant est
+                documentée dans sa <strong>Référence API</strong>, section
+                « Attributs & Propriétés ».
             </p>
 
-            <NarrativeHeading id="presets">Styles prêts à l'emploi</NarrativeHeading>
-            <p style="margin-bottom: 1rem">
-                Ariane propose — de manière optionnelle — des feuilles de styles comportant
-                des classes CSS prêtes à l'emploi.<br />
-                Elles peuvent s'appliquer au HTML qui se trouve dans le Light DOM
-                (un bouton slotté dans un composant, par exemple) — distinctes des tokens /
-                <code>::part()</code> du thème qui s'appliquent aux composants <code>ar-*</code>. <br />
-                Chaque famille de classes vit dans son propre fichier,
-                à charger séparément de <code>themes/default.css</code> :
+            <NarrativeHeading id="slots">Slots</NarrativeHeading>
+            <p>
+                Les <code>&lt;slot&gt;</code> permettent de projeter votre propre
+                contenu à un emplacement précis du composant. Le <strong>slot par
+                défaut</strong> (sans attribut <code>slot</code>) reçoit le contenu
+                principal :
             </p>
-            <pre><code class="language-html" set:text={codePresets} /></pre>
+            <pre><code class="language-html" set:text={codeDefaultSlot} /></pre>
+            <p>
+                Un <strong>slot nommé</strong> cible un emplacement spécifique via
+                l'attribut <code>slot</code> sur l'élément projeté — par exemple, le
+                déclencheur d'<code>ar-collapse</code> :
+            </p>
+            <pre><code class="language-html" set:text={codeNamedSlot} /></pre>
+            <p class="hint">
+                Les slots disponibles pour chaque composant sont documentés dans sa
+                Référence API, section « Slots ».
+            </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la
+                <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_templates_and_slots"
+                target="_blank" rel="noopener">documentation complète sur MDN</a>.
+            </p>
+
+            <NarrativeHeading id="evenements">Événements</NarrativeHeading>
+            <p>
+                Les composants Ariane émettent des <code>CustomEvent</code> standards,
+                préfixés par le nom du tag (<code>ar-pagination-page-changed</code>,
+                <code>ar-collapse-shown</code>...). Écoutez-les comme n'importe quel
+                événement DOM :
+            </p>
+            <pre><code class="language-js" set:text={codeEventListener} /></pre>
+            <p>
+                Certains événements sont <strong>annulables</strong>
+                (<code>event.preventDefault()</code> bloque le comportement par défaut)
+                — c'est indiqué dans la colonne « Annulable » de leur Référence API.
+            </p>
+            <p class="hint">
+                La liste complète des événements de chaque composant, avec le type de
+                leur <code>detail</code>, est documentée dans sa Référence API, section
+                « Événements ».
+            </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la
+                <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
+                target="_blank" rel="noopener">documentation complète sur MDN</a>.
+            </p>
+
+            <NarrativeHeading id="methodes">Méthodes</NarrativeHeading>
+            <p>
+                Certaines actions s'appellent directement en JavaScript sur l'élément,
+                une fois le composant défini :
+            </p>
+            <pre><code class="language-js" set:text={codeMethodCall} /></pre>
+            <p class="hint">
+                La liste des méthodes disponibles par composant est documentée dans sa
+                Référence API, section « Méthodes ». Voir aussi la section précédente
+                <a href="#chargement">Attendre le chargement</a> pour garantir que le
+                composant est prêt avant d'appeler une méthode.
+            </p>
         </div>
+
+        <NextStep
+            label="Prochaine étape :"
+            links={[{ href: '/theming/overview', label: 'Appliquez un style à vos composants' }]}
+        />
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
@@ -165,28 +210,4 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
 
 <style>
     @import '../../styles/doc-prose.css';
-
-    .page-summary {
-        margin-top: 0.5rem;
-        color: var(--doc-text-muted);
-    }
-
-    .download-theme {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--doc-border);
-        border-radius: 0.375rem;
-        background: var(--doc-nav-bg);
-        color: var(--doc-text);
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .download-theme:hover {
-        background: var(--doc-accent-bg);
-        color: var(--doc-accent);
-    }
 </style>
