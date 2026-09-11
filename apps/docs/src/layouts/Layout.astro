@@ -84,6 +84,18 @@ const {
                 border-width: 0;
             }
 
+            /* Cible d'ancre (lien TOC, hash d'URL) : réserve l'espace du header
+               sticky pour que le titre/la section visée n'atterrisse pas dessous.
+               La bannière alpha n'est pas sticky (position: relative, défile avec
+               le contenu) — seul --doc-header-h compte une fois qu'on a scrollé.
+               Couvre les titres narratifs (h2/h3 de NarrativeHeading/Subheading),
+               les titres sr-only de l'API (ComponentApi.astro), et les <section
+               id> qui servent elles-mêmes de cible (Exemples, Playground,
+               Référence API dans Playground.astro). */
+            :where(h2, h3, h4, section)[id] {
+                scroll-margin-top: calc(var(--doc-header-h) + 1rem);
+            }
+
             .narrative a {
                 color: var(--doc-accent);
             }
