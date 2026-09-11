@@ -79,9 +79,13 @@ const controls = buildControls(component.members ?? []);
 
 // ─── Sous-sections de la Référence API ─────────────────────────────────────────
 //
-// Chaque entrée reflète exactement la condition d'affichage de la section
-// correspondante dans ComponentApi.astro — une section absente (ex. pas de slot)
-// ne doit pas apparaître dans la TOC.
+// Chaque entrée reflète exactement la condition d'affichage ET l'ordre des onglets
+// de ComponentApi.astro (categories) — une section absente (ex. pas de slot) ne
+// doit pas apparaître dans la TOC, et l'ordre doit correspondre à l'ordre réel des
+// onglets pour que la TOC serve de sommaire fidèle.
+
+const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
+const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
 
 const apiTocEntries = [
     component['x-localized']
@@ -89,6 +93,9 @@ const apiTocEntries = [
         : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
+        : null,
+    component.slots && component.slots.length > 0
+        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
         : null,
     component.events && component.events.length > 0
         ? { id: 'api-evenements', label: 'Événements', level: 2 as const }
@@ -99,11 +106,8 @@ const apiTocEntries = [
     component.cssParts && component.cssParts.length > 0
         ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
         : null,
-    component.cssProperties && component.cssProperties.length > 0
+    (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
-        : null,
-    component.slots && component.slots.length > 0
-        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
         : null,
 ].filter((entry) => entry !== null);
 
@@ -307,7 +311,9 @@ const tocEntries = [
         .toc-mobile-inline { display: block; }
     }
 
-    /* Tables narratives — alignées sur le style de ComponentApi (doc-table.css) */
+    /* Tables narratives (contenu MDX libre) — style propre à ce fichier ;
+       ComponentApi.astro n'utilise plus de tableau HTML pour l'API (lignes
+       de vie, cf. spec §5), ces styles ne s'appliquent donc qu'ici. */
     .narrative :global(table) {
         width: 100%;
         border-collapse: collapse;

@@ -54,6 +54,12 @@ rendu correspond.
 - Démo épinglée (réduction de la démo dans la colonne TOC) — explorée en mockup
   (emprunt à la direction « Établi »), écartée : la démo interactive reste unique,
   dans le flux principal (cf. section 6).
+- Fond pointillé décoratif de la zone de scène du playground (`radial-gradient`
+  reprenant les points du rail, section 6) — présent dans le mockup d'exploration
+  mais jamais implémenté sur ce chantier. L'exigence structurelle (titre/description
+  en prose au-dessus, cadre unique autour de preview + code) était déjà couverte par
+  le balisage préexistant de `Playground.astro` ; seule la texture de fond reste à
+  faire, reportée à un chantier ultérieur plutôt que silencieusement omise.
 
 ## 1. Système visuel : le fil
 
