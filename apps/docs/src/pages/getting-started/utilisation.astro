@@ -123,9 +123,8 @@ const codeVsCodeSettings = `{
 
             <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
             <p>
-                Comme tout élément HTML, les composants Ariane se configurent par
-                <strong>attributs</strong> (valeur texte, visible dans le HTML) ou par
-                <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
+                Comme tout élément HTML, les composants Ariane se configurent par <strong>attributs</strong>
+                (valeur texte, visible dans le HTML) ou par <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
                 y compris un objet ou une fonction).
             </p>
             <pre><code class="language-html" set:text={codeAttribute} /></pre>
@@ -137,9 +136,8 @@ const codeVsCodeSettings = `{
             <p class="hint">
                 Une <strong>propriété</strong> ne se pose qu'en JavaScript, jamais en
                 attribut HTML — c'est le cas dès que la valeur n'est pas une chaîne de
-                caractères (fonction, tableau, objet). Par exemple,
-                <code>ar-datepicker</code> expose une propriété
-                <code>isDateDisabled</code> pour désactiver certaines dates :
+                caractères (fonction, tableau, objet). Par exemple, <code>ar-datepicker</code> expose
+                une propriété <code>isDateDisabled</code> pour désactiver certaines dates :
             </p>
             <pre><code class="language-js" set:text={codeJsProperty} /></pre>
             <p class="hint">

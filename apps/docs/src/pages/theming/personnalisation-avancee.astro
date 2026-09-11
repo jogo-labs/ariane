@@ -25,8 +25,8 @@ const tocEntries = [
             <p>
                 En plus de <code>CSS part</code> propres à chacun, les composants Ariane
                 exposent des CSS part qui ont un rôle <strong>sémantique et transverse</strong>.<br />
-                Un même élément expose souvent plusieurs CSS part complémentaires, par exemple
-                <code>control</code> (sémantique) et <code>link</code> (spécifique).
+                Un même élément expose souvent plusieurs CSS part complémentaires, par exemple <code>control</code>
+                (sémantique) et <code>link</code> (spécifique).
             </p>
             <p style="margin-top: 1rem">
                 Ces <code>::part()</code> sémantiques facilitent la personnalisation des éléments communs à
@@ -47,9 +47,7 @@ const tocEntries = [
                             <td><code>(nom du composant)</code></td>
                             <td>Racine du composant.</td>
                             <td>
-                                <code>ar-charcounter::part(charcounter)</code>,
-                                <code>ar-datepicker::part(datepicker)</code>,
-                                <code>ar-breadcrumb::part(breadcrumb)</code>
+                                <code>ar-charcounter::part(charcounter)</code>, <code>ar-datepicker::part(datepicker)</code>, <code>ar-breadcrumb::part(breadcrumb)</code>
                             </td>
                         </tr>
                         <tr>
@@ -71,8 +69,7 @@ const tocEntries = [
                             <td><code>body</code></td>
                             <td>Zone de contenu principal.</td>
                             <td>
-                                <code>ar-dialog::part(body)</code>,
-                                <code>ar-alert::part(body)</code>
+                                <code>ar-dialog::part(body)</code>, <code>ar-alert::part(body)</code>
                             </td>
                         </tr>
                         <tr>
@@ -82,21 +79,18 @@ const tocEntries = [
                                 field/action-button/trigger).
                             </td>
                             <td>
-                                <code>ar-pagination::part(link)</code>,
-                                <code>ar-datepicker::part(day)</code>
+                                <code>ar-pagination::part(link)</code>, <code>ar-datepicker::part(day)</code>
                             </td>
                         </tr>
                         <tr>
                             <td><code>field</code></td>
                             <td>
                                 Élément qui reçoit une saisie. Deux sous-rôles standard,
-                                réutilisables par tout futur composant :
-                                <code>input</code> (champ texte/textarea) et
-                                <code>select</code> (liste déroulante).
+                                réutilisables par tout futur composant : <code>input</code>
+                                (champ texte/textarea) et <code>select</code> (liste déroulante).
                             </td>
                             <td>
-                                <code>ar-datepicker::part(input)</code>,
-                                <code>ar-pagination::part(select)</code>
+                                <code>ar-datepicker::part(input)</code>, <code>ar-pagination::part(select)</code>
                             </td>
                         </tr>
                         <tr>
@@ -106,8 +100,7 @@ const tocEntries = [
                                 panel).
                             </td>
                             <td>
-                                <code>ar-pagination::part(prev)</code>,
-                                <code>ar-datepicker::part(today-button)</code>
+                                <code>ar-pagination::part(prev)</code>, <code>ar-datepicker::part(today-button)</code>
                             </td>
                         </tr>
                         <tr>
@@ -131,10 +124,10 @@ const tocEntries = [
 
             <NarrativeHeading id="state-parts">Parts d'état</NarrativeHeading>
             <p>
-                Certains <code>::part()</code> portent en plus un <strong>modificateur d'état</strong>, selon la convention
-                <code>&lt;élément&gt;--&lt;état&gt;</code> : l'élément de base reste
-                présent, l'état s'ajoute en second part sur le même attribut (ex.
-                <code>part="bullet bullet--current"</code>). <br />
+                Certains <code>::part()</code> portent en plus un <strong>modificateur d'état</strong>, selon la convention <code>&lt;élément&gt;--&lt;état&gt;</code> :
+                l'élément de base reste
+                présent, l'état s'ajoute en second part sur le même attribut (ex. <code>part="bullet bullet--current"</code>).
+                <br />
                 Ces parts d'état permettent une customisation avancée des composants dans leur différents états.
             </p>
 
