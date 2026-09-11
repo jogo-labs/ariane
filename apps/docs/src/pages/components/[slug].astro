@@ -25,17 +25,22 @@ export async function getStaticPaths() {
     const mdxEntries = await getCollection('components');
     const mdxByTag   = Object.fromEntries(mdxEntries.map((e) => [e.data.tagName, e]));
 
-    return components.map((component) => ({
-        params: { slug: getSlug(component.tagName!) },
-        props:  { component, mdx: mdxByTag[component.tagName!] ?? null },
-    }));
+    return components.map((component) => {
+        const parentTag = component['x-parent'];
+        const parentLabel = parentTag ? (mdxByTag[parentTag]?.data.title ?? parentTag) : null;
+        return {
+            params: { slug: getSlug(component.tagName!) },
+            props:  { component, mdx: mdxByTag[component.tagName!] ?? null, parentLabel },
+        };
+    });
 }
 
 // ─── Props de la page ─────────────────────────────────────────────────────────
 
-const { component, mdx } = Astro.props as {
-    component: CemDeclaration;
-    mdx: MdxEntry | null;
+const { component, mdx, parentLabel } = Astro.props as {
+    component:   CemDeclaration;
+    mdx:         MdxEntry | null;
+    parentLabel: string | null;
 };
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
@@ -151,7 +156,24 @@ const tocEntries = [
 
     <div class="page-container">
         <div class="page-header">
-            <h2 class="page-title">{pageTitle}</h2>
+            <nav class="crumb" aria-label="Fil d'Ariane">
+                <a href="/">Composants</a>
+                {parentTag && parentLabel && (
+                    <>
+                        <span class="crumb-dot" aria-hidden="true"></span>
+                        <a href={`/components/${getSlug(parentTag)}`}>{parentLabel}</a>
+                    </>
+                )}
+                <span class="crumb-dot" aria-hidden="true"></span>
+                <span aria-current="page">{pageTitle}</span>
+            </nav>
+
+            <div class="title-row">
+                <h2 class="page-title">{pageTitle}</h2>
+                {/* Toujours "Alpha" dans ce chantier — cf. Global Constraints,
+                    aucune donnée de maturité par composant n'existe encore. */}
+                <span class="status status-alpha">Alpha</span>
+            </div>
 
             <div class="meta">
                 <code>&lt;{component.tagName}&gt;</code>
@@ -207,6 +229,71 @@ const tocEntries = [
 
 <style>
     @import '../../styles/doc-prose.css';
+
+    .crumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--doc-text-muted);
+        margin-bottom: 1.1rem;
+    }
+
+    .crumb a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .crumb a:hover {
+        color: var(--doc-text);
+    }
+
+    .crumb .crumb-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--doc-rail-live);
+        display: inline-block;
+    }
+
+    .title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .title-row .page-title {
+        margin: 0;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+    }
+
+    .status::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-alpha {
+        color: var(--doc-alpha);
+    }
+    .status-stable {
+        color: var(--doc-stable);
+    }
 
     /* ── Encart parent ───────────────────────────────── */
 
