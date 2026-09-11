@@ -106,6 +106,22 @@
     --doc-space-paragraph: 1rem;
     --doc-space-subsection: 1.5rem;
     --doc-space-section: 2.5rem;
+
+    /* ─── Le fil : rail décoratif + perle (position courante) ──────────
+       Ajouts du sous-chantier 3 (#110) — aucun token existant modifié.
+       cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md */
+    --doc-rail: light-dark(rgba(20, 20, 20, 0.13), var(--doc-thread-soft));
+    --doc-rail-live: var(--doc-ember);
+    --doc-bead: var(--doc-ember);
+    --doc-bead-ring: light-dark(var(--doc-paper), var(--doc-vault));
+
+    /* ─── Statut de maturité — jamais l'ambre d'accent : un badge de
+       statut n'est pas un élément actif/interactif. ────────────────── */
+    --doc-alpha: light-dark(#8f5f00, var(--doc-ember));
+    --doc-stable: light-dark(#2f6b45, #7fd3a2);
+
+    /* ─── Surface secondaire (barres de contrôle, encarts) ──────────── */
+    --doc-surface: light-dark(var(--doc-slate), var(--doc-vault-deep));
 }
 
 :root[data-theme='dark'] {
