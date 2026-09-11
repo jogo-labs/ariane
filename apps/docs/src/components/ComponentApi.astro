@@ -33,6 +33,35 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
     isTransversePart(p.name, component.tagName ?? ''),
 );
 const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name));
+
+interface ApiCategory {
+    key:   string;
+    label: string;
+    count: number;
+}
+
+const categories: ApiCategory[] = [
+    component.attributes && component.attributes.length > 0
+        ? { key: 'attributs', label: 'Attributs', count: component.attributes.length }
+        : null,
+    component.slots && component.slots.length > 0
+        ? { key: 'slots', label: 'Slots', count: component.slots.length }
+        : null,
+    component.events && component.events.length > 0
+        ? { key: 'evenements', label: 'Événements', count: component.events.length }
+        : null,
+    publicMethods.length > 0
+        ? { key: 'methodes', label: 'Méthodes', count: publicMethods.length }
+        : null,
+    component.cssParts && component.cssParts.length > 0
+        ? { key: 'css-parts', label: 'CSS Parts', count: component.cssParts.length }
+        : null,
+    (ownProps.length > 0 || panelProps.length > 0)
+        ? { key: 'css-props', label: 'CSS Custom Properties', count: ownProps.length + panelProps.length }
+        : null,
+].filter((c): c is ApiCategory => c !== null);
+
+const firstCategory = categories[0]?.key ?? 'attributs';
 ---
 
 <div class="component-api">
@@ -55,248 +84,185 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
         </section>
     )}
 
-    {/* ── Attributs & Propriétés ── */}
-    {component.attributes && component.attributes.length > 0 && (
-        <section>
-            <h4 id="api-attributs" class="subsection-title">Attributs &amp; Propriétés</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Défaut</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+    {/* ── Référence API : une catégorie par onglet, ar-tab-group gère
+         entièrement l'ARIA/le clavier (déjà publié, packages/core). ── */}
+    {categories.length > 0 && (
+        <ar-tab-group active={firstCategory} label="Référence API" class="api-tabs">
+            {categories.map((cat) => (
+                <ar-tab panel={cat.key}>
+                    {cat.label} <span class="api-tab-count">{cat.count}</span>
+                </ar-tab>
+            ))}
+
+            {component.attributes && component.attributes.length > 0 && (
+                <ar-tab-panel name="attributs">
+                    <h4 id="api-attributs" class="sr-only">Attributs</h4>
+                    <div class="api-list">
                         {component.attributes.map((attr) => (
-                            <tr>
-                                <td><code>{attr.name}</code></td>
-                                <td><code>{attr.type?.text ?? '—'}</code></td>
-                                <td><code>{attr.default ?? '—'}</code></td>
-                                <td>{attr.description ?? ''}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )}
-
-    {/* ── Événements ── */}
-    {component.events && component.events.length > 0 && (
-        <section>
-            <h4 id="api-evenements" class="subsection-title">Événements</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Annulable</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {component.events.map((event) => (
-                            <tr>
-                                <td><code>{event.name}</code></td>
-                                <td>{stripCancelableMarker(event.description)}</td>
-                                <td>{isCancelableEvent(event.description) ? 'Oui' : 'Non'}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )}
-
-    {/* ── Méthodes ── */}
-    {publicMethods.length > 0 && (
-        <section>
-            <h4 id="api-methodes" class="subsection-title">Méthodes</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Paramètres</th>
-                            <th scope="col">Retour</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {publicMethods
-                            .map((m) => {
-                                const params = (m.parameters ?? [])
-                                    .map((p) => {
-                                        let s = p.name;
-                                        if (p.type?.text) s += `: ${p.type.text}`;
-                                        if (p.default !== undefined) s += ` = ${p.default}`;
-                                        return s;
-                                    })
-                                    .join(', ');
-                                const returnType = m.return?.type?.text ?? 'void';
-                                return (
-                                    <tr>
-                                        <td><code>{m.name}()</code></td>
-                                        <td>{params ? <code>{params}</code> : <span class="muted">—</span>}</td>
-                                        <td><code>{returnType}</code></td>
-                                        <td>{m.description ?? ''}</td>
-                                    </tr>
-                                );
-                            })}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )}
-
-    {/* ── CSS Parts ── */}
-    {component.cssParts && component.cssParts.length > 0 && (
-        <section>
-            <h4 id="api-css-parts" class="subsection-title">CSS Parts</h4>
-            <p class="hint">
-                Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
-                {hasTransverseParts && (
-                    <>
-                        <br />Certaines parts indiquent un rôle transverse, partagé avec
-                        d'autres composants — voir <a href="/theming/personnalisation-avancee#semantic-parts">Personnalisation avancée</a>.
-                    </>
-                )}
-                {hasStateParts && (
-                    <>
-                        <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir <a href="/theming/personnalisation-avancee#state-parts">Personnalisation avancée</a>.
-                    </>
-                )}
-            </p>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {component.cssParts.map((part) => (
-                            <tr>
-                                <td><code>{part.name}</code></td>
-                                <td>{part.description ?? ''}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    )}
-
-    {/* ── CSS Custom Properties propres au composant ── */}
-    {(ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0) && (
-        <section>
-            <h4 id="api-css-props" class="subsection-title">CSS Custom Properties</h4>
-            {/* ── Tokens du panel partagé (affiché en premier si présent) ── */}
-            {panelProps.length > 0 && (
-                <p>
-                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br />
-                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
-                </p>
-                <div class="token-example">
-                    <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
-                </div>
-                <div class="table-wrap panel-tokens-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Nom</th>
-                                <th scope="col">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {panelProps.map((prop) => (
-                                <tr>
-                                    <td><code>{prop.name}</code></td>
-                                    <td>{prop.description ?? ''}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-            {(panelProps.length > 0 && ownProps.length > 0) && (
-                <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
-            )}
-            {ownProps.length > 0 && (
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Nom</th>
-                                <th scope="col">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ownProps.map((prop) => (
-                                <tr>
-                                    <td><code>{prop.name}</code></td>
-                                    <td>{prop.description ?? ''}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-            {/* ── Tokens d'un composant imbriqué en interne (ex. tooltip dans table-sort) ── */}
-            {relatedTokens.length > 0 && (
-                <ar-alert class="doc-callout-alert" variant="info" without-notification>
-                    <div class="doc-callout-alert-content">
-                        {relatedTokens.map((rt) => (
-                            <p>
-                                {rt.description}{' '}<br />
-                                <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
-                            </p>
+                            <div class="api-row">
+                                <div>
+                                    <span class="api-name">{attr.name}</span>
+                                    <code class="api-sig">{attr.type?.text ?? '—'}</code>
+                                    {attr.default !== undefined && (
+                                        <code class="api-default">défaut&nbsp;: {attr.default}</code>
+                                    )}
+                                </div>
+                                <p class="api-desc">{attr.description ?? ''}</p>
+                            </div>
                         ))}
                     </div>
-                </ar-alert>
+                </ar-tab-panel>
             )}
-        </section>
-    )}
 
-    {/* ── Slots ── */}
-    {component.slots && component.slots.length > 0 && (
-        <section>
-            <h4 id="api-slots" class="subsection-title">Slots</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {component.slots && component.slots.length > 0 && (
+                <ar-tab-panel name="slots">
+                    <h4 id="api-slots" class="sr-only">Slots</h4>
+                    <div class="api-list">
                         {component.slots.map((slot) => (
-                            <tr>
-                                <td><code>{slot.name || '(default)'}</code></td>
-                                <td>{slot.description ?? ''}</td>
-                            </tr>
+                            <div class="api-row">
+                                <span class="api-name">{slot.name || '(default)'}</span>
+                                <p class="api-desc">{slot.description ?? ''}</p>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                    </div>
+                </ar-tab-panel>
+            )}
+
+            {component.events && component.events.length > 0 && (
+                <ar-tab-panel name="evenements">
+                    <h4 id="api-evenements" class="sr-only">Événements</h4>
+                    <div class="api-list">
+                        {component.events.map((event) => (
+                            <div class="api-row">
+                                <span class="api-name">
+                                    {event.name}
+                                    {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
+                                </span>
+                                <p class="api-desc">{stripCancelableMarker(event.description)}</p>
+                            </div>
+                        ))}
+                    </div>
+                </ar-tab-panel>
+            )}
+
+            {publicMethods.length > 0 && (
+                <ar-tab-panel name="methodes">
+                    <h4 id="api-methodes" class="sr-only">Méthodes</h4>
+                    <div class="api-list">
+                        {publicMethods.map((m) => {
+                            const params = (m.parameters ?? [])
+                                .map((p) => {
+                                    let s = p.name;
+                                    if (p.type?.text) s += `: ${p.type.text}`;
+                                    if (p.default !== undefined) s += ` = ${p.default}`;
+                                    return s;
+                                })
+                                .join(', ');
+                            const returnType = m.return?.type?.text ?? 'void';
+                            return (
+                                <div class="api-row">
+                                    <div>
+                                        <span class="api-name">{m.name}()</span>
+                                        {params && <code class="api-sig">{params}</code>}
+                                        <code class="api-default">retour&nbsp;: {returnType}</code>
+                                    </div>
+                                    <p class="api-desc">{m.description ?? ''}</p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </ar-tab-panel>
+            )}
+
+            {component.cssParts && component.cssParts.length > 0 && (
+                <ar-tab-panel name="css-parts">
+                    <h4 id="api-css-parts" class="sr-only">CSS Parts</h4>
+                    <p class="hint">
+                        Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
+                        {hasTransverseParts && (
+                            <>
+                                <br />Certaines parts indiquent un rôle transverse, partagé avec
+                                d'autres composants — voir <a href="/theming/personnalisation-avancee#semantic-parts">Personnalisation avancée</a>.
+                            </>
+                        )}
+                        {hasStateParts && (
+                            <>
+                                <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir <a href="/theming/personnalisation-avancee#state-parts">Personnalisation avancée</a>.
+                            </>
+                        )}
+                    </p>
+                    <div class="api-list">
+                        {component.cssParts.map((part) => (
+                            <div class="api-row">
+                                <span class="api-name">{part.name}</span>
+                                <p class="api-desc">{part.description ?? ''}</p>
+                            </div>
+                        ))}
+                    </div>
+                </ar-tab-panel>
+            )}
+
+            {(ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0) && (
+                <ar-tab-panel name="css-props">
+                    <h4 id="api-css-props" class="sr-only">CSS Custom Properties</h4>
+                    {panelProps.length > 0 && (
+                        <>
+                            <p>
+                                Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br />
+                                Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
+                            </p>
+                            <div class="token-example">
+                                <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
+                            </div>
+                            <div class="api-list panel-tokens-list">
+                                {panelProps.map((prop) => (
+                                    <div class="api-row">
+                                        <span class="api-name">{prop.name}</span>
+                                        <p class="api-desc">{prop.description ?? ''}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    {(panelProps.length > 0 && ownProps.length > 0) && (
+                        <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
+                    )}
+                    {ownProps.length > 0 && (
+                        <div class="api-list">
+                            {ownProps.map((prop) => (
+                                <div class="api-row">
+                                    <span class="api-name">{prop.name}</span>
+                                    <p class="api-desc">{prop.description ?? ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {relatedTokens.length > 0 && (
+                        <ar-alert class="doc-callout-alert" variant="info" without-notification>
+                            <div class="doc-callout-alert-content">
+                                {relatedTokens.map((rt) => (
+                                    <p>
+                                        {rt.description}{' '}<br />
+                                        <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
+                                    </p>
+                                ))}
+                            </div>
+                        </ar-alert>
+                    )}
+                </ar-tab-panel>
+            )}
+        </ar-tab-group>
     )}
 </div>
 
 <style>
     @import '../styles/doc-prose.css';
-    @import '../styles/doc-table.css';
 
     .component-api {
-        display:        flex;
+        display: flex;
         flex-direction: column;
-        gap:            2.5rem;
-        margin-top:     2rem;
+        gap: 2.5rem;
+        margin-top: 2rem;
     }
 
     .hint {
@@ -307,30 +273,163 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
         margin-bottom: 1rem;
     }
 
-    .panel-tokens-table {
-        margin-bottom: 1.875rem;
-    }
-
     .own-props-intro {
         margin-top: 1.875rem;
     }
 
     .token-example pre {
-        margin:         0;
-        padding:        1rem 1.25rem;
-        overflow-x:     auto;
-        border-radius:  0.5rem;
-        font-family:    'Fira Code', 'Cascadia Code', monospace;
-        font-size:      0.8rem;
-        line-height:    1.6;
-        background:     var(--doc-code-block-bg);
+        margin: 0;
+        padding: 1rem 1.25rem;
+        overflow-x: auto;
+        border-radius: 0.5rem;
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        background: var(--doc-code-block-bg);
     }
 
     .token-example pre code {
         font-family: inherit;
-        font-size:   inherit;
-        padding:     0;
-        background:  transparent;
-        color:       #cdd6f4;
+        font-size: inherit;
+        padding: 0;
+        background: transparent;
+        color: #cdd6f4;
+    }
+
+    /* ── Onglets ──────────────────────────────────────────── */
+
+    .api-tabs {
+        display: block;
+    }
+
+    .api-tab-count {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.72rem;
+        color: var(--doc-text-muted);
+    }
+
+    /* ── API en « lignes de vie » — remplace les tableaux : plus de
+           scroll horizontal en mobile. ─────────────────────────────── */
+
+    .api-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-tokens-list {
+        margin-bottom: 1.875rem;
+    }
+
+    .api-row {
+        display: grid;
+        grid-template-columns: 15.5rem minmax(0, 1fr);
+        gap: 0 1.75rem;
+        padding: 0.95rem 0 0.95rem 1.15rem;
+        position: relative;
+        border-top: 1px solid var(--doc-border);
+    }
+
+    .api-row:first-child {
+        border-top: 0;
+    }
+
+    /* Le fil relie toutes les entrées de la catégorie. */
+    .api-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--doc-rail);
+    }
+
+    .api-row:first-child::before {
+        top: 0.95rem;
+    }
+    .api-row:last-child::before {
+        bottom: 0.95rem;
+    }
+
+    .api-row::after {
+        content: '';
+        position: absolute;
+        left: -3px;
+        top: 1.35rem;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--doc-bg, var(--doc-paper));
+        border: 1px solid var(--doc-rail);
+    }
+
+    .api-row:hover::after {
+        background: var(--doc-bead);
+        border-color: var(--doc-bead);
+    }
+
+    .api-name {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.86rem;
+        font-weight: 500;
+        color: var(--doc-text);
+        word-break: break-word;
+    }
+
+    .api-sig {
+        display: block;
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.75rem;
+        color: var(--doc-accent);
+        margin-top: 0.2rem;
+        line-height: 1.5;
+        background: transparent;
+        padding: 0;
+    }
+
+    .api-default {
+        display: block;
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.72rem;
+        color: var(--doc-text-muted);
+        margin-top: 0.15rem;
+        background: transparent;
+        padding: 0;
+    }
+
+    .api-desc {
+        font-size: 0.9rem;
+        color: var(--doc-text-muted);
+        margin: 0;
+    }
+
+    .api-desc code {
+        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-size: 0.84em;
+        background: var(--doc-surface);
+        padding: 0.05rem 0.3rem;
+        border-radius: var(--doc-radius-sm);
+        color: var(--doc-text);
+    }
+
+    .flag {
+        display: inline-block;
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.05rem 0.4rem;
+        border-radius: 999px;
+        border: 1px solid var(--doc-accent);
+        color: var(--doc-accent);
+        margin-left: 0.4rem;
+        vertical-align: 1px;
+    }
+
+    @media (max-width: 900px) {
+        .api-row {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.4rem;
+        }
     }
 </style>
