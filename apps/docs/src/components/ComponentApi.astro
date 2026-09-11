@@ -45,7 +45,7 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
                 La langue de ce composant suit l'attribut <code>lang</code> de la page
                 (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
                 instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
-                page <a href="/getting-started/i18n">Internationalisation</a> pour le détail du
+                page <a href="/getting-started/traductions">Traductions</a> pour le détail du
                 mécanisme et la liste des traductions disponibles.
             </p>
             <p>
@@ -161,13 +161,12 @@ const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name)
                 {hasTransverseParts && (
                     <>
                         <br />Certaines parts indiquent un rôle transverse, partagé avec
-                        d'autres composants — voir <a href="/theming/parts-and-slots#semantic-parts">Parts & Slots</a>.
+                        d'autres composants — voir <a href="/theming/personnalisation-avancee#semantic-parts">Personnalisation avancée</a>.
                     </>
                 )}
                 {hasStateParts && (
                     <>
-                        <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir
-                        <a href="/theming/parts-and-slots#state-parts">Parts & Slots</a>.
+                        <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir <a href="/theming/personnalisation-avancee#state-parts">Personnalisation avancée</a>.
                     </>
                 )}
             </p>

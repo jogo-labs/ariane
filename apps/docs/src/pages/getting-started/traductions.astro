@@ -48,10 +48,10 @@ const codeCustomTranslationCdn = `<html lang="es">
 `;
 ---
 
-<Layout title="Internationalisation (i18n)" currentPath="/getting-started/i18n" showToc={true}>
+<Layout title="Traductions" currentPath="/getting-started/traductions" showToc={true}>
     <div class="page-container">
         <div class="page-header">
-            <h2 class="page-title">Internationalisation</h2>
+            <h2 class="page-title">Traductions</h2>
             <p class="summary">
                 Certains composants Ariane embarquent des libellés accessibles (annonces
                 aria-live, aria-label). Ce mécanisme permet de les traduire sans surcharger
@@ -80,8 +80,8 @@ const codeCustomTranslationCdn = `<html lang="es">
                 <div class="doc-callout-alert-content">
                     <p>
                         Seuls <code>&lt;html lang&gt;</code> et le <code>lang</code> posé
-                        directement sur le composant sont pris en compte — un
-                        <code>&lt;div lang="es"&gt;</code> autour d'un composant Ariane n'a
+                        directement sur le composant sont pris en compte — un <code>&lt;div lang="es"&gt;</code> autour
+                        d'un composant Ariane n'a
                         aucun effet. C'est une limite assumée de la librairie, pour des
                         raisons de performance (pas de traversée du DOM à chaque rendu).
                     </p>
@@ -91,10 +91,10 @@ const codeCustomTranslationCdn = `<html lang="es">
             <NarrativeSubheading id="default-imports">Imports par défaut</NarrativeSubheading>
             <p>
                 Contrairement à d'autres bibliothèques qui publient un fichier par langue à
-                charger à la demande, les traductions <code>fr</code> (défaut) et
-                <code>en</code> sont embarquées directement dans chaque composant qui en a
-                besoin (CDN ou npm). Charger <code>ar-table-sort</code> ou
-                <code>ar-datepicker</code> suffit — les deux langues sont déjà enregistrées,
+                charger à la demande, les traductions <code>fr</code> (défaut) et <code>en</code> sont
+                embarquées directement dans chaque composant qui en a
+                besoin (CDN ou npm). Charger <code>ar-table-sort</code> ou <code>ar-datepicker</code> suffit
+                — les deux langues sont déjà enregistrées,
                 aucun import supplémentaire n'est nécessaire pour les utiliser.
             </p>
 

@@ -5,7 +5,7 @@ import { getSlug } from './tag-name.ts';
 /**
  * Rôles ::part() transverses reconnus (hors racine, qui varie par composant —
  * voir isTransversePart). Source de vérité unique, à tenir synchronisée avec
- * la table de /theming/parts-and-slots (Parts & Slots).
+ * la table de /theming/personnalisation-avancee (Personnalisation avancée).
  */
 export const TRANSVERSE_ROLES = [
     'panel',

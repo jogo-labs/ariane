@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+import NextStep from '../../components/NextStep.astro';
+
+const tocEntries = [
+    { id: 'personnalisation',        label: 'Thème et personnalisation',   level: 1 as const },
+    { id: 'charger-un-theme',        label: 'Charger un thème',            level: 2 as const },
+    { id: 'tokens-globaux',          label: 'Personnaliser toute la librairie', level: 2 as const },
+    { id: 'personnaliser-instance',  label: 'Personnaliser une instance',  level: 2 as const },
+    { id: 'presets',                 label: 'Éléments slottés ou externes',    level: 2 as const },
+];
+
+const codeCustomProps = `.alerte-succes-perso {
+    --ar-alert-bg:   #f5f0ff;
+    --ar-alert-icon: #7c3aed;
+}`;
+
+const codeGlobalCustom = `/* Personnalisation des tokens consommés par les composants */
+:root {
+    ...
+    --ar-alert-color: #2e2e31;
+    --ar-alert-close-size: 2rem;
+    --ar-alert-hide-transition-duration: 0.33s;
+}
+
+/* Personnalisation des CSS Parts exposées par les composant */
+ar-alert::part(close-button) {
+    border-radius: 10px;
+    color: currentColor;
+    ...
+}`;
+
+const codeTokensAlias = `:root {
+    ...
+    --ar-alert-color: var(--mon-ds-color-alert);
+}`;
+
+const codePresets = `<!-- Charger le CSS dans le <head> -->
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/fields.css" />
+
+<!-- Utilisez les classes dans votre HTML -->
+<button class="ar-btn ar-btn-primary">Valider</button>
+<textarea class="ar-input" id="mon-textarea" rows="3"></textarea>
+`;
+---
+
+<Layout
+    title="Appliquer un thème à vos composants"
+    description="Charger et personnaliser le thème CSS d'Ariane, à l'échelle d'une instance ou de toute la librairie."
+    currentPath="/theming/appliquer-un-theme"
+    showToc={true}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Appliquer un thème à vos composants</h2>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="personnalisation">Thème et personnalisation</NarrativeHeading>
+            <p>
+                Ariane est une librairie <strong>headless</strong> et n'impose donc aucun style par défaut. <br />
+                Cela vous laisse donc le champs libre pour créer un thème adapté à votre besoin.
+            </p>
+
+            <NarrativeSubheading id="charger-un-theme">Créer un thème</NarrativeSubheading>
+            <p>
+                Chaque page de documentation d'un composant liste les différents points de personnalisation disponibles (Custom Properties CSS et CSS Parts). <br />
+                Pour mieux comprendre les mécanisme et faciliter la création de votre thème, vous pouvez utiliser comme base le thème créé pour les démos de cette documentation. <br />
+                Ce thème est commenté de manière exhaustive pour mieux comprendre les mécanismes en place, notamment aussi pour une gestion du modes clair et sombre :
+            </p>
+            <p>
+                <a class="download-theme" href="/themes/default.css" download>
+                    Télécharger le thème de démo
+                </a>
+            </p>
+
+            <NarrativeSubheading id="tokens-globaux">Personnaliser toute la librairie</NarrativeSubheading>
+            <p>
+                C'est la méthode principale que vous utiliserez pour créer votre thème, c'est celle illustrée dans le thème de démo.
+            </p>
+            <pre><code class="language-css" set:text={codeGlobalCustom} /></pre>
+            <p>
+                Si vous avez déjà votre propre design system, pointez les tokens Ariane vers
+                les vôtres au lieu de dupliquer les valeurs — le nom du token Ariane reste
+                stable, sa valeur suit la vôtre (y compris un éventuel mode sombre déjà géré
+                de votre côté) :
+            </p>
+            <pre><code class="language-css" set:text={codeTokensAlias} /></pre>
+            <p class="hint">
+                Les propriétés disponibles par composant sont listées dans la section <strong>Référence API</strong> de chaque page de composant.
+            </p>
+
+            <NarrativeSubheading id="personnaliser-instance">Personnaliser une instance</NarrativeSubheading>
+            <p>
+                Comme pour n'importe quel élément HTML natifs, vous pouvez aussi personnaliser une instance précise. <br />
+                Pour se faire, ajoutez-lui une classe et surchargez ses propriétés ou ses CSS Parts :
+            </p>
+            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
+
+
+            <NarrativeSubheading id="presets">Éléments slottés ou externes</NarrativeSubheading>
+            <p style="margin-bottom: 1rem">
+                Ces mécanismes — tokens et <a href="/theming/personnalisation-avancee"><code>::part()</code></a> — couvrent l'apparence à l'intérieur des composants. <br />
+                Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
+                hors de leur portée. Pour ces cas là ce sera le CSS de votre page qui prendra le relais pour personnaliser ces éléments. <br />
+                En complément du thème de démo, Ariane met donc à disposition un exemple de classes CSS pré-définies pour personnaliser l'apparence de ces éléments non couverts.<br />
+                Chaque famille de classes vit dans son propre fichier et peut être chargé utilisée comme base de départ pour vos propre style ou utilisés directement en complément du thème de démo :
+            </p>
+            <pre><code class="language-html" set:text={codePresets} /></pre>
+        </div>
+
+        <NextStep
+            label="Prochaine étape :"
+            links={[{ href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' }]}
+        />
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+
+    .download-theme {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--doc-border);
+        border-radius: 0.375rem;
+        background: var(--doc-nav-bg);
+        color: var(--doc-text);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .download-theme:hover {
+        background: var(--doc-accent-bg);
+        color: var(--doc-accent);
+    }
+</style>
