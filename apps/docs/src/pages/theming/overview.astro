@@ -14,17 +14,15 @@ import NextStep from '../../components/NextStep.astro';
         <div class="page-header">
             <h2 class="page-title">Personnaliser vos composants</h2>
             <p class="summary">
-                Ariane est une librairie <strong>headless</strong> : aucun style visuel par
-                défaut. Sans thème, les composants fonctionnent pleinement (accessibilité,
-                interactions, slots) mais leur rendu est indéfini — c'est une fondation sur
-                laquelle construire un design system, pas un kit d'UI clé en main.
+                Ariane est une librairie <strong>headless</strong>, cela signifie qu'elle n'inclut aucun style visuel par défaut. Les composants fonctionnent pleinement (accessibilité, interactions, slots) mais leur apparence est brute.<br />
+                Que vous travailliez sur un projet simple ou plus complexe tel qu'un Design System, il vous faudra donc ajouter une couche CSS pour adapter leur apparence à votre besoin.
             </p>
         </div>
 
         <div class="narrative">
-            <NarrativeHeading id="leviers">Trois leviers de personnalisation</NarrativeHeading>
+            <NarrativeHeading id="leviers">Deux leviers de personnalisation</NarrativeHeading>
             <p>
-                Selon ce que vous cherchez à faire, un de ces trois mécanismes s'applique :
+                Selon ce que vous cherchez à faire, un de ces deux mécanismes s'applique :
             </p>
 
             <div class="table-wrap">
@@ -38,38 +36,33 @@ import NextStep from '../../components/NextStep.astro';
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Tokens CSS (<code>--ar-*</code>)</td>
+                            <td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/--*" rel="noopener" target="_blank">CSS custom properties</a> <br />(parfois appelés "Tokens CSS")</td>
                             <td>Toute la librairie, ou une instance via une classe</td>
                             <td>Couleurs, espacements, typographie — la majorité des besoins</td>
                         </tr>
                         <tr>
-                            <td><code>::part()</code></td>
+                            <td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Shadow_parts" rel="noopener" target="_blank">CSS parts</a></td>
                             <td>Une partie interne précise d'un composant</td>
                             <td>Layout ou styles non couverts par un token</td>
-                        </tr>
-                        <tr>
-                            <td>Styles prêts à l'emploi (presets)</td>
-                            <td>Éléments HTML natifs slottés (pas les composants <code>ar-*</code>)</td>
-                            <td>Un bouton ou un champ que vous slottez doit ressembler aux composants Ariane</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <p class="hint">
-                Les tokens et les <code>::part()</code> couvrent l'intérieur des composants —
-                les styles prêts à l'emploi sont documentés comme complément, dans la page
-                <a href="/theming/appliquer-un-theme#presets">Appliquer un thème</a>.
+                Ces deux leviers couvrent<strong> l'apparence des éléments inclus dans le shadow DOM des composants</strong>. <br />
+                Pour tout ce qui est à l'extérieur (certains boutons, contenus dans des slots, input ou textarea dans certains cas), il sera nécessaire de compléter ces leviers par des règles spécifiques. <br />
+                Des exemples de feuilles de style sont documentées - pour servir directement ou comme base - dans la page <a href="/theming/appliquer-un-theme#presets">Appliquer un thème</a>.
             </p>
             <p class="hint">
-                Si vous découvrez tout juste les Custom Elements, commencez par
+                Si vous découvrez tout juste les Custom Elements, commencez par la section
                 <a href="/theming/appliquer-un-theme">Appliquer un thème</a> — les autres
-                pages partent du principe que le thème par défaut est chargé.
+                pages partent du principe qu'un thème est chargé.
             </p>
         </div>
 
         <NextStep
-            label="Prochaine étape : choisissez votre point d'entrée"
+            label="Prochaines étapes :"
             links={[
                 { href: '/theming/appliquer-un-theme', label: 'Appliquer un thème' },
                 { href: '/theming/personnalisation-avancee', label: 'Personnalisation avancée' },

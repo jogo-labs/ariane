@@ -21,7 +21,7 @@ const { label, links } = Astro.props;
 ---
 
 <div class="next-step">
-    <strong>{label}</strong>
+    <strong>{label}</strong>&nbsp;
     {links.length === 1 ? (
         <a href={links[0].href}>{links[0].label}</a>
     ) : (

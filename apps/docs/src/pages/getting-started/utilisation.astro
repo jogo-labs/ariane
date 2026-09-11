@@ -12,6 +12,7 @@ const tocEntries = [
     { id: 'slots',       label: 'Slots',                    level: 1 as const },
     { id: 'evenements',  label: 'Événements',                level: 1 as const },
     { id: 'methodes',    label: 'Méthodes',                  level: 1 as const },
+    { id: 'ide-autocomplete', label: 'Autocomplétion IDE',   level: 1 as const },
 ];
 
 const codeHtml = `<ar-alert variant="success">
@@ -65,10 +66,20 @@ pagination.addEventListener('ar-pagination-page-changed', (event) => {
     console.log(\`Page changée : \${event.detail.from} → \${event.detail.to}\`);
 });`;
 
-const codeMethodCall = `const collapse = document.querySelector('ar-collapse');
+const codeMethodCall = `<ar-collapse>
+    <button slot="trigger" class="ar-btn ar-btn-secondary">Révéler le contenu</button>
+    <p>Contenu qui se révèle à l'ouverture</p>
+</ar-collapse>
 
-await customElements.whenDefined('ar-collapse');
-collapse.show();`;
+<script>
+    const collapse = document.querySelector('ar-collapse');
+    collapse.show();
+</script>`;
+
+const codeVsCodeSettings = `{
+    "html.customData": ["node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
+    "css.customData": ["node_modules/@ariane-ui/core/dist/vscode.css-custom-data.json"]
+}`;
 ---
 
 <Layout
@@ -152,36 +163,29 @@ collapse.show();`;
             </p>
             <pre><code class="language-html" set:text={codeNamedSlot} /></pre>
             <p class="hint">
-                Les slots disponibles pour chaque composant sont documentés dans sa
-                Référence API, section « Slots ».
+                Les slots disponibles pour chaque composant sont documentés dans la partie <strong>Référence API</strong>, section « Slots ».
             </p>
             <p class="hint">
-                Pour plus d'information sur ce sujet, voir la
-                <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_templates_and_slots"
+                Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_templates_and_slots"
                 target="_blank" rel="noopener">documentation complète sur MDN</a>.
             </p>
 
             <NarrativeHeading id="evenements">Événements</NarrativeHeading>
             <p>
                 Les composants Ariane émettent des <code>CustomEvent</code> standards,
-                préfixés par le nom du tag (<code>ar-pagination-page-changed</code>,
-                <code>ar-collapse-shown</code>...). Écoutez-les comme n'importe quel
+                préfixés par le nom du tag (<code>ar-pagination-page-changed</code>, <code>ar-collapse-shown</code>...). Écoutez-les comme n'importe quel
                 événement DOM :
             </p>
             <pre><code class="language-js" set:text={codeEventListener} /></pre>
             <p>
-                Certains événements sont <strong>annulables</strong>
-                (<code>event.preventDefault()</code> bloque le comportement par défaut)
-                — c'est indiqué dans la colonne « Annulable » de leur Référence API.
+                Les événements <strong>annulables</strong> sont indiqués dans la colonne « Annulable » de leur partie <strong>Référence API</strong>.
             </p>
             <p class="hint">
-                La liste complète des événements de chaque composant, avec le type de
-                leur <code>detail</code>, est documentée dans sa Référence API, section
+                La liste complète des événements de chaque composant, avec le type de leur <code>detail</code>, est documentée dans la partie <strong>Référence API</strong>, section
                 « Événements ».
             </p>
             <p class="hint">
-                Pour plus d'information sur ce sujet, voir la
-                <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
+                Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
                 target="_blank" rel="noopener">documentation complète sur MDN</a>.
             </p>
 
@@ -190,13 +194,21 @@ collapse.show();`;
                 Certaines actions s'appellent directement en JavaScript sur l'élément,
                 une fois le composant défini :
             </p>
-            <pre><code class="language-js" set:text={codeMethodCall} /></pre>
+            <pre><code class="language-html" set:text={codeMethodCall} /></pre>
             <p class="hint">
-                La liste des méthodes disponibles par composant est documentée dans sa
-                Référence API, section « Méthodes ». Voir aussi la section précédente
-                <a href="#chargement">Attendre le chargement</a> pour garantir que le
+                La liste des méthodes disponibles par composant est documentée dans sa partie <strong>Référence API</strong>, section « Méthodes ». <br />
+                Voir aussi la section précédente <a href="#chargement">Attendre le chargement</a> pour garantir que le
                 composant est prêt avant d'appeler une méthode.
             </p>
+
+            <NarrativeHeading id="ide-autocomplete">Autocomplétion IDE</NarrativeHeading>
+            <p>
+                Le paquet npm publie des fichiers de données VS Code générés automatiquement
+                depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
+                de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
+                Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
+            </p>
+            <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
         </div>
 
         <NextStep

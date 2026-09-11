@@ -8,9 +8,9 @@ import NextStep from '../../components/NextStep.astro';
 const tocEntries = [
     { id: 'personnalisation',        label: 'Thème et personnalisation',   level: 1 as const },
     { id: 'charger-un-theme',        label: 'Charger un thème',            level: 2 as const },
-    { id: 'personnaliser-instance',  label: 'Personnaliser une instance',  level: 2 as const },
     { id: 'tokens-globaux',          label: 'Personnaliser toute la librairie', level: 2 as const },
-    { id: 'presets',                 label: 'Styles prêts à l\'emploi',    level: 2 as const },
+    { id: 'personnaliser-instance',  label: 'Personnaliser une instance',  level: 2 as const },
+    { id: 'presets',                 label: 'Éléments slottés ou externes',    level: 2 as const },
 ];
 
 const codeCustomProps = `.alerte-succes-perso {
@@ -18,22 +18,33 @@ const codeCustomProps = `.alerte-succes-perso {
     --ar-alert-icon: #7c3aed;
 }`;
 
-const codeTokens = `:root {
-    --ar-color-interactive: #7c3aed;
-    --ar-border-radius-md:  0.75rem;
+const codeGlobalCustom = `/* Personnalisation des tokens consommés par les composants */
+:root {
+    ...
+    --ar-alert-color: #2e2e31;
+    --ar-alert-close-size: 2rem;
+    --ar-alert-hide-transition-duration: 0.33s;
+}
+
+/* Personnalisation des CSS Parts exposées par les composant */
+ar-alert::part(close-button) {
+    border-radius: 10px;
+    color: currentColor;
+    ...
 }`;
 
 const codeTokensAlias = `:root {
-    --ar-color-interactive: var(--mon-ds-color-primary);
-    --ar-color-text:        var(--mon-ds-color-text);
+    ...
+    --ar-alert-color: var(--mon-ds-color-alert);
 }`;
 
 const codePresets = `<!-- Charger le CSS dans le <head> -->
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/fields.css" />
 
 <!-- Utilisez les classes dans votre HTML -->
 <button class="ar-btn ar-btn-primary">Valider</button>
-<button class="ar-btn ar-btn-secondary">Annuler</button>
+<textarea class="ar-input" id="mon-textarea" rows="3"></textarea>
 `;
 ---
 
@@ -51,41 +62,27 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
         <div class="narrative">
             <NarrativeHeading id="personnalisation">Thème et personnalisation</NarrativeHeading>
             <p>
-                Ariane est une librairie <strong>headless</strong> : les composants ne portent
-                aucun style visuel par défaut. Sans thème, ils fonctionnent (accessibilité,
-                interactions, slots) mais leur rendu visuel est indéfini — c'est intentionnel,
-                Ariane est une fondation sur laquelle construire un design system, pas un kit
-                d'UI clé en main. Couleurs, espacements et typographie proviennent exclusivement
-                d'un fichier de thème chargé séparément.
+                Ariane est une librairie <strong>headless</strong> et n'impose donc aucun style par défaut. <br />
+                Cela vous laisse donc le champs libre pour créer un thème adapté à votre besoin.
             </p>
 
-            <NarrativeSubheading id="charger-un-theme">Charger un thème</NarrativeSubheading>
+            <NarrativeSubheading id="charger-un-theme">Créer un thème</NarrativeSubheading>
             <p>
-                Les exemples de cette documentation utilisent <code>themes/default.css</code>,
-                un thème de démo fourni avec Ariane (modes clair et sombre inclus) — pas les
-                valeurs par défaut intrinsèques des composants. Utilisez-le comme point de
-                départ pour construire votre propre thème :
+                Chaque page de documentation d'un composant liste les différents points de personnalisation disponibles (Custom Properties CSS et CSS Parts). <br />
+                Pour mieux comprendre les mécanisme et faciliter la création de votre thème, vous pouvez utiliser comme base le thème créé pour les démos de cette documentation. <br />
+                Ce thème est commenté de manière exhaustive pour mieux comprendre les mécanismes en place, notamment aussi pour une gestion du modes clair et sombre :
             </p>
             <p>
                 <a class="download-theme" href="/themes/default.css" download>
-                    Télécharger default.css
+                    Télécharger le thème de démo
                 </a>
             </p>
 
-            <NarrativeSubheading id="personnaliser-instance">Personnaliser une instance</NarrativeSubheading>
-            <p>
-                Chaque composant expose des <strong>CSS Custom Properties</strong>. Pour
-                personnaliser une instance précise, ajoutez-lui une classe et surchargez ses
-                propriétés sur cette classe :
-            </p>
-            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
-
             <NarrativeSubheading id="tokens-globaux">Personnaliser toute la librairie</NarrativeSubheading>
             <p>
-                Pour modifier l'ensemble de la librairie, surchargez plutôt les tokens
-                globaux (couleurs, espacements, typographie) sur <code>:root</code> :
+                C'est la méthode principale que vous utiliserez pour créer votre thème, c'est celle illustrée dans le thème de démo.
             </p>
-            <pre><code class="language-css" set:text={codeTokens} /></pre>
+            <pre><code class="language-css" set:text={codeGlobalCustom} /></pre>
             <p>
                 Si vous avez déjà votre propre design system, pointez les tokens Ariane vers
                 les vôtres au lieu de dupliquer les valeurs — le nom du token Ariane reste
@@ -94,25 +91,24 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
             </p>
             <pre><code class="language-css" set:text={codeTokensAlias} /></pre>
             <p class="hint">
-                Les propriétés disponibles par composant sont listées dans la section
-                <strong>Référence API</strong> de chaque page de composant.
+                Les propriétés disponibles par composant sont listées dans la section <strong>Référence API</strong> de chaque page de composant.
             </p>
 
-            <p style="margin-top: 1rem">
-                Ces mécanismes — tokens et <a href="/theming/personnalisation-avancee"><code>::part()</code></a> — couvrent l'intérieur des composants.
-                Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
-                hors de leur portée : c'est ce que couvrent les styles prêts à l'emploi ci-dessous.
+            <NarrativeSubheading id="personnaliser-instance">Personnaliser une instance</NarrativeSubheading>
+            <p>
+                Comme pour n'importe quel élément HTML natifs, vous pouvez aussi personnaliser une instance précise. <br />
+                Pour se faire, ajoutez-lui une classe et surchargez ses propriétés ou ses CSS Parts :
             </p>
+            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
 
-            <NarrativeSubheading id="presets">Styles prêts à l'emploi</NarrativeSubheading>
+
+            <NarrativeSubheading id="presets">Éléments slottés ou externes</NarrativeSubheading>
             <p style="margin-bottom: 1rem">
-                Ariane propose — de manière optionnelle — des feuilles de styles comportant
-                des classes CSS prêtes à l'emploi.<br />
-                Elles peuvent s'appliquer au HTML qui se trouve dans le Light DOM
-                (un bouton slotté dans un composant, par exemple) — distinctes des tokens /
-                <code>::part()</code> du thème qui s'appliquent aux composants <code>ar-*</code>. <br />
-                Chaque famille de classes vit dans son propre fichier,
-                à charger séparément de <code>themes/default.css</code> :
+                Ces mécanismes — tokens et <a href="/theming/personnalisation-avancee"><code>::part()</code></a> — couvrent l'apparence à l'intérieur des composants. <br />
+                Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
+                hors de leur portée. Pour ces cas là ce sera le CSS de votre page qui prendra le relais pour personnaliser ces éléments. <br />
+                En complément du thème de démo, Ariane met donc à disposition un exemple de classes CSS pré-définies pour personnaliser l'apparence de ces éléments non couverts.<br />
+                Chaque famille de classes vit dans son propre fichier et peut être chargé utilisée comme base de départ pour vos propre style ou utilisés directement en complément du thème de démo :
             </p>
             <pre><code class="language-html" set:text={codePresets} /></pre>
         </div>

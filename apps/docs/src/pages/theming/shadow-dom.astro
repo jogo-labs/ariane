@@ -35,7 +35,7 @@ export class MonApp extends HTMLElement {
 }
 customElements.define('mon-app', MonApp);`;
 
-const codeCustomTheme = `// mon-theme.js — généré par votre build à partir de votre fichier CSS
+const codeCustomTheme = `// mon-theme.js — dans l'idéal, généré au build à partir de votre thème CSS
 export const monTheme = new CSSStyleSheet();
 
 /* Injectez le contenu de votre fichier CSS ci-dessous */
@@ -98,17 +98,6 @@ customElements.define('mon-app', MonApp);`;
                 les <code>adoptedStyleSheets</code> permettent un chargement synchrone (pas de FOUC).
             </p>
 
-            <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-top: 1rem">
-                <p class="doc-callout-alert-title">Compatibilité</p>
-                <div class="doc-callout-alert-content">
-                    <p>
-                        <code>CSSStyleSheet</code> constructible et <code>adoptedStyleSheets</code>
-                        sont supportés par tous les navigateurs majeurs actuels (Safari 16.4+, mars
-                        2023).
-                    </p>
-                </div>
-            </ar-alert>
-
             <NarrativeSubheading id="preparez-theme">Préparez votre thème</NarrativeSubheading>
             <p>
                 Le plus souvent votre application a déjà son propre thème, local à votre code
@@ -117,7 +106,7 @@ customElements.define('mon-app', MonApp);`;
             </p>
             <pre><code class="language-js" set:text={codeCustomTheme} /></pre>
             <ar-alert variant="info" without-notification class="doc-callout-alert">
-                <p class="doc-callout-alert-title">N'importez pas les tokens</p>
+                <p class="doc-callout-alert-title">N'importez pas les tokens CSS</p>
                 <div class="doc-callout-alert-content">
                     <p>
                         Les CSS Custom properties n'ont pas besoin d'être incluses dans cette version JS,
@@ -126,10 +115,10 @@ customElements.define('mon-app', MonApp);`;
                 </div>
             </ar-alert>
 
-            <NarrativeSubheading id="theme-defaut">Utiliser le thème par défaut</NarrativeSubheading>
+            <NarrativeSubheading id="theme-defaut">Exemple avec le thème de démo</NarrativeSubheading>
             <p>
-                Si vous utilisez le thème Ariane dans votre projet, celui-ci est packagé en JS
-                et utilisable via le CDN ou le paquet npm.
+                Ariane embarque pour un usage interne une version de son thème packagée en JS. <br />
+                Si vous utilisez ce thème pour votre projet, voici comment l'utiliser.
             </p>
 
             <p><strong>Via CDN :</strong></p>

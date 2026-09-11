@@ -3,14 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
 import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+import NextStep from '../../components/NextStep.astro';
 
 const tocEntries = [
     { id: 'prerequis',      label: 'Prérequis',         level: 1 as const },
     { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
     { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
     { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
-    { id: 'npm',            label: 'Installation avec NPM', level: 1 as const },
-    { id: 'ide-autocomplete', label: 'Autocomplétion IDE', level: 2 as const },
+    { id: 'npm',            label: 'Installation avec npm', level: 1 as const },
 ];
 
 const codeAutoloader = `<!-- Charge automatiquement les composants utilisés dans la page ou ses shadow DOM. -->
@@ -27,11 +27,6 @@ const codeNpmInstall = `npm install @ariane-ui/core`;
 const codeNpmGlobal = `import '@ariane-ui/core';`;
 
 const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.js';`;
-
-const codeVsCodeSettings = `{
-  "html.customData": ["node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
-  "css.customData": ["node_modules/@ariane-ui/core/dist/vscode.css-custom-data.json"]
-}`;
 ---
 
 <Layout
@@ -45,7 +40,10 @@ const codeVsCodeSettings = `{
             <p class="summary">
                 Vous pouvez charger les composants via CDN, ou en les installant en local dans votre projet.<br />
                 Il s'agit de <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_custom_elements" target="_blank" rel="noopener">Custom Elements natifs</a>, ils devraient donc fonctionner de manière transparente avec n'importe quel framework.
-                Cependant certains framework peuvent nécessiter une configuration préalable.
+            </p>
+            <p class="summary">
+                Cependant, l'utilisation de Custom Elements avec certains frameworks peut nécessiter une configuration préalable.<br />
+                Consultez <a href="/getting-started/frameworks">la page dédiée</a> pour plus d'informations.
             </p>
         </div>
 
@@ -70,7 +68,7 @@ const codeVsCodeSettings = `{
             </p>
             <pre><code class="language-html" set:text={codeBundle} /></pre>
 
-            <NarrativeHeading id="npm">Installation avec NPM</NarrativeHeading>
+            <NarrativeHeading id="npm">Installation avec npm</NarrativeHeading>
             <p>Installez d'abord le paquet d'Ariane</p>
             <pre><code class="language-bash" set:text={codeNpmInstall} /></pre>
 
@@ -79,20 +77,15 @@ const codeVsCodeSettings = `{
 
             <p>Vous pouvez aussi importer tous les composants en une seule ligne :</p>
             <pre><code class="language-typescript" set:text={codeNpmGlobal} /></pre>
-
-            <NarrativeSubheading id="ide-autocomplete">Autocomplétion IDE</NarrativeSubheading>
-            <p>
-                Le paquet npm publie des fichiers de données VS Code générés automatiquement
-                depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
-                de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
-                Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
-            </p>
-            <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
-            <p class="hint">
-                Les composants sont fonctionnels mais visuellement indéfinis sans thème chargé — voir
-                <a href="/theming/appliquer-un-theme">Appliquer un thème</a> pour l'étape suivante.
-            </p>
         </div>
+
+        <NextStep
+            label="Prochaine étape :"
+            links={[
+                { href: '/getting-started/utilisation', label: 'Utilisation' },
+                { href: '/getting-started/frameworks', label: 'Frameworks' },
+            ]}
+        />
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />

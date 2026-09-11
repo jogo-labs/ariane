@@ -4,7 +4,7 @@
  * Le bloc `:root` de base doit être déclaré avant les règles `[data-theme='dark']`/`[data-theme='light']` qui suivent (voir plus bas), car `packages/core/cem.config.js` valide les `@cssprop` en s'y fiant.
  *
  * Usage :
- *   <link rel="stylesheet" href="@ariane-ui/core/themes/default.css">
+ *   <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.css">
  *   ou
  *   import '@ariane-ui/core/themes/default.css'; // via bundler
  */
