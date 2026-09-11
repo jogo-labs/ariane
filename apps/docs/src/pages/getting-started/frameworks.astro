@@ -130,6 +130,10 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 soit la version :
             </p>
             <pre><code class="language-js" set:text={codeReactProperty} /></pre>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://react.dev/reference/react-dom/components#custom-html-elements"
+                target="_blank" rel="noopener">documentation officielle de React sur les Custom Elements</a>.
+            </p>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
             <p>
@@ -150,6 +154,10 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 façon fiable, quel que soit le moment du rendu — c'est l'approche recommandée par Vue
                 lui-même pour ce cas.
             </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://vuejs.org/guide/extras/web-components.html"
+                target="_blank" rel="noopener">documentation officielle de Vue sur les Custom Elements</a>.
+            </p>
 
             <NarrativeHeading id="angular">Angular</NarrativeHeading>
             <p>
@@ -165,6 +173,10 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 un attribut), donc les valeurs complexes passent sans configuration
                 additionnelle.
             </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://angular.dev/api/core/CUSTOM_ELEMENTS_SCHEMA"
+                target="_blank" rel="noopener">documentation officielle d'Angular sur <code>CUSTOM_ELEMENTS_SCHEMA</code></a>.
+            </p>
 
             <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
             <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
@@ -176,6 +188,10 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 heuristique, pas garanti dans tous les cas (notamment si le composant n'est pas encore
                 chargé au moment du rendu). Vérifiez le comportement sur votre cas d'usage avant de vous
                 y fier pour une valeur critique.
+            </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://svelte.dev/docs/svelte/custom-elements"
+                target="_blank" rel="noopener">documentation officielle de Svelte sur les Custom Elements</a>.
             </p>
         </div>
     </div>
