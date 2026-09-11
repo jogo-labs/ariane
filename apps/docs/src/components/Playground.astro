@@ -257,7 +257,11 @@ const showPlayground = displayMode === 'demo';
         border:        1px solid var(--doc-border);
         border-bottom: 0;
         border-radius: 0.5rem 0.5rem 0 0;
-        background: var(--doc-bg);
+        /* Fond pointillé — reprend les points du rail (spec §6, différé au
+           sous-chantier 3, cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md). */
+        background-color: var(--doc-bg);
+        background-image: radial-gradient(circle at 1px 1px, var(--doc-rail) 1px, transparent 0);
+        background-size: 16px 16px;
     }
 
     /* ── Code block ─────────────────────────────────── */

@@ -101,15 +101,17 @@ const { entries, mobileOnly = false } = Astro.props;
     // un onglet (ar-tab-group), active l'onglet correspondant — sinon la
     // cible reste masquée (panneau inactif = hidden) et le navigateur ne
     // peut pas y scroller.
-    function activateTabForTarget(id: string): HTMLElement | null {
+    type TabGroupEl = HTMLElement & { active?: string; updateComplete?: Promise<unknown> };
+
+    function activateTabForTarget(id: string): { target: HTMLElement | null; group: TabGroupEl | null } {
         const target = document.getElementById(id);
         const panel = target?.closest('ar-tab-panel');
-        const group = panel?.closest('ar-tab-group') as (HTMLElement & { active?: string }) | null;
+        const group = (panel?.closest('ar-tab-group') as TabGroupEl | null) ?? null;
         const panelName = panel?.getAttribute('name');
         if (group && panelName) {
             group.active = panelName;
         }
-        return target ?? null;
+        return { target: target ?? null, group };
     }
 
     // Clic sur un lien TOC : active l'onglet avant que le navigateur ne
@@ -117,7 +119,7 @@ const { entries, mobileOnly = false } = Astro.props;
     document.querySelectorAll<HTMLAnchorElement>('.toc-link, .toc-link-m').forEach((link) => {
         link.addEventListener('click', () => {
             const id = link.getAttribute('href')?.slice(1);
-            if (id) activateTabForTarget(id);
+            if (id) void activateTabForTarget(id);
         });
     });
 
@@ -127,10 +129,19 @@ const { entries, mobileOnly = false } = Astro.props;
     // avant que la cible ne soit visible) — on active l'onglet puis on
     // scrolle explicitement, sans dépendre du scroll natif. Même logique
     // sur `hashchange` pour couvrir une navigation in-page ultérieure.
-    function handleHash() {
+    //
+    // ar-tab-group est un composant Lit : `group.active = panelName` déclenche
+    // sa mise à jour (qui retire `hidden` du panneau) sur un microtask différé,
+    // pas de façon synchrone. Un `scrollIntoView()` appelé juste après rate donc
+    // sa cible (encore masquée) — il faut attendre `updateComplete` avant de
+    // scroller. Le clic sur un lien TOC n'a pas ce problème : le scroll natif du
+    // navigateur pour une ancre est traité comme une tâche, exécutée après que
+    // tous les microtasks en attente (dont celui de Lit) se soient déjà résolus.
+    async function handleHash() {
         const id = location.hash?.slice(1);
         if (!id) return;
-        const target = activateTabForTarget(id);
+        const { target, group } = activateTabForTarget(id);
+        if (group?.updateComplete) await group.updateComplete;
         target?.scrollIntoView();
     }
     handleHash();
