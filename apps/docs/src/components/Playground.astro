@@ -315,22 +315,53 @@ const showPlayground = displayMode === 'demo';
         border-end-start-radius: .5rem;
     }
     .copy-btn {
-        position:      absolute;
-        top:           0.5rem;
-        right:         0.5rem;
-        padding:       0.25rem 0.6rem;
-        background:    rgba(255,255,255,0.08);
-        color:         #adb5bd;
-        border:        1px solid rgba(255,255,255,0.15);
+        position: absolute;
+        inset-block-start: 0.55rem;
+        /* Logique RTL : le bouton suit le bord de fin de lecture. */
+        inset-inline-end: 0.55rem;
+        padding: 0.25rem 0.6rem;
+        background: rgba(255, 255, 255, 0.08);
+        color: #adb5bd;
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 0.25rem;
-        font-size:     0.75rem;
-        cursor:        pointer;
-        transition:    background 0.15s, color 0.15s;
-        z-index:       1;
+        font-size: 0.75rem;
+        cursor: pointer;
+        opacity: 0;
+        transition:
+            opacity 0.18s var(--doc-ease),
+            background 0.15s,
+            color 0.15s;
+        z-index: 1;
     }
 
-    .copy-btn:hover  { background: rgba(255,255,255,0.15); color: #e6edf3; }
-    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: #fff; border-color: transparent; }
+    .code-block:hover .copy-btn,
+    .code-block:focus-within .copy-btn,
+    .playground-code-block:hover .copy-btn,
+    .playground-code-block:focus-within .copy-btn {
+        opacity: 1;
+    }
+
+    .copy-btn:focus-visible {
+        opacity: 1;
+    }
+
+    /* Sur pointeur tactile, pas de survol possible : le bouton reste visible. */
+    @media (hover: none) {
+        .copy-btn {
+            opacity: 1;
+        }
+    }
+
+    .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #e6edf3;
+    }
+    .copy-btn.copied {
+        background: var(--ar-color-success-text, #0a8560);
+        color: #fff;
+        border-color: transparent;
+        opacity: 1;
+    }
 
     /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
     :global(.code-block pre),
