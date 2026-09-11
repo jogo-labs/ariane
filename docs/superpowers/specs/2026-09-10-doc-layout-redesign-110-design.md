@@ -11,8 +11,8 @@ jusqu'ici seule à l'avoir reçue (PR #202).
 Brainstorming mené avec Opus, rôle cantonné au visuel/layout — même convention que
 pour la palette « Voûte » du sous-chantier 1. Trois directions explorées en mockups
 Artifacts (« Le Fil », « L'Établi », « Le Portique »). **Direction retenue : « Le
-Fil »**, avec un emprunt à « L'Établi » (démo épinglée). Design affiné sur 5
-itérations avec le mainteneur — ce document fige l'état final.
+Fil »**. Design affiné sur 6 itérations avec le mainteneur — ce document fige
+l'état final.
 
 Mockup de référence (HTML/CSS complet, à utiliser comme source des valeurs
 d'implémentation) : Artifact publié pendant le brainstorming, conservé dans l'historique
@@ -27,21 +27,23 @@ rendu correspond.
 1. Système visuel « le fil » : nouveaux tokens, rail/perle appliqués à la nav, au TOC,
    aux listes d'API, aux titres de section.
 2. Header : simplifié, nouveau logo SVG.
-3. Nav latérale gauche : structure par grandes sections avec rails segmentés.
+3. Nav latérale gauche : structure par grandes sections avec rails segmentés, un
+   niveau d'imbrication pour les composants qui ont des sous-composants documentés.
 4. Contenu principal : fil d'Ariane (breadcrumb), badge de statut, titres de section,
    hiérarchie h2/h3 narrative.
 5. Tables d'API remplacées par des listes de définition (« lignes de vie »).
 6. Playground / exemples d'usage : bloc de démo, exemples preview + code repliable.
 7. Blocs de code : bouton copier repositionné.
-8. TOC : colonne sticky desktop, démo épinglée ≥1440px, repli dans le flux <1180px.
+8. TOC : colonne sticky desktop (220px, 296px ≥1440px), repli dans le flux <1180px.
 9. Comportement mobile : nav en drawer, TOC en `<details>` dans le flux.
 
 ### Hors scope
 
-- Hiérarchie de nav à plusieurs niveaux (familles de composants, sous-composants) —
-  exploré en mockup, mis de côté volontairement pour un chantier ultérieur.
-- Moteur de recherche — emplacement réservé dans le header (aucun lien de section
-  n'y vit), mais aucune implémentation de recherche dans ce chantier.
+- Regroupement de la nav par famille de composants (Surfaces/Navigation/Saisie...) —
+  exploré en mockup, mis de côté volontairement pour un chantier ultérieur. Seul le
+  niveau composant → sous-composant est retenu dans ce chantier (cf. section 3).
+- Moteur de recherche — emplacement réservé dans le header, mais aucune
+  implémentation de recherche dans ce chantier.
 - `themes/default.css` (packages/core) — c'est #201, qui suit ce chantier. Le
   vocabulaire visuel du fil devra l'informer (cf. section Suite), pas le dupliquer ici.
 - Réutilisation du nouveau logo sur la home page — tâche de suivi séparée, notée mais
@@ -49,6 +51,9 @@ rendu correspond.
   est un travail distinct).
 - Contenu réel des pages (textes, exemples) — seule la structure/le style changent ;
   le contenu existant est reporté tel quel dans la nouvelle structure.
+- Démo épinglée (réduction de la démo dans la colonne TOC) — explorée en mockup
+  (emprunt à la direction « Établi »), écartée : la démo interactive reste unique,
+  dans le flux principal (cf. section 6).
 
 ## 1. Système visuel : le fil
 
@@ -91,9 +96,10 @@ relie que des éléments du même parcours. Concrètement :
 Simplifié : plus de liens de section (« Composants », « Thème ») — ils vivent dans la
 nav gauche, les répéter dans le header brouille la question « où suis-je ? » que la
 perle est censée trancher. Composition finale : bouton drawer (mobile uniquement),
-logo, pastille de version (`0.9.0-alpha.4`, mono), GitHub, sélecteur de thème
-(Clair/Sombre/Auto). **Pas de bloc de recherche** — retiré définitivement (pas
-d'emplacement réservé).
+logo, pastille de version (`0.9.0-alpha.4`, mono), **emplacement réservé pour une
+recherche future** (`aria-disabled="true"`, infobulle « Recherche — prévue, non
+active » — dimensionne le header dès maintenant, aucune implémentation de recherche
+dans ce chantier), GitHub, sélecteur de thème (Clair/Sombre/Auto).
 
 Le nouveau **logo SVG** (trait fil + perle stylisés, `viewBox 0 0 22 22`) créé pendant
 ce chantier est validé par le mainteneur et remplace le texte seul actuel
@@ -105,10 +111,21 @@ pas une bordure — cohérence avec le vocabulaire du rail plutôt qu'un simple 
 
 ## 3. Nav latérale
 
-Liste plate par grande section (Démarrer / Thème / Composants), pas de hiérarchie
-imbriquée — l'exploration de familles/sous-composants a plu au mainteneur mais est
-explicitement reportée à un chantier ultérieur. Composants en police mono
-(`--doc-font-mono`), le reste en police body.
+Liste plate par grande section (Démarrer / Thème / Composants) — pas de regroupement
+par famille (cf. Hors scope). Composants en police mono (`--doc-font-mono`), le reste
+en police body.
+
+**Un niveau d'imbrication, pour les composants qui ont des sous-composants
+documentés** : `ar-breadcrumb` › `ar-breadcrumb-item`, `ar-dropdown` ›
+`ar-dropdown-item`, `ar-stepper` › `ar-stepper-item`, `ar-tab-group` › `ar-tab` /
+`ar-tab-panel`. Règle de rail qui distingue cette imbrication de celle écartée
+(regroupement par famille) : **le segment de rail reste continu** — un sous-composant
+ne démarre pas son propre fil, il prolonge celui de son parent (le composant et ses
+enfants appartiennent au même parcours, contrairement à deux grandes sections qui n'ont
+rien en commun). Le décrochage visuel entre un composant et sa liste d'enfants est
+porté uniquement par une coche horizontale qui part du rail et rejoint chaque feuille.
+La perle d'un sous-composant actif se pose sur le même rail que celle d'un composant
+de premier niveau.
 
 ## 4. Contenu principal
 
@@ -170,11 +187,10 @@ tactile** (`@media (hover: none)`, pas de survol possible). Confirmation sur pla
 
 ## 8. TOC (sommaire de page)
 
-- **Desktop large** : colonne sticky à droite, rail + perle, sous-niveaux indentés.
-- **≥1440px** : la colonne s'élargit (220px → 296px) et affiche en plus, sous le
-  sommaire, une **démo épinglée** (emprunt à la direction « Établi ») — réduction de
-  la démo interactive (scène miniature + 1-2 contrôles clés) qui reste visible pendant
-  la lecture de la table d'API.
+- **Desktop** : colonne sticky à droite, 220px, rail + perle, sous-niveaux indentés.
+- **≥1440px** : la colonne s'élargit à 296px (plus d'air pour le sommaire quand la
+  place le permet) — pas de contenu supplémentaire à ce palier, la démo interactive
+  n'existe qu'à un seul endroit, dans le flux principal (section 6, cf. Hors scope).
 - **<1180px** : la colonne TOC disparaît, remplacée par un `<details>` repliable
   inséré dans le flux sous le titre de page. Replié par défaut, son `<summary>` affiche
   la section courante (`API · 5 sections`) — donc informe même fermé. Garde son rail
