@@ -56,7 +56,7 @@ const categories: ApiCategory[] = [
     component.cssParts && component.cssParts.length > 0
         ? { key: 'css-parts', label: 'CSS Parts', count: component.cssParts.length }
         : null,
-    (ownProps.length > 0 || panelProps.length > 0)
+    (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { key: 'css-props', label: 'CSS Custom Properties', count: ownProps.length + panelProps.length }
         : null,
 ].filter((c): c is ApiCategory => c !== null);
