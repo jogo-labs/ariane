@@ -96,6 +96,23 @@ const { entries, mobileOnly = false } = Astro.props;
             if (details) details.open = false;
         });
     });
+
+    // Si le lien TOC cible une catégorie d'API repliée dans un onglet
+    // (ar-tab-group), active l'onglet correspondant avant que le
+    // navigateur ne scrolle vers l'ancre — sinon la cible reste masquée
+    // (panneau inactif = hidden).
+    document.querySelectorAll<HTMLAnchorElement>('.toc-link, .toc-link-m').forEach((link) => {
+        link.addEventListener('click', () => {
+            const id = link.getAttribute('href')?.slice(1);
+            const target = id ? document.getElementById(id) : null;
+            const panel = target?.closest('ar-tab-panel');
+            const group = panel?.closest('ar-tab-group') as (HTMLElement & { active?: string }) | null;
+            const panelName = panel?.getAttribute('name');
+            if (group && panelName) {
+                group.active = panelName;
+            }
+        });
+    });
 </script>
 
 <style>
