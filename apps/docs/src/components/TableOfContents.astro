@@ -36,7 +36,7 @@ const { entries, mobileOnly = false } = Astro.props;
 <!-- Mobile : collapse injecté dans le contenu principal (via slot="toc" → ignoré en mobile,
      donc on l'injecte aussi via un slot sans nom dans [slug].astro — voir ci-dessous) -->
 <details class="toc-mobile">
-    <summary>Sur cette page</summary>
+    <summary>Sur cette page <span class="toc-mobile-current"></span></summary>
     <ul>
         {entries.map((entry) => (
             <li class={`toc-item level-${entry.level}`}>
@@ -71,6 +71,14 @@ const { entries, mobileOnly = false } = Astro.props;
                             document
                                 .querySelectorAll<HTMLAnchorElement>(`.toc-link[href="#${entry.target.id}"]`)
                                 .forEach((l) => l.classList.add('active'));
+
+                            const activeLabel =
+                                document.querySelector<HTMLAnchorElement>('.toc-link.active')?.textContent;
+                            const summarySpan =
+                                document.querySelector<HTMLElement>('.toc-mobile-current');
+                            if (summarySpan) {
+                                summarySpan.textContent = activeLabel ? `· ${activeLabel}` : '';
+                            }
                         }
                     }
                 },
@@ -145,7 +153,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
     /* ── Mobile ─────────────────────────────────────────────── */
 
-    @media (max-width: 768px) {
+    @media (max-width: 1180px) {
         .toc-desktop { display: none; }
         .toc-mobile  {
             display:       block;
@@ -184,5 +192,11 @@ const { entries, mobileOnly = false } = Astro.props;
             padding:       0 0.5rem 0.5rem;
             border-top:    1px solid var(--doc-border);
         }
+    }
+
+    .toc-mobile-current {
+        font-weight: 400;
+        color:       var(--doc-text-muted);
+        font-size:   0.75rem;
     }
 </style>

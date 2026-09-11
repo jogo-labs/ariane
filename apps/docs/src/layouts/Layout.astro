@@ -322,7 +322,13 @@ const {
             }
 
             .layout-body.with-nav.with-toc {
-                grid-template-columns: 270px minmax(0, 1fr) 270px;
+                grid-template-columns: 270px minmax(0, 1fr) 220px;
+            }
+
+            @media (min-width: 1440px) {
+                .layout-body.with-nav.with-toc {
+                    grid-template-columns: 270px minmax(0, 1fr) 296px;
+                }
             }
 
             .nav-column {
@@ -373,7 +379,19 @@ const {
             .nav-overlay   { display: none; }
             #nav-close-btn { display: none; }
 
-            @media (max-width: 768px) {
+            /* ── TOC : repli dans le flux, indépendant du drawer nav ──── */
+            @media (max-width: 1180px) {
+                .layout-body.with-nav.with-toc {
+                    grid-template-columns: 270px minmax(0, 1fr);
+                }
+
+                .toc-column {
+                    display: none;
+                }
+            }
+
+            /* ── Nav : drawer plein écran ─────────────────────────────── */
+            @media (max-width: 820px) {
                 #burger-btn  { display: flex; }
                 .nav-overlay { display: block; }
 
@@ -422,8 +440,6 @@ const {
                     padding:   1.5rem 1rem;
                     max-width: 100%;
                 }
-
-                .toc-column { display: none; }
             }
         </style>
     </head>
