@@ -43,15 +43,28 @@
 }
 
 :global(.section-title) {
+    position: relative;
     font-size: var(--doc-font-size-lg);
     font-weight: var(--doc-font-weight-semibold);
-    border-bottom: 2px solid var(--doc-border);
-    padding-bottom: 1rem;
+    padding-top: 1.1rem;
     margin: 0;
     color: var(--doc-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Le fil se prolonge en amorce horizontale — réservée au h2. Le h3
+   (.subsection-title, inchangé ci-dessous) n'en porte pas : si le repère
+   apparaît à tous les niveaux, il perd sa valeur de marqueur de section. */
+:global(.section-title)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 2px;
+    background: var(--doc-rail-live);
 }
 
 :global(.subsection-title) {
@@ -77,6 +90,22 @@
     color: var(--doc-text);
     margin: 0;
     padding-left: 1.25rem;
+    list-style: none;
+}
+
+.narrative :global(.narrative-list li) {
+    position: relative;
+}
+
+.narrative :global(.narrative-list li)::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -1rem;
+    top: 0.65em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--doc-rail-live);
 }
 
 /* Owl-selector overrides — déclarées après les règles de base ci-dessus
@@ -227,11 +256,16 @@ pre code {
 }
 
 .doc-callout-alert {
-    --ar-alert-bg: var(--doc-accent-bg);
-    --ar-alert-border: var(--doc-accent-border);
+    /* Filet vertical plutôt qu'une carte — cohérent avec la légèreté
+       demandée pour les blocs de contenu (cf. spec section 4). */
+    --ar-alert-bg: transparent;
+    --ar-alert-border: transparent;
     --ar-alert-icon: var(--doc-accent);
     --ar-alert-color: var(--doc-text);
 
+    display: block;
+    border-inline-start: 2px solid var(--doc-rail-live);
+    padding-inline-start: 1rem;
     margin-top: 1.875rem;
 
     p {
