@@ -10,23 +10,27 @@ const tocEntries = [
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
 ];
 
-const codeReactUsage = `import { useEffect, useRef } from 'react';
-import '@ariane-ui/core';
+const codeReactUsage = `import '@ariane-ui/core';
 
 function Pagination() {
-    const ref = useRef(null);
-
-    useEffect(() => {
-        const el = ref.current;
-        const onChanged = (event) => console.log(event.detail.to);
-        el.addEventListener('ar-pagination-page-changed', onChanged);
-        return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
-    }, []);
-
-    return <ar-pagination ref={ref} current={1} total={10} />;
+    return (
+        <ar-pagination
+            current={1}
+            total={10}
+            onar-pagination-page-changed={(event) => console.log(event.detail.to)}
+        />
+    );
 }`;
 
-const codeReactProperty = `// Propriété JS complexe : passe par une ref, comme pour tout DOM node.
+const codeReactEventFallback = `// React 18 et antérieur : pas de support natif des Custom Elements, passe par une ref.
+useEffect(() => {
+    const el = ref.current;
+    const onChanged = (event) => console.log(event.detail.to);
+    el.addEventListener('ar-pagination-page-changed', onChanged);
+    return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
+}, []);`;
+
+const codeReactProperty = `// Propriété JS complexe : passe toujours par une ref, quelle que soit la version.
 useEffect(() => {
     if (datepickerRef.current) {
         datepickerRef.current.isDateDisabled = (date) => date.getDay() === 0;
@@ -34,7 +38,7 @@ useEffect(() => {
 }, []);`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
-<ar-datepicker :isDateDisabled="isSunday" />`;
+<ar-datepicker :isDateDisabled.prop="isSunday" />`;
 
 const codeVueScript = `function onChanged(event) {
     console.log(event.detail.to);
@@ -62,16 +66,21 @@ const codeAngularTemplate = `<ar-pagination [current]="1" [total]="10" (ar-pagin
 </ar-pagination>
 <ar-datepicker [isDateDisabled]="isSunday"></ar-datepicker>`;
 
-const codeAngularModule = `@NgModule({
+const codeAngularComponent = `import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+@Component({
+    selector: 'app-root',
+    standalone: true,
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    templateUrl: './app.component.html',
 })
-export class AppModule {}`;
+export class AppComponent {
+    onChanged(event: CustomEvent<{ from: number; to: number }>) {
+        console.log(event.detail.to);
+    }
 
-const codeAngularHandler = `onChanged(event: CustomEvent<{ from: number; to: number }>) {
-    console.log(event.detail.to);
-}
-
-isSunday = (date: Date) => date.getDay() === 0;`;
+    isSunday = (date: Date) => date.getDay() === 0;
+}`;
 
 const codeSvelteScript = `import '@ariane-ui/core';
 
@@ -79,7 +88,7 @@ function onChanged(event) {
     console.log(event.detail.to);
 }`;
 
-const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination-page-changed={onChanged} />
+const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-page-changed={onChanged} />
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
 ---
 
@@ -108,17 +117,19 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
                 Custom Elements utilisables sans que leur classe soit enregistrée.
             </p>
             <pre><code class="language-js" set:text={codeReactUsage} /></pre>
+            <p class="hint">
+                Depuis React 19, les Custom Elements sont supportés nativement : un événement
+                personnalisé s'écoute via un préfixe <code>on</code> sensible à la casse
+                (<code>onar-pagination-page-changed</code> écoute l'événement
+                <code>ar-pagination-page-changed</code>). Sur React 18 et antérieur, ce support natif
+                n'existe pas — passez par une ref et <code>addEventListener</code> :
+            </p>
+            <pre><code class="language-js" set:text={codeReactEventFallback} /></pre>
             <p>
-                Une propriété JS complexe (objet, fonction) passe par une ref, comme pour
-                tout DOM node :
+                Une propriété JS complexe (objet, fonction) passe toujours par une ref, quelle que
+                soit la version :
             </p>
             <pre><code class="language-js" set:text={codeReactProperty} /></pre>
-            <p class="hint">
-                React ne convertit pas automatiquement un événement custom kebab-case en
-                prop <code>onX</code> — l'écoute passe toujours par
-                <code>addEventListener</code> via une ref, quelle que soit la version de
-                React.
-            </p>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
             <p>
@@ -133,21 +144,22 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
             <pre><code class="language-js" set:text={codeVueScript} /></pre>
             <p class="hint">
                 Vue affecte un binding en propriété JS (plutôt qu'en attribut) uniquement si sa clé
-                correspond exactement à un nom déjà présent sur l'élément — d'où <code>:isDateDisabled</code>
-                en camelCase, et non <code>:is-date-disabled</code>.
+                correspond exactement à un nom déjà présent sur l'élément — un souci si le composant
+                n'est pas encore chargé au moment du rendu (chargement asynchrone, cas courant avec
+                l'autoloader CDN d'Ariane). Le modificateur <code>.prop</code> force ce comportement de
+                façon fiable, quel que soit le moment du rendu — c'est l'approche recommandée par Vue
+                lui-même pour ce cas.
             </p>
 
             <NarrativeHeading id="angular">Angular</NarrativeHeading>
             <p>
-                Ajoutez <code>CUSTOM_ELEMENTS_SCHEMA</code> au module qui utilise des
-                composants Ariane, pour qu'Angular accepte des tags inconnus de son
-                compilateur de template :
+                Ajoutez <code>CUSTOM_ELEMENTS_SCHEMA</code> aux <code>schemas</code> du composant
+                (standalone) qui utilise des composants Ariane, pour qu'Angular accepte des tags
+                inconnus de son compilateur de template :
             </p>
-            <pre><code class="language-typescript" set:text={codeAngularModule} /></pre>
+            <pre><code class="language-typescript" set:text={codeAngularComponent} /></pre>
             <p>Dans le template :</p>
             <pre><code class="language-html" set:text={codeAngularTemplate} /></pre>
-            <p>Et le gestionnaire associé :</p>
-            <pre><code class="language-typescript" set:text={codeAngularHandler} /></pre>
             <p class="hint">
                 Le binding <code>[prop]</code> affecte toujours une propriété JS (jamais
                 un attribut), donc les valeurs complexes passent sans configuration
@@ -159,9 +171,11 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} on:ar-pagination
             <pre><code class="language-js" set:text={codeSvelteScript} /></pre>
             <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
             <p class="hint">
-                Svelte reconnaît les tags contenant un tiret comme des custom elements et
-                affecte automatiquement les valeurs non-textuelles en propriété JS plutôt
-                qu'en attribut.
+                Svelte affecte les valeurs non-textuelles (comme une fonction) en propriété JS plutôt
+                qu'en attribut dès que la clé correspond à un nom existant sur l'élément — un mécanisme
+                heuristique, pas garanti dans tous les cas (notamment si le composant n'est pas encore
+                chargé au moment du rendu). Vérifiez le comportement sur votre cas d'usage avant de vous
+                y fier pour une valeur critique.
             </p>
         </div>
     </div>
