@@ -213,6 +213,17 @@ const componentItems: NavItem[] = allComponents
     nav::-webkit-scrollbar       { width: 4px; }
     nav::-webkit-scrollbar-thumb { background: var(--doc-border); border-radius: 4px; }
 
+    /* En dessous de 1180px, la colonne nav persistante (ex. iPad en paysage,
+       encore au-dessus du seuil drawer de 820px) devient trop étroite pour
+       que le padding gauche minimal (juste la moitié de la bille) reste
+       lisible : le texte touche presque le bord de l'écran. On aligne alors
+       le padding gauche sur le padding droit. */
+    @media (max-width: 1180px) {
+        nav {
+            padding-inline-start: 1.25rem;
+        }
+    }
+
     /* ── Marque (masquée sur desktop, le header a déjà le logo) ── */
 
     .nav-brand {
