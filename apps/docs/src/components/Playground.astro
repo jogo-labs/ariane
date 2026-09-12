@@ -12,6 +12,7 @@
  */
 
 import ComponentApi from './ComponentApi.astro';
+import CodeBlock from './CodeBlock.astro';
 import { type CemDeclaration, type CemControl } from '../utils/cem-types.ts';
 
 interface Variant {
@@ -78,10 +79,7 @@ const showPlayground = displayMode === 'demo';
                                 <span class="chevron" aria-hidden="true">›</span>
                                 <span>Voir le code</span>
                             </summary>
-                            <div class="code-block">
-                                <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
-                                <pre><code class="language-html">{variant.html.trim()}</code></pre>
-                            </div>
+                            <CodeBlock code={variant.html.trim()} />
                         </details>
                     </div>
                 </article>
@@ -153,11 +151,8 @@ const showPlayground = displayMode === 'demo';
                         ))}
                     </div>
                 )}
-                <div class="code-block">
-                    <button class="copy-btn" data-copy-playground aria-label="Copier le code">Copier</button>
-                    {/* Le <pre><code> est mis à jour par playground.js après chaque changement de contrôle */}
-                    <pre data-playground-pre><code class="language-html" data-playground-code>{playgroundHtml.trim()}</code></pre>
-                </div>
+                {/* Le contenu est mis à jour par playground.js après chaque changement de contrôle */}
+                <CodeBlock code={playgroundHtml.trim()} interactive />
             </div>
         </div>
     </section>
@@ -263,81 +258,14 @@ const showPlayground = displayMode === 'demo';
     }
 
     /* ── Code block ─────────────────────────────────── */
-
-    .code-block {
-        position:   relative;
+    /* Forme/typo du bouton Copier et du bloc de code : partagées via
+       doc-code-block.css (CodeBlock.astro). Seule la bordure propre à ce
+       contexte reste ici (séparateur du panneau contrôles au-dessus —
+       pas une boîte autonome comme sur la home). :global() car
+       .code-block est rendu par le composant enfant CodeBlock, hors du
+       scope Astro de ce fichier. */
+    :global(.code-block) {
         border-top: 1px solid var(--doc-border);
-        overflow:   hidden;
-    }
-
-    .copy-btn {
-        position: absolute;
-        inset-block-start: 0.6rem;
-        /* Logique RTL : le bouton suit le bord de fin de lecture. */
-        inset-inline-end: 0.6rem;
-        padding: 0.25rem 0.7rem;
-        background: transparent;
-        color: var(--doc-paper);
-        border: 1px solid var(--doc-on-dark-line);
-        border-radius: 50px;
-        font-size: var(--doc-font-size-sm);
-        cursor: pointer;
-        transition:
-            opacity 0.18s var(--doc-ease),
-            background 0.15s,
-            color 0.15s;
-        z-index: 1;
-
-        &.copied,
-        &.copied:hover {
-            background: var(--doc-ember);
-            border-color: var(--doc-ember);
-            color: var(--doc-ink);
-        }
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-        .copy-btn {
-            opacity: 0;
-
-            &:hover {
-                background: var(--doc-paper);
-                color: var(--doc-ink);
-            }
-        }
-
-        .code-block:hover .copy-btn,
-        .code-block:has(pre:focus) .copy-btn,
-        .code-block:has(code:focus) .copy-btn,
-        .copy-btn:focus {
-            opacity: 1;
-        }
-    }
-
-    /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
-    :global(.code-block pre),
-    :global(.code-block pre) {
-        margin:      0;
-        padding:     1rem 1.25rem;
-        overflow-x:  auto;
-        font-family: var(--doc-font-mono);
-        font-size:   0.8rem;
-        line-height: 1.6;
-        background:  var(--doc-code-block-bg);
-    }
-
-    :global(.code-block pre code),
-    :global(.code-block pre code) {
-        font-family: inherit;
-        font-size:   inherit;
-        padding:     0;
-        background:  transparent;
-        color:       #cdd6f4;
-    }
-
-    :global(.code-block pre),
-    :global(.code-block pre) {
-        border-radius: 0;
     }
 
     /* ── Playground contrôles ────────────────────────── */

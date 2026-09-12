@@ -1,5 +1,6 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
@@ -342,11 +343,7 @@ const codeDatepicker = `<ar-datepicker
                         <span class="step-node" aria-hidden="true">1</span>
                         <p class="step-label">Copiez script et thème dans le <code>&lt;head&gt;</code></p>
                     </div>
-                    <div class="code-block">
-                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button
-                        >
-                        <pre><code class="language-html" set:text={codeInstall} /></pre>
-                    </div>
+                    <CodeBlock code={codeInstall} />
                 </li>
 
                 <li class="step">
@@ -414,12 +411,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="dropdown">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code class="language-html" set:text={codeDropdown} /></pre>
-                                </div>
+                                <CodeBlock code={codeDropdown} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -448,12 +440,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="dialog">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code class="language-html" set:text={codeDialog} /></pre>
-                                </div>
+                                <CodeBlock code={codeDialog} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -476,15 +463,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="datepicker">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code
-                                            class="language-html"
-                                            set:text={codeDatepicker}
-                                        /></pre>
-                                </div>
+                                <CodeBlock code={codeDatepicker} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -1003,58 +982,25 @@ const codeDatepicker = `<ar-datepicker
     }
 
 
-    .try-grid .code-block {
+    :global(.try-grid .code-block) {
         border-radius: var(--doc-radius-md) var(--doc-radius-md) 0 0;
         margin-left: 0;
     }
 
-    .code-block {
-        position: relative;
-        background: var(--doc-code-block-bg);
+    /* Forme/typo du bouton Copier et du bloc de code : partagées via
+       doc-code-block.css (CodeBlock.astro). Restent propres à la home :
+       la bordure/le radius (boîte autonome ici, pas un panneau flush
+       comme dans Playground) et le padding du <pre> (respiration
+       supplémentaire en haut, pour la mise en avant marketing).
+       :global() car .code-block est rendu par le composant enfant
+       CodeBlock, hors du scope Astro de ce fichier. */
+    :global(.code-block) {
         border: 1px solid var(--doc-on-dark-line);
         border-radius: var(--doc-radius-md);
-        overflow: hidden;
-
-        pre {
-            margin: 0;
-            padding: 2rem 1.35rem 1.25rem ;
-            overflow-x: auto;
-        }
-
-        code {
-            font-family: var(--doc-font-mono);
-            font-size: 0.78rem;
-            line-height: 1.65;
-            background: transparent;
-        }
     }
 
-    .copy-btn {
-        position: absolute;
-        inset-block-start: 0.6rem;
-        /* Logique RTL : le bouton suit le bord de fin de lecture. */
-        inset-inline-end: 0.6rem;
-        background: transparent;
-        color: var(--doc-paper);
-        border: 1px solid var(--doc-on-dark-line);
-        border-radius: 50px;
-        font-size: var(--doc-font-size-sm);
-        font-weight: var(--doc-font-weight-semibold);
-        font-family: inherit;
-        padding: 0.25rem 0.7rem;
-        cursor: pointer;
-        z-index: 1;
-        transition:
-            background 0.35s var(--doc-ease),
-            color 0.35s var(--doc-ease),
-            opacity 0.35s var(--doc-ease);
-
-        &.copied,
-        &.copied:hover {
-            background: var(--doc-ember);
-            border-color: var(--doc-ember);
-            color: var(--doc-ink);
-        }
+    :global(.code-block pre) {
+        padding: 2rem 1.35rem 1.25rem;
     }
 
     .try-grid {
@@ -1198,7 +1144,7 @@ const codeDatepicker = `<ar-datepicker
         }
 
 
-        .try-grid .code-block {
+        :global(.try-grid .code-block) {
             border-radius: var(--doc-radius-md);
         }
 
@@ -1300,7 +1246,7 @@ const codeDatepicker = `<ar-datepicker
             font-size: 1.3rem;
         }
 
-        .code-block,
+        :global(.code-block),
         .try ar-tab-group {
             margin-inline-start: 4.5rem;
         }
@@ -1349,29 +1295,8 @@ const codeDatepicker = `<ar-datepicker
             }
         }
 
-        .code-block pre {
+        :global(.code-block pre) {
             padding-block-start: 1.25rem;
-        }
-
-        /* Masquer le bouton derrière le survol suppose qu'un survol existe : sur
-           tactile (tablette/laptop tactile ≥901px), il n'y en a pas, et rien ne
-           le focus automatiquement — il resterait invisible en permanence. */
-        @media (hover: hover) and (pointer: fine) {
-            .copy-btn {
-                opacity: 0;
-
-                &:hover {
-                    background: var(--doc-paper);
-                    color: var(--doc-ink);
-                }
-            }
-
-            .code-block:hover .copy-btn,
-            .code-block:has(pre:focus) .copy-btn,
-            .code-block:has(code:focus) .copy-btn,
-            .copy-btn:focus {
-                opacity: 1;
-            }
         }
     }
 </style>
