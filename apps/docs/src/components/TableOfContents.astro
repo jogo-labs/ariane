@@ -36,7 +36,7 @@ const { entries, mobileOnly = false } = Astro.props;
 <!-- Mobile : collapse injecté dans le contenu principal (via slot="toc" → ignoré en mobile,
      donc on l'injecte aussi via un slot sans nom dans [slug].astro — voir ci-dessous) -->
 <details class="toc-mobile">
-    <summary>Sur cette page <span class="toc-mobile-current"></span></summary>
+    <summary>Sur cette page</summary>
     <div class="nav-container">
         <ul>
             {entries.map((entry) => (
@@ -317,11 +317,5 @@ const { entries, mobileOnly = false } = Astro.props;
             padding-inline-start: 2rem;
             border-top:          1px solid var(--doc-border);
         }
-    }
-
-    .toc-mobile-current {
-        font-weight: 400;
-        color:       var(--doc-text-muted);
-        font-size:   0.75rem;
     }
 </style>

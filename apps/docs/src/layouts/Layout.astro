@@ -171,15 +171,33 @@ const {
                 padding:         0.5rem 1rem;
                 background:      var(--doc-accent);
                 color:           #fff;
+                border:          none;
                 border-radius:   0 0 0.4rem 0.4rem;
                 text-decoration: none;
+                font-family:     inherit;
                 font-size:       0.85rem;
                 font-weight:     600;
+                cursor:          pointer;
                 transition:      top 0.15s ease;
             }
 
             .skip-link:focus {
                 top: 0;
+            }
+
+            /* Le lien d'évitement vers la nav a deux variantes selon le
+               breakpoint (cf. #burger-btn/.nav-column ci-dessus) : sur
+               desktop la nav est une colonne visible, un simple <a href>
+               suffit ; sur mobile elle est masquée dans l'ar-dialog tant
+               qu'il n'est pas ouvert — la variante mobile est un bouton qui
+               l'ouvre (data-ar-dialog-open) au lieu de sauter vers une
+               cible non focusable. Une seule des deux existe dans l'ordre
+               de tabulation à la fois. */
+            @media (min-width: 821px) {
+                .skip-link--nav-mobile { display: none; }
+            }
+            @media (max-width: 820px) {
+                .skip-link--nav-desktop { display: none; }
             }
 
             /* ── Header (toujours visible) ──────────────── */
@@ -548,7 +566,12 @@ const {
             )}
             <main id="main-content" tabindex="-1">
                 <div class="main-inner">
-                    {showNav && <a href="#site-nav-column" class="skip-link">Aller à la liste des composants</a>}
+                    {showNav && (
+                        <>
+                            <a href="#site-nav-column" class="skip-link skip-link--nav-desktop">Aller à la liste des composants</a>
+                            <button type="button" class="skip-link skip-link--nav-mobile" data-ar-dialog-open="site-nav-column-mobile">Ouvrir la liste des composants</button>
+                        </>
+                    )}
                     {showToc && <a href="#toc" class="skip-link">Aller au menu de la page</a>}
                     <slot />
                 </div>
