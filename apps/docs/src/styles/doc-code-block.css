@@ -1,0 +1,99 @@
+/**
+ * doc-code-block.css
+ *
+ * Bloc de code copiable (CodeBlock.astro), partagé par Playground.astro
+ * (exemples + démo interactive) et la section « Essayez-le » de la home
+ * (index.astro). Couvre ce qui est réellement identique entre les deux
+ * contextes : forme et comportement du bouton Copier (y compris le
+ * hide-until-hover, réservé aux pointeurs fins — sur tactile, il n'y a
+ * pas de survol, le bouton reste donc visible en permanence, sans avoir
+ * besoin d'un garde-fou de largeur d'écran en plus), et la typographie
+ * du code.
+ *
+ * La bordure/le radius/le padding du bloc restent posés par page : le
+ * bloc est une boîte autonome sur la home, un panneau flush à
+ * l'intérieur d'une carte déjà bordée dans Playground — ce n'est pas une
+ * valeur qui a dérivé par accident, la structure diffère réellement
+ * selon le contexte. Ce fichier ne pose donc PAS de border/padding par
+ * défaut sur .code-block/pre : chaque page déclare les siens.
+ *
+ * Important : ce fichier est importé par le composant enfant
+ * CodeBlock.astro, qui lui applique le scope Astro habituel — les
+ * sélecteurs compilés portent donc un `[data-astro-cid-*]`, qui compte
+ * comme une classe dans le calcul de spécificité. Un override posé
+ * depuis la page consommatrice (nécessairement écrit `:global(...)`,
+ * donc SANS cet attribut) doit être préfixé par assez d'ancêtres pour
+ * rester au moins aussi spécifique — sinon, même en étant décrit après
+ * dans la page, il perd face à la règle scopée d'ici. C'est pour ça
+ * qu'aucune propriété codée en dur ici ne doit avoir un équivalent
+ * "à surcharger" ailleurs : soit elle est vraiment commune (pas
+ * d'override), soit elle n'est pas déclarée ici du tout.
+ */
+
+.code-block {
+    position: relative;
+    overflow: hidden;
+    background: var(--doc-code-block-bg);
+}
+
+.code-block pre {
+    margin: 0;
+    overflow-x: auto;
+    font-family: var(--doc-font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+.code-block pre code {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    background: transparent;
+    /* Couleur du thème highlight.js (github-dark) utilisé pour la
+       coloration syntaxique — aucun token --doc-* n'en tient le rôle. */
+    color: #cdd6f4;
+}
+
+.copy-btn {
+    position: absolute;
+    inset-block-start: 0.6rem;
+    /* Logique RTL : le bouton suit le bord de fin de lecture. */
+    inset-inline-end: 0.6rem;
+    padding: 0.25rem 0.7rem;
+    background: transparent;
+    color: var(--doc-paper);
+    border: 1px solid var(--doc-on-dark-line);
+    border-radius: 50px;
+    font-size: var(--doc-font-size-sm);
+    cursor: pointer;
+    z-index: 1;
+    transition:
+        opacity 0.18s var(--doc-ease),
+        background 0.15s,
+        color 0.15s;
+
+    &.copied,
+    &.copied:hover {
+        background: var(--doc-ember);
+        border-color: var(--doc-ember);
+        color: var(--doc-ink);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .copy-btn {
+        opacity: 0;
+
+        &:hover {
+            background: var(--doc-paper);
+            color: var(--doc-ink);
+        }
+    }
+
+    .code-block:hover .copy-btn,
+    .code-block:has(pre:focus) .copy-btn,
+    .code-block:has(code:focus) .copy-btn,
+    .copy-btn:focus {
+        opacity: 1;
+    }
+}

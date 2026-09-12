@@ -83,29 +83,49 @@
     /* ─── Easing / typo ─────────────────────────────────────────────── */
     --doc-ease: cubic-bezier(0.83, 0, 0.17, 1);
     --doc-font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+    --doc-font-mono: 'Fira Code', 'JetBrains Mono', SFMono-Regular, 'Cascadia Code', ui-monospace;
     --doc-font-body: 'Inter', system-ui, -apple-system, sans-serif;
 
     /* ─── Échelle typographique (vocabulaire rationalisé sur --ar-font-size-* et --ar-font-weight-*) ─── */
     --doc-font-size-xs: 0.75rem;
     --doc-font-size-sm: 0.9rem;
     --doc-font-size-md: 1.05rem;
-    --doc-font-size-lg: 1.25rem;
+    --doc-font-size-lg: 1.35rem;
     --doc-font-size-xl: 2rem;
+    --doc-font-size-xxl: 3rem;
+    --doc-font-weight-thin: 300;
     --doc-font-weight-normal: 400;
     --doc-font-weight-medium: 500;
-    /* 4e palier (absent de --ar-font-weight-*) : c'est la graisse réellement
-       utilisée par tous les titres existants (section-title, subsection-title,
-       narrative h3/h4) — un choix fidèle aux valeurs réelles prime sur le
-       calque exact de default.css (qui n'en a pas besoin, aucun composant
-       n'utilise 600). */
     --doc-font-weight-semibold: 600;
     --doc-font-weight-bold: 700;
 
     /* ─── Rythme vertical (rôles sémantiques, pas une échelle abstraite —
        cf. spec section 1, écart assumé à --ar-spacing-*) ────────────── */
     --doc-space-paragraph: 1rem;
-    --doc-space-subsection: 1.5rem;
-    --doc-space-section: 2.5rem;
+    --doc-space-subsection: 2.25rem;
+    --doc-space-section: 3.25rem;
+
+    /* ─── Le fil : rail décoratif + perle (position courante) ──────────
+       Ajouts du sous-chantier 3 (#110) — aucun token existant modifié.
+       cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md */
+    --doc-rail: light-dark(rgba(20, 20, 20, 0.13), var(--doc-thread-soft));
+    --doc-rail-live: var(--doc-ember);
+    --doc-bead: var(--doc-ember);
+    --doc-bead-hover: var(--doc-text-subtle);
+    --doc-bead-ring: light-dark(var(--doc-paper), var(--doc-vault));
+    --doc-nav-bead-size: 0.75rem;
+    --doc-toc-bead-size: 0.6rem;
+
+    --doc-nav-padding-inline-start: 1.2rem;
+    --doc-toc-padding-inline-start: 0.9rem;
+
+    /* ─── Statut de maturité — jamais l'ambre d'accent : un badge de
+       statut n'est pas un élément actif/interactif. ────────────────── */
+    --doc-alpha: light-dark(#8f5f00, var(--doc-ember));
+    --doc-stable: light-dark(#2f6b45, #7fd3a2);
+
+    /* ─── Surface secondaire (barres de contrôle, encarts) ──────────── */
+    --doc-surface: light-dark(var(--doc-slate), var(--doc-vault-deep));
 }
 
 :root[data-theme='dark'] {

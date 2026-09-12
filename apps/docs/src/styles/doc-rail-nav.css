@@ -1,0 +1,96 @@
+/**
+ * doc-rail-nav.css
+ *
+ * Vocabulaire visuel partagé par SiteNav et TableOfContents : un rail
+ * vertical (1px) courant sur toute la hauteur de la liste, et une perle
+ * qui marque le lien survolé/actif. Les deux composants paramètrent la
+ * taille de perle et l'indentation via leurs propres tokens
+ * (--doc-nav-* / --doc-toc-*) reportés sur --rail-bead-size et
+ * --rail-padding-inline-start dans leur <style> scopé.
+ *
+ * L'état "actif" reste porté par chaque composant (aria-current='page'
+ * pour SiteNav, .active pour le scroll-spy de TableOfContents) : les deux
+ * sélecteurs sont couverts ici, mais la logique qui les pose ne l'est pas.
+ */
+
+.rail-title {
+    font-size: 0.7rem;
+    font-weight: var(--doc-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--doc-text-muted);
+    margin: 0 0 0.5rem;
+}
+
+.rail-list {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: var(--rail-padding-inline-start);
+}
+
+.rail-list::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    width: 1px;
+    background: var(--doc-rail);
+}
+
+.rail-link {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.rail-link[aria-current='page'] {
+    color: var(--doc-text);
+}
+
+.rail-link[aria-current='page']::before,
+.rail-link.active::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(
+        var(--rail-padding-inline-start) * -1 - var(--rail-bead-size) / 2 + (1px / 2)
+    );
+    top: var(--rail-bead-top, 0.35rem);
+    width: var(--rail-bead-size);
+    height: var(--rail-bead-size);
+    border-radius: 50%;
+    background: var(--doc-bead);
+    box-shadow: 0 0 0 3px var(--doc-bead-ring);
+}
+
+/* Le survol reste réservé aux pointeurs fins (souris/trackpad) : sur tactile,
+   `:hover` se "coince" sur le dernier élément touché (comportement connu de
+   Safari/WebKit) et ferait apparaître une perle sur un item qui n'est plus
+   réellement survolé. Même garde-fou que Playground.astro / index.astro. */
+@media (hover: hover) and (pointer: fine) {
+    .rail-link:hover {
+        color: var(--doc-text);
+    }
+
+    .rail-link:hover::before {
+        content: '';
+        position: absolute;
+        inset-inline-start: calc(
+            var(--rail-padding-inline-start) * -1 - var(--rail-bead-size) / 2 + (1px / 2)
+        );
+        top: var(--rail-bead-top, 0.35rem);
+        width: var(--rail-bead-size);
+        height: var(--rail-bead-size);
+        border-radius: 50%;
+    }
+
+    .rail-link:not([aria-current='page']):not(.active):hover::before {
+        background: var(--doc-bead-ring);
+        box-shadow:
+            inset 0 0 0 1px var(--doc-bead),
+            0 0 0 3px var(--doc-bead-ring);
+    }
+}

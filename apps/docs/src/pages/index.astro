@@ -1,5 +1,6 @@
 ---
 import HomeLayout from '../layouts/HomeLayout.astro';
+import CodeBlock from '../components/CodeBlock.astro';
 import manifest from '@cem';
 import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
@@ -342,11 +343,7 @@ const codeDatepicker = `<ar-datepicker
                         <span class="step-node" aria-hidden="true">1</span>
                         <p class="step-label">Copiez script et thème dans le <code>&lt;head&gt;</code></p>
                     </div>
-                    <div class="code-block">
-                        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button
-                        >
-                        <pre><code class="language-html" set:text={codeInstall} /></pre>
-                    </div>
+                    <CodeBlock code={codeInstall} />
                 </li>
 
                 <li class="step">
@@ -414,12 +411,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="dropdown">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code class="language-html" set:text={codeDropdown} /></pre>
-                                </div>
+                                <CodeBlock code={codeDropdown} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -448,12 +440,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="dialog">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code class="language-html" set:text={codeDialog} /></pre>
-                                </div>
+                                <CodeBlock code={codeDialog} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -476,15 +463,7 @@ const codeDatepicker = `<ar-datepicker
 
                         <ar-tab-panel name="datepicker">
                             <div class="try-grid">
-                                <div class="code-block">
-                                    <button class="copy-btn" data-copy aria-label="Copier le code"
-                                        >Copier</button
-                                    >
-                                    <pre><code
-                                            class="language-html"
-                                            set:text={codeDatepicker}
-                                        /></pre>
-                                </div>
+                                <CodeBlock code={codeDatepicker} />
                                 <div class="try-preview">
                                     <div class="try-browser-bar" aria-hidden="true">
                                         <span class="try-browser-dot"></span>
@@ -662,7 +641,7 @@ const codeDatepicker = `<ar-datepicker
     .hero-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2.6rem, 11vw, 4rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 0.96;
         color: var(--doc-ink);
@@ -671,7 +650,7 @@ const codeDatepicker = `<ar-datepicker
     }
 
     .hero-pitch {
-        font-size: 1.05rem;
+        font-size: var(--doc-font-size-md);
         line-height: 1.6;
         color: var(--doc-ink-muted);
         max-width: 40ch;
@@ -705,7 +684,7 @@ const codeDatepicker = `<ar-datepicker
 
     .hero-facts strong {
         color: var(--doc-ink);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
@@ -717,7 +696,7 @@ const codeDatepicker = `<ar-datepicker
         justify-content: center;
         font-family: inherit;
         font-size: 0.92rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.01em;
         padding: 0.7rem 1.5rem;
         border-radius: 999px;
@@ -775,7 +754,7 @@ const codeDatepicker = `<ar-datepicker
     .promise-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2rem, 7vw, 2.5rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 1;
         color: var(--doc-ink);
@@ -807,14 +786,14 @@ const codeDatepicker = `<ar-datepicker
     .promise-item h3 {
         font-family: var(--doc-font-display);
         font-size: 1.1rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.02em;
         color: var(--doc-ink);
         margin: 0 0 0.4rem;
     }
 
     .promise-item p {
-        font-size: 0.9rem;
+        font-size: var(--doc-font-size-sm);
         line-height: 1.65;
         color: var(--doc-ink-muted);
         margin: 0;
@@ -841,7 +820,7 @@ const codeDatepicker = `<ar-datepicker
     .try-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2rem, 7vw, 2.5rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 1;
         margin: 0 0 0.6rem;
@@ -891,13 +870,13 @@ const codeDatepicker = `<ar-datepicker
         color: var(--doc-ink);
         border-radius: 50%;
         font-family: var(--doc-font-display);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     .step-label {
         font-family: var(--doc-font-display);
         font-size: 1.15rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.02em;
         margin: 0;
     }
@@ -998,62 +977,32 @@ const codeDatepicker = `<ar-datepicker
     }
 
     .try-tab-label {
-        font-size: 0.9rem;
-        font-weight: 600;
+        font-size: var(--doc-font-size-sm);
+        font-weight: var(--doc-font-weight-semibold);
     }
 
 
-    .try-grid .code-block {
+    :global(.try-grid .code-block) {
         border-radius: var(--doc-radius-md) var(--doc-radius-md) 0 0;
         margin-left: 0;
     }
 
-    .code-block {
-        position: relative;
-        background: var(--doc-code-block-bg);
+    /* Forme/typo du bouton Copier et du bloc de code : partagées via
+       doc-code-block.css (CodeBlock.astro). Restent propres à la home :
+       la bordure/le radius (boîte autonome ici, pas un panneau flush
+       comme dans Playground) et le padding du <pre> (respiration
+       supplémentaire en haut, pour la mise en avant marketing).
+       :global() car .code-block est rendu par le composant enfant
+       CodeBlock, hors du scope Astro de ce fichier — doc-code-block.css
+       ne déclare ni border/border-radius ni padding par défaut sur
+       .code-block/pre, donc rien à concurrencer en spécificité ici. */
+    :global(.code-block) {
         border: 1px solid var(--doc-on-dark-line);
         border-radius: var(--doc-radius-md);
-        overflow: hidden;
-
-        pre {
-            margin: 0;
-            padding: 2rem 1.35rem 1.25rem ;
-            overflow-x: auto;
-        }
-
-        code {
-            font-family: 'Fira Code', 'Cascadia Code', monospace;
-            font-size: 0.78rem;
-            line-height: 1.65;
-            background: transparent;
-        }
     }
 
-    .copy-btn {
-        position: absolute;
-        top: 0.6rem;
-        right: 0.6rem;
-        background: transparent;
-        color: var(--doc-paper);
-        border: 1px solid var(--doc-on-dark-line);
-        border-radius: 50px;
-        font-size: .9rem;
-        font-weight: 600;
-        font-family: inherit;
-        padding: 0.28rem 0.7rem;
-        cursor: pointer;
-        z-index: 1;
-        transition:
-            background 0.35s var(--doc-ease),
-            color 0.35s var(--doc-ease),
-            opacity 0.35s var(--doc-ease);
-
-        &.copied,
-        &.copied:hover {
-            background: var(--doc-ember);
-            border-color: var(--doc-ember);
-            color: var(--doc-ink);
-        }
+    :global(.code-block pre) {
+        padding: 2rem 1.35rem 1.25rem;
     }
 
     .try-grid {
@@ -1101,7 +1050,7 @@ const codeDatepicker = `<ar-datepicker
         h2 {
             font-family: var(--doc-font-display);
             font-size: clamp(2rem, 7vw, 2.5rem);
-            font-weight: 600;
+            font-weight: var(--doc-font-weight-semibold);
             letter-spacing: -0.025em;
             line-height: 1;
             color: var(--doc-ink);
@@ -1131,7 +1080,7 @@ const codeDatepicker = `<ar-datepicker
         padding: 2rem 1.25rem;
         background: var(--doc-grove-deep);
         color: var(--doc-on-dark-muted);
-        font-size: .9rem;
+        font-size: var(--doc-font-size-sm);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1197,7 +1146,7 @@ const codeDatepicker = `<ar-datepicker
         }
 
 
-        .try-grid .code-block {
+        :global(.try-grid .code-block) {
             border-radius: var(--doc-radius-md);
         }
 
@@ -1281,7 +1230,7 @@ const codeDatepicker = `<ar-datepicker
             width: var(--step-node-size);
             height: var(--step-node-size);
             font-size: 1.3rem;
-            font-weight: 700;
+            font-weight: var(--doc-font-weight-bold);
             background-color: transparent;
             color: var(--doc-ember);
 
@@ -1299,7 +1248,7 @@ const codeDatepicker = `<ar-datepicker
             font-size: 1.3rem;
         }
 
-        .code-block,
+        :global(.code-block),
         .try ar-tab-group {
             margin-inline-start: 4.5rem;
         }
@@ -1348,29 +1297,8 @@ const codeDatepicker = `<ar-datepicker
             }
         }
 
-        .code-block pre {
+        :global(.code-block pre) {
             padding-block-start: 1.25rem;
-        }
-
-        /* Masquer le bouton derrière le survol suppose qu'un survol existe : sur
-           tactile (tablette/laptop tactile ≥901px), il n'y en a pas, et rien ne
-           le focus automatiquement — il resterait invisible en permanence. */
-        @media (hover: hover) and (pointer: fine) {
-            .copy-btn {
-                opacity: 0;
-
-                &:hover {
-                    background: var(--doc-paper);
-                    color: var(--doc-ink);
-                }
-            }
-
-            .code-block:hover .copy-btn,
-            .code-block:has(pre:focus) .copy-btn,
-            .code-block:has(code:focus) .copy-btn,
-            .copy-btn:focus {
-                opacity: 1;
-            }
         }
     }
 </style>

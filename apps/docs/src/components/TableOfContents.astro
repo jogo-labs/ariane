@@ -23,11 +23,11 @@ const { entries, mobileOnly = false } = Astro.props;
 
 <!-- Desktop : sticky dans la colonne de droite (masqué si mobileOnly) -->
 <nav class={`toc toc-desktop${mobileOnly ? ' toc-hidden' : ''}`} aria-label="Sur cette page">
-    <p class="toc-title">Sur cette page</p>
-    <ul>
+    <p class="rail-title">Sur cette page</p>
+    <ul class="rail-list">
         {entries.map((entry) => (
             <li class={`toc-item level-${entry.level}`}>
-                <a href={`#${entry.id}`} class="toc-link">{entry.label}</a>
+                <a href={`#${entry.id}`} class="toc-link rail-link">{entry.label}</a>
             </li>
         ))}
     </ul>
@@ -37,16 +37,32 @@ const { entries, mobileOnly = false } = Astro.props;
      donc on l'injecte aussi via un slot sans nom dans [slug].astro — voir ci-dessous) -->
 <details class="toc-mobile">
     <summary>Sur cette page</summary>
-    <ul>
-        {entries.map((entry) => (
-            <li class={`toc-item level-${entry.level}`}>
-                <a href={`#${entry.id}`} class="toc-link-m">{entry.label}</a>
-            </li>
-        ))}
-    </ul>
+    <div class="nav-container">
+        <ul class="rail-list">
+            {entries.map((entry) => (
+                <li class={`toc-item level-${entry.level}`}>
+                    <a href={`#${entry.id}`} class="toc-link-m rail-link">{entry.label}</a>
+                </li>
+            ))}
+        </ul>
+    </div>
 </details>
 
 <script>
+    // Le scroll-spy (IntersectionObserver ci-dessous) ne détecte l'actif que
+    // quand un titre traverse une bande précise du viewport (10%-40%). Un clic
+    // qui scrolle directement vers une cible peut faire traverser cette bande
+    // à un AUTRE titre au même moment — typiquement un titre voisin très proche
+    // dans la mise en page (ex. les catégories de l'API, toutes regroupées au
+    // même endroit puisqu'un seul onglet ar-tab-group est visible à la fois) —
+    // ce qui écrase l'état fixé par le clic quelques dizaines de ms après coup.
+    // On suspend donc le scroll-spy brièvement après un clic explicite, le
+    // temps que le scroll déclenché par ce clic se stabilise.
+    let suppressObserverUntil = 0;
+    function suppressObserverBriefly() {
+        suppressObserverUntil = performance.now() + 700;
+    }
+
     // Un seul observer global — initialisé une seule fois même si le composant est monté deux fois
     if (!(window as any).__tocObserverInit) {
         (window as any).__tocObserverInit = true;
@@ -63,14 +79,10 @@ const { entries, mobileOnly = false } = Astro.props;
 
             const observer = new IntersectionObserver(
                 (entries) => {
+                    if (performance.now() < suppressObserverUntil) return;
                     for (const entry of entries) {
                         if (entry.isIntersecting) {
-                            document.querySelectorAll<HTMLAnchorElement>('.toc-link').forEach((l) =>
-                                l.classList.remove('active')
-                            );
-                            document
-                                .querySelectorAll<HTMLAnchorElement>(`.toc-link[href="#${entry.target.id}"]`)
-                                .forEach((l) => l.classList.add('active'));
+                            setActiveLink(entry.target.id);
                         }
                     }
                 },
@@ -88,64 +100,123 @@ const { entries, mobileOnly = false } = Astro.props;
             if (details) details.open = false;
         });
     });
+
+    // Si un lien (TOC ou hash d'URL) cible une catégorie d'API repliée dans
+    // un onglet (ar-tab-group), active l'onglet correspondant — sinon la
+    // cible reste masquée (panneau inactif = hidden) et le navigateur ne
+    // peut pas y scroller.
+    type TabGroupEl = HTMLElement & { active?: string; updateComplete?: Promise<unknown> };
+
+    function activateTabForTarget(id: string): { target: HTMLElement | null; group: TabGroupEl | null } {
+        const target = document.getElementById(id);
+        const panel = target?.closest('ar-tab-panel');
+        const group = (panel?.closest('ar-tab-group') as TabGroupEl | null) ?? null;
+        const panelName = panel?.getAttribute('name');
+        if (group && panelName) {
+            group.active = panelName;
+        }
+        return { target: target ?? null, group };
+    }
+
+    // Marque le lien cliqué comme actif immédiatement, sans attendre le
+    // scroll-spy (IntersectionObserver) — celui-ci ne détecte l'actif que
+    // quand un titre traverse une bande précise du viewport (10%-40%,
+    // cf. rootMargin ci-dessus) ; un clic qui scrolle directement vers une
+    // section trop courte, ou vers un titre qui atterrit hors de cette
+    // bande, ne la traverse jamais et l'ancien actif reste affiché sinon.
+    function setActiveLink(id: string) {
+        document.querySelectorAll<HTMLAnchorElement>('.toc-link, .toc-link-m').forEach((l) =>
+            l.classList.remove('active')
+        );
+        document
+            .querySelectorAll<HTMLAnchorElement>(`.toc-link[href="#${id}"], .toc-link-m[href="#${id}"]`)
+            .forEach((l) => l.classList.add('active'));
+    }
+
+    // Clic sur un lien TOC : active l'onglet avant que le navigateur ne
+    // scrolle vers l'ancre, et fixe l'état actif du lien lui-même.
+    document.querySelectorAll<HTMLAnchorElement>('.toc-link, .toc-link-m').forEach((link) => {
+        link.addEventListener('click', () => {
+            const id = link.getAttribute('href')?.slice(1);
+            if (!id) return;
+            suppressObserverBriefly();
+            void activateTabForTarget(id);
+            setActiveLink(id);
+        });
+    });
+
+    // Hash initial (deep-link cross-page, ex. venant d'un callout
+    // relatedTokens vers #api-css-props d'une autre page) : le navigateur
+    // a pu essayer de scroller avant que le panneau ne soit actif (donc
+    // avant que la cible ne soit visible) — on active l'onglet puis on
+    // scrolle explicitement, sans dépendre du scroll natif. Même logique
+    // sur `hashchange` pour couvrir une navigation in-page ultérieure.
+    //
+    // ar-tab-group est un composant Lit : `group.active = panelName` déclenche
+    // sa mise à jour (qui retire `hidden` du panneau) sur un microtask différé,
+    // pas de façon synchrone. Un `scrollIntoView()` appelé juste après rate donc
+    // sa cible (encore masquée) — il faut attendre `updateComplete` avant de
+    // scroller. Le clic sur un lien TOC n'a pas ce problème : le scroll natif du
+    // navigateur pour une ancre est traité comme une tâche, exécutée après que
+    // tous les microtasks en attente (dont celui de Lit) se soient déjà résolus.
+    async function handleHash() {
+        const id = location.hash?.slice(1);
+        if (!id) return;
+        const { target, group } = activateTabForTarget(id);
+        if (group?.updateComplete) await group.updateComplete;
+        target?.scrollIntoView();
+    }
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
 </script>
 
 <style>
+    @import '../styles/doc-rail-nav.css';
+
     /* ── Desktop ────────────────────────────────────────────── */
 
     .toc-hidden { display: none !important; }
 
     .toc-desktop {
         font-size: 0.8rem;
+        font-weight: var(--doc-font-weight-thin);
+        padding-inline-start: calc(var(--doc-toc-bead-size) / 2);
     }
 
     .toc-mobile { display: none; }
 
-    .toc-title {
-        font-size:      0.65rem;
-        font-weight:    600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color:          var(--doc-text-muted);
-        margin:         0 0 0.5rem;
+    /* ── Le fil : même vocabulaire que SiteNav (rail 1px + perle,
+       partagés via doc-rail-nav.css / .rail-title, .rail-list, .rail-link).
+       La taille de perle et l'indentation restent propres à la TOC
+       (--doc-toc-*) ; le reste (couleur, survol, fil) vient du fichier
+       partagé. */
+
+    ul.rail-list {
+        --rail-padding-inline-start: var(--doc-toc-padding-inline-start);
+        --rail-bead-size: var(--doc-toc-bead-size);
+        --rail-bead-top: 0.3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
-    ul {
-        list-style: none;
-        margin:     0;
-        padding:    0;
-    }
-
-    .toc-item        { margin: 0; }
+    .toc-item        { position: relative; margin: 0; }
     .toc-item.level-2 { padding-left: 1rem; }
 
-    .toc-link,
+    .toc-link:not(.level-2),
     .toc-link-m {
-        display:         block;
-        padding:         0.25rem 0;
-        padding-left:    0.75rem;
-        color:           var(--doc-text-subtle);
-        text-decoration: none;
-        border-left:     2px solid transparent;
-        line-height:     1.4;
-        font-size:       0.8rem;
-        transition:      color 0.1s, border-color 0.1s;
+        color: var(--doc-text-subtle);
+        font-size: 0.8rem;
     }
 
-    .toc-link:hover,
-    .toc-link-m:hover {
-        color:        var(--doc-text);
-        border-color: var(--doc-border);
-    }
-
-    .toc-link.active {
-        color:        var(--doc-accent);
-        border-color: var(--doc-accent);
+    .toc-link.active,
+    .toc-link-m.active {
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     /* ── Mobile ─────────────────────────────────────────────── */
 
-    @media (max-width: 768px) {
+    @media (max-width: 1180px) {
         .toc-desktop { display: none; }
         .toc-mobile  {
             display:       block;
@@ -158,7 +229,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
         .toc-mobile summary {
             padding:         0.6rem 0.875rem;
-            font-weight:     600;
+            font-weight:     var(--doc-font-weight-semibold);
             font-size:       0.8rem;
             text-transform:  uppercase;
             letter-spacing:  0.06em;
@@ -172,7 +243,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
         .toc-mobile summary::after {
             content:     '▾';
-            font-size:   0.75rem;
+            font-size:   var(--doc-font-size-xs);
             transition:  transform 0.15s;
         }
 
@@ -180,9 +251,10 @@ const { entries, mobileOnly = false } = Astro.props;
             transform: rotate(180deg);
         }
 
-        .toc-mobile ul {
-            padding:       0 0.5rem 0.5rem;
-            border-top:    1px solid var(--doc-border);
+        .toc-mobile .nav-container {
+            padding: 1rem;
+            padding-inline-start: 2rem;
+            border-top:          1px solid var(--doc-border);
         }
     }
 </style>

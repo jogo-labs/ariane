@@ -35,7 +35,7 @@ export async function getStaticPaths() {
 
 const { component, mdx } = Astro.props as {
     component: CemDeclaration;
-    mdx: MdxEntry | null;
+    mdx:       MdxEntry | null;
 };
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
@@ -74,9 +74,13 @@ const controls = buildControls(component.members ?? []);
 
 // ─── Sous-sections de la Référence API ─────────────────────────────────────────
 //
-// Chaque entrée reflète exactement la condition d'affichage de la section
-// correspondante dans ComponentApi.astro — une section absente (ex. pas de slot)
-// ne doit pas apparaître dans la TOC.
+// Chaque entrée reflète exactement la condition d'affichage ET l'ordre des onglets
+// de ComponentApi.astro (categories) — une section absente (ex. pas de slot) ne
+// doit pas apparaître dans la TOC, et l'ordre doit correspondre à l'ordre réel des
+// onglets pour que la TOC serve de sommaire fidèle.
+
+const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
+const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
 
 const apiTocEntries = [
     component['x-localized']
@@ -84,6 +88,9 @@ const apiTocEntries = [
         : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
+        : null,
+    component.slots && component.slots.length > 0
+        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
         : null,
     component.events && component.events.length > 0
         ? { id: 'api-evenements', label: 'Événements', level: 2 as const }
@@ -94,11 +101,8 @@ const apiTocEntries = [
     component.cssParts && component.cssParts.length > 0
         ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
         : null,
-    component.cssProperties && component.cssProperties.length > 0
+    (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
-        : null,
-    component.slots && component.slots.length > 0
-        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
         : null,
 ].filter((entry) => entry !== null);
 
@@ -151,13 +155,21 @@ const tocEntries = [
 
     <div class="page-container">
         <div class="page-header">
-            <h2 class="page-title">{pageTitle}</h2>
-
-            <div class="meta">
-                <code>&lt;{component.tagName}&gt;</code>
+            <div class="title-row">
+                <h2 class="page-title">{pageTitle}</h2>
+                {/* Toujours "Alpha" dans ce chantier — cf. Global Constraints,
+                    aucune donnée de maturité par composant n'existe encore. */}
+                <span class="status status-alpha">Alpha</span>
             </div>
 
             {pageDesc && <p class="summary">{pageDesc}</p>}
+
+            {/*
+            On masque pour le moment, en attendant de construire un vrai bloc meta complet comme sur le mockup
+            <div class="meta">
+                <code>&lt;{component.tagName}&gt;</code>
+            </div>
+             */}
 
             {/* ── Encart parent pour les sous-composants ── */}
             {parentTag && (
@@ -208,6 +220,48 @@ const tocEntries = [
 <style>
     @import '../../styles/doc-prose.css';
 
+    .title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .title-row .page-title {
+        margin: 0;
+        font-family: var(--doc-font-mono);
+    }
+
+    .status {
+        position: relative;
+        top: 3px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+        font-size: 0.68rem;
+        font-weight: var(--doc-font-weight-semibold);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 0.12rem 0.55rem;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+    }
+
+    .status::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-alpha {
+        color: var(--doc-alpha);
+    }
+    .status-stable {
+        color: var(--doc-stable);
+    }
+
     /* ── Encart parent ───────────────────────────────── */
 
     .parent-notice {
@@ -216,11 +270,13 @@ const tocEntries = [
 
     /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
     .toc-mobile-inline { display: none; }
-    @media (max-width: 768px) {
+    @media (max-width: 1180px) {
         .toc-mobile-inline { display: block; }
     }
 
-    /* Tables narratives — alignées sur le style de ComponentApi (doc-table.css) */
+    /* Tables narratives (contenu MDX libre) — style propre à ce fichier ;
+       ComponentApi.astro n'utilise plus de tableau HTML pour l'API (lignes
+       de vie, cf. spec §5), ces styles ne s'appliquent donc qu'ici. */
     .narrative :global(table) {
         width: 100%;
         border-collapse: collapse;
@@ -233,7 +289,7 @@ const tocEntries = [
         padding: 0.5rem 0.75rem;
         background: var(--doc-nav-bg);
         color: var(--doc-text);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         border-bottom: 1px solid var(--doc-border);
     }
 
@@ -246,7 +302,7 @@ const tocEntries = [
 
     .narrative :global(td code),
     .narrative :global(th code) {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.8rem;
         background: var(--doc-accent-bg);
         color: var(--doc-accent);
@@ -255,12 +311,12 @@ const tocEntries = [
     }
 
     .narrative :global(kbd) {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 0.75rem;
+        font-family: var(--doc-font-mono);
+        font-size: var(--doc-font-size-xs);
         background: var(--doc-nav-bg);
         color: var(--doc-text);
         border: 1px solid var(--doc-border);
-        border-radius: 0.25rem;
+        border-radius: var(--doc-radius-sm);
         padding: 0.15em 0.45em;
         box-shadow: 0 1px 0 var(--doc-border);
         white-space: nowrap;
