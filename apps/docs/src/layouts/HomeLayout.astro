@@ -97,7 +97,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 border-radius: 0 0 var(--doc-radius-sm) var(--doc-radius-sm);
                 text-decoration: none;
                 font-size: 0.85rem;
-                font-weight: 600;
+                font-weight: var(--doc-font-weight-semibold);
                 transition: top 0.25s var(--doc-ease);
             }
 
@@ -119,7 +119,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
 
             .alpha-banner a {
                 color: inherit;
-                font-weight: 600;
+                font-weight: var(--doc-font-weight-semibold);
                 text-underline-offset: 2px;
             }
 
@@ -144,7 +144,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
             .home-logo {
                 font-family: var(--doc-font-display);
                 font-size: 1.75rem;
-                font-weight: 600;
+                font-weight: var(--doc-font-weight-semibold);
                 letter-spacing: -0.03em;
                 color: var(--doc-ink);
                 text-decoration: none;
@@ -179,7 +179,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 }
 
                 .home-logo {
-                    font-size: 2rem;
+                    font-size: var(--doc-font-size-xl);
                 }
             }
         </style>

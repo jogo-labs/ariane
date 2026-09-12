@@ -211,7 +211,7 @@ const componentItems: NavItem[] = allComponents
     }
 
     nav::-webkit-scrollbar       { width: 4px; }
-    nav::-webkit-scrollbar-thumb { background: var(--doc-border); border-radius: 4px; }
+    nav::-webkit-scrollbar-thumb { background: var(--doc-border); border-radius: var(--doc-radius-sm); }
 
     /* En dessous de 1180px, la colonne nav persistante (ex. iPad en paysage,
        encore au-dessus du seuil drawer de 820px) devient trop étroite pour
@@ -283,13 +283,13 @@ const componentItems: NavItem[] = allComponents
        perle sur le fil) vient de .rail-link dans doc-rail-nav.css. */
     .nav-list a {
         color: var(--doc-text-subtle);
-        font-size: 0.9rem;
-        font-weight: 300;
+        font-size: var(--doc-font-size-sm);
+        font-weight: var(--doc-font-weight-thin);
     }
 
     /* La perle : marque la position courante sur le fil. */
     .nav-list a[aria-current='page'] {
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     /* ── Sous-composants : UN niveau, rail continu ───────────────────

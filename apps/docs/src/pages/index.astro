@@ -662,7 +662,7 @@ const codeDatepicker = `<ar-datepicker
     .hero-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2.6rem, 11vw, 4rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 0.96;
         color: var(--doc-ink);
@@ -671,7 +671,7 @@ const codeDatepicker = `<ar-datepicker
     }
 
     .hero-pitch {
-        font-size: 1.05rem;
+        font-size: var(--doc-font-size-md);
         line-height: 1.6;
         color: var(--doc-ink-muted);
         max-width: 40ch;
@@ -705,7 +705,7 @@ const codeDatepicker = `<ar-datepicker
 
     .hero-facts strong {
         color: var(--doc-ink);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     /* ── Boutons ──────────────────────────────────────────── */
@@ -717,7 +717,7 @@ const codeDatepicker = `<ar-datepicker
         justify-content: center;
         font-family: inherit;
         font-size: 0.92rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.01em;
         padding: 0.7rem 1.5rem;
         border-radius: 999px;
@@ -775,7 +775,7 @@ const codeDatepicker = `<ar-datepicker
     .promise-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2rem, 7vw, 2.5rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 1;
         color: var(--doc-ink);
@@ -807,14 +807,14 @@ const codeDatepicker = `<ar-datepicker
     .promise-item h3 {
         font-family: var(--doc-font-display);
         font-size: 1.1rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.02em;
         color: var(--doc-ink);
         margin: 0 0 0.4rem;
     }
 
     .promise-item p {
-        font-size: 0.9rem;
+        font-size: var(--doc-font-size-sm);
         line-height: 1.65;
         color: var(--doc-ink-muted);
         margin: 0;
@@ -841,7 +841,7 @@ const codeDatepicker = `<ar-datepicker
     .try-title {
         font-family: var(--doc-font-display);
         font-size: clamp(2rem, 7vw, 2.5rem);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.025em;
         line-height: 1;
         margin: 0 0 0.6rem;
@@ -891,13 +891,13 @@ const codeDatepicker = `<ar-datepicker
         color: var(--doc-ink);
         border-radius: 50%;
         font-family: var(--doc-font-display);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     .step-label {
         font-family: var(--doc-font-display);
         font-size: 1.15rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: -0.02em;
         margin: 0;
     }
@@ -998,8 +998,8 @@ const codeDatepicker = `<ar-datepicker
     }
 
     .try-tab-label {
-        font-size: 0.9rem;
-        font-weight: 600;
+        font-size: var(--doc-font-size-sm);
+        font-weight: var(--doc-font-weight-semibold);
     }
 
 
@@ -1038,8 +1038,8 @@ const codeDatepicker = `<ar-datepicker
         color: var(--doc-paper);
         border: 1px solid var(--doc-on-dark-line);
         border-radius: 50px;
-        font-size: .9rem;
-        font-weight: 600;
+        font-size: var(--doc-font-size-sm);
+        font-weight: var(--doc-font-weight-semibold);
         font-family: inherit;
         padding: 0.25rem 0.7rem;
         cursor: pointer;
@@ -1102,7 +1102,7 @@ const codeDatepicker = `<ar-datepicker
         h2 {
             font-family: var(--doc-font-display);
             font-size: clamp(2rem, 7vw, 2.5rem);
-            font-weight: 600;
+            font-weight: var(--doc-font-weight-semibold);
             letter-spacing: -0.025em;
             line-height: 1;
             color: var(--doc-ink);
@@ -1132,7 +1132,7 @@ const codeDatepicker = `<ar-datepicker
         padding: 2rem 1.25rem;
         background: var(--doc-grove-deep);
         color: var(--doc-on-dark-muted);
-        font-size: .9rem;
+        font-size: var(--doc-font-size-sm);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1282,7 +1282,7 @@ const codeDatepicker = `<ar-datepicker
             width: var(--step-node-size);
             height: var(--step-node-size);
             font-size: 1.3rem;
-            font-weight: 700;
+            font-weight: var(--doc-font-weight-bold);
             background-color: transparent;
             color: var(--doc-ember);
 

@@ -211,7 +211,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
     .toc-link.active,
     .toc-link-m.active {
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
     }
 
     /* ── Mobile ─────────────────────────────────────────────── */
@@ -229,7 +229,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
         .toc-mobile summary {
             padding:         0.6rem 0.875rem;
-            font-weight:     600;
+            font-weight:     var(--doc-font-weight-semibold);
             font-size:       0.8rem;
             text-transform:  uppercase;
             letter-spacing:  0.06em;
@@ -243,7 +243,7 @@ const { entries, mobileOnly = false } = Astro.props;
 
         .toc-mobile summary::after {
             content:     '▾';
-            font-size:   0.75rem;
+            font-size:   var(--doc-font-size-xs);
             transition:  transform 0.15s;
         }
 

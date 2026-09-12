@@ -18,7 +18,7 @@
 
     .meta {
         display: flex;
-        font-size: 0.9rem;
+        font-size: var(--doc-font-size-sm);
     }
 
     .summary {
@@ -277,7 +277,7 @@ pre code {
 
 .badge {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: var(--doc-font-weight-semibold);
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
     background: var(--doc-accent-bg);
@@ -302,7 +302,7 @@ pre code {
 
     p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: var(--doc-font-size-sm);
     }
 
     ul {
@@ -320,8 +320,8 @@ pre code {
 }
 
 .doc-callout-alert-title {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: var(--doc-font-size-xs);
+    font-weight: var(--doc-font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--doc-accent);
@@ -341,7 +341,7 @@ pre code {
 
 .badge-subtle {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: var(--doc-font-weight-semibold);
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
     background: color-mix(in srgb, var(--doc-border) 80%, transparent);

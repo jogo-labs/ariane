@@ -239,7 +239,7 @@ const tocEntries = [
         align-items: center;
         gap: 0.32rem;
         font-size: 0.68rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         letter-spacing: 0.07em;
         text-transform: uppercase;
         padding: 0.12rem 0.55rem;
@@ -289,7 +289,7 @@ const tocEntries = [
         padding: 0.5rem 0.75rem;
         background: var(--doc-nav-bg);
         color: var(--doc-text);
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         border-bottom: 1px solid var(--doc-border);
     }
 
@@ -312,11 +312,11 @@ const tocEntries = [
 
     .narrative :global(kbd) {
         font-family: var(--doc-font-mono);
-        font-size: 0.75rem;
+        font-size: var(--doc-font-size-xs);
         background: var(--doc-nav-bg);
         color: var(--doc-text);
         border: 1px solid var(--doc-border);
-        border-radius: 0.25rem;
+        border-radius: var(--doc-radius-sm);
         padding: 0.15em 0.45em;
         box-shadow: 0 1px 0 var(--doc-border);
         white-space: nowrap;
