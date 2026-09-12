@@ -10,25 +10,34 @@
  * besoin d'un garde-fou de largeur d'écran en plus), et la typographie
  * du code.
  *
- * La bordure/le radius/le padding du bloc restent posés par page via
- * les custom properties ci-dessous (--code-block-border, -radius,
- * -pre-padding) : le bloc est une boîte autonome sur la home, un panneau
- * flush à l'intérieur d'une carte déjà bordée dans Playground — ce n'est
- * pas une valeur qui a dérivé par accident, la structure diffère
- * réellement selon le contexte.
+ * La bordure/le radius/le padding du bloc restent posés par page : le
+ * bloc est une boîte autonome sur la home, un panneau flush à
+ * l'intérieur d'une carte déjà bordée dans Playground — ce n'est pas une
+ * valeur qui a dérivé par accident, la structure diffère réellement
+ * selon le contexte. Ce fichier ne pose donc PAS de border/padding par
+ * défaut sur .code-block/pre : chaque page déclare les siens.
+ *
+ * Important : ce fichier est importé par le composant enfant
+ * CodeBlock.astro, qui lui applique le scope Astro habituel — les
+ * sélecteurs compilés portent donc un `[data-astro-cid-*]`, qui compte
+ * comme une classe dans le calcul de spécificité. Un override posé
+ * depuis la page consommatrice (nécessairement écrit `:global(...)`,
+ * donc SANS cet attribut) doit être préfixé par assez d'ancêtres pour
+ * rester au moins aussi spécifique — sinon, même en étant décrit après
+ * dans la page, il perd face à la règle scopée d'ici. C'est pour ça
+ * qu'aucune propriété codée en dur ici ne doit avoir un équivalent
+ * "à surcharger" ailleurs : soit elle est vraiment commune (pas
+ * d'override), soit elle n'est pas déclarée ici du tout.
  */
 
 .code-block {
     position: relative;
     overflow: hidden;
     background: var(--doc-code-block-bg);
-    border: var(--code-block-border, none);
-    border-radius: var(--code-block-radius, 0);
 }
 
 .code-block pre {
     margin: 0;
-    padding: var(--code-block-pre-padding, 1rem 1.25rem);
     overflow-x: auto;
     font-family: var(--doc-font-mono);
     font-size: 0.8rem;

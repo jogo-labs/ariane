@@ -263,9 +263,16 @@ const showPlayground = displayMode === 'demo';
        contexte reste ici (séparateur du panneau contrôles au-dessus —
        pas une boîte autonome comme sur la home). :global() car
        .code-block est rendu par le composant enfant CodeBlock, hors du
-       scope Astro de ce fichier. */
-    :global(.code-block) {
+       scope Astro de ce fichier — préfixé par .preview-controls-wrap
+       (ancêtre commun aux deux usages) pour battre en spécificité la
+       règle `.code-block` de doc-code-block.css, chargée après ce
+       <style> dans la page. */
+    :global(.preview-controls-wrap .code-block) {
         border-top: 1px solid var(--doc-border);
+    }
+
+    :global(.preview-controls-wrap .code-block pre) {
+        padding: 1rem 1.25rem;
     }
 
     /* ── Playground contrôles ────────────────────────── */

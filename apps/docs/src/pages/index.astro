@@ -993,13 +993,16 @@ const codeDatepicker = `<ar-datepicker
        comme dans Playground) et le padding du <pre> (respiration
        supplémentaire en haut, pour la mise en avant marketing).
        :global() car .code-block est rendu par le composant enfant
-       CodeBlock, hors du scope Astro de ce fichier. */
-    :global(.code-block) {
+       CodeBlock, hors du scope Astro de ce fichier — préfixé par .steps
+       (ancêtre commun à toutes les instances de cette page) pour battre
+       en spécificité la règle `.code-block` de doc-code-block.css,
+       chargée après ce <style> dans la page. */
+    :global(.steps .code-block) {
         border: 1px solid var(--doc-on-dark-line);
         border-radius: var(--doc-radius-md);
     }
 
-    :global(.code-block pre) {
+    :global(.steps .code-block pre) {
         padding: 2rem 1.35rem 1.25rem;
     }
 
@@ -1295,7 +1298,7 @@ const codeDatepicker = `<ar-datepicker
             }
         }
 
-        :global(.code-block pre) {
+        :global(.steps .code-block pre) {
             padding-block-start: 1.25rem;
         }
     }
