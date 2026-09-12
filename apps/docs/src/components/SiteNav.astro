@@ -261,17 +261,14 @@ const componentItems: NavItem[] = allComponents
 
     /* ── Listes ──────────────────────────────────────────────── */
 
-    /* padding: 0 séparé de .nav-list : .rail-list (doc-rail-nav.css) pose
-       déjà son propre padding-inline-start, qu'un reset groupé ici
-       écraserait (même spécificité, mais après dans la cascade). */
-    .nav-list,
+    /* list-style/margin/padding de .nav-list viennent de .rail-list
+       (doc-rail-nav.css). .nav-children n'a pas cette classe (elle
+       prolonge le rail du parent plutôt que d'en poser un) : elle garde
+       son propre reset. */
     .nav-children {
         list-style: none;
         margin:     0;
-    }
-
-    .nav-children {
-        padding: 0;
+        padding:    0;
     }
 
     .nav-list,
