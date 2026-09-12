@@ -37,13 +37,15 @@ const { entries, mobileOnly = false } = Astro.props;
      donc on l'injecte aussi via un slot sans nom dans [slug].astro — voir ci-dessous) -->
 <details class="toc-mobile">
     <summary>Sur cette page <span class="toc-mobile-current"></span></summary>
-    <ul>
-        {entries.map((entry) => (
-            <li class={`toc-item level-${entry.level}`}>
-                <a href={`#${entry.id}`} class="toc-link-m">{entry.label}</a>
-            </li>
-        ))}
-    </ul>
+    <div class="nav-container">
+        <ul>
+            {entries.map((entry) => (
+                <li class={`toc-item level-${entry.level}`}>
+                    <a href={`#${entry.id}`} class="toc-link-m">{entry.label}</a>
+                </li>
+            ))}
+        </ul>
+    </div>
 </details>
 
 <script>
@@ -129,12 +131,6 @@ const { entries, mobileOnly = false } = Astro.props;
         document
             .querySelectorAll<HTMLAnchorElement>(`.toc-link[href="#${id}"], .toc-link-m[href="#${id}"]`)
             .forEach((l) => l.classList.add('active'));
-
-        const activeLabel = document.querySelector<HTMLAnchorElement>('.toc-link.active')?.textContent;
-        const summarySpan = document.querySelector<HTMLElement>('.toc-mobile-current');
-        if (summarySpan) {
-            summarySpan.textContent = activeLabel ? `· ${activeLabel}` : '';
-        }
     }
 
     // Clic sur un lien TOC : active l'onglet avant que le navigateur ne
@@ -181,13 +177,15 @@ const { entries, mobileOnly = false } = Astro.props;
 
     .toc-desktop {
         font-size: 0.8rem;
+        font-weight: var(--doc-font-weight-thin);
+        padding-inline-start: calc(var(--doc-toc-bead-size) / 2);
     }
 
     .toc-mobile { display: none; }
 
     .toc-title {
-        font-size:      0.65rem;
-        font-weight:    600;
+        font-size:      0.7rem;
+        font-weight:    var(--doc-font-weight-semibold);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color:          var(--doc-text-muted);
@@ -203,9 +201,14 @@ const { entries, mobileOnly = false } = Astro.props;
 
     ul {
         position:    relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
         list-style:  none;
         margin:      0;
-        padding:     0 0 0 0.9rem;
+        padding: 0;
+        padding-inline-start: var(--doc-toc-padding-inline-start);
+
     }
 
     ul::before {
@@ -221,29 +224,45 @@ const { entries, mobileOnly = false } = Astro.props;
     .toc-item        { position: relative; margin: 0; }
     .toc-item.level-2 { padding-left: 1rem; }
 
-    .toc-item:has(> .toc-link.active)::before,
-    .toc-item:has(> .toc-link-m.active)::before {
+    .toc-link:hover::before,
+    .toc-link-m:hover::before,
+    .toc-link.active::before,
+    .toc-link-m.active::before {
         content:            '';
         position:           absolute;
-        inset-inline-start: calc(-0.9rem - 3.5px);
-        top:                50%;
-        margin-top:         -4px;
-        width:              8px;
-        height:             8px;
+        inset-inline-start: calc(var(--doc-toc-padding-inline-start) * -1  - var(--doc-toc-bead-size) / 2 + (1px /2));
+        top: .3rem;
+        width:              var(--doc-toc-bead-size);
+        height:              var(--doc-toc-bead-size);
         border-radius:      50%;
-        background:         var(--doc-bead);
-        box-shadow:         0 0 0 3px var(--doc-bead-ring);
     }
 
-    .toc-link,
+    .toc-link:not(.active):hover::before,
+    .toc-link-m:not(.active):hover::before {
+        background: var(--doc-bead-ring);
+        box-shadow: inset 0 0 0 1px var(--doc-bead), 0 0 0 3px var(--doc-bead-ring);
+    }
+
+    .toc-link.active::before,
+    .toc-link-m.active::before {
+        background: var(--doc-bead);
+        box-shadow: 0 0 0 3px var(--doc-bead-ring);
+    }
+
+    .toc-link:not(.level-2),
     .toc-link-m {
         display:         block;
-        padding:         0.25rem 0 0.25rem 0.75rem;
         color:           var(--doc-text-subtle);
         text-decoration: none;
-        line-height:     1.4;
-        font-size:       0.8rem;
-        transition:      color 0.1s;
+        font-size:       0.8rem;;
+        transition:      color 0.15s;
+    }
+
+    .toc-item:not(.level-2) {
+        .toc-link,
+        .toc-link-m {
+            position: relative;
+        }
     }
 
     .toc-link:hover,
@@ -253,7 +272,6 @@ const { entries, mobileOnly = false } = Astro.props;
 
     .toc-link.active,
     .toc-link-m.active {
-        color:       var(--doc-accent);
         font-weight: 600;
     }
 
@@ -294,10 +312,9 @@ const { entries, mobileOnly = false } = Astro.props;
             transform: rotate(180deg);
         }
 
-        .toc-mobile ul {
-            padding-block-start: 0.5rem;
-            padding-inline-end:  0.5rem;
-            padding-block-end:   0.5rem;
+        .toc-mobile .nav-container {
+            padding: 1rem;
+            padding-inline-start: 2rem;
             border-top:          1px solid var(--doc-border);
         }
     }

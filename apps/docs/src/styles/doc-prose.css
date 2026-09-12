@@ -13,13 +13,19 @@
 }
 
 .page-header {
+    padding-block-end: 2rem;
+    border-bottom: 1px solid var(--doc-rail);
+
     .meta {
         display: flex;
-        font-size: 1rem;
-        margin-top: 1rem;
+        font-size: 0.9rem;
     }
 
-    .summary,
+    .summary {
+        margin-block-start: 0.75rem;
+    }
+
+    .meta,
     .doc-callout-alert {
         margin-top: 1.5rem;
     }
@@ -37,8 +43,8 @@
 
 :global(.page-title) {
     color: var(--doc-text);
-    font-size: var(--doc-font-size-xl);
-    font-weight: var(--doc-font-weight-bold);
+    font-size: var(--doc-font-size-xxl);
+    font-weight: var(--doc-font-weight-medium);
     margin: 0;
 }
 
@@ -63,31 +69,55 @@
     top: 0;
     left: 0;
     width: 28px;
-    height: 2px;
+    height: 3px;
     background: var(--doc-rail-live);
 }
 
 :global(.subsection-title) {
     font-size: var(--doc-font-size-md);
     font-weight: var(--doc-font-weight-semibold);
-    color: var(--doc-text-subtle);
+
+    /* color: var(--doc-text-subtle); */
     margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
+.narrative :global(strong) {
+    font-weight: var(--doc-font-weight-bold);
+    color: var(--doc-text);
+}
+
 .narrative :global(p) {
     font-size: var(--doc-font-size-sm);
     line-height: 1.75;
-    color: var(--doc-text);
+    color: var(--doc-text-muted);
     margin: 0;
+}
+
+.narrative :global(:not(pre) code) {
+    font-family: var(--doc-font-mono);
+    font-size: 0.9em;
+    background: var(--doc-surface);
+    padding: 0.05rem 0.3rem;
+    border-radius: var(--doc-radius-sm);
+    color: var(--doc-text);
+}
+
+.narrative :global(pre code) {
+    background-color: var(--doc-code-block-bg);
+    border-radius: 0.5rem;
+}
+
+.narrative :global(pre) {
+    border-radius: 0.5rem;
 }
 
 .narrative :global(.narrative-list) {
     font-size: var(--doc-font-size-sm);
     line-height: 1.75;
-    color: var(--doc-text);
+    color: var(--doc-text-muted);
     margin: 0;
     padding-left: 1.25rem;
     list-style: none;
@@ -178,8 +208,10 @@
 }
 
 .summary {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--doc-text-muted);
+    max-width: 62ch;
+    text-wrap: pretty;
     margin: 0;
 }
 
@@ -226,17 +258,16 @@ pre {
 }
 
 code {
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
-    font-size: 0.9rem;
-    display: inline-block;
-    line-height: 1.6;
-    background-color: var(--doc-accent-bg);
-    color: var(--doc-accent);
-    font-weight: 500;
+    font-family: var(--doc-font-mono);
+    font-size: 0.9em;
+    background: var(--doc-surface);
+    padding: 0.05rem 0.3rem;
+    border-radius: var(--doc-radius-sm);
+    color: var(--doc-text);
 }
 
 pre code {
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-family: var(--doc-font-mono);
     font-size: 0.82rem;
     line-height: 1.6;
     color: #cdd6f4;
@@ -262,11 +293,12 @@ pre code {
     --ar-alert-border: transparent;
     --ar-alert-icon: var(--doc-accent);
     --ar-alert-color: var(--doc-text);
-
-    display: block;
-    border-inline-start: 2px solid var(--doc-rail-live);
+    background-color: var(--doc-surface);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-inline-start: 3px solid var(--doc-rail-live);
     padding-inline-start: 1rem;
-    margin-top: 1.875rem;
+    margin-top: 1rem;
 
     p {
         margin: 0;

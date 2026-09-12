@@ -9,7 +9,6 @@
 import { getCollection } from 'astro:content';
 import { getSlug } from '../utils/tag-name.ts';
 import manifest from '@cem';
-import { version } from '../../../../packages/core/package.json';
 import { type CemDeclaration, getCustomElements } from '../utils/cem-types.ts';
 
 interface Props {
@@ -157,7 +156,7 @@ const componentItems: NavItem[] = allComponents
 
         <div class="nav-section">
             <h2>Composants</h2>
-            <ul class="nav-list nav-mono">
+            <ul class="nav-list">
                 {componentItems.map((item) => (
                     <li class={item.children.length ? 'has-children' : ''}>
                         <a href={item.href} aria-current={item.ariaCurrent}>{item.label}</a>
@@ -177,8 +176,6 @@ const componentItems: NavItem[] = allComponents
             </ul>
         </div>
     </div>
-
-    <p class="nav-footer-version">v{version}</p>
 </nav>
 
 <style>
@@ -187,8 +184,7 @@ const componentItems: NavItem[] = allComponents
         flex-direction:  column;
         justify-content: space-between;
         flex-grow:       1;
-        padding:         4rem 0.75rem 1.25rem;
-        border-right:    1px solid var(--doc-nav-border);
+        padding:         2.75rem 1.25rem 3rem calc(var(--doc-nav-bead-size) / 2);
         background:      var(--doc-nav-bg);
         position:        sticky;
         top:             0;
@@ -204,7 +200,7 @@ const componentItems: NavItem[] = allComponents
     /* ── Marque (masquée sur desktop, le header a déjà le logo) ── */
 
     .nav-brand {
-        font-weight:     500;
+        font-weight:     var(--doc-font-weight-medium);
         font-size:       .8rem;
         letter-spacing:  -0.02em;
         color:           var(--doc-text);
@@ -214,7 +210,7 @@ const componentItems: NavItem[] = allComponents
     }
 
     .brand-accent {
-        color: var(--ar-color-interactive, #2563eb);
+        color: var(--ar-color-interactive);
     }
 
     /* ── Sections ────────────────────────────────────────────── */
@@ -223,29 +219,22 @@ const componentItems: NavItem[] = allComponents
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-    }
-
-    /* Le fil ne traverse pas les grandes sections : chacune ouvre son
-       propre segment (rupture de parcours). Le titre sort du rail : décalé
-       jusqu'à son axe, le segment ne commence qu'en dessous. */
-    .nav-section + .nav-section {
-        margin-top: 2.1rem;
+        row-gap: 2rem;
     }
 
     .nav-section {
-        margin-bottom: 0;
         position: relative;
-        padding-left: 1.15rem;
     }
 
     .nav-section > .nav-list {
         position: relative;
+        padding-inline-start: var(--doc-nav-padding-inline-start);
     }
 
     .nav-section > .nav-list::before {
         content: '';
         position: absolute;
-        inset-inline-start: -1.15rem;
+        inset-inline-start: 0;
         top: 0.35rem;
         bottom: 0.35rem;
         width: 1px;
@@ -253,14 +242,12 @@ const componentItems: NavItem[] = allComponents
     }
 
     .nav-section h2 {
-        font-size: 0.65rem;
-        font-weight: 600;
+        font-size: 0.7rem;
+        font-weight: var(--doc-font-weight-semibold);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--doc-text-muted);
-        padding: 0;
-        margin: 0 0 0.6rem;
-        margin-inline-start: -1.15rem;
+        margin:         0 0 0.5rem;
     }
 
     /* ── Listes ──────────────────────────────────────────────── */
@@ -272,14 +259,21 @@ const componentItems: NavItem[] = allComponents
         padding:    0;
     }
 
+    .nav-list,
+    .has-children,
+    .nav-children {
+        display: flex;
+        flex-direction: column;
+        row-gap: 0.5rem;
+    }
+
     .nav-list a {
         position: relative;
         display: block;
-        padding: 0.4rem 0.75rem 0.4rem 0;
         color: var(--doc-text-subtle);
         text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 450;
+        font-size: 0.9rem;
+        font-weight: 300;
         transition: color 0.15s;
     }
 
@@ -293,22 +287,26 @@ const componentItems: NavItem[] = allComponents
         font-weight: 600;
     }
 
+    .nav-list a:hover::before,
     .nav-list a[aria-current='page']::before {
         content: '';
         position: absolute;
-        inset-inline-start: calc(-1.15rem - 3.5px);
-        top: 50%;
-        margin-top: -4px;
-        width: 8px;
-        height: 8px;
+        /** On prend en compte le padding, - 50% de la largeur de la bille, -50% de l'épaisseur de la ligne */
+        inset-inline-start: calc(var(--doc-nav-padding-inline-start) * -1  - var(--doc-nav-bead-size) / 2 + (1px /2));
+        top: .4rem;
+        width: var(--doc-nav-bead-size);
+        height: var(--doc-nav-bead-size);
         border-radius: 50%;
-        background: var(--doc-bead);
-        box-shadow: 0 0 0 3px var(--doc-bead-ring);
     }
 
-    .nav-mono {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 0.84rem;
+    .nav-list a:not([aria-current='page']):hover::before {
+        background: var(--doc-bead-ring);
+        box-shadow: inset 0 0 0 1px var(--doc-bead), 0 0 0 3px var(--doc-bead-ring);
+    }
+
+    .nav-list a[aria-current='page']::before {
+        background: var(--doc-bead);
+        box-shadow: 0 0 0 3px var(--doc-bead-ring);
     }
 
     /* ── Sous-composants : UN niveau, rail continu ───────────────────
@@ -318,12 +316,6 @@ const componentItems: NavItem[] = allComponents
        propre segment : il prolonge celui de son parent (contrairement aux
        grandes sections, qui n'ont rien en commun). Seule une coche
        horizontale marque le décrochage vers chaque feuille. */
-    .nav-children {
-        position: relative;
-        list-style: none;
-        margin: 0.15rem 0 0.25rem;
-        padding: 0;
-    }
 
     .nav-children li {
         position: relative;
@@ -331,20 +323,32 @@ const componentItems: NavItem[] = allComponents
 
     .nav-children a {
         display: block;
-        padding-inline-start: 0.95rem;
-        font-size: 0.8rem;
+        padding-inline-start: 1.25rem;
         color: var(--doc-text-subtle);
     }
 
-    .nav-children li::before {
+    .nav-children li::before,
+    .nav-children li::after {
         content: '';
         position: absolute;
-        inset-inline-start: -1.15rem;
-        top: 50%;
-        width: 1.85rem;
-        height: 1px;
+        inset-inline-start: .2rem;
+        inset-block-start: 55%;
         background: var(--doc-rail);
     }
+
+    .nav-children li::before {
+        width: 0.75rem;
+        height: 1px;
+    }
+
+    .nav-children li::after {
+        height: auto;
+        width: 1px;
+        inset-block-start: 0;
+        inset-block-end: 45%;
+    }
+
+
 
     /* La perle d'un sous-composant actif reste sur l'axe du rail de
        section (pas sur son propre retrait, qui n'est qu'un padding interne
@@ -360,7 +364,7 @@ const componentItems: NavItem[] = allComponents
         padding:     0.75rem 0.75rem 0.5rem;
         border-top:  1px solid var(--doc-border);
         font-size:   0.7rem;
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         color:       var(--doc-text-muted);
     }
 </style>

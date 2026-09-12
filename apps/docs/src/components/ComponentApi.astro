@@ -90,7 +90,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
         <ar-tab-group active={firstCategory} label="Référence API" class="api-tabs">
             {categories.map((cat) => (
                 <ar-tab panel={cat.key}>
-                    {cat.label} <span class="api-tab-count">{cat.count}</span>
+                    <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
                 </ar-tab>
             ))}
 
@@ -282,7 +282,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
         padding: 1rem 1.25rem;
         overflow-x: auto;
         border-radius: 0.5rem;
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.8rem;
         line-height: 1.6;
         background: var(--doc-code-block-bg);
@@ -300,12 +300,37 @@ const firstCategory = categories[0]?.key ?? 'attributs';
 
     .api-tabs {
         display: block;
+        --ar-tab-padding-x: .75rem;
+        --ar-tab-active-shadow: inset 0 -2px 0 var(--doc-ember);
+
+        ar-tab::part(tab) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--doc-text-muted);
+            font-size: 0.9rem;
+            transition: color .35s var(--doc-ease)
+        }
+
+        ar-tab:not([active]):hover::part(tab),
+        ar-tab:not([active]):hover .api-tab-count {
+            color: var(--doc-text);
+            background: transparent;
+            --ar-tab-active-shadow: inset 0 -2px 0 var(--doc-text);
+        }
+
+        ar-tab::part(tab--selected) {
+            color: var(--doc-text);
+            font-weight: var(--doc-font-weight-bold);
+        }
     }
 
     .api-tab-count {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 0.72rem;
+        font-family: var(--doc-font-mono);
+        font-size: 0.8rem;
         color: var(--doc-text-muted);
+        font-weight: var(--doc-font-weight-thin);
+        transition: color .35s var(--doc-ease)
     }
 
     /* ── API en « lignes de vie » — remplace les tableaux : plus de
@@ -314,6 +339,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
     .api-list {
         display: flex;
         flex-direction: column;
+        padding-block-start: .5rem;
     }
 
     .panel-tokens-list {
@@ -369,7 +395,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
     }
 
     .api-name {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.86rem;
         font-weight: 500;
         color: var(--doc-text);
@@ -378,7 +404,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
 
     .api-sig {
         display: block;
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.75rem;
         color: var(--doc-accent);
         margin-top: 0.2rem;
@@ -389,7 +415,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
 
     .api-default {
         display: block;
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.72rem;
         color: var(--doc-text-muted);
         margin-top: 0.15rem;
@@ -404,7 +430,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
     }
 
     .api-desc code {
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
         font-size: 0.84em;
         background: var(--doc-surface);
         padding: 0.05rem 0.3rem;

@@ -1022,7 +1022,7 @@ const codeDatepicker = `<ar-datepicker
         }
 
         code {
-            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-family: var(--doc-font-mono);
             font-size: 0.78rem;
             line-height: 1.65;
             background: transparent;
@@ -1031,8 +1031,9 @@ const codeDatepicker = `<ar-datepicker
 
     .copy-btn {
         position: absolute;
-        top: 0.6rem;
-        right: 0.6rem;
+        inset-block-start: 0.6rem;
+        /* Logique RTL : le bouton suit le bord de fin de lecture. */
+        inset-inline-end: 0.6rem;
         background: transparent;
         color: var(--doc-paper);
         border: 1px solid var(--doc-on-dark-line);
@@ -1040,7 +1041,7 @@ const codeDatepicker = `<ar-datepicker
         font-size: .9rem;
         font-weight: 600;
         font-family: inherit;
-        padding: 0.28rem 0.7rem;
+        padding: 0.25rem 0.7rem;
         cursor: pointer;
         z-index: 1;
         transition:
