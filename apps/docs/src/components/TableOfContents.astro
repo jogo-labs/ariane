@@ -23,11 +23,11 @@ const { entries, mobileOnly = false } = Astro.props;
 
 <!-- Desktop : sticky dans la colonne de droite (masqué si mobileOnly) -->
 <nav class={`toc toc-desktop${mobileOnly ? ' toc-hidden' : ''}`} aria-label="Sur cette page">
-    <p class="toc-title">Sur cette page</p>
-    <ul>
+    <p class="rail-title">Sur cette page</p>
+    <ul class="rail-list">
         {entries.map((entry) => (
             <li class={`toc-item level-${entry.level}`}>
-                <a href={`#${entry.id}`} class="toc-link">{entry.label}</a>
+                <a href={`#${entry.id}`} class="toc-link rail-link">{entry.label}</a>
             </li>
         ))}
     </ul>
@@ -38,10 +38,10 @@ const { entries, mobileOnly = false } = Astro.props;
 <details class="toc-mobile">
     <summary>Sur cette page</summary>
     <div class="nav-container">
-        <ul>
+        <ul class="rail-list">
             {entries.map((entry) => (
                 <li class={`toc-item level-${entry.level}`}>
-                    <a href={`#${entry.id}`} class="toc-link-m">{entry.label}</a>
+                    <a href={`#${entry.id}`} class="toc-link-m rail-link">{entry.label}</a>
                 </li>
             ))}
         </ul>
@@ -171,6 +171,8 @@ const { entries, mobileOnly = false } = Astro.props;
 </script>
 
 <style>
+    @import '../styles/doc-rail-nav.css';
+
     /* ── Desktop ────────────────────────────────────────────── */
 
     .toc-hidden { display: none !important; }
@@ -183,91 +185,28 @@ const { entries, mobileOnly = false } = Astro.props;
 
     .toc-mobile { display: none; }
 
-    .toc-title {
-        font-size:      0.7rem;
-        font-weight:    var(--doc-font-weight-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color:          var(--doc-text-muted);
-        margin:         0 0 0.5rem;
-    }
+    /* ── Le fil : même vocabulaire que SiteNav (rail 1px + perle,
+       partagés via doc-rail-nav.css / .rail-title, .rail-list, .rail-link).
+       La taille de perle et l'indentation restent propres à la TOC
+       (--doc-toc-*) ; le reste (couleur, survol, fil) vient du fichier
+       partagé. */
 
-    /* ── Le fil : même vocabulaire que SiteNav (rail 1px + perle) ────
-       Le rail court sur toute la hauteur de la liste (::before sur <ul>,
-       positionné relativement à son bord de padding) ; la perle marque
-       le lien actif (.toc-link.active), portée par le <li> plutôt que
-       par le lien lui-même pour rester alignée sur le rail même quand
-       un sous-niveau (.level-2) ajoute son propre retrait interne. */
-
-    ul {
-        position:    relative;
+    ul.rail-list {
+        --rail-padding-inline-start: var(--doc-toc-padding-inline-start);
+        --rail-bead-size: var(--doc-toc-bead-size);
+        --rail-bead-top: 0.3rem;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        list-style:  none;
-        margin:      0;
-        padding: 0;
-        padding-inline-start: var(--doc-toc-padding-inline-start);
-
-    }
-
-    ul::before {
-        content:            '';
-        position:           absolute;
-        inset-inline-start: 0;
-        top:                0.35rem;
-        bottom:             0.35rem;
-        width:              1px;
-        background:         var(--doc-rail);
     }
 
     .toc-item        { position: relative; margin: 0; }
     .toc-item.level-2 { padding-left: 1rem; }
 
-    .toc-link:hover::before,
-    .toc-link-m:hover::before,
-    .toc-link.active::before,
-    .toc-link-m.active::before {
-        content:            '';
-        position:           absolute;
-        inset-inline-start: calc(var(--doc-toc-padding-inline-start) * -1  - var(--doc-toc-bead-size) / 2 + (1px /2));
-        top: .3rem;
-        width:              var(--doc-toc-bead-size);
-        height:              var(--doc-toc-bead-size);
-        border-radius:      50%;
-    }
-
-    .toc-link:not(.active):hover::before,
-    .toc-link-m:not(.active):hover::before {
-        background: var(--doc-bead-ring);
-        box-shadow: inset 0 0 0 1px var(--doc-bead), 0 0 0 3px var(--doc-bead-ring);
-    }
-
-    .toc-link.active::before,
-    .toc-link-m.active::before {
-        background: var(--doc-bead);
-        box-shadow: 0 0 0 3px var(--doc-bead-ring);
-    }
-
     .toc-link:not(.level-2),
     .toc-link-m {
-        display:         block;
-        color:           var(--doc-text-subtle);
-        text-decoration: none;
-        font-size:       0.8rem;;
-        transition:      color 0.15s;
-    }
-
-    .toc-item:not(.level-2) {
-        .toc-link,
-        .toc-link-m {
-            position: relative;
-        }
-    }
-
-    .toc-link:hover,
-    .toc-link-m:hover {
-        color: var(--doc-text);
+        color: var(--doc-text-subtle);
+        font-size: 0.8rem;
     }
 
     .toc-link.active,
