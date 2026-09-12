@@ -259,19 +259,18 @@ const showPlayground = displayMode === 'demo';
 
     /* ── Code block ─────────────────────────────────── */
     /* Forme/typo du bouton Copier et du bloc de code : partagées via
-       doc-code-block.css (CodeBlock.astro). Seule la bordure propre à ce
-       contexte reste ici (séparateur du panneau contrôles au-dessus —
-       pas une boîte autonome comme sur la home). :global() car
-       .code-block est rendu par le composant enfant CodeBlock, hors du
-       scope Astro de ce fichier — préfixé par .preview-controls-wrap
-       (ancêtre commun aux deux usages) pour battre en spécificité la
-       règle `.code-block` de doc-code-block.css, chargée après ce
-       <style> dans la page. */
-    :global(.preview-controls-wrap .code-block) {
-        border-top: 1px solid var(--doc-border);
-    }
-
-    :global(.preview-controls-wrap .code-block pre) {
+       doc-code-block.css (CodeBlock.astro). Seul le padding du <pre>
+       reste propre à ce contexte (1rem 1.25rem, plus dense que sur la
+       home). :global() car .code-block est rendu par le composant
+       enfant CodeBlock, hors du scope Astro de ce fichier — sans besoin
+       de préfixe par un ancêtre : doc-code-block.css ne déclare aucun
+       padding par défaut sur .code-block pre, donc rien à concurrencer
+       en spécificité ici.
+       Le séparateur au-dessus du bloc de code n'est PAS porté par
+       .code-block lui-même (cf. .controls-panel--collapse/--interactive
+       plus bas) : ça évite justement d'avoir à toucher au composant
+       enfant pour une simple ligne. */
+    :global(.code-block pre) {
         padding: 1rem 1.25rem;
     }
 
@@ -309,13 +308,25 @@ const showPlayground = displayMode === 'demo';
         }
     }
 
+    /* Séparateur avec le bloc de code, uniquement visible une fois le
+       <details> ouvert (le <summary>, lui, reste toujours affiché — sans
+       le [open], la ligne apparaîtrait aussi replié). */
+    details.preview-controls-wrap[open] .controls-panel--collapse {
+        border-bottom: 1px solid var(--doc-border);
+    }
+
     details.preview-controls-wrap[open] .chevron {
         transform: rotate(90deg);
     }
 
+    /* Même séparateur pour le playground interactif : les contrôles ne
+       sont jamais repliables ici, la bordure est donc inconditionnelle.
+       Absente quand il n'y a pas de contrôles (controls.length === 0),
+       ce qui est correct : rien à séparer du bloc de code dans ce cas. */
     .controls-panel--interactive {
-        flex-wrap:     wrap;
-        gap:           1rem 2rem;
+        flex-wrap:      wrap;
+        gap:            1rem 2rem;
+        border-bottom:  1px solid var(--doc-border);
     }
 
     .control-row {
