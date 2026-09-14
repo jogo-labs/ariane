@@ -83,29 +83,81 @@
     /* ─── Easing / typo ─────────────────────────────────────────────── */
     --doc-ease: cubic-bezier(0.83, 0, 0.17, 1);
     --doc-font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+    --doc-font-mono: 'Fira Code', 'JetBrains Mono', SFMono-Regular, 'Cascadia Code', ui-monospace;
     --doc-font-body: 'Inter', system-ui, -apple-system, sans-serif;
 
     /* ─── Échelle typographique (vocabulaire rationalisé sur --ar-font-size-* et --ar-font-weight-*) ─── */
     --doc-font-size-xs: 0.75rem;
     --doc-font-size-sm: 0.9rem;
     --doc-font-size-md: 1.05rem;
-    --doc-font-size-lg: 1.25rem;
+    --doc-font-size-lg: 1.35rem;
     --doc-font-size-xl: 2rem;
+    --doc-font-size-xxl: 3rem;
+    --doc-font-weight-thin: 300;
     --doc-font-weight-normal: 400;
     --doc-font-weight-medium: 500;
-    /* 4e palier (absent de --ar-font-weight-*) : c'est la graisse réellement
-       utilisée par tous les titres existants (section-title, subsection-title,
-       narrative h3/h4) — un choix fidèle aux valeurs réelles prime sur le
-       calque exact de default.css (qui n'en a pas besoin, aucun composant
-       n'utilise 600). */
     --doc-font-weight-semibold: 600;
     --doc-font-weight-bold: 700;
 
     /* ─── Rythme vertical (rôles sémantiques, pas une échelle abstraite —
        cf. spec section 1, écart assumé à --ar-spacing-*) ────────────── */
     --doc-space-paragraph: 1rem;
-    --doc-space-subsection: 1.5rem;
-    --doc-space-section: 2.5rem;
+    --doc-space-subsection: 2.25rem;
+    --doc-space-section: 3.25rem;
+
+    /* ─── Le fil : rail décoratif + perle (position courante) ──────────
+       Ajouts du sous-chantier 3 (#110) — aucun token existant modifié.
+       cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md */
+    --doc-rail: light-dark(rgba(20, 20, 20, 0.13), var(--doc-thread-soft));
+    --doc-rail-live: var(--doc-ember);
+    --doc-bead: var(--doc-ember);
+    --doc-bead-hover: var(--doc-text-subtle);
+    --doc-bead-ring: light-dark(var(--doc-paper), var(--doc-vault));
+    --doc-nav-bead-size: 0.75rem;
+    --doc-toc-bead-size: 0.6rem;
+
+    --doc-nav-padding-inline-start: 1.2rem;
+    --doc-toc-padding-inline-start: 0.9rem;
+
+    /* ─── Statut de maturité — jamais l'ambre d'accent : un badge de
+       statut n'est pas un élément actif/interactif. ────────────────── */
+    --doc-alpha: light-dark(#8f5f00, var(--doc-ember));
+    --doc-stable: light-dark(#2f6b45, #7fd3a2);
+
+    /* ─── Surface secondaire (barres de contrôle, encarts) ──────────── */
+    --doc-surface: light-dark(var(--doc-slate), var(--doc-vault-deep));
+
+    /* ─── Coloration syntaxique des blocs de code ────────────────────
+       Palette maison (pas le thème CDN highlight.js), 11 rôles pour
+       JS/CSS/HTML (+ TS/JSON en best-effort via les mêmes classes
+       highlight.js) — révisée après audit (scan de la grammaire réelle
+       sur du contenu authentique du site) qui a trouvé la 1ère version
+       "Spectre" incohérente : plusieurs rôles sémantiquement distincts
+       partageaient exactement la même couleur (ex. --doc-code-attr/
+       -selector-tag/-property/-params tous == --doc-ember-hi), et un
+       même mot (ar-dialog) changeait de couleur entre HTML et CSS.
+       Règle transversale de cette révision : bleu = ce qui s'exécute,
+       ambre = ce qui se déclare, vert = ce qui est nommé (balise/entité),
+       violet = ce qui pilote la grammaire (mot-clé), rose = noms venus
+       de la plateforme/librairie (globals JS, argument ::part()).
+       Déclinée via light-dark() sur --doc-grove-deep / --doc-vault-deep
+       — les deux fonds réels du bloc de code, cf. --doc-code-block-bg.
+       Contraste vérifié ≥4.5:1 sur les deux fonds, y compris les
+       commentaires (pas de dérogation à un plancher plus bas). Posés en
+       tokens globaux (pas scopés à .code-block) : le contenu narratif
+       MDX ([slug].astro) colore aussi ses <pre><code> via ces mêmes
+       tokens, sans passer par le composant CodeBlock.astro. */
+    --doc-code-base: light-dark(#d9dcd6, #cdd2e4);
+    --doc-code-comment: light-dark(#8a958c, #8189a8);
+    --doc-code-punct: light-dark(#9aa19b, #969cb8);
+    --doc-code-entity: light-dark(#8ed6a6, #7fd3a2);
+    --doc-code-name: var(--doc-ember-hi);
+    --doc-code-property: light-dark(#cdb187, #d8bf96);
+    --doc-code-string: light-dark(#7fd3db, #74d6e2);
+    --doc-code-special: light-dark(#ff8fc0, #ff8ab8);
+    --doc-code-keyword: light-dark(#d3a4ff, #cba6ff);
+    --doc-code-function: light-dark(#84b6ff, #82b8ff);
+    --doc-code-number: light-dark(#ff9d76, #ffa480);
 }
 
 :root[data-theme='dark'] {

@@ -88,6 +88,24 @@ transition réagissant au pointeur ou au clavier.
 4. Owl-selector (`:where(...) + *`) plutôt que des `margin-bottom` fixes.
 5. Le premier titre après `.page-title` a un espacement réduit.
 
+## Le fil (sous-chantier 3)
+
+Rail décoratif + perle appliqués au chrome (nav, TOC, listes d'API) — même
+vocabulaire que le motif de la home. Voir
+`docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md`.
+
+| Nom               | Rôle                                         |
+| ----------------- | -------------------------------------------- |
+| `--doc-rail`      | trait décoratif continu                      |
+| `--doc-rail-live` | segment « parcouru » (amorces, puces, actif) |
+| `--doc-bead`      | la perle (position courante)                 |
+| `--doc-bead-ring` | détourage de la perle sur son fond           |
+| `--doc-alpha`     | statut de maturité « alpha »                 |
+| `--doc-stable`    | statut de maturité « stable »                |
+| `--doc-surface`   | fond de zone secondaire                      |
+
+- 2026-09 : ajout des tokens du fil (sous-chantier 3, #110).
+
 ## Historique
 
 - 2026-09-09 : unification initiale (home + pages de contenu + pages

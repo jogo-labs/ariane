@@ -12,6 +12,7 @@
  */
 
 import ComponentApi from './ComponentApi.astro';
+import CodeBlock from './CodeBlock.astro';
 import { type CemDeclaration, type CemControl } from '../utils/cem-types.ts';
 
 interface Variant {
@@ -55,36 +56,33 @@ const showPlayground = displayMode === 'demo';
 {variants.length > 0 && (
     <section id="exemples">
         <h3 class="section-title">Exemples</h3>
-        <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1rem">
+        <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
             <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.</p>
         </ar-alert>
-        <div class="main-section">
+        <div class="main-section examples-section">
             {variants.map((variant) => (
-                <section id={`exemple-${variant.name}`}>
-                    <h4 class="subsection-title">{variant.label ?? variant.name}</h4>
-                    {variant.description && (
-                        <p class="variant-description">{variant.description}</p>
-                    )}
-                    <div>
+                <article id={`exemple-${variant.name}`} class="example">
+                    <div class="example-head">
+                        <h4 class="subsection-title">{variant.label ?? variant.name}</h4>
+                        {variant.description && (
+                            <p class="variant-description">{variant.description}</p>
+                        )}
+                    </div>
+                    <div class="playground-card">
                         <div class="preview-wrap">
                             <div class="preview">
                                 <Fragment set:html={variant.html} />
                             </div>
                         </div>
-                        <ar-collapse class="code-collapse" for={`collapse-${variant.name}`}>
-                            <div class="code-block">
-                                <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
-                                <pre><code class="language-html">{variant.html.trim()}</code></pre>
-                            </div>
-                        </ar-collapse>
-                        <div class="preview-controls">
-                            <button class="code-collapse-btn" id={`collapse-${variant.name}`}>
-                                <span class="sr-only">Voir le&nbsp;</span>Code&nbsp;
-                                <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-                            </button>
-                        </div>
+                        <details class="preview-controls-wrap">
+                            <summary class="controls-panel controls-panel--collapse">
+                                <span class="chevron" aria-hidden="true">›</span>
+                                <span>Voir le code</span>
+                            </summary>
+                            <CodeBlock code={variant.html.trim()} />
+                        </details>
                     </div>
-                </section>
+                </article>
             ))}
         </div>
     </section>
@@ -93,76 +91,76 @@ const showPlayground = displayMode === 'demo';
 {/* ── Playground interactif ── */}
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
-        <div class="playground-label" aria-hidden="true"><span class="playground-dot">●</span> PLAYGROUND</div>
+        <h3 class="section-title">Démo interactive</h3>
+            <p class="variant-description">Manipulez les attributs pour voir le code et la preview se mettre à jour.</p>
         <div class="playground-card">
             <div class="preview-wrap">
                 <div class="preview" data-playground-preview>
                     <Fragment set:html={playgroundHtml} />
                 </div>
             </div>
-            <div class="playground-code-block">
-                <button class="copy-btn" data-copy-playground aria-label="Copier le code">Copier</button>
-                {/* Le <pre><code> est mis à jour par playground.js après chaque changement de contrôle */}
-                <pre data-playground-pre><code class="language-html" data-playground-code>{playgroundHtml.trim()}</code></pre>
+            <div class="preview-controls-wrap">
+                {controls.length > 0 && (
+                    <div class="controls-panel controls-panel--interactive">
+                        {controls.map((ctrl) => (
+                            <label class="control-row">
+                                <span class="control-label">{ctrl.attribute}</span>
+                                {ctrl.controlType === 'select' && (
+                                    <select
+                                        data-attr={ctrl.attribute}
+                                        data-playground-ctrl
+                                        data-default={ctrl.default ?? ''}
+                                    >
+                                        {ctrl.addDefault && (
+                                            <option value="" selected={!ctrl.default}>Par défaut</option>
+                                        )}
+                                        {ctrl.options.map((opt) => (
+                                            <option value={opt} selected={opt === ctrl.default}>{opt}</option>
+                                        ))}
+                                    </select>
+                                )}
+                                {ctrl.controlType === 'checkbox' && (
+                                    <input
+                                        type="checkbox"
+                                        data-attr={ctrl.attribute}
+                                        data-playground-ctrl
+                                        checked={ctrl.default === 'true'}
+                                    />
+                                )}
+                                {ctrl.controlType === 'text' && (
+                                    <input
+                                        type="text"
+                                        data-attr={ctrl.attribute}
+                                        data-playground-ctrl
+                                        data-default={ctrl.default ?? ''}
+                                        placeholder={ctrl.default ?? ''}
+                                        value={ctrl.default ?? ''}
+                                    />
+                                )}
+                                {ctrl.controlType === 'number' && (
+                                    <input
+                                        type="number"
+                                        data-attr={ctrl.attribute}
+                                        data-playground-ctrl
+                                        data-default={ctrl.default ?? ''}
+                                        placeholder={ctrl.default ?? ''}
+                                        value={ctrl.default ?? ''}
+                                    />
+                                )}
+                            </label>
+                        ))}
+                    </div>
+                )}
+                {/* Le contenu est mis à jour par playground.js après chaque changement de contrôle */}
+                <CodeBlock code={playgroundHtml.trim()} interactive />
             </div>
-            {controls.length > 0 && (
-                <div class="controls-panel">
-                    {controls.map((ctrl) => (
-                        <label class="control-row">
-                            <span class="control-label">{ctrl.attribute}</span>
-                            {ctrl.controlType === 'select' && (
-                                <select
-                                    data-attr={ctrl.attribute}
-                                    data-playground-ctrl
-                                    data-default={ctrl.default ?? ''}
-                                >
-                                    {ctrl.addDefault && (
-                                        <option value="" selected={!ctrl.default}>Par défaut</option>
-                                    )}
-                                    {ctrl.options.map((opt) => (
-                                        <option value={opt} selected={opt === ctrl.default}>{opt}</option>
-                                    ))}
-                                </select>
-                            )}
-                            {ctrl.controlType === 'checkbox' && (
-                                <input
-                                    type="checkbox"
-                                    data-attr={ctrl.attribute}
-                                    data-playground-ctrl
-                                    checked={ctrl.default === 'true'}
-                                />
-                            )}
-                            {ctrl.controlType === 'text' && (
-                                <input
-                                    type="text"
-                                    data-attr={ctrl.attribute}
-                                    data-playground-ctrl
-                                    data-default={ctrl.default ?? ''}
-                                    placeholder={ctrl.default ?? ''}
-                                    value={ctrl.default ?? ''}
-                                />
-                            )}
-                            {ctrl.controlType === 'number' && (
-                                <input
-                                    type="number"
-                                    data-attr={ctrl.attribute}
-                                    data-playground-ctrl
-                                    data-default={ctrl.default ?? ''}
-                                    placeholder={ctrl.default ?? ''}
-                                    value={ctrl.default ?? ''}
-                                />
-                            )}
-                        </label>
-                    ))}
-                </div>
-            )}
         </div>
     </section>
 )}
 
 {/* ── Référence API ── */}
 <section id="reference-api">
-    <h3 class="section-title">Référence API</h3>
+    <h3 class="section-title">API</h3>
     <ComponentApi component={component} relatedTokens={relatedTokens} />
 </section>
 
@@ -184,12 +182,6 @@ const showPlayground = displayMode === 'demo';
        code (class="code-collapse") — jamais les démos ar-collapse de sa propre page de doc
        (couvertes par la règle générale ci-dessus), qui n'ont pas vocation à être forcées à
        hauteur 0 (ex. variante "open"). */
-    ar-collapse.code-collapse:not(:defined) {
-        visibility: hidden;
-        display: block;
-        height: 0;
-        overflow: hidden;
-    }
 
     /* ── Variantes ─────────────────────────────────────── */
 
@@ -197,6 +189,12 @@ const showPlayground = displayMode === 'demo';
         display:        flex;
         flex-direction: column;
         gap:            2.5rem;
+
+        .example {
+            display:        flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
     }
 
     .playground-section {
@@ -208,15 +206,14 @@ const showPlayground = displayMode === 'demo';
     .playground-card {
         display:        flex;
         flex-direction: column;
-        border:         1px solid #d4bbff;
-        border-radius:  10px;
-        overflow:       hidden;
-        box-shadow:     0 0 0 3px rgba(124,58,237,0.06);
+        border-radius: .5rem;
+        border: 1px solid var(--doc-border);
+        overflow: hidden;
     }
 
     .playground-label {
         font-size:      0.8rem;
-        font-weight:    600;
+        font-weight:    var(--doc-font-weight-semibold);
         letter-spacing: 0.1em;
         text-transform: uppercase;
         color:          var(--doc-accent);
@@ -226,20 +223,17 @@ const showPlayground = displayMode === 'demo';
         gap:            0.35rem;
     }
 
-    .playground-dot {
-        font-size: 0.5rem;
-    }
-
     h5 {
         font-size:   1rem;
-        font-weight: 600;
+        font-weight: var(--doc-font-weight-semibold);
         color:       var(--doc-text);
         margin:      0;
     }
 
     .variant-description {
-        margin: .75rem 0 1rem;
-        font-size: .9rem;
+        color: var(--doc-text-muted);
+        margin: 0;
+        font-size: var(--doc-font-size-sm);
     }
 
     /* ── Preview ─────────────────────────────────────── */
@@ -254,141 +248,85 @@ const showPlayground = displayMode === 'demo';
         gap:           0.75rem;
         align-items:   center;
         padding:       2rem;
-        border:        1px solid var(--doc-border);
         border-bottom: 0;
         border-radius: 0.5rem 0.5rem 0 0;
-        background: var(--doc-bg);
+        /* Fond pointillé — reprend les points du rail (spec §6, différé au
+           sous-chantier 3, cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md). */
+        background-color: var(--doc-bg);
+        background-image: radial-gradient(circle at 1px 1px, var(--doc-rail) 1px, transparent 0);
+        background-size: 16px 16px;
     }
 
     /* ── Code block ─────────────────────────────────── */
-
-    .code-block,
-    .playground-code-block {
-        position:   relative;
-        border:     1px solid var(--doc-border);
-        border-top: none;
-        overflow:   hidden;
-    }
-
-    .preview-controls {
-        display: flex;
-    }
-
-
-    .code-collapse-btn {
-        display:         inline-flex;
-        flex:            1 1 100%;
-        align-items:     center;
-        justify-content: center;
-        gap:             0.4rem;
-        background:      transparent;
-        color:           var(--doc-text);
-        font-family:     inherit;
-        font-size:       0.9rem;
-        font-weight:     600;
-        padding:         0.65rem 1.5rem;
-        text-decoration: none;
-        border:          1.5px solid var(--doc-border);
-        cursor:          pointer;
-        transition:      border-color 0.15s, color 0.15s;
-        width: 100%;
-
-        &:hover {
-            border-color: var(--doc-accent);
-            color:        var(--doc-accent);
-        }
-
-        svg {
-            height: 1.25rem;
-            width: auto;
-            transform: rotate(0deg);
-        }
-
-        &[aria-expanded="true"] svg {
-            rotate: 180deg;
-        }
-    }
-
-    .preview-controls,
-    .code-collapse-btn {
-        border-end-end-radius: .5rem;
-        border-end-start-radius: .5rem;
-    }
-    .copy-btn {
-        position:      absolute;
-        top:           0.5rem;
-        right:         0.5rem;
-        padding:       0.25rem 0.6rem;
-        background:    rgba(255,255,255,0.08);
-        color:         #adb5bd;
-        border:        1px solid rgba(255,255,255,0.15);
-        border-radius: 0.25rem;
-        font-size:     0.75rem;
-        cursor:        pointer;
-        transition:    background 0.15s, color 0.15s;
-        z-index:       1;
-    }
-
-    .copy-btn:hover  { background: rgba(255,255,255,0.15); color: #e6edf3; }
-    .copy-btn.copied { background: var(--ar-color-success-text, #0a8560); color: #fff; border-color: transparent; }
-
-    /* highlight.js gère le background via son thème CSS — on aligne juste la typo */
-    :global(.code-block pre),
-    :global(.playground-code-block pre) {
-        margin:      0;
-        padding:     1rem 1.25rem;
-        overflow-x:  auto;
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
-        font-size:   0.8rem;
-        line-height: 1.6;
-        background:  var(--doc-code-block-bg);
-    }
-
-    :global(.code-block pre code),
-    :global(.playground-code-block pre code) {
-        font-family: inherit;
-        font-size:   inherit;
-        padding:     0;
-        background:  transparent;
-        color:       #cdd6f4;
-    }
-
-    :global(.code-block pre),
-    :global(.playground-code-block pre) {
-        border-radius: 0;
+    /* Forme/typo du bouton Copier et du bloc de code : partagées via
+       doc-code-block.css (CodeBlock.astro). Seul le padding du <pre>
+       reste propre à ce contexte (1rem 1.25rem, plus dense que sur la
+       home). :global() car .code-block est rendu par le composant
+       enfant CodeBlock, hors du scope Astro de ce fichier — sans besoin
+       de préfixe par un ancêtre : doc-code-block.css ne déclare aucun
+       padding par défaut sur .code-block pre, donc rien à concurrencer
+       en spécificité ici.
+       Le séparateur au-dessus du bloc de code n'est PAS porté par
+       .code-block lui-même (cf. .controls-panel--collapse/--interactive
+       plus bas) : ça évite justement d'avoir à toucher au composant
+       enfant pour une simple ligne. */
+    :global(.code-block pre) {
+        padding: 1rem 1.25rem;
     }
 
     /* ── Playground contrôles ────────────────────────── */
 
-    .playground-section .preview-wrap { margin-bottom: 0; }
-    .playground-section .preview {
-        border:        none;
-        border-bottom: 1px solid var(--doc-border);
-        border-bottom: 0;
-        border-radius: 0;
-    }
-
-    .playground-section .playground-code-block {
-        border:        none;
-        border-bottom: 1px solid var(--doc-border);
-        border-bottom: 0;
-    }
-
-    .playground-section .controls-panel {
-        border:     none;
-        border-top: none;
+    .preview-controls-wrap {
+        background:    var(--doc-surface);
+        border-top: 1px solid var(--doc-border);
     }
 
     .controls-panel {
-        border:        1px solid var(--doc-border);
-        border-top:    none;
-        border-radius: 0 0 0.5rem 0.5rem;
-        padding:       1rem 1.5rem;
-        background:    var(--doc-nav-bg);
-        display:       flex;
-        flex-wrap:     wrap;
-        gap:           1rem 2rem;
+        display: flex;
+        padding: 0.95rem 1.15rem;
         align-items:   start;
+    }
+
+    .controls-panel--collapse {
+        padding-block-start: 0.65rem;
+        padding-block-end: 0.65rem;
+        gap:             0.4rem;
+        color:           var(--doc-text-muted);
+        font-size:       var(--doc-font-size-sm);
+        cursor:          pointer;
+        transition:      color 0.15s;
+        width: 100%;
+
+        &:hover {
+            color: var(--doc-text);
+        }
+
+        .chevron {
+            font-family: var(--doc-font-mono);
+            transition: transform 0.22s var(--doc-ease);
+            display: inline-block;
+        }
+    }
+
+    /* Séparateur avec le bloc de code, uniquement visible une fois le
+       <details> ouvert (le <summary>, lui, reste toujours affiché — sans
+       le [open], la ligne apparaîtrait aussi replié). */
+    details.preview-controls-wrap[open] .controls-panel--collapse {
+        border-bottom: 1px solid var(--doc-border);
+    }
+
+    details.preview-controls-wrap[open] .chevron {
+        transform: rotate(90deg);
+    }
+
+    /* Même séparateur pour le playground interactif : les contrôles ne
+       sont jamais repliables ici, la bordure est donc inconditionnelle.
+       Absente quand il n'y a pas de contrôles (controls.length === 0),
+       ce qui est correct : rien à séparer du bloc de code dans ce cas. */
+    .controls-panel--interactive {
+        flex-wrap:      wrap;
+        gap:            1rem 2rem;
+        border-bottom:  1px solid var(--doc-border);
     }
 
     .control-row {
@@ -396,13 +334,14 @@ const showPlayground = displayMode === 'demo';
         flex-direction: column;
         gap:            0.25rem;
         min-width:      140px;
+        cursor: pointer;
     }
 
     .control-label {
-        font-size:   0.75rem;
-        font-weight: 600;
+        font-size:   var(--doc-font-size-xs);
+        font-weight: var(--doc-font-weight-semibold);
         color:       var(--doc-text-muted);
-        font-family: 'Fira Code', 'Cascadia Code', monospace;
+        font-family: var(--doc-font-mono);
     }
 
     .control-row select,
@@ -410,7 +349,7 @@ const showPlayground = displayMode === 'demo';
     .control-row input[type="number"] {
         padding:       0.3rem 0.5rem;
         border:        1px solid var(--doc-accent-border);
-        border-radius: 0.25rem;
+        border-radius: var(--doc-radius-sm);
         font-size:     0.875rem;
         background:    var(--doc-bg);
         color:         var(--doc-text);
@@ -434,7 +373,6 @@ const showPlayground = displayMode === 'demo';
 
     .preview :global(ar-dropdown hr) {
         border:     none;
-        border-top: 1px solid var(--ar-color-border, #e5e7eb);
         margin:     0.25rem 0;
     }
 

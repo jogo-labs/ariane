@@ -1,0 +1,49 @@
+---
+/**
+ * CodeBlock.astro
+ *
+ * Bloc de code copiable : <pre><code> + bouton "Copier". Utilisé par
+ * Playground.astro (exemples + démo interactive) et par la home
+ * (section « Essayez-le »). Le comportement (copie, coloration
+ * syntaxique) est géré globalement par public/js/playground.js, qui
+ * cible génériquement [data-copy]/[data-copy-playground]/.code-block —
+ * ce composant ne fait qu'émettre le HTML attendu par ce script.
+ *
+ * `interactive` distingue le seul bloc dont le contenu est réécrit en
+ * live par playground.js (data-copy-playground + data-playground-pre/
+ * code) des blocs figés (data-copy).
+ *
+ * Le style (.code-block/.copy-btn) vient de doc-code-block.css, importé
+ * ci-dessous. Il doit rester importé ICI (et pas dans chaque page/
+ * composant consommateur) : Astro scope un CSS importé avec l'id du
+ * fichier qui contient le <style>, pas avec celui des éléments qu'il
+ * cible — un import fait depuis Playground.astro/index.astro ne
+ * matcherait jamais les éléments rendus par ce composant enfant. Les
+ * overrides propres à chaque consommateur (bordure, radius, padding du
+ * <pre>) restent dans leur <style> respectif, via :global().
+ */
+interface Props {
+    code:         string;
+    lang?:        string;
+    interactive?: boolean;
+}
+
+const { code, lang = 'html', interactive = false } = Astro.props;
+---
+
+<div class="code-block">
+    {interactive ? (
+        <button class="copy-btn" data-copy-playground aria-label="Copier le code">Copier</button>
+    ) : (
+        <button class="copy-btn" data-copy aria-label="Copier le code">Copier</button>
+    )}
+    {interactive ? (
+        <pre data-playground-pre><code class={`language-${lang}`} data-playground-code>{code}</code></pre>
+    ) : (
+        <pre><code class={`language-${lang}`}>{code}</code></pre>
+    )}
+</div>
+
+<style>
+    @import '../styles/doc-code-block.css';
+</style>

@@ -80,14 +80,14 @@ function needsBorder(value: string): boolean {
     .stop-header {
         font-size: 0.65rem;
         color: var(--doc-text-muted);
-        font-weight: 400;
+        font-weight: var(--doc-font-weight-normal);
         text-align: center;
         padding: 0 2px 0.4rem;
     }
 
     .hue-label {
-        font-size: .75rem;
-        font-family: monospace;
+        font-size: var(--doc-font-size-xs);
+        font-family: var(--doc-font-mono);
         color: var(--doc-text-muted);
         padding-right: 0.5rem;
         padding-bottom: 2.5rem;
@@ -113,7 +113,7 @@ function needsBorder(value: string): boolean {
         width: 100%;
         min-width: 2.5rem;
         height: 2.5rem;
-        border-radius: 4px;
+        border-radius: var(--doc-radius-sm);
     }
 
     .swatch-bordered {
@@ -127,7 +127,7 @@ function needsBorder(value: string): boolean {
 
     .stop-value {
         font-size: 0.65rem;
-        font-family: monospace;
+        font-family: var(--doc-font-mono);
         color: var(--doc-text-muted);
         text-align: center;
         width: 100%;

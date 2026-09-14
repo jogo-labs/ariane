@@ -24,7 +24,7 @@ th {
     padding: 0.5rem 0.75rem;
     background: var(--doc-nav-bg);
     color: var(--doc-text);
-    font-weight: 600;
+    font-weight: var(--doc-font-weight-semibold);
     border-bottom: 1px solid var(--doc-border);
 }
 
@@ -46,7 +46,7 @@ td:first-child {
 }
 
 code {
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-family: var(--doc-font-mono);
     font-size: 0.8rem;
     background: var(--doc-accent-bg);
     color: var(--doc-accent);

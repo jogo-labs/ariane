@@ -57,6 +57,20 @@ function getContentType(filePath) {
 export default defineConfig({
     integrations: [mdx()],
 
+    // Le contenu narratif MDX (src/content/components/*.mdx) est la seule source
+    // Markdown du site — les autres pages passent par CodeBlock.astro (pipeline
+    // highlight.js). Sans ce réglage, Astro colore les blocs de code MDX avec
+    // Shiki (thème "github-dark" par défaut, classes .astro-code + styles
+    // inline color/background-color sur chaque span) — des styles inline qui
+    // gagnent toujours la cascade face à nos règles CSS et à la palette
+    // --doc-code-* (cf. doc-code-block.css). On désactive Shiki pour que ces
+    // blocs restent du <pre><code class="language-xxx"> brut, repris comme les
+    // autres par le highlight.js global (Layout.astro) et coloré par la même
+    // palette maison.
+    markdown: {
+        syntaxHighlight: false,
+    },
+
     vite: {
         resolve: {
             alias: {
