@@ -127,6 +127,16 @@ const {
         </style>
         <style>
             @import '../styles/doc-tokens.css';
+            /* Les règles .hljs-* de coloration syntaxique doivent atteindre TOUTE
+               page, y compris celles qui rendent <pre><code> directement sans
+               passer par CodeBlock.astro (getting-started/*, theming/*) — Astro
+               ne bundle le <style> d'un composant que sur les pages qui le
+               rendent réellement, donc sans cet import ici, ces pages n'auraient
+               jamais reçu les règles (seulement les tokens --doc-code-*, sans
+               effet seuls). Import supplémentaire à celui de CodeBlock.astro :
+               même règles chargées deux fois sur les pages qui utilisent les
+               deux, sans conflit (:global(), donc idempotent). */
+            @import '../styles/doc-code-block.css';
 
             *, *::before, *::after { box-sizing: border-box; }
 
