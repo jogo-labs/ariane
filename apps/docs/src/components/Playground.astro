@@ -13,6 +13,7 @@
 
 import ComponentApi from './ComponentApi.astro';
 import CodeBlock from './CodeBlock.astro';
+import HeadingAnchor from './HeadingAnchor.astro';
 import { type CemDeclaration, type CemControl } from '../utils/cem-types.ts';
 
 interface Variant {
@@ -55,7 +56,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Exemples (variantes) ── */}
 {variants.length > 0 && (
     <section id="exemples">
-        <h3 class="section-title">Exemples</h3>
+        <h3 class="section-title">Exemples<HeadingAnchor id="exemples" label="Exemples" /></h3>
         <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
             <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>default.css</code> fourni par Ariane.</p>
         </ar-alert>
@@ -63,7 +64,7 @@ const showPlayground = displayMode === 'demo';
             {variants.map((variant) => (
                 <article id={`exemple-${variant.name}`} class="example">
                     <div class="example-head">
-                        <h4 class="subsection-title">{variant.label ?? variant.name}</h4>
+                        <h4 class="subsection-title">{variant.label ?? variant.name}<HeadingAnchor id={`exemple-${variant.name}`} label={variant.label ?? variant.name} /></h4>
                         {variant.description && (
                             <p class="variant-description">{variant.description}</p>
                         )}
@@ -91,7 +92,7 @@ const showPlayground = displayMode === 'demo';
 {/* ── Playground interactif ── */}
 {showPlayground && (
     <section class="playground-section" id="playground" data-playground data-tag-name={tagName}>
-        <h3 class="section-title">Démo interactive</h3>
+        <h3 class="section-title">Démo interactive<HeadingAnchor id="playground" label="Démo interactive" /></h3>
             <p class="variant-description">Manipulez les attributs pour voir le code et la preview se mettre à jour.</p>
         <div class="playground-card">
             <div class="preview-wrap">
@@ -160,7 +161,7 @@ const showPlayground = displayMode === 'demo';
 
 {/* ── Référence API ── */}
 <section id="reference-api">
-    <h3 class="section-title">API</h3>
+    <h3 class="section-title">API<HeadingAnchor id="reference-api" label="API" /></h3>
     <ComponentApi component={component} relatedTokens={relatedTokens} />
 </section>
 
