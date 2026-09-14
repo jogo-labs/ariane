@@ -22,8 +22,11 @@ import { announceA11y } from '/cdn/index.js';
 // garde le point d'insertion — juste avant l'alternative d'origine — pour
 // que les vraies balises HTML continuent de matcher en premier. Le lookahead
 // restreint le match à une position de sélecteur (avant `{`, `,`, `.`, `:`,
-// `[`, un combinateur ou une fin de ligne) pour ne pas colorer un mot composé
-// utilisé comme valeur de propriété (`sans-serif`, `border-box`…).
+// `[`, `)`, un combinateur ou une fin de ligne) pour ne pas colorer un mot
+// composé utilisé comme valeur de propriété (`sans-serif`, `border-box`…).
+// Le `)` couvre `::part(header-actions)`/`:not(ar-dialog)` — sans lui, la
+// liste blanche d'origine matchait quand même le préfixe "header" tout
+// seul (elle le contient), coupant le mot en deux couleurs différentes.
 function patchCssCustomElementSelectors() {
     var css = window.hljs && window.hljs.getLanguage && window.hljs.getLanguage('css');
     if (!css) return;
@@ -34,7 +37,7 @@ function patchCssCustomElementSelectors() {
     // `begin` est ici une chaîne de pattern brute (pas encore compilée en
     // RegExp par highlight.js — ça n'arrive qu'à la première coloration) :
     // simple concaténation de motif, pas de `.source`/`.flags` à lire.
-    var customElementPattern = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+(?=[\\s,.:#[{>+~]|$)';
+    var customElementPattern = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+(?=[\\s,.:#[)>+~]|$)';
     tagMode.begin = customElementPattern + '|' + tagMode.begin;
     tagMode._customElementPatched = true;
 }
