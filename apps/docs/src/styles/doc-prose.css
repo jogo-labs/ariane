@@ -106,12 +106,28 @@
 }
 
 .narrative :global(pre code) {
-    background-color: var(--doc-code-block-bg);
-    border-radius: 0.5rem;
+    /* Contenu MDX : ce <pre><code> est rendu par le compilateur MDX, pas par
+       [slug].astro — il porte un attribut de scope Astro différent (interne
+       au MDX), donc les règles génériques `pre`/`pre code` plus bas dans ce
+       fichier (scopées à [slug].astro) ne le matchent jamais. On repose donc
+       ici, sous des sélecteurs globaux dédiés au contenu narratif, les mêmes
+       règles que celles qui stylent les autres blocs de code du site — cf.
+       `.code-block`/`.code-block pre code` dans doc-code-block.css : le fond
+       va sur le bloc (`pre`, élément de bloc), jamais sur `code` (inline),
+       sous peine d'un bandeau de fond par ligne au lieu d'un rectangle plein. */
+    background: transparent;
+    color: var(--doc-code-base);
+    font-family: var(--doc-font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
 }
 
 .narrative :global(pre) {
+    background-color: var(--doc-code-block-bg);
     border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 0;
 }
 
 .narrative :global(.narrative-list) {
@@ -270,7 +286,7 @@ pre code {
     font-family: var(--doc-font-mono);
     font-size: 0.82rem;
     line-height: 1.6;
-    color: #cdd6f4;
+    color: var(--doc-code-base);
     background: transparent;
     padding: 0;
 }
