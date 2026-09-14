@@ -128,29 +128,36 @@
     --doc-surface: light-dark(var(--doc-slate), var(--doc-vault-deep));
 
     /* ─── Coloration syntaxique des blocs de code ────────────────────
-       Palette maison (pas le thème CDN highlight.js) : hues franchement
-       séparées par catégorie (pas de nuances d'une même teinte) pour
-       que chaque rôle syntaxique se distingue au premier coup d'œil,
-       direction "Spectre" retenue après brainstorming visuel (6
-       familles de teinte, ancrées sur --doc-ember-hi pour les
-       attributs et un vert dédié pour les balises). Déclinée via
-       light-dark() sur --doc-grove-deep / --doc-vault-deep — les deux
-       fonds réels du bloc de code, cf. --doc-code-block-bg. Posés en
+       Palette maison (pas le thème CDN highlight.js), 11 rôles pour
+       JS/CSS/HTML (+ TS/JSON en best-effort via les mêmes classes
+       highlight.js) — révisée après audit (scan de la grammaire réelle
+       sur du contenu authentique du site) qui a trouvé la 1ère version
+       "Spectre" incohérente : plusieurs rôles sémantiquement distincts
+       partageaient exactement la même couleur (ex. --doc-code-attr/
+       -selector-tag/-property/-params tous == --doc-ember-hi), et un
+       même mot (ar-dialog) changeait de couleur entre HTML et CSS.
+       Règle transversale de cette révision : bleu = ce qui s'exécute,
+       ambre = ce qui se déclare, vert = ce qui est nommé (balise/entité),
+       violet = ce qui pilote la grammaire (mot-clé), rose = noms venus
+       de la plateforme/librairie (globals JS, argument ::part()).
+       Déclinée via light-dark() sur --doc-grove-deep / --doc-vault-deep
+       — les deux fonds réels du bloc de code, cf. --doc-code-block-bg.
+       Contraste vérifié ≥4.5:1 sur les deux fonds, y compris les
+       commentaires (pas de dérogation à un plancher plus bas). Posés en
        tokens globaux (pas scopés à .code-block) : le contenu narratif
        MDX ([slug].astro) colore aussi ses <pre><code> via ces mêmes
        tokens, sans passer par le composant CodeBlock.astro. */
     --doc-code-base: light-dark(#d9dcd6, #cdd2e4);
-    --doc-code-comment: light-dark(#7f8c82, #767d9b);
-    --doc-code-punct: light-dark(#8e958f, #878dab);
-    --doc-code-tag: light-dark(#9ad0a0, #a3d9a9);
-    --doc-code-attr: var(--doc-ember-hi);
+    --doc-code-comment: light-dark(#8a958c, #8189a8);
+    --doc-code-punct: light-dark(#9aa19b, #969cb8);
+    --doc-code-entity: light-dark(#8ed6a6, #7fd3a2);
+    --doc-code-name: var(--doc-ember-hi);
+    --doc-code-property: light-dark(#cdb187, #d8bf96);
     --doc-code-string: light-dark(#7fd3db, #74d6e2);
+    --doc-code-special: light-dark(#ff8fc0, #ff8ab8);
     --doc-code-keyword: light-dark(#d3a4ff, #cba6ff);
     --doc-code-function: light-dark(#84b6ff, #82b8ff);
     --doc-code-number: light-dark(#ff9d76, #ffa480);
-    --doc-code-literal: light-dark(#ff8fc0, #ff8ab8);
-    --doc-code-property: light-dark(#c6cade, #c9cde6);
-    --doc-code-params: light-dark(#b9bfc6, #b2b8cf);
 }
 
 :root[data-theme='dark'] {

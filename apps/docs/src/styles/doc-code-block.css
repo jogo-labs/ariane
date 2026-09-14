@@ -66,48 +66,89 @@
     font-style: italic;
 }
 
+/* Chevrons < > d'une balise HTML : le nom lui-même (.hljs-name, imbriqué)
+   reste --doc-code-entity — cf. règle spécifique plus bas, plus précise
+   donc prioritaire sur celle-ci. */
 :global(.hljs-tag),
 :global(.hljs-punctuation) {
     color: var(--doc-code-punct);
 }
 
-:global(.hljs-name) {
-    color: var(--doc-code-tag);
+/* « Ce qui est nommé » (balise/entité) — même rôle en HTML (nom de
+   balise), CSS (sélecteur de balise, y compris les custom elements
+   patchés par patchCssCustomElementSelectors) et JS (nom de classe/
+   constructeur) : un même mot doit rester reconnaissable d'un langage à
+   l'autre, ex. <ar-dialog> en HTML et ar-dialog::part(...) en CSS. */
+:global(.hljs-name),
+:global(.hljs-selector-tag),
+:global(.hljs-title.class_) {
+    color: var(--doc-code-entity);
 }
 
-:global(.hljs-attr) {
-    color: var(--doc-code-attr);
+/* « Ce qui se déclare » (nom d'attribut/propriété/sélecteur qualifiant,
+   paramètre de fonction) — rôle unique volontairement partagé sur
+   --doc-ember-hi : c'est le seul rôle qui reste sur l'ambre (la 1ère
+   palette l'utilisait pour 4 rôles distincts, brouillant la lecture). */
+:global(.hljs-attr),
+:global(.hljs-attribute),
+:global(.hljs-selector-class),
+:global(.hljs-selector-id),
+:global(.hljs-selector-attr),
+:global(.hljs-params) {
+    color: var(--doc-code-name);
 }
 
-:global(.hljs-string) {
-    color: var(--doc-code-string);
-}
-
-:global(.hljs-keyword) {
-    color: var(--doc-code-keyword);
-}
-
-:global(.hljs-title),
-:global(.hljs-title.function_),
-:global(.hljs-built_in),
-:global(.hljs-variable.language_) {
-    color: var(--doc-code-function);
-}
-
-:global(.hljs-number) {
-    color: var(--doc-code-number);
-}
-
-:global(.hljs-literal) {
-    color: var(--doc-code-literal);
-}
-
+/* Accès en lecture à une propriété (JS : e.detail.to) — même famille que
+   --doc-code-name (déclaration) mais un ton plus sourd : hiérarchie, pas
+   nouvelle catégorie de rôle. */
 :global(.hljs-property) {
     color: var(--doc-code-property);
 }
 
-:global(.hljs-params) {
-    color: var(--doc-code-params);
+:global(.hljs-string),
+:global(.hljs-regexp) {
+    color: var(--doc-code-string);
+}
+
+/* Noms venus de la plateforme/librairie, pas du code métier lui-même :
+   argument de ::part(...) (mode maison, cf. playground.js), globals JS
+   (document, console), constantes globales (NaN, Infinity...). */
+:global(.hljs-selector-part),
+:global(.hljs-variable.language_),
+:global(.hljs-variable.constant_) {
+    color: var(--doc-code-special);
+}
+
+/* Ce qui pilote la grammaire : mots-clés JS, at-rules/!important CSS,
+   sélecteurs pseudo (:hover, ::part), et l'enveloppe d'une fonction
+   fléchée (.hljs-function — auparavant sans règle, donc en couleur de
+   base alors que son contenu .hljs-params était coloré). */
+:global(.hljs-keyword),
+:global(.hljs-meta),
+:global(.hljs-function),
+:global(.hljs-selector-pseudo) {
+    color: var(--doc-code-keyword);
+}
+
+/* Ce qui s'exécute : appel de fonction/méthode, fonction CSS (var(),
+   rect()...). .hljs-title seul (sans .function_/.class_ plus haut, plus
+   spécifique donc prioritaire) retombe ici aussi par défaut. */
+:global(.hljs-title),
+:global(.hljs-title.function_),
+:global(.hljs-built_in) {
+    color: var(--doc-code-function);
+}
+
+:global(.hljs-number),
+:global(.hljs-literal) {
+    color: var(--doc-code-number);
+}
+
+/* Interpolation dans un template literal JS (`${expr}`) — reste la
+   couleur de base : c'est un retour au code normal, pas une catégorie
+   syntaxique à part. */
+:global(.hljs-subst) {
+    color: var(--doc-code-base);
 }
 
 .copy-btn {

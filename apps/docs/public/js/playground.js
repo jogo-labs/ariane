@@ -40,6 +40,22 @@ function patchCssCustomElementSelectors() {
     var customElementPattern = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+(?=[\\s,.:#[)>+~]|$)';
     tagMode.begin = customElementPattern + '|' + tagMode.begin;
     tagMode._customElementPatched = true;
+
+    // L'argument de ::part(...) (ex. "header-actions" dans
+    // ::part(header-actions)) n'est pas un nom de balise — c'est un nom de
+    // part, un rôle sémantiquement différent qui mérite sa propre couleur
+    // (--doc-code-part) plutôt que d'hériter de celle des tags via le motif
+    // custom element ci-dessus. Mode dédié, inséré en tête de `contains`
+    // pour être essayé AVANT le mode selector-tag à chaque position — sinon
+    // ce dernier (élargi juste au-dessus pour matcher les mots composés)
+    // capterait l'argument en premier. Le lookbehind ancre spécifiquement
+    // sur "::part(" : un identifiant qui apparaît ailleurs entre parenthèses
+    // (":not(ar-dialog)") reste donc bien coloré comme un tag, pas comme un
+    // nom de part.
+    css.contains.unshift({
+        className: 'selector-part',
+        begin: '(?<=::part\\()[a-zA-Z][a-zA-Z0-9-]*(?=\\))',
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
