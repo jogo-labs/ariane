@@ -196,18 +196,7 @@ const componentItems: NavItem[] = allComponents
     @import '../styles/doc-rail-nav.css';
 
     nav {
-        display:         flex;
-        flex-direction:  column;
-        justify-content: space-between;
-        flex-grow:       1;
         padding:         2.75rem 1.25rem 3rem calc(var(--doc-nav-bead-size) / 2);
-        background:      var(--doc-nav-bg);
-        position:        sticky;
-        top:             0;
-        height:          100%;
-        overflow-y:      auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--doc-border) transparent;
     }
 
     nav::-webkit-scrollbar       { width: 4px; }
@@ -220,7 +209,7 @@ const componentItems: NavItem[] = allComponents
        le padding gauche sur le padding droit. */
     @media (max-width: 1180px) {
         nav {
-            padding-inline-start: 1.25rem;
+            padding-inline-start: 2rem;
         }
     }
 
@@ -282,6 +271,7 @@ const componentItems: NavItem[] = allComponents
     /* Taille/graisse propres à SiteNav ; le reste (couleur, survol,
        perle sur le fil) vient de .rail-link dans doc-rail-nav.css. */
     .nav-list a {
+        position: relative;
         color: var(--doc-text-subtle);
         font-size: var(--doc-font-size-sm);
         font-weight: var(--doc-font-weight-thin);

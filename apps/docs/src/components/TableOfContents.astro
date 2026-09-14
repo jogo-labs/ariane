@@ -35,8 +35,11 @@ const { entries, mobileOnly = false } = Astro.props;
 
 <!-- Mobile : collapse injecté dans le contenu principal (via slot="toc" → ignoré en mobile,
      donc on l'injecte aussi via un slot sans nom dans [slug].astro — voir ci-dessous) -->
-<details class="toc-mobile">
-    <summary>Sur cette page</summary>
+<details class="toc-mobile" open>
+    <summary>
+        <span>Sur cette page</span>
+        <span class="chevron" aria-hidden="true">›</span>
+    </summary>
     <div class="nav-container">
         <ul class="rail-list">
             {entries.map((entry) => (
@@ -173,28 +176,64 @@ const { entries, mobileOnly = false } = Astro.props;
 <style>
     @import '../styles/doc-rail-nav.css';
 
-    /* ── Desktop ────────────────────────────────────────────── */
-
     .toc-hidden { display: none !important; }
 
-    .toc-desktop {
-        font-size: 0.8rem;
-        font-weight: var(--doc-font-weight-thin);
-        padding-inline-start: calc(var(--doc-toc-bead-size) / 2);
+    /* ── Desktop ────────────────────────────────────────────── */
+
+    .toc-mobile  {
+        --rail-padding-inline-start: 0;
+
+        display:       block;
+        margin:        0 0 1.5rem;
+        border:        1px solid var(--doc-border);
+        border-radius: 0.5rem;
+        background:    var(--doc-nav-bg);
+        font-size:     0.875rem;
+
+        summary {
+            padding:         0.6rem 0.875rem;
+            font-weight:     var(--doc-font-weight-medium);
+            font-size:       0.8rem;
+            color:           var(--doc-text-muted);
+            cursor:          pointer;
+            list-style:      none;
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+
+            .chevron {
+                display: inline-block;
+                font-size:   var(--doc-font-size-xs);
+                transition:  transform 0.15s;
+            }
+
+        }
+
+        &[open] .chevron {
+            transform: rotate(90deg);
+        }
+
+        .nav-container {
+            padding: 1rem;
+            padding-inline-start: 2rem;
+            border-top:          1px solid var(--doc-border);
+        }
+
+        .rail-list {
+            padding: 0;
+
+            &:before {
+                content: none;
+            }
+
+            .rail-link:before {
+                content: none;
+            }
+        }
+
     }
 
-    .toc-mobile { display: none; }
-
-    /* ── Le fil : même vocabulaire que SiteNav (rail 1px + perle,
-       partagés via doc-rail-nav.css / .rail-title, .rail-list, .rail-link).
-       La taille de perle et l'indentation restent propres à la TOC
-       (--doc-toc-*) ; le reste (couleur, survol, fil) vient du fichier
-       partagé. */
-
-    ul.rail-list {
-        --rail-padding-inline-start: var(--doc-toc-padding-inline-start);
-        --rail-bead-size: var(--doc-toc-bead-size);
-        --rail-bead-top: 0.3rem;
+    .rail-list {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
@@ -214,47 +253,26 @@ const { entries, mobileOnly = false } = Astro.props;
         font-weight: var(--doc-font-weight-semibold);
     }
 
-    /* ── Mobile ─────────────────────────────────────────────── */
-
-    @media (max-width: 1180px) {
-        .toc-desktop { display: none; }
-        .toc-mobile  {
-            display:       block;
-            margin:        0 0 1.5rem;
-            border:        1px solid var(--doc-border);
-            border-radius: 0.5rem;
-            background:    var(--doc-nav-bg);
-            font-size:     0.875rem;
+    @media (min-width: 1181px) {
+        .toc-desktop {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: var(--doc-font-weight-thin);
+            padding-inline-start: calc(var(--doc-toc-bead-size) / 2);
         }
 
-        .toc-mobile summary {
-            padding:         0.6rem 0.875rem;
-            font-weight:     var(--doc-font-weight-semibold);
-            font-size:       0.8rem;
-            text-transform:  uppercase;
-            letter-spacing:  0.06em;
-            color:           var(--doc-text-muted);
-            cursor:          pointer;
-            list-style:      none;
-            display:         flex;
-            align-items:     center;
-            justify-content: space-between;
-        }
+        .toc-mobile { display: none; }
 
-        .toc-mobile summary::after {
-            content:     '▾';
-            font-size:   var(--doc-font-size-xs);
-            transition:  transform 0.15s;
-        }
+        /* ── Le fil : même vocabulaire que SiteNav (rail 1px + perle,
+        partagés via doc-rail-nav.css / .rail-title, .rail-list, .rail-link).
+        La taille de perle et l'indentation restent propres à la TOC
+        (--doc-toc-*) ; le reste (couleur, survol, fil) vient du fichier
+        partagé. */
 
-        .toc-mobile[open] summary::after {
-            transform: rotate(180deg);
-        }
-
-        .toc-mobile .nav-container {
-            padding: 1rem;
-            padding-inline-start: 2rem;
-            border-top:          1px solid var(--doc-border);
+        .rail-list {
+            --rail-padding-inline-start: var(--doc-toc-padding-inline-start);
+            --rail-bead-size: var(--doc-toc-bead-size);
+            --rail-bead-top: 0.3rem;
         }
     }
 </style>
