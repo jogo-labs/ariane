@@ -13,10 +13,37 @@
 
 import { announceA11y } from '/cdn/index.js';
 
+// Le mode `selector-tag` de la grammaire CSS de highlight.js ne reconnaît que
+// les balises HTML/SVG standards (liste blanche figée dans sa regex) — un
+// custom element (`ar-dialog`, `ar-alert`…) n'y figure jamais et ressort donc
+// non coloré. Or c'est justement ce que ciblent quasiment tous les exemples
+// CSS du site. On élargit la regex du mode existant (même className, mêmes
+// styles --doc-code-tag déjà en place) plutôt que d'ajouter un mode : on
+// garde le point d'insertion — juste avant l'alternative d'origine — pour
+// que les vraies balises HTML continuent de matcher en premier. Le lookahead
+// restreint le match à une position de sélecteur (avant `{`, `,`, `.`, `:`,
+// `[`, un combinateur ou une fin de ligne) pour ne pas colorer un mot composé
+// utilisé comme valeur de propriété (`sans-serif`, `border-box`…).
+function patchCssCustomElementSelectors() {
+    var css = window.hljs && window.hljs.getLanguage && window.hljs.getLanguage('css');
+    if (!css) return;
+    var tagMode = css.contains.find(function (mode) {
+        return mode.className === 'selector-tag';
+    });
+    if (!tagMode || tagMode._customElementPatched) return;
+    // `begin` est ici une chaîne de pattern brute (pas encore compilée en
+    // RegExp par highlight.js — ça n'arrive qu'à la première coloration) :
+    // simple concaténation de motif, pas de `.source`/`.flags` à lire.
+    var customElementPattern = '[a-z][a-z0-9]*(?:-[a-z0-9]+)+(?=[\\s,.:#[{>+~]|$)';
+    tagMode.begin = customElementPattern + '|' + tagMode.begin;
+    tagMode._customElementPatched = true;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     // ── Coloration syntaxique (highlight.js) ────────────────────────────────────
 
     if (window.hljs) {
+        patchCssCustomElementSelectors();
         window.hljs.highlightAll();
     }
 
