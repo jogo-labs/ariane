@@ -367,6 +367,10 @@ const {
             }
 
             #site-nav-column-mobile {
+                &::part(dialog) {
+                    background: var(--doc-bg);
+                }
+
                 &::part(title) {
                     position: absolute;
                     width: 1px;
