@@ -17,9 +17,9 @@ const { title, description = 'Accessible web components library' } = Astro.props
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <!-- Bunny Fonts (pas Google Fonts) — cf. Layout.astro pour le détail -->
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link href="https://fonts.bunny.net/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         {/* ── highlight.js — tokenisation des blocs de code de la section « Essayez-le »
              uniquement ; la coloration vient de doc-code-block.css, pas d'un thème CDN ── */}

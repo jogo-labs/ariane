@@ -28,10 +28,14 @@ const {
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
 
-        <!-- Inter — haute probabilité de cache navigateur -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <!-- Bunny Fonts (pas Google Fonts) : même API css2, un seul host
+             (pas de séparation css/statique type gstatic), sans tracking
+             IP côté Google. Le bénéfice de cache partagé inter-sites d'un
+             CDN de polices public n'existe plus depuis le partitionnement
+             du cache HTTP par site (Chrome/Firefox/Safari, ~2020) — ce
+             n'était donc plus un argument pour rester sur Google Fonts. -->
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link href="https://fonts.bunny.net/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
