@@ -45,7 +45,25 @@
     color: var(--doc-text);
     font-size: var(--doc-font-size-xxl);
     font-weight: var(--doc-font-weight-medium);
+    /* Un titre display n'a pas la lecture d'un paragraphe — hérite sinon
+       la line-height de body (1.65), pensée pour du texte courant, jamais
+       calibrée pour un si grand corps : le résultat traîne un espace
+       vide énorme entre les lignes dès que le titre passe sur 2 lignes
+       (systématique en mobile, où la largeur disponible est faible). */
+    line-height: 1.15;
     margin: 0;
+    text-wrap: balance;
+}
+
+/* Le mono (pages composant) est visuellement plus large à taille égale
+   que la police display (prose) — l'ancien plancher à 3rem faisait
+   déborder les titres longs sur 2 lignes dès un mobile standard
+   (ex. "Breadcrumb Item"), avec le même effet d'espace vide décrit
+   ci-dessus, même une fois la line-height resserrée. */
+@media (max-width: 640px) {
+    :global(.page-title) {
+        font-size: 2rem;
+    }
 }
 
 :global(.section-title) {
