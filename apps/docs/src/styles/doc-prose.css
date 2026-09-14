@@ -292,14 +292,26 @@ pre code {
 }
 
 .badge {
-    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.68rem;
     font-weight: var(--doc-font-weight-semibold);
-    padding: 0.15em 0.5em;
-    border-radius: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.2em 0.6em;
+    border-radius: 999px;
     background: var(--doc-accent-bg);
     color: var(--doc-accent);
-    border: 1px solid var(--doc-accent-border);
-    letter-spacing: 0.02em;
+}
+
+.badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
 }
 
 .doc-callout-alert {
