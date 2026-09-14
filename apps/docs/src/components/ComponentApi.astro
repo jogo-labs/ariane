@@ -11,6 +11,7 @@ import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
 import { isStatePart } from '../utils/state-parts.ts';
+import CodeBlock from './CodeBlock.astro';
 
 interface RelatedTokens {
     component:   string;
@@ -62,9 +63,38 @@ const categories: ApiCategory[] = [
 ].filter((c): c is ApiCategory => c !== null);
 
 const firstCategory = categories[0]?.key ?? 'attributs';
+
+const slug = getSlug(component.tagName!);
+const codeImportCdn = `<script type="module" src="https://unpkg.com/@ariane-ui/core/dist/components/${slug}/index.js"></script>`;
+const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js';`;
 ---
 
 <div class="component-api">
+
+    {/* ── Import ── */}
+    <section>
+        <h4 id="api-import" class="subsection-title">Import</h4>
+
+        <p>
+            Si vous utilisez <a href="/getting-started/quickstart#autoloader">l'autoloader</a>, les composants détectés dans la pages sont chargés automatiquement, donc pas besoin de les importer individuellement.<br />
+            Pour un import manuel, voici comment vous y prendre.
+        </p>
+
+        <ar-tab-group active="cdn" label="Méthode d'import" class="api-tabs import-tabs">
+            <ar-tab panel="cdn">CDN</ar-tab>
+            <ar-tab panel="npm">npm</ar-tab>
+
+            <ar-tab-panel name="cdn">
+                <p>Importez ce composant depuis le CDN.</p>
+                <CodeBlock code={codeImportCdn} lang="html" />
+            </ar-tab-panel>
+
+            <ar-tab-panel name="npm">
+                <p>Après avoir <a href="/getting-started/quickstart#npm">installé le paquet via npm</a>, vous pouvez importer le composant ainsi :</p>
+                <CodeBlock code={codeImportNpm} lang="typescript" />
+            </ar-tab-panel>
+        </ar-tab-group>
+    </section>
 
     {/* ── Traduction ── */}
     {component['x-localized'] && (
@@ -293,7 +323,7 @@ const firstCategory = categories[0]?.key ?? 'attributs';
         font-size: inherit;
         padding: 0;
         background: transparent;
-        color: #cdd6f4;
+        color: var(--doc-code-base);
     }
 
     /* ── Onglets ──────────────────────────────────────────── */
@@ -323,6 +353,20 @@ const firstCategory = categories[0]?.key ?? 'attributs';
             color: var(--doc-text);
             font-weight: var(--doc-font-weight-bold);
         }
+    }
+
+    .import-tabs ar-tab .badge {
+        margin-inline-start: 0.5rem;
+        transform: scale(0.85);
+    }
+
+    /* doc-code-block.css ne pose volontairement aucun border-radius sur
+       .code-block (cf. son commentaire d'en-tête) — boîte autonome ici
+       (pas de panneau bordé englobant comme dans Playground), donc à
+       poser ici. :global() car .code-block est rendu par le composant
+       enfant CodeBlock, hors du scope Astro de ce fichier. */
+    .import-tabs :global(.code-block) {
+        border-radius: 0.5rem;
     }
 
     .api-tab-count {

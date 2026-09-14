@@ -224,7 +224,7 @@
 }
 
 .summary {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--doc-text-muted);
     max-width: 62ch;
     text-wrap: pretty;
