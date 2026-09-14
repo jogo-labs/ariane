@@ -21,11 +21,8 @@ const { title, description = 'Accessible web components library' } = Astro.props
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        {/* ── highlight.js — colore les blocs de code de la section « Essayez-le » ── */}
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css"
-        />
+        {/* ── highlight.js — tokenisation des blocs de code de la section « Essayez-le »
+             uniquement ; la coloration vient de doc-code-block.css, pas d'un thème CDN ── */}
         <script
             is:inline
             src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>

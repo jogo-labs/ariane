@@ -49,9 +49,84 @@
     font-size: inherit;
     padding: 0;
     background: transparent;
-    /* Couleur du thème highlight.js (github-dark) utilisé pour la
-       coloration syntaxique — aucun token --doc-* n'en tient le rôle. */
-    color: #cdd6f4;
+    color: var(--doc-code-base);
+}
+
+/* ── Coloration syntaxique ──────────────────────────────────────────
+   Palette maison (pas le thème CDN highlight.js) : hues franchement
+   séparées par catégorie (pas de nuances d'une même teinte) pour que
+   chaque rôle syntaxique se distingue au premier coup d'œil, direction
+   "Spectre" retenue après brainstorming visuel (6 familles de teinte,
+   ancrées sur --doc-ember-hi pour les attributs et un vert dédié pour
+   les balises). Déclinée via light-dark() pour --doc-grove-deep (mode
+   clair du site) / --doc-vault-deep (mode sombre) — les deux fonds
+   réels du bloc de code, cf. --doc-code-block-bg. */
+.code-block {
+    --doc-code-base: light-dark(#d9dcd6, #cdd2e4);
+    --doc-code-comment: light-dark(#7f8c82, #767d9b);
+    --doc-code-punct: light-dark(#8e958f, #878dab);
+    --doc-code-tag: light-dark(#9ad0a0, #a3d9a9);
+    --doc-code-attr: var(--doc-ember-hi);
+    --doc-code-string: light-dark(#7fd3db, #74d6e2);
+    --doc-code-keyword: light-dark(#d3a4ff, #cba6ff);
+    --doc-code-function: light-dark(#84b6ff, #82b8ff);
+    --doc-code-number: light-dark(#ff9d76, #ffa480);
+    --doc-code-literal: light-dark(#ff8fc0, #ff8ab8);
+    --doc-code-property: light-dark(#c6cade, #c9cde6);
+    --doc-code-params: light-dark(#b9bfc6, #b2b8cf);
+}
+
+/* :global() est nécessaire : highlight.js insère ces <span class="hljs-*">
+   côté client après le rendu — ils ne portent jamais l'attribut de scope
+   Astro (data-astro-cid-*) posé à la compilation, donc un sélecteur scopé
+   ne les matcherait jamais. */
+:global(.hljs-comment) {
+    color: var(--doc-code-comment);
+    font-style: italic;
+}
+
+:global(.hljs-tag),
+:global(.hljs-punctuation) {
+    color: var(--doc-code-punct);
+}
+
+:global(.hljs-name) {
+    color: var(--doc-code-tag);
+}
+
+:global(.hljs-attr) {
+    color: var(--doc-code-attr);
+}
+
+:global(.hljs-string) {
+    color: var(--doc-code-string);
+}
+
+:global(.hljs-keyword) {
+    color: var(--doc-code-keyword);
+}
+
+:global(.hljs-title),
+:global(.hljs-title.function_),
+:global(.hljs-built_in),
+:global(.hljs-variable.language_) {
+    color: var(--doc-code-function);
+}
+
+:global(.hljs-number) {
+    color: var(--doc-code-number);
+}
+
+:global(.hljs-literal) {
+    color: var(--doc-code-literal);
+}
+
+:global(.hljs-property) {
+    color: var(--doc-code-property);
+}
+
+:global(.hljs-params) {
+    color: var(--doc-code-params);
 }
 
 .copy-btn {

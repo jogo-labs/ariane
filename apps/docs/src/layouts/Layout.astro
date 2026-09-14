@@ -44,8 +44,9 @@ const {
             })();
         </script>
 
-        {/* ── highlight.js — chargé une seule fois, colore tous les blocs de la page ── */}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
+        {/* ── highlight.js — tokenisation uniquement (chargé une seule fois, tous les
+             blocs de la page) ; la coloration vient de doc-code-block.css, pas d'un
+             thème CDN — cf. palette --doc-code-* */}
         <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
 
         <!-- Thème par défaut de la librairie -->
