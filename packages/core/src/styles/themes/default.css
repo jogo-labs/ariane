@@ -267,7 +267,7 @@
         );
 
         /* Texte */
-        --ar-color-text: light-dark(#2e2e31, var(--ar-color-neutral-95));
+        --ar-color-text: light-dark(var(--ar-color-neutral-20), var(--ar-color-neutral-95));
         --ar-color-text-muted: light-dark(var(--ar-color-neutral-40), var(--ar-color-neutral-80));
         --ar-color-text-inverse: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
 
@@ -366,8 +366,8 @@
             var(--ar-color-neutral-80),
             var(--ar-color-neutral-40)
         );
-        --ar-button-disabled-color: #71747f;
-        --ar-button-disabled-icon-color: #9ea2b3;
+        --ar-button-disabled-color: var(--ar-color-neutral-50);
+        --ar-button-disabled-icon-color: var(--ar-color-neutral-60);
         --ar-button-tertiary-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
         --ar-button-tertiary-bg-hover: light-dark(rgba(26, 26, 26, 0.7), rgba(255, 255, 255, 0.15));
         --ar-button-tertiary-bg-active: light-dark(rgba(26, 26, 26, 0.8), rgba(255, 255, 255, 0.2));
@@ -376,8 +376,15 @@
             rgba(255, 255, 255, 0.08)
         );
         --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
-        --ar-button-link-color: #2458e5;
-        --ar-button-focus-ring-color: var(--ar-color-neutral-20);
+        --ar-button-link-color: var(--ar-color-interactive);
+        /* light-dark() explicite (pas une simple référence à neutral-20) : ce
+           token servait un seul gris sombre dans les deux modes — invisible
+           sur le nouveau fond sombre "vault" (contraste ~1.2:1). neutral-80
+           donne 10.74:1 sur vault ; neutral-20 reste inchangé côté clair. */
+        --ar-button-focus-ring-color: light-dark(
+            var(--ar-color-neutral-20),
+            var(--ar-color-neutral-80)
+        );
         --ar-button-border-radius: var(--ar-border-radius-md);
         --ar-button-font-weight: var(--ar-font-weight-medium);
         --ar-button-height: 2.5rem;
