@@ -43,18 +43,24 @@
         /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
         --ar-color-white: #ffffff /* oklch(100% 0 0) */;
 
-        /* Neutral — 05=sombre → 95=clair (même convention que les autres hues) */
-        --ar-color-neutral-05: #0d0d0c /* oklch(15.79% 0.000 259.52) */;
-        --ar-color-neutral-10: #171717 /* oklch(20.46% 0.000 263.28) */;
-        --ar-color-neutral-20: #2c2d30 /* oklch(29.82% 0.005 270.80) */;
-        --ar-color-neutral-30: #44454b /* oklch(39.17% 0.010 278.32) */;
-        --ar-color-neutral-40: #5b5d65 /* oklch(47.94% 0.013 274.65) */;
-        --ar-color-neutral-50: #888b99 /* oklch(63.89% 0.021 276.13) */;
-        --ar-color-neutral-60: #9ea1ae /* oklch(71.11% 0.018 276.08) */;
-        --ar-color-neutral-70: #b5b8c3 /* oklch(78.34% 0.016 276.04) */;
-        --ar-color-neutral-80: #cdcfd8 /* oklch(85.56% 0.013 276.00) */;
-        --ar-color-neutral-90: #e6e7ec /* oklch(92.86% 0.007 277.00) */;
-        --ar-color-neutral-95: #f5f5f8 /* oklch(97.10% 0.004 285.86) */;
+        /* Neutral — 05=sombre → 95=clair (même convention que les autres hues).
+           Chroma quasi nulle (0.002, contre 0.000-0.021 dans l'ancienne rampe
+           teintée bleu froid) — aligné sur le gris pur des primitifs --doc-*
+           (--doc-paper/--doc-ink mesurés à chroma=0 exactement). Luminosité (L)
+           inchangée par rapport à l'ancienne rampe : le contraste de tout token
+           qui en dérive (bordures, texte muté, désactivé) n'est pas affecté,
+           seule la teinte perceptible change. */
+        --ar-color-neutral-05: oklch(15.79% 0.002 90);
+        --ar-color-neutral-10: oklch(20.46% 0.002 90);
+        --ar-color-neutral-20: oklch(29.82% 0.002 90);
+        --ar-color-neutral-30: oklch(39.17% 0.002 90);
+        --ar-color-neutral-40: oklch(47.94% 0.002 90);
+        --ar-color-neutral-50: oklch(63.89% 0.002 90);
+        --ar-color-neutral-60: oklch(71.11% 0.002 90);
+        --ar-color-neutral-70: oklch(78.34% 0.002 90);
+        --ar-color-neutral-80: oklch(85.56% 0.002 90);
+        --ar-color-neutral-90: oklch(92.86% 0.002 90);
+        --ar-color-neutral-95: oklch(97.1% 0.002 90);
 
         /* Green — utilisé pour success (Webawesome bright) */
         --ar-color-green-05: #00160d /* oklch(17.74% 0.037 165.47) */;
