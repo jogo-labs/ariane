@@ -22,18 +22,23 @@
          * Passer par les tokens sémantiques (sections 2 et 3).
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-        /* Primary (bleu France Travail) — 05=sombre → 95=clair */
-        --ar-color-primary-05: #010105 /* oklch(7.47% 0.022 279.71) */;
-        --ar-color-primary-10: #04071c /* oklch(14.05% 0.046 270.71) */;
-        --ar-color-primary-20: #0f1438 /* oklch(21.15% 0.070 272.98) */;
-        --ar-color-primary-30: #1b2256 /* oklch(27.98% 0.094 273.00) */;
-        --ar-color-primary-40: #283276 /* oklch(35.06% 0.116 272.63) */;
-        --ar-color-primary-50: #434fa7 /* oklch(46.62% 0.141 273.80) */;
-        --ar-color-primary-60: #707bcd /* oklch(61.04% 0.125 276.28) */;
-        --ar-color-primary-70: #a1abf9 /* oklch(76.33% 0.112 277.78) */;
-        --ar-color-primary-80: #cdd2ff /* oklch(87.46% 0.062 280.03) */;
-        --ar-color-primary-90: #eaecfb /* oklch(94.60% 0.020 279.87) */;
-        --ar-color-primary-95: #f4f5ff /* oklch(97.50% 0.012 280.00) */;
+        /* Primary (ambre — identité #110) — 05=sombre → 95=clair.
+           Ancré sur deux valeurs déjà vérifiées AA côté doc (charte-graphique.md) :
+           40 = #8f5f00 (--doc-accent clair), 70 = #ffaa00 (--doc-ember brut).
+           Contraste vérifié (packages/core/scripts/tmp-color-contrast-check.mjs) :
+           primary-40 vs blanc (fond de bouton, texte blanc dessus) = 5.52:1 (>=4.5)
+           primary-70 vs vault #191d2e (texte interactif en sombre) = 8.76:1 (>=4.5) */
+        --ar-color-primary-05: oklch(16.5% 0.035 70);
+        --ar-color-primary-10: oklch(22.5% 0.05 71);
+        --ar-color-primary-20: oklch(31% 0.075 72);
+        --ar-color-primary-30: oklch(41.5% 0.095 73);
+        --ar-color-primary-40: oklch(52.43% 0.1108 74.71);
+        --ar-color-primary-50: oklch(60.5% 0.13 74.5);
+        --ar-color-primary-60: oklch(70.5% 0.155 74);
+        --ar-color-primary-70: oklch(80.16% 0.1705 73.27);
+        --ar-color-primary-80: oklch(86.5% 0.13 78);
+        --ar-color-primary-90: oklch(92.5% 0.075 83);
+        --ar-color-primary-95: oklch(96.5% 0.038 87);
 
         /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
         --ar-color-white: #ffffff /* oklch(100% 0 0) */;
