@@ -9,7 +9,7 @@
     overflow-x: auto;
 }
 
-.subsection-title + .table-wrap {
+.subsection-title-row + .table-wrap {
     margin-top: 1rem;
 }
 

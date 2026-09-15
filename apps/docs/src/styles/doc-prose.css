@@ -66,22 +66,29 @@
     }
 }
 
-:global(.section-title) {
+/* .section-title-row / .subsection-title-row : wrapper flex autour du titre
+   ET de son HeadingAnchor (#218), tous deux enfants directs — l'ancre n'est
+   PAS un descendant du <h3>/<h4> lui-même. Nécessaire pour l'accessibilité :
+   un descendant portant son propre aria-label (le lien de l'ancre) contribue
+   ce label — pas son texte brut « # » — au nom accessible calculé de tout
+   ancêtre qui l'englobe. Si l'ancre restait dans le <h3>, un lecteur d'écran
+   naviguant par titre (touche H) entendrait le titre dupliqué : « Api Lien
+   direct vers « Api » » au lieu de « Api » seul. Sortir l'ancre du titre
+   (siblings dans ce wrapper plutôt qu'enfant) élimine la pollution à la
+   source ; .heading-anchor porte son propre aria-label pour son propre nom
+   accessible de lien, sans jamais remonter dans celui du titre. */
+:global(.section-title-row) {
     position: relative;
-    font-size: var(--doc-font-size-lg);
-    font-weight: var(--doc-font-weight-semibold);
     padding-top: 1.1rem;
-    margin: 0;
-    color: var(--doc-text);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 /* Le fil se prolonge en amorce horizontale — réservée au h2. Le h3
-   (.subsection-title, inchangé ci-dessous) n'en porte pas : si le repère
+   (.subsection-title-row, inchangé ci-dessous) n'en porte pas : si le repère
    apparaît à tous les niveaux, il perd sa valeur de marqueur de section. */
-:global(.section-title)::before {
+:global(.section-title-row)::before {
     content: '';
     position: absolute;
     top: 0;
@@ -91,6 +98,30 @@
     background: var(--doc-rail-live);
 }
 
+/* display:flex ici aussi (pas seulement sur .section-title-row) : le titre
+   peut contenir plus que du texte — ex. <NarrativeHeading>Via CDN <span
+   class="badge">Recommandé</span></NarrativeHeading> sur le quickstart —
+   et sans ce flex sur le <h3> lui-même, le badge (inline-flex) retombe en
+   alignement de ligne de base par défaut au lieu d'être centré avec le
+   texte du titre. */
+:global(.section-title) {
+    font-size: var(--doc-font-size-lg);
+    font-weight: var(--doc-font-weight-semibold);
+    margin: 0;
+    color: var(--doc-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+:global(.subsection-title-row) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* display:flex ici aussi, même raison que .section-title ci-dessus (contenu
+   du titre potentiellement mixte texte + badge, pas seulement du texte). */
 :global(.subsection-title) {
     font-size: var(--doc-font-size-md);
     font-weight: var(--doc-font-weight-semibold);
@@ -103,18 +134,26 @@
 }
 
 /* Ancre de lien direct sur un titre (HeadingAnchor.astro, #218) — enfant flex
-   de plus dans .section-title/.subsection-title (déjà display:flex, gap),
-   aucune restructuration de layout nécessaire. Visible en continu par défaut
-   (pas de survol sur tactile — opacité 1, valeur initiale CSS, rien à poser
-   explicitement) ; masquée jusqu'au survol du titre pour les pointeurs fins
-   (révélée à 0.7, teinte lavée), puis pleinement visible (1) au survol direct
-   de l'ancre elle-même. :focus-visible reste toujours visible même masquée —
-   le survol seul ne garantit jamais l'accessibilité clavier/tactile d'un
-   élément qui se révèle au hover (même précaution que .copy-btn). */
+   du wrapper .section-title-row/.subsection-title-row (sibling du titre, pas
+   descendant). Visible en continu par défaut (pas de survol sur tactile —
+   opacité 1, valeur initiale CSS, rien à poser explicitement) ; masquée
+   jusqu'au survol du titre pour les pointeurs fins (révélée à 0.85, teinte
+   lavée), puis pleinement visible (1) au survol direct de l'ancre
+   elle-même. :focus-visible reste toujours visible même masquée — le survol
+   seul ne garantit jamais l'accessibilité clavier/tactile d'un élément qui
+   se révèle au hover (même précaution que .copy-btn). */
 :global(.heading-anchor) {
     color: var(--doc-text-muted);
     text-decoration: none;
     transition: opacity 0.35s;
+}
+
+:global(.section-title + .heading-anchor) {
+    font-size: var(--doc-font-size-lg);
+}
+
+:global(.subsection-title + .heading-anchor) {
+    font-size: var(--doc-font-size-md);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -122,16 +161,16 @@
         opacity: 0;
     }
 
-    :global(:is(.section-title, .subsection-title):hover .heading-anchor) {
+    :global(:is(.section-title-row, .subsection-title-row):hover .heading-anchor) {
         opacity: 0.85;
     }
 
     /* Le préfixe ancêtre :is(...):hover est nécessaire ICI malgré la
        redondance logique (survoler l'ancre implique déjà survoler son
-       ancêtre) : il sert à égaler la spécificité de la règle à 0.7
+       ancêtre) : il sert à égaler la spécificité de la règle à 0.85
        ci-dessus (0,3,0) — un simple .heading-anchor:hover (0,2,0) perd
-       face à elle et reste bloqué à 0.7 au lieu de passer à 1. */
-    :global(:is(.section-title, .subsection-title):hover .heading-anchor:hover),
+       face à elle et reste bloqué à 0.85 au lieu de passer à 1. */
+    :global(:is(.section-title-row, .subsection-title-row):hover .heading-anchor:hover),
     :global(.heading-anchor):focus-visible {
         opacity: 1;
     }
@@ -211,18 +250,17 @@
  * (qui posent margin: 0 sur les titres/le contenu narratif) : elles
  * doivent gagner la cascade pour ces mêmes éléments. `:where()` reste
  * utilisé pour la partie qui ne cible pas l'élément stylé lui-même
- * (matcher du sibling précédent — `.page-title`, `.section-title`,
- * `.subsection-title`, contexte ancêtre `.narrative`) — sa spécificité n'a
- * pas besoin d'être renforcée. `:is()` est en revanche systématiquement
+ * (matcher du sibling précédent — `.page-title`, `.section-title-row`,
+ * `.subsection-title-row`, contexte ancêtre `.narrative`) — sa spécificité
+ * n'a pas besoin d'être renforcée. `:is()` est en revanche systématiquement
  * utilisé pour la partie qui cible l'élément stylé lui-même, à gauche du
- * `>` (`.section-title`/`h3`, `.subsection-title`/`h4`) COMME à droite du
- * `+` (liste explicite des éléments de contenu légitimes — jamais de `*`
- * générique, qui retombe à spécificité nulle) : `:is()` propage la
+ * `>` (`.section-title-row`/`h3`, `.subsection-title-row`/`h4`) COMME à
+ * droite du `+` (liste explicite des éléments de contenu légitimes — jamais
+ * de `*` générique, qui retombe à spécificité nulle) : `:is()` propage la
  * spécificité du sélecteur le plus spécifique de sa liste, contrairement
  * à `:where()` et à `*` qui sont toujours à spécificité nulle — nécessaire
- * ici pour battre `.section-title { margin: 0 }`, `.narrative p
- * { margin: 0 }`, `.narrative .narrative-list { margin: 0 }`, etc. sur le
- * même élément. */
+ * ici pour battre `.narrative p { margin: 0 }`, `.narrative .narrative-list
+ * { margin: 0 }`, etc. sur le même élément. */
 
 /* Préfixe ancêtre (`.page-header` / `.narrative`) laissé HORS de `:global()` :
  * Astro le scope (attribut data-astro-cid-*) comme n'importe quel sélecteur
@@ -242,7 +280,7 @@
 
 .narrative
     :global(
-        :where(.section-title)
+        :where(.section-title-row)
             + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
     ) {
     margin-top: var(--doc-space-subsection);
@@ -250,21 +288,27 @@
 
 .narrative
     :global(
-        :where(.subsection-title)
+        :where(.subsection-title-row)
             + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
     ) {
     margin-top: var(--doc-space-paragraph);
 }
 
-:global(.narrative > :is(.section-title, h3)) {
+:global(.narrative > :is(.section-title-row, h3)) {
     margin-top: var(--doc-space-section);
 }
 
-:global(.narrative > :is(.section-title, h3):first-child) {
+:global(.narrative > :is(.section-title-row, h3):first-child) {
     margin-top: 0;
 }
 
-:global(.narrative :is(.subsection-title, h4)) {
+/* h4:not(.subsection-title) exclut le <h4> qu'un .subsection-title-row
+   contient déjà — sans combinateur `>` (nécessaire ici, contrairement à la
+   règle h3 ci-dessus, car un h4 peut être imbriqué plus profond dans
+   .narrative), le <h4 class="subsection-title"> matcherait DEUX fois cette
+   règle : une fois via son wrapper .subsection-title-row, une fois via
+   l'alternative h4 — doublant visuellement l'espace au-dessus du titre. */
+:global(.narrative :is(.subsection-title-row, h4:not(.subsection-title))) {
     margin-top: var(--doc-space-subsection);
 }
 
@@ -433,7 +477,7 @@ pre code {
 
 /* ── NextStep ──────────────────────────────────────────────────────────
  * .next-step est rendu par un composant séparé (NextStep.astro) : comme
- * pour .section-title/.subsection-title, `:global()` est nécessaire pour
+ * pour .section-title-row/.subsection-title-row, `:global()` est nécessaire pour
  * que la règle matche à travers la frontière de scope Astro. Le préfixe
  * `.page-container` reste HORS `:global()` — il est écrit directement dans
  * chaque page important ce fichier, donc porte bien le scope de CETTE
