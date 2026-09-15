@@ -123,7 +123,7 @@
     }
 
     :global(:is(.section-title, .subsection-title):hover .heading-anchor) {
-        opacity: 0.8;
+        opacity: 0.85;
     }
 
     /* Le préfixe ancêtre :is(...):hover est nécessaire ICI malgré la
