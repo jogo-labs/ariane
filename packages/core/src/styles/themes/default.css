@@ -273,7 +273,10 @@
 
         /* Surface */
         --ar-color-bg: light-dark(var(--ar-color-white), var(--ar-color-vault));
-        --ar-color-bg-subtle: light-dark(var(--ar-color-neutral-95), var(--ar-color-vault-deep));
+        --ar-color-bg-subtle: light-dark(
+            var(--ar-color-neutral-95),
+            color-mix(in oklab, var(--ar-color-vault), white 20%)
+        );
 
         /* Bordure */
         --ar-color-border: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-40));
@@ -366,8 +369,8 @@
         --ar-button-disabled-color: #71747f;
         --ar-button-disabled-icon-color: #9ea2b3;
         --ar-button-tertiary-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
-        --ar-button-tertiary-bg-hover: light-dark(rgba(18, 20, 55, 0.7), rgba(255, 255, 255, 0.15));
-        --ar-button-tertiary-bg-active: light-dark(rgba(18, 20, 55, 0.8), rgba(255, 255, 255, 0.2));
+        --ar-button-tertiary-bg-hover: light-dark(rgba(26, 26, 26, 0.7), rgba(255, 255, 255, 0.15));
+        --ar-button-tertiary-bg-active: light-dark(rgba(26, 26, 26, 0.8), rgba(255, 255, 255, 0.2));
         --ar-button-tertiary-bg-focus: light-dark(
             rgba(26, 26, 26, 0.05),
             rgba(255, 255, 255, 0.08)
@@ -439,11 +442,11 @@
         --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
         --ar-breadcrumb-toggle-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
         --ar-breadcrumb-toggle-bg-hover: light-dark(
-            rgba(18, 20, 55, 0.7),
+            rgba(26, 26, 26, 0.7),
             rgba(255, 255, 255, 0.15)
         );
         --ar-breadcrumb-toggle-bg-pressed: light-dark(
-            rgba(18, 20, 55, 0.8),
+            rgba(26, 26, 26, 0.8),
             rgba(255, 255, 255, 0.2)
         );
         --ar-breadcrumb-toggle-bg-focus: light-dark(
@@ -603,7 +606,7 @@
         --ar-datepicker-day-today-bg: var(--ar-panel-bg);
 
         --ar-datepicker-day-hover-bg: light-dark(
-            var(--ar-color-primary-50),
+            var(--ar-color-primary-40),
             var(--ar-color-primary-70)
         );
         --ar-datepicker-day-hover-color: light-dark(
