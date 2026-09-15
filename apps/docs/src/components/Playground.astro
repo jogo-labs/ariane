@@ -387,4 +387,20 @@ const showPlayground = displayMode === 'demo';
     .preview > :global(ar-pagination) {
         flex: 1 1 100%;
     }
+
+    /*
+     * Même piège flexbox, cas plus général (#217) : un enfant flex a min-width: auto
+     * par défaut sur l'axe principal — il ne se réduit jamais sous sa largeur de
+     * contenu intrinsèque, même si elle dépasse .preview. Pour un composant avec
+     * scroll interne (ar-tab-group : tablist qui déborde), ce débordement invisible
+     * est ensuite silencieusement rogné par .playground-card { overflow: hidden }
+     * deux niveaux plus haut — sans mécanisme de scroll pour atteindre le contenu
+     * coupé. min-width: 0 laisse chaque enfant se contraindre à la largeur réelle du
+     * preview et gérer lui-même son propre débordement (scroll interne, wrap...).
+     * Sans effet sur les composants qui tiennent déjà dans la largeur disponible.
+     */
+    .preview > :global(*) {
+        min-width: 0;
+        max-width: 100%;
+    }
 </style>
