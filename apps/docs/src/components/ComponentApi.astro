@@ -12,6 +12,7 @@ import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
 import { isStatePart } from '../utils/state-parts.ts';
 import CodeBlock from './CodeBlock.astro';
+import HeadingAnchor from './HeadingAnchor.astro';
 
 interface RelatedTokens {
     component:   string;
@@ -73,7 +74,7 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
 
     {/* ── Import ── */}
     <section>
-        <h4 id="api-import" class="subsection-title">Import</h4>
+        <h4 id="api-import" class="subsection-title">Import<HeadingAnchor id="api-import" label="Import" /></h4>
 
         <p>
             Si vous utilisez <a href="/getting-started/quickstart#autoloader">l'autoloader</a>, les composants détectés dans la pages sont chargés automatiquement, donc pas besoin de les importer individuellement.<br />
@@ -99,7 +100,7 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
     {/* ── Traduction ── */}
     {component['x-localized'] && (
         <section>
-            <h4 id="api-traduction" class="subsection-title">Traduction</h4>
+            <h4 id="api-traduction" class="subsection-title">Traduction<HeadingAnchor id="api-traduction" label="Traduction" /></h4>
             <p>
                 La langue de ce composant suit l'attribut <code>lang</code> de la page
                 (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une

@@ -102,6 +102,41 @@
     gap: 0.5rem;
 }
 
+/* Ancre de lien direct sur un titre (HeadingAnchor.astro, #218) — enfant flex
+   de plus dans .section-title/.subsection-title (déjà display:flex, gap),
+   aucune restructuration de layout nécessaire. Visible en continu par défaut
+   (pas de survol sur tactile — opacité 1, valeur initiale CSS, rien à poser
+   explicitement) ; masquée jusqu'au survol du titre pour les pointeurs fins
+   (révélée à 0.7, teinte lavée), puis pleinement visible (1) au survol direct
+   de l'ancre elle-même. :focus-visible reste toujours visible même masquée —
+   le survol seul ne garantit jamais l'accessibilité clavier/tactile d'un
+   élément qui se révèle au hover (même précaution que .copy-btn). */
+:global(.heading-anchor) {
+    color: var(--doc-text-muted);
+    text-decoration: none;
+    transition: opacity 0.35s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :global(.heading-anchor) {
+        opacity: 0;
+    }
+
+    :global(:is(.section-title, .subsection-title):hover .heading-anchor) {
+        opacity: 0.85;
+    }
+
+    /* Le préfixe ancêtre :is(...):hover est nécessaire ICI malgré la
+       redondance logique (survoler l'ancre implique déjà survoler son
+       ancêtre) : il sert à égaler la spécificité de la règle à 0.7
+       ci-dessus (0,3,0) — un simple .heading-anchor:hover (0,2,0) perd
+       face à elle et reste bloqué à 0.7 au lieu de passer à 1. */
+    :global(:is(.section-title, .subsection-title):hover .heading-anchor:hover),
+    :global(.heading-anchor):focus-visible {
+        opacity: 1;
+    }
+}
+
 .narrative :global(strong) {
     font-weight: var(--doc-font-weight-bold);
     color: var(--doc-text);

@@ -1,0 +1,32 @@
+---
+/**
+ * HeadingAnchor.astro
+ *
+ * Ancre de lien direct (#) affichée en dernier enfant d'un titre listé dans la
+ * TOC (.section-title/.subsection-title) — permet de lier ou mettre en favori
+ * une section précise sans aller chercher son ancre à la main dans l'URL.
+ *
+ * `id` doit être l'id déjà posé sur le titre lui-même (cible du lien) — l'ancre
+ * porte son propre id dérivé (`${id}-anchor`) pour que ar-tooltip puisse s'y
+ * attacher (`for=`) sans entrer en conflit avec l'id du titre. `label` est le
+ * texte du titre, pour le nom accessible du lien.
+ *
+ * Comportement au clic volontairement natif : un vrai <a href="#slug">, pas de
+ * copie dans le presse-papiers (cf. issue #218, comportement testé et écarté).
+ */
+interface Props {
+    id:    string;
+    label: string;
+}
+
+const { id, label } = Astro.props;
+const anchorId = `${id}-anchor`;
+---
+
+<a
+    href={`#${id}`}
+    id={anchorId}
+    class="heading-anchor"
+    data-heading-anchor
+    aria-label={`Lien direct vers « ${label} »`}
+>#</a><ar-tooltip for={anchorId}>Lien direct vers cette section</ar-tooltip>
