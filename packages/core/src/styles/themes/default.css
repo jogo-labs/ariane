@@ -40,6 +40,13 @@
         --ar-color-primary-90: oklch(92.5% 0.075 83);
         --ar-color-primary-95: oklch(96.5% 0.038 87);
 
+        /* Vault (surfaces sombres dédiées — identité "Voûte", #110) — utilisé
+           uniquement par --ar-color-bg/-bg-subtle côté sombre, jamais par un
+           composant directement. Valeurs alignées sur --doc-vault/-vault-deep
+           (apps/docs/src/styles/doc-tokens.css), converties en oklch natif. */
+        --ar-color-vault: oklch(23.54% 0.0334 273.44);
+        --ar-color-vault-deep: oklch(18.99% 0.0249 273.04);
+
         /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
         --ar-color-white: #ffffff /* oklch(100% 0 0) */;
 
@@ -265,8 +272,8 @@
         --ar-color-text-inverse: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
 
         /* Surface */
-        --ar-color-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
-        --ar-color-bg-subtle: light-dark(var(--ar-color-neutral-95), var(--ar-color-neutral-30));
+        --ar-color-bg: light-dark(var(--ar-color-white), var(--ar-color-vault));
+        --ar-color-bg-subtle: light-dark(var(--ar-color-neutral-95), var(--ar-color-vault-deep));
 
         /* Bordure */
         --ar-color-border: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-40));
