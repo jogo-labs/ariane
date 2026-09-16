@@ -592,71 +592,87 @@
          * Datepicker
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
+        /* -- Positionnement du panel flottant (calendrier) -- */
         --ar-datepicker-distance: var(--ar-anchor-distance);
         --ar-datepicker-offset: var(--ar-anchor-offset);
+
+        /* -- Champ texte + message d'erreur (au-dessus/en-dessous de l'input) -- */
         /* --ar-color-danger-text (pas red-50 directement) : même convention que
            ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
         --ar-datepicker-error-color: light-dark(
             var(--ar-color-danger-text),
             var(--ar-color-red-40)
         );
+        --ar-datepicker-input-error-border-color: light-dark(
+            var(--ar-color-red-50),
+            var(--ar-color-red-40)
+        );
 
+        /* -- Panel calendrier (conteneur du header + grille + footer) -- */
         /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
            dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
            taille plus généreuse (25rem) que la valeur par défaut partagée (18rem) — même
            précédent que le min-width littéral d'ar-dropdown::part(panel) (10rem, cf. plus bas). */
         --ar-datepicker-panel-max-width: 25rem;
 
+        /* -- Header du calendrier : flèches précédent/suivant mois/année -- */
         --ar-datepicker-nav-button-border-color: transparent;
         --ar-datepicker-nav-button-focus-ring-color: var(--ar-focus-ring-color);
 
+        /* -- Footer du calendrier : boutons "Aujourd'hui" / "Fermer" -- */
         --ar-datepicker-footer-button-border-color: var(--ar-color-border);
         --ar-datepicker-footer-button-focus-ring-color: var(--ar-focus-ring-color);
 
+        /* -- Grille de jours : dimension de cellule + jours hors mois affiché -- */
+        --ar-datepicker-day-size: 2.5rem;
         --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
 
-        --ar-datepicker-day-size: 2.5rem;
+        /* -- Grille de jours : état par défaut d'une cellule -- */
+        --ar-datepicker-day-color: var(--ar-color-text);
+        --ar-datepicker-day-bg: transparent;
+        --ar-datepicker-day-border-color: transparent;
 
-        --ar-datepicker-day-today-color: light-dark(
-            var(--ar-color-primary-40),
-            var(--ar-color-primary-70)
-        );
+        /* -- Grille de jours : état "today" (jour du jour, non sélectionné) --
+           Contour uniquement (pas d'aplat) — seul vecteur visuel de "today", doit
+           tenir 3:1 (WCAG 1.4.11) sur son propre mérite. neutral-50 est le palier le
+           plus clair de la rampe qui passe encore ce seuil sur blanc (3,38:1) ;
+           neutral-60 en sombre (6,52:1 sur vault, marge large). Le contour est
+           préservé sous le survol par une règle dédiée dans datepicker.styles.ts (sinon
+           la règle générique de hover l'efface) — pas sous le focus, qui remplace
+           toujours la bordure par son propre anneau plutôt que de s'y cumuler. */
+        --ar-datepicker-day-today-color: var(--ar-color-text);
         --ar-datepicker-day-today-border: light-dark(
-            var(--ar-color-primary-50),
-            var(--ar-color-primary-70)
+            var(--ar-color-neutral-50),
+            var(--ar-color-neutral-60)
         );
-        --ar-datepicker-day-today-bg: var(--ar-panel-bg);
+        --ar-datepicker-day-today-bg: transparent;
 
+        /* -- Grille de jours : état survol (souris) — s'applique à toute cellule,
+           y compris "today" (qui garde en plus son contour, cf. ci-dessus) --
+           Aplat léger, plus clair que la bordure "today" dans les deux modes —
+           réutilise le token de surface déjà dark-aware plutôt qu'un littéral dédié. */
         --ar-datepicker-day-hover-bg: light-dark(
-            var(--ar-color-primary-40),
-            var(--ar-color-primary-70)
+            var(--ar-color-neutral-90),
+            color-mix(in oklab, var(--ar-color-vault), white 20%)
         );
-        --ar-datepicker-day-hover-color: light-dark(
-            var(--ar-color-white),
-            var(--ar-color-text-inverse)
-        );
+        --ar-datepicker-day-hover-color: var(--ar-color-text);
 
+        /* -- Grille de jours : anneau de focus clavier (cellule roving-tabindex) --
+           Pas de token "day-focus-bg" : depuis datepicker.styles.ts, le focus n'a
+           plus de fond propre, seulement cet anneau (+ le contour "today" s'il y a
+           lieu) — volontairement découplé du hover pour rester lisible sans fond. */
         --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
         --ar-datepicker-day-focus-ring-width: 2px;
         --ar-datepicker-day-focus-ring-offset: 0;
         --ar-datepicker-day-focus-border-color: var(--ar-panel-bg);
-        --ar-datepicker-day-border-color: transparent;
-        --ar-datepicker-day-color: var(--ar-color-text);
-        --ar-datepicker-day-bg: transparent;
 
-        --ar-datepicker-day-selected-bg: light-dark(
-            var(--ar-color-primary-40),
-            var(--ar-color-primary-70)
-        );
-        --ar-datepicker-day-selected-color: light-dark(
-            var(--ar-color-white),
-            var(--ar-color-text-inverse)
-        );
-
-        --ar-datepicker-input-error-border-color: light-dark(
-            var(--ar-color-red-50),
-            var(--ar-color-red-40)
-        );
+        /* -- Grille de jours : état "selected" (date choisie par clic) --
+           Aplat ambre vif + texte quasi-noir, identique clair/sombre — même paire
+           que le bouton primaire (9,39:1), cf. principe "ambre si marge de contraste".
+           Prime toujours sur "today" en cas de cumul (contour effacé, cf.
+           datepicker.styles.ts) : cf. amendement ADR-005 du 2026-07-27. */
+        --ar-datepicker-day-selected-bg: var(--ar-color-primary-70);
+        --ar-datepicker-day-selected-color: var(--ar-color-neutral-10);
     }
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -693,15 +709,22 @@
 
     /* Datepicker */
     ar-datepicker {
+        /* -- Conteneur racine (label + input + trigger empilés) -- */
         &::part(datepicker) {
             gap: var(--ar-field-gap);
         }
 
+        /* -- Panel flottant du calendrier -- */
         &::part(panel) {
-            width: 20rem;
-            padding: 1rem;
+            width: 20.5rem;
+            padding: 0.5rem;
         }
 
+        &::part(grid) {
+            border-collapse: separate;
+        }
+
+        /* -- Header du calendrier : flèches précédent/suivant mois/année -- */
         &::part(nav-button) {
             width: 2rem;
             height: 2rem;
@@ -723,6 +746,7 @@
             outline-offset: var(--ar-focus-ring-offset);
         }
 
+        /* -- Footer du calendrier : boutons "Aujourd'hui" / "Fermer" -- */
         &::part(footer) {
             margin: 0;
             padding: 0.75rem 0 0;
@@ -753,6 +777,8 @@
             outline-offset: var(--ar-focus-ring-offset);
         }
 
+        /* -- Header du calendrier : conteneur de la rangée de nav-button ci-dessus
+           (mois/année affichés, cf. header span[aria-live] dans datepicker.styles.ts) -- */
         &::part(header) {
             font-size: 1rem;
             margin: 0;
@@ -762,6 +788,8 @@
             gap: 0.25rem;
         }
 
+        /* -- Champ texte : label / aide / erreur (au-dessus et en-dessous de l'input,
+           hors du panel calendrier) -- */
         &::part(label) {
             font-size: var(--ar-font-size-sm);
             font-weight: var(--ar-font-weight-medium);
@@ -778,6 +806,7 @@
             color: var(--ar-datepicker-error-color);
         }
 
+        /* -- Champ texte : l'input lui-même -- */
         &::part(input) {
             height: var(--ar-button-height);
             box-sizing: border-box;
@@ -811,6 +840,7 @@
             cursor: not-allowed;
         }
 
+        /* -- Champ texte : bouton d'ouverture du calendrier (icône) -- */
         &::part(trigger) {
             width: var(--ar-button-height);
             height: var(--ar-button-height);
@@ -851,7 +881,8 @@
             cursor: not-allowed;
         }
 
-        /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
+        /* -- Grille de jours : ligne d'en-tête (Lu/Ma/Me...) --
+           neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
         &::part(weekday) {
             color: var(--ar-color-neutral-50);
             font-size: 0.75rem;
@@ -861,9 +892,14 @@
             text-transform: uppercase;
         }
 
+        /* -- Grille de jours : dimensions/forme communes à toute cellule --
+           Les couleurs par état (défaut/today/hover/focus/selected) viennent des
+           tokens --ar-datepicker-day-* déclarés en section 7 (:root) ci-dessus, pas
+           d'ici : ::part(day) ne peut pas les piloter (états posés en interne par
+           datepicker.styles.ts, cf. ADR-005 amendement du 2026-07-27). */
         &::part(day) {
             font-size: 1rem;
-            border-radius: var(--ar-border-radius-lg);
+            border-radius: var(--ar-border-radius-md);
             border-width: 2px;
         }
     }

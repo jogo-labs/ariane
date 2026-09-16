@@ -141,10 +141,21 @@ export default css`
         color: var(--ar-datepicker-day-hover-color, ButtonText);
     }
 
+    /* Préserve le contour "today" sous le survol (la règle générale ci-dessus l'efface
+       sinon) : sans ça, survoler le jour actuel devient indiscernable de n'importe quel
+       autre jour. Exclut .selected pour ne pas interférer avec le cumul today+selected
+       (qui doit rester un fond plein sans contour, cf. règle .selected plus bas). */
+    [part~='day'].today:not(.selected):not([aria-disabled='true']):not(.disabled):hover {
+        border-color: var(--ar-datepicker-day-today-border, GrayText);
+    }
+
     /*
      * Position courante dans la grille (roving tabindex).
      * :focus-within couvre le focus programmatique (ouverture du picker) ET le focus clavier,
      * contrairement à :focus-visible qui ne s'active pas pour le focus programmatique.
+     * Le focus remplace toujours la bordure (y compris celle de "today") plutôt que de s'y
+     * cumuler — un contour + un anneau de focus superposés rendent mal visuellement. Seul
+     * le survol (règle ci-dessus) préserve le contour "today", pas le focus.
      */
     [part='grid']:focus-within [part~='day'][tabindex='0'] {
         outline-style: solid;
@@ -156,17 +167,12 @@ export default css`
         border-color: var(--ar-datepicker-day-focus-border-color, transparent);
     }
 
-    [part='grid']:focus-within [part~='day'][tabindex='0']:not(.selected) {
-        background-color: var(--ar-datepicker-day-hover-bg);
-        color: var(--ar-datepicker-day-hover-color);
-    }
-
     /*
      * Curseur de navigation visible quand le focus est hors de la grille (boutons nav/footer).
      * Indique quel jour prendra le focus au prochain Tab dans la grille.
      */
     [part~='day'][tabindex='0']:not(:focus-visible) {
-        outline: 1px dashed var(--ar-datepicker-day-focus-ring-color, ButtonText);
+        outline: 2px dashed var(--ar-datepicker-day-focus-ring-color, ButtonText);
         outline-offset: var(--ar-datepicker-day-focus-ring-offset);
     }
 
