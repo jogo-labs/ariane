@@ -350,17 +350,25 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
         /* Button — Partagé (stepper) */
-        --ar-button-bg: var(--ar-color-interactive);
-        --ar-button-bg-hover: var(--ar-color-interactive-hover);
-        --ar-button-color: var(--ar-color-text-inverse);
-        --ar-button-border-color: var(--ar-color-interactive);
-        --ar-button-danger-bg: var(--ar-color-danger-50);
-        --ar-button-danger-color: var(--ar-color-text-inverse);
-        --ar-button-secondary-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-30));
-        --ar-button-secondary-bg-hover: light-dark(
-            var(--ar-color-neutral-40),
-            var(--ar-color-neutral-40)
+        --ar-button-primary-bg: var(--ar-color-primary-70);
+        --ar-button-primary-bg-hover: light-dark(
+            var(--ar-color-primary-60),
+            var(--ar-color-primary-80)
         );
+        --ar-button-primary-bg-active: light-dark(
+            var(--ar-color-primary-80),
+            var(--ar-color-primary-60)
+        );
+        --ar-button-primary-color: var(--ar-color-neutral-10);
+        --ar-button-primary-border-color: var(--ar-color-primary-70);
+        --ar-button-danger-bg: var(--ar-color-danger-50);
+        --ar-button-danger-color: var(--ar-color-white);
+        --ar-button-secondary-bg: var(--ar-color-bg);
+        --ar-button-secondary-border-hover: light-dark(
+            var(--ar-color-neutral-40),
+            var(--ar-color-neutral-90)
+        );
+        --ar-button-secondary-bg-hover: var(--ar-color-bg-subtle);
         --ar-button-disabled-bg: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-30));
         --ar-button-disabled-border: light-dark(
             var(--ar-color-neutral-80),
@@ -385,11 +393,10 @@
             var(--ar-color-neutral-20),
             var(--ar-color-neutral-80)
         );
-        --ar-button-border-radius: var(--ar-border-radius-md);
+        --ar-button-border-radius: var(--ar-border-radius-sm);
         --ar-button-font-weight: var(--ar-font-weight-medium);
         --ar-button-height: 2.5rem;
         --ar-button-padding-x: 1rem;
-        --ar-button-border-radius-pill: 0.75rem;
         --ar-button-ratio-square-width: 2.5rem;
         --ar-button-transition-duration: 0.15s;
 
@@ -400,7 +407,12 @@
         --ar-input-color: var(--ar-color-text);
         --ar-input-font-size: var(--ar-font-size-md);
         --ar-input-focus-ring-color: var(--ar-focus-ring-color);
-        --ar-input-disabled-bg: var(--ar-color-bg-subtle);
+        --ar-input-disabled-color: var(--ar-color-neutral-50);
+        --ar-input-disabled-bg: light-dark(
+            var(--ar-color-neutral-95),
+            color-mix(in oklab, var(--ar-color-vault), white 10%)
+        );
+        --ar-input-readonly-bg: var(--ar-color-bg-subtle);
 
         /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
            interne d'ar-datepicker::part(datepicker) */
@@ -469,9 +481,9 @@
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
-        --ar-stepper-bullet-color: var(--ar-color-interactive);
-        --ar-stepper-bullet-bg: var(--ar-color-primary-80);
-        --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
+        --ar-stepper-bullet-color: var(--ar-color-text-inverse);
+        --ar-stepper-bullet-bg: var(--ar-color-interactive);
+        --ar-stepper-bullet-border-color: var(--ar-color-neutral-70);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
         --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-label-color: var(--ar-color-text);
@@ -487,8 +499,11 @@
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Progressbar
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-        --ar-progressbar-track-color: var(--ar-color-bg-subtle);
-        --ar-progressbar-fill-color: var(--ar-color-interactive);
+        --ar-progressbar-track-color: light-dark(
+            var(--ar-color-neutral-90),
+            color-mix(in oklab, var(--ar-color-vault), white 20%)
+        );
+        --ar-progressbar-fill-color: var(--ar-color-primary-70);
         --ar-progressbar-max-width: 500px;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -554,9 +569,9 @@
          * Tablesort
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-table-sort-indicator-size: 0.65rem;
-        --ar-table-sort-indicator-color: var(--ar-color-text-muted, #9ca3af);
-        --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
-        --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted, #9ca3af);
+        --ar-table-sort-indicator-color: var(--ar-color-text-muted);
+        --ar-table-sort-indicator-active-color: var(--ar-color-primary-70);
+        --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted);
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Tab
@@ -564,7 +579,7 @@
         --ar-tab-padding-x: 1.5rem;
         --ar-tab-padding-y: 1rem;
 
-        --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-interactive);
+        --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-primary-70);
 
         --ar-tab-focus-ring-offset: -2px;
         --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
@@ -716,20 +731,22 @@
         }
 
         &::part(footer-button) {
-            background: transparent;
+            background-color: var(--ar-button-secondary-bg);
             border-width: 1px;
-            color: var(--ar-color-interactive);
+            color: var(--ar-color-text);
             border-radius: var(--ar-border-radius-md);
             padding: 0.375rem 0.75rem;
         }
 
         &::part(footer-button):hover {
-            background: color-mix(in srgb, var(--ar-color-interactive) 10%, transparent);
-            border-color: var(--ar-color-interactive);
+            border-color: var(--ar-button-secondary-border-hover);
+            background-color: var(--ar-button-secondary-bg-hover);
         }
 
         &::part(footer-button):active {
-            background: color-mix(in srgb, var(--ar-color-interactive) 18%, transparent);
+            transform: scale(0.985);
+            border-color: var(--ar-button-secondary-border-hover);
+            background-color: var(--ar-button-secondary-bg-hover);
         }
 
         &::part(footer-button):focus-visible {
@@ -784,22 +801,22 @@
         }
 
         &::part(input):read-only {
-            background: var(--ar-color-bg-subtle);
+            background: var(--ar-input-readonly-bg);
             cursor: default;
         }
 
         &::part(input):disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            color: var(--ar-input-disabled-color);
             background: var(--ar-input-disabled-bg);
+            cursor: not-allowed;
         }
 
         &::part(trigger) {
             width: var(--ar-button-height);
             height: var(--ar-button-height);
-            background: var(--ar-color-interactive);
-            color: var(--ar-color-text-inverse);
-            border: 1px solid var(--ar-color-interactive);
+            background: var(--ar-button-primary-bg);
+            color: var(--ar-button-primary-color);
+            border: 1px solid var(--ar-button-primary-border-color);
             border-start-end-radius: var(--ar-border-radius-md);
             border-end-end-radius: var(--ar-border-radius-md);
             cursor: pointer;
@@ -808,14 +825,18 @@
                 border-color 0.15s ease;
         }
 
-        &::part(trigger):hover:not(:disabled) {
-            background: var(--ar-color-interactive-hover);
-            border-color: var(--ar-color-interactive-hover);
+        &::part(trigger):not(:disabled):hover {
+            background: var(--ar-button-primary-bg-hover);
+            border-color: var(--ar-button-primary-bg-hover);
         }
 
-        &::part(trigger):active:not(:disabled) {
-            background: var(--ar-color-interactive-active);
-            border-color: var(--ar-color-interactive-active);
+        &::part(trigger):not(:disabled):active,
+        &[open]::part(trigger):hover,
+        &[open]::part(trigger) {
+            transform: scale(0.985);
+            background: var(--ar-button-primary-bg-active);
+            border-color: var(--ar-button-primary-bg-active);
+            color: light-dark(var(--ar-color-text), var(--ar-color-text-inverse));
         }
 
         &::part(trigger):focus-visible {
@@ -824,7 +845,9 @@
         }
 
         &::part(trigger):disabled {
-            opacity: 0.5;
+            background-color: var(--ar-button-disabled-bg);
+            border-color: var(--ar-button-disabled-border);
+            color: var(--ar-button-disabled-color);
             cursor: not-allowed;
         }
 
@@ -912,14 +935,14 @@
     /* Alert */
     ar-alert {
         padding: 1rem;
-        border-radius: var(--ar-border-radius-xl);
+        border-radius: var(--ar-border-radius-lg);
         border-width: 1px;
         border-style: solid;
         column-gap: 0.75rem;
 
         /* Customisation */
         &::part(close-button) {
-            border-radius: var(--ar-border-radius-md);
+            border-radius: var(--ar-border-radius-sm);
             color: currentColor;
             background-color: color-mix(in srgb, currentColor 8%, transparent);
             opacity: 0.75;
@@ -1135,16 +1158,16 @@
         &::part(prev),
         &::part(next),
         &::part(select) {
-            border-radius: var(--ar-border-radius-lg);
+            border-radius: var(--ar-border-radius-md);
         }
 
         &[compact]::part(prev) {
-            border-radius: var(--ar-border-radius-xl) 0 0 var(--ar-border-radius-lg);
+            border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
             border-right: 1px solid var(--ar-color-neutral-80);
         }
 
         &[compact]::part(next) {
-            border-radius: 0 var(--ar-border-radius-xl) var(--ar-border-radius-lg) 0;
+            border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
         }
 
         /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
@@ -1299,13 +1322,29 @@
 
         &::part(track),
         &::part(bar) {
-            border-radius: 50rem;
+            border-radius: var(--ar-border-radius-full);
         }
     }
 
     ar-tab-group {
         &::part(tab-group) {
             gap: 0;
+        }
+
+        &.has-overflow-start:not(.has-overflow-end)::part(nav) {
+            mask-image: linear-gradient(to right, transparent, black 3rem);
+        }
+        &.has-overflow-end:not(.has-overflow-start)::part(nav) {
+            mask-image: linear-gradient(to left, transparent, black 3rem);
+        }
+        &.has-overflow-start.has-overflow-end::part(nav) {
+            mask-image: linear-gradient(
+                to right,
+                transparent,
+                black 3rem,
+                black calc(100% - 3rem),
+                transparent
+            );
         }
     }
 
@@ -1314,22 +1353,31 @@
         font-weight: var(--ar-font-weight-normal);
 
         &::part(tab) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: color 0.35s;
             color: var(--ar-color-text-muted);
             background: transparent;
         }
 
         &::part(tab--selected) {
-            color: var(--ar-color-interactive);
+            color: var(--ar-color-text);
+            font-weight: var(--ar-font-weight-bold);
             background: transparent;
         }
 
         &:hover:not([disabled]):not([active])::part(tab) {
             color: var(--ar-color-text);
-            background: var(--ar-color-bg-subtle);
+            background: transparent;
+            box-shadow: inset 0 -2px 0 var(--ar-color-text);
         }
     }
 
-    ar-tab[disabled] {
-        opacity: 0.5;
+    ar-tab[disabled]::part(tab) {
+        color: light-dark(
+            var(--ar-color-neutral-60),
+            color-mix(in oklab, var(--ar-color-vault), white 20%)
+        );
     }
 }
