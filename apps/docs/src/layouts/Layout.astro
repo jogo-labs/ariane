@@ -97,8 +97,8 @@ const {
                les titres sr-only de l'API (ComponentApi.astro), et les <section
                id> qui servent elles-mêmes de cible (Exemples, Playground,
                Référence API dans Playground.astro). */
-            :where(h2, h3, h4, section)[id] {
-                scroll-margin-top: calc(var(--doc-header-h) + 1rem);
+            :where(.heading-anchor, article, section, .section-title, .subsection-title)[id] {
+                scroll-margin-top: calc(var(--doc-header-h) + var(--doc-alpha-banner-h) + 1rem);
             }
 
             .narrative a {
