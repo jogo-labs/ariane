@@ -31,19 +31,28 @@ function isGroupCurrent(node: NavigationNode, mode: NavigationMode): boolean {
     );
 }
 
+type BulletState = 'current' | 'completed' | 'default';
+
 /** Compose la valeur `part=` d'un élément avec son rôle transverse et sa variante d'état "current" (convention BEM `--`). */
 function withCurrentPart(base: string, isCurrent: boolean, role: string): string {
     return isCurrent ? `${base} ${role} ${base}--current` : `${base} ${role}`;
 }
 
+/** Compose la valeur `part=` de la puce d'étape avec sa variante d'état (convention BEM `--`). */
+function withBulletStatePart(state: BulletState): string {
+    if (state === 'current') return 'bullet indicator bullet--current';
+    if (state === 'completed') return 'bullet indicator bullet--completed';
+    return 'bullet indicator';
+}
+
 function renderStepText(
     label: string,
     order: number,
-    isCurrent: boolean,
+    bulletState: BulletState,
     isSubstep: boolean,
     stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
-    const bulletPart = withCurrentPart('bullet', isCurrent, 'indicator');
+    const bulletPart = withBulletStatePart(bulletState);
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${stepLabel(order, isSubstep)}</span>
@@ -66,6 +75,7 @@ function renderSubStep(
     const isCurrent = sub.state === 'current';
     const isCompleted = sub.state === 'completed';
     const isEditMode = mode === 'edit';
+    const bulletState: BulletState = isCurrent ? 'current' : isCompleted ? 'completed' : 'default';
 
     return html`
         <li
@@ -73,24 +83,26 @@ function renderSubStep(
             part="substep"
             aria-current=${isCurrent ? 'step' : nothing}
         >
-            ${isCompleted || isEditMode
-                ? html`
-                      <a
-                          class="item-header"
-                          part=${withCurrentPart('step-link', isCurrent, 'control')}
-                          data-substep-order=${order}
-                          data-path=${sub.path}
-                          href=${sub.href ?? '#'}
-                          @click=${onClickLink}
-                      >
-                          ${renderStepText(sub.label, order, isCurrent, true, stepLabel)}
-                      </a>
-                  `
-                : html`
-                      <div class="item-header" data-path=${sub.path} tabindex="-1">
-                          ${renderStepText(sub.label, order, isCurrent, true, stepLabel)}
-                      </div>
-                  `}
+            ${
+                isCompleted || isEditMode
+                    ? html`
+                          <a
+                              class="item-header"
+                              part=${withCurrentPart('step-link', isCurrent, 'control')}
+                              data-substep-order=${order}
+                              data-path=${sub.path}
+                              href=${sub.href ?? '#'}
+                              @click=${onClickLink}
+                          >
+                              ${renderStepText(sub.label, order, bulletState, true, stepLabel)}
+                          </a>
+                      `
+                    : html`
+                          <div class="item-header" data-path=${sub.path} tabindex="-1">
+                              ${renderStepText(sub.label, order, bulletState, true, stepLabel)}
+                          </div>
+                      `
+            }
         </li>
     `;
 }
@@ -107,6 +119,11 @@ function renderStep(
     // Un parent complété dont le groupe est courant ne doit pas être rendu comme lien
     const isCompleted =
         (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !isCurrent);
+    const bulletState: BulletState = isCurrent
+        ? 'current'
+        : step.state === 'completed'
+          ? 'completed'
+          : 'default';
 
     return html`
         <li
@@ -114,32 +131,36 @@ function renderStep(
             part="step"
             aria-current=${isCurrent ? 'step' : nothing}
         >
-            ${isCompleted
-                ? html`
-                      <a
-                          class="item-header"
-                          part=${withCurrentPart('step-link', isCurrent, 'control')}
-                          data-path=${step.path}
-                          href=${step.href ?? '#'}
-                          @click=${onClickLink}
-                      >
-                          ${renderStepText(step.label, order, isCurrent, false, stepLabel)}
-                      </a>
-                  `
-                : html`
-                      <div class="item-header" data-path=${step.path} tabindex="-1">
-                          ${renderStepText(step.label, order, isCurrent, false, stepLabel)}
-                      </div>
-                  `}
-            ${(isCurrent || mode === 'edit') && step.children.length
-                ? html`
-                      <ol class="list-unstyled" part="list list--substep">
-                          ${step.children.map((sub, i) =>
+            ${
+                isCompleted
+                    ? html`
+                          <a
+                              class="item-header"
+                              part=${withCurrentPart('step-link', isCurrent, 'control')}
+                              data-path=${step.path}
+                              href=${step.href ?? '#'}
+                              @click=${onClickLink}
+                          >
+                              ${renderStepText(step.label, order, bulletState, false, stepLabel)}
+                          </a>
+                      `
+                    : html`
+                          <div class="item-header" data-path=${step.path} tabindex="-1">
+                              ${renderStepText(step.label, order, bulletState, false, stepLabel)}
+                          </div>
+                      `
+            }
+            ${
+                (isCurrent || mode === 'edit') && step.children.length
+                    ? html`
+                          <ol class="list-unstyled" part="list list--substep">
+                              ${step.children.map((sub, i) =>
                               renderSubStep(sub, i, mode, onClickLink, stepLabel),
                           )}
-                      </ol>
-                  `
-                : nothing}
+                          </ol>
+                      `
+                    : nothing
+            }
         </li>
     `;
 }
