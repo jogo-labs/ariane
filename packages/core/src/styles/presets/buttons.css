@@ -23,9 +23,9 @@
         padding: 0 var(--ar-button-padding-x);
         min-height: var(--ar-button-height);
         border: 1px solid transparent;
-        border-radius: var(--ar-button-border-radius-pill);
+        border-radius: var(--ar-button-border-radius);
         font-family: inherit;
-        font-size: var(--ar-font-size-md);
+        font-size: var(--ar-font-size-sm);
         font-weight: var(--ar-button-font-weight);
         line-height: 1;
         text-decoration: none;
@@ -34,73 +34,90 @@
             background-color var(--ar-button-transition-duration),
             color var(--ar-button-transition-duration),
             border-color var(--ar-button-transition-duration);
-    }
 
-    .ar-btn:disabled,
-    .ar-btn[aria-disabled='true'] {
-        background-color: var(--ar-button-disabled-bg) !important;
-        border-color: var(--ar-button-disabled-border) !important;
-        color: var(--ar-button-disabled-color) !important;
-        cursor: not-allowed;
-    }
+        &:disabled,
+        &[aria-disabled='true'] {
+            background-color: var(--ar-button-disabled-bg) !important;
+            border-color: var(--ar-button-disabled-border) !important;
+            color: var(--ar-button-disabled-color) !important;
+            cursor: not-allowed;
+        }
 
-    .ar-btn:focus-visible {
-        outline: 2px solid var(--ar-button-focus-ring-color);
-        outline-offset: 2px;
+        &:not(:disabled):not([aria-disabled='true']):active,
+        &:not(:disabled):not([aria-disabled='true'])[aria-expanded='true'] {
+            transform: scale(0.985);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--ar-button-focus-ring-color);
+            outline-offset: 2px;
+        }
     }
 
     .ar-btn-primary {
-        background-color: var(--ar-button-bg);
-        border-color: var(--ar-button-border-color);
-        color: var(--ar-button-color);
-    }
+        background-color: var(--ar-button-primary-bg);
+        border-color: var(--ar-button-primary-border-color);
+        color: var(--ar-button-primary-color);
 
-    .ar-btn-primary:not(:disabled):not([aria-disabled='true']):hover {
-        background-color: var(--ar-button-bg-hover);
-        border-color: var(--ar-button-bg-hover);
+        &:not(:disabled):not([aria-disabled='true']):hover {
+            background-color: var(--ar-button-primary-bg-hover);
+            border-color: var(--ar-button-primary-bg-hover);
+        }
+
+        &:not(:disabled):not([aria-disabled='true']):active {
+            background: var(--ar-button-primary-bg-active);
+            border-color: var(--ar-button-primary-bg-active);
+            color: light-dark(var(--ar-color-text), var(--ar-color-text-inverse));
+        }
     }
 
     .ar-btn-secondary {
         background-color: var(--ar-button-secondary-bg);
         border-color: var(--ar-color-border);
         color: var(--ar-color-text);
-    }
 
-    .ar-btn-secondary:not(:disabled):not([aria-disabled='true']):hover {
-        background-color: var(--ar-button-secondary-bg-hover);
-        color: var(--ar-color-white);
+        &:not(:disabled):not([aria-disabled='true']):hover {
+            border-color: var(--ar-button-secondary-border-hover);
+            background-color: var(--ar-button-secondary-bg-hover);
+        }
+
+        &:not(:disabled):not([aria-disabled='true']):active,
+        &:not(:disabled):not([aria-disabled='true'])[aria-expanded='true'] {
+            border-color: var(--ar-button-secondary-border-hover);
+            background-color: var(--ar-button-secondary-bg-hover);
+        }
     }
 
     .ar-btn-danger {
         background-color: var(--ar-button-danger-bg);
         border-color: var(--ar-button-danger-bg);
         color: var(--ar-button-danger-color);
-    }
 
-    /* Pas de token --ar-button-danger-bg-hover dédié (jamais consommé jusqu'ici,
-       cf. #200) : repli direct sur une valeur déjà publique de la palette brute,
-       plutôt qu'introduire un token dont le calibrage sera revu par #201. */
-    .ar-btn-danger:not(:disabled):not([aria-disabled='true']):hover {
-        background-color: var(--ar-color-danger-40);
-        border-color: var(--ar-color-danger-40);
+        /* Pas de token --ar-button-danger-bg-hover dédié (jamais consommé jusqu'ici,
+        cf. #200) : repli direct sur une valeur déjà publique de la palette brute,
+        plutôt qu'introduire un token dont le calibrage sera revu par #201. */
+        &:not(:disabled):not([aria-disabled='true']):hover {
+            background-color: var(--ar-color-danger-40);
+            border-color: var(--ar-color-danger-40);
+        }
     }
 
     .ar-btn-tertiary {
         background-color: var(--ar-button-tertiary-bg);
         border-color: transparent;
         color: var(--ar-color-text);
-    }
 
-    .ar-btn-tertiary:not(:disabled):not([aria-disabled='true']):hover {
-        background-color: var(--ar-button-tertiary-bg-hover);
-    }
+        &:not(:disabled):not([aria-disabled='true']):hover {
+            background-color: var(--ar-button-tertiary-bg-hover);
+        }
 
-    .ar-btn-tertiary:not(:disabled):not([aria-disabled='true']):active {
-        background-color: var(--ar-button-tertiary-bg-active);
-        box-shadow: inset var(--ar-button-tertiary-active-shadow);
-    }
+        &:not(:disabled):not([aria-disabled='true']):active {
+            background-color: var(--ar-button-tertiary-bg-active);
+            box-shadow: inset var(--ar-button-tertiary-active-shadow);
+        }
 
-    .ar-btn-tertiary:focus-visible {
-        background-color: var(--ar-button-tertiary-bg-focus);
+        &:focus-visible {
+            background-color: var(--ar-button-tertiary-bg-focus);
+        }
     }
 }
