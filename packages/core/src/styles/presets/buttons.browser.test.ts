@@ -60,12 +60,12 @@ describe('presets/buttons.css', () => {
 
     it('ar-btn-secondary consomme --ar-button-secondary-bg', () => {
         const btn = makeButton('ar-btn ar-btn-secondary');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(255, 255, 255)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(1 0 0)');
     });
 
     it('ar-btn-danger consomme --ar-button-danger-bg', () => {
         const btn = makeButton('ar-btn ar-btn-danger');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(208, 68, 66)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.5851 0.177 25.15)');
     });
 
     it('ar-btn-tertiary consomme --ar-button-tertiary-bg', () => {

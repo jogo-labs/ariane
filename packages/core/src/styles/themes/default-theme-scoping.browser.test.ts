@@ -6,7 +6,7 @@
  */
 import { expect } from '@open-wc/testing';
 
-const WHITE_RGB = 'rgb(255, 255, 255)';
+const WHITE_OKLCH = 'oklch(1 0 0)';
 const VAULT_OKLCH = 'oklch(0.2354 0.0334 273.44)';
 
 async function loadDefaultTheme(): Promise<HTMLLinkElement> {
@@ -66,10 +66,10 @@ describe('default.css — scoping de data-theme par bloc', () => {
         dark.appendChild(light);
 
         expect(probeBackground(dark)).to.equal(VAULT_OKLCH);
-        expect(probeBackground(light)).to.equal(WHITE_RGB);
+        expect(probeBackground(light)).to.equal(WHITE_OKLCH);
     });
 
     it('un conteneur sans data-theme reste au thème clair par défaut', () => {
-        expect(probeBackground(root)).to.equal(WHITE_RGB);
+        expect(probeBackground(root)).to.equal(WHITE_OKLCH);
     });
 });
