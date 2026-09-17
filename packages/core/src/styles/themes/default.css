@@ -261,9 +261,15 @@
             var(--ar-color-primary-20),
             var(--ar-color-primary-80)
         );
+        /* Inverse exact de --ar-color-interactive (primary-40/primary-70) plutôt qu'une
+           nuance dédiée : garantit un aplat visiblement distinct de "interactive" dans
+           chaque mode sans introduire de nouvelle teinte. primary-95/primary-20
+           (précédent) était quasi indiscernable du fond (1,11:1 / 1,26:1) — primary-70/
+           primary-40 reste ≥5:1 pour un texte foncé/clair dessus tout en étant
+           nettement visible sur la page (1,91:1 / 3,03:1). */
         --ar-color-interactive-subtle: light-dark(
-            var(--ar-color-primary-95),
-            var(--ar-color-primary-20)
+            var(--ar-color-primary-70),
+            var(--ar-color-primary-40)
         );
 
         /* Texte */
@@ -481,11 +487,17 @@
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
         --ar-stepper-label-color: var(--ar-color-text-muted);
-        --ar-stepper-bullet-color: var(--ar-color-text-inverse);
-        --ar-stepper-bullet-bg: var(--ar-color-interactive);
-        --ar-stepper-bullet-border-color: var(--ar-color-neutral-70);
+        /* Aplat pâle plutôt que --ar-color-interactive plein : la distinction
+           complétée/courante n'a pas besoin d'un fort contraste de couleur, le
+           texte gras + coloré de l'étape courante suffit à la signaler. */
+        --ar-stepper-bullet-color: var(--ar-color-text);
+        --ar-stepper-bullet-bg: var(--ar-color-interactive-subtle);
+        /* Primaire claire plutôt que neutre — reste ≥ 3:1 (WCAG 1.4.11, non-textuel)
+           sur blanc (3,96:1) comme sur Voûte (4,22:1) ; au-delà (primary-60+), ça
+           repasse sous 3:1 en clair. Valeur fixe (pas de light-dark()), comme l'était
+           déjà --ar-color-neutral-70 qu'elle remplace. */
+        --ar-stepper-bullet-border-color: var(--ar-color-primary-50);
         --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
-        --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
         --ar-stepper-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
         --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
@@ -938,25 +950,64 @@
             padding: 0.75rem;
         }
 
+        /* Texte cliquable en couleur neutre, pas ambre — seule la puce porte l'accent
+           (cf. #224/#225). text-decoration: none explicite (pas juste l'absence de
+           déclaration) : sans ça, le soulignement par défaut du user-agent sur <a> reste
+           actif et souffre du même bug de peinture "bande continue sur toute la largeur
+           du conteneur flex" que n'importe quelle règle d'auteur (cf. ::part(label--link)
+           plus bas) — le chiffre de la puce restait souligné même une fois la déclaration
+           d'auteur retirée, tant que le user-agent style n'était pas neutralisé. */
         &::part(step-link) {
-            color: var(--ar-color-interactive);
-            text-decoration: underline;
+            color: var(--ar-color-text);
+            text-decoration: none;
         }
 
         &::part(step-link):hover,
         &::part(step-link):focus {
             color: var(--ar-color-text-muted);
-            text-decoration: none;
         }
 
         &::part(step-link):focus {
             border-radius: 0.125rem;
         }
 
+        /* Sur ::part(label--link) — variante d'état exportée uniquement quand le label
+           est réellement dans un lien (le part `label` de base existe aussi pour les
+           étapes non cliquables, ex. l'étape courante non-lien) — plutôt que sur
+           ::part(step-link) directement : text-decoration posé sur un conteneur
+           display:flex (step-link) se peint comme une bande continue sur toute sa largeur,
+           en ignorant les text-decoration:none des enfants (vérifié y compris avec
+           !important et du texte réel, pas seulement le pseudo-élément du compteur) — un
+           bug de rendu, pas un souci de spécificité. Limite connue : pas de retrait au
+           survol/focus (chaîner ::part(step-link):hover ::part(label--link) est un
+           sélecteur CSS invalide, vérifié via CSS.supports) ; le soulignement reste donc
+           permanent, ce qui est un choix d'accessibilité défendable (identification du
+           lien non dépendante d'un état transitoire). */
+        &::part(label--link) {
+            text-decoration: underline;
+        }
+
+        /* Étape courante devenue lien (mode edit) : reste alignée sur le pairing
+           puce+label de l'état "courant" (gras + --ar-color-interactive, cf. règle interne
+           .current > .item-header), pas sur le traitement neutre des liens "complétés". */
         &::part(step-link--current) {
             color: var(--ar-color-interactive);
         }
 
+        /*
+         * Hiérarchie à 3 niveaux (cf. #224/#225) :
+         * - future (part="bullet" seul)   : puce creuse, bordure primaire claire —
+         *   --ar-stepper-bullet-border-color
+         * - complétée (bullet--completed) : aplat pâle --ar-color-interactive-subtle +
+         *   texte neutre, hérité du style interne générique de toute puce dans un
+         *   step-link (stepper.styles.ts), pas de règle dédiée ici. Contraste volontairement
+         *   relâché : le gras + la couleur du label "courant" suffisent à le distinguer,
+         *   la puce n'a pas besoin de porter seule cette distinction.
+         * - courante (bullet--current)    : aplat vif --ar-color-interactive +
+         *   --ar-color-text-inverse, seul état combinant puce ET label colorés/gras.
+         *   Règle explicite nécessaire car une étape courante non complétée n'est PAS
+         *   rendue comme step-link (simple <div>), donc n'hérite pas du style générique.
+         */
         &::part(bullet) {
             border-radius: var(--ar-border-radius-xl);
         }
@@ -965,6 +1016,21 @@
             background-color: var(--ar-color-interactive);
             color: var(--ar-color-text-inverse);
             box-shadow: none;
+        }
+
+        /* Cas mode="edit" uniquement : une étape courante peut aussi être un lien
+           (redevenir éditable). Un ::part() externe l'emporte toujours sur l'état
+           :hover/:focus interne de stepper.styles.ts pour le MÊME part — sans cette
+           règle dédiée, bullet--current resterait figé au survol/focus.
+           Limite connue : contrairement aux puces "complétées" (dont le survol réagit
+           n'importe où dans le lien, via une règle interne ancêtre), cette règle ne
+           réagit qu'au survol direct de la puce elle-même — CSS ne permet pas de
+           chaîner deux ::part() avec un combinateur (`::part(a) ::part(b)` est un
+           sélecteur invalide, vérifié via CSS.supports), donc impossible de cibler
+           "bullet--current dont l'ancêtre step-link est survolé" depuis le thème. */
+        &::part(bullet--current):is(:hover, :focus) {
+            background-color: var(--ar-stepper-bullet-hover-bg);
+            color: var(--ar-stepper-link-hover-bullet-text-color);
         }
     }
 
