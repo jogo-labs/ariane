@@ -163,12 +163,11 @@ describe('ArStepper', () => {
             expect(bulletB.getAttribute('part')).toBe('bullet indicator');
         });
 
-        it('rend le part d\'état "step-link--current" sur le lien de l\'étape de premier niveau courante en mode edit', async () => {
-            // isGroupCurrent() ne dépend plus du mode (correctif) : seul le groupe contenant
-            // réellement la sous-étape courante est marqué "courant" (aria-current + part
-            // d'état), même en mode edit — pas tous les groupes. C'est ce groupe-là (rendu
-            // comme lien en mode edit puisque son propre état est "completed" via le state
-            // engine) qui porte "step-link--current", pas les autres liens du même niveau.
+        it("ne rend jamais l'étape de premier niveau comme un lien quand une de ses sous-étapes est courante, même en mode edit", async () => {
+            // Miroir du mode create (déjà correct) : cliquer une étape sélectionne sa
+            // première sous-étape, donc une fois une sous-étape choisie, le label du
+            // parent n'est plus une destination de navigation — y compris en mode edit,
+            // où seule une étape SANS enfant courant reste cliquable.
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/2" mode="edit">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -181,8 +180,9 @@ describe('ArStepper', () => {
             const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
             expect(steps.length).toBe(2);
 
-            const linkA = requireQuery<HTMLElement>(steps[0]!, ':scope > a[part~="step-link"]');
-            expect(linkA.getAttribute('part')).toBe('step-link control step-link--current');
+            const headerA = requireQuery<HTMLElement>(steps[0]!, ':scope > .item-header');
+            expect(headerA.tagName).toBe('DIV');
+            expect(headerA.hasAttribute('part')).toBe(false);
             expect(steps[0]!.getAttribute('class')).toContain('current');
             expect(steps[0]!.getAttribute('aria-current')).toBe('step');
 

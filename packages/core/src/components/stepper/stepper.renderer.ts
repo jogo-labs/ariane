@@ -126,9 +126,12 @@ function renderStep(
 ): TemplateResult {
     const order = index + 1;
     const isCurrent = isGroupCurrent(step);
-    // Un parent complété dont le groupe est courant ne doit pas être rendu comme lien
+    // Un parent dont le groupe est courant (une de ses sous-étapes est sélectionnée) ne
+    // doit jamais être rendu comme lien, y compris en mode edit — miroir du mode create,
+    // où cliquer l'étape sélectionne déjà sa première sous-étape : une fois une sous-étape
+    // choisie, le label du parent n'est plus une destination de navigation à part entière.
     const isCompleted =
-        (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !isCurrent);
+        !isCurrent && (mode === 'edit' ? step.state !== 'current' : step.state === 'completed');
     const bulletState: BulletState = isCurrent
         ? 'current'
         : step.state === 'completed'
