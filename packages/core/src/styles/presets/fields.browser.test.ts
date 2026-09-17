@@ -58,14 +58,14 @@ describe('presets/fields.css', () => {
 
     it('ar-input consomme --ar-color-border', () => {
         const input = makeInput('input');
-        expect(getComputedStyle(input).borderColor).to.equal('rgb(230, 231, 236)');
+        expect(getComputedStyle(input).borderColor).to.equal('oklch(0.9286 0.002 90)');
     });
 
     it('ar-input consomme --ar-color-bg et --ar-color-text', () => {
         const input = makeInput('input');
         const style = getComputedStyle(input);
         expect(style.backgroundColor).to.equal('rgb(255, 255, 255)');
-        expect(style.color).to.equal('rgb(46, 46, 49)');
+        expect(style.color).to.equal('oklch(0.2982 0.002 90)');
     });
 
     it('textarea.ar-input applique resize:vertical', () => {
@@ -81,7 +81,7 @@ describe('presets/fields.css', () => {
 
     it('ar-label consomme --ar-color-text par défaut', () => {
         const label = makeLabel();
-        expect(getComputedStyle(label).color).to.equal('rgb(46, 46, 49)');
+        expect(getComputedStyle(label).color).to.equal('oklch(0.2982 0.002 90)');
     });
 
     it("ar-label[data-ar-char-state='warning'] consomme --ar-color-warning-text", () => {

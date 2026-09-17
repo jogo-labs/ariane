@@ -7,7 +7,7 @@
 import { expect } from '@open-wc/testing';
 
 const WHITE_RGB = 'rgb(255, 255, 255)';
-const NEUTRAL_10_RGB = 'rgb(23, 23, 23)';
+const VAULT_OKLCH = 'oklch(0.2354 0.0334 273.44)';
 
 async function loadDefaultTheme(): Promise<HTMLLinkElement> {
     const link = document.createElement('link');
@@ -53,7 +53,7 @@ describe('default.css — scoping de data-theme par bloc', () => {
         dark.setAttribute('data-theme', 'dark');
         root.appendChild(dark);
 
-        expect(probeBackground(dark)).to.equal(NEUTRAL_10_RGB);
+        expect(probeBackground(dark)).to.equal(VAULT_OKLCH);
     });
 
     it("permet de forcer le thème clair dans un sous-arbre d'un ancêtre en dark", () => {
@@ -65,7 +65,7 @@ describe('default.css — scoping de data-theme par bloc', () => {
         light.setAttribute('data-theme', 'light');
         dark.appendChild(light);
 
-        expect(probeBackground(dark)).to.equal(NEUTRAL_10_RGB);
+        expect(probeBackground(dark)).to.equal(VAULT_OKLCH);
         expect(probeBackground(light)).to.equal(WHITE_RGB);
     });
 
