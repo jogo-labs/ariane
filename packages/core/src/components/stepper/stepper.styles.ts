@@ -34,6 +34,15 @@ export default css`
         counter-reset: step;
     }
 
+    /* [part='list'] (égalité stricte) ne matche pas "list list--substep" (deux tokens) :
+       sans ce reset dédié, la liste de sous-étapes hériterait du compteur "step" du
+       parent au lieu de repartir de zéro, faisant sauter la numérotation des étapes
+       principales suivantes (leur puce affiche counter(step), même si celle des
+       sous-étapes ne l'affiche pas — cf. règle content: '' plus bas). */
+    [part~='list--substep'] {
+        counter-reset: step;
+    }
+
     .item-header {
         display: inline-flex;
         counter-increment: step;
