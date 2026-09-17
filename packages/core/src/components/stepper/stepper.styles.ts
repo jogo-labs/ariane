@@ -60,7 +60,6 @@ export default css`
         display: flex;
         flex-shrink: 0;
         justify-content: center;
-        padding-bottom: 0.125rem;
         margin-inline-end: 0.5rem;
         transform: translateY(1px);
         box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
