@@ -53,19 +53,19 @@ describe('presets/buttons.css', () => {
         expect(getComputedStyle(btn).borderColor).to.equal('rgba(0, 0, 0, 0)');
     });
 
-    it('ar-btn-primary consomme --ar-button-bg', () => {
+    it('ar-btn-primary consomme --ar-button-primary-bg', () => {
         const btn = makeButton('ar-btn ar-btn-primary');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(40, 50, 118)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.8016 0.1705 73.27)');
     });
 
     it('ar-btn-secondary consomme --ar-button-secondary-bg', () => {
         const btn = makeButton('ar-btn ar-btn-secondary');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(255, 255, 255)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(1 0 0)');
     });
 
     it('ar-btn-danger consomme --ar-button-danger-bg', () => {
         const btn = makeButton('ar-btn ar-btn-danger');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(208, 68, 66)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.5851 0.177 25.15)');
     });
 
     it('ar-btn-tertiary consomme --ar-button-tertiary-bg', () => {
@@ -76,11 +76,15 @@ describe('presets/buttons.css', () => {
     it('un bouton disabled applique --ar-button-disabled-bg quelle que soit la variante', () => {
         const btn = makeButton('ar-btn ar-btn-primary');
         btn.disabled = true;
-        expect(getComputedStyle(btn).backgroundColor).to.equal('rgb(230, 231, 236)');
+        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.9286 0.002 90)');
     });
 
     // :hover ne peut pas être forcé de façon fiable en JS pur (pas de vrai pointeur) —
-    // on inspecte donc la règle CSS elle-même plutôt que le style calculé.
+    // on inspecte donc la règle CSS elle-même plutôt que le style calculé. Avec le CSS
+    // nesting natif (`&:hover { ... }`), le selectorText de la règle imbriquée ne
+    // contient que le fragment relatif ("&:not(...):hover"), pas le sélecteur parent —
+    // on localise donc d'abord la règle parente exacte (selectorFragment), puis on
+    // cherche ":hover" uniquement parmi ses propres enfants imbriqués.
     function* walkRules(rules: CSSRuleList): Generator<CSSRule> {
         for (const rule of rules) {
             yield rule;
@@ -91,21 +95,24 @@ describe('presets/buttons.css', () => {
     function findHoverRule(selectorFragment: string): CSSStyleRule | undefined {
         for (const sheet of document.styleSheets) {
             for (const rule of walkRules(sheet.cssRules)) {
-                if (
-                    rule instanceof CSSStyleRule &&
-                    rule.selectorText.includes(selectorFragment) &&
-                    rule.selectorText.includes(':hover')
-                ) {
-                    return rule;
+                if (rule instanceof CSSStyleRule && rule.selectorText === selectorFragment) {
+                    for (const child of rule.cssRules ?? []) {
+                        if (
+                            child instanceof CSSStyleRule &&
+                            child.selectorText.includes(':hover')
+                        ) {
+                            return child;
+                        }
+                    }
                 }
             }
         }
         return undefined;
     }
 
-    it('ar-btn-secondary:hover repasse le texte en clair (fond gris moyen, sinon illisible)', () => {
+    it("ar-btn-secondary:hover garde le texte neutre (fond pâle --ar-color-bg-subtle, pas besoin d'inverser la couleur)", () => {
         const rule = findHoverRule('.ar-btn-secondary');
         expect(rule).to.not.equal(undefined, 'règle .ar-btn-secondary:hover introuvable');
-        expect(rule?.style.color).to.equal('var(--ar-color-white)');
+        expect(rule?.style.color).to.equal('');
     });
 });

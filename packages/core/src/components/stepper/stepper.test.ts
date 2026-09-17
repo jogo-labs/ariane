@@ -128,10 +128,9 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
             const link = shadow(el).querySelector('a[part~="step-link"]');
-            // En mode edit, isGroupCurrent() rend "isCurrent" toujours vrai pour un step top-level
-            // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
-            // step-link--current — cf. le test dédié plus bas pour la variante "non courante".
-            expect(link?.getAttribute('part')).toContain('step-link');
+            // Étape A n'est pas courante (B l'est) : le mode edit la rend cliquable
+            // (step.state !== 'current').
+            expect(link?.getAttribute('part')).toBe('step-link control');
             const currentItemInner = shadow(el).querySelector('div.item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });
@@ -163,13 +162,36 @@ describe('ArStepper', () => {
             expect(bulletB.getAttribute('part')).toBe('bullet indicator');
         });
 
-        it('rend le part d\'état "step-link--current" sur le lien de la sous-étape courante en mode edit', async () => {
-            // Au niveau top-level, isGroupCurrent() rend "isCurrent" toujours vrai en mode edit
-            // (tous les groupes sont navigables) : impossible d'y observer un lien "courant" vs
-            // "non courant" côte à côte. Au niveau sous-étape, sub.state === 'current' est un
-            // état littéral par sous-étape : c'est le seul niveau où deux liens rendus
-            // simultanément peuvent différer sur ce part d'état — exactement le scénario visé
-            // par le correctif (plusieurs liens courants simultanément en mode edit).
+        it("ne rend jamais l'étape de premier niveau comme un lien quand une de ses sous-étapes est courante, même en mode edit", async () => {
+            // Miroir du mode create (déjà correct) : cliquer une étape sélectionne sa
+            // première sous-étape, donc une fois une sous-étape choisie, le label du
+            // parent n'est plus une destination de navigation — y compris en mode edit,
+            // où seule une étape SANS enfant courant reste cliquable.
+            const el = await fixtureWithItems(`
+                        <ar-stepper current-path="/a/2" mode="edit">
+                            <ar-stepper-item path="/a" label="Étape A">
+                                <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                                <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                            </ar-stepper-item>
+                            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                        </ar-stepper>
+                    `);
+            const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
+            expect(steps.length).toBe(2);
+
+            const headerA = requireQuery<HTMLElement>(steps[0]!, ':scope > .item-header');
+            expect(headerA.tagName).toBe('DIV');
+            expect(headerA.hasAttribute('part')).toBe(false);
+            expect(steps[0]!.getAttribute('class')).toContain('current');
+            expect(steps[0]!.getAttribute('aria-current')).toBe('step');
+
+            const linkB = requireQuery<HTMLElement>(steps[1]!, ':scope > a[part~="step-link"]');
+            expect(linkB.getAttribute('part')).toBe('step-link control');
+            expect(steps[1]!.getAttribute('class')).not.toContain('current');
+            expect(steps[1]!.getAttribute('aria-current')).toBeNull();
+        });
+
+        it('ne rend jamais la sous-étape courante comme un lien, même en mode edit', async () => {
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/2" mode="edit">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -178,13 +200,14 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const links = shadow(el).querySelectorAll('li[part~="substep"] a[part~="step-link"]');
-            expect(links.length).toBe(2);
-
-            const link1 = [...links].find((l) => l.getAttribute('data-path') === '/a/1');
-            const link2 = [...links].find((l) => l.getAttribute('data-path') === '/a/2');
-            expect(link1?.getAttribute('part')).toBe('step-link control');
-            expect(link2?.getAttribute('part')).toBe('step-link control step-link--current');
+            const substeps = shadow(el).querySelectorAll('li[part~="substep"]');
+            const currentSubstep = [...substeps].find(
+                (li) => li.querySelector('[data-path="/a/2"]') !== null,
+            );
+            expect(currentSubstep).toBeDefined();
+            expect(currentSubstep!.querySelector('a[part~="step-link"]')).toBeNull();
+            const header = requireQuery<HTMLElement>(currentSubstep!, '.item-header');
+            expect(header.tagName).toBe('DIV');
         });
 
         it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {

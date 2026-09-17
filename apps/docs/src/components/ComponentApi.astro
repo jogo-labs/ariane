@@ -337,34 +337,15 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
 
     .api-tabs {
         display: block;
-        --ar-tab-padding-x: .75rem;
-        --ar-tab-active-shadow: inset 0 -2px 0 var(--doc-ember);
+        --ar-tab-padding-x: .9rem;
 
-        ar-tab::part(tab) {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--doc-text-muted);
-            font-size: var(--doc-font-size-sm);
-            transition: color .35s var(--doc-ease)
-        }
-
-        ar-tab:not([active]):hover::part(tab),
         ar-tab:not([active]):hover .api-tab-count {
             color: var(--doc-text);
-            background: transparent;
-            --ar-tab-active-shadow: inset 0 -2px 0 var(--doc-text);
-        }
-
-        ar-tab::part(tab--selected) {
-            color: var(--doc-text);
-            font-weight: var(--doc-font-weight-bold);
         }
     }
 
-    .import-tabs ar-tab .badge {
-        margin-inline-start: 0.5rem;
-        transform: scale(0.85);
+    .import-tabs {
+        --ar-tab-padding-x: 2rem;
     }
 
     /* doc-code-block.css ne pose volontairement aucun border-radius sur

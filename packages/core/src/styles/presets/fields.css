@@ -30,27 +30,37 @@
         font-family: inherit;
         font-size: var(--ar-input-font-size);
         transition: border-color 0.15s;
+
+        &:focus-visible {
+            outline: 2px solid var(--ar-input-focus-ring-color);
+            outline-offset: 1px;
+        }
+
+        &:read-only {
+            background: var(--ar-input-readonly-bg);
+            cursor: default;
+        }
+
+        &[aria-disabled],
+        &:disabled {
+            cursor: not-allowed;
+            color: var(--ar-input-disabled-color);
+            background-color: var(--ar-input-disabled-bg);
+        }
+
+        &[aria-disabled] {
+            pointer-events: none;
+        }
+
+        &[aria-invalid='true'] {
+            border-color: var(--ar-color-danger-text);
+            color: var(--ar-color-danger-text);
+        }
     }
 
     textarea.ar-input {
         min-height: 4.5rem;
         resize: vertical;
-    }
-
-    .ar-input:focus-visible {
-        outline: 2px solid var(--ar-input-focus-ring-color);
-        outline-offset: 1px;
-    }
-
-    .ar-input:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background-color: var(--ar-input-disabled-bg);
-    }
-
-    .ar-input[aria-invalid='true'] {
-        border-color: var(--ar-color-danger-text);
-        color: var(--ar-color-danger-text);
     }
 
     .ar-label {

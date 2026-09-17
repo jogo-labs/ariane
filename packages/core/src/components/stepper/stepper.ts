@@ -62,9 +62,10 @@ export interface ArStepperStepChangeDetail {
  * @csspart control      - Porté par `step-link` : élément interactif générique.
  * @csspart bullet       - La puce numérotée d'une étape.
  * @csspart indicator    - Porté par `bullet` : marqueur/indicateur visuel.
+ * @csspart label        - Le texte du label d'une étape.
+ * @csspart label--link  - Le texte du label d'une étape cliquable (variante d'état de `label`).
  * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
  * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
- * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
@@ -79,7 +80,6 @@ export interface ArStepperStepChangeDetail {
  * @cssprop --ar-stepper-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
- * @cssprop --ar-stepper-link-hover-bullet-color - Couleur de la puce du lien d'étape au survol/focus (cascade vers --ar-color-interactive).
  * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).
  * @cssprop --ar-stepper-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
