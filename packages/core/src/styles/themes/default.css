@@ -261,14 +261,14 @@
             var(--ar-color-primary-20),
             var(--ar-color-primary-80)
         );
-        /* Inverse exact de --ar-color-interactive (primary-40/primary-70) plutôt qu'une
-           nuance dédiée : garantit un aplat visiblement distinct de "interactive" dans
-           chaque mode sans introduire de nouvelle teinte. primary-95/primary-20
-           (précédent) était quasi indiscernable du fond (1,11:1 / 1,26:1) — primary-70/
-           primary-40 reste ≥5:1 pour un texte foncé/clair dessus tout en étant
-           nettement visible sur la page (1,91:1 / 3,03:1). */
+        /* Proche de l'inverse de --ar-color-interactive (primary-40/primary-70), ajusté
+           d'un cran (primary-60 plutôt que 70 en clair) pour plus de visibilité : garantit
+           un aplat distinct de "interactive" sans introduire de nouvelle teinte.
+           primary-95/primary-20 (précédent) était quasi indiscernable du fond (1,11:1 /
+           1,26:1) — primary-60/primary-40 reste ≥5:1 pour un texte foncé/clair dessus tout
+           en étant nettement plus visible sur la page (2,69:1 / 3,03:1). */
         --ar-color-interactive-subtle: light-dark(
-            var(--ar-color-primary-70),
+            var(--ar-color-primary-60),
             var(--ar-color-primary-40)
         );
 
