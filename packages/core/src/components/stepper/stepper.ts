@@ -63,6 +63,7 @@ export interface ArStepperStepChangeDetail {
  * @csspart bullet       - La puce numérotée d'une étape.
  * @csspart indicator    - Porté par `bullet` : marqueur/indicateur visuel.
  * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
+ * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
  * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
