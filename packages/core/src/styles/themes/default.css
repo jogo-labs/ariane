@@ -987,13 +987,6 @@
             text-decoration: underline;
         }
 
-        /* Étape courante devenue lien (mode edit) : reste alignée sur le pairing
-           puce+label de l'état "courant" (gras + --ar-color-interactive, cf. règle interne
-           .current > .item-header), pas sur le traitement neutre des liens "complétés". */
-        &::part(step-link--current) {
-            color: var(--ar-color-interactive);
-        }
-
         /*
          * Hiérarchie à 3 niveaux (cf. #224/#225) :
          * - future (part="bullet" seul)   : puce creuse, bordure primaire claire —
@@ -1004,9 +997,11 @@
          *   relâché : le gras + la couleur du label "courant" suffisent à le distinguer,
          *   la puce n'a pas besoin de porter seule cette distinction.
          * - courante (bullet--current)    : aplat vif --ar-color-interactive +
-         *   --ar-color-text-inverse, seul état combinant puce ET label colorés/gras.
-         *   Règle explicite nécessaire car une étape courante non complétée n'est PAS
-         *   rendue comme step-link (simple <div>), donc n'hérite pas du style générique.
+         *   --ar-color-text-inverse, seul état combinant puce ET label colorés/gras. Une
+         *   étape courante n'est jamais rendue comme step-link (toujours un <div>, y
+         *   compris en mode edit — cf. renderStep), donc bullet--current n'a jamais de
+         *   règle :hover/:focus : rien n'y est cliquable, un retour visuel au survol
+         *   serait trompeur.
          */
         &::part(bullet) {
             border-radius: var(--ar-border-radius-xl);
@@ -1016,21 +1011,6 @@
             background-color: var(--ar-color-interactive);
             color: var(--ar-color-text-inverse);
             box-shadow: none;
-        }
-
-        /* Cas mode="edit" uniquement : une étape courante peut aussi être un lien
-           (redevenir éditable). Un ::part() externe l'emporte toujours sur l'état
-           :hover/:focus interne de stepper.styles.ts pour le MÊME part — sans cette
-           règle dédiée, bullet--current resterait figé au survol/focus.
-           Limite connue : contrairement aux puces "complétées" (dont le survol réagit
-           n'importe où dans le lien, via une règle interne ancêtre), cette règle ne
-           réagit qu'au survol direct de la puce elle-même — CSS ne permet pas de
-           chaîner deux ::part() avec un combinateur (`::part(a) ::part(b)` est un
-           sélecteur invalide, vérifié via CSS.supports), donc impossible de cibler
-           "bullet--current dont l'ancêtre step-link est survolé" depuis le thème. */
-        &::part(bullet--current):is(:hover, :focus) {
-            background-color: var(--ar-stepper-bullet-hover-bg);
-            color: var(--ar-stepper-link-hover-bullet-text-color);
         }
     }
 

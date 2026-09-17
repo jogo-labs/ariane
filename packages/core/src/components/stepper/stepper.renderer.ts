@@ -34,11 +34,6 @@ function isGroupCurrent(node: NavigationNode): boolean {
 
 type BulletState = 'current' | 'completed' | 'default';
 
-/** Compose la valeur `part=` d'un élément avec son rôle transverse et sa variante d'état "current" (convention BEM `--`). */
-function withCurrentPart(base: string, isCurrent: boolean, role: string): string {
-    return isCurrent ? `${base} ${role} ${base}--current` : `${base} ${role}`;
-}
-
 /** Compose la valeur `part=` de la puce d'étape avec sa variante d'état (convention BEM `--`). */
 function withBulletStatePart(state: BulletState): string {
     if (state === 'current') return 'bullet indicator bullet--current';
@@ -98,7 +93,7 @@ function renderSubStep(
                     ? html`
                           <a
                               class="item-header"
-                              part=${withCurrentPart('step-link', isCurrent, 'control')}
+                              part="step-link control"
                               data-substep-order=${order}
                               data-path=${sub.path}
                               href=${sub.href ?? '#'}
@@ -149,7 +144,7 @@ function renderStep(
                     ? html`
                           <a
                               class="item-header"
-                              part=${withCurrentPart('step-link', isCurrent, 'control')}
+                              part="step-link control"
                               data-path=${step.path}
                               href=${step.href ?? '#'}
                               @click=${onClickLink}

@@ -129,9 +129,8 @@ describe('ArStepper', () => {
             `);
             const link = shadow(el).querySelector('a[part~="step-link"]');
             // Étape A n'est pas courante (B l'est) : le mode edit la rend cliquable
-            // (step.state !== 'current'), mais son lien ne porte pas step-link--current —
-            // cf. le test dédié plus bas pour cette variante d'état.
-            expect(link?.getAttribute('part')).toContain('step-link');
+            // (step.state !== 'current').
+            expect(link?.getAttribute('part')).toBe('step-link control');
             const currentItemInner = shadow(el).querySelector('div.item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
         });

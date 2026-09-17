@@ -66,7 +66,6 @@ export interface ArStepperStepChangeDetail {
  * @csspart label--link  - Le texte du label d'une étape cliquable (variante d'état de `label`).
  * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
  * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
- * @csspart step-link--current - Le lien de l'étape courante (variante d'état de `step-link`).
  * @csspart trigger      - Le bouton d'ouverture du panel mobile.
  * @csspart panel        - Le panel mobile flottant.
  *
