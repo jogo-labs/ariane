@@ -23,12 +23,13 @@ export interface MobileRenderContext {
 // Un groupe est "courant" si lui-même OU l'un de ses enfants l'est.
 // Le state engine aplatit les noeuds en DFS et marque le parent 'completed'
 // dès qu'un enfant est current → on ne peut pas se fier uniquement à step.state.
-function isGroupCurrent(node: NavigationNode, mode: NavigationMode): boolean {
-    return (
-        node.state === 'current' ||
-        mode === 'edit' ||
-        node.children.some((child) => child.state === 'current')
-    );
+// Ne dépend PAS du mode : l'expansion des sous-étapes en mode edit (cf. appel
+// séparé `isCurrent || mode === 'edit'` dans renderStep) est une préoccupation
+// distincte du statut "courant" — les confondre ici marquait TOUS les groupes
+// comme courants (aria-current + gras/primaire) en mode edit, pas seulement
+// celui contenant réellement la sous-étape courante.
+function isGroupCurrent(node: NavigationNode): boolean {
+    return node.state === 'current' || node.children.some((child) => child.state === 'current');
 }
 
 type BulletState = 'current' | 'completed' | 'default';
@@ -50,13 +51,19 @@ function renderStepText(
     order: number,
     bulletState: BulletState,
     isSubstep: boolean,
+    isLink: boolean,
     stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const bulletPart = withBulletStatePart(bulletState);
+    // Variante d'état dédiée (pas juste "label") : le thème ne peut pas cibler
+    // "label à l'intérieur d'un step-link" via ::part() (chaîner deux ::part()
+    // avec un combinateur est un sélecteur invalide) — nécessaire pour ne
+    // souligner le texte que lorsqu'il s'agit réellement d'un lien.
+    const labelPart = isLink ? 'label label--link' : 'label';
     return html`
         <span part=${bulletPart} aria-hidden="true"></span>
         <span class="sr-only">${stepLabel(order, isSubstep)}</span>
-        <span class="item-label">${label}</span>
+        <span class="item-label" part=${labelPart}>${label}</span>
     `;
 }
 
@@ -74,7 +81,10 @@ function renderSubStep(
     const order = index + 1;
     const isCurrent = sub.state === 'current';
     const isCompleted = sub.state === 'completed';
-    const isEditMode = mode === 'edit';
+    // La sous-étape courante ne doit jamais être un lien, y compris en mode edit
+    // (on ne navigue pas vers la page où l'on se trouve déjà) — miroir de la
+    // même exclusion déjà appliquée à l'étape de premier niveau (renderStep).
+    const isEditableLink = mode === 'edit' && !isCurrent;
     const bulletState: BulletState = isCurrent ? 'current' : isCompleted ? 'completed' : 'default';
 
     return html`
@@ -84,7 +94,7 @@ function renderSubStep(
             aria-current=${isCurrent ? 'step' : nothing}
         >
             ${
-                isCompleted || isEditMode
+                isCompleted || isEditableLink
                     ? html`
                           <a
                               class="item-header"
@@ -94,12 +104,12 @@ function renderSubStep(
                               href=${sub.href ?? '#'}
                               @click=${onClickLink}
                           >
-                              ${renderStepText(sub.label, order, bulletState, true, stepLabel)}
+                              ${renderStepText(sub.label, order, bulletState, true, true, stepLabel)}
                           </a>
                       `
                     : html`
                           <div class="item-header" data-path=${sub.path} tabindex="-1">
-                              ${renderStepText(sub.label, order, bulletState, true, stepLabel)}
+                              ${renderStepText(sub.label, order, bulletState, true, false, stepLabel)}
                           </div>
                       `
             }
@@ -115,7 +125,7 @@ function renderStep(
     stepLabel: (order: number, isSubstep: boolean) => string,
 ): TemplateResult {
     const order = index + 1;
-    const isCurrent = isGroupCurrent(step, mode);
+    const isCurrent = isGroupCurrent(step);
     // Un parent complété dont le groupe est courant ne doit pas être rendu comme lien
     const isCompleted =
         (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !isCurrent);
@@ -141,12 +151,12 @@ function renderStep(
                               href=${step.href ?? '#'}
                               @click=${onClickLink}
                           >
-                              ${renderStepText(step.label, order, bulletState, false, stepLabel)}
+                              ${renderStepText(step.label, order, bulletState, false, true, stepLabel)}
                           </a>
                       `
                     : html`
                           <div class="item-header" data-path=${step.path} tabindex="-1">
-                              ${renderStepText(step.label, order, bulletState, false, stepLabel)}
+                              ${renderStepText(step.label, order, bulletState, false, false, stepLabel)}
                           </div>
                       `
             }
@@ -155,8 +165,8 @@ function renderStep(
                     ? html`
                           <ol class="list-unstyled" part="list list--substep">
                               ${step.children.map((sub, i) =>
-                              renderSubStep(sub, i, mode, onClickLink, stepLabel),
-                          )}
+                                  renderSubStep(sub, i, mode, onClickLink, stepLabel),
+                              )}
                           </ol>
                       `
                     : nothing

@@ -73,6 +73,10 @@ export default css`
 
     [part~='bullet']:before {
         content: counter(step);
+        /* Les pseudo-éléments n'héritent pas toujours de façon fiable le
+           text-decoration: none posé sur [part~='bullet'] (cf. commentaire
+           ci-dessus) — le chiffre lui-même ne doit jamais être souligné. */
+        text-decoration: none;
     }
 
     .item {
@@ -82,22 +86,16 @@ export default css`
         align-items: flex-start;
     }
 
-    [part~='step-link'] {
-        &:is(:focus, :hover) {
-            &:before {
-                background-color: var(--ar-stepper-link-hover-bullet-color);
-            }
+    /* S'applique à toute puce (étape ou sous-étape) dans un lien survolé/focus —
+       même mécanisme pour les deux niveaux, aucun traitement spécifique au niveau. */
+    [part~='step-link']:is(:hover, :focus) [part~='bullet'] {
+        color: var(--ar-stepper-link-hover-bullet-text-color);
+        background-color: var(--ar-stepper-bullet-hover-bg);
+        box-shadow: none;
+    }
 
-            .item-label {
-                color: var(--ar-stepper-link-hover-label-color);
-            }
-
-            [part~='bullet'] {
-                color: var(--ar-stepper-link-hover-bullet-text-color);
-                background-color: var(--ar-stepper-bullet-hover-bg);
-                box-shadow: none;
-            }
-        }
+    [part~='step-link']:is(:hover, :focus) .item-label {
+        color: var(--ar-stepper-link-hover-label-color);
     }
 
     .item-header:focus-visible {
@@ -118,6 +116,7 @@ export default css`
     [part~='step-link'] [part~='bullet'] {
         color: var(--ar-stepper-bullet-color);
         background-color: var(--ar-stepper-bullet-bg);
+        box-shadow: none;
     }
 
     [part='step']:after {

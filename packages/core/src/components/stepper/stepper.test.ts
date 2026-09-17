@@ -163,13 +163,36 @@ describe('ArStepper', () => {
             expect(bulletB.getAttribute('part')).toBe('bullet indicator');
         });
 
-        it('rend le part d\'état "step-link--current" sur le lien de la sous-étape courante en mode edit', async () => {
-            // Au niveau top-level, isGroupCurrent() rend "isCurrent" toujours vrai en mode edit
-            // (tous les groupes sont navigables) : impossible d'y observer un lien "courant" vs
-            // "non courant" côte à côte. Au niveau sous-étape, sub.state === 'current' est un
-            // état littéral par sous-étape : c'est le seul niveau où deux liens rendus
-            // simultanément peuvent différer sur ce part d'état — exactement le scénario visé
-            // par le correctif (plusieurs liens courants simultanément en mode edit).
+        it('rend le part d\'état "step-link--current" sur le lien de l\'étape de premier niveau courante en mode edit', async () => {
+            // isGroupCurrent() ne dépend plus du mode (correctif) : seul le groupe contenant
+            // réellement la sous-étape courante est marqué "courant" (aria-current + part
+            // d'état), même en mode edit — pas tous les groupes. C'est ce groupe-là (rendu
+            // comme lien en mode edit puisque son propre état est "completed" via le state
+            // engine) qui porte "step-link--current", pas les autres liens du même niveau.
+            const el = await fixtureWithItems(`
+                        <ar-stepper current-path="/a/2" mode="edit">
+                            <ar-stepper-item path="/a" label="Étape A">
+                                <ar-stepper-item path="/a/1" label="Sous-étape 1"></ar-stepper-item>
+                                <ar-stepper-item path="/a/2" label="Sous-étape 2"></ar-stepper-item>
+                            </ar-stepper-item>
+                            <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                        </ar-stepper>
+                    `);
+            const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
+            expect(steps.length).toBe(2);
+
+            const linkA = requireQuery<HTMLElement>(steps[0]!, ':scope > a[part~="step-link"]');
+            expect(linkA.getAttribute('part')).toBe('step-link control step-link--current');
+            expect(steps[0]!.getAttribute('class')).toContain('current');
+            expect(steps[0]!.getAttribute('aria-current')).toBe('step');
+
+            const linkB = requireQuery<HTMLElement>(steps[1]!, ':scope > a[part~="step-link"]');
+            expect(linkB.getAttribute('part')).toBe('step-link control');
+            expect(steps[1]!.getAttribute('class')).not.toContain('current');
+            expect(steps[1]!.getAttribute('aria-current')).toBeNull();
+        });
+
+        it('ne rend jamais la sous-étape courante comme un lien, même en mode edit', async () => {
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/2" mode="edit">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -178,13 +201,14 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const links = shadow(el).querySelectorAll('li[part~="substep"] a[part~="step-link"]');
-            expect(links.length).toBe(2);
-
-            const link1 = [...links].find((l) => l.getAttribute('data-path') === '/a/1');
-            const link2 = [...links].find((l) => l.getAttribute('data-path') === '/a/2');
-            expect(link1?.getAttribute('part')).toBe('step-link control');
-            expect(link2?.getAttribute('part')).toBe('step-link control step-link--current');
+            const substeps = shadow(el).querySelectorAll('li[part~="substep"]');
+            const currentSubstep = [...substeps].find(
+                (li) => li.querySelector('[data-path="/a/2"]') !== null,
+            );
+            expect(currentSubstep).toBeDefined();
+            expect(currentSubstep!.querySelector('a[part~="step-link"]')).toBeNull();
+            const header = requireQuery<HTMLElement>(currentSubstep!, '.item-header');
+            expect(header.tagName).toBe('DIV');
         });
 
         it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {
