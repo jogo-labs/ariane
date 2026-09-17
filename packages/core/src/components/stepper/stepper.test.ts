@@ -128,9 +128,9 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
             const link = shadow(el).querySelector('a[part~="step-link"]');
-            // En mode edit, isGroupCurrent() rend "isCurrent" toujours vrai pour un step top-level
-            // (tous les groupes sont navigables) : le lien porte donc aussi le part d'état
-            // step-link--current — cf. le test dédié plus bas pour la variante "non courante".
+            // Étape A n'est pas courante (B l'est) : le mode edit la rend cliquable
+            // (step.state !== 'current'), mais son lien ne porte pas step-link--current —
+            // cf. le test dédié plus bas pour cette variante d'état.
             expect(link?.getAttribute('part')).toContain('step-link');
             const currentItemInner = shadow(el).querySelector('div.item-header');
             expect(currentItemInner?.hasAttribute('part')).toBe(false);
