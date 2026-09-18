@@ -46,6 +46,16 @@ retenue — consignées ici pour ne pas les retenter :
   observé par un listener délégué situé en dehors de cette frontière — `event.target.closest('a')`
   renvoie `null`. Le mécanisme de clic actuel (délégation + `closest`) ne survit pas tel quel à
   l'ajout d'un shadow DOM sur `ar-stepper-item`, quelle que soit l'option retenue par ailleurs.
+- **`::part()` ne matche jamais un attribut `part` posé sur un élément projeté via `<slot>`**
+  (testé Chromium + WebKit) — seuls les éléments littéralement à l'intérieur du template du shadow
+  DOM interrogé sont éligibles. Conséquence directe sur `step`/`substep`/`list--substep` : voir
+  section Impact API CSS publique.
+- **Les compteurs CSS (`counter-reset`/`counter-increment`/`content: counter()`) traversent
+  correctement une frontière shadow DOM** (testé Chromium + WebKit : numérotation 1, 2, 3 correcte
+  avec `counter-reset` dans le shadow DOM du parent et `counter-increment`/`content: counter()`
+  dans des shadow DOM enfants séparés, connectés uniquement via `:host{display:contents}` +
+  `<slot>`). La numérotation des puces reste donc un mécanisme CSS pur, inchangé dans son principe
+  — pas besoin de pousser une valeur `order` calculée en JS.
 
 ## Décision retenue : `ar-stepper-item` porte son propre rendu
 
@@ -120,21 +130,31 @@ c'est ce slot qui assure le forwarding récursif à travers les niveaux d'imbric
 
 ## `ar-stepper-item` — nouveau shadow DOM
 
-Gabarit (pseudo-code, détails d'implémentation laissés au plan) :
+`ar-stepper-item` pose `part="step"` ou `part="substep"` et `aria-current` sur **son propre host**
+(pas dans son shadow DOM — voir correction ci-dessous), poussés par `ar-stepper` via le
+render-state. Le numéro de puce reste un compteur CSS pur (`counter-increment`/`content:
+counter()`), vérifié empiriquement qu'il traverse correctement la frontière shadow DOM tant que
+`counter-reset` reste sur `ar-stepper` — pas de valeur `order` à pousser pour ça, seul `srLabel`
+(la chaîne localisée complète) a besoin d'être calculé côté `ar-stepper` et transmis.
+
+Gabarit du shadow DOM (pseudo-code, détails d'implémentation laissés au plan) :
 
 ```
 <!-- <a> si isLink (poussé par ar-stepper), sinon <div tabindex="-1"> -->
-<a part="step-link control"
+<a class="item-header" part="step-link control"
    aria-describedby=${hasAfterLabel ? afterLabelId : nothing}
-   @click=${...}>
-    <span part=${bulletPart} aria-hidden="true">${order}</span>
-    <span class="sr-only">${srLabel}</span>
-    <span class="item-label" part=${labelPart}>${label}</span>
+   href=${this.href ?? '#'}
+   @click=${this._handleClick}>
+    <span part=${bulletPart} aria-hidden="true"></span>
+    <span class="sr-only">${this._srLabel}</span>
+    <span class="item-label" part=${labelPart}>${this.label}</span>
 </a>
 <span id=${afterLabelId}>
     <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
 </span>
-${showSubsteps ? html`<slot></slot>` : nothing}  <!-- slot par défaut, forward des sous-items -->
+${this._showSubsteps
+    ? html`<ol part="list list--substep"><slot></slot></ol>`
+    : nothing}  <!-- slot par défaut, forward des sous-items -->
 ```
 
 `:host { display: contents }` (précédent `ar-dropdown-item`) — élimine le risque de flash de
@@ -190,12 +210,22 @@ même si ce dernier a un précédent sur `ar-dropdown`).
 
 ## Impact API CSS publique (`::part()`) — cassant, accepté
 
-- `bullet`, `indicator`, `label`, `step-link`, `control` migrent du shadow DOM d'`ar-stepper` vers
-  celui d'`ar-stepper-item`. Un consommateur cible désormais `ar-stepper-item::part(bullet)`
-  directement (élément normal du light DOM, pas de `exportparts` nécessaire) plutôt que
-  `ar-stepper::part(bullet)`.
-- `list`, `list--substep`, `step`, `substep` restent portés par `ar-stepper` (structure de liste,
-  inchangée).
+- `bullet`, `indicator`, `label`, `step-link`, `control`, **`step`, `substep`, `list--substep`**
+  migrent du shadow DOM d'`ar-stepper` vers celui d'`ar-stepper-item`. Un consommateur cible
+  désormais `ar-stepper-item::part(bullet)` directement (élément normal du light DOM, pas de
+  `exportparts` nécessaire) plutôt que `ar-stepper::part(bullet)`.
+- Correction par rapport à une première rédaction de cette section : `step`/`substep`/
+  `list--substep` ne peuvent **pas** rester portés par `ar-stepper` — vérifié empiriquement
+  (Chromium + WebKit) qu'un attribut `part` posé sur un élément projeté via `<slot>` (donc du
+  light DOM, même visuellement à l'intérieur du shadow DOM de l'hôte qui le slot) n'est **jamais**
+  matché par `::part()` de cet hôte. Avec le slot par défaut unique retenu pour projeter les vrais
+  `<ar-stepper-item>` (voir plus haut), il n'existe plus de `<li>` construit par `ar-stepper` pour
+  porter ces parts — `ar-stepper-item` doit les poser sur son propre host (`part="step"` ou
+  `part="substep"` selon l'imbrication, `aria-current` idem), et le wrapper `<ol part="list
+list--substep">` d'un item ayant des sous-étapes doit être construit **dans son propre shadow
+  DOM**, autour du slot par défaut qui forward ses sous-items.
+- Seul `list` (liste de premier niveau) reste porté par `ar-stepper` — c'est un wrapper statique
+  autour du `<slot>` unique, pas une structure reconstruite par item.
 - Changement cassant assumé sans mesure de migration : alpha non utilisée en production à ce jour,
   c'est le moment le moins coûteux pour le faire (cohérent avec la préoccupation
   `priority:avant-beta` déjà actée sur ce chantier).
