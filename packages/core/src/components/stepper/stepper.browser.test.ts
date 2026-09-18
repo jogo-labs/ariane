@@ -129,15 +129,16 @@ describe('ar-stepper — browser', () => {
                 el.currentPath = (event as CustomEvent<{ from: string; to: string }>).detail.to;
             });
 
-            const shadowRoot = el.shadowRoot as ShadowRoot;
-            const linkA = shadowRoot.querySelector('a[data-path="/a"]') as HTMLElement;
+            const itemA = el.querySelector('ar-stepper-item[path="/a"]')!;
+            const linkA = itemA.shadowRoot!.querySelector('.item-header') as HTMLElement;
             linkA.focus();
             linkA.click();
             await elementUpdated(el);
+            await elementUpdated(itemA);
 
-            const newCurrent = shadowRoot.querySelector('[data-path="/a"]') as HTMLElement;
+            const newCurrent = itemA.shadowRoot!.querySelector('.item-header') as HTMLElement;
             expect(newCurrent.tagName.toLowerCase()).to.equal('div');
-            expect(shadowRoot.activeElement).to.equal(newCurrent);
+            expect(itemA.shadowRoot!.activeElement).to.equal(newCurrent);
             expect(newCurrent.matches(':focus-visible')).to.equal(true);
         });
     });
@@ -161,7 +162,8 @@ describe('ar-stepper — browser', () => {
         // une propriété logique bascule physiquement de côté.
         it('la puce utilise margin-inline-end : bascule à gauche sous dir="rtl"', async () => {
             el = await desktopStepper('rtl');
-            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            const item = el.querySelector('ar-stepper-item')!;
+            const bullet = item.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
             if (!bullet) throw new Error('[part~="bullet"] introuvable');
             const style = getComputedStyle(bullet);
             expect(style.marginLeft).to.equal('8px');
@@ -170,10 +172,9 @@ describe('ar-stepper — browser', () => {
 
         it('la puce de sous-étape utilise margin-inline-start/end : bascule sous dir="rtl"', async () => {
             el = await desktopStepper('rtl');
-            const subBullet = el.shadowRoot?.querySelector<HTMLElement>(
-                "[part='substep'] [part~='bullet']",
-            );
-            if (!subBullet) throw new Error("[part='substep'] [part~='bullet'] introuvable");
+            const subItem = el.querySelector('ar-stepper-item ar-stepper-item')!;
+            const subBullet = subItem.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            if (!subBullet) throw new Error('[part~="bullet"] introuvable');
             const style = getComputedStyle(subBullet);
             expect(style.marginRight).to.equal('12px');
             expect(style.marginLeft).to.equal('20px');
@@ -211,21 +212,24 @@ describe('ar-stepper — browser', () => {
 
         it('sans reverse-align, en LTR : la puce garde order initial (0)', async () => {
             el = await desktopStepper(false);
-            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            const item = el.querySelector('ar-stepper-item')!;
+            const bullet = item.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
             if (!bullet) throw new Error('[part~="bullet"] introuvable');
             expect(getComputedStyle(bullet).order).to.equal('0');
         });
 
         it('avec reverse-align, en LTR : la puce passe en fin de ligne (order 2)', async () => {
             el = await desktopStepper(true);
-            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            const item = el.querySelector('ar-stepper-item')!;
+            const bullet = item.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
             if (!bullet) throw new Error('[part~="bullet"] introuvable');
             expect(getComputedStyle(bullet).order).to.equal('2');
         });
 
         it('avec reverse-align, en RTL : la puce passe aussi en fin de ligne (order 2) — effet composable avec dir', async () => {
             el = await desktopStepper(true, 'rtl');
-            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            const item = el.querySelector('ar-stepper-item')!;
+            const bullet = item.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
             if (!bullet) throw new Error('[part~="bullet"] introuvable');
             expect(getComputedStyle(bullet).order).to.equal('2');
         });
@@ -237,7 +241,8 @@ describe('ar-stepper — browser', () => {
         // qu'un margin-left physique aurait donné (qui resterait marginLeft peu importe dir).
         it('avec reverse-align, en RTL : la marge de la puce bascule en physique (marginRight, pas marginLeft)', async () => {
             el = await desktopStepper(true, 'rtl');
-            const bullet = el.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
+            const item = el.querySelector('ar-stepper-item')!;
+            const bullet = item.shadowRoot?.querySelector<HTMLElement>('[part~="bullet"]');
             if (!bullet) throw new Error('[part~="bullet"] introuvable');
             const style = getComputedStyle(bullet);
             expect(style.marginRight).to.equal('8px');
