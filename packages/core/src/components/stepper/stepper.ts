@@ -18,7 +18,7 @@ import { announceA11y } from '../../a11y/announce-a11y.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import { renderDesktop, renderMobile } from './stepper.renderer.js';
+import { renderDesktop, renderMobile, pushItemRenderState } from './stepper.renderer.js';
 import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
@@ -216,6 +216,9 @@ export class ArStepper extends LitElement {
                 this.rebuildTree();
             }
         },
+        notifyItemActivated: (item, event) => {
+            this.onItemActivated(item, event);
+        },
     };
 
     protected readonly _provider = new ContextProvider(this, {
@@ -281,7 +284,7 @@ export class ArStepper extends LitElement {
                 this._emitChanged({ from, to });
                 announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
                 if (to === this._pendingFocusPath) {
-                    this.shadowRoot?.querySelector<HTMLElement>(`[data-path="${to}"]`)?.focus();
+                    this.navigation.currentNode?.item.focusControl();
                 }
             }
         }
@@ -317,6 +320,11 @@ export class ArStepper extends LitElement {
         if (changed.has('desktopTarget') || changed.has('desktopFrom')) {
             this.setupResponsiveMode();
         }
+        if (this.navigation.tree.length) {
+            const stepLabel = (order: number, isSubstep: boolean): string =>
+                this.localize.term('stepLabel', order, isSubstep);
+            pushItemRenderState(this.navigation.tree, this.mode, stepLabel);
+        }
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -329,33 +337,22 @@ export class ArStepper extends LitElement {
             return html`<slot></slot>`;
         }
 
-        const stepLabel = (order: number, isSubstep: boolean): string =>
-            this.localize.term('stepLabel', order, isSubstep);
-
         const content = this._isDesktop
-            ? renderDesktop(steps, this.mode, this.onClickLink, stepLabel)
-            : renderMobile(
-                  steps,
-                  {
-                      currentStepIndex: this._currentStepIndex,
-                      currentStepLabel: this.getCurrentStepLabel(),
-                      currentSubStepLabel: this.getCurrentSubStepLabel(),
-                      currentStepStatus: this.localize.term(
-                          'currentStepStatus',
-                          this._currentStepIndex + 1,
-                          steps.length,
-                      ),
-                      onToggle: this._onDropdownToggle,
-                  },
-                  this.mode,
-                  this.onClickLink,
-                  stepLabel,
-              );
+            ? renderDesktop()
+            : renderMobile({
+                  currentStepLabel: this.getCurrentStepLabel(),
+                  currentSubStepLabel: this.getCurrentSubStepLabel(),
+                  currentStepStatus: this.localize.term(
+                      'currentStepStatus',
+                      this._currentStepIndex + 1,
+                      steps.length,
+                  ),
+                  onToggle: this._onDropdownToggle,
+              });
 
         return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
             <p id="label-nav" class="sr-only">${this.localize.term('stepperNavLabel')}</p>
             ${content}
-            <slot></slot>
         </nav>`;
     }
 
@@ -500,26 +497,10 @@ export class ArStepper extends LitElement {
 
     // ── Events ───────────────────────────────────────────────────────────────
 
-    private onClickLink = (event: MouseEvent): void => {
-        const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
-        if (!path) return;
+    private onItemActivated(item: ArStepperItem, event: MouseEvent): void {
+        this._pendingFocusPath = item.path;
 
-        this._pendingFocusPath = path;
-
-        const node = this.navigation.tree
-            .flatMap((s) => [s, ...s.children])
-            .find((s) => s.path === path);
-
-        // Sans href réel fourni par le consommateur (omis, ou explicitement '#' — la
-        // convention documentée pour un item sans navigation propre), l'ancre est purement
-        // décorative : la navigation est pilotée par l'event, pas par le comportement natif.
-        // Un href réel (ex: navigation en dur vers une autre page) reste navigable
-        // normalement, y compris ctrl/cmd/clic-molette pour ouvrir dans un nouvel onglet.
-        if (node?.href === undefined || node.href === '#') {
-            event.preventDefault();
-        }
-
-        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: path };
+        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: item.path };
 
         const proceed = this.dispatchEvent(
             new CustomEvent('ar-stepper-step-change', {
@@ -540,7 +521,7 @@ export class ArStepper extends LitElement {
         // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
         // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
         this.requestUpdate();
-    };
+    }
 
     private handleScrollChange = (event: CustomEvent<string>): void => {
         this.currentPath = event.detail;

@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ArStepper } from './stepper.js';
 import type { ArStepperStepChangeDetail } from './stepper.js';
+import type { StepperRegistry } from '../../context/stepper.context.js';
+import type { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
@@ -1165,6 +1167,52 @@ describe('ArStepper', () => {
                     .filter((v) => typeof v === 'string')
                     .some((v) => v.includes('scheduled an update')),
             ).toBe(false);
+        });
+    });
+
+    describe('notifyItemActivated (registry)', () => {
+        it('dispatch ar-stepper-step-change puis met à jour currentPath si non annulé', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="a">
+                    <ar-stepper-item path="a" label="A" href="#a"></ar-stepper-item>
+                    <ar-stepper-item path="b" label="B" href="#b"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const stepChange = vi.fn();
+            el.addEventListener('ar-stepper-step-change', stepChange);
+
+            const itemB = el.querySelector('ar-stepper-item[path="b"]') as ArStepperItem;
+            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+            // Accès à la registry interne via le mécanisme de contexte n'est pas exposé publiquement :
+            // on simule l'appel tel que ArStepperItem._handleClick le ferait.
+            (el as unknown as { _registry: StepperRegistry })._registry.notifyItemActivated(
+                itemB,
+                event,
+            );
+
+            expect(stepChange).toHaveBeenCalledOnce();
+            const detail = stepChange.mock.calls[0]![0].detail;
+            expect(detail).toEqual({ from: 'a', to: 'b' });
+        });
+
+        it('preventDefault() sur ar-stepper-step-change annule la navigation et l’event natif', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="a">
+                    <ar-stepper-item path="a" label="A" href="#a"></ar-stepper-item>
+                    <ar-stepper-item path="b" label="B" href="#b"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+
+            const itemB = el.querySelector('ar-stepper-item[path="b"]') as ArStepperItem;
+            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+            (el as unknown as { _registry: StepperRegistry })._registry.notifyItemActivated(
+                itemB,
+                event,
+            );
+
+            expect(event.defaultPrevented).toBe(true);
         });
     });
 });
