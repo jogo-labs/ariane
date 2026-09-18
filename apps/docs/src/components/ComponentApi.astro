@@ -48,7 +48,7 @@ interface ApiCategory {
 
 const categories: ApiCategory[] = [
     component.attributes && component.attributes.length > 0
-        ? { key: 'attributs', label: 'Attributs', count: component.attributes.length }
+        ? { key: 'attributs', label: 'Attributs et propriétés', count: component.attributes.length }
         : null,
     component.slots && component.slots.length > 0
         ? { key: 'slots', label: 'Slots', count: component.slots.length }
@@ -137,7 +137,7 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
 
             {component.attributes && component.attributes.length > 0 && (
                 <ar-tab-panel name="attributs">
-                    <h4 id="api-attributs" class="sr-only">Attributs</h4>
+                    <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
                     <div class="api-list">
                         {component.attributes.map((attr) => (
                             <div class="api-row">
