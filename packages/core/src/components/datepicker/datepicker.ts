@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { property, query } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
@@ -105,6 +105,13 @@ export class ArDatepicker extends LitElement {
     private _internals: ElementInternals | undefined;
     private readonly _uid = Math.random().toString(36).slice(2, 9);
 
+    /**
+     * Désactivé par cascade d'un `<fieldset disabled>` ancêtre (formDisabledCallback), distinct
+     * de `disabled` (posé explicitement par le consommateur) pour ne pas refléter cet état sur
+     * l'attribut HTML `disabled` du host et pour ne pas perdre l'origine si les deux divergent.
+     */
+    @state() private _formDisabled = false;
+
     private readonly _calendar = new CalendarController(this);
     private readonly _hasSlot = new HasSlotController(
         this,
@@ -171,6 +178,15 @@ export class ArDatepicker extends LitElement {
         return this._input;
     }
 
+    private get _effectiveDisabled(): boolean {
+        return this.disabled || this._formDisabled;
+    }
+
+    /** Appelé par le navigateur quand un `<fieldset disabled>` ancêtre change d'état. */
+    formDisabledCallback(disabled: boolean): void {
+        this._formDisabled = disabled;
+    }
+
     override connectedCallback(): void {
         super.connectedCallback();
         // attachInternals() doit être appelé avant le premier render mais après
@@ -217,7 +233,12 @@ export class ArDatepicker extends LitElement {
             this._syncInputFromValue();
         }
 
-        if (changed.has('value') || changed.has('required') || changed.has('disabled')) {
+        if (
+            changed.has('value') ||
+            changed.has('required') ||
+            changed.has('disabled') ||
+            changed.has('_formDisabled')
+        ) {
             this._syncFormValue();
         }
     }
@@ -259,7 +280,7 @@ export class ArDatepicker extends LitElement {
                         part="input field"
                         id="dp-input-${this._uid}"
                         type="text"
-                        ?disabled=${this.disabled}
+                        ?disabled=${this._effectiveDisabled}
                         ?readonly=${this.readonly}
                         aria-required=${this.required ? 'true' : nothing}
                         autocomplete=${this.autocomplete || nothing}
@@ -272,7 +293,7 @@ export class ArDatepicker extends LitElement {
                     <button
                         part="trigger"
                         type="button"
-                        ?disabled=${this.disabled || this.readonly}
+                        ?disabled=${this._effectiveDisabled || this.readonly}
                         aria-label=${this.localize.term('openCalendar')}
                         aria-haspopup="dialog"
                         aria-expanded=${this.open}
@@ -316,9 +337,11 @@ export class ArDatepicker extends LitElement {
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
                 >
-                    ${this.open
-                        ? this._renderCalendar(locale, todayLabel, closeLabel, closeAriaLabel)
-                        : nothing}
+                    ${
+                        this.open
+                            ? this._renderCalendar(locale, todayLabel, closeLabel, closeAriaLabel)
+                            : nothing
+                    }
                 </div>
             </div>
         `;
@@ -585,7 +608,7 @@ export class ArDatepicker extends LitElement {
     }
 
     private async _show(): Promise<void> {
-        if (this.disabled || this.readonly) return;
+        if (this._effectiveDisabled || this.readonly) return;
 
         const allowed = this.dispatchEvent(
             new CustomEvent('ar-datepicker-show', {
@@ -659,7 +682,7 @@ export class ArDatepicker extends LitElement {
     }
 
     private _handleTriggerClick(): void {
-        if (this.disabled || this.readonly) return;
+        if (this._effectiveDisabled || this.readonly) return;
         this.open = !this.open;
     }
 
@@ -854,7 +877,7 @@ export class ArDatepicker extends LitElement {
         }
     }
     private _syncFormValue(): void {
-        if (this.disabled) {
+        if (this._effectiveDisabled) {
             this._internals?.setFormValue(null);
             this._internals?.setValidity({});
             return;
