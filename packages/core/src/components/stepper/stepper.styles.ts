@@ -56,5 +56,9 @@ export default css`
         --ar-stepper-item-bullet-margin-end: 0;
         /* functional-default: cf. commentaire ci-dessus */
         --ar-stepper-item-bullet-margin-start: 0.5rem;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-substep-bullet-margin-start: 1.25rem;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-substep-bullet-margin-end: 0.75rem;
     }
 `;

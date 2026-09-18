@@ -43,8 +43,10 @@ export default css`
     :host([part='substep']) [part~='bullet'] {
         width: 0.75rem;
         height: 0.75rem;
-        margin-inline-start: 0.75rem;
-        margin-inline-end: 1.25rem;
+        /* a11y-fallback: posé par ar-stepper seulement sous reverse-align, sinon marge normale */
+        margin-inline-start: var(--ar-stepper-item-substep-bullet-margin-start, 0.75rem);
+        /* a11y-fallback: idem — reproduit la marge de puce sous-étape par défaut */
+        margin-inline-end: var(--ar-stepper-item-substep-bullet-margin-end, 1.25rem);
         display: block;
         padding-bottom: 0;
 
