@@ -284,7 +284,16 @@ export class ArStepper extends LitElement {
                 this._emitChanged({ from, to });
                 announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
                 if (to === this._pendingFocusPath) {
-                    this.navigation.currentNode?.item.focusControl();
+                    // L'item cible vient de recevoir son nouveau render-state (bulletState,
+                    // isLink…) via pushItemRenderState() dans willUpdate(), mais son propre
+                    // cycle de rendu (LitElement séparé, Task 2) n'a pas encore tourné : son
+                    // shadow DOM reflète encore l'ancien contrôle (ex. <a> avant un swap vers
+                    // <div>). Attendre son updateComplete évite de focaliser un noeud sur le
+                    // point d'être remplacé (ce qui perdrait le focus).
+                    const item = this.navigation.currentNode?.item;
+                    if (item) {
+                        void item.updateComplete.then(() => item.focusControl());
+                    }
                 }
             }
         }
