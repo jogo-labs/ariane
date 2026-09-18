@@ -161,11 +161,23 @@ contenu non stylé avant upgrade du custom element, qui existerait sans shadow D
 
 Le listener actuel (délégué sur le shadow root d'`ar-stepper`, `event.target.closest('a')`) ne
 survit pas à la frontière shadow introduite par `ar-stepper-item` (vérifié, voir plus haut).
-Remplacé par : `ar-stepper-item` dispatch un `CustomEvent` interne bullant et composé au clic sur
-son `<a>` (détail du nom d'event et du payload laissé au plan d'implémentation — non exposé
-publiquement, usage interne uniquement) ; `ar-stepper` écoute cet event à la place du `click`
-délégué. La logique de `ar-stepper-step-change` (cancelable, `preventDefault` bloque la navigation)
-reste inchangée dans son fonctionnement — seul le déclencheur change.
+
+Remplacé par un appel de méthode direct via le registry, pas par un `CustomEvent` interne —
+réutilise le canal de communication déjà établi pour `notifyItemChanged`, plutôt que d'introduire
+un second mécanisme pour un besoin de même nature (item → parent, jamais destiné à être intercepté
+par un consommateur). Nouvelle méthode sur `StepperRegistry` : `notifyItemActivated(item:
+ArStepperItem, event: MouseEvent): void` — distincte de `notifyItemChanged` (changement d'état vs.
+interaction), même mécanique.
+
+- `ar-stepper-item` gère son propre `preventDefault()` conditionnel localement au clic sur son
+  `<a>` interne (sa prop `href` est déjà disponible en local — plus besoin, comme aujourd'hui, de
+  chercher `node.href` dans l'arbre aplati), puis appelle
+  `this._registry?.notifyItemActivated(this, event)`.
+- `ar-stepper` implémente `notifyItemActivated` avec la logique actuellement dans `onClickLink` :
+  fixe `_pendingFocusPath`, dispatch `ar-stepper-step-change` (cancelable, inchangé — c'est
+  l'événement public consommateur, sans rapport avec ce canal interne), et si la navigation est
+  annulée, appelle `event.preventDefault()` sur l'event natif reçu et réinitialise
+  `_pendingFocusPath`.
 
 ## Gestion du focus
 
@@ -204,5 +216,5 @@ même si ce dernier a un précédent sur `ar-dropdown`).
 
 Deux issues à ouvrir **après** la mise en production et le rodage du mécanisme sur `ar-stepper`
 (pas immédiatement) : alignement `ar-breadcrumb-item`, et amélioration `aria-describedby` sur
-`ar-datepicker` (`label`/`after-label`). Étiquette `priority:après-beta` a priori pour les deux,
+`ar-datepicker` (`label`/`after-label`). Étiquette `priority:avant-beta` a priori pour les deux,
 à confirmer au moment de leur ouverture.
