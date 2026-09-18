@@ -147,13 +147,16 @@ describe('autoloader — préfixe configurable', () => {
         await stepper.updateComplete;
         await tick();
 
-        // Preuve que le lien parent/enfant a bien été reconstruit sous le préfixe custom :
-        // l'item "B" n'est rendu comme sous-étape imbriquée (un <li class="item">
-        // dans le <ol part="list"> DU <li> de "A") QUE si buildFromItems() a réussi
-        // à retrouver le parent de "B" via closestInstanceOf(). Si ce lookup échoue (comme
-        // avec l'ancien `.closest('ar-stepper-item')` hardcodé), "A" et "B" deviennent tous
-        // les deux des racines indépendantes et cette structure imbriquée n'apparaît jamais.
-        const nestedSubstep = stepper.shadowRoot?.querySelector('li.item [part~="list"] li.item');
-        expect(nestedSubstep).not.toBeNull();
+        // Preuve équivalente sous la nouvelle architecture : l'item "B" porte part="substep" sur
+        // son propre host (posé par ArStepperItem.updated() — Task 2), ET le parent "A" a bien
+        // construit le wrapper <ol part="list list--substep"> dans son propre shadow DOM (posé
+        // uniquement quand showSubsteps est vrai, Task 3/4) — les deux ne sont vrais que si
+        // buildFromItems() a correctement retrouvé le lien parent/enfant via closestInstanceOf().
+        const itemA = stepper.querySelector('acme-stepper-item[path="/a"]') as HTMLElement & {
+            shadowRoot: ShadowRoot | null;
+        };
+        const itemB = stepper.querySelector('acme-stepper-item[path="/a/b"]');
+        expect(itemA.shadowRoot?.querySelector('[part~="list--substep"]')).not.toBeNull();
+        expect(itemB?.getAttribute('part')).toBe('substep');
     });
 });

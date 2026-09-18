@@ -34,155 +34,31 @@ export default css`
         counter-reset: step;
     }
 
-    /* [part='list'] (égalité stricte) ne matche pas "list list--substep" (deux tokens) :
-       sans ce reset dédié, la liste de sous-étapes hériterait du compteur "step" du
-       parent au lieu de repartir de zéro, faisant sauter la numérotation des étapes
-       principales suivantes (leur puce affiche counter(step), même si celle des
-       sous-étapes ne l'affiche pas — cf. règle content: '' plus bas). */
-    [part~='list--substep'] {
-        counter-reset: step;
-    }
-
-    .item-header {
-        display: inline-flex;
-        counter-increment: step;
-    }
-
-    [part~='bullet'],
-    .item-header {
-        align-items: center;
-        color: var(--ar-stepper-label-color);
-    }
-
-    [part~='bullet'] {
-        width: 2.25rem;
-        height: 2.25rem;
-        display: flex;
-        flex-shrink: 0;
-        justify-content: center;
-        margin-inline-end: 0.5rem;
-        transform: translateY(1px);
-        box-shadow: 0 0 0 1px var(--ar-stepper-bullet-border-color) inset;
-        background-color: transparent;
-        /* Empêche le soulignement de ::part(step-link) de peindre à travers ce
-         * flex-item (le conteneur <a> est en inline-flex, sans cette règle le trait
-         * traverse aussi le chiffre du compteur). */
-        text-decoration: none;
-    }
-
-    [part~='bullet']:before {
-        content: counter(step);
-        /* Les pseudo-éléments n'héritent pas toujours de façon fiable le
-           text-decoration: none posé sur [part~='bullet'] (cf. commentaire
-           ci-dessus) — le chiffre lui-même ne doit jamais être souligné. */
-        text-decoration: none;
-    }
-
-    .item {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    /* S'applique à toute puce (étape ou sous-étape) dans un lien survolé/focus —
-       même mécanisme pour les deux niveaux, aucun traitement spécifique au niveau. */
-    [part~='step-link']:is(:hover, :focus) [part~='bullet'] {
-        color: var(--ar-stepper-link-hover-bullet-text-color);
-        background-color: var(--ar-stepper-bullet-hover-bg);
-        box-shadow: none;
-    }
-
-    [part~='step-link']:is(:hover, :focus) .item-label {
-        color: var(--ar-stepper-link-hover-label-color);
-    }
-
-    .item-header:focus-visible {
-        outline-offset: 4px;
-        outline-color: var(--ar-stepper-link-focus-outline-color);
-    }
-
-    .current > .item-header {
-        color: var(--ar-stepper-current-header-color);
-        font-weight: 700;
-    }
-
-    [part='step']:not(:last-child):after {
-        content: '';
-        display: block;
-    }
-
-    [part~='step-link'] [part~='bullet'] {
-        color: var(--ar-stepper-bullet-color);
-        background-color: var(--ar-stepper-bullet-bg);
-        box-shadow: none;
-    }
-
-    [part='step']:after {
-        width: 2.25rem;
-        height: var(--ar-stepper-gap);
-        background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
-        background-size: 2px 8px;
-        background-position: center 3px;
-        background-repeat: repeat-y;
-    }
-
-    [part='substep'] {
-        &:before {
-            content: '';
-            display: block;
-            width: 2.25rem;
-            height: var(--ar-stepper-substep-gap);
-            background-image: linear-gradient(var(--ar-stepper-connector-color) 25%, transparent 0);
-            background-size: 2px 8px;
-            background-position: center 4px;
-            background-repeat: repeat-y;
-        }
-    }
-
-    [part='substep'] [part~='bullet'] {
-        width: 0.75rem;
-        height: 0.75rem;
-        margin-inline-start: 0.75rem;
-        margin-inline-end: 1.25rem;
-        display: block;
-        padding-bottom: 0;
-
-        &:before {
-            content: '';
-        }
-    }
-
     .desktop {
         display: flex;
         flex-flow: column;
     }
 
-    :host([reverse-align]) .desktop {
-        .item {
-            align-items: flex-end;
-            text-align: end;
-
-            &::after {
-                margin-inline-start: auto;
-            }
-        }
-
-        .item-header {
-            justify-content: flex-end;
-            margin-inline-start: auto;
-            text-align: end;
-        }
-
-        [part~='bullet'] {
-            order: 2;
-            margin-inline-end: 0;
-            margin-inline-start: 0.5rem;
-        }
-
-        [part='substep'] [part~='bullet'] {
-            margin-inline-start: 1.25rem;
-            margin-inline-end: 0.75rem;
-        }
+    /* functional-default: pont d'état interne vers ar-stepper-item — reverse-align est un
+       attribut booléen posé sur ar-stepper, pas une valeur de thème ; ces custom properties
+       relaient cet état (aligné à droite ou non) au shadow DOM de ar-stepper-item, qui ne peut
+       pas lire un attribut de son hôte ancêtre. Pas des tokens de design. */
+    :host([reverse-align]) {
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-align: flex-end;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-margin-start: auto;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-text-align: end;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-bullet-order: 2;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-bullet-margin-end: 0;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-bullet-margin-start: 0.5rem;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-substep-bullet-margin-start: 1.25rem;
+        /* functional-default: cf. commentaire ci-dessus */
+        --ar-stepper-item-substep-bullet-margin-end: 0.75rem;
     }
 `;

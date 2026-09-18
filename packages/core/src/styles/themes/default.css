@@ -884,7 +884,12 @@
         &::part(panel) {
             padding: 0.75rem;
         }
+    }
 
+    /* Les parts step-link/label--link/bullet/bullet--current ont migré vers le shadow DOM
+       d'ar-stepper-item (élément slotté, pas un descendant du shadow tree d'ar-stepper) —
+       ::part() doit donc cibler ar-stepper-item directement, pas ar-stepper (#226 review finale). */
+    ar-stepper-item {
         /* Texte cliquable en couleur neutre, pas ambre — seule la puce porte l'accent
            (cf. #224/#225). text-decoration: none explicite (pas juste l'absence de
            déclaration) : sans ça, le soulignement par défaut du user-agent sur <a> reste
