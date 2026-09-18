@@ -105,11 +105,9 @@ Avant (aujourd'hui) :
 
 Après, avec contenu additif sur l'étape 1 :
 
-```html
+```
 <ar-stepper-item path="etape-1" label="Mes informations" href="#">
-    <span slot="after-label"
-        ><!-- icône de statut, éventuellement avec son propre ar-tooltip --></span
-    >
+    <span slot="after-label"><!-- icône de statut, éventuellement avec son propre ar-tooltip --></span>
 
     <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
     <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#"></ar-stepper-item>
@@ -124,26 +122,19 @@ c'est ce slot qui assure le forwarding récursif à travers les niveaux d'imbric
 
 Gabarit (pseudo-code, détails d'implémentation laissés au plan) :
 
-```html
+```
 <!-- <a> si isLink (poussé par ar-stepper), sinon <div tabindex="-1"> -->
-<a
-    part="step-link control"
-    aria-describedby="${hasAfterLabel"
-    ?
-    afterLabelId
-    :
-    nothing}
-    @click="${...}"
->
-    <span part="${bulletPart}" aria-hidden="true">${order}</span>
+<a part="step-link control"
+   aria-describedby=${hasAfterLabel ? afterLabelId : nothing}
+   @click=${...}>
+    <span part=${bulletPart} aria-hidden="true">${order}</span>
     <span class="sr-only">${srLabel}</span>
-    <span class="item-label" part="${labelPart}">${label}</span>
+    <span class="item-label" part=${labelPart}>${label}</span>
 </a>
-<span id="${afterLabelId}">
-    <slot name="after-label" @slotchange="${this._handleAfterLabelSlotChange}"></slot>
+<span id=${afterLabelId}>
+    <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
 </span>
-${showSubsteps ? html`<slot></slot>` : nothing}
-<!-- slot par défaut, forward des sous-items -->
+${showSubsteps ? html`<slot></slot>` : nothing}  <!-- slot par défaut, forward des sous-items -->
 ```
 
 `:host { display: contents }` (précédent `ar-dropdown-item`) — élimine le risque de flash de
