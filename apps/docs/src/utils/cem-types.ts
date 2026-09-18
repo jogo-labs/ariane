@@ -39,6 +39,7 @@ export interface CemAttribute {
     type?: { text: string };
     description?: string;
     default?: string;
+    fieldName?: string;
 }
 
 export interface CemEvent {
