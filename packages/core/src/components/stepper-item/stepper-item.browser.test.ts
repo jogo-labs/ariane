@@ -111,5 +111,20 @@ describe('ar-stepper-item — browser', () => {
         // root : on retrouve donc l'item propriétaire via la liste zippée plutôt que via bullet.
         values.forEach((v) => expect(v).to.include('counter(step)'));
         expect(new Set(items.map((item) => item.getAttribute('path'))).size).to.equal(3);
+
+        // La valeur spécifiée du `content` ne prouve pas que le compteur CSS traverse
+        // effectivement la frontière shadow DOM (ar-stepper → slot → ar-stepper-item) : c'est le
+        // mécanisme empiriquement critique que le spec appelle à vérifier réellement (finding #6
+        // de la review finale #226). counter-reset/counter-increment résolus sont, eux,
+        // disponibles via getComputedStyle (contrairement au chiffre peint dans ::before), donc on
+        // vérifie le câblage du compteur lui-même : le reset côté <ol part="list"> d'ar-stepper et
+        // l'increment côté .item-header de chaque ar-stepper-item.
+        const list = el.shadowRoot!.querySelector('[part="list"]') as HTMLElement;
+        expect(getComputedStyle(list).counterReset).to.equal('step 0');
+
+        items.forEach((item) => {
+            const header = item.shadowRoot!.querySelector('.item-header') as HTMLElement;
+            expect(getComputedStyle(header).counterIncrement).to.equal('step 1');
+        });
     });
 });
