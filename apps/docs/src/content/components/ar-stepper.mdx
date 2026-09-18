@@ -138,6 +138,20 @@ La prop `mode` détermine quelles étapes sont cliquables. En mode **`create`** 
 avec un parcours de création où les étapes suivantes n'ont pas encore de contenu à afficher. Voir la
 variante _Mode édition_ pour le mode `edit`.
 
+### Contenu additionnel après le label (`after-label`)
+
+Chaque `ar-stepper-item` expose un slot nommé `after-label` pour afficher un contenu additif à
+côté du label — un badge de statut, une icône, une pastille de compteur. Ce contenu s'ajoute au
+label sans jamais le remplacer : il reste toujours lu séparément par les lecteurs d'écran
+(annoncé via `aria-describedby`), le label demeure donc le seul texte vocalisé pour identifier
+l'étape.
+
+```html
+<ar-stepper-item path="etape-1-1" label="Mon état civil" href="#">
+    <span slot="after-label">🔒 Verrouillé</span>
+</ar-stepper-item>
+```
+
 ### Navigation synchronisée au scroll (`follow-scroll`)
 
 Avec `follow-scroll`, la prop `current-path` se met à jour automatiquement pendant que l'utilisateur scrolle la page : le stepper détecte quelle section est visible et se synchronise sans action de votre part.

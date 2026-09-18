@@ -53,21 +53,10 @@ export interface ArStepperStepChangeDetail {
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
  *
- * @csspart stepper      - Racine du composant.
- * @csspart list         - La liste des étapes.
- * @csspart list--substep - La liste des sous-étapes (variante d'état de `list`).
- * @csspart step         - Une étape de premier niveau.
- * @csspart substep      - Une sous-étape.
- * @csspart step-link    - Le lien d'une étape.
- * @csspart control      - Porté par `step-link` : élément interactif générique.
- * @csspart bullet       - La puce numérotée d'une étape.
- * @csspart indicator    - Porté par `bullet` : marqueur/indicateur visuel.
- * @csspart label        - Le texte du label d'une étape.
- * @csspart label--link  - Le texte du label d'une étape cliquable (variante d'état de `label`).
- * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
- * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
- * @csspart trigger      - Le bouton d'ouverture du panel mobile.
- * @csspart panel        - Le panel mobile flottant.
+ * @csspart stepper - Racine du composant.
+ * @csspart list    - La liste des étapes.
+ * @csspart trigger - Le bouton d'ouverture du panel mobile.
+ * @csspart panel   - Le panel mobile flottant.
  *
  * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
  * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
