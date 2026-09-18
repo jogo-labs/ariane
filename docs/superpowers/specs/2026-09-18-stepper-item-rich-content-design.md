@@ -6,7 +6,7 @@
 
 ## Problème
 
-Référence visuelle partagée en session (DSFR-like) : certaines sous-étapes affichent une icône de
+Référence visuelle partagée en session (DS France Travail) : certaines sous-étapes affichent une icône de
 statut contextuelle (ex. alerte) à côté du label, avec un tooltip au survol. `ar-stepper-item`
 n'offre aujourd'hui aucun moyen d'ajouter du contenu à côté de son label — seul l'attribut `label`
 (texte simple) est disponible.
