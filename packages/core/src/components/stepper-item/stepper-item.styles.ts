@@ -5,6 +5,17 @@ export default css`
         display: contents;
     }
 
+    /* :host { display: contents } aplatit l'item dans le flux du parent (ar-stepper) — sans ce
+       conteneur, .item-header et le wrapper after-label deviendraient chacun un flex-item
+       séparé de la colonne .desktop d'ar-stepper (blockifiés, empilés) au lieu de rester côte à
+       côte. La numérotation (counter-increment) reste sur .item-header, pas ici : le compteur
+       ne doit s'incrémenter qu'une fois par item, pas par ce conteneur purement layout. */
+    .item-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
     .item-header {
         display: inline-flex;
         counter-increment: step;

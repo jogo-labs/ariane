@@ -41,9 +41,13 @@ function withBulletStatePart(state: BulletState): string {
  * @csspart label--link - Le texte du label quand l'étape est cliquable (variante d'état de `label`).
  * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
  * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
- * @csspart step        - L'étape elle-même (posé sur le host), quand elle est de premier niveau.
- * @csspart substep     - L'étape elle-même (posé sur le host), quand c'est une sous-étape.
  * @csspart list--substep - La liste des sous-étapes, quand cette étape en affiche.
+ *
+ * L'attribut `part` posé sur le host lui-même (`step` pour une étape de premier niveau,
+ * `substep` pour une sous-étape) n'est pas un `::part()` consommable depuis l'extérieur —
+ * `ar-stepper-item` est un élément slotté en light DOM, pas un descendant du shadow tree d'un
+ * ancêtre, donc `::part()` ne peut pas l'atteindre. Il reste ciblable en CSS classique via un
+ * sélecteur d'attribut : `ar-stepper-item[part="step"]` / `ar-stepper-item[part="substep"]`.
  */
 export class ArStepperItem extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, styles];
@@ -117,6 +121,7 @@ export class ArStepperItem extends LitElement {
         });
 
         this.setAttribute('part', this._isSubstep ? 'substep' : 'step');
+        this.setAttribute('role', 'listitem');
         if (this._bulletState === 'current') {
             this.setAttribute('aria-current', 'step');
         } else {
@@ -159,33 +164,35 @@ export class ArStepperItem extends LitElement {
         `;
 
         return html`
-            ${
-                this._isLink
-                    ? html`
-                          <a
-                              class="item-header"
-                              part="step-link control"
-                              aria-describedby=${describedBy}
-                              href=${this.href ?? '#'}
-                              @click=${this._handleClick}
-                          >
-                              ${headerContent}
-                          </a>
-                      `
-                    : html`
-                          <div
-                              class="item-header"
-                              part="control"
-                              aria-describedby=${describedBy}
-                              tabindex="-1"
-                          >
-                              ${headerContent}
-                          </div>
-                      `
-            }
-            <span id=${this._afterLabelId}>
-                <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
-            </span>
+            <div class="item-row">
+                ${
+                    this._isLink
+                        ? html`
+                              <a
+                                  class="item-header"
+                                  part="step-link control"
+                                  aria-describedby=${describedBy}
+                                  href=${this.href ?? '#'}
+                                  @click=${this._handleClick}
+                              >
+                                  ${headerContent}
+                              </a>
+                          `
+                        : html`
+                              <div
+                                  class="item-header"
+                                  part="control"
+                                  aria-describedby=${describedBy}
+                                  tabindex="-1"
+                              >
+                                  ${headerContent}
+                              </div>
+                          `
+                }
+                <span id=${this._afterLabelId}>
+                    <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
+                </span>
+            </div>
             ${
                 this._showSubsteps
                     ? html`
