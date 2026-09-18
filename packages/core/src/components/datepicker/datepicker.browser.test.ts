@@ -401,4 +401,71 @@ describe('ar-datepicker — browser', () => {
             expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
         });
     });
+
+    // ── Cascade disabled depuis un fieldset ancêtre ─────────────────────────────
+
+    describe('fieldset disabled — formDisabledCallback', () => {
+        let form: HTMLFormElement;
+
+        afterEach(() => form?.remove());
+
+        it("désactive l'input et le trigger sans poser l'attribut disabled sur le host", async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            const trigger = el.shadowRoot!.querySelector(
+                'button[part="trigger"]',
+            ) as HTMLButtonElement;
+
+            expect(input.disabled).to.equal(true);
+            expect(trigger.disabled).to.equal(true);
+            // this.disabled reste false : la cascade n'écrase pas l'état explicite du composant.
+            expect(el.disabled).to.equal(false);
+            expect(el.hasAttribute('disabled')).to.equal(false);
+        });
+
+        it("réactive l'input/trigger quand le fieldset est réactivé", async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(input.disabled).to.equal(false);
+        });
+
+        it('reste désactivé si disabled est aussi posé explicitement quand le fieldset est réactivé', async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01" disabled></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(input.disabled, 'disabled explicite doit rester actif').to.equal(true);
+        });
+    });
 });
