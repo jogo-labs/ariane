@@ -138,9 +138,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
             {component.attributes && component.attributes.length > 0 && (
                 <ar-tab-panel name="attributs">
                     <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
-                    <div class="api-list">
-                        {component.attributes.map((attr) => (
-                            <div class="api-row">
+                    <div class="api-list" role="list">
+                        {component.attributes.map((attr, i) => (
+                            <div class="api-row" role="listitem">
+                                <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
                                 <div>
                                     <span class="api-name">
                                         {attr.name}
@@ -163,9 +164,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
             {component.slots && component.slots.length > 0 && (
                 <ar-tab-panel name="slots">
                     <h4 id="api-slots" class="sr-only">Slots</h4>
-                    <div class="api-list">
-                        {component.slots.map((slot) => (
-                            <div class="api-row">
+                    <div class="api-list" role="list">
+                        {component.slots.map((slot, i) => (
+                            <div class="api-row" role="listitem">
+                                <span class="sr-only">{i + 1} sur {component.slots!.length}</span>
                                 <span class="api-name">{slot.name || '(default)'}</span>
                                 <p class="api-desc">{slot.description ?? ''}</p>
                             </div>
@@ -177,9 +179,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
             {component.events && component.events.length > 0 && (
                 <ar-tab-panel name="evenements">
                     <h4 id="api-evenements" class="sr-only">Événements</h4>
-                    <div class="api-list">
-                        {component.events.map((event) => (
-                            <div class="api-row">
+                    <div class="api-list" role="list">
+                        {component.events.map((event, i) => (
+                            <div class="api-row" role="listitem">
+                                <span class="sr-only">{i + 1} sur {component.events!.length}</span>
                                 <span class="api-name">
                                     {event.name}
                                     {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
@@ -194,8 +197,8 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
             {publicMethods.length > 0 && (
                 <ar-tab-panel name="methodes">
                     <h4 id="api-methodes" class="sr-only">Méthodes</h4>
-                    <div class="api-list">
-                        {publicMethods.map((m) => {
+                    <div class="api-list" role="list">
+                        {publicMethods.map((m, i) => {
                             const params = (m.parameters ?? [])
                                 .map((p) => {
                                     let s = p.name;
@@ -206,7 +209,8 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                                 .join(', ');
                             const returnType = m.return?.type?.text ?? 'void';
                             return (
-                                <div class="api-row">
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {publicMethods.length}</span>
                                     <div>
                                         <span class="api-name">{m.name}()</span>
                                         {params && <code class="api-sig">{params}</code>}
@@ -237,9 +241,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                             </>
                         )}
                     </p>
-                    <div class="api-list">
-                        {component.cssParts.map((part) => (
-                            <div class="api-row">
+                    <div class="api-list" role="list">
+                        {component.cssParts.map((part, i) => (
+                            <div class="api-row" role="listitem">
+                                <span class="sr-only">{i + 1} sur {component.cssParts!.length}</span>
                                 <span class="api-name">{part.name}</span>
                                 <p class="api-desc">{part.description ?? ''}</p>
                             </div>
@@ -260,9 +265,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                             <div class="token-example">
                                 <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
                             </div>
-                            <div class="api-list panel-tokens-list">
-                                {panelProps.map((prop) => (
-                                    <div class="api-row">
+                            <div class="api-list panel-tokens-list" role="list">
+                                {panelProps.map((prop, i) => (
+                                    <div class="api-row" role="listitem">
+                                        <span class="sr-only">{i + 1} sur {panelProps.length}</span>
                                         <span class="api-name">{prop.name}</span>
                                         <p class="api-desc">{prop.description ?? ''}</p>
                                     </div>
@@ -274,9 +280,10 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                         <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
                     )}
                     {ownProps.length > 0 && (
-                        <div class="api-list">
-                            {ownProps.map((prop) => (
-                                <div class="api-row">
+                        <div class="api-list" role="list">
+                            {ownProps.map((prop, i) => (
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {ownProps.length}</span>
                                     <span class="api-name">{prop.name}</span>
                                     <p class="api-desc">{prop.description ?? ''}</p>
                                 </div>
