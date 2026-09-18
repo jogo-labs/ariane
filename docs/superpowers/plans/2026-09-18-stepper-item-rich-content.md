@@ -1373,15 +1373,306 @@ git commit -m "refactor(core): stepper — déplace les styles bullet/label/step
 
 ---
 
-### Task 6: Tests browser — clic réel, focus, `aria-describedby`, compteur CSS
+### Task 6: Tests — unitaires cassés (stepper.test.ts, autoloader.test.ts) + browser
+
+**Ruling du contrôleur (2026-09-18), consigné dans le ledger SDD** : le plan initial ne prévoyait
+d'adapter que `stepper.browser.test.ts` — un trou de couverture, découvert par l'implémenteur de la
+Task 4, qui a laissé 28 tests cassés dans `stepper.test.ts` (unitaires, Vitest) + 1 dans
+`autoloader.test.ts`, tous cassés par le même changement structurel (rendu délégué à
+`ar-stepper-item`, `data-path` supprimé). Cette tâche est étendue pour les couvrir — c'est la même
+famille de correctif que celui déjà prévu pour les tests browser, appliqué au même changement de
+cause racine.
 
 **Files:**
 
+- Modify: `packages/core/src/components/stepper/stepper.test.ts`
+- Modify: `packages/core/src/autoloader.test.ts`
 - Create: `packages/core/src/components/stepper-item/stepper-item.browser.test.ts`
 - Modify: `packages/core/src/components/stepper/stepper.browser.test.ts`
 
-**Interfaces:** Aucune nouvelle — valide en conditions réelles (Chromium) ce que Tasks 2-4 ont
-construit.
+**Interfaces:** Aucune nouvelle — valide ce que Tasks 2-4 ont construit.
+
+- [ ] **Step 0a: Ajouter des helpers de requête dans `stepper.test.ts`**
+
+`data-path` a été supprimé de `ar-stepper-item` (Task 2) — plus aucun sélecteur `[data-path]` ne
+matche quoi que ce soit. Les parts (`bullet`, `label`, `step-link`, `control`, `list--substep`)
+vivent maintenant dans le shadow DOM de l'`ar-stepper-item` concerné, pas celui d'`ar-stepper`, et
+`part="step"`/`part="substep"` sont posés sur l'HOST de l'item (light DOM d'`ar-stepper`), pas dans
+un `<li>` construit par `ar-stepper`.
+
+Ajouter, juste après la fonction `requireQuery` existante (ligne 24-28) :
+
+```typescript
+/** Retrouve l'ar-stepper-item (léger DOM) portant ce path. */
+function itemOf(el: ArStepper, path: string): ArStepperItem {
+    return requireQuery<ArStepperItem>(el, `ar-stepper-item[path="${path}"]`);
+}
+
+/** Résout un sélecteur DANS le shadow DOM de l'item portant ce path (bullet, label, step-link…). */
+function itemPart<T extends Element = HTMLElement>(
+    el: ArStepper,
+    path: string,
+    selector: string,
+): T {
+    return requireQuery<T>(shadow(itemOf(el, path)), selector);
+}
+
+/** Le contrôle interne (<a> ou <div>) de l'item portant ce path. */
+function itemHeader(el: ArStepper, path: string): HTMLElement {
+    return itemPart<HTMLElement>(el, path, '.item-header');
+}
+```
+
+- [ ] **Step 0b: Réécrire les 9 tests du bloc `describe('rendu', ...)` (lignes 50-295)**
+
+Remplacements exacts, un test à la fois (les fixtures/structure de chaque `it` restent identiques
+sauf mention contraire — seules les assertions changent) :
+
+`'step-link porte aussi le rôle transverse "control"'` (ligne 72) — remplacer :
+
+```typescript
+const link = shadow(el).querySelector('a[part~="step-link"]');
+expect(link?.getAttribute('part')?.split(/\s+/)).toContain('control');
+```
+
+par :
+
+```typescript
+const link = itemPart(el, '/a', 'a[part~="step-link"]');
+expect(link.getAttribute('part')?.split(/\s+/)).toContain('control');
+```
+
+(Le lien cliquable apparaît sur l'étape non courante en mode edit — ici `/a`, puisque `current-path="/b"`.)
+
+`'bullet porte aussi le rôle transverse "indicator"'` (ligne 85) — remplacer :
+
+```typescript
+const bullet = shadow(el).querySelector('[part~="bullet"]');
+expect(bullet?.getAttribute('part')?.split(/\s+/)).toContain('indicator');
+```
+
+par :
+
+```typescript
+const bullet = itemPart(el, '/a', '[part~="bullet"]');
+expect(bullet.getAttribute('part')?.split(/\s+/)).toContain('indicator');
+```
+
+`'rend part="step" sur un item de premier niveau et part="substep" sur une sous-étape'` (ligne 106)
+— remplacer le corps entier après la fixture par :
+
+```typescript
+const topLevel = el.querySelectorAll(':scope > ar-stepper-item[part="step"]');
+expect(topLevel.length).toBeGreaterThan(0);
+const nested = el.querySelectorAll('ar-stepper-item ar-stepper-item[part="substep"]');
+expect(nested.length).toBe(2);
+// La sous-liste imbriquée vit dans le shadow DOM du parent ("/a"), pas celui d'ar-stepper.
+const nestedList = shadow(itemOf(el, '/a')).querySelector('[part~="list--substep"]');
+expect(nestedList?.getAttribute('part')).toBe('list list--substep');
+```
+
+`'rend part="step-link" sur le lien d\'une étape complétée, jamais sur une étape non cliquable'`
+(ligne 125) — remplacer :
+
+```typescript
+const link = shadow(el).querySelector('a[part~="step-link"]');
+expect(link?.getAttribute('part')).toBe('step-link control');
+const currentItemInner = shadow(el).querySelector('div.item-header');
+expect(currentItemInner?.hasAttribute('part')).toBe(false);
+```
+
+par :
+
+```typescript
+const link = itemPart(el, '/a', 'a[part~="step-link"]');
+expect(link.getAttribute('part')).toBe('step-link control');
+const currentItemInner = itemHeader(el, '/b');
+expect(currentItemInner.tagName.toLowerCase()).toBe('div');
+```
+
+(`/b` est l'étape courante : son contrôle interne est un `<div>`, jamais un `<a>`, donc jamais de
+`part="step-link"` dessus — l'ancien test vérifiait "pas de `part`" sur ce `<div>`, mais Task 2 pose
+`part="control"` dessus même non cliquable ; vérifier plutôt que ce n'est pas un `<a>`, ce qui est
+la garantie réellement voulue par ce test.)
+
+`'rend part="bullet" sur la puce de chaque étape'` (ligne 140) — remplacer :
+
+```typescript
+expect(shadow(el).querySelector('[part~="bullet"]')).not.toBeNull();
+```
+
+par :
+
+```typescript
+expect(itemPart(el, '/a', '[part~="bullet"]')).toBeTruthy();
+```
+
+`'rend le part d'état "bullet--current" uniquement sur la puce de l'étape courante'` (ligne 150) —
+lire les ~15 lignes suivantes dans le fichier réel (non reproduites ici) et remplacer chaque
+`shadow(el).querySelectorAll('[part="list"] > li[part="step"]')`/`requireQuery(steps[i], ...)` par
+`el.querySelectorAll(':scope > ar-stepper-item[part="step"]')` pour la liste des items top-level, et
+`itemPart(el, path, '[part~="bullet"]')` pour chaque puce individuelle (remplacer l'indexation
+`steps[0]`/`steps[1]` par un accès direct via le `path` de chaque étape de la fixture).
+
+Pour les 2 tests restants du bloc `rendu` non listés individuellement ci-dessus (chercher
+`grep -n "it(" packages/core/src/components/stepper/stepper.test.ts` entre les lignes 50 et 295
+pour les repérer précisément) : appliquer le même principe — toute requête `shadow(el)` ciblant
+`bullet`/`step-link`/`label`/`list--substep` devient `itemPart(el, path, ...)` ; toute requête
+ciblant `part="step"`/`part="substep"` sur un `<li>` devient une requête `el.querySelectorAll(...)`
+en light DOM sur `ar-stepper-item[part=...]`.
+
+- [ ] **Step 0c: Réécrire le test `'construit l'arbre depuis les items enfants'`**
+
+Chercher `grep -n "construit l'arbre depuis les items enfants" packages/core/src/components/stepper/stepper.test.ts`,
+lire le test, et remplacer toute assertion sur la structure HTML reconstruite (`li.item`,
+`[data-path]`) par une assertion équivalente sur la présence/l'imbrication des `ar-stepper-item`
+dans le light DOM (`el.querySelectorAll('ar-stepper-item')`, `.getAttribute('path')`) — la donnée
+vérifiée (l'arbre est bien construit) reste identique, seule la façon de l'observer change.
+
+- [ ] **Step 0d: Réécrire le bloc `describe('événements', ...)` (6 tests, à partir de la ligne 298)**
+
+Chaque occurrence de `requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]')` devient
+`itemPart<HTMLAnchorElement>(el, '/a', 'a')` (l'item `/a` n'a qu'un seul `<a>` dans son shadow DOM
+quand il est cliquable — pas besoin de préciser `[part~="step-link"]` en plus, `a` suffit et reste
+robuste si la structure interne change). Exemple complet, premier test du bloc (ligne 300-318) :
+
+```typescript
+it('émet ar-stepper-step-change au clic sur un lien, avec { from, to }', async () => {
+    const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+    const handler = vi.fn();
+    el.addEventListener('ar-stepper-step-change', handler);
+
+    const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+    link.click();
+
+    expect(handler).toHaveBeenCalledOnce();
+    const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
+    expect(event.detail).toEqual({ from: '/b', to: '/a' });
+
+    el.removeEventListener('ar-stepper-step-change', handler);
+});
+```
+
+Appliquer la même substitution (`shadow(el)` + `[data-path="..."]` → `itemPart(el, path, 'a')`) aux
+5 autres tests du bloc, sans changer leur logique d'assertion par ailleurs.
+
+- [ ] **Step 0e: Réécrire `'met à jour l'état courant quand currentPath change'`**
+
+Chercher le test dans le bloc `describe('mise à jour de currentPath', ...)` — même substitution que
+Step 0d/0b selon ce qu'il interroge (`a[data-path]` → `itemPart(..., 'a')`, ou `[part=...]` → même
+principe).
+
+- [ ] **Step 0f: Réécrire le bloc `describe("focus après activation d'un lien", ...)` (5 tests, à partir de la ligne 541)**
+
+`data-path` est supprimé : `shadow(el).activeElement` doit devenir `shadow(itemOf(el, path))
+.activeElement` (le focus atterrit dans le shadow DOM de l'ITEM concerné, pas celui d'`ar-stepper`
+— cf. `focusControl()`, Task 2/4). Exemple complet pour les 2 premiers tests (lignes 542-578) :
+
+```typescript
+it("porte un <div> comme contrôle interne pour l'étape courante", async () => {
+    const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+    const currentHeader = itemHeader(el, '/b');
+    expect(currentHeader.tagName.toLowerCase()).toBe('div');
+});
+
+it("focalise le contrôle de l'étape cliquée quand le consommateur répond en mettant à jour currentPath", async () => {
+    const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b">
+                        <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+
+    const linkA = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+    linkA.click();
+
+    el.currentPath = '/a';
+    await waitForUpdate(el);
+
+    const newCurrentHeader = itemHeader(el, '/a');
+    expect(newCurrentHeader.tagName.toLowerCase()).toBe('div');
+    expect(shadow(itemOf(el, '/a')).activeElement).toBe(newCurrentHeader);
+    expect(newCurrentHeader.getAttribute('tabindex')).toBe('-1');
+});
+```
+
+(Le premier test perd son assertion `data-path` — devenue impossible à vérifier puisque l'attribut
+n'existe plus ; le titre est légèrement reformulé ci-dessus en conséquence, garde l'assertion sur le
+tag `<div>` qui reste la garantie réellement testée.)
+
+Pour les 3 tests restants du bloc (`ne vole pas le focus...`, `n'affecte plus le focus...`,
+`focalise le <div> de la SOUS-étape cliquée...`) : même substitution —
+`shadow(el).activeElement`/`shadow(el).querySelector('[data-path="..."]')` deviennent
+respectivement `shadow(itemOf(el, path)).activeElement` et `itemHeader(el, path)`.
+
+- [ ] **Step 0g: Réécrire le bloc `describe('annonces a11y', ...)` (3 tests, à partir de la ligne ~1000)**
+
+Chercher `grep -n "describe('annonces a11y'" packages/core/src/components/stepper/stepper.test.ts`,
+lire les 3 tests. Ceux qui déclenchent un clic pour amorcer l'annonce utilisent la même substitution
+que Step 0d (`shadow(el)` + `[data-path]` → `itemPart(el, path, 'a')`) ; l'assertion finale
+(`expect(announceA11ySpy)...`) ne change pas, elle ne dépend pas de la structure DOM.
+
+- [ ] **Step 0h: Réécrire `'lang="en" traduit le label sr-only de chaque étape'` (ligne 1092)**
+
+Le texte `sr-only` (`.sr-only` dans `renderStepText`, désormais dans le shadow DOM de l'item) —
+remplacer toute requête `shadow(el).querySelector('.sr-only')`/similaire ciblant le sr-only d'une
+étape par `itemPart(el, path, '.sr-only')`. Les 2 autres tests du bloc `traduction`
+(`stepperNavLabel`, `currentStepStatus` du dropdown mobile) ne sont **pas** dans la liste des 28
+échecs — ne pas y toucher, ils continuent de cibler le shadow DOM d'`ar-stepper` lui-même (chrome
+mobile, inchangé).
+
+- [ ] **Step 0i: Corriger `autoloader.test.ts`**
+
+Dans `packages/core/src/autoloader.test.ts`, remplacer (ligne ~156) :
+
+```typescript
+const nestedSubstep = stepper.shadowRoot?.querySelector('li.item [part~="list"] li.item');
+expect(nestedSubstep).not.toBeNull();
+```
+
+par :
+
+```typescript
+// Preuve équivalente sous la nouvelle architecture : l'item "B" porte part="substep" sur
+// son propre host (posé par ArStepperItem.updated() — Task 2), ET le parent "A" a bien
+// construit le wrapper <ol part="list list--substep"> dans son propre shadow DOM (posé
+// uniquement quand showSubsteps est vrai, Task 3/4) — les deux ne sont vrais que si
+// buildFromItems() a correctement retrouvé le lien parent/enfant via closestInstanceOf().
+const itemA = stepper.querySelector('acme-stepper-item[path="/a"]') as HTMLElement & {
+    shadowRoot: ShadowRoot | null;
+};
+const itemB = stepper.querySelector('acme-stepper-item[path="/a/b"]');
+expect(itemA.shadowRoot?.querySelector('[part~="list--substep"]')).not.toBeNull();
+expect(itemB?.getAttribute('part')).toBe('substep');
+```
+
+- [ ] **Step 0j: Lancer la suite unitaire complète, vérifier 0 échec**
+
+Run: `npm run test --workspace=packages/core`
+Expected: PASS intégral (0 échec) — les 28 tests de `stepper.test.ts` + le test d'`autoloader.test.ts`
+listés dans le rapport de Task 4 (`.superpowers/sdd/2026-09-18-stepper-item-rich-content/task-4-report.md`)
+doivent tous passer désormais. Si un test échoue encore après application des Steps 0a-0i, relire
+son intitulé exact dans cette liste et vérifier qu'aucune substitution n'a été oubliée — ne pas
+supprimer ni skip un test pour faire passer la suite.
+
+- [ ] **Step 0k: Commit intermédiaire**
+
+```bash
+git add packages/core/src/components/stepper/stepper.test.ts packages/core/src/autoloader.test.ts
+git commit -m "test(core): stepper — adapte les tests unitaires au rendu délégué à ar-stepper-item (#226)"
+```
 
 - [ ] **Step 1: Créer les tests browser d'`ar-stepper-item`**
 
