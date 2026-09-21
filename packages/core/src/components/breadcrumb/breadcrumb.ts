@@ -41,7 +41,7 @@ import '../../translations/en.js';
  * @csspart panel      - Le panel mobile flottant.
  *
  * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
- * @slot separator    - Séparateur entre les items (desktop). Cloné dans chaque item ; remplace le « / » par défaut. Sans `id`, ni contenu interactif (le séparateur est masqué aux lecteurs d'écran).
+ * @slot separator    - Séparateur entre les items (desktop uniquement ; en mobile, une puce le remplace). Cloné dans chaque item ; remplace le « / » par défaut. Le contenu est décoratif (`aria-hidden`) : ni `id` (dupliqué dans chaque clone), ni élément interactif. Il fixe sa propre taille (un `<svg>` a besoin de `width` et `height`). Couleur et taille de police via `ar-breadcrumb-item::part(separator)`.
  * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
