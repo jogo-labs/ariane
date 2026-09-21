@@ -31,7 +31,7 @@ describe('pushItemRenderState', () => {
         pushItemRenderState([step], 'create', stepLabel);
 
         expect(setRenderState).toHaveBeenCalledWith({
-            bulletState: 'completed',
+            indicatorState: 'completed',
             isLink: true,
             showSubsteps: false,
             srLabel: 'étape 1:',
@@ -53,13 +53,13 @@ describe('pushItemRenderState', () => {
         pushItemRenderState([step], 'create', stepLabel);
 
         expect(setRenderState).toHaveBeenCalledWith({
-            bulletState: 'current',
+            indicatorState: 'current',
             isLink: false,
             showSubsteps: true,
             srLabel: 'étape 1:',
         } satisfies ItemRenderState);
         expect(setSubRenderState).toHaveBeenCalledWith({
-            bulletState: 'default',
+            indicatorState: 'default',
             isLink: false,
             showSubsteps: false,
             srLabel: 'sous-étape 1:',

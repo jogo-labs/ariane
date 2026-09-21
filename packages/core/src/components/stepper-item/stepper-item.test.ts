@@ -208,7 +208,7 @@ describe('ArStepperItem', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('affiche le label en texte par défaut, sans lien (bulletState default)', async () => {
+        it('affiche le label en texte par défaut, sans lien (indicatorState default)', async () => {
             const el = await fixture<ArStepperItem>(
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
@@ -222,7 +222,7 @@ describe('ArStepperItem', () => {
                 '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'completed',
+                indicatorState: 'completed',
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -239,7 +239,7 @@ describe('ArStepperItem', () => {
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'current',
+                indicatorState: 'current',
                 isLink: false,
                 showSubsteps: true,
                 srLabel: 'étape 1:',
@@ -249,12 +249,12 @@ describe('ArStepperItem', () => {
             expect(el.shadowRoot!.querySelector('ol[part~="list--substep"] slot')).not.toBeNull();
         });
 
-        it('bulletState: "current" pose aria-current="step" sur le host', async () => {
+        it('indicatorState: "current" pose aria-current="step" sur le host', async () => {
             const el = await fixture<ArStepperItem>(
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'current',
+                indicatorState: 'current',
                 isLink: false,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -264,12 +264,12 @@ describe('ArStepperItem', () => {
             expect(el.getAttribute('aria-current')).toBe('step');
         });
 
-        it('bulletState !== "current" ne pose pas aria-current', async () => {
+        it('indicatorState !== "current" ne pose pas aria-current', async () => {
             const el = await fixture<ArStepperItem>(
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'completed',
+                indicatorState: 'completed',
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -286,7 +286,7 @@ describe('ArStepperItem', () => {
                 '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'completed',
+                indicatorState: 'completed',
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -314,7 +314,7 @@ describe('ArStepperItem', () => {
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'completed',
+                indicatorState: 'completed',
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -341,7 +341,7 @@ describe('ArStepperItem', () => {
                 '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
             );
             el.setRenderState({
-                bulletState: 'completed',
+                indicatorState: 'completed',
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',

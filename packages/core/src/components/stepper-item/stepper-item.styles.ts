@@ -39,7 +39,7 @@ export default css`
     }
 
     /* functional-default: numérotation par défaut — chiffre visible sur les étapes principales,
-       puce nue sur les sous-étapes. Forme, taille et couleur de l'indicateur relèvent du thème. */
+       indicateur nu sur les sous-étapes. Forme, taille et couleur de l'indicateur relèvent du thème. */
     [part~='indicator']:before {
         content: counter(step);
         /* a11y-fallback: posé par ar-stepper-item lui-même seulement quand imbriqué (sous-étape), sinon numéro visible */

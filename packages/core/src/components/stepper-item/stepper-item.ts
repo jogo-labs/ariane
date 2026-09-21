@@ -8,17 +8,17 @@ import styles from './stepper-item.styles.js';
 
 import { stepperContext, type StepperRegistry } from '../../context/stepper.context.js';
 
-export type BulletState = 'current' | 'completed' | 'default';
+export type IndicatorState = 'current' | 'completed' | 'default';
 
 export interface ItemRenderState {
-    bulletState: BulletState;
+    indicatorState: IndicatorState;
     isLink: boolean;
     showSubsteps: boolean;
     srLabel: string;
 }
 
 /** Compose la valeur `part=` de l'indicateur d'étape avec sa variante d'état (convention BEM `--`). */
-function withIndicatorStatePart(state: BulletState): string {
+function withIndicatorStatePart(state: IndicatorState): string {
     if (state === 'current') return 'indicator indicator--current';
     if (state === 'completed') return 'indicator indicator--completed';
     return 'indicator';
@@ -59,7 +59,7 @@ export class ArStepperItem extends LitElement {
     @property({ type: String }) label = '';
     @property({ type: String }) href?: string;
 
-    @state() private _bulletState: BulletState = 'default';
+    @state() private _indicatorState: IndicatorState = 'default';
     @state() private _isLink = false;
     @state() private _showSubsteps = false;
     @state() private _srLabel = '';
@@ -88,7 +88,7 @@ export class ArStepperItem extends LitElement {
 
     /** Poussé par `ar-stepper` à chaque recalcul d'état (currentPath, mode, structure de l'arbre). */
     setRenderState(state: ItemRenderState): void {
-        this._bulletState = state.bulletState;
+        this._indicatorState = state.indicatorState;
         this._isLink = state.isLink;
         this._showSubsteps = state.showSubsteps;
         this._srLabel = state.srLabel;
@@ -120,7 +120,7 @@ export class ArStepperItem extends LitElement {
         });
 
         this.setAttribute('role', 'listitem');
-        if (this._bulletState === 'current') {
+        if (this._indicatorState === 'current') {
             this.setAttribute('aria-current', 'step');
         } else {
             this.removeAttribute('aria-current');
@@ -156,7 +156,7 @@ export class ArStepperItem extends LitElement {
     /* ------------------------------------------------ */
 
     override render(): TemplateResult {
-        const indicatorPart = withIndicatorStatePart(this._bulletState);
+        const indicatorPart = withIndicatorStatePart(this._indicatorState);
         const labelPart = this._isLink ? 'label label--link' : 'label';
         const describedBy = this._hasAfterLabel ? this._afterLabelId : nothing;
 

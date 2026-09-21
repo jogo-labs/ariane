@@ -112,7 +112,7 @@ describe('ar-stepper-item — browser', () => {
         expect(detail).to.deep.equal({ from: 'b', to: 'a' });
     });
 
-    it('la numérotation des puces (compteur CSS) reste correcte à travers le shadow DOM des items', async () => {
+    it('la numérotation des indicateurs (compteur CSS) reste correcte à travers le shadow DOM des items', async () => {
         el = await fixture(html`
             <ar-stepper current-path="a">
                 <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
@@ -123,19 +123,19 @@ describe('ar-stepper-item — browser', () => {
         await el.updateComplete;
 
         const items = [...el.querySelectorAll('ar-stepper-item')];
-        const bullets = items.map(
+        const indicators = items.map(
             (item) => item.shadowRoot!.querySelector('[part~="indicator"]') as HTMLElement,
         );
-        const values = bullets.map((bullet) =>
-            getComputedStyle(bullet, '::before').getPropertyValue('content'),
+        const values = indicators.map((indicator) =>
+            getComputedStyle(indicator, '::before').getPropertyValue('content'),
         );
 
         // content résolu contient le chiffre littéral (pas "counter(step)") une fois peint —
         // vérifié via un screenshot serait plus fiable mais indisponible en environnement WTR ;
         // on vérifie au minimum que la valeur spécifiée référence bien le compteur "step" et que
-        // les trois puces appartiennent bien à trois items distincts (host ar-stepper commun).
+        // les trois indicateurs appartiennent bien à trois items distincts (host ar-stepper commun).
         // `closest()` ne traverse pas la frontière shadow DOM depuis l'intérieur d'un shadow
-        // root : on retrouve donc l'item propriétaire via la liste zippée plutôt que via bullet.
+        // root : on retrouve donc l'item propriétaire via la liste zippée plutôt que via indicator.
         values.forEach((v) => expect(v).to.include('counter(step)'));
         expect(new Set(items.map((item) => item.getAttribute('path'))).size).to.equal(3);
 

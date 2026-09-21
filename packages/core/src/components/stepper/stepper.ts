@@ -264,7 +264,7 @@ export class ArStepper extends LitElement {
                 this._emitChanged({ from, to });
                 announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
                 if (to === this._pendingFocusPath) {
-                    // L'item cible vient de recevoir son nouveau render-state (bulletState,
+                    // L'item cible vient de recevoir son nouveau render-state (indicatorState,
                     // isLink…) via pushItemRenderState() dans willUpdate(), mais son propre
                     // cycle de rendu (LitElement séparé, Task 2) n'a pas encore tourné : son
                     // shadow DOM reflète encore l'ancien contrôle (ex. <a> avant un swap vers

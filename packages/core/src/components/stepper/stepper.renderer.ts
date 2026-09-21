@@ -1,6 +1,6 @@
 import { html, type TemplateResult } from 'lit';
 import { type NavigationNode, type NavigationMode } from '../../types/navigation-nodes.js';
-import type { BulletState } from '../stepper-item/stepper-item.js';
+import type { IndicatorState } from '../stepper-item/stepper-item.js';
 
 /* ------------------------------------------------ */
 /* TYPES                                            */
@@ -41,7 +41,7 @@ export function pushItemRenderState(
         const isCurrent = isGroupCurrent(step);
         const isCompleted =
             !isCurrent && (mode === 'edit' ? step.state !== 'current' : step.state === 'completed');
-        const bulletState: BulletState = isCurrent
+        const indicatorState: IndicatorState = isCurrent
             ? 'current'
             : step.state === 'completed'
               ? 'completed'
@@ -49,7 +49,7 @@ export function pushItemRenderState(
         const showSubsteps = (isCurrent || mode === 'edit') && step.children.length > 0;
 
         step.item.setRenderState({
-            bulletState,
+            indicatorState,
             isLink: isCompleted,
             showSubsteps,
             srLabel: stepLabel(order, false),
@@ -62,14 +62,14 @@ export function pushItemRenderState(
             // La sous-étape courante ne doit jamais être un lien, y compris en mode edit
             // (on ne navigue pas vers la page où l'on se trouve déjà).
             const isEditableLink = mode === 'edit' && !subIsCurrent;
-            const subBulletState: BulletState = subIsCurrent
+            const subIndicatorState: IndicatorState = subIsCurrent
                 ? 'current'
                 : subIsCompleted
                   ? 'completed'
                   : 'default';
 
             sub.item.setRenderState({
-                bulletState: subBulletState,
+                indicatorState: subIndicatorState,
                 isLink: subIsCompleted || isEditableLink,
                 showSubsteps: false,
                 srLabel: stepLabel(subOrder, true),
