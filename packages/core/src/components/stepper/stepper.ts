@@ -58,20 +58,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart trigger - Le bouton d'ouverture du panel mobile.
  * @csspart panel   - Le panel mobile flottant.
  *
- * @cssprop --ar-stepper-gap - Hauteur du connecteur entre les étapes principales.
- * @cssprop --ar-stepper-substep-gap - Hauteur du connecteur entre les sous-étapes.
- * @cssprop --ar-stepper-connector-color - Couleur du connecteur pointillé entre les étapes.
- * @cssprop --ar-stepper-bullet-bg - Fond des puces des étapes visitables.
- * @cssprop --ar-stepper-bullet-color - Couleur du numéro dans les puces visitables.
- * @cssprop --ar-stepper-bullet-border-color - Bordure des puces des étapes suivantes.
- * @cssprop --ar-stepper-bullet-hover-bg - Fond de la puce au survol.
- * @cssprop --ar-stepper-label-color - Couleur des labels des étapes non courantes.
- * @cssprop --ar-stepper-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
- * @cssprop --ar-stepper-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
- * @cssprop --ar-stepper-link-hover-bullet-text-color - Couleur du numéro affiché dans la puce au survol/focus (cascade vers --ar-color-text-inverse).
- * @cssprop --ar-stepper-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
  * @cssprop --ar-stepper-toggle-transition-duration - Durée de la transition de fond du bouton d'ouverture (respecte `prefers-reduced-motion`).
  * @cssprop --ar-stepper-toggle-min-size - Taille de cible minimale du bouton d'ouverture (WCAG 2.5.8).
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
@@ -138,6 +126,9 @@ export class ArStepper extends LitElement {
     /**
      * Inverse l'alignement de la liste d'étapes en mode desktop. Sans effet en mode
      * mobile (dropdown).
+     *
+     * S'appuie sur des règles posées sur les parts `control` et `indicator` d'ar-stepper-item —
+     * un thème qui les redéfinit peut désactiver l'inversion.
      */
     @property({ attribute: 'reverse-align', reflect: true, type: Boolean })
     reverseAlign: boolean = false;

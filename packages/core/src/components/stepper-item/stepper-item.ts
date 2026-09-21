@@ -12,17 +12,16 @@ export type BulletState = 'current' | 'completed' | 'default';
 
 export interface ItemRenderState {
     bulletState: BulletState;
-    isSubstep: boolean;
     isLink: boolean;
     showSubsteps: boolean;
     srLabel: string;
 }
 
-/** Compose la valeur `part=` de la puce d'étape avec sa variante d'état (convention BEM `--`). */
-function withBulletStatePart(state: BulletState): string {
-    if (state === 'current') return 'bullet indicator bullet--current';
-    if (state === 'completed') return 'bullet indicator bullet--completed';
-    return 'bullet indicator';
+/** Compose la valeur `part=` de l'indicateur d'étape avec sa variante d'état (convention BEM `--`). */
+function withIndicatorStatePart(state: BulletState): string {
+    if (state === 'current') return 'indicator indicator--current';
+    if (state === 'completed') return 'indicator indicator--completed';
+    return 'indicator';
 }
 
 /**
@@ -32,22 +31,23 @@ function withBulletStatePart(state: BulletState): string {
  *
  * @slot after-label - Contenu additif affiché à côté du label (ex. icône de statut) — n'affecte
  *   jamais le texte du label lui-même, toujours lu séparément (voir `aria-describedby`).
+ * @slot indicator - Remplace le contenu par défaut (numéro d'étape via compteur CSS) de
+ *   l'indicateur visuel (ex. icône de statut). Purement décoratif (`aria-hidden`) — l'information
+ *   accessible de position est toujours portée séparément par le texte masqué visuellement.
  *
  * @csspart step-link  - Le lien de l'étape (présent uniquement quand l'étape est cliquable).
  * @csspart control    - Porté par `step-link`, ou par le conteneur non cliquable : élément interactif générique.
- * @csspart bullet     - La puce numérotée de l'étape.
- * @csspart indicator  - Porté par `bullet` : marqueur/indicateur visuel.
+ * @csspart indicator  - Le marqueur visuel de l'étape (numéro par défaut, ou contenu du slot `indicator`).
+ * @csspart indicator--current - Le marqueur visuel de l'étape courante (variante d'état de `indicator`).
+ * @csspart indicator--completed - Le marqueur visuel d'une étape complétée (variante d'état de `indicator`).
  * @csspart label      - Le texte du label.
  * @csspart label--link - Le texte du label quand l'étape est cliquable (variante d'état de `label`).
- * @csspart bullet--current - La puce numérotée de l'étape courante (variante d'état de `bullet`).
- * @csspart bullet--completed - La puce numérotée d'une étape complétée (variante d'état de `bullet`).
  * @csspart list--substep - La liste des sous-étapes, quand cette étape en affiche.
  *
- * L'attribut `part` posé sur le host lui-même (`step` pour une étape de premier niveau,
- * `substep` pour une sous-étape) n'est pas un `::part()` consommable depuis l'extérieur —
- * `ar-stepper-item` est un élément slotté en light DOM, pas un descendant du shadow tree d'un
- * ancêtre, donc `::part()` ne peut pas l'atteindre. Il reste ciblable en CSS classique via un
- * sélecteur d'attribut : `ar-stepper-item[part="step"]` / `ar-stepper-item[part="substep"]`.
+ * @cssprop --ar-stepper-item-label-color - Couleur des labels des étapes non courantes.
+ * @cssprop --ar-stepper-item-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
+ * @cssprop --ar-stepper-item-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
+ * @cssprop --ar-stepper-item-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
  */
 export class ArStepperItem extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, styles];
@@ -60,11 +60,11 @@ export class ArStepperItem extends LitElement {
     @property({ type: String }) href?: string;
 
     @state() private _bulletState: BulletState = 'default';
-    @state() private _isSubstep = false;
     @state() private _isLink = false;
     @state() private _showSubsteps = false;
     @state() private _srLabel = '';
     @state() private _hasAfterLabel = false;
+    @state() private _hasIndicatorContent = false;
 
     private _registry?: StepperRegistry | undefined;
 
@@ -89,7 +89,6 @@ export class ArStepperItem extends LitElement {
     /** Poussé par `ar-stepper` à chaque recalcul d'état (currentPath, mode, structure de l'arbre). */
     setRenderState(state: ItemRenderState): void {
         this._bulletState = state.bulletState;
-        this._isSubstep = state.isSubstep;
         this._isLink = state.isLink;
         this._showSubsteps = state.showSubsteps;
         this._srLabel = state.srLabel;
@@ -120,7 +119,6 @@ export class ArStepperItem extends LitElement {
             }
         });
 
-        this.setAttribute('part', this._isSubstep ? 'substep' : 'step');
         this.setAttribute('role', 'listitem');
         if (this._bulletState === 'current') {
             this.setAttribute('aria-current', 'step');
@@ -148,17 +146,28 @@ export class ArStepperItem extends LitElement {
         this._hasAfterLabel = slot.assignedNodes({ flatten: true }).length > 0;
     };
 
+    private _handleIndicatorSlotChange = (event: Event): void => {
+        const slot = event.target as HTMLSlotElement;
+        this._hasIndicatorContent = slot.assignedNodes({ flatten: true }).length > 0;
+    };
+
     /* ------------------------------------------------ */
     /* RENDER                                           */
     /* ------------------------------------------------ */
 
     override render(): TemplateResult {
-        const bulletPart = withBulletStatePart(this._bulletState);
+        const indicatorPart = withIndicatorStatePart(this._bulletState);
         const labelPart = this._isLink ? 'label label--link' : 'label';
         const describedBy = this._hasAfterLabel ? this._afterLabelId : nothing;
 
         const headerContent = html`
-            <span part=${bulletPart} aria-hidden="true"></span>
+            <span
+                part=${indicatorPart}
+                aria-hidden="true"
+                ?data-has-content=${this._hasIndicatorContent}
+            >
+                <slot name="indicator" @slotchange=${this._handleIndicatorSlotChange}></slot>
+            </span>
             <span class="sr-only">${this._srLabel}</span>
             <span class="item-label" part=${labelPart}>${this.label}</span>
         `;
@@ -189,7 +198,7 @@ export class ArStepperItem extends LitElement {
                               </div>
                           `
                 }
-                <span id=${this._afterLabelId}>
+                <span id=${this._afterLabelId} ?hidden=${!this._hasAfterLabel}>
                     <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
                 </span>
             </div>

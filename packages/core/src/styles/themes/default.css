@@ -421,25 +421,10 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
-        --ar-stepper-label-color: var(--ar-color-text-muted);
-        /* Aplat pâle plutôt que --ar-color-interactive plein : la distinction
-           complétée/courante n'a pas besoin d'un fort contraste de couleur, le
-           texte gras + coloré de l'étape courante suffit à la signaler. */
-        --ar-stepper-bullet-color: var(--ar-color-text);
-        --ar-stepper-bullet-bg: var(--ar-color-interactive-subtle);
-        /* Primaire claire plutôt que neutre — reste ≥ 3:1 (WCAG 1.4.11, non-textuel)
-           sur blanc (3,96:1) comme sur Voûte (4,22:1) ; au-delà (primary-60+), ça
-           repasse sous 3:1 en clair. Valeur fixe (pas de light-dark()), comme l'était
-           déjà --ar-color-neutral-70 qu'elle remplace. */
-        --ar-stepper-bullet-border-color: var(--ar-color-primary-50);
-        --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
-        --ar-stepper-link-hover-label-color: var(--ar-color-text);
-        --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
-        --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
-        --ar-stepper-current-header-color: var(--ar-color-interactive);
-        --ar-stepper-gap: 1.5rem;
-        --ar-stepper-substep-gap: 1rem;
-        --ar-stepper-connector-color: var(--ar-color-neutral-80);
+        --ar-stepper-item-label-color: var(--ar-color-text-muted);
+        --ar-stepper-item-link-hover-label-color: var(--ar-color-text);
+        --ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
+        --ar-stepper-item-current-header-color: var(--ar-color-interactive);
         --ar-stepper-toggle-transition-duration: 0.15s;
         --ar-stepper-toggle-min-size: 2.5rem;
 
@@ -886,10 +871,23 @@
         }
     }
 
-    /* Les parts step-link/label--link/bullet/bullet--current ont migré vers le shadow DOM
+    /* Les parts step-link/label--link/indicator/indicator--current ont migré vers le shadow DOM
        d'ar-stepper-item (élément slotté, pas un descendant du shadow tree d'ar-stepper) —
        ::part() doit donc cibler ar-stepper-item directement, pas ar-stepper (#226 review finale). */
     ar-stepper-item {
+        /* Aplat pâle plutôt que --ar-color-interactive plein : la distinction
+           complétée/courante n'a pas besoin d'un fort contraste de couleur, le
+           texte gras + coloré de l'étape courante suffit à la signaler.
+           Préfixe --ar-theme- (pas --ar-stepper-item-) : ces deux variables ne sont consommées
+           que par ce fichier (::part(indicator) plus bas + le pont :hover), jamais par
+           stepper-item.styles.ts — ce ne sont pas des @cssprop du composant, seulement des
+           valeurs mutualisées pour éviter de répéter la couleur à plusieurs endroits du thème.
+           Le préfixe --ar-stepper-item- est réservé aux tokens documentés en @cssprop dans
+           stepper-item.ts (garde-fou validate-cssprop-defaults.js, détection par préfixe de
+           tag). */
+        --ar-theme-stepper-indicator-color: var(--ar-color-text);
+        --ar-theme-stepper-indicator-bg: var(--ar-color-interactive-subtle);
+
         /* Texte cliquable en couleur neutre, pas ambre — seule la puce porte l'accent
            (cf. #224/#225). text-decoration: none explicite (pas juste l'absence de
            déclaration) : sans ça, le soulignement par défaut du user-agent sur <a> reste
@@ -905,6 +903,9 @@
         &::part(step-link):hover,
         &::part(step-link):focus {
             color: var(--ar-color-text-muted);
+
+            --ar-theme-stepper-indicator-bg: var(--ar-color-text-muted);
+            --ar-theme-stepper-indicator-color: var(--ar-color-text-inverse);
         }
 
         &::part(step-link):focus {
@@ -928,30 +929,91 @@
         }
 
         /*
-         * Hiérarchie à 3 niveaux (cf. #224/#225) :
-         * - future (part="bullet" seul)   : puce creuse, bordure primaire claire —
-         *   --ar-stepper-bullet-border-color
-         * - complétée (bullet--completed) : aplat pâle --ar-color-interactive-subtle +
-         *   texte neutre, hérité du style interne générique de toute puce dans un
-         *   step-link (stepper.styles.ts), pas de règle dédiée ici. Contraste volontairement
-         *   relâché : le gras + la couleur du label "courant" suffisent à le distinguer,
-         *   la puce n'a pas besoin de porter seule cette distinction.
-         * - courante (bullet--current)    : aplat vif --ar-color-interactive +
-         *   --ar-color-text-inverse, seul état combinant puce ET label colorés/gras. Une
-         *   étape courante n'est jamais rendue comme step-link (toujours un <div>, y
-         *   compris en mode edit — cf. renderStep), donc bullet--current n'a jamais de
-         *   règle :hover/:focus : rien n'y est cliquable, un retour visuel au survol
-         *   serait trompeur.
+         * Hiérarchie à 2 niveaux + courant (cf. #224/#225, revu #226 suivi) :
+         * - par défaut (à venir ET complétée, part="indicator" seul ou + indicator--completed) :
+         *   même aplat --ar-theme-stepper-indicator-bg — la distinction à venir/complétée n'a pas
+         *   besoin d'un traitement visuel séparé sur l'indicateur seul.
+         * - courante (indicator--current) : aplat vif --ar-color-interactive +
+         *   --ar-color-text-inverse, seul état combinant indicateur ET label colorés/gras.
+         *
+         * Toutes les déclarations (fond, couleur, y compris :hover/:focus) vivent ici, pas dans
+         * stepper-item.styles.ts : un ::part() posé par une feuille @layer (ce fichier) l'emporte
+         * TOUJOURS sur une règle interne du shadow tree pour la même propriété, quelle que soit sa
+         * spécificité — vérifié empiriquement (Chromium), contre-intuitif vu qu'une règle non
+         * calquée gagne normalement sur une règle @layer. Une règle interne équivalente serait
+         * donc du code mort silencieux.
+         *
+         * Taille/forme : valeurs de design, portées ici plutôt que dans le composant (headless —
+         * cf. #226 suivi). ar-stepper-item > ar-stepper-item::part(indicator) cible les
+         * indicateurs de sous-étapes via la structure (imbrication réelle), sans avoir besoin
+         * d'un état pour le savoir — ::part() ne peut pas chaîner sur un attribut du host ni sur
+         * un pseudo-élément (::part(x)::before invalide en spec).
          */
-        &::part(bullet) {
-            border-radius: var(--ar-border-radius-xl);
+        &::part(indicator) {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: var(--ar-border-radius-full);
+            background-color: var(--ar-theme-stepper-indicator-bg);
+            color: var(--ar-theme-stepper-indicator-color);
         }
 
-        &::part(bullet--current) {
+        &::part(indicator--current) {
             background-color: var(--ar-color-interactive);
             color: var(--ar-color-text-inverse);
-            box-shadow: none;
         }
+
+        & > ar-stepper-item::part(indicator) {
+            width: 0.75rem;
+            height: 0.75rem;
+            margin-inline-start: 0.75rem;
+            margin-inline-end: 1.25rem;
+        }
+    }
+
+    /* reverse-align inverse déjà l'ordre visuel de l'indicateur (pont interne côté composant,
+       ar-stepper-item.styles.ts) mais pas cette marge de sous-étape : elle est posée ici, côté
+       thème, sans lien avec ce pont — sans cette règle dédiée, la puce de sous-étape passe en
+       fin de ligne (order) tout en gardant sa marge de départ, d'où le décalage visuel. */
+    ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::part(indicator) {
+        margin-inline-start: 1.25rem;
+        margin-inline-end: 0.75rem;
+    }
+
+    /* Connecteur décoratif (ligne pointillée) entre étapes/sous-étapes — un pseudo-élément du
+       host ar-stepper-item, jamais un vrai part (::part() ne peut pas l'atteindre, ni via
+       chaînage ::part(x)::after, invalide en spec). Un sélecteur direct sur le tag atteint
+       toutefois le même pseudo-élément que :host::after/:before le ferait de l'intérieur —
+       vérifié empiriquement (#226 suivi). Étape/sous-étape est résolu par sélecteur structurel
+       (ar-stepper > ar-stepper-item pour une étape principale, ar-stepper-item > ar-stepper-item
+       pour une sous-étape), sans aucun état à relayer depuis le composant. */
+    ar-stepper > ar-stepper-item:not(:last-child)::after,
+    ar-stepper-item > ar-stepper-item::before {
+        content: '';
+        display: block;
+        width: 2.25rem;
+        align-self: flex-start;
+        background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
+        background-size: 2px 8px;
+        background-repeat: repeat-y;
+    }
+
+    ar-stepper > ar-stepper-item:not(:last-child)::after {
+        height: 1.5rem;
+        background-position: center 3px;
+    }
+
+    ar-stepper-item > ar-stepper-item::before {
+        height: 1rem;
+        background-position: center 4px;
+    }
+
+    /* reverse-align bascule le connecteur du même côté que l'indicateur — résolu en ciblant
+       directement l'attribut public sur ar-stepper, jamais la custom property interne
+       (--ar-stepper-item-align) : un thème ne doit pas dépendre d'un détail de plomberie non
+       documenté du composant. */
+    ar-stepper[reverse-align] > ar-stepper-item:not(:last-child)::after,
+    ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::before {
+        align-self: flex-end;
     }
 
     /* Alert */

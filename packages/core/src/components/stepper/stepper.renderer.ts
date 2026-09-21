@@ -50,7 +50,6 @@ export function pushItemRenderState(
 
         step.item.setRenderState({
             bulletState,
-            isSubstep: false,
             isLink: isCompleted,
             showSubsteps,
             srLabel: stepLabel(order, false),
@@ -71,7 +70,6 @@ export function pushItemRenderState(
 
             sub.item.setRenderState({
                 bulletState: subBulletState,
-                isSubstep: true,
                 isLink: subIsCompleted || isEditableLink,
                 showSubsteps: false,
                 srLabel: stepLabel(subOrder, true),

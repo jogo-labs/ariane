@@ -147,16 +147,17 @@ describe('autoloader — préfixe configurable', () => {
         await stepper.updateComplete;
         await tick();
 
-        // Preuve équivalente sous la nouvelle architecture : l'item "B" porte part="substep" sur
-        // son propre host (posé par ArStepperItem.updated() — Task 2), ET le parent "A" a bien
-        // construit le wrapper <ol part="list list--substep"> dans son propre shadow DOM (posé
-        // uniquement quand showSubsteps est vrai, Task 3/4) — les deux ne sont vrais que si
-        // buildFromItems() a correctement retrouvé le lien parent/enfant via closestInstanceOf().
+        // Preuve équivalente sous la nouvelle architecture : le parent "A" a bien construit le
+        // wrapper <ol part="list list--substep"> dans son propre shadow DOM (posé uniquement
+        // quand showSubsteps est vrai, Task 3/4), ET "B" y est bien imbriqué en tant qu'enfant
+        // direct — les deux ne sont vrais que si buildFromItems() a correctement retrouvé le
+        // lien parent/enfant via closestInstanceOf() (aucun des deux niveaux ne pose plus
+        // d'attribut part sur son propre host, cf. #226 suivi).
         const itemA = stepper.querySelector('acme-stepper-item[path="/a"]') as HTMLElement & {
             shadowRoot: ShadowRoot | null;
         };
         const itemB = stepper.querySelector('acme-stepper-item[path="/a/b"]');
         expect(itemA.shadowRoot?.querySelector('[part~="list--substep"]')).not.toBeNull();
-        expect(itemB?.getAttribute('part')).toBe('substep');
+        expect(itemB?.matches('acme-stepper-item > acme-stepper-item')).toBe(true);
     });
 });

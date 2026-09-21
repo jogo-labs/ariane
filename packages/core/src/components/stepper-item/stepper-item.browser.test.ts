@@ -61,6 +61,33 @@ describe('ar-stepper-item — browser', () => {
         expect(control.hasAttribute('aria-describedby')).to.equal(false);
     });
 
+    it('un contenu projeté dans le slot indicator remplace le numéro par défaut', async () => {
+        el = await fixture(html`
+            <ar-stepper current-path="a">
+                <ar-stepper-item path="a" label="Étape A">
+                    <span slot="indicator">✓</span>
+                </ar-stepper-item>
+                <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+            </ar-stepper>
+        `);
+        await el.updateComplete;
+
+        const itemA = el.querySelector('ar-stepper-item[path="a"]')!;
+        // Même remarque que pour after-label : le slotchange est asynchrone, distinct du
+        // cycle de rendu d'ar-stepper — laisser passer un tick réel absorbe le second rendu
+        // qu'il déclenche (_hasIndicatorContent → true).
+        await aTimeout(0);
+        await (itemA as unknown as { updateComplete: Promise<boolean> }).updateComplete;
+
+        const indicator = itemA.shadowRoot!.querySelector('[part~="indicator"]')!;
+        expect(indicator.hasAttribute('data-has-content')).to.equal(true);
+        expect(getComputedStyle(indicator, '::before').display).to.equal('none');
+
+        const itemB = el.querySelector('ar-stepper-item[path="b"]')!;
+        const indicatorB = itemB.shadowRoot!.querySelector('[part~="indicator"]')!;
+        expect(indicatorB.hasAttribute('data-has-content')).to.equal(false);
+    });
+
     it('clic réel sur le lien d’une étape déclenche ar-stepper-step-change avec le bon detail', async () => {
         // current-path="b" : "a" est déjà complétée (avant l'étape courante), donc rendue comme
         // un <a> cliquable dans son shadow DOM — condition nécessaire pour tester un vrai clic
@@ -97,7 +124,7 @@ describe('ar-stepper-item — browser', () => {
 
         const items = [...el.querySelectorAll('ar-stepper-item')];
         const bullets = items.map(
-            (item) => item.shadowRoot!.querySelector('[part~="bullet"]') as HTMLElement,
+            (item) => item.shadowRoot!.querySelector('[part~="indicator"]') as HTMLElement,
         );
         const values = bullets.map((bullet) =>
             getComputedStyle(bullet, '::before').getPropertyValue('content'),

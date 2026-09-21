@@ -32,7 +32,6 @@ describe('pushItemRenderState', () => {
 
         expect(setRenderState).toHaveBeenCalledWith({
             bulletState: 'completed',
-            isSubstep: false,
             isLink: true,
             showSubsteps: false,
             srLabel: 'étape 1:',
@@ -55,14 +54,12 @@ describe('pushItemRenderState', () => {
 
         expect(setRenderState).toHaveBeenCalledWith({
             bulletState: 'current',
-            isSubstep: false,
             isLink: false,
             showSubsteps: true,
             srLabel: 'étape 1:',
         } satisfies ItemRenderState);
         expect(setSubRenderState).toHaveBeenCalledWith({
             bulletState: 'default',
-            isSubstep: true,
             isLink: false,
             showSubsteps: false,
             srLabel: 'sous-étape 1:',

@@ -32,7 +32,7 @@ function itemOf(el: ArStepper, path: string): ArStepperItem {
     return requireQuery<ArStepperItem>(el, `ar-stepper-item[path="${path}"]`);
 }
 
-/** Résout un sélecteur DANS le shadow DOM de l'item portant ce path (bullet, label, step-link…). */
+/** Résout un sélecteur DANS le shadow DOM de l'item portant ce path (indicator, label, step-link…). */
 function itemPart<T extends Element = HTMLElement>(
     el: ArStepper,
     path: string,
@@ -101,17 +101,6 @@ describe('ArStepper', () => {
             expect(link.getAttribute('part')?.split(/\s+/)).toContain('control');
         });
 
-        it('bullet porte aussi le rôle transverse "indicator"', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const bullet = itemPart(el, '/a', '[part~="bullet"]');
-            expect(bullet.getAttribute('part')?.split(/\s+/)).toContain('indicator');
-        });
-
         it('rend part="list" sur la liste des étapes', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
@@ -122,7 +111,10 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('[part="list"]')).not.toBeNull();
         });
 
-        it('rend part="step" sur un item de premier niveau et part="substep" sur une sous-étape', async () => {
+        it('une sous-étape est un enfant direct imbriqué dans un autre ar-stepper-item', async () => {
+            // L'imbrication structurelle (pas un attribut part sur le host, cf. #226 suivi —
+            // ::part() ne peut pas atteindre un ar-stepper-item, élément slotté en light DOM)
+            // est le seul signal, interne comme externe, distinguant étape et sous-étape.
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a/1">
                     <ar-stepper-item path="/a" label="Étape A">
@@ -132,9 +124,9 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const topLevel = el.querySelectorAll(':scope > ar-stepper-item[part="step"]');
-            expect(topLevel.length).toBeGreaterThan(0);
-            const nested = el.querySelectorAll('ar-stepper-item ar-stepper-item[part="substep"]');
+            const topLevel = el.querySelectorAll(':scope > ar-stepper-item');
+            expect(topLevel.length).toBe(2);
+            const nested = el.querySelectorAll('ar-stepper-item > ar-stepper-item');
             expect(nested.length).toBe(2);
             // La sous-liste imbriquée vit dans le shadow DOM du parent ("/a"), pas celui d'ar-stepper.
             const nestedList = shadow(itemOf(el, '/a')).querySelector('[part~="list--substep"]');
@@ -156,31 +148,31 @@ describe('ArStepper', () => {
             expect(currentItemInner.tagName.toLowerCase()).toBe('div');
         });
 
-        it('rend part="bullet" sur la puce de chaque étape', async () => {
+        it('rend part="indicator" sur l\'indicateur de chaque étape', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(itemPart(el, '/a', '[part~="bullet"]')).toBeTruthy();
+            expect(itemPart(el, '/a', '[part~="indicator"]')).toBeTruthy();
         });
 
-        it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape courante', async () => {
+        it("rend le part d'état \"indicator--current\" uniquement sur l'indicateur de l'étape courante", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const steps = el.querySelectorAll(':scope > ar-stepper-item[part="step"]');
+            const steps = el.querySelectorAll(':scope > ar-stepper-item');
             expect(steps.length).toBe(2);
 
-            const bulletA = itemPart(el, '/a', '[part~="bullet"]');
-            expect(bulletA.getAttribute('part')).toBe('bullet indicator bullet--current');
+            const indicatorA = itemPart(el, '/a', '[part~="indicator"]');
+            expect(indicatorA.getAttribute('part')).toBe('indicator indicator--current');
 
-            const bulletB = itemPart(el, '/b', '[part~="bullet"]');
-            expect(bulletB.getAttribute('part')).toBe('bullet indicator');
+            const indicatorB = itemPart(el, '/b', '[part~="indicator"]');
+            expect(indicatorB.getAttribute('part')).toBe('indicator');
         });
 
         it("ne rend jamais l'étape de premier niveau comme un lien quand une de ses sous-étapes est courante, même en mode edit", async () => {
@@ -197,7 +189,7 @@ describe('ArStepper', () => {
                             <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                         </ar-stepper>
                     `);
-            const steps = el.querySelectorAll(':scope > ar-stepper-item[part="step"]');
+            const steps = el.querySelectorAll(':scope > ar-stepper-item');
             expect(steps.length).toBe(2);
 
             const headerA = itemHeader(el, '/a');
@@ -218,13 +210,13 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            expect(itemOf(el, '/a/2').getAttribute('part')).toBe('substep');
+            expect(itemOf(el, '/a/2').matches('ar-stepper-item > ar-stepper-item')).toBe(true);
             expect(shadow(itemOf(el, '/a/2')).querySelector('a[part~="step-link"]')).toBeNull();
             const header = itemHeader(el, '/a/2');
             expect(header.tagName).toBe('DIV');
         });
 
-        it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {
+        it("rend le part d'état \"indicator--current\" sur l'indicateur d'une sous-étape courante", async () => {
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/1">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -233,10 +225,10 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const bullet1 = itemPart(el, '/a/1', '[part~="bullet"]');
-            const bullet2 = itemPart(el, '/a/2', '[part~="bullet"]');
-            expect(bullet1.getAttribute('part')).toBe('bullet indicator bullet--current');
-            expect(bullet2.getAttribute('part')).toBe('bullet indicator');
+            const indicator1 = itemPart(el, '/a/1', '[part~="indicator"]');
+            const indicator2 = itemPart(el, '/a/2', '[part~="indicator"]');
+            expect(indicator1.getAttribute('part')).toBe('indicator indicator--current');
+            expect(indicator2.getAttribute('part')).toBe('indicator');
         });
     });
 
@@ -284,7 +276,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/c" label="Étape C"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const items = el.querySelectorAll(':scope > ar-stepper-item[part="step"]');
+            const items = el.querySelectorAll(':scope > ar-stepper-item');
             expect(items.length).toBe(3);
         });
 

@@ -223,7 +223,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'completed',
-                isSubstep: false,
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -241,7 +240,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'current',
-                isSubstep: false,
                 isLink: false,
                 showSubsteps: true,
                 srLabel: 'étape 1:',
@@ -251,29 +249,12 @@ describe('ArStepperItem', () => {
             expect(el.shadowRoot!.querySelector('ol[part~="list--substep"] slot')).not.toBeNull();
         });
 
-        it('isSubstep: true pose part="substep" sur le host, sinon part="step"', async () => {
-            const el = await fixture<ArStepperItem>(
-                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
-            );
-            el.setRenderState({
-                bulletState: 'default',
-                isSubstep: true,
-                isLink: false,
-                showSubsteps: false,
-                srLabel: 'sous-étape 1:',
-            });
-            await el.updateComplete;
-
-            expect(el.getAttribute('part')).toBe('substep');
-        });
-
         it('bulletState: "current" pose aria-current="step" sur le host', async () => {
             const el = await fixture<ArStepperItem>(
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
             el.setRenderState({
                 bulletState: 'current',
-                isSubstep: false,
                 isLink: false,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -289,7 +270,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'completed',
-                isSubstep: false,
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -307,7 +287,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'completed',
-                isSubstep: false,
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -336,7 +315,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'completed',
-                isSubstep: false,
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',
@@ -364,7 +342,6 @@ describe('ArStepperItem', () => {
             );
             el.setRenderState({
                 bulletState: 'completed',
-                isSubstep: false,
                 isLink: true,
                 showSubsteps: false,
                 srLabel: 'étape 1:',

@@ -42,7 +42,10 @@ export default css`
     /* functional-default: pont d'état interne vers ar-stepper-item — reverse-align est un
        attribut booléen posé sur ar-stepper, pas une valeur de thème ; ces custom properties
        relaient cet état (aligné à droite ou non) au shadow DOM de ar-stepper-item, qui ne peut
-       pas lire un attribut de son hôte ancêtre. Pas des tokens de design. */
+       pas lire un attribut de son hôte ancêtre. Pas des tokens de design. La marge/taille par
+       défaut de l'indicateur (y compris pour les sous-étapes) est du ressort du thème
+       (::part(indicator), ar-stepper-item > ar-stepper-item::part(indicator)) — seul l'ordre
+       de flex (avant/après le label) reste ici, c'est un renversement de layout structurel. */
     :host([reverse-align]) {
         /* functional-default: cf. commentaire ci-dessus */
         --ar-stepper-item-align: flex-end;
@@ -51,14 +54,10 @@ export default css`
         /* functional-default: cf. commentaire ci-dessus */
         --ar-stepper-item-text-align: end;
         /* functional-default: cf. commentaire ci-dessus */
-        --ar-stepper-item-bullet-order: 2;
+        --ar-stepper-item-indicator-order: 2;
         /* functional-default: cf. commentaire ci-dessus */
-        --ar-stepper-item-bullet-margin-end: 0;
+        --ar-stepper-item-indicator-margin-end: 0;
         /* functional-default: cf. commentaire ci-dessus */
-        --ar-stepper-item-bullet-margin-start: 0.5rem;
-        /* functional-default: cf. commentaire ci-dessus */
-        --ar-stepper-item-substep-bullet-margin-start: 1.25rem;
-        /* functional-default: cf. commentaire ci-dessus */
-        --ar-stepper-item-substep-bullet-margin-end: 0.75rem;
+        --ar-stepper-item-indicator-margin-start: 0.5rem;
     }
 `;
