@@ -52,12 +52,14 @@ export interface ArStepperStepChangeDetail {
  * d'origine ; au-dessus il se déplace dans l'élément cible et affiche la liste verticale.
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
+ * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace le chevron SVG par défaut.
  *
  * @csspart stepper - Racine du composant.
  * @csspart list    - La liste des étapes.
  * @csspart trigger - Le bouton d'ouverture du panel mobile.
  * @csspart trigger-status - Le statut d'avancement affiché dans le bouton d'ouverture (ex. « Étape 2 / 5 (en cours) »).
  * @csspart trigger-label - Le libellé de l'étape (et sous-étape) courante affiché dans le bouton d'ouverture.
+ * @csspart trigger-icon - Le conteneur de l'icône du bouton d'ouverture (chevron par défaut, ou contenu du slot `trigger-icon`) — cible d'une éventuelle rotation à l'ouverture.
  * @csspart panel   - Le panel mobile flottant.
  *
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.

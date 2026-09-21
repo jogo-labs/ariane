@@ -12,8 +12,7 @@ export default css`
 
     [part='trigger'] {
         display: flex;
-        align-items: flex-start;
-        flex-direction: column;
+        align-items: center;
         line-height: normal;
         transition:
             background-color var(--ar-stepper-toggle-transition-duration),
@@ -21,6 +20,23 @@ export default css`
             border-color var(--ar-stepper-toggle-transition-duration);
         /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
         min-height: var(--ar-stepper-toggle-min-size, 2.5rem);
+    }
+
+    .trigger-text {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    [part='trigger-icon'] {
+        display: inline-flex;
+        flex-shrink: 0;
+    }
+
+    svg {
+        height: 1.25em;
+        overflow: visible;
+        width: auto;
     }
 
     @media (prefers-reduced-motion: reduce) {

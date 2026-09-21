@@ -94,6 +94,18 @@ export function renderDesktop(): TemplateResult {
     return renderStepList('desktop');
 }
 
+function defaultTriggerIcon(): TemplateResult {
+    return html`<svg
+        aria-hidden="true"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+    >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+    </svg>`;
+}
+
 export function renderMobile(ctx: MobileRenderContext): TemplateResult {
     const subLabel = ctx.currentSubStepLabel ? ` | ${ctx.currentSubStepLabel}` : '';
 
@@ -105,8 +117,13 @@ export function renderMobile(ctx: MobileRenderContext): TemplateResult {
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span part="trigger-status"> ${ctx.currentStepStatus} </span>
-                <span part="trigger-label"> ${ctx.currentStepLabel}${subLabel} </span>
+                <span class="trigger-text">
+                    <span part="trigger-status"> ${ctx.currentStepStatus} </span>
+                    <span part="trigger-label"> ${ctx.currentStepLabel}${subLabel} </span>
+                </span>
+                <span part="trigger-icon" aria-hidden="true">
+                    <slot name="trigger-icon">${defaultTriggerIcon()}</slot>
+                </span>
             </button>
 
             <div id="stepper-dropdown-menu" part="panel">${renderStepList('mobile')}</div>

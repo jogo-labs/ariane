@@ -425,7 +425,7 @@
         --ar-stepper-item-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
         --ar-stepper-item-current-header-color: var(--ar-color-interactive);
-        --ar-stepper-toggle-transition-duration: 0.15s;
+        --ar-stepper-toggle-transition-duration: 0.35s;
         --ar-stepper-toggle-min-size: 2.5rem;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -843,7 +843,7 @@
             background-color: var(--ar-button-secondary-bg);
             color: var(--ar-color-text);
             justify-content: center;
-            gap: 0.375rem;
+            gap: 1.25rem;
             padding: var(--ar-button-padding-x);
             min-height: var(--ar-button-height);
             border: 1px solid var(--ar-color-border);
@@ -885,8 +885,23 @@
         }
 
         &::part(trigger-label) {
+            margin-top: 0.5rem;
             font-weight: 700;
             color: var(--ar-color-interactive);
+        }
+
+        &::part(trigger-icon) {
+            transition: transform var(--ar-stepper-toggle-transition-duration);
+        }
+
+        &[open]::part(trigger-icon) {
+            transform: rotate(180deg);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &::part(trigger-icon) {
+                transition: none;
+            }
         }
 
         &::part(panel) {

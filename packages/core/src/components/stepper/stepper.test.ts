@@ -1100,7 +1100,7 @@ describe('ArStepper', () => {
                 '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
             );
 
-            const trigger = el.shadowRoot?.querySelector('[part="trigger"] span');
+            const trigger = el.shadowRoot?.querySelector('[part="trigger-status"]');
             expect(trigger?.textContent).toBe(' Step 1 / 1 (in progress) ');
             el.remove();
         });
@@ -1123,6 +1123,25 @@ describe('ArStepper', () => {
             expect(trigger?.querySelector('[part="trigger-label"]')?.textContent).toContain(
                 'Mon étape',
             );
+            el.remove();
+        });
+
+        it('le trigger mobile expose un slot trigger-icon avec un chevron SVG par défaut', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(
+                '<ar-stepper current-path="/a"><ar-stepper-item path="/a" href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+
+            const icon = el.shadowRoot?.querySelector('[part="trigger-icon"]');
+            expect(icon?.getAttribute('aria-hidden')).toBe('true');
+            const slot = icon?.querySelector<HTMLSlotElement>('slot[name="trigger-icon"]');
+            expect(slot).not.toBeNull();
+            expect(slot?.querySelector('svg')).not.toBeNull();
             el.remove();
         });
     });
