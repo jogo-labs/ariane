@@ -12,19 +12,6 @@ export default css`
         padding-inline-end: 0.25rem;
     }
 
-    [part='item'] {
-        display: flex;
-        align-items: center;
-    }
-
-    [part='link'],
-    [part='current'] {
-        display: inline-flex;
-        align-items: center;
-        color: inherit;
-        background-color: inherit;
-    }
-
     /* ── Layout desktop ──────────────────────────────────────── */
 
     [part~='list'] {
@@ -35,16 +22,6 @@ export default css`
     [part~='list--desktop'] {
         display: flex;
         flex-flow: row wrap;
-    }
-
-    [part='separator'] {
-        display: inline-block;
-        flex-shrink: 0;
-        margin: 0.125rem 0.5rem 0;
-        height: 65%;
-        width: 1px;
-        transform: rotate(15deg);
-        transform-origin: center;
     }
 
     /* ── Layout mobile ───────────────────────────────────────── */
@@ -70,25 +47,6 @@ export default css`
         background-size: 2px 8px;
         background-position: center 4px;
         background-repeat: repeat-y;
-    }
-
-    [part~='bullet'] {
-        flex-shrink: 0;
-        width: 0.375rem;
-        height: 0.375rem;
-        margin: 0 0.75rem;
-    }
-
-    [part~='bullet--current'] {
-        width: 0.625rem;
-        height: 0.625rem;
-        margin: 0 0.625rem;
-    }
-
-    [part~='list--mobile'] [part='link'],
-    [part~='list--mobile'] [part='current'] {
-        flex-grow: 1;
-        padding: 0.5rem 0.25rem;
     }
 
     /* ── Wrapper dropdown mobile ────────────────────────────── */

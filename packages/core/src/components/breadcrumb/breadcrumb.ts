@@ -3,7 +3,6 @@ import {
     type TemplateResult,
     html,
     type CSSResultGroup,
-    nothing,
     type PropertyValues,
 } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
@@ -36,12 +35,6 @@ import '../../translations/en.js';
  * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
- * @csspart item       - Chaque `<li>` de la liste.
- * @csspart link       - Les `<a>` de navigation.
- * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
- * @csspart separator  - Le séparateur entre deux items (desktop uniquement, absent avant le premier item).
- * @csspart bullet     - La puce d'un item (mobile uniquement).
- * @csspart bullet--current - La puce de l'élément courant (variante d'état de `bullet`).
  * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
@@ -160,6 +153,10 @@ export class ArBreadcrumb extends LitElement {
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
+    override willUpdate(): void {
+        this._pushRenderState();
+    }
+
     override firstUpdated(): void {
         if (this.isMobile) this._attachDropdown();
     }
@@ -201,49 +198,38 @@ export class ArBreadcrumb extends LitElement {
 
         if (items.length === 0) return;
 
-        const listTemplates: TemplateResult[] = items.map((item, index) => {
-            const isCurrent = index === items.length - 1;
-            const decoration = this.isMobile
-                ? html`<span
-                      part="bullet${isCurrent ? ' bullet--current' : ''}"
-                      aria-hidden="true"
-                  ></span>`
-                : index > 0
-                  ? html`<span part="separator" aria-hidden="true"></span>`
-                  : nothing;
-
-            return html` <li part="item" .ariaCurrent="${isCurrent ? 'page' : nothing}">
-                ${decoration}
-                ${isCurrent
-                    ? html`<span part="current">${item.label}</span>`
-                    : html`<a part="link" href="${item.href}">${item.label}</a>`}
-            </li>`;
-        });
-
         const navLabel = this.localize.term('breadcrumbNavLabel');
 
         return html`
             <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
                 <p id="breadcrumb-label" class="sr-only">${navLabel}</p>
-                ${this.isMobile
-                    ? html`<div class="dropdown">
-                          <a part="home" href="${items[0]?.href}">
-                              <slot name="home-icon">${this._defaultHomeIcon()}</slot>
-                              <span>${items[0]?.label}</span>
-                          </a>
-                          <button @click=${this._handleTriggerClick} type="button" part="trigger">
-                              <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
-                              <span class="sr-only">${this.localize.term('showBreadcrumb')}</span>
-                          </button>
-                          <div part="panel" popover="auto" tabindex="-1">
-                              <ol part="list list--mobile">
-                                  ${listTemplates.slice(1)}
-                              </ol>
-                          </div>
-                      </div>`
-                    : html`<ol part="list list--desktop">
-                          ${listTemplates}
-                      </ol>`}
+                ${
+                    this.isMobile
+                        ? html`<div class="dropdown">
+                              <a part="home" href="${items[0]?.href}">
+                                  <slot name="home-icon">${this._defaultHomeIcon()}</slot>
+                                  <span>${items[0]?.label}</span>
+                              </a>
+                              <button
+                                  @click=${this._handleTriggerClick}
+                                  type="button"
+                                  part="trigger"
+                              >
+                                  <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
+                                  <span class="sr-only"
+                                      >${this.localize.term('showBreadcrumb')}</span
+                                  >
+                              </button>
+                              <div part="panel" popover="auto" tabindex="-1">
+                                  <ol part="list list--mobile">
+                                      <slot></slot>
+                                  </ol>
+                              </div>
+                          </div>`
+                        : html`<ol part="list list--desktop">
+                              <slot></slot>
+                          </ol>`
+                }
             </nav>
         `;
     }
@@ -264,6 +250,17 @@ export class ArBreadcrumb extends LitElement {
         [...this.querySelectorAll('*')]
             .filter((el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem)
             .forEach((item) => item.setRegistry(registry));
+    }
+
+    private _pushRenderState(): void {
+        const items = this._orderedItems;
+        items.forEach((item, index) => {
+            item.setRenderState({
+                isFirst: index === 0,
+                isCurrent: index === items.length - 1,
+                isMobile: this.isMobile,
+            });
+        });
     }
 
     private _scheduleRebuild(): void {

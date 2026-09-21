@@ -12,10 +12,19 @@ document.documentElement.lang = 'fr';
 
 type LitEl = { updateComplete: Promise<boolean> };
 
+/** Attend le rendu des items enfants : leur état de rendu est poussé par le parent, ils sont des éléments Lit à part entière. */
+async function settleItems(el: ArBreadcrumb): Promise<void> {
+    await Promise.all(
+        [...el.querySelectorAll('ar-breadcrumb-item')].map(
+            (item) => (item as unknown as LitEl).updateComplete,
+        ),
+    );
+}
+
 /**
  * Double await nécessaire : le premier cycle initialise le composant, le second
  * absorbe le queueMicrotask de _scheduleRebuild déclenché par l'enregistrement
- * des ar-breadcrumb-item enfants.
+ * des ar-breadcrumb-item enfants ; puis on attend le rendu de chaque item.
  */
 async function fixture(html: string): Promise<ArBreadcrumb> {
     const template = document.createElement('template');
@@ -24,12 +33,18 @@ async function fixture(html: string): Promise<ArBreadcrumb> {
     document.body.appendChild(el);
     await (el as unknown as LitEl).updateComplete;
     await (el as unknown as LitEl).updateComplete;
+    await settleItems(el);
     return el;
 }
 
 async function waitForUpdate(el: ArBreadcrumb): Promise<void> {
     await (el as unknown as LitEl).updateComplete;
     await (el as unknown as LitEl).updateComplete;
+    await settleItems(el);
+}
+
+function itemsOf(el: ArBreadcrumb): HTMLElement[] {
+    return [...el.querySelectorAll<HTMLElement>('ar-breadcrumb-item')];
 }
 
 function getShadow(el: ArBreadcrumb): ShadowRoot {
@@ -89,31 +104,6 @@ describe('ArBreadcrumb', () => {
             expect(list?.tagName.toLowerCase()).toBe('ol');
         });
 
-        it("n'affiche pas de séparateur avant le premier item", async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            const items = getShadow(el).querySelectorAll('[part="item"]');
-            expect(items[0]?.querySelector('[part="separator"]')).toBeNull();
-        });
-
-        it('affiche un séparateur avant chaque item sauf le premier', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            const items = getShadow(el).querySelectorAll('[part="item"]');
-            expect(items[1]?.querySelector('[part="separator"]')).not.toBeNull();
-            expect(items[2]?.querySelector('[part="separator"]')).not.toBeNull();
-        });
-
         it('ne rend pas de dropdown en mode desktop', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
@@ -124,7 +114,29 @@ describe('ArBreadcrumb', () => {
             expect(getPart(el, 'trigger')).toBeNull();
         });
 
-        it("affiche le bon nombre d'items", async () => {
+        it('la liste desktop contient un slot pour les items', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const list = getShadow(el).querySelector('[part~="list--desktop"]');
+            expect(list?.querySelector('slot')).not.toBeNull();
+        });
+
+        it('ne rend plus d\'élément part="item" (les items rendent eux-mêmes)', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(getShadow(el).querySelector('[part="item"]')).toBeNull();
+            expect(getShadow(el).querySelector('[part="link"]')).toBeNull();
+        });
+
+        it('pousse un rôle listitem à chaque item', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
@@ -132,36 +144,24 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const items = getShadow(el).querySelectorAll('[part="item"]');
-            expect(items.length).toBe(3);
+            itemsOf(el).forEach((item) => expect(item.getAttribute('role')).toBe('listitem'));
         });
 
-        it('le dernier item a part="current" et est un span', async () => {
+        it('seul le dernier item porte aria-current="page"', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const current = getPart(el, 'current');
-            expect(current).not.toBeNull();
-            expect(current?.tagName.toLowerCase()).toBe('span');
+            const items = itemsOf(el);
+            expect(items[0]?.hasAttribute('aria-current')).toBe(false);
+            expect(items[1]?.hasAttribute('aria-current')).toBe(false);
+            expect(items[2]?.getAttribute('aria-current')).toBe('page');
         });
 
-        it('le dernier item a ariaCurrent="page"', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            const items = getShadow(el).querySelectorAll('[part="item"]');
-            const lastItem = items[items.length - 1] as HTMLElement;
-            // Lit assigne via .ariaCurrent (propriété DOM), pas setAttribute
-            expect((lastItem as unknown as { ariaCurrent: string }).ariaCurrent).toBe('page');
-        });
-
-        it('les items intermédiaires ont part="link" avec le bon href', async () => {
+        it('chaque item rend son contenu dans son propre shadow DOM', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>
@@ -169,21 +169,10 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const links = getShadow(el).querySelectorAll('[part="link"]');
-            expect(links.length).toBe(2);
-            expect(links[0]?.getAttribute('href')).toBe('/accueil');
-            expect(links[1]?.getAttribute('href')).toBe('/cat');
-        });
-
-        it("le premier item n'a pas aria-current", async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            const firstItem = getShadow(el).querySelector('[part="item"]');
-            expect(firstItem?.hasAttribute('aria-current')).toBe(false);
+            const items = itemsOf(el);
+            expect(getPart(items[0]!, 'link')?.getAttribute('href')).toBe('/accueil');
+            expect(getPart(items[1]!, 'link')?.getAttribute('href')).toBe('/cat');
+            expect(getPart(items[2]!, 'current')?.textContent?.trim()).toBe('Page courante');
         });
 
         it('contient un part="breadcrumb"', async () => {
@@ -255,20 +244,18 @@ describe('ArBreadcrumb', () => {
             expect(homeBtn?.getAttribute('href')).toBe('/accueil');
         });
 
-        it("chaque item mobile a un part='bullet'", async () => {
+        it('la liste mobile contient un slot pour les items', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            // listTemplates.slice(1) : "Accueil" n'est pas dans la liste mobile, il reste 2 puces
-            const bullets = getShadow(el).querySelectorAll('[part~="bullet"]');
-            expect(bullets.length).toBe(2);
+            const list = getShadow(el).querySelector('[part~="list--mobile"]');
+            expect(list?.querySelector('slot')).not.toBeNull();
         });
 
-        it("seul l'item courant a le part d'état 'bullet--current'", async () => {
+        it('le premier item est masqué (le bouton home le remplace), les autres non', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
@@ -276,9 +263,14 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const bullets = getShadow(el).querySelectorAll('[part~="bullet"]');
-            expect(bullets[0]?.getAttribute('part')).toBe('bullet');
-            expect(bullets[1]?.getAttribute('part')).toBe('bullet bullet--current');
+            const items = itemsOf(el);
+            expect(items[0]?.hasAttribute('hidden')).toBe(true);
+            expect(items[0]?.shadowRoot?.querySelector('.item')).toBeNull();
+            expect(items[1]?.hasAttribute('hidden')).toBe(false);
+            expect(getPart(items[1]!, 'indicator')).not.toBeNull();
+            expect(getPart(items[2]!, 'indicator')?.getAttribute('part')).toBe(
+                'indicator indicator--current',
+            );
         });
     });
 
@@ -587,10 +579,10 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page A"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const item = el.querySelector('ar-breadcrumb-item:last-child') as ArBreadcrumb;
-            (item as unknown as { label: string }).label = 'Page B';
+            const last = itemsOf(el)[1]!;
+            (last as unknown as { label: string }).label = 'Page B';
             await waitForUpdate(el);
-            expect(getPart(el, 'current')?.textContent?.trim()).toBe('Page B');
+            expect(getPart(last, 'current')?.textContent?.trim()).toBe('Page B');
         });
     });
 

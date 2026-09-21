@@ -1140,24 +1140,6 @@
             color: var(--ar-color-text);
         }
 
-        &::part(current) {
-            font-weight: 700;
-        }
-
-        &::part(separator) {
-            background-color: var(--ar-color-neutral-80);
-        }
-
-        &::part(bullet) {
-            border-radius: var(--ar-border-radius-full);
-            background-color: var(--ar-color-neutral-80);
-            box-shadow: 0 0 0 2px var(--ar-color-bg);
-        }
-
-        &::part(bullet--current) {
-            background-color: var(--ar-color-interactive);
-        }
-
         &::part(home),
         &::part(trigger) {
             border-radius: var(--ar-border-radius-xl);
@@ -1181,6 +1163,26 @@
 
         &::part(trigger) {
             margin-inline-start: 0.5rem;
+        }
+    }
+
+    ar-breadcrumb-item {
+        &::part(current) {
+            font-weight: 700;
+        }
+
+        &::part(separator) {
+            background-color: var(--ar-color-neutral-80);
+        }
+
+        &::part(indicator) {
+            border-radius: var(--ar-border-radius-full);
+            background-color: var(--ar-color-neutral-80);
+            box-shadow: 0 0 0 2px var(--ar-color-bg);
+        }
+
+        &::part(indicator--current) {
+            background-color: var(--ar-color-interactive);
         }
     }
 
