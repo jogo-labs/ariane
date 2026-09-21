@@ -56,6 +56,8 @@ export interface ArStepperStepChangeDetail {
  * @csspart stepper - Racine du composant.
  * @csspart list    - La liste des étapes.
  * @csspart trigger - Le bouton d'ouverture du panel mobile.
+ * @csspart trigger-status - Le statut d'avancement affiché dans le bouton d'ouverture (ex. « Étape 2 / 5 (en cours) »).
+ * @csspart trigger-label - Le libellé de l'étape (et sous-étape) courante affiché dans le bouton d'ouverture.
  * @csspart panel   - Le panel mobile flottant.
  *
  * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.

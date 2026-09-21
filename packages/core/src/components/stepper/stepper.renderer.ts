@@ -105,8 +105,8 @@ export function renderMobile(ctx: MobileRenderContext): TemplateResult {
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span> ${ctx.currentStepStatus} </span>
-                <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
+                <span part="trigger-status"> ${ctx.currentStepStatus} </span>
+                <span part="trigger-label"> ${ctx.currentStepLabel}${subLabel} </span>
             </button>
 
             <div id="stepper-dropdown-menu" part="panel">${renderStepList('mobile')}</div>

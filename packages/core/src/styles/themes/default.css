@@ -884,6 +884,11 @@
             background-color: var(--ar-button-secondary-bg-hover);
         }
 
+        &::part(trigger-label) {
+            font-weight: 700;
+            color: var(--ar-color-interactive);
+        }
+
         &::part(panel) {
             padding: 0.75rem;
         }
