@@ -12,7 +12,11 @@ export interface BreadcrumbItemRenderState {
     /** Dernier item du fil : rendu comme texte, non cliquable. */
     isCurrent: boolean;
     isMobile: boolean;
-    /** Un item visible précède celui-ci (en mobile, le premier item est remplacé par « home »). */
+    /**
+     * Un item visible précède celui-ci (en mobile, le premier item est remplacé par « home »).
+     * Conditionne le séparateur desktop et le connecteur mobile : en desktop il vaut `!isFirst`,
+     * en mobile `isFirst` ne pilote que le cas « ne rend rien + masqué ».
+     */
     hasPrevious: boolean;
     /** Nœud modèle du slot `separator` d'ar-breadcrumb, cloné dans l'item (desktop). */
     separator: Node | undefined;
