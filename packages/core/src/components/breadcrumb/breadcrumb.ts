@@ -33,7 +33,7 @@ import '../../translations/en.js';
  * "Retour".
  *
  * @csspart breadcrumb - Racine du composant.
- * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
+ * @csspart list       - Le conteneur `role="list"` des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
  * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
@@ -233,14 +233,14 @@ export class ArBreadcrumb extends LitElement {
                                   <span class="sr-only">${showLabel}</span>
                               </button>
                               <div part="panel" popover="auto" tabindex="-1">
-                                  <ol part="list list--mobile">
+                                  <div role="list" part="list list--mobile">
                                       <slot></slot>
-                                  </ol>
+                                  </div>
                               </div>
                           </div>`
-                        : html`<ol part="list list--desktop">
+                        : html`<div role="list" part="list list--desktop">
                               <slot></slot>
-                          </ol>`
+                          </div>`
                 }
             </nav>
         `;

@@ -101,7 +101,8 @@ describe('ArBreadcrumb', () => {
             `);
             const list = getShadow(el).querySelector('[part~="list--desktop"]');
             expect(list).not.toBeNull();
-            expect(list?.tagName.toLowerCase()).toBe('ol');
+            expect(list?.tagName.toLowerCase()).toBe('div');
+            expect(list?.getAttribute('role')).toBe('list');
         });
 
         it('ne rend pas de dropdown en mode desktop', async () => {
