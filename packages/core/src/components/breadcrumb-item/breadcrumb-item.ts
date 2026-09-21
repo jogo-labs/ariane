@@ -18,6 +18,11 @@ export interface BreadcrumbItemRenderState {
      * en mobile `isFirst` ne pilote que le cas « ne rend rien + masqué ».
      */
     hasPrevious: boolean;
+    /**
+     * Un item visible suit celui-ci. Conditionne, avec `hasPrevious`, la présence du connecteur
+     * mobile et sa variante : un item sans voisin visible n'en rend pas.
+     */
+    hasNext: boolean;
     /** Nœud modèle du slot `separator` d'ar-breadcrumb, cloné dans l'item (desktop). */
     separator: Node | undefined;
     /** Incrémenté par ar-breadcrumb quand le contenu du nœud modèle change. */
@@ -32,7 +37,9 @@ export interface BreadcrumbItemRenderState {
  * @csspart link - Le lien de navigation (items intermédiaires).
  * @csspart current - Le texte de la page courante (dernier item, non cliquable).
  * @csspart separator - Le séparateur avant l'item (desktop uniquement, absent avant le premier item).
- * @csspart connector - Le trait décoratif reliant l'indicateur de l'item à celui de l'item précédent (mobile uniquement).
+ * @csspart connector - Le trait décoratif reliant les indicateurs des items visibles, sur la hauteur de la ligne de l'item (mobile uniquement).
+ * @csspart connector--first - Le trait du premier item visible, tracé du centre de son indicateur vers le bas (variante d'état de `connector`).
+ * @csspart connector--last - Le trait du dernier item visible, tracé du haut vers le centre de son indicateur (variante d'état de `connector`).
  * @csspart indicator - La puce de l'item (mobile uniquement).
  * @csspart indicator--current - La puce de l'élément courant (variante d'état de `indicator`).
  */
@@ -75,6 +82,7 @@ export class ArBreadcrumbItem extends LitElement {
             previous.isCurrent === state.isCurrent &&
             previous.isMobile === state.isMobile &&
             previous.hasPrevious === state.hasPrevious &&
+            previous.hasNext === state.hasNext &&
             previous.separator === state.separator &&
             previous.separatorVersion === state.separatorVersion
         ) {
@@ -139,9 +147,15 @@ export class ArBreadcrumbItem extends LitElement {
         const state = this._renderState;
         if (!state || (state.isMobile && state.isFirst)) return nothing;
 
-        const connector = state.hasPrevious
-            ? html`<span part="connector" aria-hidden="true"></span>`
-            : nothing;
+        // Chaque item visible trace la part de ligne de sa propre hauteur : le tracé reste exact
+        // quelle que soit la hauteur des lignes voisines.
+        const connectorPart = `connector${state.hasPrevious ? '' : ' connector--first'}${
+            state.hasNext ? '' : ' connector--last'
+        }`;
+        const connector =
+            state.hasPrevious || state.hasNext
+                ? html`<span part=${connectorPart} aria-hidden="true"></span>`
+                : nothing;
         const decoration = state.isMobile
             ? html`${connector}<span
                       part="indicator${state.isCurrent ? ' indicator--current' : ''}"

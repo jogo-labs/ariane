@@ -300,17 +300,34 @@ describe('ArBreadcrumb', () => {
             );
         });
 
-        it("mobile : le premier item visible n'a pas de connecteur, les suivants en ont un", async () => {
+        it('mobile : chaque item visible porte le segment de connecteur de sa ligne', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Sous-catégorie" href="/cat/sub"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const items = itemsOf(el);
+            expect(getPart(items[1]!, 'connector')?.getAttribute('part')).toBe(
+                'connector connector--first',
+            );
+            expect(getPart(items[2]!, 'connector')?.getAttribute('part')).toBe('connector');
+            expect(getPart(items[3]!, 'connector')?.getAttribute('part')).toBe(
+                'connector connector--last',
+            );
+        });
+
+        it("mobile : un seul item visible n'a pas de connecteur", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
             const items = itemsOf(el);
             expect(getPart(items[1]!, 'connector')).toBeNull();
-            expect(getPart(items[2]!, 'connector')).not.toBeNull();
         });
     });
 

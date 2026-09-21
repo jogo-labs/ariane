@@ -1211,18 +1211,28 @@
             background-color: var(--ar-color-interactive);
         }
 
-        /* Segment pointillé entre l'indicateur de l'item précédent et le sien (centres alignés
-           sur la colonne des indicateurs). */
+        /* Segment pointillé sur toute la hauteur de la ligne de l'item, centré sur la colonne
+           des indicateurs : les segments des lignes successives se joignent bord à bord. */
         &::part(connector) {
             position: absolute;
             inset-inline-start: 0;
-            top: -50%;
-            bottom: 50%;
+            top: 0;
+            bottom: 0;
             width: 1.875rem;
             background-image: linear-gradient(var(--ar-color-neutral-90) 25%, transparent 0);
             background-size: 2px 8px;
             background-position: center 4px;
             background-repeat: repeat-y;
+        }
+
+        /* Premier item visible : le tracé part du centre de son indicateur. */
+        &::part(connector--first) {
+            top: 50%;
+        }
+
+        /* Dernier item visible : le tracé s'arrête au centre de son indicateur. */
+        &::part(connector--last) {
+            bottom: 50%;
         }
     }
 

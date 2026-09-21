@@ -44,7 +44,8 @@ Alpha, pas de dépréciation (cf. `CLAUDE.md`) :
   `ar-breadcrumb-item`.
 - `bullet` et `bullet--current` deviennent `indicator` et `indicator--current`.
 - Le part `item` est supprimé ; on cible la balise `ar-breadcrumb-item`.
-- Nouveau part `connector` sur `ar-breadcrumb-item` (mobile).
+- Nouveaux parts `connector`, `connector--first` et `connector--last` sur `ar-breadcrumb-item`
+  (mobile).
 - Tokens supprimés : `--ar-breadcrumb-mobile-separator-color`, `--ar-breadcrumb-toggle-bg`,
   `--ar-breadcrumb-toggle-bg-hover`, `--ar-breadcrumb-toggle-bg-pressed`,
   `--ar-breadcrumb-toggle-bg-focus`, `--ar-breadcrumb-toggle-transition-duration`.
@@ -73,8 +74,11 @@ L'item a un shadow DOM propre (comme `ar-stepper-item`) :
 - Le shadow rend un wrapper interne (`position: relative`, flex centré) contenant, dans l'ordre :
     - **desktop, item non premier** : `<span part="separator" aria-hidden="true">` (contenu : cf.
       section 3) ;
-    - **mobile, item non premier** : `<span part="connector" aria-hidden="true">` puis
+    - **mobile, item visible ayant au moins un voisin visible** :
+      `<span part="connector[ connector--first][ connector--last]" aria-hidden="true">` puis
       `<span part="indicator[ indicator--current]" aria-hidden="true">` ;
+      `connector--first` quand aucun item visible ne précède, `connector--last` quand aucun ne
+      suit ; un item visible seul ne rend pas de connecteur ;
     - le contrôle : `<a part="link" href=…>label</a>` ou `<span part="current">label</span>` pour
       le dernier item.
 - En **mobile, le premier item ne rend rien** : il est déjà affiché par le bouton `home`. Son hôte
@@ -93,6 +97,8 @@ export interface ItemRenderState {
     isFirst: boolean;
     isCurrent: boolean; // dernier item
     isMobile: boolean;
+    hasPrevious: boolean; // un item visible précède celui-ci
+    hasNext: boolean; // un item visible suit celui-ci
     separator: Node | undefined; // nœud modèle, cf. section 3
 }
 ```
@@ -130,7 +136,12 @@ espacement et états visuels passent dans `default.css`.
   sont jamais collés. Aucune marge équivalente pour l'indicateur et le connecteur, dont la taille
   est purement visuelle.
 - **Connecteur mobile** : un vrai élément (`part="connector"`), positionné par le thème
-  (`position: absolute` relatif au wrapper interne). Il remplace le `::before` du `<ol>`.
+  (`position: absolute` relatif au wrapper interne). Il remplace le `::before` de la liste. Chaque
+  item visible trace la portion de ligne de sa propre hauteur (`top: 0; bottom: 0`), de sorte que
+  les segments de deux lignes successives se joignent bord à bord quelle que soit leur hauteur
+  (libellé sur plusieurs lignes compris) ; les variantes `connector--first` (`top: 50%`) et
+  `connector--last` (`bottom: 50%`) arrêtent le tracé au centre des indicateurs des extrémités.
+  Ordre dans le thème : `connector` avant ses variantes (garde-fou `validate-part-state-order`).
 - **Boutons `home` / `trigger`** : les états visuels passent en règles `::part(home)` /
   `::part(trigger)` du thème (`:hover`, `:active`, `:focus-visible`), en pseudo-classes seules
   (aucun sélecteur d'attribut après `::part()`, invalide). Le thème gère

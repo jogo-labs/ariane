@@ -291,6 +291,7 @@ export class ArBreadcrumb extends LitElement {
                 isCurrent: index === items.length - 1,
                 isMobile: this.isMobile,
                 hasPrevious: this.isMobile ? index > 1 : index > 0,
+                hasNext: index < items.length - 1,
                 separator,
                 separatorVersion: this._separatorVersion,
             });

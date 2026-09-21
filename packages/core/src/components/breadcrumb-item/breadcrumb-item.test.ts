@@ -33,6 +33,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -50,6 +51,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -68,6 +70,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -85,6 +88,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -96,6 +100,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -111,6 +116,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -124,6 +130,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: true,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -140,6 +147,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: false,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -155,6 +163,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -169,6 +178,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -186,6 +196,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: source,
                 separatorVersion: 1,
             });
@@ -208,6 +219,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: source,
             };
             el.setRenderState({ ...base, separatorVersion: 1 });
@@ -229,6 +241,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: source,
                 separatorVersion: 1,
             });
@@ -238,6 +251,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 2,
             });
@@ -252,12 +266,14 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
+                hasNext: true,
                 separator: undefined,
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
             const connector = getPart(el, 'connector');
             expect(connector).not.toBeNull();
+            expect(connector?.getAttribute('part')).toBe('connector');
             expect(connector?.getAttribute('aria-hidden')).toBe('true');
             const indicator = getPart(el, 'indicator');
             expect(
@@ -265,13 +281,48 @@ describe('ArBreadcrumbItem', () => {
             ).toBeTruthy();
         });
 
-        it('mobile : le premier item visible (hasPrevious false) a un indicateur mais pas de connecteur', async () => {
+        it('mobile : le premier item visible porte connector--first', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
                 isFirst: false,
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: false,
+                hasNext: true,
+                separator: undefined,
+                separatorVersion: 0,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'connector')?.getAttribute('part')).toBe(
+                'connector connector--first',
+            );
+        });
+
+        it('mobile : le dernier item visible porte connector--last', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: true,
+                hasPrevious: true,
+                hasNext: false,
+                separator: undefined,
+                separatorVersion: 0,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'connector')?.getAttribute('part')).toBe(
+                'connector connector--last',
+            );
+        });
+
+        it('mobile : un item visible sans voisin visible a un indicateur mais pas de connecteur', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: false,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -287,6 +338,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -305,6 +357,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -325,6 +378,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -336,6 +390,7 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -526,6 +581,7 @@ describe('ArBreadcrumbItem', () => {
             isCurrent: false,
             isMobile: false,
             hasPrevious: true,
+            hasNext: false,
             separator: undefined,
             separatorVersion: 0,
         };
