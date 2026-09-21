@@ -40,6 +40,7 @@ import '../../translations/en.js';
  * @csspart panel      - Le panel mobile flottant.
  *
  * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
+ * @slot separator - Séparateur entre les items (desktop). Cloné dans chaque item ; remplace le « / » par défaut. Sans `id`, ni contenu interactif (le séparateur est masqué aux lecteurs d'écran).
  * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
@@ -82,6 +83,12 @@ export class ArBreadcrumb extends LitElement {
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
+    private _separatorVersion = 0;
+
+    private readonly _separatorObserver = new MutationObserver(() => {
+        this._separatorVersion += 1;
+        this._scheduleRebuild();
+    });
 
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
@@ -128,6 +135,13 @@ export class ArBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._separatorObserver.observe(this, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['slot'],
+        });
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
@@ -144,6 +158,7 @@ export class ArBreadcrumb extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        this._separatorObserver.disconnect();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
@@ -248,12 +263,15 @@ export class ArBreadcrumb extends LitElement {
 
     private _pushRenderState(): void {
         const items = this._orderedItems;
+        const separator = this.querySelector(':scope > [slot="separator"]') ?? undefined;
         items.forEach((item, index) => {
             item.setRenderState({
                 isFirst: index === 0,
                 isCurrent: index === items.length - 1,
                 isMobile: this.isMobile,
                 hasPrevious: this.isMobile ? index > 1 : index > 0,
+                separator,
+                separatorVersion: this._separatorVersion,
             });
         });
     }

@@ -11,6 +11,16 @@ variants:
             <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
             <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
           </ar-breadcrumb>
+    - name: custom-separator
+      label: Séparateur personnalisé
+      description: Un contenu posé dans le slot separator remplace le « / » par défaut ; il est cloné entre chaque item.
+      html: |
+          <ar-breadcrumb>
+            <span slot="separator">›</span>
+            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
+          </ar-breadcrumb>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -76,3 +86,24 @@ mobile tire sa couleur de texte de `::part(home)`, pas de `::part(list)`) :
     color: white;
 }
 ```
+
+## Utilisation
+
+### Personnaliser le séparateur
+
+Par défaut, un « / » s'affiche entre les items (desktop). Le slot `separator` permet de le
+remplacer par un caractère ou une icône : le contenu est cloné dans chaque item, le nœud posé sur
+`ar-breadcrumb` n'est jamais affiché lui-même.
+
+```html
+<ar-breadcrumb>
+    <span slot="separator">›</span>
+    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+    <ar-breadcrumb-item label="Produits" href="/produits"></ar-breadcrumb-item>
+    <ar-breadcrumb-item label="Chaussures"></ar-breadcrumb-item>
+</ar-breadcrumb>
+```
+
+Le séparateur est décoratif (`aria-hidden`) : évitez les éléments interactifs, et ne mettez pas
+d'`id` dans son contenu (il serait dupliqué dans chaque clone). En mobile, il n'est pas affiché.
+La couleur et la taille se règlent depuis le thème via `ar-breadcrumb-item::part(separator)`.

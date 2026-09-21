@@ -613,6 +613,73 @@ describe('ArBreadcrumb', () => {
         });
     });
 
+    // ── Slot separator ────────────────────────────────────────────────────────
+
+    describe('slot separator', () => {
+        beforeEach(() => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(false);
+        });
+
+        const withSeparator = `
+            <ar-breadcrumb>
+                <span slot="separator">›</span>
+                <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+            </ar-breadcrumb>
+        `;
+
+        it('affiche « / » par défaut entre les items', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it('clone le contenu du slot dans chaque item sauf le premier', async () => {
+            el = await fixture(withSeparator);
+            const items = itemsOf(el);
+            expect(getPart(items[0]!, 'separator')).toBeNull();
+            expect(getPart(items[1]!, 'separator')?.textContent?.trim()).toBe('›');
+            expect(getPart(items[2]!, 'separator')?.textContent?.trim()).toBe('›');
+        });
+
+        it("laisse le nœud modèle dans le light DOM d'ar-breadcrumb", async () => {
+            el = await fixture(withSeparator);
+            const source = el.querySelector(':scope > [slot="separator"]');
+            expect(source?.parentElement).toBe(el);
+            expect(source?.textContent).toBe('›');
+        });
+
+        it('suit une mutation du contenu du séparateur', async () => {
+            el = await fixture(withSeparator);
+            const source = el.querySelector(':scope > [slot="separator"]') as HTMLElement;
+            source.textContent = '»';
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('»');
+        });
+
+        it('retombe sur « / » quand le nœud séparateur est retiré', async () => {
+            el = await fixture(withSeparator);
+            el.querySelector(':scope > [slot="separator"]')?.remove();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it("n'affiche pas le séparateur en mobile (indicateur à la place)", async () => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(true);
+            el = await fixture(withSeparator);
+            const items = itemsOf(el);
+            expect(getPart(items[1]!, 'separator')).toBeNull();
+            expect(getPart(items[1]!, 'indicator')).not.toBeNull();
+        });
+    });
+
     // ── Accessibilité ─────────────────────────────────────────────────────────
 
     describe('accessibilité', () => {

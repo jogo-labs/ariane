@@ -33,6 +33,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const link = getPart(el, 'link');
@@ -50,6 +52,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const current = getPart(el, 'current');
@@ -65,6 +69,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
@@ -74,6 +80,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).not.toBeNull();
@@ -87,6 +95,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
@@ -98,6 +108,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: true,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe(
@@ -112,6 +124,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.shadowRoot?.querySelector('.item')).toBeNull();
@@ -125,6 +139,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.hasAttribute('hidden')).toBe(false);
@@ -137,6 +153,77 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it('desktop : clone le nœud séparateur fourni, sans le déplacer ni garder son attribut slot', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.setAttribute('slot', 'separator');
+            source.textContent = '›';
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+                separatorVersion: 1,
+            });
+            await waitForUpdate(el);
+
+            const rendered = getPart(el, 'separator');
+            expect(rendered?.textContent?.trim()).toBe('›');
+            const clone = rendered?.firstElementChild as HTMLElement;
+            expect(clone).not.toBe(source);
+            expect(clone.hasAttribute('slot')).toBe(false);
+            expect(source.getAttribute('slot')).toBe('separator');
+        });
+
+        it('re-clone quand la version du séparateur change', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.textContent = '›';
+            const base = {
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+            };
+            el.setRenderState({ ...base, separatorVersion: 1 });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('›');
+
+            source.textContent = '»';
+            el.setRenderState({ ...base, separatorVersion: 2 });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('»');
+        });
+
+        it('retombe sur « / » quand le nœud séparateur disparaît', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.textContent = '›';
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+                separatorVersion: 1,
+            });
+            await waitForUpdate(el);
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 2,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
@@ -149,6 +236,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const connector = getPart(el, 'connector');
@@ -167,6 +256,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'indicator')).not.toBeNull();
@@ -180,6 +271,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
@@ -188,6 +281,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).not.toBeNull();
@@ -200,6 +295,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'connector')).toBeNull();
@@ -216,6 +313,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.getAttribute('role')).toBe('listitem');
@@ -228,6 +327,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.getAttribute('aria-current')).toBe('page');
@@ -237,6 +338,8 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.hasAttribute('aria-current')).toBe(false);

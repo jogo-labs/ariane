@@ -14,6 +14,10 @@ export interface BreadcrumbItemRenderState {
     isMobile: boolean;
     /** Un item visible précède celui-ci (en mobile, le premier item est remplacé par « home »). */
     hasPrevious: boolean;
+    /** Nœud modèle du slot `separator` d'ar-breadcrumb, cloné dans l'item (desktop). */
+    separator: Node | undefined;
+    /** Incrémenté par ar-breadcrumb quand le contenu du nœud modèle change. */
+    separatorVersion: number;
 }
 
 /**
@@ -38,6 +42,8 @@ export class ArBreadcrumbItem extends LitElement {
 
     private _registry: BreadcrumbRegistry | undefined = undefined;
 
+    private _separatorClone: { source: Node; version: number; node: Node } | undefined = undefined;
+
     protected readonly _consumer = new ContextConsumer(this, {
         context: breadcrumbContext,
         subscribe: true,
@@ -58,7 +64,9 @@ export class ArBreadcrumbItem extends LitElement {
             previous.isFirst === state.isFirst &&
             previous.isCurrent === state.isCurrent &&
             previous.isMobile === state.isMobile &&
-            previous.hasPrevious === state.hasPrevious
+            previous.hasPrevious === state.hasPrevious &&
+            previous.separator === state.separator &&
+            previous.separatorVersion === state.separatorVersion
         ) {
             return;
         }
@@ -89,6 +97,25 @@ export class ArBreadcrumbItem extends LitElement {
         }
     }
 
+    /** Un nœud ne peut être assigné qu'à un slot : chaque item rend son propre clone du modèle. */
+    private _separatorContent(state: BreadcrumbItemRenderState): Node | string {
+        const source = state.separator;
+        if (!source) return '/';
+        const cached = this._separatorClone;
+        if (cached && cached.source === source && cached.version === state.separatorVersion) {
+            return cached.node;
+        }
+        const node = source.cloneNode(true);
+        if (node instanceof Element) node.removeAttribute('slot');
+        this._separatorClone = { source, version: state.separatorVersion, node };
+        return node;
+    }
+
+    private _renderSeparator(state: BreadcrumbItemRenderState): TemplateResult {
+        const content = this._separatorContent(state);
+        return html`<span part="separator" aria-hidden="true">${content}</span>`;
+    }
+
     override render(): TemplateResult | typeof nothing {
         const state = this._renderState;
         if (!state || (state.isMobile && state.isFirst)) return nothing;
@@ -102,7 +129,7 @@ export class ArBreadcrumbItem extends LitElement {
                       aria-hidden="true"
                   ></span>`
             : state.hasPrevious
-              ? html`<span part="separator" aria-hidden="true">/</span>`
+              ? this._renderSeparator(state)
               : nothing;
 
         const control = state.isCurrent
