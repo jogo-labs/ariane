@@ -119,6 +119,7 @@ espacement et états visuels passent dans `default.css`.
 | Layout de `list--desktop` (flex row wrap) et `list--mobile` (flex column), reset `margin` / `padding` des `<ol>` | Couleur de la liste, `padding-inline-end` du nav                                                               |
 | `display: inline-flex; align-items: center` sur `link`, `current`, `home`, `trigger`                             | Reset visuel des liens (couleur héritée, décoration)                                                           |
 | Wrapper de l'item : flex centré, `position: relative`                                                            | Séparateur : couleur, taille de police                                                                         |
+| Padding vertical des liens dans la liste mobile (`0.5rem 0.25rem`, cible tactile WCAG 2.5.8)                     |                                                                                                                |
 | `svg { height: 1.25em; … }` et slots d'icône par défaut                                                          | Indicateur : tailles, marges, forme, couleur, variante `--current`                                             |
 | Repli d'accessibilité `--ar-breadcrumb-toggle-min-size` (WCAG 2.5.8)                                             | Connecteur mobile : ligne pointillée, géométrie, couleur                                                       |
 | Marge minimale du séparateur (cf. ci-dessous)                                                                    | Boutons `home` / `trigger` : fond, états hover / active / focus, transition, outline, `prefers-reduced-motion` |
@@ -207,18 +208,22 @@ composant.
 - Contexte : `context/breadcrumb.context.ts` inchangé (l'état de rendu passe par
   `setRenderState`, pas par le registre).
 - Thème : section `ar-breadcrumb` de `default.css` et tokens de `:root`.
-- Doc : `ar-breadcrumb.mdx` (variante « séparateur personnalisé »), `ar-breadcrumb-item.mdx`, tableau
-  de parts de `personnalisation-avancee.astro` (cite encore `list--desktop` / `list--mobile`),
-  manifest régénéré.
+- Doc : `ar-breadcrumb.mdx` (variante « séparateur personnalisé » et section d'usage). Aucun
+  changement nécessaire dans `ar-breadcrumb-item.mdx` (les parts de l'item viennent du JSDoc via le
+  manifest, non versionné et régénéré) ni dans `personnalisation-avancee.astro` (les parts
+  `list--desktop` / `list--mobile` restent sur `ar-breadcrumb`).
 
 ## Découpage
 
 Une branche, une PR, trois commits dans l'ordre :
 
-1. `ar-breadcrumb-item` rend son propre shadow DOM, sans changement de comportement visible ;
-   thème adapté aux nouveaux parts.
-2. Partage du CSS interne / thème, suppression des tokens.
-3. Slot `separator` et doc.
+1. `ar-breadcrumb-item` rend son propre shadow DOM, sans changement de comportement visible : les
+   règles CSS des parts déplacés suivent leurs éléments, sans être modifiées ; thème adapté aux
+   nouveaux parts (`indicator*`, sélecteur `ar-breadcrumb-item`).
+2. Partage du CSS interne / thème, suppression des tokens, nouveau part `connector` et séparateur
+   par défaut « / » (le trait dessiné en CSS disparaît avec le CSS visuel : le caractère le
+   remplace dans la même étape).
+3. Slot `separator` (clonage, suivi des mutations) et doc.
 
 ## Risques
 
