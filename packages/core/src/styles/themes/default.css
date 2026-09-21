@@ -871,30 +871,19 @@
         }
     }
 
-    /* Les parts step-link/label--link/indicator/indicator--current ont migré vers le shadow DOM
-       d'ar-stepper-item (élément slotté, pas un descendant du shadow tree d'ar-stepper) —
-       ::part() doit donc cibler ar-stepper-item directement, pas ar-stepper (#226 review finale). */
+    /* Les parts step-link, label--link, indicator et indicator--current appartiennent au shadow
+       DOM d'ar-stepper-item : ::part() doit cibler ar-stepper-item, pas ar-stepper. */
     ar-stepper-item {
-        /* Aplat pâle plutôt que --ar-color-interactive plein : la distinction
-           complétée/courante n'a pas besoin d'un fort contraste de couleur, le
-           texte gras + coloré de l'étape courante suffit à la signaler.
-           Préfixe --ar-theme- (pas --ar-stepper-item-) : ces deux variables ne sont consommées
-           que par ce fichier (::part(indicator) plus bas + le pont :hover), jamais par
-           stepper-item.styles.ts — ce ne sont pas des @cssprop du composant, seulement des
-           valeurs mutualisées pour éviter de répéter la couleur à plusieurs endroits du thème.
-           Le préfixe --ar-stepper-item- est réservé aux tokens documentés en @cssprop dans
-           stepper-item.ts (garde-fou validate-cssprop-defaults.js, détection par préfixe de
-           tag). */
+        /* Variables de mutualisation propres au thème, jamais consommées par le composant : le
+           préfixe --ar-theme- les distingue des tokens --ar-stepper-item-* documentés en
+           @cssprop (validate-cssprop-defaults.js détecte le composant par préfixe de tag).
+           Aplat pâle : le texte gras et coloré de l'étape courante suffit à la distinguer. */
         --ar-theme-stepper-indicator-color: var(--ar-color-text);
         --ar-theme-stepper-indicator-bg: var(--ar-color-interactive-subtle);
 
-        /* Texte cliquable en couleur neutre, pas ambre — seule la puce porte l'accent
-           (cf. #224/#225). text-decoration: none explicite (pas juste l'absence de
-           déclaration) : sans ça, le soulignement par défaut du user-agent sur <a> reste
-           actif et souffre du même bug de peinture "bande continue sur toute la largeur
-           du conteneur flex" que n'importe quelle règle d'auteur (cf. ::part(label--link)
-           plus bas) — le chiffre de la puce restait souligné même une fois la déclaration
-           d'auteur retirée, tant que le user-agent style n'était pas neutralisé. */
+        /* Texte cliquable en couleur neutre : seule la puce porte l'accent. text-decoration:
+           none est explicite pour neutraliser le soulignement par défaut du user-agent sur <a>,
+           qui se peint comme une bande continue sur toute la largeur du conteneur flex. */
         &::part(step-link) {
             color: var(--ar-color-text);
             text-decoration: none;
@@ -912,42 +901,25 @@
             border-radius: 0.125rem;
         }
 
-        /* Sur ::part(label--link) — variante d'état exportée uniquement quand le label
-           est réellement dans un lien (le part `label` de base existe aussi pour les
-           étapes non cliquables, ex. l'étape courante non-lien) — plutôt que sur
-           ::part(step-link) directement : text-decoration posé sur un conteneur
-           display:flex (step-link) se peint comme une bande continue sur toute sa largeur,
-           en ignorant les text-decoration:none des enfants (vérifié y compris avec
-           !important et du texte réel, pas seulement le pseudo-élément du compteur) — un
-           bug de rendu, pas un souci de spécificité. Limite connue : pas de retrait au
-           survol/focus (chaîner ::part(step-link):hover ::part(label--link) est un
-           sélecteur CSS invalide, vérifié via CSS.supports) ; le soulignement reste donc
-           permanent, ce qui est un choix d'accessibilité défendable (identification du
-           lien non dépendante d'un état transitoire). */
+        /* Posé sur label--link (label d'une étape cliquable) plutôt que sur step-link :
+           text-decoration sur un conteneur display:flex se peint en bande continue sur toute sa
+           largeur, en ignorant le text-decoration:none des enfants. Le soulignement reste
+           permanent, y compris au survol/focus : ::part(step-link):hover ::part(label--link)
+           n'est pas un sélecteur valide. */
         &::part(label--link) {
             text-decoration: underline;
         }
 
         /*
-         * Hiérarchie à 2 niveaux + courant (cf. #224/#225, revu #226 suivi) :
-         * - par défaut (à venir ET complétée, part="indicator" seul ou + indicator--completed) :
-         *   même aplat --ar-theme-stepper-indicator-bg — la distinction à venir/complétée n'a pas
-         *   besoin d'un traitement visuel séparé sur l'indicateur seul.
-         * - courante (indicator--current) : aplat vif --ar-color-interactive +
-         *   --ar-color-text-inverse, seul état combinant indicateur ET label colorés/gras.
+         * Indicateur à 2 niveaux :
+         * - par défaut (à venir et complétée) : aplat --ar-theme-stepper-indicator-bg ;
+         * - courante (indicator--current) : aplat --ar-color-interactive + texte inversé.
          *
-         * Toutes les déclarations (fond, couleur, y compris :hover/:focus) vivent ici, pas dans
-         * stepper-item.styles.ts : un ::part() posé par une feuille @layer (ce fichier) l'emporte
-         * TOUJOURS sur une règle interne du shadow tree pour la même propriété, quelle que soit sa
-         * spécificité — vérifié empiriquement (Chromium), contre-intuitif vu qu'une règle non
-         * calquée gagne normalement sur une règle @layer. Une règle interne équivalente serait
-         * donc du code mort silencieux.
+         * Toutes les déclarations d'indicateur (fond, couleur, taille, y compris :hover/:focus)
+         * sont ici : un ::part() externe l'emporte toujours sur une règle interne du shadow tree
+         * pour la même propriété, quelle que soit la spécificité.
          *
-         * Taille/forme : valeurs de design, portées ici plutôt que dans le composant (headless —
-         * cf. #226 suivi). ar-stepper-item > ar-stepper-item::part(indicator) cible les
-         * indicateurs de sous-étapes via la structure (imbrication réelle), sans avoir besoin
-         * d'un état pour le savoir — ::part() ne peut pas chaîner sur un attribut du host ni sur
-         * un pseudo-élément (::part(x)::before invalide en spec).
+         * ar-stepper-item > ar-stepper-item cible les sous-étapes par l'imbrication réelle.
          */
         &::part(indicator) {
             width: 2.25rem;
@@ -970,22 +942,17 @@
         }
     }
 
-    /* reverse-align inverse déjà l'ordre visuel de l'indicateur (pont interne côté composant,
-       ar-stepper-item.styles.ts) mais pas cette marge de sous-étape : elle est posée ici, côté
-       thème, sans lien avec ce pont — sans cette règle dédiée, la puce de sous-étape passe en
-       fin de ligne (order) tout en gardant sa marge de départ, d'où le décalage visuel. */
+    /* Sous reverse-align, l'indicateur de sous-étape passe après le label : ses marges sont
+       inversées en conséquence. */
     ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::part(indicator) {
         margin-inline-start: 1.25rem;
         margin-inline-end: 0.75rem;
     }
 
-    /* Connecteur décoratif (ligne pointillée) entre étapes/sous-étapes — un pseudo-élément du
-       host ar-stepper-item, jamais un vrai part (::part() ne peut pas l'atteindre, ni via
-       chaînage ::part(x)::after, invalide en spec). Un sélecteur direct sur le tag atteint
-       toutefois le même pseudo-élément que :host::after/:before le ferait de l'intérieur —
-       vérifié empiriquement (#226 suivi). Étape/sous-étape est résolu par sélecteur structurel
-       (ar-stepper > ar-stepper-item pour une étape principale, ar-stepper-item > ar-stepper-item
-       pour une sous-étape), sans aucun état à relayer depuis le composant. */
+    /* Connecteur décoratif (ligne pointillée) : pseudo-élément du host ar-stepper-item, atteint
+       par un sélecteur direct sur le tag (::part() ne peut pas cibler un pseudo-élément).
+       Étape et sous-étape se distinguent par l'imbrication : ar-stepper > ar-stepper-item /
+       ar-stepper-item > ar-stepper-item. */
     ar-stepper > ar-stepper-item:not(:last-child)::after,
     ar-stepper-item > ar-stepper-item::before {
         content: '';
@@ -1007,10 +974,7 @@
         background-position: center 4px;
     }
 
-    /* reverse-align bascule le connecteur du même côté que l'indicateur — résolu en ciblant
-       directement l'attribut public sur ar-stepper, jamais la custom property interne
-       (--ar-stepper-item-align) : un thème ne doit pas dépendre d'un détail de plomberie non
-       documenté du composant. */
+    /* Sous reverse-align, le connecteur passe du même côté que l'indicateur. */
     ar-stepper[reverse-align] > ar-stepper-item:not(:last-child)::after,
     ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::before {
         align-self: flex-end;
