@@ -42,7 +42,7 @@ function withIndicatorStatePart(state: IndicatorState): string {
  * @csspart indicator--completed - Le marqueur visuel d'une étape complétée (variante d'état de `indicator`).
  * @csspart label      - Le texte du label.
  * @csspart label--link - Le texte du label quand l'étape est cliquable (variante d'état de `label`).
- * @csspart list--substep - La liste des sous-étapes, quand cette étape en affiche.
+ * @csspart list--substep - Le conteneur `role="list"` des sous-étapes, quand cette étape en affiche.
  *
  * @cssprop --ar-stepper-item-label-color - Couleur des labels des étapes non courantes.
  * @cssprop --ar-stepper-item-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
@@ -224,9 +224,9 @@ export class ArStepperItem extends LitElement {
             ${
                 this._showSubsteps
                     ? html`
-                          <ol part="list list--substep" class="list-unstyled">
+                          <div role="list" part="list list--substep" class="list-unstyled">
                               <slot></slot>
-                          </ol>
+                          </div>
                       `
                     : nothing
             }
