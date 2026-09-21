@@ -70,7 +70,7 @@ L'item a un shadow DOM propre (comme `ar-stepper-item`) :
 
 - Hôte en `display: contents`, avec `role="listitem"` posé dans `updated()` ; `aria-current="page"`
   sur le dernier item, retiré sinon.
-- Le shadow rend un wrapper interne (`position: relative`, flex centré) contenant, dans l'ordre :
+- Le shadow rend un wrapper interne (flex centré) contenant, dans l'ordre :
     - **desktop, item non premier** : `<span part="separator" aria-hidden="true">` (contenu : cf.
       section 3) ;
     - **mobile, item visible** : une colonne décorative `<div class="rail" aria-hidden="true">`
@@ -123,7 +123,7 @@ espacement et états visuels passent dans `default.css`.
 | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Layout de `list--desktop` (flex row wrap) et `list--mobile` (flex column), reset `margin` / `padding` des `<ol>` | Couleur de la liste, `padding-inline-end` du nav                                                               |
 | `display: inline-flex; align-items: center` sur `link`, `current`, `home`, `trigger`                             | Reset visuel des liens (couleur héritée, décoration)                                                           |
-| Wrapper de l'item : flex centré, `position: relative`                                                            | Séparateur : couleur, taille de police                                                                         |
+| Wrapper de l'item : flex centré ; colonne décorative mobile (`.rail`, segments `flex: 1 1 0`)                    | Séparateur : couleur, taille de police                                                                         |
 | Padding vertical des liens dans la liste mobile (`0.5rem 0.25rem`, cible tactile WCAG 2.5.8)                     |                                                                                                                |
 | `svg { height: 1.25em; … }` et slots d'icône par défaut                                                          | Indicateur : tailles, marges, forme, couleur, variante `--current`                                             |
 | Repli d'accessibilité `--ar-breadcrumb-toggle-min-size` (WCAG 2.5.8)                                             | Connecteur mobile : ligne pointillée, géométrie, couleur                                                       |
@@ -147,6 +147,11 @@ espacement et états visuels passent dans `default.css`.
   joignent bord à bord, si bien que le trait court d'un bord d'indicateur au bord du suivant sans
   jamais passer derrière un indicateur. Rien n'est tracé au-dessus du premier indicateur visible
   ni en dessous du dernier.
+- **Panel mobile** : le thème pose une `max-width` propre sur `ar-breadcrumb::part(panel)`,
+  `min(20rem, calc(100vw - 2rem))`, volontairement non cascadée depuis `--ar-panel-max-width`
+  (18rem, partagé avec les autres composants à panel) : la liste mobile empile des libellés de
+  fil d'ariane, qui se replient moins sur 20rem. `min()` borne la largeur au viewport (WCAG
+  1.4.10 Reflow) ; `min-width` reste celle du panel partagé.
 - **Boutons `home` / `trigger`** : les états visuels passent en règles `::part(home)` /
   `::part(trigger)` du thème (`:hover`, `:active`, `:focus-visible`), en pseudo-classes seules
   (aucun sélecteur d'attribut après `::part()`, invalide). Le thème gère

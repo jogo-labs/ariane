@@ -1125,6 +1125,14 @@
             padding-inline-end: 0.25rem;
         }
 
+        &::part(panel) {
+            /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width : la liste
+               mobile empile des libellés de fil d'ariane, qui se replient moins sur 20rem que sur
+               la valeur partagée (18rem). min() borne la largeur au viewport (WCAG 1.4.10
+               Reflow) ; min-width reste celle du panel partagé. */
+            max-width: min(20rem, calc(100vw - 2rem));
+        }
+
         &::part(list) {
             color: var(--ar-color-text);
         }
