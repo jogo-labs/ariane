@@ -2,6 +2,7 @@ import {
     LitElement,
     type TemplateResult,
     html,
+    nothing,
     type CSSResultGroup,
     type PropertyValues,
 } from 'lit';
@@ -40,7 +41,7 @@ import '../../translations/en.js';
  * @csspart panel      - Le panel mobile flottant.
  *
  * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
- * @slot separator - Séparateur entre les items (desktop). Cloné dans chaque item ; remplace le « / » par défaut. Sans `id`, ni contenu interactif (le séparateur est masqué aux lecteurs d'écran).
+ * @slot separator    - Séparateur entre les items (desktop). Cloné dans chaque item ; remplace le « / » par défaut. Sans `id`, ni contenu interactif (le séparateur est masqué aux lecteurs d'écran).
  * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
@@ -85,10 +86,7 @@ export class ArBreadcrumb extends LitElement {
     private _rebuildPending = false;
     private _separatorVersion = 0;
 
-    private readonly _separatorObserver = new MutationObserver(() => {
-        this._separatorVersion += 1;
-        this._scheduleRebuild();
-    });
+    private _separatorObserver: MutationObserver | undefined = undefined;
 
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
@@ -135,6 +133,11 @@ export class ArBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._separatorObserver ??= new MutationObserver((records) => {
+            if (!records.some((record) => this._isSeparatorMutation(record))) return;
+            this._separatorVersion += 1;
+            this._scheduleRebuild();
+        });
         this._separatorObserver.observe(this, {
             childList: true,
             subtree: true,
@@ -158,7 +161,7 @@ export class ArBreadcrumb extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        this._separatorObserver.disconnect();
+        this._separatorObserver?.disconnect();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
@@ -208,6 +211,7 @@ export class ArBreadcrumb extends LitElement {
         if (items.length === 0) return;
 
         const navLabel = this.localize.term('breadcrumbNavLabel');
+        const showLabel = this.localize.term('showBreadcrumb');
 
         return html`
             <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
@@ -215,7 +219,7 @@ export class ArBreadcrumb extends LitElement {
                 ${
                     this.isMobile
                         ? html`<div class="dropdown">
-                              <a part="home" href="${items[0]?.href}">
+                              <a part="home" href=${items[0]?.href ?? nothing}>
                                   <slot name="home-icon">${this._defaultHomeIcon()}</slot>
                                   <span>${items[0]?.label}</span>
                               </a>
@@ -225,9 +229,7 @@ export class ArBreadcrumb extends LitElement {
                                   part="trigger"
                               >
                                   <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
-                                  <span class="sr-only"
-                                      >${this.localize.term('showBreadcrumb')}</span
-                                  >
+                                  <span class="sr-only">${showLabel}</span>
                               </button>
                               <div part="panel" popover="auto" tabindex="-1">
                                   <ol part="list list--mobile">
@@ -259,6 +261,18 @@ export class ArBreadcrumb extends LitElement {
         [...this.querySelectorAll('*')]
             .filter((el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem)
             .forEach((item) => item.setRegistry(registry));
+    }
+
+    /** Une mutation concerne-t-elle le slot `separator` (nœud modèle, son contenu ou son attribut slot) ? */
+    private _isSeparatorMutation(record: MutationRecord): boolean {
+        if (record.type === 'attributes') return record.target.parentElement === this;
+        if (record.type === 'childList' && record.target === this) {
+            return [...record.addedNodes, ...record.removedNodes].some(
+                (node) => node instanceof Element && node.getAttribute('slot') === 'separator',
+            );
+        }
+        const source = this.querySelector(':scope > [slot="separator"]');
+        return source !== null && source.contains(record.target);
     }
 
     private _pushRenderState(): void {

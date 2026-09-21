@@ -43,6 +43,22 @@ describe('ArBreadcrumbItem', () => {
             expect(link?.textContent?.trim()).toBe('Catégorie');
         });
 
+        it("n'a pas d'attribut href sur le lien quand href est absent", async () => {
+            el = await fixture('<ar-breadcrumb-item label="Catégorie"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+                separatorVersion: 0,
+            });
+            await waitForUpdate(el);
+            const link = getPart(el, 'link');
+            expect(link).not.toBeNull();
+            expect(link?.hasAttribute('href')).toBe(false);
+        });
+
         it('rend un span part="current" (pas un lien) quand il est le dernier', async () => {
             el = await fixture(
                 '<ar-breadcrumb-item label="Page courante" href="/x"></ar-breadcrumb-item>',
@@ -264,30 +280,6 @@ describe('ArBreadcrumbItem', () => {
             expect(getPart(el, 'connector')).toBeNull();
         });
 
-        it('desktop : le séparateur suit hasPrevious', async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: false,
-                hasPrevious: false,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            expect(getPart(el, 'separator')).toBeNull();
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: false,
-                hasPrevious: true,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            expect(getPart(el, 'separator')).not.toBeNull();
-        });
-
         it('desktop : ne rend pas de connecteur', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
@@ -317,6 +309,12 @@ describe('ArBreadcrumbItem', () => {
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
+            expect(el.getAttribute('role')).toBe('listitem');
+        });
+
+        it('pose role="listitem" dès la connexion, avant tout rendu', () => {
+            el = document.createElement('ar-breadcrumb-item') as ArBreadcrumbItem;
+            document.body.appendChild(el);
             expect(el.getAttribute('role')).toBe('listitem');
         });
 

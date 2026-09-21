@@ -77,6 +77,11 @@ export class ArBreadcrumbItem extends LitElement {
         this._renderState = state;
     }
 
+    override connectedCallback() {
+        super.connectedCallback();
+        this.setAttribute('role', 'listitem');
+    }
+
     override disconnectedCallback() {
         this._registry?.unregisterItem(this);
         this._registry = undefined;
@@ -92,7 +97,6 @@ export class ArBreadcrumbItem extends LitElement {
         });
 
         const state = this._renderState;
-        this.setAttribute('role', 'listitem');
         this.toggleAttribute('hidden', state !== undefined && state.isMobile && state.isFirst);
         if (state?.isCurrent) {
             this.setAttribute('aria-current', 'page');
@@ -138,7 +142,7 @@ export class ArBreadcrumbItem extends LitElement {
 
         const control = state.isCurrent
             ? html`<span part="current">${this.label}</span>`
-            : html`<a part="link" href=${this.href ?? ''}>${this.label}</a>`;
+            : html`<a part="link" href=${this.href ?? nothing}>${this.label}</a>`;
 
         return html`<div class=${state.isMobile ? 'item item--mobile' : 'item'}>
             ${decoration}${control}

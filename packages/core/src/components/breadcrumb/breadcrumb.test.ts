@@ -217,6 +217,16 @@ describe('ArBreadcrumb', () => {
             expect(getPart(el, 'trigger')).not.toBeNull();
         });
 
+        it("le lien home n'a pas d'attribut href quand le premier item n'en a pas", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            expect(getPart(el, 'home')?.hasAttribute('href')).toBe(false);
+        });
+
         it("ne rend pas de part='list--desktop' en mode mobile", async () => {
             el = await fixture(`
                 <ar-breadcrumb>
@@ -661,6 +671,19 @@ describe('ArBreadcrumb', () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
             await waitForUpdate(el);
             expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('»');
+        });
+
+        it('ne re-clone pas le séparateur quand on ajoute un item ordinaire', async () => {
+            el = await fixture(withSeparator);
+            const before = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
+            expect(before).toBeTruthy();
+            const extra = document.createElement('ar-breadcrumb-item');
+            extra.setAttribute('label', 'Extra');
+            el.appendChild(extra);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            const after = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
+            expect(after).toBe(before);
         });
 
         it('retombe sur « / » quand le nœud séparateur est retiré', async () => {
