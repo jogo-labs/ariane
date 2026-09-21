@@ -28,7 +28,12 @@ describe('ArBreadcrumbItem', () => {
             el = await fixture(
                 '<ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>',
             );
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             const link = getPart(el, 'link');
             expect(link?.tagName.toLowerCase()).toBe('a');
@@ -40,7 +45,12 @@ describe('ArBreadcrumbItem', () => {
             el = await fixture(
                 '<ar-breadcrumb-item label="Page courante" href="/x"></ar-breadcrumb-item>',
             );
-            el.setRenderState({ isFirst: false, isCurrent: true, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             const current = getPart(el, 'current');
             expect(current?.tagName.toLowerCase()).toBe('span');
@@ -50,11 +60,21 @@ describe('ArBreadcrumbItem', () => {
 
         it('desktop : rend un séparateur part="separator" sauf sur le premier item', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: true, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
 
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).not.toBeNull();
             expect(getPart(el, 'separator')?.getAttribute('aria-hidden')).toBe('true');
@@ -62,13 +82,23 @@ describe('ArBreadcrumbItem', () => {
 
         it("mobile : rend un indicateur à la place du séparateur, avec la variante d'état sur le dernier", async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: true });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe('indicator');
             expect(getPart(el, 'indicator')?.getAttribute('aria-hidden')).toBe('true');
 
-            el.setRenderState({ isFirst: false, isCurrent: true, isMobile: true });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: true,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe(
                 'indicator indicator--current',
@@ -77,7 +107,12 @@ describe('ArBreadcrumbItem', () => {
 
         it('mobile : le premier item ne rend rien et porte hidden', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: true, isCurrent: false, isMobile: true });
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: false,
+            });
             await waitForUpdate(el);
             expect(el.shadowRoot?.querySelector('.item')).toBeNull();
             expect(el.hasAttribute('hidden')).toBe(true);
@@ -85,21 +120,36 @@ describe('ArBreadcrumbItem', () => {
 
         it('desktop : le premier item ne porte pas hidden', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: true, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+            });
             await waitForUpdate(el);
             expect(el.hasAttribute('hidden')).toBe(false);
         });
 
         it('desktop : le séparateur par défaut est un « / » visible', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
         });
 
         it("mobile : rend un connecteur décoratif avant l'indicateur", async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: true });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             const connector = getPart(el, 'connector');
             expect(connector).not.toBeNull();
@@ -110,9 +160,47 @@ describe('ArBreadcrumbItem', () => {
             ).toBeTruthy();
         });
 
+        it('mobile : le premier item visible (hasPrevious false) a un indicateur mais pas de connecteur', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: false,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'indicator')).not.toBeNull();
+            expect(getPart(el, 'connector')).toBeNull();
+        });
+
+        it('desktop : le séparateur suit hasPrevious', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')).toBeNull();
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')).not.toBeNull();
+        });
+
         it('desktop : ne rend pas de connecteur', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(getPart(el, 'connector')).toBeNull();
         });
@@ -123,18 +211,33 @@ describe('ArBreadcrumbItem', () => {
     describe("attributs d'hôte", () => {
         it('pose role="listitem"', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: true, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+            });
             await waitForUpdate(el);
             expect(el.getAttribute('role')).toBe('listitem');
         });
 
         it('pose aria-current="page" sur le dernier item seulement', async () => {
             el = await fixture('<ar-breadcrumb-item label="A"></ar-breadcrumb-item>');
-            el.setRenderState({ isFirst: false, isCurrent: true, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(el.getAttribute('aria-current')).toBe('page');
 
-            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+            });
             await waitForUpdate(el);
             expect(el.hasAttribute('aria-current')).toBe(false);
         });

@@ -12,6 +12,8 @@ export interface BreadcrumbItemRenderState {
     /** Dernier item du fil : rendu comme texte, non cliquable. */
     isCurrent: boolean;
     isMobile: boolean;
+    /** Un item visible précède celui-ci (en mobile, le premier item est remplacé par « home »). */
+    hasPrevious: boolean;
 }
 
 /**
@@ -55,7 +57,8 @@ export class ArBreadcrumbItem extends LitElement {
             previous &&
             previous.isFirst === state.isFirst &&
             previous.isCurrent === state.isCurrent &&
-            previous.isMobile === state.isMobile
+            previous.isMobile === state.isMobile &&
+            previous.hasPrevious === state.hasPrevious
         ) {
             return;
         }
@@ -90,15 +93,17 @@ export class ArBreadcrumbItem extends LitElement {
         const state = this._renderState;
         if (!state || (state.isMobile && state.isFirst)) return nothing;
 
+        const connector = state.hasPrevious
+            ? html`<span part="connector" aria-hidden="true"></span>`
+            : nothing;
         const decoration = state.isMobile
-            ? html`<span part="connector" aria-hidden="true"></span
-                  ><span
+            ? html`${connector}<span
                       part="indicator${state.isCurrent ? ' indicator--current' : ''}"
                       aria-hidden="true"
                   ></span>`
-            : state.isFirst
-              ? nothing
-              : html`<span part="separator" aria-hidden="true">/</span>`;
+            : state.hasPrevious
+              ? html`<span part="separator" aria-hidden="true">/</span>`
+              : nothing;
 
         const control = state.isCurrent
             ? html`<span part="current">${this.label}</span>`

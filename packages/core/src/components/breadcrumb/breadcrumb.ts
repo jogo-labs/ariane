@@ -253,6 +253,7 @@ export class ArBreadcrumb extends LitElement {
                 isFirst: index === 0,
                 isCurrent: index === items.length - 1,
                 isMobile: this.isMobile,
+                hasPrevious: this.isMobile ? index > 1 : index > 0,
             });
         });
     }

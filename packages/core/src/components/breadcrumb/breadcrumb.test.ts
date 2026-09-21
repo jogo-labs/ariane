@@ -175,6 +175,20 @@ describe('ArBreadcrumb', () => {
             expect(getPart(items[2]!, 'current')?.textContent?.trim()).toBe('Page courante');
         });
 
+        it('desktop : pas de séparateur avant le premier item, un séparateur avant les suivants', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const items = itemsOf(el);
+            expect(getPart(items[0]!, 'separator')).toBeNull();
+            expect(getPart(items[1]!, 'separator')).not.toBeNull();
+            expect(getPart(items[2]!, 'separator')).not.toBeNull();
+        });
+
         it('contient un part="breadcrumb"', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
@@ -271,6 +285,19 @@ describe('ArBreadcrumb', () => {
             expect(getPart(items[2]!, 'indicator')?.getAttribute('part')).toBe(
                 'indicator indicator--current',
             );
+        });
+
+        it("mobile : le premier item visible n'a pas de connecteur, les suivants en ont un", async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            const items = itemsOf(el);
+            expect(getPart(items[1]!, 'connector')).toBeNull();
+            expect(getPart(items[2]!, 'connector')).not.toBeNull();
         });
     });
 
