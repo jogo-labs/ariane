@@ -421,12 +421,15 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-stepper-distance: var(--ar-anchor-distance);
         --ar-stepper-offset: var(--ar-anchor-offset);
+        --ar-stepper-toggle-min-size: 2.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Stepper-item
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-stepper-item-label-color: var(--ar-color-text-muted);
         --ar-stepper-item-link-hover-label-color: var(--ar-color-text);
         --ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
         --ar-stepper-item-current-header-color: var(--ar-color-interactive);
-        --ar-stepper-toggle-transition-duration: 0.35s;
-        --ar-stepper-toggle-min-size: 2.5rem;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Progressbar
@@ -891,7 +894,7 @@
         }
 
         &::part(trigger-icon) {
-            transition: transform var(--ar-stepper-toggle-transition-duration);
+            transition: transform 0.35s;
         }
 
         &[open]::part(trigger-icon) {
@@ -909,13 +912,9 @@
         }
     }
 
-    /* Les parts step-link, label--link, indicator et indicator--current appartiennent au shadow
-       DOM d'ar-stepper-item : ::part() doit cibler ar-stepper-item, pas ar-stepper. */
+    /* Stepper-item */
     ar-stepper-item {
-        /* Variables de mutualisation propres au thème, jamais consommées par le composant : le
-           préfixe --ar-theme- les distingue des tokens --ar-stepper-item-* documentés en
-           @cssprop (validate-cssprop-defaults.js détecte le composant par préfixe de tag).
-           Aplat pâle : le texte gras et coloré de l'étape courante suffit à la distinguer. */
+        /* Variables de mutualisation propres au thème */
         --ar-theme-stepper-indicator-color: var(--ar-color-text);
         --ar-theme-stepper-indicator-bg: var(--ar-color-interactive-subtle);
 
