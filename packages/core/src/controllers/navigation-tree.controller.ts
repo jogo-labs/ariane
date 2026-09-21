@@ -67,6 +67,7 @@ export class NavigationTreeController implements ReactiveController {
                 path: item.path,
                 label: item.label,
                 href: item.href,
+                item,
 
                 children: [],
                 state: 'idle',

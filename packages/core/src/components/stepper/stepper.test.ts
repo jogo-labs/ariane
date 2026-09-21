@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ArStepper } from './stepper.js';
 import type { ArStepperStepChangeDetail } from './stepper.js';
+import type { StepperRegistry } from '../../context/stepper.context.js';
+import type { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 import '../stepper-item/index.js';
@@ -23,6 +25,25 @@ function requireQuery<T extends Element>(root: ParentNode, selector: string): T 
     const el = root.querySelector<T>(selector);
     if (!el) throw new Error(`Missing element for selector: ${selector}`);
     return el;
+}
+
+/** Retrouve l'ar-stepper-item (léger DOM) portant ce path. */
+function itemOf(el: ArStepper, path: string): ArStepperItem {
+    return requireQuery<ArStepperItem>(el, `ar-stepper-item[path="${path}"]`);
+}
+
+/** Résout un sélecteur DANS le shadow DOM de l'item portant ce path (indicator, label, step-link…). */
+function itemPart<T extends Element = HTMLElement>(
+    el: ArStepper,
+    path: string,
+    selector: string,
+): T {
+    return requireQuery<T>(shadow(itemOf(el, path)), selector);
+}
+
+/** Le contrôle interne (<a> ou <div>) de l'item portant ce path. */
+function itemHeader(el: ArStepper, path: string): HTMLElement {
+    return itemPart<HTMLElement>(el, path, '.item-header');
 }
 
 /** Monte un stepper avec des items. Attend deux updateComplete pour absorber queueMicrotask. */
@@ -76,19 +97,8 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const link = shadow(el).querySelector('a[part~="step-link"]');
-            expect(link?.getAttribute('part')?.split(/\s+/)).toContain('control');
-        });
-
-        it('bullet porte aussi le rôle transverse "indicator"', async () => {
-            const el = await fixtureWithItems(`
-                <ar-stepper current-path="/a">
-                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
-                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
-                </ar-stepper>
-            `);
-            const bullet = shadow(el).querySelector('[part~="bullet"]');
-            expect(bullet?.getAttribute('part')?.split(/\s+/)).toContain('indicator');
+            const link = itemPart(el, '/a', 'a[part~="step-link"]');
+            expect(link.getAttribute('part')?.split(/\s+/)).toContain('control');
         });
 
         it('rend part="list" sur la liste des étapes', async () => {
@@ -101,7 +111,10 @@ describe('ArStepper', () => {
             expect(shadow(el).querySelector('[part="list"]')).not.toBeNull();
         });
 
-        it('rend part="step" sur un item de premier niveau et part="substep" sur une sous-étape', async () => {
+        it('une sous-étape est un enfant direct imbriqué dans un autre ar-stepper-item', async () => {
+            // L'imbrication structurelle (pas un attribut part sur le host, cf. #226 suivi —
+            // ::part() ne peut pas atteindre un ar-stepper-item, élément slotté en light DOM)
+            // est le seul signal, interne comme externe, distinguant étape et sous-étape.
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a/1">
                     <ar-stepper-item path="/a" label="Étape A">
@@ -111,12 +124,12 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const topLevel = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
-            expect(topLevel.length).toBeGreaterThan(0);
-            const nested = shadow(el).querySelectorAll('[part="list"] li[part="substep"]');
+            const topLevel = el.querySelectorAll(':scope > ar-stepper-item');
+            expect(topLevel.length).toBe(2);
+            const nested = el.querySelectorAll('ar-stepper-item > ar-stepper-item');
             expect(nested.length).toBe(2);
-            // Vérifie que la sous-liste imbriquée porte bien part="list list--substep"
-            const nestedList = shadow(el).querySelector('li[part="step"] > [part~="list"]');
+            // La sous-liste imbriquée vit dans le shadow DOM du parent ("/a"), pas celui d'ar-stepper.
+            const nestedList = shadow(itemOf(el, '/a')).querySelector('[part~="list--substep"]');
             expect(nestedList?.getAttribute('part')).toBe('list list--substep');
         });
 
@@ -127,39 +140,39 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const link = shadow(el).querySelector('a[part~="step-link"]');
+            const link = itemPart(el, '/a', 'a[part~="step-link"]');
             // Étape A n'est pas courante (B l'est) : le mode edit la rend cliquable
             // (step.state !== 'current').
-            expect(link?.getAttribute('part')).toBe('step-link control');
-            const currentItemInner = shadow(el).querySelector('div.item-header');
-            expect(currentItemInner?.hasAttribute('part')).toBe(false);
+            expect(link.getAttribute('part')).toBe('step-link control');
+            const currentItemInner = itemHeader(el, '/b');
+            expect(currentItemInner.tagName.toLowerCase()).toBe('div');
         });
 
-        it('rend part="bullet" sur la puce de chaque étape', async () => {
+        it('rend part="indicator" sur l\'indicateur de chaque étape', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            expect(shadow(el).querySelector('[part~="bullet"]')).not.toBeNull();
+            expect(itemPart(el, '/a', '[part~="indicator"]')).toBeTruthy();
         });
 
-        it('rend le part d\'état "bullet--current" uniquement sur la puce de l\'étape courante', async () => {
+        it("rend le part d'état \"indicator--current\" uniquement sur l'indicateur de l'étape courante", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/a">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
+            const steps = el.querySelectorAll(':scope > ar-stepper-item');
             expect(steps.length).toBe(2);
 
-            const bulletA = requireQuery<HTMLElement>(steps[0]!, '[part~="bullet"]');
-            expect(bulletA.getAttribute('part')).toBe('bullet indicator bullet--current');
+            const indicatorA = itemPart(el, '/a', '[part~="indicator"]');
+            expect(indicatorA.getAttribute('part')).toBe('indicator indicator--current');
 
-            const bulletB = requireQuery<HTMLElement>(steps[1]!, '[part~="bullet"]');
-            expect(bulletB.getAttribute('part')).toBe('bullet indicator');
+            const indicatorB = itemPart(el, '/b', '[part~="indicator"]');
+            expect(indicatorB.getAttribute('part')).toBe('indicator');
         });
 
         it("ne rend jamais l'étape de premier niveau comme un lien quand une de ses sous-étapes est courante, même en mode edit", async () => {
@@ -176,19 +189,16 @@ describe('ArStepper', () => {
                             <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                         </ar-stepper>
                     `);
-            const steps = shadow(el).querySelectorAll('[part="list"] > li[part="step"]');
+            const steps = el.querySelectorAll(':scope > ar-stepper-item');
             expect(steps.length).toBe(2);
 
-            const headerA = requireQuery<HTMLElement>(steps[0]!, ':scope > .item-header');
+            const headerA = itemHeader(el, '/a');
             expect(headerA.tagName).toBe('DIV');
-            expect(headerA.hasAttribute('part')).toBe(false);
-            expect(steps[0]!.getAttribute('class')).toContain('current');
-            expect(steps[0]!.getAttribute('aria-current')).toBe('step');
+            expect(itemOf(el, '/a').getAttribute('aria-current')).toBe('step');
 
-            const linkB = requireQuery<HTMLElement>(steps[1]!, ':scope > a[part~="step-link"]');
+            const linkB = itemPart<HTMLElement>(el, '/b', 'a[part~="step-link"]');
             expect(linkB.getAttribute('part')).toBe('step-link control');
-            expect(steps[1]!.getAttribute('class')).not.toContain('current');
-            expect(steps[1]!.getAttribute('aria-current')).toBeNull();
+            expect(itemOf(el, '/b').getAttribute('aria-current')).toBeNull();
         });
 
         it('ne rend jamais la sous-étape courante comme un lien, même en mode edit', async () => {
@@ -200,17 +210,13 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const substeps = shadow(el).querySelectorAll('li[part~="substep"]');
-            const currentSubstep = [...substeps].find(
-                (li) => li.querySelector('[data-path="/a/2"]') !== null,
-            );
-            expect(currentSubstep).toBeDefined();
-            expect(currentSubstep!.querySelector('a[part~="step-link"]')).toBeNull();
-            const header = requireQuery<HTMLElement>(currentSubstep!, '.item-header');
+            expect(itemOf(el, '/a/2').matches('ar-stepper-item > ar-stepper-item')).toBe(true);
+            expect(shadow(itemOf(el, '/a/2')).querySelector('a[part~="step-link"]')).toBeNull();
+            const header = itemHeader(el, '/a/2');
             expect(header.tagName).toBe('DIV');
         });
 
-        it('rend le part d\'état "bullet--current" sur la puce d\'une sous-étape courante', async () => {
+        it("rend le part d'état \"indicator--current\" sur l'indicateur d'une sous-étape courante", async () => {
             const el = await fixtureWithItems(`
                         <ar-stepper current-path="/a/1">
                             <ar-stepper-item path="/a" label="Étape A">
@@ -219,13 +225,10 @@ describe('ArStepper', () => {
                             </ar-stepper-item>
                         </ar-stepper>
                     `);
-            const substepBullets = shadow(el).querySelectorAll(
-                'li[part~="substep"] [part~="bullet"]',
-            );
-            expect(substepBullets.length).toBe(2);
-            const [bullet1, bullet2] = substepBullets;
-            expect(bullet1?.getAttribute('part')).toBe('bullet indicator bullet--current');
-            expect(bullet2?.getAttribute('part')).toBe('bullet indicator');
+            const indicator1 = itemPart(el, '/a/1', '[part~="indicator"]');
+            const indicator2 = itemPart(el, '/a/2', '[part~="indicator"]');
+            expect(indicator1.getAttribute('part')).toBe('indicator indicator--current');
+            expect(indicator2.getAttribute('part')).toBe('indicator');
         });
     });
 
@@ -273,7 +276,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/c" label="Étape C"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const items = shadow(el).querySelectorAll('li.item');
+            const items = el.querySelectorAll(':scope > ar-stepper-item');
             expect(items.length).toBe(3);
         });
 
@@ -306,7 +309,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.click();
 
             expect(handler).toHaveBeenCalledOnce();
@@ -326,7 +329,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.click();
 
             expect(handler).toHaveBeenCalledOnce();
@@ -345,14 +348,14 @@ describe('ArStepper', () => {
             const changedHandler = vi.fn();
             el.addEventListener('ar-stepper-step-changed', changedHandler);
 
-            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.focus();
             link.click();
             await waitForUpdate(el);
 
             expect(el.currentPath).toBe('/b');
             expect(changedHandler).not.toHaveBeenCalled();
-            expect(shadow(el).activeElement).toBe(link);
+            expect(shadow(itemOf(el, '/a')).activeElement).toBe(link);
         });
 
         it("preventDefault() sur ar-stepper-step-change bloque aussi la navigation native quand l'étape a un href réel", async () => {
@@ -368,7 +371,7 @@ describe('ArStepper', () => {
             `);
             el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
 
-            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             link.dispatchEvent(clickEvent);
 
@@ -387,11 +390,9 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('step-changed', handler);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
-            if (link) {
-                link.click();
-                expect(handler).not.toHaveBeenCalled();
-            }
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
+            link.click();
+            expect(handler).not.toHaveBeenCalled();
 
             el.removeEventListener('step-changed', handler);
         });
@@ -408,7 +409,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-changed', handler);
 
-            const link = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.click();
             await waitForUpdate(el);
 
@@ -465,12 +466,11 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
-            expect(link).not.toBeNull();
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
 
-            link!.dispatchEvent(clickEvent);
+            link.dispatchEvent(clickEvent);
 
             expect(preventDefaultSpy).toHaveBeenCalledOnce();
         });
@@ -485,12 +485,11 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
-            expect(link).not.toBeNull();
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
 
-            link!.dispatchEvent(clickEvent);
+            link.dispatchEvent(clickEvent);
 
             expect(preventDefaultSpy).toHaveBeenCalledOnce();
         });
@@ -503,12 +502,11 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[part~="step-link"]');
-            expect(link).not.toBeNull();
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
 
-            link!.dispatchEvent(clickEvent);
+            link.dispatchEvent(clickEvent);
 
             expect(preventDefaultSpy).not.toHaveBeenCalled();
         });
@@ -528,16 +526,15 @@ describe('ArStepper', () => {
             el.currentPath = '/b';
             await waitForUpdate(el);
 
-            const items = shadow(el).querySelectorAll('li.item');
-            expect(items[0]?.classList.contains('current')).toBe(false);
-            expect(items[1]?.classList.contains('current')).toBe(true);
+            expect(itemOf(el, '/a').getAttribute('aria-current')).toBeNull();
+            expect(itemOf(el, '/b').getAttribute('aria-current')).toBe('step');
         });
     });
 
     // ── Focus après activation (#154) ───────────────────────────────────────
 
     describe("focus après activation d'un lien", () => {
-        it("porte data-path sur le <div> de remplacement de l'étape courante", async () => {
+        it("porte un <div> comme contrôle interne pour l'étape courante", async () => {
             const el = await fixtureWithItems(`
                     <ar-stepper current-path="/b">
                         <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -545,12 +542,8 @@ describe('ArStepper', () => {
                     </ar-stepper>
                 `);
 
-            const currentHeader = requireQuery<HTMLDivElement>(
-                shadow(el),
-                'li.item.current > .item-header',
-            );
+            const currentHeader = itemHeader(el, '/b');
             expect(currentHeader.tagName.toLowerCase()).toBe('div');
-            expect(currentHeader.getAttribute('data-path')).toBe('/b');
         });
 
         it("focalise le <div> de l'étape cliquée quand le consommateur répond en mettant à jour currentPath", async () => {
@@ -561,7 +554,7 @@ describe('ArStepper', () => {
                     </ar-stepper>
                 `);
 
-            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const linkA = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             linkA.click();
 
             // Le composant est contrôlé : le consommateur répond à l'event en réassignant
@@ -569,10 +562,10 @@ describe('ArStepper', () => {
             el.currentPath = '/a';
             await waitForUpdate(el);
 
-            const newCurrentHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a"]');
-            expect(newCurrentHeader?.tagName.toLowerCase()).toBe('div');
-            expect(shadow(el).activeElement).toBe(newCurrentHeader);
-            expect(newCurrentHeader?.getAttribute('tabindex')).toBe('-1');
+            const newCurrentHeader = itemHeader(el, '/a');
+            expect(newCurrentHeader.tagName.toLowerCase()).toBe('div');
+            expect(shadow(itemOf(el, '/a')).activeElement).toBe(newCurrentHeader);
+            expect(newCurrentHeader.getAttribute('tabindex')).toBe('-1');
         });
 
         it('ne vole pas le focus si currentPath change sans rapport avec le dernier clic (ex. scroll-follow)', async () => {
@@ -588,7 +581,7 @@ describe('ArStepper', () => {
             el.currentPath = '/b';
             await waitForUpdate(el);
 
-            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/b"]'));
+            expect(shadow(itemOf(el, '/b')).activeElement).not.toBe(itemHeader(el, '/b'));
         });
 
         it("n'affecte plus le focus au cycle de rendu suivant un clic (fenêtre bornée à un seul cycle)", async () => {
@@ -600,7 +593,7 @@ describe('ArStepper', () => {
                     </ar-stepper>
                 `);
 
-            const linkA = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a"]');
+            const linkA = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             linkA.click();
 
             // Le consommateur ignore l'event (currentPath ne change pas tout de suite) puis,
@@ -609,10 +602,10 @@ describe('ArStepper', () => {
             el.currentPath = '/a';
             await waitForUpdate(el);
 
-            expect(shadow(el).activeElement).not.toBe(shadow(el).querySelector('[data-path="/a"]'));
+            expect(shadow(itemOf(el, '/a')).activeElement).not.toBe(itemHeader(el, '/a'));
         });
 
-        it('focalise le <div> de la SOUS-étape cliquée, pas celui du step parent (les deux deviennent .item.current simultanément via isGroupCurrent())', async () => {
+        it('focalise le <div> de la SOUS-étape cliquée, pas celui du step parent (les deux deviennent aria-current="step" simultanément via isGroupCurrent())', async () => {
             const el = await fixtureWithItems(`
                     <ar-stepper current-path="/a/2">
                         <ar-stepper-item path="/a" label="Étape A">
@@ -624,24 +617,25 @@ describe('ArStepper', () => {
                 `);
 
             // /a/1 est complétée (avant la sous-étape courante /a/2) : rendue comme lien cliquable.
-            const linkSub1 = requireQuery<HTMLAnchorElement>(shadow(el), 'a[data-path="/a/1"]');
+            const linkSub1 = itemPart<HTMLAnchorElement>(el, '/a/1', 'a');
             linkSub1.click();
 
             // Le consommateur répond en mettant à jour currentPath vers la sous-étape cliquée.
             el.currentPath = '/a/1';
             await waitForUpdate(el);
 
-            // isGroupCurrent() fait que le step parent /a ET la sous-étape /a/1 sont
-            // simultanément .item.current — un sélecteur par classe seule matcherait les deux.
-            const currentItems = shadow(el).querySelectorAll('li.item.current');
+            // isGroupCurrent() fait que le step parent /a ET la sous-étape /a/1 portent
+            // simultanément aria-current="step" — un sélecteur par attribut seul matcherait les deux.
+            const currentItems = el.querySelectorAll('ar-stepper-item[aria-current="step"]');
             expect(currentItems.length).toBe(2);
 
-            const subStepHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a/1"]');
-            expect(subStepHeader?.tagName.toLowerCase()).toBe('div');
-            expect(shadow(el).activeElement).toBe(subStepHeader);
-
-            const parentHeader = shadow(el).querySelector<HTMLDivElement>('[data-path="/a"]');
-            expect(shadow(el).activeElement).not.toBe(parentHeader);
+            const subStepHeader = itemHeader(el, '/a/1');
+            expect(subStepHeader.tagName.toLowerCase()).toBe('div');
+            expect(shadow(itemOf(el, '/a/1')).activeElement).toBe(subStepHeader);
+            // L'item /a/1 (sous-étape focalisée) est un enfant en light DOM de l'item /a — le
+            // document.activeElement remonte donc jusqu'à son host propre (/a/1), pas celui de
+            // son parent /a, ce qui prouve que le focus n'a pas migré sur l'étape parente.
+            expect(document.activeElement).toBe(itemOf(el, '/a/1'));
         });
     });
 
@@ -991,8 +985,7 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
-            if (!link) throw new Error('Lien vers /a introuvable');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.click();
             await new Promise((resolve) => setTimeout(resolve, 60));
 
@@ -1016,8 +1009,7 @@ describe('ArStepper', () => {
                 el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
             });
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a"]');
-            if (!link) throw new Error('Lien vers /a introuvable');
+            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
             link.click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
@@ -1045,8 +1037,7 @@ describe('ArStepper', () => {
                 el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
             });
 
-            const link = shadow(el).querySelector<HTMLAnchorElement>('a[data-path="/a/2"]');
-            if (!link) throw new Error('Lien vers /a/2 introuvable');
+            const link = itemPart<HTMLAnchorElement>(el, '/a/2', 'a');
             link.click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
@@ -1092,7 +1083,8 @@ describe('ArStepper', () => {
                 '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
             );
             await waitForUpdate(el);
-            const srOnly = el.shadowRoot?.querySelector('.item .sr-only');
+            const item = requireQuery<ArStepperItem>(el, 'ar-stepper-item');
+            const srOnly = shadow(item).querySelector('.sr-only');
             expect(srOnly?.textContent).toBe('step 1:');
             el.remove();
         });
@@ -1108,8 +1100,48 @@ describe('ArStepper', () => {
                 '<ar-stepper current-path="/a" lang="en"><ar-stepper-item href="/a" label="A"></ar-stepper-item></ar-stepper>',
             );
 
-            const trigger = el.shadowRoot?.querySelector('[part="trigger"] span');
+            const trigger = el.shadowRoot?.querySelector('[part="trigger-status"]');
             expect(trigger?.textContent).toBe(' Step 1 / 1 (in progress) ');
+            el.remove();
+        });
+
+        it('expose les parts trigger-status et trigger-label sur le trigger mobile', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(
+                '<ar-stepper current-path="/a"><ar-stepper-item path="/a" href="/a" label="Mon étape"></ar-stepper-item></ar-stepper>',
+            );
+
+            const trigger = el.shadowRoot?.querySelector('[part="trigger"]');
+            expect(trigger?.querySelector('[part="trigger-status"]')?.textContent).toContain(
+                '1 / 1',
+            );
+            expect(trigger?.querySelector('[part="trigger-label"]')?.textContent).toContain(
+                'Mon étape',
+            );
+            el.remove();
+        });
+
+        it('le trigger mobile expose un slot trigger-icon avec un chevron SVG par défaut', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: false,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const el = await fixtureWithItems(
+                '<ar-stepper current-path="/a"><ar-stepper-item path="/a" href="/a" label="A"></ar-stepper-item></ar-stepper>',
+            );
+
+            const icon = el.shadowRoot?.querySelector('[part="trigger-icon"]');
+            expect(icon?.getAttribute('aria-hidden')).toBe('true');
+            const slot = icon?.querySelector<HTMLSlotElement>('slot[name="trigger-icon"]');
+            expect(slot).not.toBeNull();
+            expect(slot?.querySelector('svg')).not.toBeNull();
             el.remove();
         });
     });
@@ -1165,6 +1197,52 @@ describe('ArStepper', () => {
                     .filter((v) => typeof v === 'string')
                     .some((v) => v.includes('scheduled an update')),
             ).toBe(false);
+        });
+    });
+
+    describe('notifyItemActivated (registry)', () => {
+        it('dispatch ar-stepper-step-change puis met à jour currentPath si non annulé', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="a">
+                    <ar-stepper-item path="a" label="A" href="#a"></ar-stepper-item>
+                    <ar-stepper-item path="b" label="B" href="#b"></ar-stepper-item>
+                </ar-stepper>
+            `);
+
+            const stepChange = vi.fn();
+            el.addEventListener('ar-stepper-step-change', stepChange);
+
+            const itemB = el.querySelector('ar-stepper-item[path="b"]') as ArStepperItem;
+            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+            // Accès à la registry interne via le mécanisme de contexte n'est pas exposé publiquement :
+            // on simule l'appel tel que ArStepperItem._handleClick le ferait.
+            (el as unknown as { _registry: StepperRegistry })._registry.notifyItemActivated(
+                itemB,
+                event,
+            );
+
+            expect(stepChange).toHaveBeenCalledOnce();
+            const detail = stepChange.mock.calls[0]![0].detail;
+            expect(detail).toEqual({ from: 'a', to: 'b' });
+        });
+
+        it('preventDefault() sur ar-stepper-step-change annule la navigation et l’event natif', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="a">
+                    <ar-stepper-item path="a" label="A" href="#a"></ar-stepper-item>
+                    <ar-stepper-item path="b" label="B" href="#b"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+
+            const itemB = el.querySelector('ar-stepper-item[path="b"]') as ArStepperItem;
+            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+            (el as unknown as { _registry: StepperRegistry })._registry.notifyItemActivated(
+                itemB,
+                event,
+            );
+
+            expect(event.defaultPrevented).toBe(true);
         });
     });
 });

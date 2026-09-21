@@ -237,7 +237,7 @@ export class ArDatepicker extends LitElement {
             changed.has('value') ||
             changed.has('required') ||
             changed.has('disabled') ||
-            changed.has('_formDisabled')
+            (changed as Map<PropertyKey, unknown>).has('_formDisabled')
         ) {
             this._syncFormValue();
         }

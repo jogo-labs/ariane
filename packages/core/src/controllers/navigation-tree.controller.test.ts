@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { fixture } from '../test-utils.js';
 import { NavigationTreeController } from './navigation-tree.controller.js';
+import '../components/stepper-item/index.js';
 import type { ArStepperItem } from '../components/stepper-item/stepper-item.js';
 
 // ─── Mock host ────────────────────────────────────────────────────────────────
@@ -109,5 +111,21 @@ describe('NavigationTreeController', () => {
         ctrl.buildFromItems([makeItem('/dup'), makeItem('/dup')]);
 
         expect(spy).toHaveBeenCalledWith(expect.stringContaining('duplicate path'));
+    });
+});
+
+describe('NavigationTreeController — référence item sur chaque node', () => {
+    it('buildFromItems attache la référence ArStepperItem sur chaque NavigationNode', async () => {
+        const parent = await fixture<ArStepperItem>(
+            '<ar-stepper-item path="a" label="A"><ar-stepper-item path="a-1" label="A.1"></ar-stepper-item></ar-stepper-item>',
+        );
+        const child = parent.querySelector('ar-stepper-item') as ArStepperItem;
+
+        const host = { requestUpdate: () => {}, addController: () => {} } as never;
+        const controller = new NavigationTreeController(host);
+        controller.buildFromItems([parent, child]);
+
+        expect(controller.tree[0].item).toBe(parent);
+        expect(controller.tree[0].children[0].item).toBe(child);
     });
 });

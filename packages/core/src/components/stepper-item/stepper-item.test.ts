@@ -8,17 +8,6 @@ describe('ArStepperItem', () => {
 
     afterEach(() => el?.remove());
 
-    // ── Rendu ─────────────────────────────────────────────────────────────────
-
-    describe('rendu', () => {
-        it("n'a pas de shadow DOM (createRenderRoot retourne this)", async () => {
-            el = await fixture(
-                '<ar-stepper-item label="Étape 1" path="/step-1"></ar-stepper-item>',
-            );
-            expect(el.shadowRoot).toBeNull();
-        });
-    });
-
     // ── Valeurs par défaut ────────────────────────────────────────────────────
 
     describe('valeurs par défaut', () => {
@@ -208,6 +197,160 @@ describe('ArStepperItem', () => {
             await waitForUpdate(el);
             // Si on arrive ici sans exception, le test passe
             expect(el.path).toBe('/b');
+        });
+    });
+
+    describe('rendu shadow DOM', () => {
+        it('a un shadow DOM (plus de createRenderRoot() = this)', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            expect(el.shadowRoot).not.toBeNull();
+        });
+
+        it('affiche le label en texte par défaut, sans lien (indicatorState default)', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            const header = el.shadowRoot!.querySelector('.item-header')!;
+            expect(header.tagName).toBe('DIV');
+            expect(header.textContent).toContain('Étape A');
+        });
+
+        it('setRenderState({ isLink: true }) rend un <a> plutôt qu’un <div>', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'completed',
+                isLink: true,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            const header = el.shadowRoot!.querySelector('.item-header')!;
+            expect(header.tagName).toBe('A');
+            expect(header.getAttribute('href')).toBe('#a');
+        });
+
+        it('showSubsteps: true entoure le slot par défaut d’un <ol part="list list--substep">', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'current',
+                isLink: false,
+                showSubsteps: true,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            expect(el.shadowRoot!.querySelector('ol[part~="list--substep"] slot')).not.toBeNull();
+        });
+
+        it('indicatorState: "current" pose aria-current="step" sur le host', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'current',
+                isLink: false,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            expect(el.getAttribute('aria-current')).toBe('step');
+        });
+
+        it('indicatorState !== "current" ne pose pas aria-current', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'completed',
+                isLink: true,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            expect(el.hasAttribute('aria-current')).toBe(false);
+        });
+    });
+
+    describe('notifyItemActivated', () => {
+        it('appelle registry.notifyItemActivated(this, event) au clic sur le lien', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'completed',
+                isLink: true,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            const notifyItemActivated = vi.fn();
+            el.setRegistry({
+                registerItem: () => {},
+                unregisterItem: () => {},
+                notifyItemChanged: () => {},
+                notifyItemActivated,
+            });
+
+            const link = el.shadowRoot!.querySelector('a')!;
+            link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+            expect(notifyItemActivated).toHaveBeenCalledOnce();
+            expect(notifyItemActivated.mock.calls[0]![0]).toBe(el);
+            expect(notifyItemActivated.mock.calls[0]![1]).toBeInstanceOf(MouseEvent);
+        });
+
+        it('preventDefault() le clic si href est absent ou "#"', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'completed',
+                isLink: true,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+            el.setRegistry({
+                registerItem: () => {},
+                unregisterItem: () => {},
+                notifyItemChanged: () => {},
+                notifyItemActivated: () => {},
+            });
+
+            const link = el.shadowRoot!.querySelector('a')!;
+            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+            link.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+        });
+    });
+
+    describe('focusControl', () => {
+        it('déplace le focus sur le .item-header interne', async () => {
+            const el = await fixture<ArStepperItem>(
+                '<ar-stepper-item path="a" label="Étape A" href="#a"></ar-stepper-item>',
+            );
+            el.setRenderState({
+                indicatorState: 'completed',
+                isLink: true,
+                showSubsteps: false,
+                srLabel: 'étape 1:',
+            });
+            await el.updateComplete;
+
+            el.focusControl();
+
+            expect(el.shadowRoot!.activeElement).toBe(el.shadowRoot!.querySelector('.item-header'));
         });
     });
 });
