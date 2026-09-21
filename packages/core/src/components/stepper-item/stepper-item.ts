@@ -35,7 +35,7 @@ function withIndicatorStatePart(state: IndicatorState): string {
  *   l'indicateur visuel (ex. icône de statut). Purement décoratif (`aria-hidden`) — l'information
  *   accessible de position est toujours portée séparément par le texte masqué visuellement.
  *
- * @csspart step-link  - Le lien de l'étape (présent uniquement quand l'étape est cliquable).
+ * @csspart step-link  - Le contrôle cliquable de l'étape (présent uniquement quand l'étape est cliquable) : un `<a>` si `href` est une destination réelle, un `<button>` sinon (`href` absent ou `#`).
  * @csspart control    - Porté par `step-link`, ou par le conteneur non cliquable : élément interactif générique.
  * @csspart indicator  - Le marqueur visuel de l'étape (numéro par défaut, ou contenu du slot `indicator`).
  * @csspart indicator--current - Le marqueur visuel de l'étape courante (variante d'état de `indicator`).
@@ -131,12 +131,19 @@ export class ArStepperItem extends LitElement {
     /* EVENTS                                            */
     /* ------------------------------------------------ */
 
+    /** `href` absent ou `'#'` : aucune destination — l'étape n'est qu'une action pilotée par l'event. */
+    private get _hasDestination(): boolean {
+        return this.href !== undefined && this.href !== '#';
+    }
+
     private _handleClick = (event: MouseEvent): void => {
-        // Sans href réel fourni par le consommateur (omis, ou explicitement '#' — la convention
-        // documentée pour un item sans navigation propre), l'ancre est purement décorative : la
-        // navigation est pilotée par notifyItemActivated, pas par le comportement natif.
-        if (this.href === undefined || this.href === '#') {
-            event.preventDefault();
+        // Ctrl/Cmd/Maj/Alt + clic sur un vrai lien : le navigateur ouvre un nouvel onglet/fenêtre
+        // (ou télécharge) sans quitter la page courante — l'étape courante ne change donc pas.
+        if (
+            this._hasDestination &&
+            (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+        ) {
+            return;
         }
         this._registry?.notifyItemActivated(this, event);
     };
@@ -175,19 +182,8 @@ export class ArStepperItem extends LitElement {
         return html`
             <div class="item-row">
                 ${
-                    this._isLink
+                    !this._isLink
                         ? html`
-                              <a
-                                  class="item-header"
-                                  part="step-link control"
-                                  aria-describedby=${describedBy}
-                                  href=${this.href ?? '#'}
-                                  @click=${this._handleClick}
-                              >
-                                  ${headerContent}
-                              </a>
-                          `
-                        : html`
                               <div
                                   class="item-header"
                                   part="control"
@@ -197,6 +193,29 @@ export class ArStepperItem extends LitElement {
                                   ${headerContent}
                               </div>
                           `
+                        : this._hasDestination
+                          ? html`
+                                <a
+                                    class="item-header"
+                                    part="step-link control"
+                                    aria-describedby=${describedBy}
+                                    href=${this.href ?? '#'}
+                                    @click=${this._handleClick}
+                                >
+                                    ${headerContent}
+                                </a>
+                            `
+                          : html`
+                                <button
+                                    type="button"
+                                    class="item-header"
+                                    part="step-link control"
+                                    aria-describedby=${describedBy}
+                                    @click=${this._handleClick}
+                                >
+                                    ${headerContent}
+                                </button>
+                            `
                 }
                 <span id=${this._afterLabelId} ?hidden=${!this._hasAfterLabel}>
                     <slot name="after-label" @slotchange=${this._handleAfterLabelSlotChange}></slot>
