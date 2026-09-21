@@ -37,9 +37,7 @@ export interface BreadcrumbItemRenderState {
  * @csspart link - Le lien de navigation (items intermédiaires).
  * @csspart current - Le texte de la page courante (dernier item, non cliquable).
  * @csspart separator - Le séparateur avant l'item (desktop uniquement, absent avant le premier item).
- * @csspart connector - Le trait décoratif reliant les indicateurs des items visibles, sur la hauteur de la ligne de l'item (mobile uniquement).
- * @csspart connector--first - Le trait du premier item visible, tracé du centre de son indicateur vers le bas (variante d'état de `connector`).
- * @csspart connector--last - Le trait du dernier item visible, tracé du haut vers le centre de son indicateur (variante d'état de `connector`).
+ * @csspart connector - Un segment de trait décoratif, du bord de l'indicateur de l'item vers celui d'un item voisin (mobile uniquement). Un item en rend jusqu'à deux : au-dessus de son indicateur s'il a un voisin visible avant, en dessous s'il en a un après.
  * @csspart indicator - La puce de l'item (mobile uniquement).
  * @csspart indicator--current - La puce de l'élément courant (variante d'état de `indicator`).
  */
@@ -147,20 +145,23 @@ export class ArBreadcrumbItem extends LitElement {
         const state = this._renderState;
         if (!state || (state.isMobile && state.isFirst)) return nothing;
 
-        // Chaque item visible trace la part de ligne de sa propre hauteur : le tracé reste exact
-        // quelle que soit la hauteur des lignes voisines.
-        const connectorPart = `connector${state.hasPrevious ? '' : ' connector--first'}${
-            state.hasNext ? '' : ' connector--last'
-        }`;
-        const connector =
-            state.hasPrevious || state.hasNext
-                ? html`<span part=${connectorPart} aria-hidden="true"></span>`
-                : nothing;
+        // Un segment extensible de part et d'autre de l'indicateur : il couvre exactement
+        // l'espace entre le bord de la ligne et le bord de l'indicateur, quelle que soit la
+        // hauteur de la ligne. Les segments de deux lignes successives se joignent bord à bord,
+        // formant un trait continu d'un indicateur à l'autre. Un segment sans voisin de ce côté
+        // reste une cale sans `part` : rien n'est tracé au-dessus du premier indicateur visible
+        // ni en dessous du dernier.
+        const segment = (hasNeighbour: boolean): TemplateResult =>
+            hasNeighbour
+                ? html`<span class="segment" part="connector"></span>`
+                : html`<span class="segment"></span>`;
         const decoration = state.isMobile
-            ? html`${connector}<span
+            ? html`<div class="rail" aria-hidden="true">
+                  ${segment(state.hasPrevious)}<span
                       part="indicator${state.isCurrent ? ' indicator--current' : ''}"
-                      aria-hidden="true"
-                  ></span>`
+                  ></span
+                  >${segment(state.hasNext)}
+              </div>`
             : state.hasPrevious
               ? this._renderSeparator(state)
               : nothing;

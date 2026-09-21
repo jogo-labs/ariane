@@ -300,7 +300,7 @@ describe('ArBreadcrumb', () => {
             );
         });
 
-        it('mobile : chaque item visible porte le segment de connecteur de sa ligne', async () => {
+        it('mobile : les segments connecteurs relient les indicateurs voisins', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
@@ -310,13 +310,13 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             const items = itemsOf(el);
-            expect(getPart(items[1]!, 'connector')?.getAttribute('part')).toBe(
-                'connector connector--first',
-            );
-            expect(getPart(items[2]!, 'connector')?.getAttribute('part')).toBe('connector');
-            expect(getPart(items[3]!, 'connector')?.getAttribute('part')).toBe(
-                'connector connector--last',
-            );
+            const railOf = (item: Element) => getPart(item, 'indicator')!.parentElement!;
+            const parts = (item: Element) =>
+                [...railOf(item).children].map((child) => child.getAttribute('part'));
+            // Premier visible : rien au-dessus ; dernier : rien en dessous.
+            expect(parts(items[1]!)).toEqual([null, 'indicator', 'connector']);
+            expect(parts(items[2]!)).toEqual(['connector', 'indicator', 'connector']);
+            expect(parts(items[3]!)).toEqual(['connector', 'indicator indicator--current', null]);
         });
 
         it("mobile : un seul item visible n'a pas de connecteur", async () => {

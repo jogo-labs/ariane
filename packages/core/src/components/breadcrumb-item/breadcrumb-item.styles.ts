@@ -12,11 +12,24 @@ export default css`
         display: none;
     }
 
-    /* position: relative ancre le connecteur mobile, positionné par le thème. */
     .item {
-        position: relative;
         display: flex;
         align-items: center;
+    }
+
+    /* Colonne décorative mobile : segment extensible, indicateur, segment extensible. Étirée sur
+       toute la hauteur de la ligne, elle fait démarrer chaque segment au bord de la ligne et
+       s'arrêter au bord de l'indicateur. Sa largeur vient des marges de l'indicateur (thème). */
+    .rail {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rail .segment {
+        flex: 1 1 0;
+        align-self: stretch;
     }
 
     [part='link'],

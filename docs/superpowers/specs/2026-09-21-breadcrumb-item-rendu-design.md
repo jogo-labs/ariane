@@ -44,8 +44,7 @@ Alpha, pas de dépréciation (cf. `CLAUDE.md`) :
   `ar-breadcrumb-item`.
 - `bullet` et `bullet--current` deviennent `indicator` et `indicator--current`.
 - Le part `item` est supprimé ; on cible la balise `ar-breadcrumb-item`.
-- Nouveaux parts `connector`, `connector--first` et `connector--last` sur `ar-breadcrumb-item`
-  (mobile).
+- Nouveau part `connector` sur `ar-breadcrumb-item` (mobile), rendu jusqu'à deux fois par item.
 - Tokens supprimés : `--ar-breadcrumb-mobile-separator-color`, `--ar-breadcrumb-toggle-bg`,
   `--ar-breadcrumb-toggle-bg-hover`, `--ar-breadcrumb-toggle-bg-pressed`,
   `--ar-breadcrumb-toggle-bg-focus`, `--ar-breadcrumb-toggle-transition-duration`.
@@ -74,11 +73,11 @@ L'item a un shadow DOM propre (comme `ar-stepper-item`) :
 - Le shadow rend un wrapper interne (`position: relative`, flex centré) contenant, dans l'ordre :
     - **desktop, item non premier** : `<span part="separator" aria-hidden="true">` (contenu : cf.
       section 3) ;
-    - **mobile, item visible ayant au moins un voisin visible** :
-      `<span part="connector[ connector--first][ connector--last]" aria-hidden="true">` puis
-      `<span part="indicator[ indicator--current]" aria-hidden="true">` ;
-      `connector--first` quand aucun item visible ne précède, `connector--last` quand aucun ne
-      suit ; un item visible seul ne rend pas de connecteur ;
+    - **mobile, item visible** : une colonne décorative `<div class="rail" aria-hidden="true">`
+      contenant, dans l'ordre, un segment, `<span part="indicator[ indicator--current]">` et un
+      second segment. Un segment porte `part="connector"` quand un item visible existe de ce
+      côté (`hasPrevious` au-dessus, `hasNext` en dessous), sinon c'est une cale sans `part` ;
+      un item visible seul rend donc deux cales et aucun connecteur ;
     - le contrôle : `<a part="link" href=…>label</a>` ou `<span part="current">label</span>` pour
       le dernier item.
 - En **mobile, le premier item ne rend rien** : il est déjà affiché par le bouton `home`. Son hôte
@@ -135,13 +134,19 @@ espacement et états visuels passent dans `default.css`.
   `functional-default`, surchargeable par `::part(separator)`. Sans thème, items et séparateurs ne
   sont jamais collés. Aucune marge équivalente pour l'indicateur et le connecteur, dont la taille
   est purement visuelle.
-- **Connecteur mobile** : un vrai élément (`part="connector"`), positionné par le thème
-  (`position: absolute` relatif au wrapper interne). Il remplace le `::before` de la liste. Chaque
-  item visible trace la portion de ligne de sa propre hauteur (`top: 0; bottom: 0`), de sorte que
-  les segments de deux lignes successives se joignent bord à bord quelle que soit leur hauteur
-  (libellé sur plusieurs lignes compris) ; les variantes `connector--first` (`top: 50%`) et
-  `connector--last` (`bottom: 50%`) arrêtent le tracé au centre des indicateurs des extrémités.
-  Ordre dans le thème : `connector` avant ses variantes (garde-fou `validate-part-state-order`).
+- **Indicateur mobile** : tous les indicateurs ont la même taille (0.5rem) et les mêmes marges
+  (0 0.6875rem, soit une colonne de 1.875rem) ; `indicator--current` ne change que la couleur de
+  fond (`--ar-color-interactive` au lieu de `--ar-color-neutral-80`).
+- **Connecteur mobile** : des éléments réels (`part="connector"`), sans positionnement absolu. Le
+  CSS interne fournit la structure — colonne `.rail` étirée sur la hauteur de la ligne
+  (`align-self: stretch`), segments en `flex: 1 1 0` et `align-self: stretch`, indicateur
+  `flex-shrink: 0` ; le thème ne pose que le pointillé (`repeat-y`, `background-size: 2px 8px`,
+  centré, `--ar-color-neutral-80`, identique au connecteur d'`ar-stepper`). Chaque segment couvre
+  exactement l'espace entre le bord de la ligne et le bord de l'indicateur, à toute hauteur de
+  ligne (libellé sur plusieurs lignes compris) : les segments de deux lignes successives se
+  joignent bord à bord, si bien que le trait court d'un bord d'indicateur au bord du suivant sans
+  jamais passer derrière un indicateur. Rien n'est tracé au-dessus du premier indicateur visible
+  ni en dessous du dernier.
 - **Boutons `home` / `trigger`** : les états visuels passent en règles `::part(home)` /
   `::part(trigger)` du thème (`:hover`, `:active`, `:focus-visible`), en pseudo-classes seules
   (aucun sélecteur d'attribut après `::part()`, invalide). Le thème gère

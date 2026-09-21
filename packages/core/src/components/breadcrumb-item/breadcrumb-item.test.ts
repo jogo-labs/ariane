@@ -123,7 +123,10 @@ describe('ArBreadcrumbItem', () => {
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe('indicator');
-            expect(getPart(el, 'indicator')?.getAttribute('aria-hidden')).toBe('true');
+            // aria-hidden est porté par la colonne décorative qui contient l'indicateur.
+            expect(getPart(el, 'indicator')?.parentElement?.getAttribute('aria-hidden')).toBe(
+                'true',
+            );
 
             el.setRenderState({
                 isFirst: false,
@@ -259,7 +262,7 @@ describe('ArBreadcrumbItem', () => {
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
         });
 
-        it("mobile : rend un connecteur décoratif avant l'indicateur", async () => {
+        it("mobile : encadre l'indicateur de deux segments, dans une colonne décorative", async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
                 isFirst: false,
@@ -271,17 +274,31 @@ describe('ArBreadcrumbItem', () => {
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
-            const connector = getPart(el, 'connector');
-            expect(connector).not.toBeNull();
-            expect(connector?.getAttribute('part')).toBe('connector');
-            expect(connector?.getAttribute('aria-hidden')).toBe('true');
-            const indicator = getPart(el, 'indicator');
-            expect(
-                connector!.compareDocumentPosition(indicator!) & Node.DOCUMENT_POSITION_FOLLOWING,
-            ).toBeTruthy();
+            const indicator = getPart(el, 'indicator')!;
+            const rail = indicator.parentElement!;
+            expect(rail.getAttribute('aria-hidden')).toBe('true');
+            expect([...rail.children]).toHaveLength(3);
+            expect(rail.children[1]).toBe(indicator);
         });
 
-        it('mobile : le premier item visible porte connector--first', async () => {
+        it('mobile : un voisin de chaque côté donne deux segments part="connector"', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: true,
+                hasNext: true,
+                separator: undefined,
+                separatorVersion: 0,
+            });
+            await waitForUpdate(el);
+            const rail = getPart(el, 'indicator')!.parentElement!;
+            expect(rail.children[0]?.getAttribute('part')).toBe('connector');
+            expect(rail.children[2]?.getAttribute('part')).toBe('connector');
+        });
+
+        it("mobile : le premier item visible n'a pas de segment connecteur au-dessus", async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
                 isFirst: false,
@@ -293,12 +310,12 @@ describe('ArBreadcrumbItem', () => {
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
-            expect(getPart(el, 'connector')?.getAttribute('part')).toBe(
-                'connector connector--first',
-            );
+            const rail = getPart(el, 'indicator')!.parentElement!;
+            expect(rail.children[0]?.hasAttribute('part')).toBe(false);
+            expect(rail.children[2]?.getAttribute('part')).toBe('connector');
         });
 
-        it('mobile : le dernier item visible porte connector--last', async () => {
+        it("mobile : le dernier item visible n'a pas de segment connecteur en dessous", async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
                 isFirst: false,
@@ -310,9 +327,9 @@ describe('ArBreadcrumbItem', () => {
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
-            expect(getPart(el, 'connector')?.getAttribute('part')).toBe(
-                'connector connector--last',
-            );
+            const rail = getPart(el, 'indicator')!.parentElement!;
+            expect(rail.children[0]?.getAttribute('part')).toBe('connector');
+            expect(rail.children[2]?.hasAttribute('part')).toBe(false);
         });
 
         it('mobile : un item visible sans voisin visible a un indicateur mais pas de connecteur', async () => {
