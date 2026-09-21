@@ -12,7 +12,9 @@ export default css`
         display: none;
     }
 
+    /* position: relative ancre le connecteur mobile, positionné par le thème. */
     .item {
+        position: relative;
         display: flex;
         align-items: center;
     }
@@ -21,36 +23,22 @@ export default css`
     [part='current'] {
         display: inline-flex;
         align-items: center;
-        color: inherit;
-        background-color: inherit;
     }
 
+    /* functional-default: sans thème, item et séparateur ne doivent jamais être collés. */
     [part='separator'] {
-        display: inline-block;
         flex-shrink: 0;
-        margin: 0.125rem 0.5rem 0;
-        height: 65%;
-        width: 1px;
-        transform: rotate(15deg);
-        transform-origin: center;
+        margin-inline: 0.5em;
     }
 
     [part~='indicator'] {
         flex-shrink: 0;
-        width: 0.375rem;
-        height: 0.375rem;
-        margin: 0 0.75rem;
-    }
-
-    [part~='indicator--current'] {
-        width: 0.625rem;
-        height: 0.625rem;
-        margin: 0 0.625rem;
     }
 
     .item--mobile [part='link'],
     .item--mobile [part='current'] {
         flex-grow: 1;
+        /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — cible tactile des lignes de la liste mobile */
         padding: 0.5rem 0.25rem;
     }
 `;

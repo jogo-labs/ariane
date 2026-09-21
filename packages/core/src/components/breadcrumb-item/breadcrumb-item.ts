@@ -22,6 +22,7 @@ export interface BreadcrumbItemRenderState {
  * @csspart link - Le lien de navigation (items intermédiaires).
  * @csspart current - Le texte de la page courante (dernier item, non cliquable).
  * @csspart separator - Le séparateur avant l'item (desktop uniquement, absent avant le premier item).
+ * @csspart connector - Le trait décoratif reliant l'indicateur de l'item à celui de l'item précédent (mobile uniquement).
  * @csspart indicator - La puce de l'item (mobile uniquement).
  * @csspart indicator--current - La puce de l'élément courant (variante d'état de `indicator`).
  */
@@ -90,13 +91,14 @@ export class ArBreadcrumbItem extends LitElement {
         if (!state || (state.isMobile && state.isFirst)) return nothing;
 
         const decoration = state.isMobile
-            ? html`<span
-                  part="indicator${state.isCurrent ? ' indicator--current' : ''}"
-                  aria-hidden="true"
-              ></span>`
+            ? html`<span part="connector" aria-hidden="true"></span
+                  ><span
+                      part="indicator${state.isCurrent ? ' indicator--current' : ''}"
+                      aria-hidden="true"
+                  ></span>`
             : state.isFirst
               ? nothing
-              : html`<span part="separator" aria-hidden="true"></span>`;
+              : html`<span part="separator" aria-hidden="true">/</span>`;
 
         const control = state.isCurrent
             ? html`<span part="current">${this.label}</span>`

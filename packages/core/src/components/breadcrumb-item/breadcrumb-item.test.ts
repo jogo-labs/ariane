@@ -89,6 +89,33 @@ describe('ArBreadcrumbItem', () => {
             await waitForUpdate(el);
             expect(el.hasAttribute('hidden')).toBe(false);
         });
+
+        it('desktop : le séparateur par défaut est un « / » visible', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it("mobile : rend un connecteur décoratif avant l'indicateur", async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: true });
+            await waitForUpdate(el);
+            const connector = getPart(el, 'connector');
+            expect(connector).not.toBeNull();
+            expect(connector?.getAttribute('aria-hidden')).toBe('true');
+            const indicator = getPart(el, 'indicator');
+            expect(
+                connector!.compareDocumentPosition(indicator!) & Node.DOCUMENT_POSITION_FOLLOWING,
+            ).toBeTruthy();
+        });
+
+        it('desktop : ne rend pas de connecteur', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({ isFirst: false, isCurrent: false, isMobile: false });
+            await waitForUpdate(el);
+            expect(getPart(el, 'connector')).toBeNull();
+        });
     });
 
     // ── Attributs d'hôte ──────────────────────────────────────────────────────
