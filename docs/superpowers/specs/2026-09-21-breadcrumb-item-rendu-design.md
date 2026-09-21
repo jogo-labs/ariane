@@ -97,6 +97,11 @@ export interface ItemRenderState {
 }
 ```
 
+**Tant qu'un item n'a pas reçu son premier état de rendu, il ne rend rien.** Sans cette règle, un
+item rendu avant que `ar-breadcrumb` lui pousse son état afficherait son lien par défaut : le
+premier item serait brièvement visible et cliquable dans le panel mobile (en plus du bouton `home`),
+ou dupliqué en desktop. L'item apparaît directement avec le bon état.
+
 Le registre `BreadcrumbRegistry` (register / unregister / notifyItemChanged) est inchangé.
 
 ### Ordre des items
@@ -182,7 +187,7 @@ composant.
 - **`breadcrumb-item.test.ts`** (reçoit les assertions de rendu qui étaient sur le parent) :
   structure et parts (`link`, `current`, `separator`, `indicator`, `indicator--current`,
   `connector`) selon l'état de rendu ; `role="listitem"`, `aria-current="page"` sur le dernier ;
-  premier item mobile sans rendu ; « / » par défaut ; clonage du séparateur fourni.
+  premier item mobile sans rendu, `hidden` sur l'hôte ; aucun rendu avant le premier état ; « / » par défaut ; clonage du séparateur fourni.
 - **`breadcrumb.test.ts`** : structure du parent (`nav`, `list--desktop` / `list--mobile`, bouton
   `home`, `trigger`, panel), état de rendu poussé aux items, ordre DOM, slot `separator` (clone dans
   chaque item, mise à jour sur mutation du contenu, repli « / » si le slot est retiré).
