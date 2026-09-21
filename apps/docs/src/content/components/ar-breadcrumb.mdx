@@ -77,12 +77,15 @@ Ces événements se déclenchent à chaque changement d'état du dropdown : clic
 La couleur du texte du fil d'ariane suit `--ar-color-text` par défaut (le thème s'inverse déjà
 automatiquement avec `[data-theme="dark"]`). Si le breadcrumb est posé sur un fond sombre
 **indépendamment du thème global** (bannière, section à fond coloré...), surchargez
-`::part(list)` et `::part(home)` localement pour garantir la lisibilité (le bouton "Retour"
-mobile tire sa couleur de texte de `::part(home)`, pas de `::part(list)`) :
+`::part(list)`, `::part(home)` et le séparateur localement pour garantir la lisibilité (le
+bouton "Retour" mobile tire sa couleur de texte de `::part(home)`, pas de `::part(list)` ; la
+couleur du séparateur est posée par le thème sur `ar-breadcrumb-item::part(separator)`, elle
+n'est pas héritée de la liste) :
 
 ```css
 .hero ar-breadcrumb::part(list),
-.hero ar-breadcrumb::part(home) {
+.hero ar-breadcrumb::part(home),
+.hero ar-breadcrumb-item::part(separator) {
     color: white;
 }
 ```
@@ -105,3 +108,6 @@ remplacer par un caractère ou une icône : le contenu est cloné dans chaque it
 Le séparateur est décoratif (`aria-hidden`) : évitez les éléments interactifs, et ne mettez pas
 d'`id` dans son contenu (il serait dupliqué dans chaque clone). En mobile, il n'est pas affiché.
 La couleur et la taille se règlent depuis le thème via `ar-breadcrumb-item::part(separator)`.
+Un séparateur personnalisé doit fixer sa propre taille : un `<svg>` en ligne a besoin de ses
+propres `width` et `height`, la règle de dimensionnement des icônes du composant ne s'applique pas
+au contenu slotté.
