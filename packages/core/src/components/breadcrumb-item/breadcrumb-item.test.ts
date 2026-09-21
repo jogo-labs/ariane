@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type ArBreadcrumbItem } from './breadcrumb-item.js';
+import type { ArBreadcrumbItem } from './breadcrumb-item.js';
 import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
 import './index.js';
 
@@ -480,12 +480,85 @@ describe('ArBreadcrumbItem', () => {
         });
 
         it("ne notifie pas si aucun registry n'est défini", async () => {
-            // Pas d'appel à setRegistry — ne doit pas planter
             el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
-            el.label = 'Autre';
+            expect(() => {
+                el.label = 'Autre';
+            }).not.toThrow();
             await waitForUpdate(el);
-            // Si on arrive ici sans exception, le test passe
-            expect(el.label).toBe('Autre');
+        });
+
+        it('notifie quand href passe de undefined à une valeur après le premier rendu', async () => {
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
+            const registry = {
+                registerItem: vi.fn(),
+                unregisterItem: vi.fn(),
+                notifyItemChanged: vi.fn(),
+            };
+            el.setRegistry(registry);
+            registry.notifyItemChanged.mockClear();
+
+            el.href = '/x';
+            await waitForUpdate(el);
+            expect(registry.notifyItemChanged).toHaveBeenCalledOnce();
+        });
+
+        it('ne notifie pas pendant le rendu initial', async () => {
+            const registry = {
+                registerItem: vi.fn(),
+                unregisterItem: vi.fn(),
+                notifyItemChanged: vi.fn(),
+            };
+            el = document.createElement('ar-breadcrumb-item') as ArBreadcrumbItem;
+            el.label = 'Accueil';
+            el.href = '/';
+            el.setRegistry(registry);
+            document.body.appendChild(el);
+            await waitForUpdate(el);
+            expect(registry.notifyItemChanged).not.toHaveBeenCalled();
+        });
+    });
+
+    // ── hidden et role appartenant à l'auteur ─────────────────────────────────
+
+    describe('hidden et role', () => {
+        const desktop = {
+            isFirst: false,
+            isCurrent: false,
+            isMobile: false,
+            hasPrevious: true,
+            separator: undefined,
+            separatorVersion: 0,
+        };
+
+        it("conserve un hidden posé par l'auteur lors des mises à jour", async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState(desktop);
+            await waitForUpdate(el);
+            el.hidden = true;
+            el.label = 'B';
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(true);
+        });
+
+        it('masque le premier item en mobile puis retire hidden en desktop', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({ ...desktop, isFirst: true, isMobile: true, hasPrevious: false });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(true);
+
+            el.setRenderState({ ...desktop, isFirst: true, hasPrevious: false });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(false);
+        });
+
+        it("garde le role posé par l'auteur", async () => {
+            el = await fixture('<ar-breadcrumb-item role="none" label="A"></ar-breadcrumb-item>');
+            expect(el.getAttribute('role')).toBe('none');
+        });
+
+        it('pose role="listitem" par défaut', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A"></ar-breadcrumb-item>');
+            expect(el.getAttribute('role')).toBe('listitem');
         });
     });
 });

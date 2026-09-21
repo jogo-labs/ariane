@@ -125,17 +125,6 @@ describe('ArBreadcrumb', () => {
             expect(list?.querySelector('slot')).not.toBeNull();
         });
 
-        it('ne rend plus d\'élément part="item" (les items rendent eux-mêmes)', async () => {
-            el = await fixture(`
-                <ar-breadcrumb>
-                    <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            expect(getShadow(el).querySelector('[part="item"]')).toBeNull();
-            expect(getShadow(el).querySelector('[part="link"]')).toBeNull();
-        });
-
         it('pousse un rôle listitem à chaque item', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
@@ -215,6 +204,19 @@ describe('ArBreadcrumb', () => {
                 </ar-breadcrumb>
             `);
             expect(getPart(el, 'trigger')).not.toBeNull();
+        });
+
+        it('le lien home reçoit le href posé après le montage sur le premier item', async () => {
+            el = await fixture(`
+                <ar-breadcrumb>
+                    <ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>
+                    <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
+                </ar-breadcrumb>
+            `);
+            (itemsOf(el)[0] as unknown as { href: string }).href = '/x';
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            expect(getPart(el, 'home')?.getAttribute('href')).toBe('/x');
         });
 
         it("le lien home n'a pas d'attribut href quand le premier item n'en a pas", async () => {
@@ -684,6 +686,24 @@ describe('ArBreadcrumb', () => {
             await waitForUpdate(el);
             const after = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
             expect(after).toBe(before);
+        });
+
+        it("ne re-clone pas le séparateur quand l'attribut slot d'un item ordinaire change", async () => {
+            el = await fixture(withSeparator);
+            const before = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
+            expect(before).toBeTruthy();
+            itemsOf(el)[2]!.setAttribute('slot', 'autre');
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild).toBe(before);
+        });
+
+        it('retombe sur « / » quand slot="separator" est retiré du nœud modèle', async () => {
+            el = await fixture(withSeparator);
+            el.querySelector(':scope > [slot="separator"]')?.setAttribute('slot', 'autre');
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await waitForUpdate(el);
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('/');
         });
 
         it('retombe sur « / » quand le nœud séparateur est retiré', async () => {

@@ -40,11 +40,17 @@ export class ArBreadcrumbItem extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, styles];
 
     @property({ type: String }) label = '';
+    /**
+     * Destination du lien. Un item intermédiaire sans `href` est rendu comme un `<a>` inerte :
+     * pas de rôle link, non focusable.
+     */
     @property({ type: String }) href?: string;
 
     @state() private _renderState: BreadcrumbItemRenderState | undefined = undefined;
 
     private _registry: BreadcrumbRegistry | undefined = undefined;
+    private _hasRendered = false;
+    private _hiddenByComponent = false;
 
     private _separatorClone: { source: Node; version: number; node: Node } | undefined = undefined;
 
@@ -79,7 +85,7 @@ export class ArBreadcrumbItem extends LitElement {
 
     override connectedCallback() {
         super.connectedCallback();
-        this.setAttribute('role', 'listitem');
+        if (!this.hasAttribute('role')) this.setAttribute('role', 'listitem');
     }
 
     override disconnectedCallback() {
@@ -89,15 +95,20 @@ export class ArBreadcrumbItem extends LitElement {
     }
 
     override updated(changed: Map<string, unknown>) {
-        changed.forEach((oldValue, prop) => {
-            if (oldValue === undefined) return;
-            if (prop === 'label' || prop === 'href') {
-                this._registry?.notifyItemChanged(this);
-            }
-        });
+        if (this._hasRendered) {
+            changed.forEach((_, prop) => {
+                if (prop === 'label' || prop === 'href') this._registry?.notifyItemChanged(this);
+            });
+        }
+        this._hasRendered = true;
 
         const state = this._renderState;
-        this.toggleAttribute('hidden', state !== undefined && state.isMobile && state.isFirst);
+        const shouldHide = state !== undefined && state.isMobile && state.isFirst;
+        if (shouldHide !== this._hiddenByComponent) {
+            if (shouldHide) this.setAttribute('hidden', '');
+            else this.removeAttribute('hidden');
+            this._hiddenByComponent = shouldHide;
+        }
         if (state?.isCurrent) {
             this.setAttribute('aria-current', 'page');
         } else {

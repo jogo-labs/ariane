@@ -144,6 +144,7 @@ export class ArBreadcrumb extends LitElement {
             characterData: true,
             attributes: true,
             attributeFilter: ['slot'],
+            attributeOldValue: true,
         });
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
@@ -265,7 +266,13 @@ export class ArBreadcrumb extends LitElement {
 
     /** Une mutation concerne-t-elle le slot `separator` (nœud modèle, son contenu ou son attribut slot) ? */
     private _isSeparatorMutation(record: MutationRecord): boolean {
-        if (record.type === 'attributes') return record.target.parentElement === this;
+        if (record.type === 'attributes') {
+            return (
+                record.target.parentElement === this &&
+                (record.oldValue === 'separator' ||
+                    (record.target as Element).getAttribute('slot') === 'separator')
+            );
+        }
         if (record.type === 'childList' && record.target === this) {
             return [...record.addedNodes, ...record.removedNodes].some(
                 (node) => node instanceof Element && node.getAttribute('slot') === 'separator',
