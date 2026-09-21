@@ -309,9 +309,32 @@ describe('ArStepperItem', () => {
             expect(notifyItemActivated.mock.calls[0]![1]).toBeInstanceOf(MouseEvent);
         });
 
-        it('preventDefault() le clic si href est absent ou "#"', async () => {
+        it.each([undefined, '#'])(
+            'rend un <button type="button"> (pas un <a>) quand href vaut %s',
+            async (href) => {
+                const attr = href === undefined ? '' : ` href="${href}"`;
+                const el = await fixture<ArStepperItem>(
+                    `<ar-stepper-item path="a" label="Étape A"${attr}></ar-stepper-item>`,
+                );
+                el.setRenderState({
+                    indicatorState: 'completed',
+                    isLink: true,
+                    showSubsteps: false,
+                    srLabel: 'étape 1:',
+                });
+                await el.updateComplete;
+
+                const header = el.shadowRoot!.querySelector('.item-header')!;
+                expect(header.tagName).toBe('BUTTON');
+                expect(header.getAttribute('type')).toBe('button');
+                expect(header.getAttribute('part')).toBe('step-link control');
+                expect(el.shadowRoot!.querySelector('a')).toBeNull();
+            },
+        );
+
+        it('ignore un clic avec touche modificatrice sur un <a> à href réel', async () => {
             const el = await fixture<ArStepperItem>(
-                '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
+                '<ar-stepper-item path="a" label="Étape A" href="/a"></ar-stepper-item>',
             );
             el.setRenderState({
                 indicatorState: 'completed',
@@ -320,18 +343,22 @@ describe('ArStepperItem', () => {
                 srLabel: 'étape 1:',
             });
             await el.updateComplete;
+            const notifyItemActivated = vi.fn();
             el.setRegistry({
                 registerItem: () => {},
                 unregisterItem: () => {},
                 notifyItemChanged: () => {},
-                notifyItemActivated: () => {},
+                notifyItemActivated,
             });
 
             const link = el.shadowRoot!.querySelector('a')!;
-            const event = new MouseEvent('click', { bubbles: true, cancelable: true });
-            link.dispatchEvent(event);
+            link.dispatchEvent(
+                new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: true }),
+            );
+            expect(notifyItemActivated).not.toHaveBeenCalled();
 
-            expect(event.defaultPrevented).toBe(true);
+            link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+            expect(notifyItemActivated).toHaveBeenCalledOnce();
         });
     });
 

@@ -7,18 +7,18 @@ variants:
       label: Par défaut
       description: Stepper à 3 étapes avec sous-étapes, sous-étape « Mes coordonnées » active.
       html: |
-          <ar-stepper current-path="etape-1-2">
+          <ar-stepper current-path="etape-1-3">
             <!-- Étape 1 -->
-            <ar-stepper-item path="etape-1" label="Mes informations" href="#">
-                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#"></ar-stepper-item>
+            <ar-stepper-item path="etape-1" label="Mes informations" href="/etape-1">
+                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#etape-1-1"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#etape-1-2"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#etape-1-3"></ar-stepper-item>
             </ar-stepper-item>
 
             <!-- Étape 2 -->
-            <ar-stepper-item path="etape-2" label="Mes préférences" href="#">
-                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="#etape-2-1"></ar-stepper-item>
-                <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
+            <ar-stepper-item path="etape-2" label="Mes préférences" href="/etape-2">
+                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="/etape-2-1"></ar-stepper-item>
+                <ar-stepper-item path="etape-2-2" label="Mes langues" href="/etape-2-2"></ar-stepper-item>
             </ar-stepper-item>
 
             <!-- Étape 3 -->
@@ -123,9 +123,11 @@ import WcagRef from '../../components/WcagRef.astro';
   ("Mes informations", "Récapitulatif").
 - **`current-path` doit correspondre au `path` d'un item existant.** Une valeur incorrecte
   n'active aucun item — aucun feedback visuel ni vocal ne signale l'étape courante.
-- **Les items sans `href` ne sont pas des liens.** Un item sans destination est rendu comme
-  un élément non interactif — ne pas en faire la cible de `current-path` si l'utilisateur
-  doit pouvoir y naviguer.
+- **`href` détermine l'élément rendu pour une étape cliquable.** Un `href` réel (ex. `/etape-2`)
+  produit un lien `<a>` : la navigation native a lieu, sauf si `ar-stepper-step-change` est
+  annulé. Un `href` absent ou égal à `#` produit un `<button>` : aucune navigation native, tout
+  passe par l'événement (routeur de framework, navigation asynchrone). Un Ctrl/Cmd/Maj/Alt + clic
+  sur un lien réel ouvre un nouvel onglet sans émettre `ar-stepper-step-change`.
 - **Mettre à jour `current-path` de façon synchrone (ou quasi-synchrone) dans le handler de
   `ar-stepper-step-change`.** Le focus n'est restauré sur la nouvelle étape courante que si
   cette mise à jour arrive dans le même tick microtask que l'event (cas des frameworks

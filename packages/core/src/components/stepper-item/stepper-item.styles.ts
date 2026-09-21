@@ -21,6 +21,18 @@ export default css`
         counter-increment: step;
     }
 
+    /* Neutralise le style natif du <button> (rendu quand l'étape n'a pas de destination URL)
+       pour qu'il soit visuellement identique au <a>. :where() garde la spécificité d'une simple
+       classe : les règles .item-header plus bas (marges, alignement) l'emportent. */
+    :where(button).item-header {
+        appearance: none;
+        background: none;
+        border: 0;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+    }
+
     [part~='indicator'],
     .item-header {
         align-items: center;
@@ -33,7 +45,7 @@ export default css`
         justify-content: center;
         transform: translateY(1px);
         background-color: transparent;
-        /* Empêche le soulignement de ::part(step-link) de traverser ce flex-item (le <a> est en
+        /* Empêche le soulignement de ::part(step-link) de traverser ce flex-item (le lien/bouton est en
          * inline-flex : sans cette règle le trait barre aussi le chiffre du compteur). */
         text-decoration: none;
     }

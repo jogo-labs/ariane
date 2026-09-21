@@ -89,7 +89,7 @@ describe('ArStepper', () => {
         });
 
         it('step-link porte aussi le rôle transverse "control"', async () => {
-            // mode="edit" est requis pour que le renderer produise un vrai <a part="step-link ...">
+            // mode="edit" est requis pour que le renderer produise un vrai part="step-link ..."
             // (sans ce mode, la garde de stepper.renderer.ts rend un simple <div>, sans part testable).
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
@@ -97,7 +97,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const link = itemPart(el, '/a', 'a[part~="step-link"]');
+            const link = itemPart(el, '/a', '[part~="step-link"]');
             expect(link.getAttribute('part')?.split(/\s+/)).toContain('control');
         });
 
@@ -140,7 +140,7 @@ describe('ArStepper', () => {
                     <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
                 </ar-stepper>
             `);
-            const link = itemPart(el, '/a', 'a[part~="step-link"]');
+            const link = itemPart(el, '/a', '[part~="step-link"]');
             // Étape A n'est pas courante (B l'est) : le mode edit la rend cliquable
             // (step.state !== 'current').
             expect(link.getAttribute('part')).toBe('step-link control');
@@ -196,7 +196,7 @@ describe('ArStepper', () => {
             expect(headerA.tagName).toBe('DIV');
             expect(itemOf(el, '/a').getAttribute('aria-current')).toBe('step');
 
-            const linkB = itemPart<HTMLElement>(el, '/b', 'a[part~="step-link"]');
+            const linkB = itemPart<HTMLElement>(el, '/b', '[part~="step-link"]');
             expect(linkB.getAttribute('part')).toBe('step-link control');
             expect(itemOf(el, '/b').getAttribute('aria-current')).toBeNull();
         });
@@ -211,7 +211,7 @@ describe('ArStepper', () => {
                         </ar-stepper>
                     `);
             expect(itemOf(el, '/a/2').matches('ar-stepper-item > ar-stepper-item')).toBe(true);
-            expect(shadow(itemOf(el, '/a/2')).querySelector('a[part~="step-link"]')).toBeNull();
+            expect(shadow(itemOf(el, '/a/2')).querySelector('[part~="step-link"]')).toBeNull();
             const header = itemHeader(el, '/a/2');
             expect(header.tagName).toBe('DIV');
         });
@@ -309,7 +309,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
 
             expect(handler).toHaveBeenCalledOnce();
@@ -329,7 +329,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-change', handler);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
 
             expect(handler).toHaveBeenCalledOnce();
@@ -348,7 +348,7 @@ describe('ArStepper', () => {
             const changedHandler = vi.fn();
             el.addEventListener('ar-stepper-step-changed', changedHandler);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.focus();
             link.click();
             await waitForUpdate(el);
@@ -371,7 +371,7 @@ describe('ArStepper', () => {
             `);
             el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             link.dispatchEvent(clickEvent);
 
@@ -390,7 +390,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('step-changed', handler);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
             expect(handler).not.toHaveBeenCalled();
 
@@ -409,7 +409,7 @@ describe('ArStepper', () => {
             const handler = vi.fn();
             el.addEventListener('ar-stepper-step-changed', handler);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
             await waitForUpdate(el);
 
@@ -457,8 +457,8 @@ describe('ArStepper', () => {
         });
     });
 
-    describe('navigation — preventDefault sur les liens sans href réel', () => {
-        it("appelle preventDefault() au clic sur un lien d'étape (empêche le scroll-to-top natif)", async () => {
+    describe('navigation — <a> pour une destination réelle, <button> sinon', () => {
+        it('rend un <button type="button"> quand href est absent, et n\'émet le clic qu\'en event', async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -466,18 +466,13 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
-            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
-            const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
-
-            link.dispatchEvent(clickEvent);
-
-            expect(preventDefaultSpy).toHaveBeenCalledOnce();
+            const control = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
+            expect(control.tagName).toBe('BUTTON');
+            expect(control.getAttribute('type')).toBe('button');
+            expect(shadow(itemOf(el, '/a')).querySelector('a')).toBeNull();
         });
 
-        it("appelle preventDefault() quand href vaut explicitement '#' (convention documentée)", async () => {
-            // La doc (ar-stepper.mdx) pose systématiquement href="#" plutôt que de l'omettre —
-            // ce cas doit être traité comme décoratif au même titre qu'un href absent.
+        it("rend un <button> quand href vaut explicitement '#' (convention documentée)", async () => {
             const el = await fixtureWithItems(`
                 <ar-stepper current-path="/b" mode="edit">
                     <ar-stepper-item path="/a" href="#" label="Étape A"></ar-stepper-item>
@@ -485,13 +480,21 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
-            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
-            const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+            const control = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
+            expect(control.tagName).toBe('BUTTON');
+        });
 
-            link.dispatchEvent(clickEvent);
+        it('rend un <a> avec le href fourni quand il désigne une destination réelle', async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" href="/etape-a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
 
-            expect(preventDefaultSpy).toHaveBeenCalledOnce();
+            const control = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
+            expect(control.tagName).toBe('A');
+            expect(control.getAttribute('href')).toBe('/etape-a');
         });
 
         it("n'appelle pas preventDefault() quand l'étape a un href réel fourni par le consommateur", async () => {
@@ -502,13 +505,66 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a[part~="step-link"]');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
             const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
 
             link.dispatchEvent(clickEvent);
 
             expect(preventDefaultSpy).not.toHaveBeenCalled();
+        });
+
+        it.each(['ctrlKey', 'metaKey', 'shiftKey', 'altKey'] as const)(
+            "n'émet pas ar-stepper-step-change sur un clic %s d'un lien à href réel (nouvel onglet)",
+            async (modifier) => {
+                const el = await fixtureWithItems(`
+                    <ar-stepper current-path="/b" mode="edit">
+                        <ar-stepper-item path="/a" href="/etape-a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>
+                `);
+                const handler = vi.fn();
+                el.addEventListener('ar-stepper-step-change', handler);
+
+                const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
+                link.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true, cancelable: true, [modifier]: true }),
+                );
+
+                expect(handler).not.toHaveBeenCalled();
+            },
+        );
+
+        it("émet ar-stepper-step-change sur un clic simple d'un lien à href réel", async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" href="/etape-a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-stepper-step-change', handler);
+
+            itemPart<HTMLElement>(el, '/a', '[part~="step-link"]').click();
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it("émet ar-stepper-step-change sur un clic Ctrl d'un <button> (aucune destination)", async () => {
+            const el = await fixtureWithItems(`
+                <ar-stepper current-path="/b" mode="edit">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            const handler = vi.fn();
+            el.addEventListener('ar-stepper-step-change', handler);
+
+            itemPart<HTMLElement>(el, '/a', '[part~="step-link"]').dispatchEvent(
+                new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: true }),
+            );
+
+            expect(handler).toHaveBeenCalledOnce();
         });
     });
 
@@ -554,7 +610,7 @@ describe('ArStepper', () => {
                     </ar-stepper>
                 `);
 
-            const linkA = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const linkA = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             linkA.click();
 
             // Le composant est contrôlé : le consommateur répond à l'event en réassignant
@@ -593,7 +649,7 @@ describe('ArStepper', () => {
                     </ar-stepper>
                 `);
 
-            const linkA = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const linkA = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             linkA.click();
 
             // Le consommateur ignore l'event (currentPath ne change pas tout de suite) puis,
@@ -617,7 +673,7 @@ describe('ArStepper', () => {
                 `);
 
             // /a/1 est complétée (avant la sous-étape courante /a/2) : rendue comme lien cliquable.
-            const linkSub1 = itemPart<HTMLAnchorElement>(el, '/a/1', 'a');
+            const linkSub1 = itemPart<HTMLElement>(el, '/a/1', '[part~="step-link"]');
             linkSub1.click();
 
             // Le consommateur répond en mettant à jour currentPath vers la sous-étape cliquée.
@@ -985,7 +1041,7 @@ describe('ArStepper', () => {
                 </ar-stepper>
             `);
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
             await new Promise((resolve) => setTimeout(resolve, 60));
 
@@ -1009,7 +1065,7 @@ describe('ArStepper', () => {
                 el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
             });
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a', 'a');
+            const link = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             link.click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
@@ -1037,7 +1093,7 @@ describe('ArStepper', () => {
                 el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
             });
 
-            const link = itemPart<HTMLAnchorElement>(el, '/a/2', 'a');
+            const link = itemPart<HTMLElement>(el, '/a/2', '[part~="step-link"]');
             link.click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
