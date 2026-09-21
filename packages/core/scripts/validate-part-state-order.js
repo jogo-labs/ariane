@@ -7,7 +7,7 @@
  * Convention : un nom de part B est une variante d'état d'un nom A (déclaré dans le même
  * bloc de composant) si B commence par `${A}--` (double tiret, convention BEM). Le double
  * tiret distingue syntaxiquement un part d'état de tout autre part partageant un préfixe à
- * simple tiret (ex. `step`/`step-link` ne sont pas liés, alors que `bullet`/`bullet--current`
+ * simple tiret (ex. `step`/`step-link` ne sont pas liés, alors que `indicator`/`indicator--current`
  * le sont) — élimine la classe de faux positifs trouvée avec un délimiteur simple tiret
  * (`footer`/`footer-btn` sur ar-datepicker).
  *

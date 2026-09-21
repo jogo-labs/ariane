@@ -5,29 +5,29 @@ describe('findPartStateOrderErrors', () => {
     it("détecte une règle d'état déclarée avant sa base", () => {
         const source = `
             ar-test {
-                &::part(bullet--current) {
+                &::part(indicator--current) {
                     background-color: red;
                 }
 
-                &::part(bullet) {
+                &::part(indicator) {
                     border-radius: 0.75rem;
                 }
             }
         `;
         const errors = findPartStateOrderErrors('default.css', source);
         expect(errors).toHaveLength(1);
-        expect(errors[0]).toContain('bullet--current');
-        expect(errors[0]).toContain('bullet');
+        expect(errors[0]).toContain('indicator--current');
+        expect(errors[0]).toContain('indicator');
     });
 
     it("accepte une règle d'état déclarée après sa base", () => {
         const source = `
             ar-test {
-                &::part(bullet) {
+                &::part(indicator) {
                     border-radius: 0.75rem;
                 }
 
-                &::part(bullet--current) {
+                &::part(indicator--current) {
                     background-color: red;
                 }
             }
@@ -42,7 +42,7 @@ describe('findPartStateOrderErrors', () => {
                     color: blue;
                 }
 
-                &::part(bullet) {
+                &::part(indicator) {
                     border-radius: 0.75rem;
                 }
             }
@@ -53,19 +53,19 @@ describe('findPartStateOrderErrors', () => {
     it('traite chaque bloc de composant indépendamment', () => {
         const source = `
             ar-one {
-                &::part(bullet--current) {
+                &::part(indicator--current) {
                     background-color: red;
                 }
-                &::part(bullet) {
+                &::part(indicator) {
                     border-radius: 0.75rem;
                 }
             }
 
             ar-two {
-                &::part(bullet) {
+                &::part(indicator) {
                     border-radius: 0.5rem;
                 }
-                &::part(bullet--current) {
+                &::part(indicator--current) {
                     background-color: blue;
                 }
             }
@@ -78,11 +78,11 @@ describe('findPartStateOrderErrors', () => {
     it('rapporte le bon numéro de ligne', () => {
         const source = [
             'ar-test {',
-            '    &::part(bullet--current) {',
+            '    &::part(indicator--current) {',
             '        background-color: red;',
             '    }',
             '',
-            '    &::part(bullet) {',
+            '    &::part(indicator) {',
             '        border-radius: 0.75rem;',
             '    }',
             '}',
