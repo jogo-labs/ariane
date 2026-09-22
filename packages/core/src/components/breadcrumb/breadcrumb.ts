@@ -36,6 +36,8 @@ import '../../translations/en.js';
  * @csspart list       - Le conteneur `role="list"` des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
+ * @csspart connector  - Point d'ancrage décoratif pour le trait reliant les puces des items dans
+ *   le panel mobile — position verticale, géométrie et couleur à la charge du thème.
  * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
@@ -233,6 +235,7 @@ export class ArBreadcrumb extends LitElement {
                                   <span class="sr-only">${showLabel}</span>
                               </button>
                               <div part="panel" popover="auto" tabindex="-1">
+                                  <div part="connector" aria-hidden="true"></div>
                                   <div role="list" part="list list--mobile">
                                       <slot></slot>
                                   </div>
@@ -291,7 +294,6 @@ export class ArBreadcrumb extends LitElement {
                 isCurrent: index === items.length - 1,
                 isMobile: this.isMobile,
                 hasPrevious: this.isMobile ? index > 1 : index > 0,
-                hasNext: index < items.length - 1,
                 separator,
                 separatorVersion: this._separatorVersion,
             });

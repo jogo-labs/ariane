@@ -21,6 +21,14 @@ export default css`
         flex-direction: column;
     }
 
+    /* Le connecteur est un point d'ancrage décoratif pour le thème (trait, position verticale,
+       couleur) : rester hors du flux, ancré au panel (positionné, cf. panel.styles.ts), relève de
+       son rôle plutôt que d'un choix visuel — comme pour [part='panel'] lui-même. */
+    [part='connector'] {
+        position: absolute;
+        inset-inline-start: 0;
+    }
+
     /* ── Wrapper dropdown mobile ────────────────────────────── */
 
     .dropdown {

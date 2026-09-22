@@ -18,11 +18,6 @@ export interface BreadcrumbItemRenderState {
      * en mobile `isFirst` ne pilote que le cas « ne rend rien + masqué ».
      */
     hasPrevious: boolean;
-    /**
-     * Un item visible suit celui-ci. Conditionne, avec `hasPrevious`, la présence du connecteur
-     * mobile et sa variante : un item sans voisin visible n'en rend pas.
-     */
-    hasNext: boolean;
     /** Nœud modèle du slot `separator` d'ar-breadcrumb, cloné dans l'item (desktop). */
     separator: Node | undefined;
     /** Incrémenté par ar-breadcrumb quand le contenu du nœud modèle change. */
@@ -37,9 +32,11 @@ export interface BreadcrumbItemRenderState {
  * @csspart link - Le lien de navigation (items intermédiaires).
  * @csspart current - Le texte de la page courante (dernier item, non cliquable).
  * @csspart separator - Le séparateur avant l'item (desktop uniquement, absent avant le premier item).
- * @csspart connector - Un segment de trait décoratif, du bord de l'indicateur de l'item vers celui d'un item voisin (mobile uniquement). Un item en rend jusqu'à deux : au-dessus de son indicateur s'il a un voisin visible avant, en dessous s'il en a un après.
  * @csspart indicator - La puce de l'item (mobile uniquement).
  * @csspart indicator--current - La puce de l'élément courant (variante d'état de `indicator`).
+ *
+ * @slot indicator - Remplace le contenu par défaut (aplat de couleur posé par le thème) de la
+ *   puce mobile par une icône. Purement décoratif (`aria-hidden`).
  */
 export class ArBreadcrumbItem extends LitElement {
     static override styles: CSSResultGroup = [resetStyles, styles];
@@ -80,7 +77,6 @@ export class ArBreadcrumbItem extends LitElement {
             previous.isCurrent === state.isCurrent &&
             previous.isMobile === state.isMobile &&
             previous.hasPrevious === state.hasPrevious &&
-            previous.hasNext === state.hasNext &&
             previous.separator === state.separator &&
             previous.separatorVersion === state.separatorVersion
         ) {
@@ -145,33 +141,28 @@ export class ArBreadcrumbItem extends LitElement {
         const state = this._renderState;
         if (!state || (state.isMobile && state.isFirst)) return nothing;
 
-        // Un segment extensible de part et d'autre de l'indicateur : il couvre exactement
-        // l'espace entre le bord de la ligne et le bord de l'indicateur, quelle que soit la
-        // hauteur de la ligne. Les segments de deux lignes successives se joignent bord à bord,
-        // formant un trait continu d'un indicateur à l'autre. Un segment sans voisin de ce côté
-        // reste une cale sans `part` : rien n'est tracé au-dessus du premier indicateur visible
-        // ni en dessous du dernier.
-        const segment = (hasNeighbour: boolean): TemplateResult =>
-            hasNeighbour
-                ? html`<span class="segment" part="connector"></span>`
-                : html`<span class="segment"></span>`;
         const decoration = state.isMobile
-            ? html`<div class="rail" aria-hidden="true">
-                  ${segment(state.hasPrevious)}<span
-                      part="indicator${state.isCurrent ? ' indicator--current' : ''}"
-                  ></span
-                  >${segment(state.hasNext)}
-              </div>`
-            : state.hasPrevious
-              ? this._renderSeparator(state)
-              : nothing;
+            ? html`<span
+                  aria-hidden="true"
+                  part=${state.isCurrent ? 'indicator indicator--current' : 'indicator'}
+              >
+                  <slot name="indicator"></slot>
+              </span>`
+            : nothing;
+
+        const separator =
+            state.hasPrevious && !state.isMobile ? this._renderSeparator(state) : nothing;
 
         const control = state.isCurrent
-            ? html`<span part="current">${this.label}</span>`
-            : html`<a part="link" href=${this.href ?? nothing}>${this.label}</a>`;
+            ? html`<span part="control current"
+                  >${decoration}<span class="item-label" part="label">${this.label}</span></span
+              >`
+            : html`<a part="control link" href=${this.href ?? nothing}
+                  >${decoration}<span class="item-label" part="label">${this.label}</span></a
+              >`;
 
         return html`<div class=${state.isMobile ? 'item item--mobile' : 'item'}>
-            ${decoration}${control}
+            ${separator} ${control}
         </div>`;
     }
 }

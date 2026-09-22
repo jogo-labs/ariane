@@ -33,7 +33,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -51,7 +50,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -70,7 +68,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -88,7 +85,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -100,7 +96,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -116,24 +111,19 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe('indicator');
-            // aria-hidden est porté par la colonne décorative qui contient l'indicateur.
-            expect(getPart(el, 'indicator')?.parentElement?.getAttribute('aria-hidden')).toBe(
-                'true',
-            );
+            expect(getPart(el, 'indicator')?.getAttribute('aria-hidden')).toBe('true');
 
             el.setRenderState({
                 isFirst: false,
                 isCurrent: true,
                 isMobile: true,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -150,7 +140,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: false,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -166,7 +155,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -181,7 +169,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -199,7 +186,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: source,
                 separatorVersion: 1,
             });
@@ -222,7 +208,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: source,
             };
             el.setRenderState({ ...base, separatorVersion: 1 });
@@ -244,7 +229,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: source,
                 separatorVersion: 1,
             });
@@ -254,7 +238,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 2,
             });
@@ -262,100 +245,13 @@ describe('ArBreadcrumbItem', () => {
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
         });
 
-        it("mobile : encadre l'indicateur de deux segments, dans une colonne décorative", async () => {
+        it('ne rend jamais de part="connector" — le trait reliant les puces est porté par ar-breadcrumb', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             el.setRenderState({
                 isFirst: false,
                 isCurrent: false,
                 isMobile: true,
                 hasPrevious: true,
-                hasNext: true,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            const indicator = getPart(el, 'indicator')!;
-            const rail = indicator.parentElement!;
-            expect(rail.getAttribute('aria-hidden')).toBe('true');
-            expect([...rail.children]).toHaveLength(3);
-            expect(rail.children[1]).toBe(indicator);
-        });
-
-        it('mobile : un voisin de chaque côté donne deux segments part="connector"', async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: true,
-                hasPrevious: true,
-                hasNext: true,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            const rail = getPart(el, 'indicator')!.parentElement!;
-            expect(rail.children[0]?.getAttribute('part')).toBe('connector');
-            expect(rail.children[2]?.getAttribute('part')).toBe('connector');
-        });
-
-        it("mobile : le premier item visible n'a pas de segment connecteur au-dessus", async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: true,
-                hasPrevious: false,
-                hasNext: true,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            const rail = getPart(el, 'indicator')!.parentElement!;
-            expect(rail.children[0]?.hasAttribute('part')).toBe(false);
-            expect(rail.children[2]?.getAttribute('part')).toBe('connector');
-        });
-
-        it("mobile : le dernier item visible n'a pas de segment connecteur en dessous", async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: true,
-                isMobile: true,
-                hasPrevious: true,
-                hasNext: false,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            const rail = getPart(el, 'indicator')!.parentElement!;
-            expect(rail.children[0]?.getAttribute('part')).toBe('connector');
-            expect(rail.children[2]?.hasAttribute('part')).toBe(false);
-        });
-
-        it('mobile : un item visible sans voisin visible a un indicateur mais pas de connecteur', async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: true,
-                hasPrevious: false,
-                hasNext: false,
-                separator: undefined,
-                separatorVersion: 0,
-            });
-            await waitForUpdate(el);
-            expect(getPart(el, 'indicator')).not.toBeNull();
-            expect(getPart(el, 'connector')).toBeNull();
-        });
-
-        it('desktop : ne rend pas de connecteur', async () => {
-            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
-            el.setRenderState({
-                isFirst: false,
-                isCurrent: false,
-                isMobile: false,
-                hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -374,7 +270,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: false,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -395,7 +290,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: true,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -407,7 +301,6 @@ describe('ArBreadcrumbItem', () => {
                 isCurrent: false,
                 isMobile: false,
                 hasPrevious: true,
-                hasNext: false,
                 separator: undefined,
                 separatorVersion: 0,
             });
@@ -598,7 +491,6 @@ describe('ArBreadcrumbItem', () => {
             isCurrent: false,
             isMobile: false,
             hasPrevious: true,
-            hasNext: false,
             separator: undefined,
             separatorVersion: 0,
         };

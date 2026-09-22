@@ -300,7 +300,7 @@ describe('ArBreadcrumb', () => {
             );
         });
 
-        it('mobile : les segments connecteurs relient les indicateurs voisins', async () => {
+        it('mobile : le panel porte un unique part="connector", pas un par item', async () => {
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
@@ -309,25 +309,22 @@ describe('ArBreadcrumb', () => {
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const items = itemsOf(el);
-            const railOf = (item: Element) => getPart(item, 'indicator')!.parentElement!;
-            const parts = (item: Element) =>
-                [...railOf(item).children].map((child) => child.getAttribute('part'));
-            // Premier visible : rien au-dessus ; dernier : rien en dessous.
-            expect(parts(items[1]!)).toEqual([null, 'indicator', 'connector']);
-            expect(parts(items[2]!)).toEqual(['connector', 'indicator', 'connector']);
-            expect(parts(items[3]!)).toEqual(['connector', 'indicator indicator--current', null]);
+            const panel = getShadow(el).querySelector('[part="panel"]');
+            const connectors = panel?.querySelectorAll('[part="connector"]');
+            expect(connectors?.length).toBe(1);
+            expect(connectors?.[0]?.getAttribute('aria-hidden')).toBe('true');
+            itemsOf(el).forEach((item) => expect(getPart(item, 'connector')).toBeNull());
         });
 
-        it("mobile : un seul item visible n'a pas de connecteur", async () => {
+        it('desktop : ne rend pas de part="connector"', async () => {
+            ArBreadcrumb.mobileQuery = mockMediaQuery(false);
             el = await fixture(`
                 <ar-breadcrumb>
                     <ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>
                     <ar-breadcrumb-item label="Page courante"></ar-breadcrumb-item>
                 </ar-breadcrumb>
             `);
-            const items = itemsOf(el);
-            expect(getPart(items[1]!, 'connector')).toBeNull();
+            expect(getShadow(el).querySelector('[part="connector"]')).toBeNull();
         });
     });
 

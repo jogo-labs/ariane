@@ -1121,9 +1121,17 @@
     }
 
     ar-breadcrumb {
-        &::part(breadcrumb) {
-            padding-inline-end: 0.25rem;
+        /* ── Partagé ──────────────────────────────────────────── */
+
+        &::part(list) {
+            color: var(--ar-color-text);
         }
+
+        /* ── Mobile ───────────────────────────────────────────── */
+
+        --ar-theme-breadcrumb-indicator-size: 0.75rem;
+        --ar-theme-breadcrumb-indicator-margin-block: 0.35rem;
+        --ar-theme-breadcrumb-panel-padding: 0.75rem;
 
         &::part(panel) {
             /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width : la liste
@@ -1131,10 +1139,36 @@
                la valeur partagée (18rem). min() borne la largeur au viewport (WCAG 1.4.10
                Reflow) ; min-width reste celle du panel partagé. */
             max-width: min(20rem, calc(100vw - 2rem));
+            padding: var(--ar-theme-breadcrumb-panel-padding);
         }
 
-        &::part(list) {
-            color: var(--ar-color-text);
+        &::part(connector) {
+            display: block;
+            width: 2.25rem;
+            background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
+            background-size: 2px 8px;
+            background-repeat: repeat-y;
+            background-position: center 3px;
+            /* Un seul trait continu derrière toute la liste, plutôt qu'un segment par item : sa
+               position ne dépend donc jamais de la hauteur d'un libellé (1 ou plusieurs lignes).
+               Le haut est calé un peu après le centre de la puce du premier item (léger espace
+               visible avant elle, accepté) ; le bas s'arrête au padding du panel — le trait qui
+               dépasserait sous le dernier indicateur est masqué par le fond opaque de
+               ar-breadcrumb-item::part(current) (voir plus bas), qui couvre toute la hauteur
+               réelle du dernier item quel que soit son nombre de lignes. Chaque puce masque
+               localement le segment qui passe derrière elle via son propre halo (box-shadow),
+               sans dépendre de la phase du pointillé. */
+            top: calc(
+                var(--ar-theme-breadcrumb-indicator-size) +
+                    var(--ar-theme-breadcrumb-indicator-margin-block) * 2 +
+                    var(--ar-theme-breadcrumb-panel-padding)
+            );
+            bottom: var(--ar-theme-breadcrumb-panel-padding);
+        }
+
+        &::part(list--mobile) {
+            display: flex;
+            gap: 0.75rem;
         }
 
         &::part(home),
@@ -1191,40 +1225,50 @@
     }
 
     ar-breadcrumb-item {
+        /* ── Partagé ──────────────────────────────────────────── */
+
         &::part(link) {
             color: inherit;
         }
 
         &::part(current) {
             font-weight: 700;
+            /* Fond opaque qui masque le connecteur (cf. ar-breadcrumb::part(connector) plus haut)
+               sous le dernier item, sur toute sa hauteur réelle (1 ou plusieurs lignes) — sans
+               dépendre de sa propre hauteur. position: relative fait peindre ce fond au-dessus du
+               connecteur (positionné, lui) : sans elle, l'ordre de peinture standard placerait un
+               élément non positionné derrière un élément positionné, quel que soit son ordre dans
+               le DOM. Le contrat implicite : ce fond doit rester peint après le connecteur, donc
+               ar-breadcrumb-item doit rester après lui dans le DOM (déjà le cas, le connecteur
+               précède la liste dans le panel). */
+            background-color: var(--ar-panel-bg);
+            position: relative;
         }
+
+        /* ── Desktop ──────────────────────────────────────────── */
 
         &::part(separator) {
             color: var(--ar-color-neutral-80);
         }
 
+        /* ── Mobile ───────────────────────────────────────────── */
+
         /* Tous les indicateurs ont la même taille ; seule la couleur distingue l'item courant.
            Les marges horizontales fixent la largeur de la colonne décorative (1.875rem), donc
            l'alignement des libellés. */
         &::part(indicator) {
-            width: 0.5rem;
-            height: 0.5rem;
-            margin: 0 0.6875rem;
+            width: var(--ar-theme-breadcrumb-indicator-size);
+            height: var(--ar-theme-breadcrumb-indicator-size);
+            margin-inline-start: 0.75rem;
+            margin-inline-end: 1.25rem;
+            margin-block-start: var(--ar-theme-breadcrumb-indicator-margin-block);
             border-radius: var(--ar-border-radius-full);
             background-color: var(--ar-color-neutral-80);
+            box-shadow: 0 0 0 2px var(--ar-panel-bg);
         }
 
         &::part(indicator--current) {
             background-color: var(--ar-color-interactive);
-        }
-
-        /* Pointillé identique à celui du connecteur d'ar-stepper. Chaque segment s'arrête au
-           bord d'un indicateur : le trait relie deux indicateurs sans jamais passer derrière. */
-        &::part(connector) {
-            background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
-            background-size: 2px 8px;
-            background-repeat: repeat-y;
-            background-position: center;
         }
     }
 
