@@ -234,7 +234,7 @@ describe('ArStepperItem', () => {
             expect(header.getAttribute('href')).toBe('#a');
         });
 
-        it('showSubsteps: true entoure le slot par défaut d’un <ol part="list list--substep">', async () => {
+        it('showSubsteps: true entoure le slot par défaut d’un <div role="list" part="list list--substep">', async () => {
             const el = await fixture<ArStepperItem>(
                 '<ar-stepper-item path="a" label="Étape A"></ar-stepper-item>',
             );
@@ -246,7 +246,9 @@ describe('ArStepperItem', () => {
             });
             await el.updateComplete;
 
-            expect(el.shadowRoot!.querySelector('ol[part~="list--substep"] slot')).not.toBeNull();
+            expect(
+                el.shadowRoot!.querySelector('div[role="list"][part~="list--substep"] slot'),
+            ).not.toBeNull();
         });
 
         it('indicatorState: "current" pose aria-current="step" sur le host', async () => {

@@ -2,8 +2,8 @@ import {
     LitElement,
     type TemplateResult,
     html,
-    type CSSResultGroup,
     nothing,
+    type CSSResultGroup,
     type PropertyValues,
 } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
@@ -33,31 +33,22 @@ import '../../translations/en.js';
  * "Retour".
  *
  * @csspart breadcrumb - Racine du composant.
- * @csspart list       - L'élément `<ol>` de la liste des liens (desktop ou mobile).
+ * @csspart list       - Le conteneur `role="list"` des liens (desktop ou mobile).
  * @csspart list--desktop - La liste desktop (variante d'état de `list`).
  * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
- * @csspart item       - Chaque `<li>` de la liste.
- * @csspart link       - Les `<a>` de navigation.
- * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
- * @csspart separator  - Le séparateur entre deux items (desktop uniquement, absent avant le premier item).
- * @csspart bullet     - La puce d'un item (mobile uniquement).
- * @csspart bullet--current - La puce de l'élément courant (variante d'état de `bullet`).
+ * @csspart connector  - Point d'ancrage décoratif pour le trait reliant les puces des items dans
+ *   le panel mobile — position verticale, géométrie et couleur à la charge du thème.
  * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
  * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
+ * @slot separator    - Séparateur entre les items en desktop (« / » par défaut).
  * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
  * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
- * @cssprop --ar-breadcrumb-mobile-separator-color - Couleur du connecteur pointillé vertical entre les items de la liste mobile (cascade vers --ar-color-neutral-90).
- * @cssprop --ar-breadcrumb-toggle-bg - Fond du bouton retour/trigger mobile.
- * @cssprop --ar-breadcrumb-toggle-bg-hover - Fond du bouton retour/trigger mobile au survol.
- * @cssprop --ar-breadcrumb-toggle-bg-pressed - Fond du bouton retour/trigger mobile pressé.
- * @cssprop --ar-breadcrumb-toggle-bg-focus - Fond du bouton retour/trigger mobile au focus.
  * @cssprop --ar-breadcrumb-toggle-min-size - Taille minimale (largeur/hauteur) du bouton retour/trigger mobile, repli WCAG 2.5.8 si aucun thème n'est chargé.
- * @cssprop --ar-breadcrumb-toggle-transition-duration - Durée de la transition (background-color) des boutons retour/trigger mobile.
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
  * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
@@ -160,6 +151,10 @@ export class ArBreadcrumb extends LitElement {
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
+    override willUpdate(): void {
+        this._pushRenderState();
+    }
+
     override firstUpdated(): void {
         if (this.isMobile) this._attachDropdown();
     }
@@ -201,49 +196,38 @@ export class ArBreadcrumb extends LitElement {
 
         if (items.length === 0) return;
 
-        const listTemplates: TemplateResult[] = items.map((item, index) => {
-            const isCurrent = index === items.length - 1;
-            const decoration = this.isMobile
-                ? html`<span
-                      part="bullet${isCurrent ? ' bullet--current' : ''}"
-                      aria-hidden="true"
-                  ></span>`
-                : index > 0
-                  ? html`<span part="separator" aria-hidden="true"></span>`
-                  : nothing;
-
-            return html` <li part="item" .ariaCurrent="${isCurrent ? 'page' : nothing}">
-                ${decoration}
-                ${isCurrent
-                    ? html`<span part="current">${item.label}</span>`
-                    : html`<a part="link" href="${item.href}">${item.label}</a>`}
-            </li>`;
-        });
-
         const navLabel = this.localize.term('breadcrumbNavLabel');
+        const showLabel = this.localize.term('showBreadcrumb');
 
         return html`
             <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
                 <p id="breadcrumb-label" class="sr-only">${navLabel}</p>
-                ${this.isMobile
-                    ? html`<div class="dropdown">
-                          <a part="home" href="${items[0]?.href}">
-                              <slot name="home-icon">${this._defaultHomeIcon()}</slot>
-                              <span>${items[0]?.label}</span>
-                          </a>
-                          <button @click=${this._handleTriggerClick} type="button" part="trigger">
-                              <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
-                              <span class="sr-only">${this.localize.term('showBreadcrumb')}</span>
-                          </button>
-                          <div part="panel" popover="auto" tabindex="-1">
-                              <ol part="list list--mobile">
-                                  ${listTemplates.slice(1)}
-                              </ol>
-                          </div>
-                      </div>`
-                    : html`<ol part="list list--desktop">
-                          ${listTemplates}
-                      </ol>`}
+                ${
+                    this.isMobile
+                        ? html`<div class="dropdown">
+                              <a part="home" href=${items[0]?.href ?? nothing}>
+                                  <slot name="home-icon">${this._defaultHomeIcon()}</slot>
+                                  <span>${items[0]?.label}</span>
+                              </a>
+                              <button
+                                  @click=${this._handleTriggerClick}
+                                  type="button"
+                                  part="trigger"
+                              >
+                                  <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
+                                  <span class="sr-only">${showLabel}</span>
+                              </button>
+                              <div part="panel" popover="auto" tabindex="-1">
+                                  <div part="connector" aria-hidden="true"></div>
+                                  <div role="list" part="list list--mobile">
+                                      <slot></slot>
+                                  </div>
+                              </div>
+                          </div>`
+                        : html`<div role="list" part="list list--desktop">
+                              <slot></slot>
+                          </div>`
+                }
             </nav>
         `;
     }
@@ -264,6 +248,20 @@ export class ArBreadcrumb extends LitElement {
         [...this.querySelectorAll('*')]
             .filter((el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem)
             .forEach((item) => item.setRegistry(registry));
+    }
+
+    private _pushRenderState(): void {
+        const items = this._orderedItems;
+        const separator = this.querySelector(':scope > [slot="separator"]') ?? undefined;
+        items.forEach((item, index) => {
+            item.setRenderState({
+                isFirst: index === 0,
+                isCurrent: index === items.length - 1,
+                isMobile: this.isMobile,
+                hasPrevious: this.isMobile ? index > 1 : index > 0,
+                separator,
+            });
+        });
     }
 
     private _scheduleRebuild(): void {

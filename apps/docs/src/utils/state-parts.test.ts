@@ -3,7 +3,7 @@ import { isStatePart } from './state-parts.js';
 
 describe('isStatePart', () => {
     it("reconnaît un part d'état simple (élément)--(état)", () => {
-        expect(isStatePart('bullet--current')).toBe(true);
+        expect(isStatePart('indicator--current')).toBe(true);
         expect(isStatePart('count--warning')).toBe(true);
         expect(isStatePart('count--error')).toBe(true);
     });
@@ -15,7 +15,7 @@ describe('isStatePart', () => {
     });
 
     it('rejette un part sans séparateur --', () => {
-        expect(isStatePart('bullet')).toBe(false);
+        expect(isStatePart('indicator')).toBe(false);
         expect(isStatePart('action-button')).toBe(false);
         expect(isStatePart('step-link')).toBe(false);
     });

@@ -1,5 +1,5 @@
 /// <reference types="mocha" />
-import { fixture, html, expect, aTimeout, elementUpdated } from '@open-wc/testing';
+import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import './index.js';
 import '../breadcrumb-item/index.js';
 import type { ArBreadcrumb } from './breadcrumb.js';
@@ -128,50 +128,6 @@ describe('ar-breadcrumb — browser', () => {
             const computed = getComputedStyle(trigger);
             expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
             expect(parseFloat(computed.minWidth)).to.be.greaterThan(0);
-        });
-    });
-
-    // ── Collision hover/focus (#157) ─────────────────────────────────────────
-
-    describe('collision hover/focus (#157)', () => {
-        // Vérifie que :focus-visible seul (clavier, sans souris) applique bien le token
-        // bg-focus. Ne vérifie PAS la combinaison réelle hover+focus simultanés (un clic
-        // souris) : nécessiterait @web/test-runner-commands (sendMouse), non installé,
-        // hors scope de ce correctif — vérifié manuellement via Playwright contre le
-        // serveur de dev de la documentation (background attendu : token hover, pas
-        // focus, après un clic souris réel).
-        it(':focus-visible seul applique le token bg-focus, indépendamment de :hover', async () => {
-            el = await mobileBreadcrumb();
-            el.style.setProperty('--ar-breadcrumb-toggle-bg', 'rgb(1, 1, 1)');
-            el.style.setProperty('--ar-breadcrumb-toggle-bg-hover', 'rgb(2, 2, 2)');
-            el.style.setProperty('--ar-breadcrumb-toggle-bg-focus', 'rgb(3, 3, 3)');
-            const trigger = getBtn(el);
-
-            trigger.focus();
-            await elementUpdated(el);
-
-            expect(trigger.matches(':focus-visible')).to.equal(true);
-            expect(getComputedStyle(trigger).backgroundColor).to.equal('rgb(3, 3, 3)');
-        });
-    });
-
-    describe('propriétés logiques (RTL)', () => {
-        it('[part="breadcrumb"] utilise padding-inline-end : bascule à gauche sous dir="rtl"', async () => {
-            el = await fixture<ArBreadcrumb>(html`
-                <ar-breadcrumb dir="rtl">
-                    <ar-breadcrumb-item href="/" label="Accueil"></ar-breadcrumb-item>
-                    <ar-breadcrumb-item current label="Page"></ar-breadcrumb-item>
-                </ar-breadcrumb>
-            `);
-            const nav = el.shadowRoot?.querySelector<HTMLElement>('[part="breadcrumb"]');
-            if (!nav) throw new Error('[part="breadcrumb"] introuvable');
-            const style = getComputedStyle(nav);
-            // padding-inline-end sous dir="rtl" se résout physiquement à GAUCHE — un
-            // padding-right physique resterait à droite quel que soit dir. Seule une
-            // propriété logique peut produire ce résultat ; un test purement en LTR ne
-            // distingue pas logique/physique (les deux donnent le même résultat en LTR).
-            expect(style.paddingLeft).to.equal('4px');
-            expect(style.paddingRight).to.equal('0px');
         });
     });
 });

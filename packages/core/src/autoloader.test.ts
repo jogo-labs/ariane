@@ -148,7 +148,7 @@ describe('autoloader — préfixe configurable', () => {
         await tick();
 
         // Preuve équivalente sous la nouvelle architecture : le parent "A" a bien construit le
-        // wrapper <ol part="list list--substep"> dans son propre shadow DOM (posé uniquement
+        // wrapper <div role="list" part="list list--substep"> dans son propre shadow DOM (posé uniquement
         // quand showSubsteps est vrai, Task 3/4), ET "B" y est bien imbriqué en tant qu'enfant
         // direct — les deux ne sont vrais que si buildFromItems() a correctement retrouvé le
         // lien parent/enfant via closestInstanceOf() (aucun des deux niveaux ne pose plus

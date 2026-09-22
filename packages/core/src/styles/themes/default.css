@@ -399,22 +399,7 @@
          * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         --ar-breadcrumb-distance: var(--ar-anchor-distance);
         --ar-breadcrumb-offset: var(--ar-anchor-offset);
-        --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
-        --ar-breadcrumb-toggle-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
-        --ar-breadcrumb-toggle-bg-hover: light-dark(
-            rgba(26, 26, 26, 0.7),
-            rgba(255, 255, 255, 0.15)
-        );
-        --ar-breadcrumb-toggle-bg-pressed: light-dark(
-            rgba(26, 26, 26, 0.8),
-            rgba(255, 255, 255, 0.2)
-        );
-        --ar-breadcrumb-toggle-bg-focus: light-dark(
-            rgba(26, 26, 26, 0.05),
-            rgba(255, 255, 255, 0.08)
-        );
         --ar-breadcrumb-toggle-min-size: 2.5rem;
-        --ar-breadcrumb-toggle-transition-duration: 0.15s;
 
         /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          * Stepper
@@ -1136,42 +1121,91 @@
     }
 
     ar-breadcrumb {
+        /* ── Partagé ──────────────────────────────────────────── */
+
         &::part(list) {
             color: var(--ar-color-text);
         }
 
-        &::part(current) {
-            font-weight: 700;
+        /* ── Mobile ───────────────────────────────────────────── */
+
+        --ar-theme-breadcrumb-indicator-size: 0.75rem;
+        --ar-theme-breadcrumb-indicator-margin-block: 0.35rem;
+        --ar-theme-breadcrumb-indicator-margin-inline: 0.75rem;
+        --ar-theme-breadcrumb-panel-padding: 0.75rem;
+
+        &::part(panel) {
+            --ar-panel-max-width: auto;
+            min-width: 14rem;
+            padding: var(--ar-theme-breadcrumb-panel-padding);
         }
 
-        &::part(separator) {
-            background-color: var(--ar-color-neutral-80);
+        &::part(connector) {
+            display: block;
+            width: calc(
+                var(--ar-theme-breadcrumb-indicator-margin-inline) * 2 +
+                    var(--ar-theme-breadcrumb-indicator-size)
+            );
+            top: calc(
+                var(--ar-theme-breadcrumb-indicator-size) +
+                    var(--ar-theme-breadcrumb-indicator-margin-block) * 2 +
+                    var(--ar-theme-breadcrumb-panel-padding)
+            );
+            inset-inline-start: var(--ar-theme-breadcrumb-panel-padding);
+            bottom: var(--ar-theme-breadcrumb-panel-padding);
+            background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
+            background-size: 2px 8px;
+            background-repeat: repeat-y;
+            background-position: center 3px;
         }
 
-        &::part(bullet) {
-            border-radius: var(--ar-border-radius-full);
-            background-color: var(--ar-color-neutral-80);
-            box-shadow: 0 0 0 2px var(--ar-color-bg);
-        }
-
-        &::part(bullet--current) {
-            background-color: var(--ar-color-interactive);
+        &::part(list--mobile) {
+            display: flex;
+            gap: 0.75rem;
         }
 
         &::part(home),
         &::part(trigger) {
-            border-radius: var(--ar-border-radius-xl);
+            gap: 0.375rem;
+            border: none;
+            border-radius: var(--ar-border-radius-md);
+            cursor: pointer;
             font-size: var(--ar-font-size-md);
             line-height: 1;
             font-weight: 500;
             color: var(--ar-color-text);
+            background-color: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+            transition: background-color 0.15s;
+        }
+
+        /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
+           qu'un état combiné (ex. clic : hover + focus simultanés) retienne le fond de l'état le
+           plus fort (cf. #157). */
+        &::part(home):focus-visible,
+        &::part(trigger):focus-visible {
+            background-color: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.08));
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
         }
 
         &::part(home):hover,
-        &::part(trigger):hover,
-        &::part(home):active,
-        &::part(trigger):active {
+        &::part(trigger):hover {
+            background-color: light-dark(rgba(26, 26, 26, 0.7), rgba(255, 255, 255, 0.15));
             color: var(--ar-color-white);
+        }
+
+        &::part(home):active,
+        &::part(trigger):active,
+        &[open]::part(trigger),
+        &[open]::part(trigger):hover {
+            background-color: light-dark(rgba(26, 26, 26, 0.8), rgba(255, 255, 255, 0.2));
+            color: var(--ar-color-white);
+        }
+
+        &[open]::part(trigger),
+        &[open]::part(trigger):hover,
+        &::part(trigger):active {
+            transform: scale(0.985);
         }
 
         &::part(home) {
@@ -1181,6 +1215,74 @@
 
         &::part(trigger) {
             margin-inline-start: 0.5rem;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &::part(home),
+            &::part(trigger) {
+                transition: none;
+            }
+        }
+    }
+
+    ar-breadcrumb-item {
+        /* ── Partagé ──────────────────────────────────────────── */
+        --ar-theme-breadcrumb-indicator-bg: var(--ar-color-neutral-80);
+
+        /* WCAG 2.5.8 : on écrase la min-height par défaut
+        puisqu'on a un gap suffisant entre les items pour que 2 zones
+        de clic soient suffisament espacés. */
+        &::part(control) {
+            min-height: auto;
+        }
+
+        &::part(link) {
+            color: inherit;
+        }
+
+        &::part(link):hover {
+            text-decoration: none;
+            --ar-theme-breadcrumb-indicator-bg: var(--ar-color-text-muted);
+        }
+
+        &::part(current) {
+            font-weight: 700;
+            /* Fond opaque qui masque le connecteur (cf. ar-breadcrumb::part(connector) plus haut)
+               sous le dernier item, sur toute sa hauteur réelle (1 ou plusieurs lignes) — sans
+               dépendre de sa propre hauteur. position: relative fait peindre ce fond au-dessus du
+               connecteur (positionné, lui) : sans elle, l'ordre de peinture standard placerait un
+               élément non positionné derrière un élément positionné, quel que soit son ordre dans
+               le DOM. Le contrat implicite : ce fond doit rester peint après le connecteur, donc
+               ar-breadcrumb-item doit rester après lui dans le DOM (déjà le cas, le connecteur
+               précède la liste dans le panel). */
+            background-color: var(--ar-panel-bg);
+            position: relative;
+        }
+
+        /* ── Desktop ──────────────────────────────────────────── */
+
+        &::part(separator) {
+            color: var(--ar-color-neutral-80);
+        }
+
+        /* ── Mobile ───────────────────────────────────────────── */
+
+        /* Tous les indicateurs ont la même taille ; seule la couleur distingue l'item courant.
+           Les marges horizontales fixent la largeur de la colonne décorative (1.875rem), donc
+           l'alignement des libellés. */
+        &::part(indicator) {
+            width: var(--ar-theme-breadcrumb-indicator-size);
+            height: var(--ar-theme-breadcrumb-indicator-size);
+            margin-inline-start: 0.75rem;
+            margin-inline-end: 1.25rem;
+            margin-block-start: var(--ar-theme-breadcrumb-indicator-margin-block);
+            border-radius: var(--ar-border-radius-full);
+            background-color: var(--ar-theme-breadcrumb-indicator-bg);
+            box-shadow: 0 0 0 2px var(--ar-panel-bg);
+        }
+
+        &::part(indicator--current) {
+            background-color: var(--ar-color-interactive);
         }
     }
 

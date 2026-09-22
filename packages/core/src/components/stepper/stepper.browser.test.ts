@@ -188,7 +188,7 @@ describe('ar-stepper — browser', () => {
 
         // Régression #140 : .list-unstyled (feuille partagée utilities.styles.ts) posait
         // padding-left: 0, une propriété physique qui ne résout pas le padding-inline-start
-        // de 40px imposé par l'UA stylesheet sur <ol> sous dir="rtl" (indent fantôme côté
+        // de 40px imposé sous dir="rtl" par une liste à padding UA (indent fantôme côté
         // start/droite). Le fix passe .list-unstyled en padding-inline-start: 0.
         it('la liste (.list-unstyled) n\'a pas de padding fantôme côté start (droite) sous dir="rtl"', async () => {
             el = await desktopStepper('rtl');

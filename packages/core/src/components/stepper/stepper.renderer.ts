@@ -84,9 +84,9 @@ export function pushItemRenderState(
 
 function renderStepList(cssClass: string): TemplateResult {
     return html`
-        <ol part="list" class="list-unstyled ${cssClass}">
+        <div role="list" part="list" class="list-unstyled ${cssClass}">
             <slot></slot>
-        </ol>
+        </div>
     `;
 }
 
