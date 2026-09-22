@@ -1151,7 +1151,7 @@
                     var(--ar-theme-breadcrumb-indicator-margin-block) * 2 +
                     var(--ar-theme-breadcrumb-panel-padding)
             );
-            left: var(--ar-theme-breadcrumb-panel-padding);
+            inset-inline-start: var(--ar-theme-breadcrumb-panel-padding);
             bottom: var(--ar-theme-breadcrumb-panel-padding);
             background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
             background-size: 2px 8px;
@@ -1231,7 +1231,7 @@
 
         /* WCAG 2.5.8 : on écrase la min-height par défaut
         puisqu'on a un gap suffisant entre les items pour que 2 zones
-        de clic soient suffisament espacés. On fournit une  */
+        de clic soient suffisament espacés. */
         &::part(control) {
             min-height: auto;
         }
