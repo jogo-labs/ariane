@@ -48,9 +48,6 @@ export default css`
     [part='list'] {
         margin: 0;
         counter-reset: step;
-    }
-
-    .desktop {
         display: flex;
         flex-flow: column;
     }
