@@ -20,8 +20,6 @@ export interface BreadcrumbItemRenderState {
     hasPrevious: boolean;
     /** Nœud modèle du slot `separator` d'ar-breadcrumb, cloné dans l'item (desktop). */
     separator: Node | undefined;
-    /** Incrémenté par ar-breadcrumb quand le contenu du nœud modèle change. */
-    separatorVersion: number;
 }
 
 /**
@@ -54,7 +52,7 @@ export class ArBreadcrumbItem extends LitElement {
     private _hasRendered = false;
     private _hiddenByComponent = false;
 
-    private _separatorClone: { source: Node; version: number; node: Node } | undefined = undefined;
+    private _separatorClone: { source: Node; node: Node } | undefined = undefined;
 
     protected readonly _consumer = new ContextConsumer(this, {
         context: breadcrumbContext,
@@ -77,8 +75,7 @@ export class ArBreadcrumbItem extends LitElement {
             previous.isCurrent === state.isCurrent &&
             previous.isMobile === state.isMobile &&
             previous.hasPrevious === state.hasPrevious &&
-            previous.separator === state.separator &&
-            previous.separatorVersion === state.separatorVersion
+            previous.separator === state.separator
         ) {
             return;
         }
@@ -123,12 +120,12 @@ export class ArBreadcrumbItem extends LitElement {
         const source = state.separator;
         if (!source) return '/';
         const cached = this._separatorClone;
-        if (cached && cached.source === source && cached.version === state.separatorVersion) {
+        if (cached && cached.source === source) {
             return cached.node;
         }
         const node = source.cloneNode(true);
         if (node instanceof Element) node.removeAttribute('slot');
-        this._separatorClone = { source, version: state.separatorVersion, node };
+        this._separatorClone = { source, node };
         return node;
     }
 

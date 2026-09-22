@@ -681,15 +681,6 @@ describe('ArBreadcrumb', () => {
             expect(source?.textContent).toBe('›');
         });
 
-        it('suit une mutation du contenu du séparateur', async () => {
-            el = await fixture(withSeparator);
-            const source = el.querySelector(':scope > [slot="separator"]') as HTMLElement;
-            source.textContent = '»';
-            await new Promise((resolve) => setTimeout(resolve, 0));
-            await waitForUpdate(el);
-            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('»');
-        });
-
         it('ne re-clone pas le séparateur quand on ajoute un item ordinaire', async () => {
             el = await fixture(withSeparator);
             const before = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
@@ -703,30 +694,23 @@ describe('ArBreadcrumb', () => {
             expect(after).toBe(before);
         });
 
-        it("ne re-clone pas le séparateur quand l'attribut slot d'un item ordinaire change", async () => {
+        it("retombe sur « / » si le nœud séparateur est retiré et qu'un item change en même temps", async () => {
             el = await fixture(withSeparator);
-            const before = getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild;
-            expect(before).toBeTruthy();
-            itemsOf(el)[2]!.setAttribute('slot', 'autre');
-            await new Promise((resolve) => setTimeout(resolve, 0));
-            await waitForUpdate(el);
-            expect(getPart(itemsOf(el)[1]!, 'separator')?.firstElementChild).toBe(before);
-        });
-
-        it('retombe sur « / » quand slot="separator" est retiré du nœud modèle', async () => {
-            el = await fixture(withSeparator);
-            el.querySelector(':scope > [slot="separator"]')?.setAttribute('slot', 'autre');
+            el.querySelector(':scope > [slot="separator"]')?.remove();
+            const extra = document.createElement('ar-breadcrumb-item');
+            extra.setAttribute('label', 'Extra');
+            el.appendChild(extra);
             await new Promise((resolve) => setTimeout(resolve, 0));
             await waitForUpdate(el);
             expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('/');
         });
 
-        it('retombe sur « / » quand le nœud séparateur est retiré', async () => {
+        it("ne retombe pas sur « / » si le nœud séparateur est retiré sans qu'aucun item ne change (aucun suivi des mutations isolées du séparateur — seuls les changements d'items ou de mode redéclenchent la lecture)", async () => {
             el = await fixture(withSeparator);
             el.querySelector(':scope > [slot="separator"]')?.remove();
             await new Promise((resolve) => setTimeout(resolve, 0));
             await waitForUpdate(el);
-            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('/');
+            expect(getPart(itemsOf(el)[1]!, 'separator')?.textContent?.trim()).toBe('›');
         });
 
         it("n'affiche pas le séparateur en mobile (indicateur à la place)", async () => {

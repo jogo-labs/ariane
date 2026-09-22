@@ -43,7 +43,7 @@ import '../../translations/en.js';
  * @csspart panel      - Le panel mobile flottant.
  *
  * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
- * @slot separator    - Séparateur entre les items (desktop uniquement ; en mobile, une puce le remplace). Cloné dans chaque item ; remplace le « / » par défaut. Le contenu est décoratif (`aria-hidden`) : ni `id` (dupliqué dans chaque clone), ni élément interactif. Il fixe sa propre taille (un `<svg>` a besoin de `width` et `height`). Couleur et taille de police via `ar-breadcrumb-item::part(separator)`.
+ * @slot separator    - Séparateur entre les items (desktop uniquement ; en mobile, une puce le remplace). Cloné dans chaque item ; remplace le « / » par défaut. Le contenu est décoratif (`aria-hidden`) : ni `id` (dupliqué dans chaque clone), ni élément interactif. Il fixe sa propre taille (un `<svg>` a besoin de `width` et `height`). Couleur et taille de police via `ar-breadcrumb-item::part(separator)`. Lu à chaque changement d'items ou de mode ; une mutation du même nœud sans changement d'item n'est pas répercutée.
  * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
  * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
@@ -86,9 +86,6 @@ export class ArBreadcrumb extends LitElement {
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
-    private _separatorVersion = 0;
-
-    private _separatorObserver: MutationObserver | undefined = undefined;
 
     private readonly _provider = new ContextProvider(this, {
         context: breadcrumbContext,
@@ -135,19 +132,6 @@ export class ArBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._separatorObserver ??= new MutationObserver((records) => {
-            if (!records.some((record) => this._isSeparatorMutation(record))) return;
-            this._separatorVersion += 1;
-            this._scheduleRebuild();
-        });
-        this._separatorObserver.observe(this, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true,
-            attributeFilter: ['slot'],
-            attributeOldValue: true,
-        });
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
@@ -164,7 +148,6 @@ export class ArBreadcrumb extends LitElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        this._separatorObserver?.disconnect();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
@@ -267,24 +250,6 @@ export class ArBreadcrumb extends LitElement {
             .forEach((item) => item.setRegistry(registry));
     }
 
-    /** Une mutation concerne-t-elle le slot `separator` (nœud modèle, son contenu ou son attribut slot) ? */
-    private _isSeparatorMutation(record: MutationRecord): boolean {
-        if (record.type === 'attributes') {
-            return (
-                record.target.parentElement === this &&
-                (record.oldValue === 'separator' ||
-                    (record.target as Element).getAttribute('slot') === 'separator')
-            );
-        }
-        if (record.type === 'childList' && record.target === this) {
-            return [...record.addedNodes, ...record.removedNodes].some(
-                (node) => node instanceof Element && node.getAttribute('slot') === 'separator',
-            );
-        }
-        const source = this.querySelector(':scope > [slot="separator"]');
-        return source !== null && source.contains(record.target);
-    }
-
     private _pushRenderState(): void {
         const items = this._orderedItems;
         const separator = this.querySelector(':scope > [slot="separator"]') ?? undefined;
@@ -295,7 +260,6 @@ export class ArBreadcrumb extends LitElement {
                 isMobile: this.isMobile,
                 hasPrevious: this.isMobile ? index > 1 : index > 0,
                 separator,
-                separatorVersion: this._separatorVersion,
             });
         });
     }

@@ -34,7 +34,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const link = getPart(el, 'link');
@@ -51,7 +50,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const link = getPart(el, 'link');
@@ -69,7 +67,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             const current = getPart(el, 'current');
@@ -86,7 +83,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: false,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
@@ -97,7 +93,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).not.toBeNull();
@@ -112,7 +107,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: true,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')).toBeNull();
@@ -125,7 +119,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: true,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'indicator')?.getAttribute('part')).toBe(
@@ -141,7 +134,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: true,
                 hasPrevious: false,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.shadowRoot?.querySelector('.item')).toBeNull();
@@ -156,7 +148,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: false,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.hasAttribute('hidden')).toBe(false);
@@ -170,7 +161,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
@@ -187,7 +177,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: source,
-                separatorVersion: 1,
             });
             await waitForUpdate(el);
 
@@ -199,7 +188,7 @@ describe('ArBreadcrumbItem', () => {
             expect(source.getAttribute('slot')).toBe('separator');
         });
 
-        it('re-clone quand la version du séparateur change', async () => {
+        it('ne re-clone pas un nœud séparateur déjà cloné, même si son contenu a changé', async () => {
             el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
             const source = document.createElement('span');
             source.textContent = '›';
@@ -210,14 +199,14 @@ describe('ArBreadcrumbItem', () => {
                 hasPrevious: true,
                 separator: source,
             };
-            el.setRenderState({ ...base, separatorVersion: 1 });
+            el.setRenderState(base);
             await waitForUpdate(el);
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('›');
 
             source.textContent = '»';
-            el.setRenderState({ ...base, separatorVersion: 2 });
+            el.setRenderState({ ...base });
             await waitForUpdate(el);
-            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('»');
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('›');
         });
 
         it('retombe sur « / » quand le nœud séparateur disparaît', async () => {
@@ -230,7 +219,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: source,
-                separatorVersion: 1,
             });
             await waitForUpdate(el);
             el.setRenderState({
@@ -239,7 +227,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 2,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
@@ -253,7 +240,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: true,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(getPart(el, 'connector')).toBeNull();
@@ -271,7 +257,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: false,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.getAttribute('role')).toBe('listitem');
@@ -291,7 +276,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.getAttribute('aria-current')).toBe('page');
@@ -302,7 +286,6 @@ describe('ArBreadcrumbItem', () => {
                 isMobile: false,
                 hasPrevious: true,
                 separator: undefined,
-                separatorVersion: 0,
             });
             await waitForUpdate(el);
             expect(el.hasAttribute('aria-current')).toBe(false);
@@ -492,7 +475,6 @@ describe('ArBreadcrumbItem', () => {
             isMobile: false,
             hasPrevious: true,
             separator: undefined,
-            separatorVersion: 0,
         };
 
         it("conserve un hidden posé par l'auteur lors des mises à jour", async () => {

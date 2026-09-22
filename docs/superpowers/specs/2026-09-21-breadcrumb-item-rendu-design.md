@@ -105,7 +105,6 @@ export interface BreadcrumbItemRenderState {
     isMobile: boolean;
     hasPrevious: boolean; // un item visible précède celui-ci
     separator: Node | undefined; // nœud modèle, cf. section 3
-    separatorVersion: number; // incrémenté quand le contenu du nœud modèle change
 }
 ```
 
@@ -211,11 +210,14 @@ Sans élément `slot="separator"`, chaque item affiche « / » (contenu de repli
 - **Un clone par item.** Un nœud ne peut être assigné qu'à un seul slot : `ar-breadcrumb` passe le
   nœud modèle à chaque item via `BreadcrumbItemRenderState.separator`, et chaque item en fait un
   `cloneNode(true)` dans `<span part="separator" aria-hidden="true">` de son shadow. Le light DOM
-  des items n'est jamais modifié. L'item ne re-clone que si le nœud modèle ou sa version change.
-- **Suivi des changements.** Un `MutationObserver` sur `ar-breadcrumb` (`childList`, `subtree`,
-  `characterData`, attribut `slot`) déclenche `_scheduleRebuild()` : nécessaire pour les frameworks
-  réactifs qui modifient le texte de l'intérieur du `<span>` sans le recréer. Il est connecté dans
-  `connectedCallback` et déconnecté dans `disconnectedCallback`.
+  des items n'est jamais modifié. L'item ne re-clone que si le nœud modèle lui-même change
+  (identité), jamais sur une mutation de son contenu.
+- **Pas de suivi des mutations du séparateur.** `ar-breadcrumb` relit le nœud modèle à chaque
+  reconstruction (`_pushRenderState`), mais celle-ci n'est déclenchée que par un changement d'items
+  (ajout, retrait, `label`/`href`) ou de mode (`isMobile`). Une mutation isolée du séparateur seul
+  — son contenu modifié en place, son attribut `slot` changé, ou le nœud retiré — sans qu'aucun
+  item ne change en même temps, n'est pas répercutée : le séparateur est traité comme posé une
+  fois, pas comme un contenu réactif.
 - **Accessibilité** : le conteneur est toujours `aria-hidden="true"` ; le consommateur n'a pas à le
   poser.
 - **Mobile** : le séparateur n'est rendu qu'en desktop.
@@ -236,14 +238,15 @@ composant.
   `role="listitem"` posé dès `connectedCallback` sauf s'il est déjà posé par l'auteur,
   `aria-current="page"` sur le dernier ; un `hidden` posé par l'auteur n'est jamais retiré par le
   composant ; premier item mobile sans rendu, `hidden` posé par le composant ; aucun rendu avant
-  le premier état ; « / » par défaut ; clonage du séparateur fourni ; `href` notifié au parent dès
-  qu'il passe de `undefined` à une valeur, même après le premier rendu.
+  le premier état ; « / » par défaut ; clonage du séparateur fourni, jamais re-cloné sur une
+  mutation de son contenu (seule l'identité du nœud compte) ; `href` notifié au parent dès qu'il
+  passe de `undefined` à une valeur, même après le premier rendu.
 - **`breadcrumb.test.ts`** : structure du parent (`nav`, conteneurs `role="list"`
   `list--desktop` / `list--mobile`, bouton `home`, `trigger`, panel), état de rendu poussé aux
-  items, ordre DOM, slot `separator` (clone dans chaque item, mise à jour sur mutation du contenu,
-  repli « / » si le slot est retiré, pas de re-clonage sur une mutation qui ne concerne pas le
-  séparateur), unique `part="connector"` dans le panel en mobile (aucun en desktop), lien `home`
-  qui reçoit le `href` du premier item même renseigné après coup.
+  items, ordre DOM, slot `separator` (clone dans chaque item, repli « / » si le nœud est retiré
+  _et_ qu'un item change en même temps, mais pas si le séparateur seul est retiré sans changement
+  d'item — cf. section 3), unique `part="connector"` dans le panel en mobile (aucun en desktop),
+  lien `home` qui reçoit le `href` du premier item même renseigné après coup.
 - **`breadcrumb.browser.test.ts`** : conserver ouverture / fermeture, light-dismiss, fond et
   bordure du panel sans thème, taille de cible des boutons `home` / `trigger` sans thème ;
   supprimer le test `collision hover/focus (#157)` (token `bg-focus` supprimé) et le test RTL
