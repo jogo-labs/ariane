@@ -29,4 +29,13 @@ export class InternalsStatesController implements ReactiveController {
     toggle(name: string, active: boolean): void {
         toggleState(this._internals, name, active);
     }
+
+    /**
+     * L'instance `ElementInternals` sous-jacente, pour un composant `formAssociated` qui a
+     * aussi besoin de `setFormValue()`/`setValidity()` (ex. ar-datepicker) — évite un second
+     * `attachInternals()`, impossible (une seule instance par élément, quel que soit l'appelant).
+     */
+    get internals(): ElementInternals | undefined {
+        return this._internals;
+    }
 }
