@@ -25,14 +25,9 @@ import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js
 import { pruneDanglingCustomElementExports } from './scripts/prune-dangling-custom-element-exports.js';
 
 export default {
-    // Inclure tous les fichiers TS sauf les tests, les styles et les base classes internes.
-    // src/base/** : ArianeElement extends LitElement directement — le plugin Lit de l'analyzer
-    // le détecte comme customElement (heuristique sur l'extends littéral, sans analyse
-    // d'héritage), avec un tagName undefined puisqu'aucun customElements.define() n'existe. Ce
-    // n'est pas un composant documentable, donc exclu du glob plutôt que suivi d'un correctif
-    // ad hoc — cf. #253.
+    // Inclure tous les fichiers TS sauf les tests et les styles
     globs: ['src/**/*.ts'],
-    exclude: ['src/**/*.test.ts', 'src/**/*.styles.ts', 'src/base/**'],
+    exclude: ['src/**/*.test.ts', 'src/**/*.styles.ts'],
 
     // Activer la détection automatique des patterns LitElement
     // (décorateurs @customElement, @property, @state, etc.)
