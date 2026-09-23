@@ -1,6 +1,6 @@
 ---
 name: ariane-new-component
-description: Conventions spécifiques au projet Ariane pour créer un nouveau composant — naming ar-*, structure fichiers, annotations CEM custom (@display, @parent, @ignore), test helpers maison. À utiliser quand on crée ou scaffold un nouveau composant ar-*.
+description: Conventions spécifiques au projet Ariane pour créer un nouveau composant — naming ar-*, structure fichiers, annotations CEM custom (@display, @parent, @ignore, @internal), test helpers maison. À utiliser quand on crée ou scaffold un nouveau composant ar-*.
 ---
 
 # Créer un nouveau composant Ariane
@@ -43,6 +43,8 @@ Les annotations standard (`@slot`, `@csspart`, `@cssprop`, `@event`, `@summary`)
 | `@display docs` | Page doc : API uniquement, pas de playground |
 | `@parent ar-<tag>` | Marque comme sous-composant — nav et home page le lisent via CEM `x-parent` |
 | `@ignore` | Exclut un membre des contrôles playground |
+
+`@internal` sur une classe (pas un membre) est une convention TSDoc reconnue **nativement** par `@custom-elements-manifest/analyzer` (pas un ajout maison) : sa déclaration et son export sont retirés automatiquement du manifest publié — utile pour un mini custom element purement interne, jamais utilisé seul par un consommateur (ex. exporté uniquement via `::part()`). Si son `customElements.define()` vit dans un fichier séparé (pattern `index.ts`, comme les composants publics), `pruneDanglingCustomElementExports` (`cem.config.js`) nettoie le résidu ; aucune action supplémentaire requise.
 
 ## Test helpers (boilerplate maison)
 
