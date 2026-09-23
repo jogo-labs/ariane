@@ -46,7 +46,10 @@ interface ApiCategory {
     count: number;
 }
 
-const categories: ApiCategory[] = [
+// Deux groupes distincts (#233) : API de configuration/usage (comment piloter le composant
+// dans son code) vs API de thémification (comment le styliser depuis l'extérieur) — deux
+// publics différents, deux ar-tab-group séparés plutôt qu'un seul mélangeant les deux.
+const usageCategories: ApiCategory[] = [
     component.attributes && component.attributes.length > 0
         ? { key: 'attributs', label: 'Attributs et propriétés', count: component.attributes.length }
         : null,
@@ -59,6 +62,9 @@ const categories: ApiCategory[] = [
     publicMethods.length > 0
         ? { key: 'methodes', label: 'Méthodes', count: publicMethods.length }
         : null,
+].filter((c): c is ApiCategory => c !== null);
+
+const themingCategories: ApiCategory[] = [
     component.cssParts && component.cssParts.length > 0
         ? { key: 'css-parts', label: 'CSS Parts', count: component.cssParts.length }
         : null,
@@ -70,7 +76,8 @@ const categories: ApiCategory[] = [
         : null,
 ].filter((c): c is ApiCategory => c !== null);
 
-const firstCategory = categories[0]?.key ?? 'attributs';
+const firstUsageCategory = usageCategories[0]?.key ?? 'attributs';
+const firstThemingCategory = themingCategories[0]?.key ?? 'css-parts';
 
 const slug = getSlug(component.tagName!);
 const codeImportCdn = `<script type="module" src="https://unpkg.com/@ariane-ui/core/dist/components/${slug}/index.js"></script>`;
@@ -128,207 +135,231 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
         </section>
     )}
 
-    {/* ── Référence API : une catégorie par onglet, ar-tab-group gère
-         entièrement l'ARIA/le clavier (déjà publié, packages/core). ── */}
-    {categories.length > 0 && (
-        <ar-tab-group active={firstCategory} label="Référence API" class="api-tabs">
-            {categories.map((cat) => (
-                <ar-tab panel={cat.key}>
-                    <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
-                </ar-tab>
-            ))}
+    {/* ── Utilisation : API de configuration/pilotage (#233) ── */}
+    {usageCategories.length > 0 && (
+        <section>
+            <div class="subsection-title-row">
+                <h4 id="api-usage" class="subsection-title">API — Utilisation</h4>
+                <HeadingAnchor id="api-usage" label="API — Utilisation" />
+            </div>
 
-            {component.attributes && component.attributes.length > 0 && (
-                <ar-tab-panel name="attributs">
-                    <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
-                    <div class="api-list" role="list">
-                        {component.attributes.map((attr, i) => (
-                            <div class="api-row" role="listitem">
-                                <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
-                                <div>
-                                    <span class="api-name">
-                                        {attr.name}
-                                        {reflectsByFieldName.get(attr.fieldName ?? attr.name) && (
-                                            <span class="flag">reflète</span>
-                                        )}
-                                    </span>
-                                    <code class="api-sig">{attr.type?.text ?? '—'}</code>
-                                    {attr.default !== undefined && (
-                                        <code class="api-default">défaut&nbsp;: {attr.default}</code>
-                                    )}
-                                </div>
-                                <p class="api-desc">{attr.description ?? ''}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ar-tab-panel>
-            )}
+            <ar-tab-group active={firstUsageCategory} label="API d'utilisation" class="api-tabs">
+                {usageCategories.map((cat) => (
+                    <ar-tab panel={cat.key}>
+                        <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
+                    </ar-tab>
+                ))}
 
-            {component.slots && component.slots.length > 0 && (
-                <ar-tab-panel name="slots">
-                    <h4 id="api-slots" class="sr-only">Slots</h4>
-                    <div class="api-list" role="list">
-                        {component.slots.map((slot, i) => (
-                            <div class="api-row" role="listitem">
-                                <span class="sr-only">{i + 1} sur {component.slots!.length}</span>
-                                <span class="api-name">{slot.name || '(default)'}</span>
-                                <p class="api-desc">{slot.description ?? ''}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ar-tab-panel>
-            )}
-
-            {component.events && component.events.length > 0 && (
-                <ar-tab-panel name="evenements">
-                    <h4 id="api-evenements" class="sr-only">Événements</h4>
-                    <div class="api-list" role="list">
-                        {component.events.map((event, i) => (
-                            <div class="api-row" role="listitem">
-                                <span class="sr-only">{i + 1} sur {component.events!.length}</span>
-                                <span class="api-name">
-                                    {event.name}
-                                    {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
-                                </span>
-                                <p class="api-desc">{stripCancelableMarker(event.description)}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ar-tab-panel>
-            )}
-
-            {publicMethods.length > 0 && (
-                <ar-tab-panel name="methodes">
-                    <h4 id="api-methodes" class="sr-only">Méthodes</h4>
-                    <div class="api-list" role="list">
-                        {publicMethods.map((m, i) => {
-                            const params = (m.parameters ?? [])
-                                .map((p) => {
-                                    let s = p.name;
-                                    if (p.type?.text) s += `: ${p.type.text}`;
-                                    if (p.default !== undefined) s += ` = ${p.default}`;
-                                    return s;
-                                })
-                                .join(', ');
-                            const returnType = m.return?.type?.text ?? 'void';
-                            return (
+                {component.attributes && component.attributes.length > 0 && (
+                    <ar-tab-panel name="attributs">
+                        <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
+                        <div class="api-list" role="list">
+                            {component.attributes.map((attr, i) => (
                                 <div class="api-row" role="listitem">
-                                    <span class="sr-only">{i + 1} sur {publicMethods.length}</span>
+                                    <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
                                     <div>
-                                        <span class="api-name">{m.name}()</span>
-                                        {params && <code class="api-sig">{params}</code>}
-                                        <code class="api-default">retour&nbsp;: {returnType}</code>
+                                        <span class="api-name">
+                                            {attr.name}
+                                            {reflectsByFieldName.get(attr.fieldName ?? attr.name) && (
+                                                <span class="flag">reflète</span>
+                                            )}
+                                        </span>
+                                        <code class="api-sig">{attr.type?.text ?? '—'}</code>
+                                        {attr.default !== undefined && (
+                                            <code class="api-default">défaut&nbsp;: {attr.default}</code>
+                                        )}
                                     </div>
-                                    <p class="api-desc">{m.description ?? ''}</p>
+                                    <p class="api-desc">{attr.description ?? ''}</p>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </ar-tab-panel>
-            )}
+                            ))}
+                        </div>
+                    </ar-tab-panel>
+                )}
 
-            {component.cssParts && component.cssParts.length > 0 && (
-                <ar-tab-panel name="css-parts">
-                    <h4 id="api-css-parts" class="sr-only">CSS Parts</h4>
-                    <p class="hint">
-                        Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
-                        {hasTransverseParts && (
-                            <>
-                                <br />Certaines parts indiquent un rôle transverse, partagé avec
-                                d'autres composants — voir <a href="/theming/personnalisation-avancee#semantic-parts">Personnalisation avancée</a>.
-                            </>
-                        )}
-                        {hasStateParts && (
-                            <>
-                                <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir <a href="/theming/personnalisation-avancee#state-parts">Personnalisation avancée</a>.
-                            </>
-                        )}
-                    </p>
-                    <div class="api-list" role="list">
-                        {component.cssParts.map((part, i) => (
-                            <div class="api-row" role="listitem">
-                                <span class="sr-only">{i + 1} sur {component.cssParts!.length}</span>
-                                <span class="api-name">{part.name}</span>
-                                <p class="api-desc">{part.description ?? ''}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ar-tab-panel>
-            )}
+                {component.slots && component.slots.length > 0 && (
+                    <ar-tab-panel name="slots">
+                        <h4 id="api-slots" class="sr-only">Slots</h4>
+                        <div class="api-list" role="list">
+                            {component.slots.map((slot, i) => (
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {component.slots!.length}</span>
+                                    <span class="api-name">{slot.name || '(default)'}</span>
+                                    <p class="api-desc">{slot.description ?? ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ar-tab-panel>
+                )}
 
-            {component.cssStates && component.cssStates.length > 0 && (
-                <ar-tab-panel name="css-states">
-                    <h4 id="api-css-states" class="sr-only">CSS Custom States</h4>
-                    <p class="hint">
-                        Utilisez <code>:state(name)</code> sur le tag pour styler ce composant depuis
-                        l'extérieur selon son état — cumulatif aux attributs/propriétés reflétés
-                        existants, jamais un remplacement. Composable avec <code>::part()</code> pour
-                        cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>).
-                    </p>
-                    <div class="api-list" role="list">
-                        {component.cssStates.map((state, i) => (
-                            <div class="api-row" role="listitem">
-                                <span class="sr-only">{i + 1} sur {component.cssStates!.length}</span>
-                                <span class="api-name">:state({state.name})</span>
-                                <p class="api-desc">{state.description ?? ''}</p>
-                            </div>
-                        ))}
-                    </div>
-                </ar-tab-panel>
-            )}
+                {component.events && component.events.length > 0 && (
+                    <ar-tab-panel name="evenements">
+                        <h4 id="api-evenements" class="sr-only">Événements</h4>
+                        <div class="api-list" role="list">
+                            {component.events.map((event, i) => (
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {component.events!.length}</span>
+                                    <span class="api-name">
+                                        {event.name}
+                                        {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
+                                    </span>
+                                    <p class="api-desc">{stripCancelableMarker(event.description)}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ar-tab-panel>
+                )}
 
-            {(ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0) && (
-                <ar-tab-panel name="css-props">
-                    <h4 id="api-css-props" class="sr-only">CSS Custom Properties</h4>
-                    {panelProps.length > 0 && (
-                        <>
-                            <p>
-                                Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br />
-                                Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
-                            </p>
-                            <div class="token-example">
-                                <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
-                            </div>
-                            <div class="api-list panel-tokens-list" role="list">
-                                {panelProps.map((prop, i) => (
+                {publicMethods.length > 0 && (
+                    <ar-tab-panel name="methodes">
+                        <h4 id="api-methodes" class="sr-only">Méthodes</h4>
+                        <div class="api-list" role="list">
+                            {publicMethods.map((m, i) => {
+                                const params = (m.parameters ?? [])
+                                    .map((p) => {
+                                        let s = p.name;
+                                        if (p.type?.text) s += `: ${p.type.text}`;
+                                        if (p.default !== undefined) s += ` = ${p.default}`;
+                                        return s;
+                                    })
+                                    .join(', ');
+                                const returnType = m.return?.type?.text ?? 'void';
+                                return (
                                     <div class="api-row" role="listitem">
-                                        <span class="sr-only">{i + 1} sur {panelProps.length}</span>
+                                        <span class="sr-only">{i + 1} sur {publicMethods.length}</span>
+                                        <div>
+                                            <span class="api-name">{m.name}()</span>
+                                            {params && <code class="api-sig">{params}</code>}
+                                            <code class="api-default">retour&nbsp;: {returnType}</code>
+                                        </div>
+                                        <p class="api-desc">{m.description ?? ''}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </ar-tab-panel>
+                )}
+            </ar-tab-group>
+        </section>
+    )}
+
+    {/* ── Thémification : API de style depuis l'extérieur (#233) ── */}
+    {themingCategories.length > 0 && (
+        <section>
+            <div class="subsection-title-row">
+                <h4 id="api-theming" class="subsection-title">API — Thémification</h4>
+                <HeadingAnchor id="api-theming" label="API — Thémification" />
+            </div>
+
+            <ar-tab-group active={firstThemingCategory} label="API de thémification" class="api-tabs">
+                {themingCategories.map((cat) => (
+                    <ar-tab panel={cat.key}>
+                        <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
+                    </ar-tab>
+                ))}
+
+                {component.cssParts && component.cssParts.length > 0 && (
+                    <ar-tab-panel name="css-parts">
+                        <h4 id="api-css-parts" class="sr-only">CSS Parts</h4>
+                        <p class="hint">
+                            Utilisez <code>::part(name)</code> pour styler ces éléments depuis l'extérieur.
+                            {hasTransverseParts && (
+                                <>
+                                    <br />Certaines parts indiquent un rôle transverse, partagé avec
+                                    d'autres composants — voir <a href="/theming/personnalisation-avancee#semantic-parts">Personnalisation avancée</a>.
+                                </>
+                            )}
+                            {hasStateParts && (
+                                <>
+                                    <br />Certaines parts portent un modificateur d'état (<code>--</code>) — voir <a href="/theming/personnalisation-avancee#state-parts">Personnalisation avancée</a>.
+                                </>
+                            )}
+                        </p>
+                        <div class="api-list" role="list">
+                            {component.cssParts.map((part, i) => (
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {component.cssParts!.length}</span>
+                                    <span class="api-name">{part.name}</span>
+                                    <p class="api-desc">{part.description ?? ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ar-tab-panel>
+                )}
+
+                {component.cssStates && component.cssStates.length > 0 && (
+                    <ar-tab-panel name="css-states">
+                        <h4 id="api-css-states" class="sr-only">CSS Custom States</h4>
+                        <p class="hint">
+                            Utilisez <code>:state(name)</code> sur le tag pour styler ce composant depuis
+                            l'extérieur selon son état — cumulatif aux attributs/propriétés reflétés
+                            existants, jamais un remplacement. Composable avec <code>::part()</code> pour
+                            cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>).
+                        </p>
+                        <div class="api-list" role="list">
+                            {component.cssStates.map((state, i) => (
+                                <div class="api-row" role="listitem">
+                                    <span class="sr-only">{i + 1} sur {component.cssStates!.length}</span>
+                                    <span class="api-name">:state({state.name})</span>
+                                    <p class="api-desc">{state.description ?? ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ar-tab-panel>
+                )}
+
+                {(ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0) && (
+                    <ar-tab-panel name="css-props">
+                        <h4 id="api-css-props" class="sr-only">CSS Custom Properties</h4>
+                        {panelProps.length > 0 && (
+                            <>
+                                <p>
+                                    Ce composant utilise un panel flottant, partagé avec d'autres composants, qui expose des custom properties.<br />
+                                    Les thèmes peuvent redéfinir ces tokens globalement via <code>:root</code>, ou par composant comme dans cet exemple :
+                                </p>
+                                <div class="token-example">
+                                    <pre><code class="language-css">{`${component.tagName} {\n    --ar-panel-radius: 1rem;\n}`}</code></pre>
+                                </div>
+                                <div class="api-list panel-tokens-list" role="list">
+                                    {panelProps.map((prop, i) => (
+                                        <div class="api-row" role="listitem">
+                                            <span class="sr-only">{i + 1} sur {panelProps.length}</span>
+                                            <span class="api-name">{prop.name}</span>
+                                            <p class="api-desc">{prop.description ?? ''}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        {(panelProps.length > 0 && ownProps.length > 0) && (
+                            <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
+                        )}
+                        {ownProps.length > 0 && (
+                            <div class="api-list" role="list">
+                                {ownProps.map((prop, i) => (
+                                    <div class="api-row" role="listitem">
+                                        <span class="sr-only">{i + 1} sur {ownProps.length}</span>
                                         <span class="api-name">{prop.name}</span>
                                         <p class="api-desc">{prop.description ?? ''}</p>
                                     </div>
                                 ))}
                             </div>
-                        </>
-                    )}
-                    {(panelProps.length > 0 && ownProps.length > 0) && (
-                        <p class="own-props-intro">Il expose également des custom properties propres, personnalisables directement via <code>:root</code>.</p>
-                    )}
-                    {ownProps.length > 0 && (
-                        <div class="api-list" role="list">
-                            {ownProps.map((prop, i) => (
-                                <div class="api-row" role="listitem">
-                                    <span class="sr-only">{i + 1} sur {ownProps.length}</span>
-                                    <span class="api-name">{prop.name}</span>
-                                    <p class="api-desc">{prop.description ?? ''}</p>
+                        )}
+                        {relatedTokens.length > 0 && (
+                            <ar-alert class="doc-callout-alert" variant="info" without-notification>
+                                <div class="doc-callout-alert-content">
+                                    {relatedTokens.map((rt) => (
+                                        <p>
+                                            {rt.description}{' '}<br />
+                                            <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
+                                        </p>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                    {relatedTokens.length > 0 && (
-                        <ar-alert class="doc-callout-alert" variant="info" without-notification>
-                            <div class="doc-callout-alert-content">
-                                {relatedTokens.map((rt) => (
-                                    <p>
-                                        {rt.description}{' '}<br />
-                                        <a href={`/components/${getSlug(rt.component)}#api-css-props`}>Voir les tokens de <code>{rt.component}</code></a>.
-                                    </p>
-                                ))}
-                            </div>
-                        </ar-alert>
-                    )}
-                </ar-tab-panel>
-            )}
-        </ar-tab-group>
+                            </ar-alert>
+                        )}
+                    </ar-tab-panel>
+                )}
+            </ar-tab-group>
+        </section>
     )}
 </div>
 

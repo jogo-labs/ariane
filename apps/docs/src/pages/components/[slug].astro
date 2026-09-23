@@ -78,40 +78,35 @@ const controls = buildControls(component.members ?? []);
 
 // ─── Sous-sections de la Référence API ─────────────────────────────────────────
 //
-// Chaque entrée reflète exactement la condition d'affichage ET l'ordre des onglets
-// de ComponentApi.astro (categories) — une section absente (ex. pas de slot) ne
-// doit pas apparaître dans la TOC, et l'ordre doit correspondre à l'ordre réel des
-// onglets pour que la TOC serve de sommaire fidèle.
-
+// Deux groupes distincts (#233) : Utilisation (API de configuration/pilotage) et
+// Thémification (API de style depuis l'extérieur) — chacun un ar-tab-group séparé dans
+// ComponentApi.astro. Les sous-catégories (Attributs, Slots, CSS Parts…) ne sont pas
+// listées individuellement dans la TOC, même logique que Import (dont les onglets
+// CDN/npm ne le sont pas non plus) — leurs ancres restent valides pour les liens
+// externes/relatedTokens, juste absentes de « Sur cette page ».
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
+
+const hasUsageApi =
+    (component.attributes && component.attributes.length > 0) ||
+    (component.slots && component.slots.length > 0) ||
+    (component.events && component.events.length > 0) ||
+    getPublicMethods(component).length > 0;
+
+const hasThemingApi =
+    (component.cssParts && component.cssParts.length > 0) ||
+    (component.cssStates && component.cssStates.length > 0) ||
+    ownProps.length > 0 ||
+    panelProps.length > 0 ||
+    relatedTokens.length > 0;
 
 const apiTocEntries = [
     { id: 'api-import', label: 'Import', level: 2 as const },
     component['x-localized']
         ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
         : null,
-    component.attributes && component.attributes.length > 0
-        ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
-        : null,
-    component.slots && component.slots.length > 0
-        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
-        : null,
-    component.events && component.events.length > 0
-        ? { id: 'api-evenements', label: 'Événements', level: 2 as const }
-        : null,
-    getPublicMethods(component).length > 0
-        ? { id: 'api-methodes', label: 'Méthodes', level: 2 as const }
-        : null,
-    component.cssParts && component.cssParts.length > 0
-        ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
-        : null,
-    component.cssStates && component.cssStates.length > 0
-        ? { id: 'api-css-states', label: 'CSS Custom States', level: 2 as const }
-        : null,
-    (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
-        ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
-        : null,
+    hasUsageApi ? { id: 'api-usage', label: 'API — Utilisation', level: 2 as const } : null,
+    hasThemingApi ? { id: 'api-theming', label: 'API — Thémification', level: 2 as const } : null,
 ].filter((entry) => entry !== null);
 
 // ─── TOC ──────────────────────────────────────────────────────────────────────
