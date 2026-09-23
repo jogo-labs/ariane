@@ -9,9 +9,11 @@ class FocusAfterUpdateFixture extends LitElement {
     override render() {
         return html`
             <button type="button" id="always">toujours là</button>
-            ${this.showTarget
-                ? html`<button type="button" id="target" tabindex="-1">cible</button>`
-                : ''}
+            ${
+                this.showTarget
+                    ? html`<button type="button" id="target" tabindex="-1">cible</button>`
+                    : ''
+            }
         `;
     }
 }

@@ -108,8 +108,7 @@ export function requirePart(el: Element, part: string): Element {
  */
 export function mockPopoverPanel(el: Element, part = 'panel'): void {
     const target = getPart(el, part) as
-        | (HTMLElement & { showPopover?: () => void; hidePopover?: () => void })
-        | null;
+        (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null;
     if (!target) return;
     target.showPopover = vi.fn();
     target.hidePopover = vi.fn();

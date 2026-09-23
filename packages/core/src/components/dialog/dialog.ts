@@ -1,11 +1,4 @@
-import {
-    LitElement,
-    nothing,
-    type TemplateResult,
-    html,
-    type CSSResultGroup,
-    type PropertyValues,
-} from 'lit';
+import { nothing, type TemplateResult, html, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -16,7 +9,7 @@ import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -93,7 +86,7 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
-export class ArDialog extends LitElement {
+export class ArDialog extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     // ── Public properties ──────────────────────────────────────────────────────
@@ -167,8 +160,6 @@ export class ArDialog extends LitElement {
     @query('dialog', true)
     dialog!: HTMLDialogElement;
 
-    private _internals: ElementInternals | undefined;
-
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
 
@@ -234,11 +225,6 @@ export class ArDialog extends LitElement {
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
-    }
-
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         this._removeOpenListeners();
@@ -267,7 +253,7 @@ export class ArDialog extends LitElement {
             } else if (!this.open && this.dialog?.open) {
                 this._scheduleClose();
             }
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
     }
 

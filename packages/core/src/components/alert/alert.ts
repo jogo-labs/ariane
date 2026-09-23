@@ -1,10 +1,10 @@
-import { LitElement, type TemplateResult, html, nothing } from 'lit';
+import { type TemplateResult, html, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -49,15 +49,13 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
-export class ArAlert extends LitElement {
+export class ArAlert extends ArianeElement {
     static override styles = [styles];
 
     // @ignore
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
-
-    private _internals: ElementInternals | undefined;
 
     private readonly localize = new LocalizeController(this);
 
@@ -113,11 +111,6 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
-    }
-
     override firstUpdated(): void {
         // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
         this._hadAuthoredRole = this.hasAttribute('role');
@@ -125,7 +118,7 @@ export class ArAlert extends LitElement {
 
     override updated(changed: Map<string, unknown>) {
         if (changed.has('hiding')) {
-            toggleState(this._internals, 'hiding', this.hiding);
+            this.toggleState('hiding', this.hiding);
         }
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             if (this._hadAuthoredRole === true) {

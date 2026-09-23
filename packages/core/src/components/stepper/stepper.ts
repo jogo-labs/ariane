@@ -1,10 +1,4 @@
-import {
-    LitElement,
-    html,
-    type TemplateResult,
-    type CSSResultGroup,
-    type PropertyValues,
-} from 'lit';
+import { html, type TemplateResult, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
@@ -21,8 +15,8 @@ import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { renderDesktop, renderMobile, pushItemRenderState } from './stepper.renderer.js';
 import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -86,7 +80,7 @@ export interface ArStepperStepChangeDetail {
  *   `currentPath` a réellement changé (réassignation externe en réponse à
  *   `ar-stepper-step-change`, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
  */
-export class ArStepper extends LitElement {
+export class ArStepper extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
 
     private readonly localize = new LocalizeController(this);
@@ -162,7 +156,6 @@ export class ArStepper extends LitElement {
     // avant l'appel à updated()). Même pattern que ArPagination._hasRenderedOnce.
     private _hasRenderedOnce = false;
     private _pendingFocusPath: string | undefined;
-    private _internals: ElementInternals | undefined;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -218,8 +211,6 @@ export class ArStepper extends LitElement {
 
     override connectedCallback() {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
-
         if (!this._originalParent && this.parentNode) {
             this._originalParent = this.parentNode;
             this._originalNextSibling = this.nextSibling;
@@ -250,7 +241,7 @@ export class ArStepper extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
         if (!this._isDesktop && !this._dropdownAttached) {
             void this.updateComplete.then(() => {

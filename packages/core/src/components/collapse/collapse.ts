@@ -1,10 +1,10 @@
-import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
+import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './collapse.styles.js';
 
 /**
@@ -34,7 +34,7 @@ import styles from './collapse.styles.js';
  * @event {CustomEvent} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
  * @event {CustomEvent} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
  */
-export class ArCollapse extends LitElement {
+export class ArCollapse extends ArianeElement {
     static override styles = [styles];
     private static _idCounter = 0;
 
@@ -70,8 +70,6 @@ export class ArCollapse extends LitElement {
 
     @query('[part="collapsible"]') private _panel!: HTMLElement;
 
-    private _internals: ElementInternals | undefined;
-
     @state() private _animating = false;
     private _initialized = false;
     private _externalTrigger: HTMLElement | null = null;
@@ -91,7 +89,6 @@ export class ArCollapse extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         if (!this.id) {
             this.id = `ar-collapse-${++ArCollapse._idCounter}`;
         }
@@ -117,13 +114,13 @@ export class ArCollapse extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
         if (changed.has('disabled')) {
-            toggleState(this._internals, 'disabled', this.disabled);
+            this.toggleState('disabled', this.disabled);
         }
         if ((changed as Map<PropertyKey, unknown>).has('_animating')) {
-            toggleState(this._internals, 'animating', this._animating);
+            this.toggleState('animating', this._animating);
         }
         if (!this._initialized) return;
         if (changed.has('for')) {

@@ -1,15 +1,15 @@
-import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeFormElement } from '../../base/ariane-form-element.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -107,11 +107,10 @@ import '../../translations/en.js';
  * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture. @cancelable
  * @event {CustomEvent} ar-datepicker-hidden         - Après fermeture.
  */
-export class ArDatepicker extends LitElement {
+export class ArDatepicker extends ArianeFormElement {
     static override styles = [panelStyles, styles];
-    static formAssociated = true;
+    // formAssociated = true est hérité de ArianeFormElement — pas besoin de le redéclarer ici.
 
-    private _internals: ElementInternals | undefined;
     private readonly _uid = Math.random().toString(36).slice(2, 9);
 
     /**
@@ -196,15 +195,6 @@ export class ArDatepicker extends LitElement {
         this._formDisabled = disabled;
     }
 
-    override connectedCallback(): void {
-        super.connectedCallback();
-        // attachInternals() doit être appelé avant le premier render mais après
-        // la définition de l'élément. On initialise ici pour la compatibilité
-        // avec les environnements de test qui ne supportent pas l'initialisation
-        // au niveau du champ de classe.
-        this._internals ??= this.attachInternals?.();
-    }
-
     override firstUpdated(): void {
         this._anchored.attach(this._trigger, this._panel, this._inputWrapper);
         this._syncFormValue();
@@ -219,7 +209,7 @@ export class ArDatepicker extends LitElement {
 
         const hasError = this._hasSlot.test('error');
         this.toggleAttribute('has-error', hasError);
-        toggleState(this._internals, 'has-error', hasError);
+        this.toggleState('has-error', hasError);
 
         if (changed.has('open')) {
             if (this._skipNextOpenChange) {
@@ -262,13 +252,13 @@ export class ArDatepicker extends LitElement {
             changed.has('disabled') ||
             (changed as Map<PropertyKey, unknown>).has('_formDisabled')
         ) {
-            toggleState(this._internals, 'disabled', this._effectiveDisabled);
+            this.toggleState('disabled', this._effectiveDisabled);
         }
         if (changed.has('readonly')) {
-            toggleState(this._internals, 'readonly', this.readonly);
+            this.toggleState('readonly', this.readonly);
         }
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
     }
 
@@ -910,20 +900,20 @@ export class ArDatepicker extends LitElement {
     }
     private _syncFormValue(): void {
         if (this._effectiveDisabled) {
-            this._internals?.setFormValue(null);
-            this._internals?.setValidity({});
+            this.internals?.setFormValue(null);
+            this.internals?.setValidity({});
             return;
         }
-        this._internals?.setFormValue(this.value || null, this.value || null);
+        this.internals?.setFormValue(this.value || null, this.value || null);
         if (this.required && !this.value) {
             const anchor = this._input ?? undefined;
-            this._internals?.setValidity(
+            this.internals?.setValidity(
                 { valueMissing: true },
                 'Veuillez sélectionner une date.',
                 anchor,
             );
         } else {
-            this._internals?.setValidity({});
+            this.internals?.setValidity({});
         }
     }
 }

@@ -23,7 +23,7 @@ describe('toggleState', () => {
         expect(() => toggleState(undefined, 'open', true)).not.toThrow();
     });
 
-    it("ne lève pas d'erreur si internals.states est undefined (jsdom)", () => {
+    it("ne lève pas d'erreur si internals.states est undefined (happy-dom)", () => {
         const internals = { states: undefined } as unknown as ElementInternals;
         expect(() => toggleState(internals, 'open', true)).not.toThrow();
     });

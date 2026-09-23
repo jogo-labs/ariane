@@ -1,4 +1,5 @@
-import { LitElement, html, nothing, type TemplateResult, type CSSResultGroup } from 'lit';
+import { html, nothing, type TemplateResult, type CSSResultGroup } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property, state } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 
@@ -49,7 +50,7 @@ function withIndicatorStatePart(state: IndicatorState): string {
  * @cssprop --ar-stepper-item-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-item-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
  */
-export class ArStepperItem extends LitElement {
+export class ArStepperItem extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, styles];
 
     private readonly _uid = Math.random().toString(36).slice(2, 9);

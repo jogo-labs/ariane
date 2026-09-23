@@ -1,4 +1,5 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit';
+import { type TemplateResult, html, type CSSResultGroup } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { warn } from '../../utils/warn.js';
@@ -30,7 +31,7 @@ export class ArProgressbarConfig {
  * @cssprop --ar-progressbar-fill-color - Couleur de la progression. Repli `ButtonText` si aucun thème n'est chargé (WCAG 1.4.11).
  * @cssprop --ar-progressbar-max-width - Largeur maximale du composant. Repli `500px` si aucun thème n'est chargé — sans plafond, le pourcentage peut s'éloigner visuellement de son label sur un conteneur très large.
  */
-export class ArProgressbar extends LitElement {
+export class ArProgressbar extends ArianeElement {
     static override styles: CSSResultGroup = [styles];
 
     /**

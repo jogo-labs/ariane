@@ -1,4 +1,5 @@
-import { LitElement, html, nothing, type CSSResultGroup, type TemplateResult } from 'lit';
+import { html, nothing, type CSSResultGroup, type TemplateResult } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property, state } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 
@@ -36,7 +37,7 @@ export interface BreadcrumbItemRenderState {
  * @slot indicator - Remplace le contenu par défaut (aplat de couleur posé par le thème) de la
  *   puce mobile par une icône. Purement décoratif (`aria-hidden`).
  */
-export class ArBreadcrumbItem extends LitElement {
+export class ArBreadcrumbItem extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, styles];
 
     @property({ type: String }) label = '';
