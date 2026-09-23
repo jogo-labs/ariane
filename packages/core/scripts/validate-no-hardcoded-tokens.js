@@ -56,11 +56,15 @@ const STRUCTURAL_LITERAL_KEYWORDS = new Set(['0px']);
 // qui restent une opinion du thème dans `default.css`.
 const FUNCTIONAL_DEFAULT_COMMENT_RE = /^\s*\/\* functional-default: .+ \*\/\s*$/;
 
-// Un fallback qui est lui-même une référence nue à un autre token --ar-* (sans son
-// propre fallback) n'est pas une valeur de design codée en dur — c'est une cascade
-// token-à-token déjà légitime dans le modèle actuel (ex. dialog.styles.ts:174-175,
-// `var(--ar-dialog-spacing-block, var(--ar-dialog-spacing))`).
-const BARE_TOKEN_FALLBACK_RE = /^var\(\s*--ar[\w-]+\s*\)$/;
+// Un fallback qui est lui-même une référence nue à une autre custom property (sans
+// son propre fallback) n'est pas une valeur de design codée en dur — c'est une
+// cascade variable-à-variable déjà légitime dans le modèle actuel (ex.
+// dialog.styles.ts:174-175, `var(--ar-dialog-spacing-block, var(--ar-dialog-spacing))`).
+// Pas restreint au préfixe --ar- : une custom property interne non préfixée (ex.
+// --input-computed-width, pont JS → CSS d'une valeur calculée, volontairement hors
+// du vocabulaire --ar-* public pour ne pas laisser croire à un token documenté) est
+// tout autant une cascade, pas un littéral.
+const BARE_TOKEN_FALLBACK_RE = /^var\(\s*--[\w-]+\s*\)$/;
 
 // Commentaire de justification requis pour un fallback littéral hors liste système,
 // au format exact (pas une simple tolérance de tout commentaire), sur la ligne
