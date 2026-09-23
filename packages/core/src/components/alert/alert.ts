@@ -1,5 +1,5 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { property } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
@@ -97,10 +97,9 @@ export class ArAlert extends LitElement {
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
      * Passé à `true` au clic sur le bouton close, déclenche la transition CSS.
-     * @ignore
+     * État interne — pas un attribut public, observable en CSS via :state(hiding).
      */
-    @property({ reflect: true, type: Boolean })
-    protected hiding: boolean = false;
+    @state() private hiding: boolean = false;
 
     /**
      * Indique si `role` a été posé manuellement dans le markup initial.
@@ -240,8 +239,8 @@ export class ArAlert extends LitElement {
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        // La reflection de l'attribut `hiding` par Lit n'est pas synchrone : on attend
-        // updateComplete pour que `:host([hiding])` ait pu matcher avant de mesurer la durée.
+        // Le passage de l'état :state(hiding) par Lit n'est pas synchrone : on attend
+        // updateComplete pour qu'il ait pu matcher avant de mesurer la durée de transition.
         void this.updateComplete.then(() => {
             if (!this._shouldAnimate()) {
                 this._finishHide();

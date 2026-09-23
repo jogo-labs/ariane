@@ -1,5 +1,5 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
-import { property, query } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
@@ -23,8 +23,9 @@ import styles from './collapse.styles.js';
  * @cssprop --ar-collapse-duration - Durée de la transition height.
  * @cssprop --ar-collapse-easing - Easing de la transition height.
  *
- * @cssState open     - Le panel est ouvert.
- * @cssState disabled - Le composant est désactivé.
+ * @cssState open      - Le panel est ouvert.
+ * @cssState disabled  - Le composant est désactivé.
+ * @cssState animating - Le panel est en cours d'ouverture ou de fermeture (animation height).
  *
  * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
@@ -71,7 +72,7 @@ export class ArCollapse extends LitElement {
 
     private _internals: ElementInternals | undefined;
 
-    private _animating = false;
+    @state() private _animating = false;
     private _initialized = false;
     private _externalTrigger: HTMLElement | null = null;
     private _internalTrigger: HTMLElement | null = null;
@@ -120,6 +121,9 @@ export class ArCollapse extends LitElement {
         }
         if (changed.has('disabled')) {
             toggleState(this._internals, 'disabled', this.disabled);
+        }
+        if ((changed as Map<PropertyKey, unknown>).has('_animating')) {
+            toggleState(this._internals, 'animating', this._animating);
         }
         if (!this._initialized) return;
         if (changed.has('for')) {

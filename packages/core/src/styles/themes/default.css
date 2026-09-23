@@ -1325,7 +1325,7 @@
     }
 
     ar-pagination {
-        &:not(:state(compact))::part(list) {
+        &:not([compact])::part(list) {
             column-gap: 0.25rem;
         }
 
@@ -1348,12 +1348,12 @@
             border-radius: var(--ar-border-radius-md);
         }
 
-        &:state(compact)::part(prev) {
+        &[compact]::part(prev) {
             border-radius: var(--ar-border-radius-md) 0 0 var(--ar-border-radius-md);
             border-right: 1px solid var(--ar-color-neutral-80);
         }
 
-        &:state(compact)::part(next) {
+        &[compact]::part(next) {
             border-radius: 0 var(--ar-border-radius-md) var(--ar-border-radius-md) 0;
         }
 

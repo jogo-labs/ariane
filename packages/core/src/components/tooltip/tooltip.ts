@@ -2,7 +2,6 @@ import { LitElement, html, nothing, type TemplateResult, type PropertyValues } f
 import { property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
 import styles from './tooltip.styles.js';
 
 export type ArTooltipPlacement =
@@ -43,8 +42,6 @@ export type ArTooltipPlacement =
  * @cssprop --ar-tooltip-show-duration - Durée de l'animation d'apparition de la bulle (cascade vers --ar-panel-show-duration).
  * @cssprop --ar-tooltip-distance - Espacement entre le trigger et la bulle.
  * @cssprop --ar-tooltip-offset - Décalage latéral de la bulle.
- *
- * @cssState disabled - Le tooltip est désactivé.
  *
  * Pas d'events show/hide annulables : un tooltip n'a pas de raison métier de bloquer
  * son affichage (contrairement à un dialog ou un menu), contrairement à
@@ -91,8 +88,6 @@ export class ArTooltip extends LitElement {
 
     @query('[part="tooltip"]') private _bubble!: HTMLElement;
 
-    private _internals: ElementInternals | undefined;
-
     private readonly _tooltip = new TooltipController(this, {
         placement: 'top',
         cssVarPrefix: 'tooltip',
@@ -100,11 +95,6 @@ export class ArTooltip extends LitElement {
     private _trigger: HTMLElement | null = null;
     private _showTimer = 0;
     private _hideTimer = 0;
-
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
-    }
 
     override firstUpdated(): void {
         this._attachTrigger();
@@ -118,9 +108,6 @@ export class ArTooltip extends LitElement {
             this._attachTrigger();
         }
         if (changed.has('placement')) this._tooltip.setPlacement(this.placement);
-        if (changed.has('disabled')) {
-            toggleState(this._internals, 'disabled', this.disabled);
-        }
         if (changed.has('disabled') && this.disabled) {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);

@@ -240,5 +240,22 @@ describe('ar-collapse — browser', () => {
             await el.updateComplete;
             expect(el.matches(':state(disabled)')).to.equal(true);
         });
+
+        it("expose :state(animating) pendant l'animation d'ouverture, retombe à la fin", async () => {
+            el = await fixture(html`
+                <ar-collapse>
+                    <button slot="trigger">T</button>
+                    <p>Contenu</p>
+                </ar-collapse>
+            `);
+            expect(el.matches(':state(animating)')).to.equal(false);
+
+            el.show();
+            await aTimeout(30); // mi-animation (transition 100ms injectée en tête de fichier)
+            expect(el.matches(':state(animating)')).to.equal(true);
+
+            await aTimeout(ANIM_MS);
+            expect(el.matches(':state(animating)')).to.equal(false);
+        });
     });
 });

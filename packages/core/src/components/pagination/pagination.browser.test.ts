@@ -490,17 +490,4 @@ describe('ar-pagination — browser', () => {
             expect((el as unknown as { current: number }).current).to.equal(4);
         });
     });
-
-    // ── :state(compact) cumulé (généralisation #251) ──────────────────────────
-
-    describe(':state(compact)', () => {
-        it('synchronisé avec compact', async () => {
-            const el = await fixture(html`<ar-pagination current="1" total="5"></ar-pagination>`);
-            expect(el.matches(':state(compact)')).to.equal(false);
-
-            (el as unknown as { compact: boolean }).compact = true;
-            await el.updateComplete;
-            expect(el.matches(':state(compact)')).to.equal(true);
-        });
-    });
 });

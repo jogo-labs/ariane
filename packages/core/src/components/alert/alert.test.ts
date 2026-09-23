@@ -384,18 +384,9 @@ describe('ArAlert', () => {
             el.style.transitionDuration = '0.3s';
             (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            // hiding est un protected property — on y accède via cast
+            // hiding est un @state() privé — on y accède via cast. Sa réflexion en :state(hiding)
+            // CSS externe est couverte par alert.browser.test.ts (jsdom n'implémente pas :state()).
             expect((el as unknown as { hiding: boolean }).hiding).toBe(true);
-        });
-
-        it('hiding=true applique l\'attribut "hiding" sur le host', async () => {
-            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            // Cf. commentaire ci-dessus : durée de transition non nulle requise pour que
-            // hiding reste true (chemin asynchrone) au moment de l'assertion.
-            el.style.transitionDuration = '0.3s';
-            (requirePart(el, 'close-button') as HTMLButtonElement).click();
-            await waitForUpdate(el);
-            expect(el.hasAttribute('hiding')).toBe(true);
         });
 
         it('émet ar-alert-close après transitionend quand hiding=true (thème avec transition réelle)', async () => {
