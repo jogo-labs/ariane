@@ -96,8 +96,8 @@ import '../../translations/en.js';
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
  * @cssState open     - Le calendrier est ouvert.
- * @cssState disabled - Le champ est désactivé.
- * @cssState readonly - Le champ est en lecture seule.
+ * @cssState disabled - Le composant est désactivé.
+ * @cssState readonly - Le composant est en lecture seule.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
