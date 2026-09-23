@@ -139,11 +139,11 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
     {usageCategories.length > 0 && (
         <section>
             <div class="subsection-title-row">
-                <h4 id="api-usage" class="subsection-title">API — Utilisation</h4>
-                <HeadingAnchor id="api-usage" label="API — Utilisation" />
+                <h4 id="api-usage" class="subsection-title">Configuration</h4>
+                <HeadingAnchor id="api-usage" label="Configuration" />
             </div>
 
-            <ar-tab-group active={firstUsageCategory} label="API d'utilisation" class="api-tabs">
+            <ar-tab-group active={firstUsageCategory} label="API de configuration" class="api-tabs">
                 {usageCategories.map((cat) => (
                     <ar-tab panel={cat.key}>
                         <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
@@ -242,15 +242,15 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
         </section>
     )}
 
-    {/* ── Thémification : API de style depuis l'extérieur (#233) ── */}
+    {/* ── Personnalisation : API de style depuis l'extérieur (#233) ── */}
     {themingCategories.length > 0 && (
         <section>
             <div class="subsection-title-row">
-                <h4 id="api-theming" class="subsection-title">API — Thémification</h4>
-                <HeadingAnchor id="api-theming" label="API — Thémification" />
+                <h4 id="api-theming" class="subsection-title">Personnalisation</h4>
+                <HeadingAnchor id="api-theming" label="Personnalisation" />
             </div>
 
-            <ar-tab-group active={firstThemingCategory} label="API de thémification" class="api-tabs">
+            <ar-tab-group active={firstThemingCategory} label="API de personnalisation" class="api-tabs">
                 {themingCategories.map((cat) => (
                     <ar-tab panel={cat.key}>
                         <span>{cat.label}</span><span class="api-tab-count">&nbsp;{cat.count}</span>
@@ -290,9 +290,8 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     <ar-tab-panel name="css-states">
                         <h4 id="api-css-states" class="sr-only">CSS Custom States</h4>
                         <p class="hint">
-                            Utilisez <code>:state(name)</code> sur le tag pour styler ce composant depuis
-                            l'extérieur selon son état — cumulatif aux attributs/propriétés reflétés
-                            existants, jamais un remplacement. Composable avec <code>::part()</code> pour
+                            Utilisez le sélecteur <code>:state(name)</code> sur le tag pour styler ce composant en fonction de son état. <br />
+                            Composable avec <code>::part()</code> pour
                             cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>).
                         </p>
                         <div class="api-list" role="list">
