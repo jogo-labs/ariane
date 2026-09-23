@@ -199,4 +199,17 @@ describe('ar-tooltip — browser', () => {
             expect(arrowComputed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
         });
     });
+
+    // ── :state(disabled) cumulé (généralisation #251) ─────────────────────────
+
+    describe(':state(disabled)', () => {
+        it('synchronisé avec disabled', async () => {
+            const el = await fixture<ArTooltip>(html`<ar-tooltip for="btn">Aide</ar-tooltip>`);
+            expect(el.matches(':state(disabled)')).to.equal(false);
+
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
+        });
+    });
 });

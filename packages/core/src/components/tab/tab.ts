@@ -2,6 +2,7 @@ import { LitElement, html, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
+import { toggleState } from '../../utils/internals-state.js';
 import styles from './tab.styles.js';
 
 /**
@@ -19,6 +20,9 @@ import styles from './tab.styles.js';
  * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="tab--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
  * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
  * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ *
+ * @cssState disabled - L'onglet est désactivé.
+ * @cssState active   - L'onglet est actif (sélectionné).
  */
 export class ArTab extends LitElement {
     static override styles = [styles];
@@ -34,6 +38,8 @@ export class ArTab extends LitElement {
      * @readonly Piloté par ar-tab-group — ne pas modifier directement.
      */
     @property({ reflect: true, type: Boolean }) active = false;
+
+    private _internals: ElementInternals | undefined;
 
     _registry?: TabGroupRegistry | undefined;
 
@@ -52,13 +58,20 @@ export class ArTab extends LitElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        if (changed.has('disabled') && changed.get('disabled') !== undefined) {
-            this._registry?.notifyTabChanged(this);
+        if (changed.has('disabled')) {
+            toggleState(this._internals, 'disabled', this.disabled);
+            if (changed.get('disabled') !== undefined) {
+                this._registry?.notifyTabChanged(this);
+            }
+        }
+        if (changed.has('active')) {
+            toggleState(this._internals, 'active', this.active);
         }
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         this.addEventListener('click', this._handleClick);
     }
 

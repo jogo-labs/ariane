@@ -215,4 +215,30 @@ describe('ar-collapse — browser', () => {
             );
         });
     });
+
+    // ── :state() cumulés (généralisation #251) ────────────────────────────────
+
+    describe(':state() cumulés (open/disabled)', () => {
+        it('expose :state(open) synchronisé avec open', async () => {
+            el = await fixture(html`<ar-collapse></ar-collapse>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+
+        it('expose :state(disabled) synchronisé avec disabled', async () => {
+            el = await fixture(html`<ar-collapse></ar-collapse>`);
+            expect(el.matches(':state(disabled)')).to.equal(false);
+
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
+        });
+    });
 });

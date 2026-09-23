@@ -3,6 +3,7 @@ import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
@@ -38,6 +39,8 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
  * @cssprop --ar-table-sort-indicator-active-color - Couleur état actif (asc/desc).
  * @cssprop --ar-table-sort-indicator-pending-color - Couleur état pending.
  *
+ * @cssState pending - Un tri a été demandé et attend confirmation.
+ *
  * @event {CustomEvent<{ type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
  */
 export class ArTableSort extends LitElement {
@@ -55,17 +58,23 @@ export class ArTableSort extends LitElement {
      */
     @property({ reflect: true, type: Boolean }) pending = false;
 
+    private _internals: ElementInternals | undefined;
+
     private _pendingOrder: TableSortOrder | null = null;
     private readonly _buttonId = `ar-ts-btn-${crypto.randomUUID().slice(0, 8)}`;
     private readonly localize = new LocalizeController(this);
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         this._syncParentTh();
     }
 
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('order')) this._syncParentTh();
+        if (changed.has('pending')) {
+            toggleState(this._internals, 'pending', this.pending);
+        }
     }
 
     /** Applique le pending order et avance le cycle. Sans effet si pending est false. */

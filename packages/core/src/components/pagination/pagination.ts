@@ -8,6 +8,7 @@ import { _calculatePages, _clamp } from './pagination.utils.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
@@ -69,6 +70,8 @@ export interface ArPaginationPageChangeDetail {
  * @cssprop --ar-pagination-button-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
+ * @cssState compact - Le mode compact (prev/suivant + label) est actif.
+ *
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
  *   changement de page, à chaque interaction (clic page, précédent, suivant, sélection dans le
  *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
@@ -126,8 +129,11 @@ export class ArPagination extends LitElement {
     // prochain updated() si current le confirme, sinon expire (fenêtre d'un seul cycle).
     private _pendingFocusPage: number | undefined;
 
+    private _internals: ElementInternals | undefined;
+
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         // `_initialized` reste faux ici au tout premier montage (le shadow DOM n'existe pas
         // encore, `_setupResizeObserver` ne trouverait pas `[part="pagination"]`) — ce n'est donc PAS un
         // doublon avec l'appel dans `firstUpdated()` ci-dessous, qui gère ce premier montage une
@@ -222,6 +228,9 @@ export class ArPagination extends LitElement {
     }
 
     override updated(changed: Map<string, unknown>): void {
+        if (changed.has('compact')) {
+            toggleState(this._internals, 'compact', this.compact);
+        }
         // `_hasRenderedOnce` (posé false→true seulement en fin de cycle, cf. plus bas) exclut le
         // tout premier `updated()` : `compact` n'a pas de `useDefault`, donc `changed.has('compact')`
         // est déjà vrai à ce premier cycle même si l'attribut n'a jamais été posé/modifié — sans
@@ -337,9 +346,9 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="prev nav-button action-button${isPreviousDisabled
-                            ? ' nav-button--disabled'
-                            : ''}"
+                        part="prev nav-button action-button${
+                            isPreviousDisabled ? ' nav-button--disabled' : ''
+                        }"
                         href="javascript:;"
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
@@ -353,9 +362,9 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="next nav-button action-button${isNextDisabled
-                            ? ' nav-button--disabled'
-                            : ''}"
+                        part="next nav-button action-button${
+                            isNextDisabled ? ' nav-button--disabled' : ''
+                        }"
                         href="javascript:;"
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
@@ -399,20 +408,22 @@ export class ArPagination extends LitElement {
             this._budget !== undefined &&
             (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
-        return html`${useSelectMode
-            ? this.renderPageSelect(current, total)
-            : repeat(
-                  pages,
-                  (page) => page,
-                  (page) => {
-                      // -1 et -2 sont des sentinelles représentant les ellipses
-                      return page === -1 || page === -2
-                          ? html` <li part="item" aria-hidden="true">
-                                <span part="ellipsis">...</span>
-                            </li>`
-                          : this.renderPage(page, page === current, total);
-                  },
-              )}`;
+        return html`${
+            useSelectMode
+                ? this.renderPageSelect(current, total)
+                : repeat(
+                      pages,
+                      (page) => page,
+                      (page) => {
+                          // -1 et -2 sont des sentinelles représentant les ellipses
+                          return page === -1 || page === -2
+                              ? html` <li part="item" aria-hidden="true">
+                                    <span part="ellipsis">...</span>
+                                </li>`
+                              : this.renderPage(page, page === current, total);
+                      },
+                  )
+        }`;
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */

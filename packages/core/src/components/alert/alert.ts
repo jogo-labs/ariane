@@ -3,6 +3,7 @@ import { property } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
@@ -44,6 +45,8 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
  * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
  *
+ * @cssState hiding - L'alerte est en cours de fermeture (animation de sortie).
+ *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
 export class ArAlert extends LitElement {
@@ -53,6 +56,8 @@ export class ArAlert extends LitElement {
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
+
+    private _internals: ElementInternals | undefined;
 
     private readonly localize = new LocalizeController(this);
 
@@ -109,12 +114,20 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
+    }
+
     override firstUpdated(): void {
         // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
         this._hadAuthoredRole = this.hasAttribute('role');
     }
 
     override updated(changed: Map<string, unknown>) {
+        if (changed.has('hiding')) {
+            toggleState(this._internals, 'hiding', this.hiding);
+        }
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             if (this._hadAuthoredRole === true) {
                 warn(
@@ -198,16 +211,18 @@ export class ArAlert extends LitElement {
             <div part="body" class="alert-body">
                 <slot></slot>
             </div>
-            ${this.canBeHidden
-                ? html` <button
-                      part="close-button action-button"
-                      @click=${this._hide}
-                      type="button"
-                      aria-label=${this.localize.term('closeAlert')}
-                  >
-                      <slot name="close-icon">${this._defaultCloseIcon()}</slot>
-                  </button>`
-                : nothing}`;
+            ${
+                this.canBeHidden
+                    ? html` <button
+                          part="close-button action-button"
+                          @click=${this._hide}
+                          type="button"
+                          aria-label=${this.localize.term('closeAlert')}
+                      >
+                          <slot name="close-icon">${this._defaultCloseIcon()}</slot>
+                      </button>`
+                    : nothing
+            }`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */

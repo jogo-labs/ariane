@@ -214,4 +214,21 @@ describe('ar-dialog — browser', () => {
             expect(Math.abs(closeCenterY - headerCenterY)).to.be.lessThan(3);
         });
     });
+
+    // ── :state() cumulé (généralisation #251) ─────────────────────────────────
+
+    describe(':state(open)', () => {
+        it('synchronisé avec open', async () => {
+            el = await fixture(html`<ar-dialog label="Titre"></ar-dialog>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+    });
 });

@@ -535,7 +535,7 @@ describe('ar-datepicker — browser', () => {
 
     // ── États :state() cumulés à l'attribut (pilote #246) ───────────────────
 
-    describe(':state() cumulés (disabled/readonly/open)', () => {
+    describe(':state() cumulés (disabled/readonly/open/has-error)', () => {
         let form: HTMLFormElement;
 
         afterEach(() => form?.remove());
@@ -595,6 +595,14 @@ describe('ar-datepicker — browser', () => {
             el.open = false;
             await el.updateComplete;
             expect(el.matches(':state(open)')).to.equal(false);
+        });
+
+        it('expose :state(has-error) synchronisé avec la présence du slot error', async () => {
+            el = await fixture(
+                html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
+            );
+            await el.updateComplete;
+            expect(el.matches(':state(has-error)')).to.equal(true);
         });
     });
 });

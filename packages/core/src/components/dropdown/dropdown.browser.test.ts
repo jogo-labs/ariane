@@ -221,4 +221,24 @@ describe('ar-dropdown — browser', () => {
             expect(computed.borderTopWidth).to.equal('1px');
         });
     });
+
+    // ── :state() cumulés (généralisation #251) ────────────────────────────────
+
+    describe(':state() cumulés (open/disabled)', () => {
+        it('expose :state(open) synchronisé avec open', async () => {
+            el = await fixture(html`<ar-dropdown></ar-dropdown>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+        });
+
+        it('expose :state(disabled) synchronisé avec disabled', async () => {
+            el = await fixture(html`<ar-dropdown></ar-dropdown>`);
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
+        });
+    });
 });

@@ -255,4 +255,25 @@ describe('ar-stepper — browser', () => {
             expect(style.marginLeft).to.equal('0px');
         });
     });
+
+    // ── :state(open) cumulé (généralisation #251) ─────────────────────────────
+
+    describe(':state(open)', () => {
+        it('synchronisé avec open', async () => {
+            el = await fixture(html`
+                <ar-stepper>
+                    <ar-stepper-item path="a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+    });
 });

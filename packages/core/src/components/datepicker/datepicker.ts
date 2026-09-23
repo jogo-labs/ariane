@@ -95,9 +95,10 @@ import '../../translations/en.js';
  * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
- * @cssState open     - Le calendrier est ouvert.
- * @cssState disabled - Le composant est désactivé.
- * @cssState readonly - Le composant est en lecture seule.
+ * @cssState open      - Le calendrier est ouvert.
+ * @cssState disabled  - Le composant est désactivé.
+ * @cssState readonly  - Le composant est en lecture seule.
+ * @cssState has-error - Un message d'erreur est affiché (slot `error`).
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
@@ -216,7 +217,9 @@ export class ArDatepicker extends LitElement {
             this._calendar.update(opts);
         }
 
-        this.toggleAttribute('has-error', this._hasSlot.test('error'));
+        const hasError = this._hasSlot.test('error');
+        this.toggleAttribute('has-error', hasError);
+        toggleState(this._internals, 'has-error', hasError);
 
         if (changed.has('open')) {
             if (this._skipNextOpenChange) {
