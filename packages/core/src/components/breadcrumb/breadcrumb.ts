@@ -9,7 +9,7 @@ import {
 import { property, query, state } from 'lit/decorators.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -87,7 +87,7 @@ export class ArBreadcrumb extends LitElement {
     @query('[part="trigger"]') private _dropdownTrigger?: HTMLButtonElement;
     @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
-    private _internals: ElementInternals | undefined;
+    private readonly _states = new InternalsStatesController(this);
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
@@ -137,7 +137,6 @@ export class ArBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
@@ -181,7 +180,7 @@ export class ArBreadcrumb extends LitElement {
             });
         }
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this._states.toggle('open', this.open);
         }
     }
 

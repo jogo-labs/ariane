@@ -16,7 +16,7 @@ import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -167,7 +167,7 @@ export class ArDialog extends LitElement {
     @query('dialog', true)
     dialog!: HTMLDialogElement;
 
-    private _internals: ElementInternals | undefined;
+    private readonly _states = new InternalsStatesController(this);
 
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
@@ -234,11 +234,6 @@ export class ArDialog extends LitElement {
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
-    }
-
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         this._removeOpenListeners();
@@ -267,7 +262,7 @@ export class ArDialog extends LitElement {
             } else if (!this.open && this.dialog?.open) {
                 this._scheduleClose();
             }
-            toggleState(this._internals, 'open', this.open);
+            this._states.toggle('open', this.open);
         }
     }
 
@@ -297,18 +292,18 @@ export class ArDialog extends LitElement {
                         : html`<header part="header">
                               <h1 part="title" id="dialog-heading">
                                   ${
-                                  this._slotController.test('label')
-                                      ? html`<slot name="label"></slot>`
-                                      : headingLabel
-                              }
+                                      this._slotController.test('label')
+                                          ? html`<slot name="label"></slot>`
+                                          : headingLabel
+                                  }
                               </h1>
                               ${
-                              this._slotController.test('header-actions')
-                                  ? html`<div part="header-actions">
-                                        <slot name="header-actions"></slot>
-                                    </div>`
-                                  : nothing
-                          }
+                                  this._slotController.test('header-actions')
+                                      ? html`<div part="header-actions">
+                                            <slot name="header-actions"></slot>
+                                        </div>`
+                                      : nothing
+                              }
                               <button
                                   part="close-button action-button"
                                   type="button"

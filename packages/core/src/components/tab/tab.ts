@@ -2,7 +2,7 @@ import { LitElement, html, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
 import styles from './tab.styles.js';
 
 /**
@@ -39,7 +39,7 @@ export class ArTab extends LitElement {
      */
     @property({ reflect: true, type: Boolean }) active = false;
 
-    private _internals: ElementInternals | undefined;
+    private readonly _states = new InternalsStatesController(this);
 
     _registry?: TabGroupRegistry | undefined;
 
@@ -59,19 +59,18 @@ export class ArTab extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('disabled')) {
-            toggleState(this._internals, 'disabled', this.disabled);
+            this._states.toggle('disabled', this.disabled);
             if (changed.get('disabled') !== undefined) {
                 this._registry?.notifyTabChanged(this);
             }
         }
         if (changed.has('active')) {
-            toggleState(this._internals, 'active', this.active);
+            this._states.toggle('active', this.active);
         }
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         this.addEventListener('click', this._handleClick);
     }
 
