@@ -80,32 +80,19 @@ const controls = buildControls(component.members ?? []);
 //
 // Deux groupes distincts (#233) : Configuration (API de pilotage) et Personnalisation
 // (API de style depuis l'extérieur) — chacun un ar-tab-group séparé dans ComponentApi.astro.
-// Chaque entrée reflète exactement la condition d'affichage ET l'ordre des onglets de
-// ComponentApi.astro — une section absente (ex. pas de slot) ne doit pas apparaître dans la
-// TOC. Les sous-catégories (Attributs, Slots, CSS Parts…) restent listées individuellement,
-// au même niveau qu'Import/Traduction, pour un accès direct/linkable à chacune.
+// Ces deux groupes n'ont pas leur propre entrée TOC (bruit sans plus-value, collés à leurs
+// sous-catégories) : seules les sous-catégories (Attributs, Slots, CSS Parts…) sont listées,
+// au même niveau qu'Import/Traduction, pour un accès direct/linkable à chacune. Chaque entrée
+// reflète exactement la condition d'affichage ET l'ordre des onglets de ComponentApi.astro —
+// une section absente (ex. pas de slot) ne doit pas apparaître dans la TOC.
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
-
-const hasUsageApi =
-    (component.attributes && component.attributes.length > 0) ||
-    (component.slots && component.slots.length > 0) ||
-    (component.events && component.events.length > 0) ||
-    getPublicMethods(component).length > 0;
-
-const hasThemingApi =
-    (component.cssParts && component.cssParts.length > 0) ||
-    (component.cssStates && component.cssStates.length > 0) ||
-    ownProps.length > 0 ||
-    panelProps.length > 0 ||
-    relatedTokens.length > 0;
 
 const apiTocEntries = [
     { id: 'api-import', label: 'Import', level: 2 as const },
     component['x-localized']
         ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
         : null,
-    hasUsageApi ? { id: 'api-usage', label: 'Configuration', level: 2 as const } : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
         : null,
@@ -118,7 +105,6 @@ const apiTocEntries = [
     getPublicMethods(component).length > 0
         ? { id: 'api-methodes', label: 'Méthodes', level: 2 as const }
         : null,
-    hasThemingApi ? { id: 'api-theming', label: 'Personnalisation', level: 2 as const } : null,
     component.cssParts && component.cssParts.length > 0
         ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
         : null,
