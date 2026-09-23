@@ -17,11 +17,16 @@ export default css`
     .input-wrapper {
         display: flex;
         align-items: stretch;
+        /* Ne s'étire pas sur la largeur de [part~='datepicker'] (colonne flex) : celle-ci suit
+           l'enfant le plus large (généralement le hint), sans rapport avec la largeur attendue
+           de l'input — cf. #191. */
+        align-self: flex-start;
     }
 
     [part~='input'] {
         flex: 1;
         min-width: 0;
+        max-width: var(--ar-datepicker-input-max-width, var(--ar-datepicker-input-computed-width));
     }
 
     [part='trigger'] {

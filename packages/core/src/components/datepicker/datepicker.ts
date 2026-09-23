@@ -1,5 +1,6 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
@@ -57,6 +58,10 @@ import '../../translations/en.js';
  *   du footer (`footer-button`) : bouton qui déclenche une action ponctuelle.
  *
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
+ * @cssprop --ar-datepicker-input-max-width - Largeur maximale du champ de saisie. Par défaut,
+ *   une valeur calculée à partir de la longueur de `format` (indépendante de la largeur du hint,
+ *   qui peut rester plus large). En surchargeant cette valeur, gardez-la cohérente avec le
+ *   format affiché : trop étroite, elle tronque visuellement la date saisie.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
@@ -257,16 +262,18 @@ export class ArDatepicker extends LitElement {
         const closeLabel = this.localize.term('close');
         const closeAriaLabel = this.localize.term('closeCalendar');
         const exampleDate = new Date(new Date().getFullYear(), 11, 31);
-        const formatLine = this.localize.term(
-            'expectedFormat',
-            this.format,
-            format(exampleDate, this.format),
-        );
+        const formattedExample = format(exampleDate, this.format);
+        const formatLine = this.localize.term('expectedFormat', this.format, formattedExample);
         const rangeText = this._rangeText(locale);
         const defaultHint = rangeText
             ? html`${formatLine}<br />
                   ${this.localize.term('availableDates', rangeText)}`
             : formatLine;
+        // Largeur fonctionnelle par défaut de l'input, dérivée de la longueur de la date
+        // formatée (+ marge pour curseur/padding) — indépendante de la largeur du hint, qui peut
+        // rester plus large sans agrandir l'input (cf. #191). Surchargeable via
+        // --ar-datepicker-input-max-width.
+        const inputComputedMaxWidth = `${formattedExample.length + 2}ch`;
 
         return html`
             <div part="datepicker">
@@ -280,6 +287,7 @@ export class ArDatepicker extends LitElement {
                         part="input field"
                         id="dp-input-${this._uid}"
                         type="text"
+                        style=${styleMap({ '--ar-datepicker-input-computed-width': inputComputedMaxWidth })}
                         ?disabled=${this._effectiveDisabled}
                         ?readonly=${this.readonly}
                         aria-required=${this.required ? 'true' : nothing}

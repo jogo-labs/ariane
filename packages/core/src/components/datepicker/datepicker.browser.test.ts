@@ -468,4 +468,68 @@ describe('ar-datepicker — browser', () => {
             expect(input.disabled, 'disabled explicite doit rester actif').to.equal(true);
         });
     });
+
+    // ── Largeur max de l'input (#191) ────────────────────────────────────────
+
+    describe("largeur max de l'input", () => {
+        it("s'adapte à la longueur de format, indépendamment d'un hint long", async () => {
+            el = await fixture(html`
+                <ar-datepicker
+                    style="display: inline-block"
+                    format="dd/MM/yyyy"
+                    min="2026-01-01"
+                    max="2026-12-31"
+                >
+                    <span slot="hint"
+                        >Un texte d'aide volontairement très long pour vérifier qu'il n'élargit pas
+                        le champ de saisie au-delà de la largeur attendue pour une date</span
+                    >
+                </ar-datepicker>
+            `);
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            const wrapper = el.shadowRoot!.querySelector<HTMLElement>('.input-wrapper')!;
+            const datepicker = el.shadowRoot!.querySelector<HTMLElement>('[part="datepicker"]')!;
+            const inputMaxWidth = parseFloat(getComputedStyle(input).maxWidth);
+
+            // Le hint (non contraint) élargit [part='datepicker'] (shrink-to-fit en inline-block),
+            // mais .input-wrapper ne doit pas suivre cet élargissement.
+            expect(inputMaxWidth).to.be.greaterThan(0);
+            expect(wrapper.getBoundingClientRect().width).to.be.lessThan(
+                datepicker.getBoundingClientRect().width,
+            );
+        });
+
+        it('un format plus long produit une largeur max calculée plus grande', async () => {
+            const short = await fixture<ArDatepicker>(
+                html`<ar-datepicker format="dd/MM/yy"></ar-datepicker>`,
+            );
+            const long = await fixture<ArDatepicker>(
+                html`<ar-datepicker format="EEEE d MMMM yyyy"></ar-datepicker>`,
+            );
+
+            const shortMaxWidth = parseFloat(
+                getComputedStyle(short.shadowRoot!.querySelector('input')!).maxWidth,
+            );
+            const longMaxWidth = parseFloat(
+                getComputedStyle(long.shadowRoot!.querySelector('input')!).maxWidth,
+            );
+
+            expect(longMaxWidth).to.be.greaterThan(shortMaxWidth);
+
+            short.remove();
+            long.remove();
+        });
+
+        it('--ar-datepicker-input-max-width surcharge la valeur calculée', async () => {
+            el = await fixture(
+                html`<ar-datepicker
+                    style="--ar-datepicker-input-max-width: 300px"
+                ></ar-datepicker>`,
+            );
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(getComputedStyle(input).maxWidth).to.equal('300px');
+        });
+    });
 });
