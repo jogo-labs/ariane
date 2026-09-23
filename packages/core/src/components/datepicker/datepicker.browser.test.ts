@@ -532,4 +532,69 @@ describe('ar-datepicker — browser', () => {
             expect(getComputedStyle(input).maxWidth).to.equal('300px');
         });
     });
+
+    // ── États :state() cumulés à l'attribut (pilote #246) ───────────────────
+
+    describe(':state() cumulés (disabled/readonly/open)', () => {
+        let form: HTMLFormElement;
+
+        afterEach(() => form?.remove());
+
+        it("expose :state(disabled) quand l'attribut disabled est posé", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(disabled)')).to.equal(false);
+
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
+
+            el.disabled = false;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(false);
+        });
+
+        it('expose :state(disabled) par cascade fieldset, sans attribut disabled explicite', async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            expect(el.hasAttribute('disabled')).to.equal(false);
+            expect(el.matches(':state(disabled)')).to.equal(true);
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(false);
+        });
+
+        it("expose :state(readonly) quand l'attribut readonly est posé", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(readonly)')).to.equal(false);
+
+            el.readonly = true;
+            await el.updateComplete;
+            expect(el.matches(':state(readonly)')).to.equal(true);
+
+            el.readonly = false;
+            await el.updateComplete;
+            expect(el.matches(':state(readonly)')).to.equal(false);
+        });
+
+        it("expose :state(open) synchronisé avec l'ouverture/fermeture du panel", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            await openPicker(el);
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+    });
 });

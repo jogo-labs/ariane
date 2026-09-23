@@ -62,6 +62,9 @@ const categories: ApiCategory[] = [
     component.cssParts && component.cssParts.length > 0
         ? { key: 'css-parts', label: 'CSS Parts', count: component.cssParts.length }
         : null,
+    component.cssStates && component.cssStates.length > 0
+        ? { key: 'css-states', label: 'CSS Custom States', count: component.cssStates.length }
+        : null,
     (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { key: 'css-props', label: 'CSS Custom Properties', count: ownProps.length + panelProps.length }
         : null,
@@ -247,6 +250,27 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                                 <span class="sr-only">{i + 1} sur {component.cssParts!.length}</span>
                                 <span class="api-name">{part.name}</span>
                                 <p class="api-desc">{part.description ?? ''}</p>
+                            </div>
+                        ))}
+                    </div>
+                </ar-tab-panel>
+            )}
+
+            {component.cssStates && component.cssStates.length > 0 && (
+                <ar-tab-panel name="css-states">
+                    <h4 id="api-css-states" class="sr-only">CSS Custom States</h4>
+                    <p class="hint">
+                        Utilisez <code>:state(name)</code> sur le tag pour styler ce composant depuis
+                        l'extérieur selon son état — cumulatif aux attributs/propriétés reflétés
+                        existants, jamais un remplacement. Composable avec <code>::part()</code> pour
+                        cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>).
+                    </p>
+                    <div class="api-list" role="list">
+                        {component.cssStates.map((state, i) => (
+                            <div class="api-row" role="listitem">
+                                <span class="sr-only">{i + 1} sur {component.cssStates!.length}</span>
+                                <span class="api-name">:state({state.name})</span>
+                                <p class="api-desc">{state.description ?? ''}</p>
                             </div>
                         ))}
                     </div>
