@@ -1,4 +1,5 @@
-import { LitElement, html, css, type TemplateResult } from 'lit';
+import { html, css, type TemplateResult } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
@@ -9,7 +10,7 @@ const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1
  *
  * @slot - Un bouton ou un lien — reçoit automatiquement role="menuitem" et tabIndex=-1.
  */
-export class ArDropdownItem extends LitElement {
+export class ArDropdownItem extends ArianeElement {
     static override styles = [
         css`
             :host {

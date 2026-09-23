@@ -1,15 +1,8 @@
-import {
-    LitElement,
-    type TemplateResult,
-    html,
-    nothing,
-    type CSSResultGroup,
-    type PropertyValues,
-} from 'lit';
+import { type TemplateResult, html, nothing, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
@@ -69,7 +62,7 @@ import '../../translations/en.js';
  * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
  * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  */
-export class ArBreadcrumb extends LitElement {
+export class ArBreadcrumb extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, panelStyles, styles];
 
     private readonly localize = new LocalizeController(this);
@@ -86,8 +79,6 @@ export class ArBreadcrumb extends LitElement {
 
     @query('[part="trigger"]') private _dropdownTrigger?: HTMLButtonElement;
     @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
-
-    private _internals: ElementInternals | undefined;
 
     private _items = new Set<ArBreadcrumbItem>();
     private _rebuildPending = false;
@@ -137,7 +128,6 @@ export class ArBreadcrumb extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
@@ -181,7 +171,7 @@ export class ArBreadcrumb extends LitElement {
             });
         }
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
     }
 

@@ -1,11 +1,11 @@
-import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
+import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
 
@@ -54,7 +54,7 @@ export type ArDropdownPlacement =
  * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
  * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
  */
-export class ArDropdown extends LitElement {
+export class ArDropdown extends ArianeElement {
     static override styles = [panelStyles, styles];
 
     /** Ouvre ou ferme le panel. */
@@ -81,8 +81,6 @@ export class ArDropdown extends LitElement {
 
     @query('[part="panel"]') private _panel!: HTMLElement;
 
-    private _internals: ElementInternals | undefined;
-
     private readonly _popover = new AnchoredController(this, {
         cssVarPrefix: 'dropdown',
         onExternalClose: () => {
@@ -104,11 +102,6 @@ export class ArDropdown extends LitElement {
             onShow: () => this._onShow(),
             onHide: () => this._onHide(),
         });
-    }
-
-    override connectedCallback(): void {
-        super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
     }
 
     override firstUpdated(): void {
@@ -133,10 +126,10 @@ export class ArDropdown extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('open')) {
-            toggleState(this._internals, 'open', this.open);
+            this.toggleState('open', this.open);
         }
         if (changed.has('disabled')) {
-            toggleState(this._internals, 'disabled', this.disabled);
+            this.toggleState('disabled', this.disabled);
         }
         if (changed.has('placement')) {
             this._popover.setPlacement(this.placement);

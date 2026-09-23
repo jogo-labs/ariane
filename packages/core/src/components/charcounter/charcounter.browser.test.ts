@@ -3,7 +3,7 @@
  * charcounter.browser.test.ts
  *
  * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
- *   - :state() (ElementInternals.states, non implémenté par jsdom/Vitest)
+ *   - :state() (ElementInternals.states, non implémenté par happy-dom/Vitest)
  */
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArCharcounter } from './charcounter.js';

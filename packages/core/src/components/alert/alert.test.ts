@@ -385,7 +385,7 @@ describe('ArAlert', () => {
             (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
             // hiding est un @state() privé — on y accède via cast. Sa réflexion en :state(hiding)
-            // CSS externe est couverte par alert.browser.test.ts (jsdom n'implémente pas :state()).
+            // CSS externe est couverte par alert.browser.test.ts (happy-dom n'implémente pas :state()).
             expect((el as unknown as { hiding: boolean }).hiding).toBe(true);
         });
 

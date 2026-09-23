@@ -1,4 +1,5 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup, svg } from 'lit';
+import { type TemplateResult, html, type CSSResultGroup, svg } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import animationsStyles from '../../styles/animations.styles.js';
@@ -23,7 +24,7 @@ import '../../translations/en.js';
  *
  * @cssprop --ar-spinner-stroke-color - Couleur du trait SVG. Hérite de `currentColor` par défaut.
  */
-export class ArSpinner extends LitElement {
+export class ArSpinner extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];
     static readonly DEFAULT_DONE: boolean = false;
 

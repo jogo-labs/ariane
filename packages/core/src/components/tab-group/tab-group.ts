@@ -1,4 +1,5 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
@@ -26,7 +27,7 @@ import styles from './tab-group.styles.js';
  *
  * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
  */
-export class ArTabGroup extends LitElement {
+export class ArTabGroup extends ArianeElement {
     static override styles = [styles];
 
     /** Nom de l'onglet actif. Si absent, le premier onglet non-disabled s'active. */

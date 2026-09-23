@@ -1,4 +1,5 @@
-import { LitElement, type TemplateResult, type CSSResultGroup, html, nothing } from 'lit';
+import { type TemplateResult, type CSSResultGroup, html, nothing } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
@@ -77,7 +78,7 @@ export interface ArPaginationPageChangeDetail {
  *   `current` a réellement changé (réassignation externe en réponse à `ar-pagination-page-change`,
  *   ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
  */
-export class ArPagination extends LitElement {
+export class ArPagination extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     private readonly localize = new LocalizeController(this);

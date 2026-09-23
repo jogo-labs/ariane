@@ -1,10 +1,10 @@
-import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
-import { toggleState } from '../../utils/internals-state.js';
 import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -41,7 +41,7 @@ function pluralize(count: number, label: string): string {
  * @cssState warning - Le nombre de caractères restants approche la limite.
  * @cssState error   - La limite de caractères est dépassée.
  */
-export class ArCharcounter extends LitElement {
+export class ArCharcounter extends ArianeElement {
     static override styles = [styles];
     private static _idCounter = 0;
     private readonly localize = new LocalizeController(this);
@@ -67,7 +67,6 @@ export class ArCharcounter extends LitElement {
     private _errorAnnounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
-    private _internals: ElementInternals | undefined;
 
     /** État courant. Readonly — piloté par le composant. */
     get state(): CharcounterState {
@@ -76,7 +75,6 @@ export class ArCharcounter extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         if (!this.for) {
             warn('ar-charcounter', "l'attribut for est requis.");
         }
@@ -106,8 +104,8 @@ export class ArCharcounter extends LitElement {
         }
         if (this._state !== this.getAttribute('state')) {
             this.setAttribute('state', this._state);
-            toggleState(this._internals, 'warning', this._state === 'warning');
-            toggleState(this._internals, 'error', this._state === 'error');
+            this.toggleState('warning', this._state === 'warning');
+            this.toggleState('error', this._state === 'error');
         }
     }
 

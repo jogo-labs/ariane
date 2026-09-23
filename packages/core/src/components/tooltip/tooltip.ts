@@ -1,4 +1,5 @@
-import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
 import { warn } from '../../utils/warn.js';
@@ -49,7 +50,7 @@ export type ArTooltipPlacement =
  * @event {CustomEvent} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
  * @event {CustomEvent} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
  */
-export class ArTooltip extends LitElement {
+export class ArTooltip extends ArianeElement {
     static override styles = [styles];
 
     /** ID du trigger dans le light DOM. Requis. */

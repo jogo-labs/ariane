@@ -1,8 +1,8 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
-import { toggleState } from '../../utils/internals-state.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './tab.styles.js';
 
 /**
@@ -24,7 +24,7 @@ import styles from './tab.styles.js';
  * @cssState disabled - L'onglet est désactivé.
  * @cssState active   - L'onglet est actif (sélectionné).
  */
-export class ArTab extends LitElement {
+export class ArTab extends ArianeElement {
     static override styles = [styles];
 
     /** Nom du ar-tab-panel associé. Requis. */
@@ -38,8 +38,6 @@ export class ArTab extends LitElement {
      * @readonly Piloté par ar-tab-group — ne pas modifier directement.
      */
     @property({ reflect: true, type: Boolean }) active = false;
-
-    private _internals: ElementInternals | undefined;
 
     _registry?: TabGroupRegistry | undefined;
 
@@ -59,19 +57,18 @@ export class ArTab extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('disabled')) {
-            toggleState(this._internals, 'disabled', this.disabled);
+            this.toggleState('disabled', this.disabled);
             if (changed.get('disabled') !== undefined) {
                 this._registry?.notifyTabChanged(this);
             }
         }
         if (changed.has('active')) {
-            toggleState(this._internals, 'active', this.active);
+            this.toggleState('active', this.active);
         }
     }
 
     override connectedCallback(): void {
         super.connectedCallback();
-        this._internals ??= this.attachInternals?.();
         this.addEventListener('click', this._handleClick);
     }
 

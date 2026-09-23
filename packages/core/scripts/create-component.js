@@ -87,8 +87,9 @@ if (existsSync(componentDir)) {
 
 // ─── Templates ────────────────────────────────────────────────────────────────
 
-const componentTemplate = `import { LitElement, html } from 'lit';
+const componentTemplate = `import { html } from 'lit';
 import { property } from 'lit/decorators.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './${fileName}.styles.js';
 
 /**
@@ -101,7 +102,10 @@ import styles from './${fileName}.styles.js';
  *
  * @event {CustomEvent} ${tagName}-change - Émis lors d'un changement.
  */
-export class ${className} extends LitElement {
+// Composant participant à un <form> natif : extends ArianeFormElement à la place
+// (packages/core/src/base/ariane-form-element.ts) — formAssociated = true est hérité
+// automatiquement, voir ar-datepicker pour un exemple complet.
+export class ${className} extends ArianeElement {
     static override styles = [styles];
 
     override render() {
