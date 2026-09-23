@@ -151,8 +151,17 @@ export class ArBreadcrumb extends LitElement {
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
     }
 
-    override willUpdate(): void {
+    override willUpdate(changed: PropertyValues<this>): void {
         this._pushRenderState();
+        // Le panel mobile disparaît du rendu en desktop : fermer directement le popover (avant que
+        // son nœud ne soit retiré du DOM par le rendu) pour garder son état interne synchronisé, et
+        // resynchroniser `open` sur son absence. Appel direct à `_popover.hide()` plutôt que via
+        // ToggleController, qui ignore ce changement (shouldToggle gate sur isMobile) — on évite
+        // ainsi tout événement `ar-breadcrumb-hide` parasite.
+        if ((changed as Map<PropertyKey, unknown>).has('isMobile') && !this.isMobile) {
+            this._popover.hide();
+            this.open = false;
+        }
     }
 
     override firstUpdated(): void {
