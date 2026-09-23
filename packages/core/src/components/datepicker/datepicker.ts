@@ -111,6 +111,10 @@ export class ArDatepicker extends LitElement {
     static override styles = [panelStyles, styles];
     static formAssociated = true;
 
+    // Sert aussi à la participation formulaire via `_states.internals` dans _syncFormValue()
+    // (setFormValue/setValidity) — attachInternals() ne peut être appelé qu'une fois par
+    // instance, donc ce composant formAssociated réutilise l'instance du controller plutôt
+    // que d'en attacher une seconde.
     private readonly _states = new InternalsStatesController(this);
     private readonly _uid = Math.random().toString(36).slice(2, 9);
 
@@ -899,6 +903,8 @@ export class ArDatepicker extends LitElement {
             this._input.value = format(isoResult.date, this.format);
         }
     }
+    // `_states.internals` (pas juste `_states.toggle()`) : réutilise l'ElementInternals du
+    // InternalsStatesController pour la participation formulaire, cf. commentaire sur le champ.
     private _syncFormValue(): void {
         if (this._effectiveDisabled) {
             this._states.internals?.setFormValue(null);
