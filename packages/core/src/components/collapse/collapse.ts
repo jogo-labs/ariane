@@ -4,7 +4,7 @@ import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
-import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
+import { toggleState } from '../../utils/internals-state.js';
 import styles from './collapse.styles.js';
 
 /**
@@ -70,7 +70,7 @@ export class ArCollapse extends LitElement {
 
     @query('[part="collapsible"]') private _panel!: HTMLElement;
 
-    private readonly _states = new InternalsStatesController(this);
+    private _internals: ElementInternals | undefined;
 
     @state() private _animating = false;
     private _initialized = false;
@@ -91,6 +91,7 @@ export class ArCollapse extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         if (!this.id) {
             this.id = `ar-collapse-${++ArCollapse._idCounter}`;
         }
@@ -116,13 +117,13 @@ export class ArCollapse extends LitElement {
 
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('open')) {
-            this._states.toggle('open', this.open);
+            toggleState(this._internals, 'open', this.open);
         }
         if (changed.has('disabled')) {
-            this._states.toggle('disabled', this.disabled);
+            toggleState(this._internals, 'disabled', this.disabled);
         }
         if ((changed as Map<PropertyKey, unknown>).has('_animating')) {
-            this._states.toggle('animating', this._animating);
+            toggleState(this._internals, 'animating', this._animating);
         }
         if (!this._initialized) return;
         if (changed.has('for')) {

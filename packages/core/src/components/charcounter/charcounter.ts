@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
-import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
@@ -67,7 +67,7 @@ export class ArCharcounter extends LitElement {
     private _errorAnnounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
-    private readonly _states = new InternalsStatesController(this);
+    private _internals: ElementInternals | undefined;
 
     /** État courant. Readonly — piloté par le composant. */
     get state(): CharcounterState {
@@ -76,6 +76,7 @@ export class ArCharcounter extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         if (!this.for) {
             warn('ar-charcounter', "l'attribut for est requis.");
         }
@@ -105,8 +106,8 @@ export class ArCharcounter extends LitElement {
         }
         if (this._state !== this.getAttribute('state')) {
             this.setAttribute('state', this._state);
-            this._states.toggle('warning', this._state === 'warning');
-            this._states.toggle('error', this._state === 'error');
+            toggleState(this._internals, 'warning', this._state === 'warning');
+            toggleState(this._internals, 'error', this._state === 'error');
         }
     }
 

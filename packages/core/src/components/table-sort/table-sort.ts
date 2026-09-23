@@ -3,7 +3,7 @@ import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
-import { InternalsStatesController } from '../../controllers/internals-states.controller.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
@@ -58,7 +58,7 @@ export class ArTableSort extends LitElement {
      */
     @property({ reflect: true, type: Boolean }) pending = false;
 
-    private readonly _states = new InternalsStatesController(this);
+    private _internals: ElementInternals | undefined;
 
     private _pendingOrder: TableSortOrder | null = null;
     private readonly _buttonId = `ar-ts-btn-${crypto.randomUUID().slice(0, 8)}`;
@@ -66,13 +66,14 @@ export class ArTableSort extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         this._syncParentTh();
     }
 
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('order')) this._syncParentTh();
         if (changed.has('pending')) {
-            this._states.toggle('pending', this.pending);
+            toggleState(this._internals, 'pending', this.pending);
         }
     }
 
