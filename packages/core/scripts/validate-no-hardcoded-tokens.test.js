@@ -245,4 +245,13 @@ describe('findUnjustifiedFallbacks', () => {
         `;
         expect(findUnjustifiedFallbacks('dialog.styles.ts', source)).toEqual([]);
     });
+
+    it('accepte un fallback qui référence une custom property interne non préfixée --ar- (pont JS → CSS)', () => {
+        const source = `
+            [part~='input'] {
+                max-width: var(--ar-datepicker-input-max-width, var(--input-computed-width));
+            }
+        `;
+        expect(findUnjustifiedFallbacks('datepicker.styles.ts', source)).toEqual([]);
+    });
 });

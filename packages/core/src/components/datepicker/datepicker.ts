@@ -287,7 +287,7 @@ export class ArDatepicker extends LitElement {
                         part="input field"
                         id="dp-input-${this._uid}"
                         type="text"
-                        style=${styleMap({ '--ar-datepicker-input-computed-width': inputComputedMaxWidth })}
+                        style=${styleMap({ '--input-computed-width': inputComputedMaxWidth })}
                         ?disabled=${this._effectiveDisabled}
                         ?readonly=${this.readonly}
                         aria-required=${this.required ? 'true' : nothing}

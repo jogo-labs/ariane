@@ -26,7 +26,7 @@ export default css`
     [part~='input'] {
         flex: 1;
         min-width: 0;
-        max-width: var(--ar-datepicker-input-max-width, var(--ar-datepicker-input-computed-width));
+        max-width: var(--ar-datepicker-input-max-width, var(--input-computed-width));
     }
 
     [part='trigger'] {
