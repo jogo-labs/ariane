@@ -20,9 +20,9 @@ import NextStep from '../../components/NextStep.astro';
         </div>
 
         <div class="narrative">
-            <NarrativeHeading id="leviers">Deux leviers de personnalisation</NarrativeHeading>
+            <NarrativeHeading id="leviers">Trois leviers de personnalisation</NarrativeHeading>
             <p>
-                Selon ce que vous cherchez à faire, un de ces deux mécanismes s'applique :
+                Selon ce que vous cherchez à faire, un de ces trois mécanismes s'applique :
             </p>
 
             <div class="table-wrap">
@@ -45,12 +45,17 @@ import NextStep from '../../components/NextStep.astro';
                             <td>Une partie interne précise d'un composant</td>
                             <td>Layout ou styles non couverts par un token</td>
                         </tr>
+                        <tr>
+                            <td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/:state" rel="noopener" target="_blank">CSS custom states</a> <br />(sélecteur <code>:state()</code>)</td>
+                            <td>Le composant lui-même via <code>:state(x)</code>, ou une des ses part via <code>:state(x)::part(y)</code></td>
+                            <td>Styliser selon un état du composant (ouvert, désactivé…).</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
             <p class="hint">
-                Ces deux leviers couvrent <strong>l'apparence des éléments inclus dans le shadow DOM des composants</strong>. <br />
+                Ces trois leviers couvrent <strong>l'apparence des éléments inclus dans le shadow DOM des composants</strong>. <br />
                 Pour tout ce qui est à l'extérieur (certains boutons, contenus dans des slots, input ou textarea dans certains cas), il sera nécessaire de compléter ces leviers par des règles spécifiques. <br />
                 Des exemples de feuilles de style sont documentées - pour servir directement ou comme base - dans la page <a href="/theming/appliquer-un-theme#presets">Appliquer un thème</a>.
             </p>

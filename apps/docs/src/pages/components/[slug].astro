@@ -78,11 +78,13 @@ const controls = buildControls(component.members ?? []);
 
 // ─── Sous-sections de la Référence API ─────────────────────────────────────────
 //
-// Chaque entrée reflète exactement la condition d'affichage ET l'ordre des onglets
-// de ComponentApi.astro (categories) — une section absente (ex. pas de slot) ne
-// doit pas apparaître dans la TOC, et l'ordre doit correspondre à l'ordre réel des
-// onglets pour que la TOC serve de sommaire fidèle.
-
+// Deux groupes distincts (#233) : Configuration (API de pilotage) et Personnalisation
+// (API de style depuis l'extérieur) — chacun un ar-tab-group séparé dans ComponentApi.astro.
+// Ces deux groupes n'ont pas leur propre entrée TOC (bruit sans plus-value, collés à leurs
+// sous-catégories) : seules les sous-catégories (Attributs, Slots, CSS Parts…) sont listées,
+// au même niveau qu'Import/Traduction, pour un accès direct/linkable à chacune. Chaque entrée
+// reflète exactement la condition d'affichage ET l'ordre des onglets de ComponentApi.astro —
+// une section absente (ex. pas de slot) ne doit pas apparaître dans la TOC.
 const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
 const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
 
