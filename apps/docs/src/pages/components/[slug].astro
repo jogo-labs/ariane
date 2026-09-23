@@ -106,6 +106,9 @@ const apiTocEntries = [
     component.cssParts && component.cssParts.length > 0
         ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
         : null,
+    component.cssStates && component.cssStates.length > 0
+        ? { id: 'api-css-states', label: 'CSS Custom States', level: 2 as const }
+        : null,
     (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
         : null,

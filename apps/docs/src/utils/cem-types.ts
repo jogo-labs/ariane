@@ -64,6 +64,11 @@ export interface CemSlot {
     description?: string;
 }
 
+export interface CemCssState {
+    name: string;
+    description?: string;
+}
+
 // ─── Déclaration complète d'un composant ─────────────────────────────────────
 
 export interface CemDeclaration {
@@ -78,6 +83,7 @@ export interface CemDeclaration {
     events?: CemEvent[];
     cssParts?: CemCssPart[];
     cssProperties?: CemCssProperty[];
+    cssStates?: CemCssState[];
     slots?: CemSlot[];
     /** Extension JSDoc @display — contrôle le mode d'affichage de la page */
     'x-display'?: 'demo' | 'docs';

@@ -781,8 +781,8 @@
         }
 
         &::part(trigger):not(:disabled):active,
-        &[open]::part(trigger):hover,
-        &[open]::part(trigger) {
+        &:state(open)::part(trigger):hover,
+        &:state(open)::part(trigger) {
             transform: scale(0.985);
             background: var(--ar-button-primary-bg-active);
             border-color: var(--ar-button-primary-bg-active);

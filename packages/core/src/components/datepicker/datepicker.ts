@@ -9,6 +9,7 @@ import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
+import { toggleState } from '../../utils/internals-state.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -93,6 +94,10 @@ import '../../translations/en.js';
  * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
  * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
+ *
+ * @cssState open     - Le calendrier est ouvert.
+ * @cssState disabled - Le champ est désactivé.
+ * @cssState readonly - Le champ est en lecture seule.
  *
  * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
@@ -243,6 +248,24 @@ export class ArDatepicker extends LitElement {
             (changed as Map<PropertyKey, unknown>).has('_formDisabled')
         ) {
             this._syncFormValue();
+        }
+
+        // États :state() cumulés aux attributs/propriétés reflétés existants (pilote #246) —
+        // n'introduisent rien de nouveau côté API publique, juste une surface CSS
+        // supplémentaire pour le thème (::part(x):state(y)), cohérente avec le pattern
+        // WebAwesome. `disabled` reflète l'état effectif (cascade fieldset incluse), comme le
+        // ferait :disabled natif sur un <input>.
+        if (
+            changed.has('disabled') ||
+            (changed as Map<PropertyKey, unknown>).has('_formDisabled')
+        ) {
+            toggleState(this._internals, 'disabled', this._effectiveDisabled);
+        }
+        if (changed.has('readonly')) {
+            toggleState(this._internals, 'readonly', this.readonly);
+        }
+        if (changed.has('open')) {
+            toggleState(this._internals, 'open', this.open);
         }
     }
 
