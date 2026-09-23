@@ -22,6 +22,7 @@ import {
     findUnjustifiedFallbacks,
 } from './scripts/validate-no-hardcoded-tokens.js';
 import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js';
+import { pruneDanglingCustomElementExports } from './scripts/prune-dangling-custom-element-exports.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -107,6 +108,19 @@ export default {
                 });
             },
             packageLinkPhase({ customElementsManifest }) {
+                // Un mini custom element interne marqué @internal (convention TSDoc déjà
+                // reconnue nativement par l'analyzer, cf. hasIgnoreJSDoc dans son propre code —
+                // rien à coder côté projet pour ça) voit sa déclaration et son export `js`
+                // retirés du manifest automatiquement, AVANT que ce plugin ne s'exécute (les
+                // FEATURES natives de l'analyzer, dont ce retrait, sont fusionnées avant les
+                // plugins utilisateur — cf. node_modules/@custom-elements-manifest/analyzer/
+                // src/create.js). Le seul résidu (vérifié empiriquement, #247) : si
+                // `customElements.define()` vit dans un fichier séparé (pattern index.ts de ce
+                // projet, ex. ar-datepicker), l'export `custom-element-definition` de ce fichier
+                // séparé subsiste, pointant vers une déclaration qui n'existe plus nulle part —
+                // nettoyé ici en premier, avant toute autre transformation.
+                pruneDanglingCustomElementExports(customElementsManifest);
+
                 // Résolution des type aliases de string union depuis les sources.
                 // Le CEM sort le nom de l'alias (ex: "ArDropdownPlacement") au lieu de la
                 // valeur réelle — on lit les fichiers pour construire une map de résolution.
