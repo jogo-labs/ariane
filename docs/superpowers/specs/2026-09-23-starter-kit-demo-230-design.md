@@ -33,7 +33,11 @@ Le générateur (`scripts/generate-starter-demo.js`, nouveau, dans `ariane`) est
 **Sortie** : un unique `index.html` autonome —
 
 - `<head>` : `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js">` (pattern déjà documenté/publié, zéro build côté démo) + `<link rel="stylesheet" href="./ariane-starter.css">` (chemin relatif, le fichier vit dans le même repo).
-- `<body>` : une section par composant (titre = `summary` du manifest), puis chaque variant du composant avec son `label`/`description` et son `html` injecté brut. Page unique, scrollable — pas de navigation JS, pas de routing.
+- `<body>` : ossature à deux zones, **inspirée visuellement** de la doc Astro (`Layout.astro`/`SiteNav`) mais recodée en HTML/CSS statique indépendant, sans aucune dépendance à Astro — pas de réutilisation littérale du composant (chemins absolus, liens de nav internes et branding de la doc ne sont pas transposables à un repo externe sans friction) :
+    - une barre de nav simple en haut (titre "Kitchen Sink" + lien vers le repo `ariane`) — **pas de TOC**, contrairement à la doc ;
+    - une zone de contenu scrollable en dessous, avec une section par composant (titre = `summary` du manifest), puis chaque variant avec son `label`/`description` et son `html` injecté brut.
+    - Pas de navigation JS, pas de routing — page unique, scroll simple.
+- **Palette** : sobre et neutre, volontairement distincte de l'identité visuelle "Ariane" (pas la palette ambre/Voûte de `default.css`) — cohérente avec l'esprit "point de départ neutre" du starter-kit plutôt qu'avec le branding de la doc.
 
 **Garde-fou** : si un composant du manifest n'a aucun `variants` trouvé dans son `.mdx` (composant tout juste créé, pas encore documenté), le script émet un avertissement explicite sur stdout et inclut quand même le composant dans la sortie avec une mention "démo à compléter" — un oubli doit être visible, jamais masqué silencieusement.
 
@@ -69,6 +73,7 @@ Le script est exécuté en CI (`ci-core.yml` ou `ci-docs.yml`) en mode dry-run :
 - Réorganisation de l'arborescence des checkouts locaux pour matcher `jogo-labs/ariane` + `jogo-labs/ariane-starter-kit` (implique migration d'historique + workspace VSCode) — évoquée en discussion, explicitement reportée par l'utilisateur, pas nécessaire pour ce chantier.
 - Une page par composant pour la démo (rejeté au profit d'une page unique "Kitchen Sink").
 - Deux repos externes séparés (starter-theme + demo) — rejeté au profit d'un seul repo.
+- Réutilisation littérale du composant Astro `Layout.astro`/`SiteNav` (via un build Astro dont la sortie serait copiée) — rejeté : chemins absolus, liens de nav internes et branding de la doc ne sont pas transposables sans friction à un repo externe. Seule l'inspiration visuelle (ossature nav + contenu) est reprise, recodée en HTML/CSS statique indépendant.
 
 ## Points restant à trancher en implémentation (pas bloquants pour le plan)
 
