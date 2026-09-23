@@ -59,9 +59,7 @@ import '../../translations/en.js';
  *
  * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-input-max-width - Largeur maximale du champ de saisie. Par défaut,
- *   une valeur calculée à partir de la longueur de `format` (indépendante de la largeur du hint,
- *   qui peut rester plus large). En surchargeant cette valeur, gardez-la cohérente avec le
- *   format affiché : trop étroite, elle tronque visuellement la date saisie.
+ *   une valeur calculée à partir de la longueur de `format`.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
  * @cssprop --ar-datepicker-distance - Espacement entre le trigger et le panel.
  * @cssprop --ar-datepicker-offset - Décalage latéral du panel.
