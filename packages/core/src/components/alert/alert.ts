@@ -1,8 +1,9 @@
 import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { property } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
+import { toggleState } from '../../utils/internals-state.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
@@ -44,6 +45,8 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
  * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
  *
+ * @cssState hiding - L'alerte est en cours de fermeture (animation de sortie).
+ *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
 export class ArAlert extends LitElement {
@@ -53,6 +56,8 @@ export class ArAlert extends LitElement {
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
+
+    private _internals: ElementInternals | undefined;
 
     private readonly localize = new LocalizeController(this);
 
@@ -92,10 +97,9 @@ export class ArAlert extends LitElement {
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
      * Passé à `true` au clic sur le bouton close, déclenche la transition CSS.
-     * @ignore
+     * État interne — pas un attribut public, observable en CSS via :state(hiding).
      */
-    @property({ reflect: true, type: Boolean })
-    protected hiding: boolean = false;
+    @state() private hiding: boolean = false;
 
     /**
      * Indique si `role` a été posé manuellement dans le markup initial.
@@ -109,12 +113,20 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
+    }
+
     override firstUpdated(): void {
         // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
         this._hadAuthoredRole = this.hasAttribute('role');
     }
 
     override updated(changed: Map<string, unknown>) {
+        if (changed.has('hiding')) {
+            toggleState(this._internals, 'hiding', this.hiding);
+        }
         if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
             if (this._hadAuthoredRole === true) {
                 warn(
@@ -198,16 +210,18 @@ export class ArAlert extends LitElement {
             <div part="body" class="alert-body">
                 <slot></slot>
             </div>
-            ${this.canBeHidden
-                ? html` <button
-                      part="close-button action-button"
-                      @click=${this._hide}
-                      type="button"
-                      aria-label=${this.localize.term('closeAlert')}
-                  >
-                      <slot name="close-icon">${this._defaultCloseIcon()}</slot>
-                  </button>`
-                : nothing}`;
+            ${
+                this.canBeHidden
+                    ? html` <button
+                          part="close-button action-button"
+                          @click=${this._hide}
+                          type="button"
+                          aria-label=${this.localize.term('closeAlert')}
+                      >
+                          <slot name="close-icon">${this._defaultCloseIcon()}</slot>
+                      </button>`
+                    : nothing
+            }`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */
@@ -225,8 +239,8 @@ export class ArAlert extends LitElement {
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        // La reflection de l'attribut `hiding` par Lit n'est pas synchrone : on attend
-        // updateComplete pour que `:host([hiding])` ait pu matcher avant de mesurer la durée.
+        // Le passage de l'état :state(hiding) par Lit n'est pas synchrone : on attend
+        // updateComplete pour qu'il ait pu matcher avant de mesurer la durée de transition.
         void this.updateComplete.then(() => {
             if (!this._shouldAnimate()) {
                 this._finishHide();

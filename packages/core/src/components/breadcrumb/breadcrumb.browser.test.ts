@@ -151,4 +151,21 @@ describe('ar-breadcrumb — browser', () => {
             expect(parseFloat(computed.minWidth)).to.be.greaterThan(0);
         });
     });
+
+    // ── :state(open) cumulé (généralisation #251) ─────────────────────────────
+
+    describe(':state(open)', () => {
+        it('synchronisé avec open (menu mobile)', async () => {
+            el = await mobileBreadcrumb();
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+    });
 });

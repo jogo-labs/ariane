@@ -151,4 +151,21 @@ describe('ar-table-sort — browser', () => {
             expect(getComputedStyle(tooltip).fontWeight).to.equal('400');
         });
     });
+
+    // ── :state(pending) cumulé (généralisation #251) ──────────────────────────
+
+    describe(':state(pending)', () => {
+        it('synchronisé avec pending, via le clic', async () => {
+            const el = await fixture<ArTableSort>(html`<ar-table-sort></ar-table-sort>`);
+            expect(el.matches(':state(pending)')).to.equal(false);
+
+            btn(el).click();
+            await el.updateComplete;
+            expect(el.matches(':state(pending)')).to.equal(true);
+
+            el.confirm();
+            await el.updateComplete;
+            expect(el.matches(':state(pending)')).to.equal(false);
+        });
+    });
 });

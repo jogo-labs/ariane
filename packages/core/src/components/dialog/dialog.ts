@@ -16,6 +16,7 @@ import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
+import { toggleState } from '../../utils/internals-state.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
@@ -78,6 +79,8 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-bg - Fond du dialog (cascade vers --ar-color-bg). Repli `Canvas` si aucun thème n'est chargé — sans thème et sans bordure (le dialog natif perd son style UA par défaut), le contenu flotte sinon sans surface visible.
  * @cssprop --ar-dialog-color - Couleur du texte du dialog (cascade vers --ar-color-text). Repli `CanvasText` si aucun thème n'est chargé.
  * @cssprop --ar-dialog-shake-outline-color - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce` (cascade vers --ar-color-danger-text).
+ *
+ * @cssState open - Le dialog est ouvert.
  *
  * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
@@ -164,6 +167,8 @@ export class ArDialog extends LitElement {
     @query('dialog', true)
     dialog!: HTMLDialogElement;
 
+    private _internals: ElementInternals | undefined;
+
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
 
@@ -229,6 +234,11 @@ export class ArDialog extends LitElement {
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
+    }
+
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         this._removeOpenListeners();
@@ -257,6 +267,7 @@ export class ArDialog extends LitElement {
             } else if (!this.open && this.dialog?.open) {
                 this._scheduleClose();
             }
+            toggleState(this._internals, 'open', this.open);
         }
     }
 
@@ -280,46 +291,58 @@ export class ArDialog extends LitElement {
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                ${this.withoutHeader
-                    ? nothing
-                    : html`<header part="header">
-                          <h1 part="title" id="dialog-heading">
-                              ${this._slotController.test('label')
-                                  ? html`<slot name="label"></slot>`
-                                  : headingLabel}
-                          </h1>
-                          ${this._slotController.test('header-actions')
-                              ? html`<div part="header-actions">
-                                    <slot name="header-actions"></slot>
-                                </div>`
-                              : nothing}
-                          <button part="close-button action-button" type="button" data-ar-dismiss>
-                              <slot name="close-icon">
-                                  <svg
-                                      aria-hidden="true"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke-width="1.5"
-                                      stroke="currentColor"
-                                  >
-                                      <path
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          d="M6 18 18 6M6 6l12 12"
-                                      ></path>
-                                  </svg>
-                              </slot>
-                              <span class="sr-only">${closeButtonLabel}</span>
-                          </button>
-                      </header>`}
+                ${
+                    this.withoutHeader
+                        ? nothing
+                        : html`<header part="header">
+                              <h1 part="title" id="dialog-heading">
+                                  ${
+                                      this._slotController.test('label')
+                                          ? html`<slot name="label"></slot>`
+                                          : headingLabel
+                                  }
+                              </h1>
+                              ${
+                                  this._slotController.test('header-actions')
+                                      ? html`<div part="header-actions">
+                                            <slot name="header-actions"></slot>
+                                        </div>`
+                                      : nothing
+                              }
+                              <button
+                                  part="close-button action-button"
+                                  type="button"
+                                  data-ar-dismiss
+                              >
+                                  <slot name="close-icon">
+                                      <svg
+                                          aria-hidden="true"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke-width="1.5"
+                                          stroke="currentColor"
+                                      >
+                                          <path
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M6 18 18 6M6 6l12 12"
+                                          ></path>
+                                      </svg>
+                                  </slot>
+                                  <span class="sr-only">${closeButtonLabel}</span>
+                              </button>
+                          </header>`
+                }
                 <div part="body" id="dialog-body">
                     <slot></slot>
                 </div>
-                ${this._slotController.test('footer')
-                    ? html`<footer part="footer">
-                          <slot name="footer"></slot>
-                      </footer>`
-                    : nothing}
+                ${
+                    this._slotController.test('footer')
+                        ? html`<footer part="footer">
+                              <slot name="footer"></slot>
+                          </footer>`
+                        : nothing
+                }
             </dialog>
         `;
     }

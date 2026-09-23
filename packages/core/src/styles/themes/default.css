@@ -856,7 +856,7 @@
         }
 
         &::part(trigger):not(:disabled):active,
-        &[open]::part(trigger):not(:disabled) {
+        &:state(open)::part(trigger):not(:disabled) {
             border-color: var(--ar-button-secondary-border-hover);
             background-color: var(--ar-button-secondary-bg-hover);
             transform: scale(0.985);
@@ -882,7 +882,7 @@
             transition: transform 0.35s;
         }
 
-        &[open]::part(trigger-icon) {
+        &:state(open)::part(trigger-icon) {
             transform: rotate(180deg);
         }
 
@@ -1033,7 +1033,7 @@
         &::part(icon) {
             font-size: 1.5em;
         }
-        &[hiding] {
+        &:state(hiding) {
             opacity: 0;
             transform: scale(0.75);
         }
@@ -1196,14 +1196,14 @@
 
         &::part(home):active,
         &::part(trigger):active,
-        &[open]::part(trigger),
-        &[open]::part(trigger):hover {
+        &:state(open)::part(trigger),
+        &:state(open)::part(trigger):hover {
             background-color: light-dark(rgba(26, 26, 26, 0.8), rgba(255, 255, 255, 0.2));
             color: var(--ar-color-white);
         }
 
-        &[open]::part(trigger),
-        &[open]::part(trigger):hover,
+        &:state(open)::part(trigger),
+        &:state(open)::part(trigger):hover,
         &::part(trigger):active {
             transform: scale(0.985);
         }
@@ -1554,14 +1554,14 @@
             background: transparent;
         }
 
-        &:hover:not([disabled]):not([active])::part(tab) {
+        &:hover:not(:state(disabled)):not(:state(active))::part(tab) {
             color: var(--ar-color-text);
             background: transparent;
             box-shadow: inset 0 -2px 0 var(--ar-color-text);
         }
     }
 
-    ar-tab[disabled]::part(tab) {
+    ar-tab:state(disabled)::part(tab) {
         color: light-dark(
             var(--ar-color-neutral-60),
             color-mix(in oklab, var(--ar-color-vault), white 20%)

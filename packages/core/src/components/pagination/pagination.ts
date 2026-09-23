@@ -337,9 +337,9 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="prev nav-button action-button${isPreviousDisabled
-                            ? ' nav-button--disabled'
-                            : ''}"
+                        part="prev nav-button action-button${
+                            isPreviousDisabled ? ' nav-button--disabled' : ''
+                        }"
                         href="javascript:;"
                         aria-disabled=${isPreviousDisabled}
                         @click=${this._onPreviousPage}
@@ -353,9 +353,9 @@ export class ArPagination extends LitElement {
 
                 <li part="item">
                     <a
-                        part="next nav-button action-button${isNextDisabled
-                            ? ' nav-button--disabled'
-                            : ''}"
+                        part="next nav-button action-button${
+                            isNextDisabled ? ' nav-button--disabled' : ''
+                        }"
                         href="javascript:;"
                         aria-disabled=${isNextDisabled}
                         @click=${this._onNextPage}
@@ -399,20 +399,22 @@ export class ArPagination extends LitElement {
             this._budget !== undefined &&
             (this._budget < floorSlots || isMinimalWindowWithDoubleEllipsis);
 
-        return html`${useSelectMode
-            ? this.renderPageSelect(current, total)
-            : repeat(
-                  pages,
-                  (page) => page,
-                  (page) => {
-                      // -1 et -2 sont des sentinelles représentant les ellipses
-                      return page === -1 || page === -2
-                          ? html` <li part="item" aria-hidden="true">
-                                <span part="ellipsis">...</span>
-                            </li>`
-                          : this.renderPage(page, page === current, total);
-                  },
-              )}`;
+        return html`${
+            useSelectMode
+                ? this.renderPageSelect(current, total)
+                : repeat(
+                      pages,
+                      (page) => page,
+                      (page) => {
+                          // -1 et -2 sont des sentinelles représentant les ellipses
+                          return page === -1 || page === -2
+                              ? html` <li part="item" aria-hidden="true">
+                                    <span part="ellipsis">...</span>
+                                </li>`
+                              : this.renderPage(page, page === current, total);
+                      },
+                  )
+        }`;
     }
 
     /** Génère le `<li>` d'une page. Surcharger en sous-classe si besoin. */

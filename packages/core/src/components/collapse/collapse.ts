@@ -1,9 +1,10 @@
 import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
-import { property, query } from 'lit/decorators.js';
+import { property, query, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
 import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { toggleState } from '../../utils/internals-state.js';
 import styles from './collapse.styles.js';
 
 /**
@@ -21,6 +22,10 @@ import styles from './collapse.styles.js';
  *
  * @cssprop --ar-collapse-duration - Durée de la transition height.
  * @cssprop --ar-collapse-easing - Easing de la transition height.
+ *
+ * @cssState open      - Le panel est ouvert.
+ * @cssState disabled  - Le composant est désactivé.
+ * @cssState animating - Le panel est en cours d'ouverture ou de fermeture (animation height).
  *
  * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. @cancelable
  * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
@@ -65,7 +70,9 @@ export class ArCollapse extends LitElement {
 
     @query('[part="collapsible"]') private _panel!: HTMLElement;
 
-    private _animating = false;
+    private _internals: ElementInternals | undefined;
+
+    @state() private _animating = false;
     private _initialized = false;
     private _externalTrigger: HTMLElement | null = null;
     private _internalTrigger: HTMLElement | null = null;
@@ -84,6 +91,7 @@ export class ArCollapse extends LitElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        this._internals ??= this.attachInternals?.();
         if (!this.id) {
             this.id = `ar-collapse-${++ArCollapse._idCounter}`;
         }
@@ -108,6 +116,15 @@ export class ArCollapse extends LitElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
+        if (changed.has('open')) {
+            toggleState(this._internals, 'open', this.open);
+        }
+        if (changed.has('disabled')) {
+            toggleState(this._internals, 'disabled', this.disabled);
+        }
+        if ((changed as Map<PropertyKey, unknown>).has('_animating')) {
+            toggleState(this._internals, 'animating', this._animating);
+        }
         if (!this._initialized) return;
         if (changed.has('for')) {
             this._detachExternalTrigger();
@@ -148,9 +165,11 @@ export class ArCollapse extends LitElement {
         `;
         return html`
             <div part="collapse">
-                ${this.triggerPosition === 'after'
-                    ? html`${panel}${trigger}`
-                    : html`${trigger}${panel}`}
+                ${
+                    this.triggerPosition === 'after'
+                        ? html`${panel}${trigger}`
+                        : html`${trigger}${panel}`
+                }
             </div>
         `;
     }
