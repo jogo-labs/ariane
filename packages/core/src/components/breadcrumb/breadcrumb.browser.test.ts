@@ -68,6 +68,27 @@ describe('ar-breadcrumb — browser', () => {
         });
     });
 
+    describe('changement de viewport (#241)', () => {
+        it('open se resynchronise après mobile → desktop → mobile, un seul clic rouvre le panel', async () => {
+            el = await mobileBreadcrumb();
+            getBtn(el).click();
+            await aTimeout(50);
+            expect(el.open).to.equal(true);
+
+            // desktop : le panel disparaît du rendu, `open` ne doit plus refléter un panel fermé
+            (el as ArBreadcrumb & { isMobile: boolean }).isMobile = false;
+            await el.updateComplete;
+            expect(el.open).to.equal(false);
+
+            // retour mobile : un seul clic doit rouvrir le panel
+            (el as ArBreadcrumb & { isMobile: boolean }).isMobile = true;
+            await el.updateComplete;
+            getBtn(el).click();
+            await aTimeout(50);
+            expect(getPanel(el).matches(':popover-open')).to.equal(true);
+        });
+    });
+
     describe('structure', () => {
         it('le panel a part="panel"', async () => {
             el = await mobileBreadcrumb();
