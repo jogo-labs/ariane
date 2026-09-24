@@ -1,12 +1,12 @@
 /// <reference types="mocha" />
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
-import './breadcrumb.js';
-import '../breadcrumb-item/breadcrumb-item.js';
+import './index.js';
+import '../breadcrumb-item/index.js';
 import type { ArBreadcrumb } from './breadcrumb.js';
 
 function getBtn(el: ArBreadcrumb): HTMLButtonElement {
-    const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('#breadcrumb-dropdown');
-    if (!btn) throw new Error('#breadcrumb-dropdown introuvable');
+    const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
+    if (!btn) throw new Error('[part="trigger"] introuvable');
     return btn;
 }
 
@@ -68,6 +68,27 @@ describe('ar-breadcrumb — browser', () => {
         });
     });
 
+    describe('changement de viewport (#241)', () => {
+        it('open se resynchronise après mobile → desktop → mobile, un seul clic rouvre le panel', async () => {
+            el = await mobileBreadcrumb();
+            getBtn(el).click();
+            await aTimeout(50);
+            expect(el.open).to.equal(true);
+
+            // desktop : le panel disparaît du rendu, `open` ne doit plus refléter un panel fermé
+            (el as ArBreadcrumb & { isMobile: boolean }).isMobile = false;
+            await el.updateComplete;
+            expect(el.open).to.equal(false);
+
+            // retour mobile : un seul clic doit rouvrir le panel
+            (el as ArBreadcrumb & { isMobile: boolean }).isMobile = true;
+            await el.updateComplete;
+            getBtn(el).click();
+            await aTimeout(50);
+            expect(getPanel(el).matches(':popover-open')).to.equal(true);
+        });
+    });
+
     describe('structure', () => {
         it('le panel a part="panel"', async () => {
             el = await mobileBreadcrumb();
@@ -77,20 +98,74 @@ describe('ar-breadcrumb — browser', () => {
     });
 
     describe('light-dismiss', () => {
-        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-close', async () => {
+        it('un hidePopover() externe ferme le panel et émet ar-breadcrumb-hide une seule fois', async () => {
             el = await mobileBreadcrumb();
-            const closeHandler = (() => {
-                (closeHandler as { called?: boolean }).called = true;
-            }) as EventListener & { called?: boolean };
-            el.addEventListener('ar-breadcrumb-close', closeHandler);
+            let callCount = 0;
+            el.addEventListener('ar-breadcrumb-hide', () => {
+                callCount += 1;
+            });
             getBtn(el).click();
             await aTimeout(50);
 
             (getPanel(el) as HTMLElement & { hidePopover(): void }).hidePopover();
             await aTimeout(50);
 
-            expect(closeHandler.called).to.equal(true);
+            expect(callCount).to.equal(1);
             expect(getPanel(el).matches(':popover-open')).to.equal(false);
+        });
+    });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a un fond et une bordure visibles même sans ariane.css', async () => {
+            el = await mobileBreadcrumb();
+            getBtn(el).click();
+            await aTimeout(50);
+            const panel = getPanel(el);
+            const computed = getComputedStyle(panel);
+
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts, pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopWidth).to.equal('1px');
+        });
+
+        it('le bouton home a une taille de cible tactile même sans ariane.css', async () => {
+            el = await mobileBreadcrumb();
+            const home = el.shadowRoot?.querySelector<HTMLElement>('[part="home"]');
+            if (!home) throw new Error('[part="home"] introuvable');
+            const computed = getComputedStyle(home);
+            expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
+        });
+
+        it('le bouton trigger a une taille de cible tactile même sans ariane.css', async () => {
+            el = await mobileBreadcrumb();
+            const trigger = getBtn(el);
+            const computed = getComputedStyle(trigger);
+            expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
+            expect(parseFloat(computed.minWidth)).to.be.greaterThan(0);
+        });
+    });
+
+    // ── :state(open) cumulé (généralisation #251) ─────────────────────────────
+
+    describe(':state(open)', () => {
+        it('synchronisé avec open (menu mobile)', async () => {
+            el = await mobileBreadcrumb();
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
         });
     });
 });

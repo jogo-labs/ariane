@@ -1,13 +1,19 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup, svg } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { type TemplateResult, html, type CSSResultGroup, svg } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
+import { property } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import animationsStyles from '../../styles/animations.styles.js';
 import styles from './spinner.styles.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /**
- * @summary Indicateur de chargement accessible avec états "en cours" et "terminé".
+ * @summary Indique qu'une opération est en cours quand sa durée est inconnue. À utiliser pour un état de chargement là où une barre de progression déterminée n'est pas pertinente.
  * @display demo
+ * @localized
  *
  * Le spinner SVG est masqué (`hidden`) quand `done` est `true`.
  * Un `<div role="alert">` annonce aux lecteurs d'écran le changement d'état,
@@ -16,52 +22,49 @@ import { warn } from '../../utils/warn.js';
  * @csspart spinner   - L'élément `<svg>` du spinner (visible quand `done` est false).
  * @csspart status    - Le `<div role="alert">` lu par les lecteurs d'écran.
  *
- * @cssprop [--ar-spinner-stroke-color=currentColor] - Couleur du trait SVG. Hérite de `currentColor` par défaut.
+ * @cssprop --ar-spinner-stroke-color - Couleur du trait SVG. Hérite de `currentColor` par défaut.
  */
-@customElement('ar-spinner')
-export class ArSpinner extends LitElement {
+export class ArSpinner extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];
-
-    static readonly NAME = 'ArSpinner';
     static readonly DEFAULT_DONE: boolean = false;
-    static readonly DEFAULT_LOADING_LABEL: string = 'Contenu en cours de chargement';
-    static readonly DEFAULT_DONE_LABEL: string = 'Chargement terminé';
+
+    private readonly localize = new LocalizeController(this);
 
     /**
      * Passe le spinner en état "terminé" : masque le SVG et met à jour l'annonce ARIA.
-     * @attr done
-     * @default false
      */
     @property({ reflect: true, useDefault: true, type: Boolean })
     done: boolean = ArSpinner.DEFAULT_DONE;
 
     /**
-     * Texte annoncé aux lecteurs d'écran pendant le chargement.
-     * @attr loading-label
-     * @default 'Contenu en cours de chargement'
+     * Texte annoncé aux lecteurs d'écran pendant le chargement. Traduit automatiquement selon
+     * `lang` si non personnalisé.
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'loading-label' })
-    loadingLabel: string = ArSpinner.DEFAULT_LOADING_LABEL;
+    loadingLabel: string | undefined = undefined;
 
     /**
-     * Texte annoncé aux lecteurs d'écran quand le chargement est terminé.
-     * @attr done-label
-     * @default 'Chargement terminé'
+     * Texte annoncé aux lecteurs d'écran quand le chargement est terminé. Traduit automatiquement
+     * selon `lang` si non personnalisé.
      */
     @property({ reflect: true, useDefault: true, type: String, attribute: 'done-label' })
-    doneLabel: string = ArSpinner.DEFAULT_DONE_LABEL;
+    doneLabel: string | undefined = undefined;
 
     @property({ reflect: true, type: String, useDefault: true })
     size: 'xs' | 'sm' | 'lg' | undefined = undefined;
 
     override updated(changed: Map<string, unknown>): void {
-        if (changed.has('loadingLabel') && !this.loadingLabel.trim()) {
+        if (
+            changed.has('loadingLabel') &&
+            this.loadingLabel !== undefined &&
+            !this.loadingLabel.trim()
+        ) {
             warn(
                 'ar-spinner',
                 "loading-label est vide — le spinner ne sera pas annoncé aux lecteurs d'écran.",
             );
         }
-        if (changed.has('doneLabel') && !this.doneLabel.trim()) {
+        if (changed.has('doneLabel') && this.doneLabel !== undefined && !this.doneLabel.trim()) {
             warn(
                 'ar-spinner',
                 "done-label est vide — l'état terminé ne sera pas annoncé aux lecteurs d'écran.",
@@ -70,6 +73,9 @@ export class ArSpinner extends LitElement {
     }
 
     override render(): TemplateResult {
+        const label = this.done
+            ? this.doneLabel?.trim() || this.localize.term('loadingDone')
+            : this.loadingLabel?.trim() || this.localize.term('loading');
         return html` <svg
                 part="spinner"
                 class="spinner"
@@ -87,13 +93,7 @@ export class ArSpinner extends LitElement {
                 ></circle>`}
             </svg>
             <div part="status" role="alert" class="sr-only">
-                <p>${this.done ? this.doneLabel : this.loadingLabel}</p>
+                <p>${label}</p>
             </div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-spinner': ArSpinner;
     }
 }

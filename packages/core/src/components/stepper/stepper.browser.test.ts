@@ -5,11 +5,12 @@
  * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
  *   - API Popover native (showPopover / hidePopover / :popover-open)
  *   - Chargement initial en mode mobile (régression : attach différé)
+ *   - Propriétés CSS logiques (RTL).
  */
-import { fixture, html, expect, aTimeout } from '@open-wc/testing';
+import { fixture, html, expect, aTimeout, elementUpdated } from '@open-wc/testing';
 import type { ArStepper } from './stepper.js';
-import './stepper.js';
-import '../stepper-item/stepper-item.js';
+import './index.js';
+import '../stepper-item/index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,201 @@ describe('ar-stepper — browser', () => {
             el = await mobileStepper();
             const panel = el.shadowRoot?.querySelector('[part="panel"]');
             expect(panel).to.not.equal(null);
+        });
+    });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a un fond et une bordure visibles même sans ariane.css', async () => {
+            el = await mobileStepper();
+            getTrigger(el).click();
+            await aTimeout(50);
+            const panel = getPanel(el);
+            const computed = getComputedStyle(panel);
+
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts, pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopWidth).to.equal('1px');
+        });
+    });
+
+    describe('focus après activation (#154)', () => {
+        // Vérifie que le focus atterrit sur le nouvel élément data-path courant et que
+        // :focus-visible matche après un focus() + click() programmatiques, quand le
+        // consommateur répond à ar-stepper-step-change. Ne vérifie PAS l'ordre de
+        // tabulation réel ni la distinction clavier/souris — nécessiterait
+        // @web/test-runner-commands (sendKeys/sendMouse), non installé, hors scope de ce
+        // correctif.
+        it('focalise le nouvel élément data-path courant et :focus-visible matche après activation', async () => {
+            // desktop-from="0" force le mode desktop : évite le chemin mobile (attach du
+            // popover de navigation), qui ré-exécute `void this.updateComplete.then(...)`
+            // sur chaque cycle tant que le dropdown n'est pas attaché — un pattern
+            // réentrant équivalent à celui corrigé pour le focus (#154), non lié au
+            // scénario testé ici. Le forcer en desktop isole le comportement vérifié.
+            el = await fixture<ArStepper>(html`
+                <ar-stepper current-path="/b" desktop-from="0">
+                    <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="/b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await elementUpdated(el);
+            await elementUpdated(el);
+
+            el.addEventListener('ar-stepper-step-change', (event: Event) => {
+                el.currentPath = (event as CustomEvent<{ from: string; to: string }>).detail.to;
+            });
+
+            const itemA = el.querySelector('ar-stepper-item[path="/a"]')!;
+            const linkA = itemA.shadowRoot!.querySelector('.item-header') as HTMLElement;
+            linkA.focus();
+            linkA.click();
+            await elementUpdated(el);
+            await elementUpdated(itemA);
+
+            const newCurrent = itemA.shadowRoot!.querySelector('.item-header') as HTMLElement;
+            expect(newCurrent.tagName.toLowerCase()).to.equal('div');
+            expect(itemA.shadowRoot!.activeElement).to.equal(newCurrent);
+            expect(newCurrent.matches(':focus-visible')).to.equal(true);
+        });
+    });
+
+    describe('propriétés logiques par défaut (RTL)', () => {
+        async function desktopStepper(dir: 'ltr' | 'rtl' = 'ltr'): Promise<ArStepper> {
+            const stepper = await fixture<ArStepper>(html`
+                <ar-stepper current-path="/step2" desktop-from="0" dir=${dir}>
+                    <ar-stepper-item label="Étape 1" href="/step1">
+                        <ar-stepper-item label="Sous-étape 1" href="/step1-1"></ar-stepper-item>
+                    </ar-stepper-item>
+                    <ar-stepper-item label="Étape 2" href="/step2"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await aTimeout(50);
+            return stepper;
+        }
+
+        // Un test purement LTR ne distingue pas margin-inline-end de margin-right (même
+        // résultat calculé dans les deux cas) — la comparaison passe par dir="rtl", où seule
+        // une propriété logique bascule physiquement de côté.
+        it('l\'indicateur utilise margin-inline-end : bascule à gauche sous dir="rtl"', async () => {
+            el = await desktopStepper('rtl');
+            const item = el.querySelector('ar-stepper-item')!;
+            const indicator = item.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!indicator) throw new Error('[part~="indicator"] introuvable');
+            const style = getComputedStyle(indicator);
+            expect(style.marginLeft).to.equal('8px');
+            expect(style.marginRight).to.equal('0px');
+        });
+
+        // La marge spécifique aux sous-étapes (avant : 12px/20px codés en dur dans le
+        // composant) est désormais une valeur de thème (ariane.css, sélecteur structurel
+        // ar-stepper-item > ar-stepper-item::part(indicator)) — sans thème chargé (ce test),
+        // l'indicateur de sous-étape retombe sur la même marge par défaut que le
+        // top-level, toujours exprimée en propriété logique.
+        it("sans thème, l'indicateur de sous-étape retombe sur la marge par défaut (logique) du top-level", async () => {
+            el = await desktopStepper('rtl');
+            const subItem = el.querySelector('ar-stepper-item ar-stepper-item')!;
+            const subIndicator =
+                subItem.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!subIndicator) throw new Error('[part~="indicator"] introuvable');
+            const style = getComputedStyle(subIndicator);
+            expect(style.marginLeft).to.equal('8px');
+            expect(style.marginRight).to.equal('0px');
+        });
+
+        // Régression #140 : .list-unstyled (feuille partagée utilities.styles.ts) posait
+        // padding-left: 0, une propriété physique qui ne résout pas le padding-inline-start
+        // de 40px imposé sous dir="rtl" par une liste à padding UA (indent fantôme côté
+        // start/droite). Le fix passe .list-unstyled en padding-inline-start: 0.
+        it('la liste (.list-unstyled) n\'a pas de padding fantôme côté start (droite) sous dir="rtl"', async () => {
+            el = await desktopStepper('rtl');
+            const list = el.shadowRoot?.querySelector<HTMLElement>('[part="list"]');
+            if (!list) throw new Error('[part="list"] introuvable');
+            const style = getComputedStyle(list);
+            expect(style.paddingRight).to.equal('0px');
+        });
+    });
+
+    describe('reverse-align × dir', () => {
+        async function desktopStepper(reverseAlign: boolean, dir?: 'rtl'): Promise<ArStepper> {
+            const stepper = await fixture<ArStepper>(html`
+                <ar-stepper
+                    current-path="/step2"
+                    desktop-from="0"
+                    ?reverse-align=${reverseAlign}
+                    dir=${dir ?? 'ltr'}
+                >
+                    <ar-stepper-item label="Étape 1" href="/step1"></ar-stepper-item>
+                    <ar-stepper-item label="Étape 2" href="/step2"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await aTimeout(50);
+            return stepper;
+        }
+
+        it("sans reverse-align, en LTR : l'indicateur garde order initial (0)", async () => {
+            el = await desktopStepper(false);
+            const item = el.querySelector('ar-stepper-item')!;
+            const indicator = item.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!indicator) throw new Error('[part~="indicator"] introuvable');
+            expect(getComputedStyle(indicator).order).to.equal('0');
+        });
+
+        it("avec reverse-align, en LTR : l'indicateur passe en fin de ligne (order 2)", async () => {
+            el = await desktopStepper(true);
+            const item = el.querySelector('ar-stepper-item')!;
+            const indicator = item.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!indicator) throw new Error('[part~="indicator"] introuvable');
+            expect(getComputedStyle(indicator).order).to.equal('2');
+        });
+
+        it("avec reverse-align, en RTL : l'indicateur passe aussi en fin de ligne (order 2) — effet composable avec dir", async () => {
+            el = await desktopStepper(true, 'rtl');
+            const item = el.querySelector('ar-stepper-item')!;
+            const indicator = item.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!indicator) throw new Error('[part~="indicator"] introuvable');
+            expect(getComputedStyle(indicator).order).to.equal('2');
+        });
+
+        // `order` est direction-agnostic : ce test ne distinguerait pas une propriété
+        // logique d'une propriété physique équivalente. Le bloc :host([reverse-align])
+        // pose margin-inline-end: 0 / margin-inline-start: 0.5rem sur l'indicateur — sous
+        // dir="rtl", ça doit se résoudre en marginRight (pas marginLeft), l'inverse de ce
+        // qu'un margin-left physique aurait donné (qui resterait marginLeft peu importe dir).
+        it("avec reverse-align, en RTL : la marge de l'indicateur bascule en physique (marginRight, pas marginLeft)", async () => {
+            el = await desktopStepper(true, 'rtl');
+            const item = el.querySelector('ar-stepper-item')!;
+            const indicator = item.shadowRoot?.querySelector<HTMLElement>('[part~="indicator"]');
+            if (!indicator) throw new Error('[part~="indicator"] introuvable');
+            const style = getComputedStyle(indicator);
+            expect(style.marginRight).to.equal('8px');
+            expect(style.marginLeft).to.equal('0px');
+        });
+    });
+
+    // ── :state(open) cumulé (généralisation #251) ─────────────────────────────
+
+    describe(':state(open)', () => {
+        it('synchronisé avec open', async () => {
+            el = await fixture(html`
+                <ar-stepper>
+                    <ar-stepper-item path="a" label="A"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
         });
     });
 });

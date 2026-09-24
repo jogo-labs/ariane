@@ -33,6 +33,11 @@ function getLiveRegion(politeness: AriaPoliteness): HTMLElement | null {
     return region;
 }
 
+export function clearA11yRegion(politeness: AriaPoliteness): void {
+    const region = getLiveRegion(politeness);
+    if (region) region.textContent = '';
+}
+
 export function announceA11y(message: string, politeness: AriaPoliteness = 'polite'): void {
     const normalized = message.trim();
     if (!normalized) return;
@@ -40,10 +45,10 @@ export function announceA11y(message: string, politeness: AriaPoliteness = 'poli
     const region = getLiveRegion(politeness);
     if (!region) return;
 
-    // Vider puis réécrire le message aide les lecteurs d'écran à réannoncer
-    // une même information déclenchée plusieurs fois.
+    // Vider puis réécrire après 50ms : VoiceOver/Safari ignore les mutations trop
+    // rapprochées dans le même cycle de rendu ; rAF n'est pas suffisant.
     region.textContent = '';
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         region.textContent = normalized;
-    });
+    }, 50);
 }

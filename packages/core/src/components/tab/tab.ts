@@ -1,36 +1,30 @@
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, type PropertyValues } from 'lit';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './tab.styles.js';
 
 /**
- * @summary Onglet déclencheur pour ar-tab-group.
+ * @summary Nomme et active un panneau individuel dans un groupe d'onglets.
  * @parent ar-tab-group
  * @display docs
  *
  * @slot - Libellé de l'onglet.
  *
- * @csspart base - Wrapper du slot — couleur, fond, padding, box-shadow actif.
+ * @csspart tab - Racine du composant.
+ * @csspart tab--selected - Wrapper du slot quand l'onglet est actif (variante d'état de `tab`, propriété `active` pilotée par ar-tab-group).
  *
- * @cssprop --ar-tab-color - Couleur du texte (état par défaut).
- * @cssprop --ar-tab-bg - Fond (état par défaut).
  * @cssprop --ar-tab-padding-x - Padding horizontal.
  * @cssprop --ar-tab-padding-y - Padding vertical.
- * @cssprop --ar-tab-border-radius - Rayon de bordure (utile pour le style pill).
- * @cssprop --ar-tab-font-weight - Graisse du texte.
- * @cssprop --ar-tab-hover-color - Couleur du texte au survol.
- * @cssprop --ar-tab-hover-bg - Fond au survol.
- * @cssprop --ar-tab-active-color - Couleur du texte quand l'onglet est actif.
- * @cssprop --ar-tab-active-bg - Fond quand l'onglet est actif.
- * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="base" quand actif. Le thème par défaut le compose depuis --ar-tab-indicator-color et --ar-tab-indicator-width.
- * @cssprop --ar-tab-indicator-color - Couleur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
- * @cssprop --ar-tab-indicator-width - Épaisseur de l'indicateur actif (utilisé par le thème pour composer --ar-tab-active-shadow).
- * @cssprop --ar-tab-disabled-opacity - Opacité de l'onglet désactivé.
- * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Surcharge le token global --ar-focus-ring-offset pour ce composant.
+ * @cssprop --ar-tab-active-shadow - box-shadow complet sur part="tab--selected" quand actif. Repli `inset 0 -2px 0 Highlight` si aucun thème n'est chargé — sans lui, l'onglet actif est visuellement indiscernable des autres.
+ * @cssprop --ar-tab-focus-ring-offset - Décalage de la bague de focus. Valeur négative = inset (non coupée par le conteneur overflow du tab-group). Repli `-2px` si aucun thème n'est chargé — sans lui, l'anneau de focus peut être rogné par le conteneur `overflow-x: auto` du tab-group. Surcharge le token global --ar-focus-ring-offset pour ce composant.
+ * @cssprop --ar-tab-focus-ring-color - Couleur de la bague de focus de l'onglet (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
+ *
+ * @cssState disabled - L'onglet est désactivé.
+ * @cssState active   - L'onglet est actif (sélectionné).
  */
-@customElement('ar-tab')
-export class ArTab extends LitElement {
+export class ArTab extends ArianeElement {
     static override styles = [styles];
 
     /** Nom du ar-tab-panel associé. Requis. */
@@ -38,6 +32,12 @@ export class ArTab extends LitElement {
 
     /** Désactive l'onglet — non sélectionnable, ignoré au clavier. */
     @property({ reflect: true, type: Boolean }) disabled = false;
+
+    /**
+     * Vrai quand l'onglet est actif (sélectionné).
+     * @readonly Piloté par ar-tab-group — ne pas modifier directement.
+     */
+    @property({ reflect: true, type: Boolean }) active = false;
 
     _registry?: TabGroupRegistry | undefined;
 
@@ -53,6 +53,18 @@ export class ArTab extends LitElement {
         }
         this._registry = registry;
         registry.registerTab(this);
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        if (changed.has('disabled')) {
+            this.toggleState('disabled', this.disabled);
+            if (changed.get('disabled') !== undefined) {
+                this._registry?.notifyTabChanged(this);
+            }
+        }
+        if (changed.has('active')) {
+            this.toggleState('active', this.active);
+        }
     }
 
     override connectedCallback(): void {
@@ -74,12 +86,6 @@ export class ArTab extends LitElement {
     };
 
     override render() {
-        return html`<div part="base"><slot></slot></div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab': ArTab;
+        return html`<div part="tab${this.active ? ' tab--selected' : ''}"><slot></slot></div>`;
     }
 }

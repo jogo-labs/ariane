@@ -1,5 +1,5 @@
 /**
- * Utilitaire de dépréciation pour les composants mARIAnne.
+ * Utilitaire de dépréciation pour les composants Ariane.
  *
  * Usage dans un composant :
  *

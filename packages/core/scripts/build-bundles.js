@@ -24,9 +24,20 @@
  */
 
 import esbuild from 'esbuild';
-import { readdirSync, mkdirSync, rmSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import {
+    readdirSync,
+    mkdirSync,
+    rmSync,
+    existsSync,
+    readFileSync,
+    writeFileSync,
+    cpSync,
+} from 'fs';
+import { readFile } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { minifyHTMLLiterals } from 'minify-literals';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -76,6 +87,7 @@ function toEntryKey(file) {
 
 const entryPoints = {
     index: join(SRC, 'index.ts'),
+    headless: join(SRC, 'headless.ts'),
     ...Object.fromEntries(componentFiles.map((f) => [toEntryKey(f), f])),
 };
 
@@ -83,6 +95,35 @@ const cdnEntryPoints = {
     index: join(SRC, 'index.ts'),
     autoloader: join(SRC, 'autoloader.ts'),
 };
+
+// ─── Plugin : minification des templates `html`/`css` (Lit) ──────────────────
+//
+// esbuild `minify: true` minifie la syntaxe JS mais ne touche pas au contenu
+// des template literals — un composant expédie donc son CSS (`css\`...\``)
+// et son markup (`html\`...\``) tels qu'écrits en source (indentation,
+// commentaires) même dans un bundle CDN "prod". `minify-literals` fait ce
+// travail correctement : parsing du TS via acorn (gère les décorateurs Lit),
+// minification CSS via lightningcss, HTML via html-minifier-next, et surtout
+// une minification partielle correcte autour des interpolations `${...}`
+// (quasi systématiques dans les `html\`\`` de Lit pour les bindings
+// d'événements/attributs) — un scan naïf de template literal les ignorerait
+// presque tous.
+function minifyLitTemplatesPlugin() {
+    return {
+        name: 'minify-lit-templates',
+        setup(build) {
+            build.onLoad({ filter: /\.ts$/ }, async (args) => {
+                const source = await readFile(args.path, 'utf8');
+                if (!source.includes('html`') && !source.includes('css`')) return null;
+
+                const result = await minifyHTMLLiterals(source, { fileName: args.path });
+                if (!result) return null;
+
+                return { contents: result.code, loader: 'ts' };
+            });
+        },
+    };
+}
 
 // ─── Options communes ─────────────────────────────────────────────────────────
 
@@ -103,12 +144,34 @@ const commonOptions = {
 // build-css.js --watch tourne en parallèle — un rmSync ici créerait une race
 // condition (dist/styles/ wipeé pendant que build-css.js y écrit).
 if (!WATCH) {
-    // Préserver custom-elements.json pendant le clean : la doc Astro peut en avoir
-    // besoin pendant que ce build tourne (race condition Turbo avec les tâches persistent).
-    const manifestPath = join(ROOT, 'dist', 'custom-elements.json');
-    let preservedManifest = null;
-    if (existsSync(manifestPath)) {
-        preservedManifest = readFileSync(manifestPath, 'utf-8');
+    // Préserver les artefacts générés par build:manifest (qui tourne avant ce script
+    // dans la chaîne `build`) pendant le clean : la doc Astro peut avoir besoin de
+    // custom-elements.json pendant que ce build tourne (race condition Turbo avec les
+    // tâches persistent), et les fichiers vscode.*.json seraient sinon effacés sans
+    // jamais être régénérés (build:manifest ne re-tourne pas après ce script).
+    const preservedFiles = [
+        'custom-elements.json',
+        'vscode.html-custom-data.json',
+        'vscode.css-custom-data.json',
+    ];
+    const preserved = new Map();
+    for (const name of preservedFiles) {
+        const path = join(ROOT, 'dist', name);
+        if (existsSync(path)) {
+            preserved.set(name, readFileSync(path, 'utf-8'));
+        }
+    }
+
+    // Préserver dist/styles/ (généré par build:css, qui tourne avant ce script dans la
+    // chaîne `build`) : build:css ne re-tourne pas après ce script, donc un rmSync sur
+    // dist/ entier effacerait ariane.css/ariane.js sans jamais les régénérer.
+    const stylesDir = join(ROOT, 'dist', 'styles');
+    const preservedStylesTmp = join(tmpdir(), 'ariane-build-bundles-styles-tmp');
+    let hasPreservedStyles = false;
+    if (existsSync(stylesDir)) {
+        rmSync(preservedStylesTmp, { recursive: true, force: true });
+        cpSync(stylesDir, preservedStylesTmp, { recursive: true });
+        hasPreservedStyles = true;
     }
 
     for (const dir of ['dist', 'cdn']) {
@@ -119,8 +182,13 @@ if (!WATCH) {
         mkdirSync(target, { recursive: true });
     }
 
-    if (preservedManifest !== null) {
-        writeFileSync(manifestPath, preservedManifest, 'utf-8');
+    for (const [name, content] of preserved) {
+        writeFileSync(join(ROOT, 'dist', name), content, 'utf-8');
+    }
+
+    if (hasPreservedStyles) {
+        cpSync(preservedStylesTmp, stylesDir, { recursive: true });
+        rmSync(preservedStylesTmp, { recursive: true, force: true });
     }
 }
 
@@ -183,6 +251,7 @@ async function buildCdnProd() {
         chunkNames: 'chunks/[name]-[hash]',
         define: { __DEV__: 'false' },
         metafile: true,
+        plugins: [minifyLitTemplatesPlugin()],
     };
 
     const result = await esbuild.build(options);

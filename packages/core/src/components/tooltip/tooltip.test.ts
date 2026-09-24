@@ -1,15 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
+import { fixture, waitForUpdate, getPart, mockPopoverPanel } from '../../test-utils.js';
 import type { ArTooltip } from './tooltip.js';
-import './tooltip.js';
-
-// happy-dom ne supporte pas l'API Popover — on mock showPopover/hidePopover sur la bulle.
-function mockBubblePopover(el: ArTooltip): void {
-    const bubble = getPart(el, 'bubble') as HTMLElement | null;
-    if (!bubble) return;
-    (bubble as any).showPopover = vi.fn();
-    (bubble as any).hidePopover = vi.fn();
-}
+import './index.js';
 
 describe('ArTooltip', () => {
     let el: ArTooltip;
@@ -20,23 +12,23 @@ describe('ArTooltip', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
             el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
-            mockBubblePopover(el);
+            mockPopoverPanel(el, 'tooltip');
         });
 
         it('monte un shadow DOM', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un bubble avec part="bubble"', () => {
-            expect(getPart(el, 'bubble')).not.toBeNull();
+        it('contient un part="tooltip"', () => {
+            expect(getPart(el, 'tooltip')).not.toBeNull();
         });
 
         it('bubble a role="tooltip"', () => {
-            expect(getPart(el, 'bubble')?.getAttribute('role')).toBe('tooltip');
+            expect(getPart(el, 'tooltip')?.getAttribute('role')).toBe('tooltip');
         });
 
         it('bubble a popover="manual"', () => {
-            expect(getPart(el, 'bubble')?.getAttribute('popover')).toBe('manual');
+            expect(getPart(el, 'tooltip')?.getAttribute('popover')).toBe('manual');
         });
 
         it('affiche le caret par défaut', () => {
@@ -51,8 +43,6 @@ describe('ArTooltip', () => {
         });
 
         it('placement="top"', () => expect(el.placement).toBe('top'));
-        it('distance=6', () => expect(el.distance).toBe(6));
-        it('offset=0', () => expect(el.offset).toBe(0));
         it('showDelay=300', () => expect(el.showDelay).toBe(300));
         it('hideDelay=150', () => expect(el.hideDelay).toBe(150));
         it('withoutArrow=false', () => expect(el.withoutArrow).toBe(false));
@@ -124,10 +114,58 @@ describe('ArTooltip', () => {
             el = await fixture<ArTooltip>(
                 '<ar-tooltip for="btn" disabled show-delay="0">Aide</ar-tooltip>',
             );
-            mockBubblePopover(el);
+            mockPopoverPanel(el, 'tooltip');
             document.getElementById('btn')!.dispatchEvent(new Event('mouseenter'));
             await new Promise((r) => setTimeout(r, 10));
-            expect((getPart(el, 'bubble') as any).showPopover).not.toHaveBeenCalled();
+            expect((getPart(el, 'tooltip') as any).showPopover).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('events de cycle de vie', () => {
+        beforeEach(async () => {
+            document.body.innerHTML = '<button id="btn">x</button>';
+            el = await fixture<ArTooltip>(
+                '<ar-tooltip id="my-tooltip" for="btn" show-delay="0">Aide</ar-tooltip>',
+            );
+            mockPopoverPanel(el, 'tooltip');
+        });
+
+        it('émet ar-tooltip-shown avec detail.id après affichage', async () => {
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-tooltip-shown', shownHandler);
+
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            trigger.dispatchEvent(new Event('mouseenter'));
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(shownHandler).toHaveBeenCalledOnce();
+            const event = shownHandler.mock.calls[0][0] as CustomEvent;
+            expect(event.detail).toEqual({ id: 'my-tooltip' });
+        });
+
+        it('émet ar-tooltip-hidden après masquage effectif', async () => {
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            trigger.dispatchEvent(new Event('mouseenter'));
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-tooltip-hidden', hiddenHandler);
+            trigger.dispatchEvent(new Event('mouseleave'));
+            await new Promise((resolve) => setTimeout(resolve, el.hideDelay + 10));
+
+            expect(hiddenHandler).toHaveBeenCalledOnce();
+        });
+
+        it("n'émet pas ar-tooltip-hidden si le tooltip n'a jamais été affiché", async () => {
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-tooltip-hidden', hiddenHandler);
+
+            const trigger = document.getElementById('btn') as HTMLButtonElement;
+            // mouseleave sans mouseenter préalable : ne doit rien émettre.
+            trigger.dispatchEvent(new Event('mouseleave'));
+            await new Promise((resolve) => setTimeout(resolve, el.hideDelay + 10));
+
+            expect(hiddenHandler).not.toHaveBeenCalled();
         });
     });
 });

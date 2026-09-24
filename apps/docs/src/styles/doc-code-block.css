@@ -1,0 +1,196 @@
+/**
+ * doc-code-block.css
+ *
+ * Bloc de code copiable (CodeBlock.astro), partagé par Playground.astro
+ * (exemples + démo interactive) et la section « Essayez-le » de la home
+ * (index.astro). Couvre ce qui est réellement identique entre les deux
+ * contextes : forme et comportement du bouton Copier (y compris le
+ * hide-until-hover, réservé aux pointeurs fins — sur tactile, il n'y a
+ * pas de survol, le bouton reste donc visible en permanence, sans avoir
+ * besoin d'un garde-fou de largeur d'écran en plus), et la typographie
+ * du code.
+ *
+ * La bordure/le radius/le padding du bloc restent posés par page : le
+ * bloc est une boîte autonome sur la home, un panneau flush à
+ * l'intérieur d'une carte déjà bordée dans Playground — ce n'est pas une
+ * valeur qui a dérivé par accident, la structure diffère réellement
+ * selon le contexte. Ce fichier ne pose donc PAS de border/padding par
+ * défaut sur .code-block/pre : chaque page déclare les siens.
+ *
+ * Important : ce fichier est importé par le composant enfant
+ * CodeBlock.astro, qui lui applique le scope Astro habituel — les
+ * sélecteurs compilés portent donc un `[data-astro-cid-*]`, qui compte
+ * comme une classe dans le calcul de spécificité. Un override posé
+ * depuis la page consommatrice (nécessairement écrit `:global(...)`,
+ * donc SANS cet attribut) doit être préfixé par assez d'ancêtres pour
+ * rester au moins aussi spécifique — sinon, même en étant décrit après
+ * dans la page, il perd face à la règle scopée d'ici. C'est pour ça
+ * qu'aucune propriété codée en dur ici ne doit avoir un équivalent
+ * "à surcharger" ailleurs : soit elle est vraiment commune (pas
+ * d'override), soit elle n'est pas déclarée ici du tout.
+ */
+
+.code-block {
+    position: relative;
+    overflow: hidden;
+    background: var(--doc-code-block-bg);
+}
+
+.code-block pre {
+    margin: 0;
+    overflow-x: auto;
+    font-family: var(--doc-font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+.code-block pre code {
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    background: transparent;
+    color: var(--doc-code-base);
+}
+
+/* ── Coloration syntaxique ──────────────────────────────────────────
+   Tokens --doc-code-* définis globalement dans doc-tokens.css (pas ici) :
+   le contenu narratif MDX colore aussi ses <pre><code> via ces mêmes
+   tokens sans passer par .code-block, cf. le commentaire là-bas.
+
+   :global() est nécessaire : highlight.js insère ces <span class="hljs-*">
+   côté client après le rendu — ils ne portent jamais l'attribut de scope
+   Astro (data-astro-cid-*) posé à la compilation, donc un sélecteur scopé
+   ne les matcherait jamais. */
+:global(.hljs-comment) {
+    color: var(--doc-code-comment);
+    font-style: italic;
+}
+
+/* Chevrons < > d'une balise HTML : le nom lui-même (.hljs-name, imbriqué)
+   reste --doc-code-entity — cf. règle spécifique plus bas, plus précise
+   donc prioritaire sur celle-ci. */
+:global(.hljs-tag),
+:global(.hljs-punctuation) {
+    color: var(--doc-code-punct);
+}
+
+/* « Ce qui est nommé » (balise/entité) — même rôle en HTML (nom de
+   balise), CSS (sélecteur de balise, y compris les custom elements
+   patchés par patchCssCustomElementSelectors) et JS (nom de classe/
+   constructeur) : un même mot doit rester reconnaissable d'un langage à
+   l'autre, ex. <ar-dialog> en HTML et ar-dialog::part(...) en CSS. */
+:global(.hljs-name),
+:global(.hljs-selector-tag),
+:global(.hljs-title.class_) {
+    color: var(--doc-code-entity);
+}
+
+/* « Ce qui se déclare » (nom d'attribut/propriété/sélecteur qualifiant,
+   paramètre de fonction) — rôle unique volontairement partagé sur
+   --doc-ember-hi : c'est le seul rôle qui reste sur l'ambre (la 1ère
+   palette l'utilisait pour 4 rôles distincts, brouillant la lecture). */
+:global(.hljs-attr),
+:global(.hljs-attribute),
+:global(.hljs-selector-class),
+:global(.hljs-selector-id),
+:global(.hljs-selector-attr),
+:global(.hljs-params) {
+    color: var(--doc-code-name);
+}
+
+/* Accès en lecture à une propriété (JS : e.detail.to) — même famille que
+   --doc-code-name (déclaration) mais un ton plus sourd : hiérarchie, pas
+   nouvelle catégorie de rôle. */
+:global(.hljs-property) {
+    color: var(--doc-code-property);
+}
+
+:global(.hljs-string),
+:global(.hljs-regexp) {
+    color: var(--doc-code-string);
+}
+
+/* Noms venus de la plateforme/librairie, pas du code métier lui-même :
+   argument de ::part(...) (mode maison, cf. playground.js), globals JS
+   (document, console), constantes globales (NaN, Infinity...). */
+:global(.hljs-selector-part),
+:global(.hljs-variable.language_),
+:global(.hljs-variable.constant_) {
+    color: var(--doc-code-special);
+}
+
+/* Ce qui pilote la grammaire : mots-clés JS, at-rules/!important CSS,
+   sélecteurs pseudo (:hover, ::part), et l'enveloppe d'une fonction
+   fléchée (.hljs-function — auparavant sans règle, donc en couleur de
+   base alors que son contenu .hljs-params était coloré). */
+:global(.hljs-keyword),
+:global(.hljs-meta),
+:global(.hljs-function),
+:global(.hljs-selector-pseudo) {
+    color: var(--doc-code-keyword);
+}
+
+/* Ce qui s'exécute : appel de fonction/méthode, fonction CSS (var(),
+   rect()...). .hljs-title seul (sans .function_/.class_ plus haut, plus
+   spécifique donc prioritaire) retombe ici aussi par défaut. */
+:global(.hljs-title),
+:global(.hljs-title.function_),
+:global(.hljs-built_in) {
+    color: var(--doc-code-function);
+}
+
+:global(.hljs-number),
+:global(.hljs-literal) {
+    color: var(--doc-code-number);
+}
+
+/* Interpolation dans un template literal JS (`${expr}`) — reste la
+   couleur de base : c'est un retour au code normal, pas une catégorie
+   syntaxique à part. */
+:global(.hljs-subst) {
+    color: var(--doc-code-base);
+}
+
+.copy-btn {
+    position: absolute;
+    inset-block-start: 0.6rem;
+    /* Logique RTL : le bouton suit le bord de fin de lecture. */
+    inset-inline-end: 0.6rem;
+    padding: 0.25rem 0.7rem;
+    background: transparent;
+    color: var(--doc-paper);
+    border: 1px solid var(--doc-on-dark-line);
+    border-radius: 50px;
+    font-size: var(--doc-font-size-sm);
+    cursor: pointer;
+    z-index: 1;
+    transition:
+        opacity 0.18s var(--doc-ease),
+        background 0.15s,
+        color 0.15s;
+
+    &.copied,
+    &.copied:hover {
+        background: var(--doc-ember);
+        border-color: var(--doc-ember);
+        color: var(--doc-ink);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .copy-btn {
+        opacity: 0;
+
+        &:hover {
+            background: var(--doc-paper);
+            color: var(--doc-ink);
+        }
+    }
+
+    .code-block:hover .copy-btn,
+    .code-block:has(pre:focus) .copy-btn,
+    .code-block:has(code:focus) .copy-btn,
+    .copy-btn:focus {
+        opacity: 1;
+    }
+}

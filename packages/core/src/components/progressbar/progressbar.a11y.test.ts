@@ -5,7 +5,7 @@
  * Tests d'accessibilité axe-core pour ar-progressbar, via @web/test-runner (Chromium).
  */
 import { fixture, html, expect } from '@open-wc/testing';
-import './progressbar.js';
+import './index.js';
 
 describe('ar-progressbar — accessibilité', () => {
     it('barre de progression a 0% est accessible', async () => {

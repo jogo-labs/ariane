@@ -3,6 +3,12 @@ import type { CSSResultGroup } from 'lit';
 import animationsStyles from '../animations.styles.js';
 
 const panelBaseStyles = css`
+    /* Cette règle est la source canonique pour toute propriété qui ne fait que
+       consommer un token --ar-panel-* générique sans jamais diverger d'un
+       composant à l'autre. Un composant consommateur (voir static override
+       styles) ne doit ajouter sa propre règle ::part(panel) dans ariane.css
+       QUE pour une propriété dont la valeur diverge réellement du générique —
+       jamais pour redéclarer la même valeur. */
     [part='panel'] {
         /* Popover positioning reset */
         position: absolute;
@@ -14,17 +20,15 @@ const panelBaseStyles = css`
         overflow-y: auto;
 
         /* Tokens visuels */
-        background-color: var(--ar-panel-bg, var(--ar-color-bg, #fff));
-        color: var(--ar-panel-text, var(--ar-color-text, #2e2e31));
-        border: 1px solid var(--ar-panel-border-color, var(--ar-color-border, #e2e2e5));
-        border-radius: var(--ar-panel-radius, 0.375rem);
-        box-shadow: var(
-            --ar-panel-shadow,
-            0 4px 6px -1px rgba(0, 0, 0, 0.1),
-            0 10px 15px -3px rgba(0, 0, 0, 0.07)
-        );
-        padding: var(--ar-panel-padding, 0.25rem);
-        max-width: var(--ar-panel-max-width, 18rem);
+        background-color: var(--ar-panel-bg, Canvas);
+        color: var(--ar-panel-text, CanvasText);
+        border: 1px solid var(--ar-panel-border-color, ButtonBorder);
+        border-radius: var(--ar-panel-radius);
+        box-shadow: var(--ar-panel-shadow);
+        padding: var(--ar-panel-padding);
+        min-width: var(--ar-panel-min-width);
+        /* a11y-fallback: évite un débordement horizontal (WCAG 1.4.10 Reflow) sur un viewport étroit si aucun thème n'est chargé — 18rem correspond à --ar-panel-max-width par défaut, calc(100vw - 2rem) borne la largeur sur mobile */
+        max-width: var(--ar-panel-max-width, min(18rem, calc(100vw - 2rem)));
     }
 
     [part='panel']:not(:popover-open) {
@@ -32,7 +36,7 @@ const panelBaseStyles = css`
     }
 
     [part='panel']:popover-open {
-        animation: arPanelShow 0.2s ease-out;
+        animation: arPanelShow var(--ar-panel-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {

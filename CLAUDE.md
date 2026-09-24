@@ -14,11 +14,12 @@ Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorep
 - Toujours `import type` pour les imports de types
 - Conventional Commits (commitlint + Husky)
 - CSS tokens `--doc-*` (`apps/docs/`) ne forcent jamais un ajout dans `packages/core`
+- Un `${expr}` seul contenu d'un élément texte (sr-only, label…) dans un template Lit : si la ligne dépasse 100 caractères, Prettier peut le wrapper d'une façon qui insère des nœuds de texte (espaces) dans le DOM rendu, corrompant `textContent`/le nom accessible. Extraire la valeur en `const` avant le template plutôt que d'inliner un appel long.
 
 ## Philosophie de conception
 
 - **Mobile-first** : toute décision d'API, de comportement ou de style part du cas mobile. Le desktop est une amélioration progressive, pas le point de départ. Avant d'ajouter une option, se demander si le comportement par défaut couvre déjà le cas mobile sans configuration.
-- **Headless** : aucun fallback cosmétique dans les composants (`var(--token)` sans valeur par défaut). Toutes les valeurs de design vont dans `themes/default.css`. Les fallbacks structurels (0px pour des compensations de layout) sont acceptables.
+- **Headless** : aucun fallback cosmétique dans les composants (`var(--token)` sans valeur par défaut). Toutes les valeurs de design vont dans `themes/ariane.css` (liste d'`@import`) et ses fragments sous `themes/ariane/` (`_palette.css`, `_semantic-tokens.css`, `_global-tokens.css`, `shared/`, `components/`). Les fallbacks structurels (0px pour des compensations de layout) sont acceptables.
 
 ## Common Commands
 

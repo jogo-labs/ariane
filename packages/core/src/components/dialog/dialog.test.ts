@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDialog } from './dialog.js';
 import { fixture, waitForUpdate, getPart, requireShadow } from '../../test-utils.js';
-import './dialog.js';
+import './index.js';
+
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -54,6 +60,12 @@ describe('ArDialog', () => {
             expect(requireShadow(el).querySelector('[data-ar-dismiss]')).not.toBeNull();
         });
 
+        it('contient part="close-button action-button"', () => {
+            expect(getPart(el, 'close-button')?.getAttribute('part')).toBe(
+                'close-button action-button',
+            );
+        });
+
         it("le bouton close n'a pas d'aria-describedby", async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             const closeBtn = requireShadow(el).querySelector('[data-ar-dismiss]');
@@ -75,8 +87,8 @@ describe('ArDialog', () => {
         it('mode est modal', () => expect(el.mode).toBe('modal'));
         it('placement est right', () => expect(el.placement).toBe('right'));
         it('size est md', () => expect(el.size).toBe('md'));
-        it('preventedMessage a sa valeur par défaut', () =>
-            expect(el.preventedMessage).toBe('Fermeture bloquée.'));
+        it('preventedMessage vaut undefined par défaut (traduit dynamiquement)', () =>
+            expect(el.preventedMessage).toBeUndefined());
     });
 
     // ── Propriétés reflect ────────────────────────────────────────────────────
@@ -150,6 +162,144 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
 
             expect(getPart(el, 'footer')).toBeNull();
+        });
+    });
+
+    // ── without-header ───────────────────────────────────────────────────────
+
+    describe('without-header', () => {
+        it('withoutHeader vaut false par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(el.withoutHeader).toBe(false);
+        });
+
+        it('without-header reflète en attribut', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(el.hasAttribute('without-header')).toBe(true);
+            expect(el.withoutHeader).toBe(true);
+        });
+
+        it('le header est présent par défaut', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+        });
+
+        it('le header est absent du DOM quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getPart(el, 'title')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
+            expect(requireShadow(el).querySelector('[data-ar-dismiss]')).toBeNull();
+        });
+
+        it('le dialog et le body restent présents quand without-header est actif', async () => {
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            expect(getPart(el, 'dialog')).not.toBeNull();
+            expect(getPart(el, 'body')).not.toBeNull();
+        });
+
+        it('combiné à mode="drawer", le header reste absent et aria-label reste appliqué', async () => {
+            el = await fixture(
+                '<ar-dialog without-header mode="drawer" label="Filtres"></ar-dialog>',
+            );
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Filtres');
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+        });
+
+        it('bascule without-header à true après le montage remplace aria-labelledby par aria-label', async () => {
+            el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
+            expect(getPart(el, 'header')).not.toBeNull();
+            expect(getDialogEl(el).getAttribute('aria-labelledby')).toBe('dialog-heading');
+
+            el.withoutHeader = true;
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'header')).toBeNull();
+            expect(getDialogEl(el).hasAttribute('aria-labelledby')).toBe(false);
+            expect(getDialogEl(el).getAttribute('aria-label')).toBe('Titre');
+        });
+    });
+
+    // ── header-actions ───────────────────────────────────────────────────────
+
+    describe('slot header-actions', () => {
+        it('le wrapper part="header-actions" est absent du DOM sans contenu assigné', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            expect(getPart(el, 'header-actions')).toBeNull();
+        });
+
+        it('le wrapper part="header-actions" est présent si un enfant slot="header-actions" est fourni', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).not.toBeNull();
+        });
+
+        it('le wrapper disparaît dynamiquement si le slot="header-actions" est retiré', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions" id="a">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).not.toBeNull();
+
+            (el.querySelector('#a') as Element).remove();
+            await waitForUpdate(el);
+
+            expect(getPart(el, 'header-actions')).toBeNull();
+        });
+
+        it('le slot header-actions est rendu dans le wrapper', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            const wrapper = getPart(el, 'header-actions') as HTMLElement;
+            expect(wrapper.querySelector('slot[name="header-actions"]')).not.toBeNull();
+        });
+
+        it('le contenu slot="header-actions" est assigné', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions" id="action-btn">Plein écran</button>
+                </ar-dialog>
+            `);
+            const slotEl = requireShadow(el).querySelector<HTMLSlotElement>(
+                'slot[name="header-actions"]',
+            );
+            expect(slotEl).not.toBeNull();
+            const assigned = slotEl!.assignedElements();
+            expect(assigned).toHaveLength(1);
+            expect((assigned[0] as HTMLElement).id).toBe('action-btn');
+        });
+
+        it('le wrapper header-actions est positionné avant le bouton close', async () => {
+            el = await fixture(`
+                <ar-dialog label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            const header = getPart(el, 'header') as HTMLElement;
+            const wrapper = getPart(el, 'header-actions');
+            const closeBtn = header.querySelector('[data-ar-dismiss]');
+            expect(wrapper).not.toBeNull();
+            expect(closeBtn).not.toBeNull();
+            const position = wrapper!.compareDocumentPosition(closeBtn!);
+            expect(Boolean(position & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+        });
+
+        it('le wrapper header-actions est absent du DOM quand without-header est actif', async () => {
+            el = await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <button slot="header-actions">Action</button>
+                </ar-dialog>
+            `);
+            expect(getPart(el, 'header-actions')).toBeNull();
+            expect(requireShadow(el).querySelector('slot[name="header-actions"]')).toBeNull();
         });
     });
 
@@ -242,6 +392,16 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             expect(getDialogEl(el).open).toBe(false);
             expect(el.open).toBe(false);
+        });
+
+        it('ar-dialog-show annulé émet ar-dialog-show-prevented', async () => {
+            el = await fixture('<ar-dialog></ar-dialog>');
+            el.addEventListener('ar-dialog-show', (e) => e.preventDefault());
+            const prevented = vi.fn();
+            el.addEventListener('ar-dialog-show-prevented', prevented);
+            el.open = true;
+            await waitForUpdate(el);
+            expect(prevented).toHaveBeenCalledOnce();
         });
 
         it('open=true deux fois ne double-appelle pas showModal', async () => {
@@ -353,7 +513,7 @@ describe('ArDialog', () => {
             el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
             el.open = false;
             await waitForUpdate(el);
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+            await new Promise((resolve) => setTimeout(resolve, 60));
 
             expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
                 'Fermeture bloquée.',
@@ -562,7 +722,7 @@ describe('ArDialog', () => {
             el = await fixture('<ar-dialog></ar-dialog>');
             el.appendChild(document.createTextNode(' '));
             await waitForUpdate(el);
-            expect(spy).toHaveBeenCalledTimes(1);
+            expect(spy).toHaveBeenCalledOnce();
         });
     });
 
@@ -599,6 +759,66 @@ describe('ArDialog', () => {
 
             expect(el.open).toBe(false);
             btn.remove();
+        });
+    });
+
+    describe('personnalisation --ar-dialog-width', () => {
+        let presetStyle: HTMLStyleElement;
+
+        afterEach(() => {
+            presetStyle?.remove();
+        });
+
+        it('sans thème, --ar-dialog-width vaut le repli littéral du composant (500px, mode modal)', async () => {
+            el = await fixture('<ar-dialog size="sm"></ar-dialog>');
+
+            // La taxonomie sm/lg/xl est désormais une opinion du thème (ariane.css) —
+            // sans thème chargé, size="sm" n'a plus d'effet, seul le repli littéral du
+            // composant s'applique (cf. ADR-005, amendement 2026-07-29, #129 lot 3b).
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('500px');
+        });
+
+        it('sans thème, le mode drawer pilote --ar-dialog-width vers son propre repli littéral (720px)', async () => {
+            el = await fixture('<ar-dialog mode="drawer" size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('720px');
+        });
+
+        it('quand le thème fournit la taxonomie de taille, la règle externe pilote --ar-dialog-width', async () => {
+            // happy-dom ne charge pas ariane.css : on simule la règle d'attribut que
+            // le thème fournit normalement dans le bloc ar-dialog { &[size='sm'] { ... } },
+            // pour vérifier que la cascade externe l'emporte réellement (et pas
+            // seulement que le composant expose --ar-dialog-width).
+            presetStyle = document.createElement('style');
+            presetStyle.textContent = "ar-dialog[size='sm'] { --ar-dialog-width: 360px; }";
+            document.head.appendChild(presetStyle);
+
+            el = await fixture('<ar-dialog size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('360px');
+        });
+
+        it('quand le thème fournit la taxonomie de taille du drawer, la règle externe pilote --ar-dialog-width', async () => {
+            presetStyle = document.createElement('style');
+            presetStyle.textContent =
+                "ar-dialog[mode='drawer'][size='sm'] { --ar-dialog-width: 280px; }";
+            document.head.appendChild(presetStyle);
+
+            el = await fixture('<ar-dialog mode="drawer" size="sm"></ar-dialog>');
+
+            expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('280px');
+        });
+    });
+
+    describe('personnalisation --ar-dialog-spacing', () => {
+        it('applique --ar-dialog-spacing au padding du body', async () => {
+            el = await fixture('<ar-dialog style="--ar-dialog-spacing: 42px"></ar-dialog>');
+            await waitForUpdate(el);
+
+            const bodyEl = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
+            const computed = getComputedStyle(bodyEl);
+            expect(computed.getPropertyValue('padding-block').trim()).toBe('42px');
+            expect(computed.getPropertyValue('padding-inline').trim()).toBe('42px');
         });
     });
 
@@ -642,6 +862,167 @@ describe('ArDialog', () => {
 
             const placementWarns = spy.mock.calls.filter((c) => String(c[0]).includes('placement'));
             expect(placementWarns).toHaveLength(0);
+        });
+    });
+
+    describe('warn() — slot label ignoré en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si slot="label" est fourni sans la prop label et without-header actif', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si la prop label est fournie en plus du slot", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre">
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog>
+                    <span slot="label">Titre riche</span>
+                </ar-dialog>
+            `);
+
+            const slotWarns = spy.mock.calls.filter((c) => String(c[0]).includes('slot="label"'));
+            expect(slotWarns).toHaveLength(0);
+        });
+    });
+
+    describe('warn() — aucun moyen de fermeture en mode without-header', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it('émet un warn si without-header sans close-on-backdrop ni data-ar-dismiss/accept', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog without-header label="Titre" open></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
+        });
+
+        it("n'émet pas ce warn si close-on-backdrop est actif", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(
+                '<ar-dialog without-header close-on-backdrop label="Titre" open></ar-dialog>',
+            );
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-dismiss est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre" open>
+                    <button data-ar-dismiss>Fermer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn si un élément data-ar-accept est présent dans le contenu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture(`
+                <ar-dialog without-header label="Titre" open>
+                    <button data-ar-accept>Confirmer</button>
+                </ar-dialog>
+            `);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn hors mode without-header", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            await fixture('<ar-dialog open></ar-dialog>');
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("n'émet pas ce warn au montage initial (avant ouverture), même sans moyen de fermeture", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns).toHaveLength(0);
+        });
+
+        it("émet ce warn à l'ouverture (_show), pas seulement au montage", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+            el = await fixture('<ar-dialog without-header label="Titre"></ar-dialog>');
+            await waitForUpdate(el);
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('Échap'))).toHaveLength(0);
+
+            el.open = true;
+            await waitForUpdate(el);
+
+            const closeWarns = spy.mock.calls.filter((c) => String(c[0]).includes('Échap'));
+            expect(closeWarns.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit le label accessible du bouton de fermeture', async () => {
+            el = await fixture('<ar-dialog label="Titre" lang="en"></ar-dialog>');
+            const closeLabel = requireShadow(el).querySelector('[part~="close-button"] .sr-only');
+            expect(closeLabel?.textContent).toBe('Close dialog');
+        });
+
+        it('closeLabel personnalisé prend le pas sur la traduction', async () => {
+            el = await fixture('<ar-dialog label="Titre" close-label="Annuler"></ar-dialog>');
+            const closeLabel = requireShadow(el).querySelector('[part~="close-button"] .sr-only');
+            expect(closeLabel?.textContent).toBe('Annuler');
+        });
+
+        it('lang="en" traduit le message de fermeture bloquée', async () => {
+            el = await fixture('<ar-dialog label="Titre" open lang="en"></ar-dialog>');
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
+            el.open = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
+                'Closing blocked.',
+            );
+        });
+
+        it('lang="en" traduit le titre de repli quand label est vide', async () => {
+            el = await fixture('<ar-dialog open lang="en"></ar-dialog>');
+            const heading = requireShadow(el).querySelector('#dialog-heading');
+            expect(heading?.textContent?.trim()).toBe('Dialog');
         });
     });
 });

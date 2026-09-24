@@ -29,9 +29,9 @@ function needsBorder(value: string): boolean {
     <table class="palette-table">
         <thead>
             <tr>
-                <th class="hue-label"></th>
+                <th class="hue-label" scope="col"></th>
                 {displayStops.map((stop) => (
-                    <th class="stop-header">{stop}</th>
+                    <th class="stop-header" scope="col">{stop}</th>
                 ))}
             </tr>
         </thead>
@@ -79,16 +79,16 @@ function needsBorder(value: string): boolean {
 
     .stop-header {
         font-size: 0.65rem;
-        color: var(--doc-text-muted, #6b7280);
-        font-weight: 400;
+        color: var(--doc-text-muted);
+        font-weight: var(--doc-font-weight-normal);
         text-align: center;
         padding: 0 2px 0.4rem;
     }
 
     .hue-label {
-        font-size: .75rem;
-        font-family: monospace;
-        color: var(--doc-text-muted, #6b7280);
+        font-size: var(--doc-font-size-xs);
+        font-family: var(--doc-font-mono);
+        color: var(--doc-text-muted);
         padding-right: 0.5rem;
         padding-bottom: 2.5rem;
         vertical-align: middle;
@@ -113,11 +113,11 @@ function needsBorder(value: string): boolean {
         width: 100%;
         min-width: 2.5rem;
         height: 2.5rem;
-        border-radius: 4px;
+        border-radius: var(--doc-radius-sm);
     }
 
     .swatch-bordered {
-        border: 1px solid var(--doc-border, #e5e7eb);
+        border: 1px solid var(--doc-border);
     }
 
     .swatch-empty {
@@ -127,8 +127,8 @@ function needsBorder(value: string): boolean {
 
     .stop-value {
         font-size: 0.65rem;
-        font-family: monospace;
-        color: var(--doc-text-muted, #6b7280);
+        font-family: var(--doc-font-mono);
+        color: var(--doc-text-muted);
         text-align: center;
         width: 100%;
         overflow: hidden;

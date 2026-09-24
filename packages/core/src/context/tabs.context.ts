@@ -8,6 +8,7 @@ export interface TabGroupRegistry {
     registerPanel(panel: ArTabPanel): void;
     unregisterPanel(panel: ArTabPanel): void;
     activate(name: string): void;
+    notifyTabChanged(tab: ArTab): void;
 }
 
 export const tabGroupContext = createContext<TabGroupRegistry>(Symbol('ar-tab-group'));

@@ -1,6 +1,6 @@
 ---
 name: ariane-new-component
-description: Conventions spécifiques au projet Ariane pour créer un nouveau composant — naming ar-*, structure fichiers, annotations CEM custom (@display, @parent, @ignore), test helpers maison. À utiliser quand on crée ou scaffold un nouveau composant ar-*.
+description: Conventions spécifiques au projet Ariane pour créer un nouveau composant — naming ar-*, structure fichiers, base class ArianeElement/ArianeFormElement, annotations CEM custom (@display, @parent, @ignore, @internal, @cssState), test helpers maison. À utiliser quand on crée ou scaffold un nouveau composant ar-*.
 ---
 
 # Créer un nouveau composant Ariane
@@ -15,13 +15,40 @@ npm run create ar-<nom>   # depuis la racine du monorepo
 
 ```
 components/<nom>/
-  <nom>.ts          # Classe LitElement, @customElement('ar-<nom>')
+  <nom>.ts          # Classe extends ArianeElement, @customElement('ar-<nom>')
   <nom>.styles.ts   # Styles Lit css`` tagged template
   <nom>.test.ts     # Tests Vitest
   # Composants complexes ajoutent :
   <nom>.renderer.ts # Helpers de rendu (desktop/mobile)
   <nom>.utils.ts    # Fonctions utilitaires pures
 ```
+
+## Base class : ArianeElement / ArianeFormElement
+
+Tout composant étend `ArianeElement` (`packages/core/src/base/ariane-element.ts`), jamais
+`LitElement` directement — le scaffold le génère déjà. `ArianeElement` attache
+`ElementInternals` en `connectedCallback()` et expose, sans indirection (inspiré de
+[`WebAwesomeElement`](https://github.com/shoelace-style/webawesome/blob/next/packages/webawesome/src/internal/webawesome-element.ts)) :
+
+- `this.internals: ElementInternals | undefined` — accès direct, typé, pour tout besoin natif
+  (form participation, etc.).
+- `this.toggleState(name, active)` — pose ou retire un `:state()` CSS, cumulatif à un
+  attribut/propriété déjà reflété (ex. `:state(open)` en plus de `open`), jamais un
+  remplacement. Documenter avec `@cssState` (voir plus bas).
+
+Appliqué à tous les composants même sans `:state()` aujourd'hui : `attachInternals()` non
+exploité n'a aucun effet de bord, et ça évite une taxonomie à deux niveaux à re-justifier à
+chaque nouveau composant (cf. #253 pour le raisonnement complet).
+
+**Composant qui participe à un `<form>` natif** (ex. `ar-datepicker`) : `extends
+ArianeFormElement` à la place (`packages/core/src/base/ariane-form-element.ts`) —
+`formAssociated = true` est hérité automatiquement, pas besoin de le redéclarer. Utiliser
+`this.internals?.setFormValue(...)`/`this.internals?.setValidity(...)` directement, sans
+wrapper : `this.internals` est déjà pleinement typé et découvrable. `happy-dom` (Vitest)
+n'implémente pas `attachInternals()` — `this.internals` y reste `undefined` ; un test qui a
+besoin de l'exerciser l'injecte temporairement sur `HTMLElement.prototype` (cf.
+`datepicker.test.ts`, `describe('setValidity / required')`), ou passe par un
+`*.browser.test.ts` (Playwright réel) pour `:state()`.
 
 ## Naming
 
@@ -43,6 +70,9 @@ Les annotations standard (`@slot`, `@csspart`, `@cssprop`, `@event`, `@summary`)
 | `@display docs` | Page doc : API uniquement, pas de playground |
 | `@parent ar-<tag>` | Marque comme sous-composant — nav et home page le lisent via CEM `x-parent` |
 | `@ignore` | Exclut un membre des contrôles playground |
+| `@cssState <name> - <description>` | Documente un `:state()` posé via `this.toggleState()` (`ArianeElement`) — reconnu **nativement** par l'analyzer (comme `@cssprop`), génère l'onglet doc « CSS Custom States » automatiquement |
+
+`@internal` sur une classe (pas un membre) est une convention TSDoc reconnue **nativement** par `@custom-elements-manifest/analyzer` (pas un ajout maison) : sa déclaration et son export sont retirés automatiquement du manifest publié — utile pour un mini custom element purement interne, jamais utilisé seul par un consommateur (ex. exporté uniquement via `::part()`). Si son `customElements.define()` vit dans un fichier séparé (pattern `index.ts`, comme les composants publics), `pruneDanglingCustomElementExports` (`cem.config.js`) nettoie le résidu ; aucune action supplémentaire requise.
 
 ## Test helpers (boilerplate maison)
 

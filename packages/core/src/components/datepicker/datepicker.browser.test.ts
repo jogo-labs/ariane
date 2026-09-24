@@ -1,0 +1,608 @@
+/// <reference types="mocha" />
+/**
+ * datepicker.browser.test.ts
+ *
+ * Tests nécessitant un vrai browser (Chromium via @web/test-runner) :
+ *   - Focus à l'ouverture
+ *   - Retour du focus au trigger à la fermeture
+ *   - Navigation clavier dans la grille
+ *   - Roving tabindex
+ *   - Synchronisation input texte ↔ calendrier
+ */
+import { expect, fixture, html, aTimeout } from '@open-wc/testing';
+import type { ArDatepicker } from './datepicker.js';
+import './index.js';
+
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (le Chromium headless de CI n'est pas garanti
+// en fr-FR). En production, le site de doc pose lang="fr" sur <html> ; on
+// reproduit ça ici pour que les assertions FR par défaut restent valides.
+document.documentElement.lang = 'fr';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+async function openPicker(el: ArDatepicker): Promise<void> {
+    el.open = true;
+    await el.updateComplete;
+    // Laisser le temps à _show() de terminer son flow async + focus
+    await aTimeout(50);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+
+describe('ar-datepicker — browser', () => {
+    let el: ArDatepicker;
+
+    afterEach(() => el?.remove());
+
+    // ── Focus à l'ouverture ───────────────────────────────────────────────────
+
+    describe("focus à l'ouverture", () => {
+        it("focus sur aujourd'hui quand aucune date sélectionnée", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            expect(focused).to.not.equal(null);
+            expect(el.shadowRoot?.activeElement).to.equal(focused);
+        });
+
+        it("focus sur la date sélectionnée à l'ouverture", async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-12"></ar-datepicker>`);
+            await openPicker(el);
+
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            expect(focused?.getAttribute('aria-label')).to.include('12');
+        });
+    });
+
+    // ── Retour du focus au trigger à la fermeture ─────────────────────────────
+
+    describe('focus retourné à la fermeture', () => {
+        it('Escape retourne le focus au trigger', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            expect(el.shadowRoot?.activeElement).to.equal(
+                el.shadowRoot?.querySelector('[part="trigger"]'),
+            );
+        });
+
+        it("la sélection d'une date retourne le focus sur l'input", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const dayBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            dayBtn?.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            expect(el.shadowRoot?.activeElement).to.equal(
+                el.shadowRoot?.querySelector('[part~="input"]'),
+            );
+        });
+    });
+
+    // ── Navigation clavier ────────────────────────────────────────────────────
+
+    describe('navigation clavier', () => {
+        it("ArrowRight déplace le focus d'un jour", async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-12"></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            expect(focused?.getAttribute('aria-label')).to.include('13');
+        });
+
+        it("ArrowDown déplace le focus d'une semaine", async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-01"></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            expect(focused?.getAttribute('aria-label')).to.include('8');
+        });
+
+        it('PageDown navigue au mois suivant', async () => {
+            // Forcer lang="fr" pour que le label du mois soit en français
+            el = await fixture(
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
+            );
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const label = el.shadowRoot?.querySelector('[aria-live]');
+            expect(label?.textContent?.toLowerCase()).to.include('juillet');
+        });
+
+        it("Shift+PageDown navigue à l'année suivante", async () => {
+            el = await fixture(
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
+            );
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(
+                new KeyboardEvent('keydown', { key: 'PageDown', shiftKey: true, bubbles: true }),
+            );
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const label = el.shadowRoot?.querySelector('[aria-live]');
+            expect(label?.textContent).to.include('2027');
+        });
+
+        it('Enter sélectionne le jour focalisé', async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-12"></ar-datepicker>`);
+            let changeDetail: Record<string, unknown> | null = null;
+            el.addEventListener('ar-datepicker-input-change', (e) => {
+                changeDetail = (e as CustomEvent).detail;
+            });
+
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            expect(changeDetail).to.not.equal(null);
+            expect((changeDetail as Record<string, unknown>).value).to.equal('2026-06-12');
+        });
+    });
+
+    // ── Mémorisation de la position de navigation ─────────────────────────────
+
+    describe('mémorisation de position', () => {
+        it('conserve le mois affiché après fermeture sans sélection', async () => {
+            el = await fixture(html`<ar-datepicker lang="fr-FR"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Naviguer 2 mois en avant via PageDown
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const labelBefore = el.shadowRoot?.querySelector('[aria-live]')?.textContent;
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const labelAfter = el.shadowRoot?.querySelector('[aria-live]')?.textContent;
+            expect(labelAfter).to.equal(labelBefore);
+        });
+
+        it('conserve le jour navigué après fermeture sans sélection', async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-12"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Naviguer au mois suivant via le bouton nav — focusedDate suit (même jour)
+            const nextBtn = el.shadowRoot?.querySelector(
+                '[part~="next-month"]',
+            ) as HTMLButtonElement;
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            const dayBefore = el.shadowRoot
+                ?.querySelector('[part~="day"][tabindex="0"]')
+                ?.getAttribute('aria-label');
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const dayAfter = el.shadowRoot
+                ?.querySelector('[part~="day"][tabindex="0"]')
+                ?.getAttribute('aria-label');
+            expect(dayAfter).to.equal(dayBefore);
+        });
+
+        it('les boutons nav maintiennent le curseur dans le mois affiché', async () => {
+            el = await fixture(html`<ar-datepicker value="2026-06-15"></ar-datepicker>`);
+            await openPicker(el);
+
+            // Simuler navigation souris : 2 clics sur "mois suivant"
+            const nextBtn = el.shadowRoot?.querySelector(
+                '[part~="next-month"]',
+            ) as HTMLButtonElement;
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+            nextBtn.click();
+            await el.updateComplete;
+            await aTimeout(20);
+
+            // Le curseur (tabindex="0") doit être dans le mois visible (août 2026)
+            const focused = el.shadowRoot?.querySelector<HTMLButtonElement>(
+                '[part~="day"][tabindex="0"]',
+            );
+            expect(focused).to.not.equal(null);
+            // Le jour doit être le 15 (même jour, mois décalé)
+            expect(focused?.getAttribute('aria-label')).to.include('15');
+        });
+
+        it('conserve le mois navigué à la réouverture (pas de reset au mois de la valeur)', async () => {
+            el = await fixture(
+                html`<ar-datepicker value="2026-06-12" lang="fr-FR"></ar-datepicker>`,
+            );
+            await openPicker(el);
+
+            // Naviguer 2 mois en avant (juin → août)
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+
+            // Fermer sans sélectionner, puis rouvrir
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(20);
+            await openPicker(el);
+
+            const label = el.shadowRoot?.querySelector('[aria-live]')?.textContent?.toLowerCase();
+            expect(label).to.include('août');
+            expect(label).to.include('2026');
+        });
+    });
+
+    // ── Roving tabindex ───────────────────────────────────────────────────────
+
+    describe('roving tabindex', () => {
+        it('un seul bouton day a tabindex="0" à la fois', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const focused = el.shadowRoot?.querySelectorAll('[part~="day"][tabindex="0"]') ?? [];
+            expect(focused.length).to.equal(1);
+        });
+    });
+
+    // ── Synchronisation input texte ↔ calendrier ──────────────────────────────
+
+    describe('synchronisation', () => {
+        it('blur sur input valide met à jour la sélection dans le calendrier', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            // Simuler une saisie complète suivie d'un blur (commit de la valeur)
+            const input = el.inputElement;
+            input.value = '12/06/2026';
+            input.dispatchEvent(new Event('blur', { bubbles: true }));
+            await el.updateComplete;
+
+            await openPicker(el);
+
+            // aria-selected est sur <td role="gridcell">, pas sur le bouton
+            const selectedCell = el.shadowRoot?.querySelector(
+                '[role="gridcell"][aria-selected="true"]',
+            );
+            const selectedBtn = selectedCell?.querySelector('[part~="day"]');
+            expect(selectedBtn?.getAttribute('aria-label')).to.include('12');
+        });
+    });
+
+    // ── Affichage conditionnel du slot error (#210) ──────────────────────────
+
+    describe('affichage conditionnel du slot error', () => {
+        it("part=error est masqué quand le slot est vide (pas d'espace superflu dans le gap)", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('none');
+        });
+
+        it('part=error redevient visible quand le slot error est rempli au montage', async () => {
+            el = await fixture(
+                html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
+            );
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('block');
+        });
+
+        it('part=error redevient visible quand le slot error est rempli dynamiquement après coup', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
+            expect(getComputedStyle(error!).display).to.equal('none');
+
+            const span = document.createElement('span');
+            span.slot = 'error';
+            span.textContent = 'Date invalide';
+            el.appendChild(span);
+            // slotchange est asynchrone (pas garanti avant le prochain tick) —
+            // attendre son passage avant de vérifier le requestUpdate() qu'il déclenche.
+            await aTimeout(0);
+            await el.updateComplete;
+
+            expect(getComputedStyle(error!).display).to.equal('block');
+            expect(el.hasAttribute('has-error')).to.equal(true);
+        });
+    });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a une largeur maximale de 25rem par défaut', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+            if (!panel) throw new Error('[part="panel"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            expect(getComputedStyle(panel).maxWidth).to.equal(`${25 * rootFontSize}px`);
+        });
+
+        it('les cellules jour font 2.5rem × 2.5rem par défaut (WCAG 2.5.8)', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const day = el.shadowRoot?.querySelector<HTMLElement>('[part~="day"]');
+            if (!day) throw new Error('[part~="day"] introuvable');
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            const expectedPx = `${2.5 * rootFontSize}px`;
+            expect(getComputedStyle(day).width).to.equal(expectedPx);
+            expect(getComputedStyle(day).height).to.equal(expectedPx);
+        });
+
+        it('le panel a un fond, un texte et une bordure visibles même sans ariane.css', async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            await openPicker(el);
+
+            const panel = el.shadowRoot?.querySelector<HTMLElement>('[part="panel"]');
+            if (!panel) throw new Error('[part="panel"] introuvable');
+            const computed = getComputedStyle(panel);
+
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts (ar-datepicker ne redéclare pas background-color/
+            // color/border-color), pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.color).to.not.equal('');
+            expect(computed.color).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+        });
+    });
+
+    // ── Cascade disabled depuis un fieldset ancêtre ─────────────────────────────
+
+    describe('fieldset disabled — formDisabledCallback', () => {
+        let form: HTMLFormElement;
+
+        afterEach(() => form?.remove());
+
+        it("désactive l'input et le trigger sans poser l'attribut disabled sur le host", async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            const trigger = el.shadowRoot!.querySelector(
+                'button[part="trigger"]',
+            ) as HTMLButtonElement;
+
+            expect(input.disabled).to.equal(true);
+            expect(trigger.disabled).to.equal(true);
+            // this.disabled reste false : la cascade n'écrase pas l'état explicite du composant.
+            expect(el.disabled).to.equal(false);
+            expect(el.hasAttribute('disabled')).to.equal(false);
+        });
+
+        it("réactive l'input/trigger quand le fieldset est réactivé", async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(input.disabled).to.equal(false);
+        });
+
+        it('reste désactivé si disabled est aussi posé explicitement quand le fieldset est réactivé', async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01" disabled></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(input.disabled, 'disabled explicite doit rester actif').to.equal(true);
+        });
+    });
+
+    // ── Largeur max de l'input (#191) ────────────────────────────────────────
+
+    describe("largeur max de l'input", () => {
+        it("s'adapte à la longueur de format, indépendamment d'un hint long", async () => {
+            el = await fixture(html`
+                <ar-datepicker
+                    style="display: inline-block"
+                    format="dd/MM/yyyy"
+                    min="2026-01-01"
+                    max="2026-12-31"
+                >
+                    <span slot="hint"
+                        >Un texte d'aide volontairement très long pour vérifier qu'il n'élargit pas
+                        le champ de saisie au-delà de la largeur attendue pour une date</span
+                    >
+                </ar-datepicker>
+            `);
+            await el.updateComplete;
+
+            const input = el.shadowRoot!.querySelector('input')!;
+            const wrapper = el.shadowRoot!.querySelector<HTMLElement>('.input-wrapper')!;
+            const datepicker = el.shadowRoot!.querySelector<HTMLElement>('[part="datepicker"]')!;
+            const inputMaxWidth = parseFloat(getComputedStyle(input).maxWidth);
+
+            // Le hint (non contraint) élargit [part='datepicker'] (shrink-to-fit en inline-block),
+            // mais .input-wrapper ne doit pas suivre cet élargissement.
+            expect(inputMaxWidth).to.be.greaterThan(0);
+            expect(wrapper.getBoundingClientRect().width).to.be.lessThan(
+                datepicker.getBoundingClientRect().width,
+            );
+        });
+
+        it('un format plus long produit une largeur max calculée plus grande', async () => {
+            const short = await fixture<ArDatepicker>(
+                html`<ar-datepicker format="dd/MM/yy"></ar-datepicker>`,
+            );
+            const long = await fixture<ArDatepicker>(
+                html`<ar-datepicker format="EEEE d MMMM yyyy"></ar-datepicker>`,
+            );
+
+            const shortMaxWidth = parseFloat(
+                getComputedStyle(short.shadowRoot!.querySelector('input')!).maxWidth,
+            );
+            const longMaxWidth = parseFloat(
+                getComputedStyle(long.shadowRoot!.querySelector('input')!).maxWidth,
+            );
+
+            expect(longMaxWidth).to.be.greaterThan(shortMaxWidth);
+
+            short.remove();
+            long.remove();
+        });
+
+        it('--ar-datepicker-input-max-width surcharge la valeur calculée', async () => {
+            el = await fixture(
+                html`<ar-datepicker
+                    style="--ar-datepicker-input-max-width: 300px"
+                ></ar-datepicker>`,
+            );
+            const input = el.shadowRoot!.querySelector('input')!;
+            expect(getComputedStyle(input).maxWidth).to.equal('300px');
+        });
+    });
+
+    // ── États :state() cumulés à l'attribut (pilote #246) ───────────────────
+
+    describe(':state() cumulés (disabled/readonly/open/has-error)', () => {
+        let form: HTMLFormElement;
+
+        afterEach(() => form?.remove());
+
+        it("expose :state(disabled) quand l'attribut disabled est posé", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(disabled)')).to.equal(false);
+
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
+
+            el.disabled = false;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(false);
+        });
+
+        it('expose :state(disabled) par cascade fieldset, sans attribut disabled explicite', async () => {
+            form = await fixture(html`
+                <form>
+                    <fieldset disabled>
+                        <ar-datepicker name="d" value="2024-01-01"></ar-datepicker>
+                    </fieldset>
+                </form>
+            `);
+            el = form.querySelector('ar-datepicker') as ArDatepicker;
+            await el.updateComplete;
+
+            expect(el.hasAttribute('disabled')).to.equal(false);
+            expect(el.matches(':state(disabled)')).to.equal(true);
+
+            form.querySelector('fieldset')!.disabled = false;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(false);
+        });
+
+        it("expose :state(readonly) quand l'attribut readonly est posé", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(readonly)')).to.equal(false);
+
+            el.readonly = true;
+            await el.updateComplete;
+            expect(el.matches(':state(readonly)')).to.equal(true);
+
+            el.readonly = false;
+            await el.updateComplete;
+            expect(el.matches(':state(readonly)')).to.equal(false);
+        });
+
+        it("expose :state(open) synchronisé avec l'ouverture/fermeture du panel", async () => {
+            el = await fixture(html`<ar-datepicker></ar-datepicker>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            await openPicker(el);
+            expect(el.matches(':state(open)')).to.equal(true);
+
+            el.open = false;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(false);
+        });
+
+        it('expose :state(has-error) synchronisé avec la présence du slot error', async () => {
+            el = await fixture(
+                html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
+            );
+            await el.updateComplete;
+            expect(el.matches(':state(has-error)')).to.equal(true);
+        });
+    });
+});

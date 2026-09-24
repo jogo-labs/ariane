@@ -1,7 +1,13 @@
-import { LitElement, type TemplateResult, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { type TemplateResult, html, nothing } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import styles from './alert.styles.js';
 import { prefersReducedMotion } from '../../utils/media.js';
+import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {
@@ -17,57 +23,45 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
- * @summary Affiche un message d'alerte accessible avec différents niveaux de sévérité.
+ * @summary Affiche un message important intégré au contenu environnant. À utiliser pour des confirmations, avertissements, erreurs, ou toute information que l'utilisateur ne doit pas manquer.
  * @display demo
+ * @localized
  *
  * @slot              - Contenu de l'alerte (texte, titre, liens…).
  * @slot icon         - Icône de l'alerte. Remplace l'icône par défaut si fourni.
  * @slot close-icon   - Icône du bouton de fermeture. Remplace le SVG "×" par défaut.
  *
  * @csspart icon      - Le conteneur de l'icône de variant.
+ * @csspart icon-svg  - Le SVG de l'icône de variant par défaut (absent si le slot `icon` est utilisé).
  * @csspart body      - Le conteneur du titre et du contenu.
- * @csspart close     - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
+ * @csspart close-button - Le bouton de fermeture (présent uniquement si `next-focus` est défini).
+ * @csspart action-button - Porté par `close-button` : bouton qui déclenche une action ponctuelle.
  *
- * @cssprop [--ar-alert-border-radius=0.75rem]                     - Arrondi des alertes.
- * @cssprop [--ar-alert-padding=1rem]                              - Marge interne des alertes.
- * @cssprop [--ar-alert-border-width=1px]                          - Epaisseur des bordures.
- * @cssprop [--ar-alert-border-style=solid]                        - Style des bordures.
- * @cssprop [--ar-alert-close-size=2rem]                           - Taille (width/height) du bouton de fermeture.
- * @cssprop [--ar-alert-close-bg=color-mix(in srgb, currentColor 8%, transparent)]    - Fond du bouton de fermeture au repos.
- * @cssprop [--ar-alert-close-hover-bg=color-mix(in srgb, currentColor 20%, transparent)] - Fond du bouton de fermeture au survol.
- * @cssprop [--ar-alert-info-bg=var(--ar-color-info-bg)]           - Fond de l'alerte "info".
- * @cssprop [--ar-alert-info-border=var(--ar-color-info-bg)]       - Bordure de l'alerte "info".
- * @cssprop [--ar-alert-info-icon=var(--ar-color-info-text)]       - Couleur de l'icône "info".
- * @cssprop [--ar-alert-warning-bg=var(--ar-color-warning-bg)]     - Fond de l'alerte "warning".
- * @cssprop [--ar-alert-warning-border=var(--ar-color-warning-bg)] - Bordure de l'alerte "warning".
- * @cssprop [--ar-alert-warning-icon=var(--ar-color-warning-text)] - Couleur de l'icône "warning".
- * @cssprop [--ar-alert-error-bg=var(--ar-color-danger-bg)]        - Fond de l'alerte "error".
- * @cssprop [--ar-alert-error-border=var(--ar-color-danger-bg)]    - Bordure de l'alerte "error".
- * @cssprop [--ar-alert-error-icon=var(--ar-color-danger-text)]    - Couleur de l'icône "error".
- * @cssprop [--ar-alert-success-bg=var(--ar-color-success-bg)]     - Fond de l'alerte "success".
- * @cssprop [--ar-alert-success-border=var(--ar-color-success-bg)] - Bordure de l'alerte "success".
- * @cssprop [--ar-alert-success-icon=var(--ar-color-success-text)] - Couleur de l'icône "success".
-
+ * @cssprop --ar-alert-bg - Fond de l'alerte.
+ * @cssprop --ar-alert-border - Bordure de l'alerte.
+ * @cssprop --ar-alert-icon - Couleur de l'icône de variant.
+ * @cssprop --ar-alert-color - Couleur du texte de l'alerte.
+ * @cssprop --ar-alert-close-size - Taille (width/height) du bouton de fermeture.
+ * @cssprop --ar-alert-close-transition-duration - Durée de la transition (opacity/background-color) du bouton de fermeture au survol/focus.
+ * @cssprop --ar-alert-hide-transition-duration - Durée de la transition de sortie (opacity/transform) à la fermeture.
+ *
+ * @cssState hiding - L'alerte est en cours de fermeture (animation de sortie).
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  */
-@customElement('ar-alert')
-export class ArAlert extends LitElement {
+export class ArAlert extends ArianeElement {
     static override styles = [styles];
 
-    /** Nom du composant affiché dans les logs */
-    // @ignore
-    static readonly NAME = 'ArAlert';
     // @ignore
     static readonly DEFAULT_VARIANT: ArAlertVariant = 'error';
     // @ignore
     static readonly DEFAULT_NOTIFICATION = false;
 
+    private readonly localize = new LocalizeController(this);
+
     /**
      * ID de l'élément à focus après la fermeture de l'alerte.
      * Quand défini, affiche le bouton de fermeture.
-     * @attr next-focus
-     * @default undefined
      */
     @property({ reflect: true, type: String, attribute: 'next-focus' })
     nextFocus?: string;
@@ -75,25 +69,41 @@ export class ArAlert extends LitElement {
     /**
      * Désactive la notification ARIA lors de l'apparition de l'alerte.
      * Par défaut, les lecteurs d'écran sont notifiés via `role="alert"` ou `role="status"`.
-     * @attr without-notification
      */
     @property({ reflect: true, type: Boolean, attribute: 'without-notification' })
     withoutNotification = false;
 
     /**
+     * Force le niveau d'urgence ARIA indépendamment de `variant` : `role="alert"` si présent,
+     * sinon déduit de `variant` via une table de correspondance interne (`error`/`warning` →
+     * `alert`, `success`/`info` → `status`, tout autre variant → `status`).
+     */
+    @property({
+        converter: {
+            fromAttribute: (value: string | null): boolean | undefined =>
+                value === null ? undefined : true,
+        },
+    })
+    urgent?: boolean;
+
+    /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
-     * @attr variant
      */
     @property({ reflect: true, type: String })
-    variant: 'success' | 'warning' | 'error' | 'info' = 'error';
+    variant: ArAlertVariant | (string & {}) = 'error';
 
     /**
      * Indique si l'alerte est en cours de fermeture (animation de sortie).
      * Passé à `true` au clic sur le bouton close, déclenche la transition CSS.
-     * @ignore
+     * État interne — pas un attribut public, observable en CSS via :state(hiding).
      */
-    @property({ reflect: true, type: Boolean })
-    protected hiding: boolean = false;
+    @state() private hiding: boolean = false;
+
+    /**
+     * Indique si `role` a été posé manuellement dans le markup initial.
+     * Utilisé pour n'avertir qu'une seule fois que le composant va écraser cet attribut.
+     */
+    private _hadAuthoredRole: boolean | undefined = undefined;
 
     constructor() {
         super();
@@ -101,15 +111,55 @@ export class ArAlert extends LitElement {
         this.addEventListener('transitionend', this._finishHide);
     }
 
+    override firstUpdated(): void {
+        // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
+        this._hadAuthoredRole = this.hasAttribute('role');
+    }
+
     override updated(changed: Map<string, unknown>) {
-        if (changed.has('variant') || changed.has('withoutNotification')) {
-            if (this.withoutNotification) {
-                this.removeAttribute('role');
-                return;
+        if (changed.has('hiding')) {
+            this.toggleState('hiding', this.hiding);
+        }
+        if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
+            if (this._hadAuthoredRole === true) {
+                warn(
+                    'ar-alert',
+                    `role="${this.getAttribute('role')}" posé manuellement sera écrasé par le composant — utilisez la prop 'urgent' pour contrôler le niveau ARIA.`,
+                );
+                this._hadAuthoredRole = false;
             }
-            this.role = this.variant === 'info' ? 'status' : 'alert';
+            this._updateRole();
+        }
+        if (
+            changed.has('variant') &&
+            !(this.variant in ArAlert._ICON_PATHS) &&
+            !this.querySelector('[slot="icon"]')
+        ) {
+            warn(
+                'ar-alert',
+                `variant="${this.variant}" n'a pas d'icône par défaut, fournissez un contenu via slot="icon".`,
+            );
         }
     }
+
+    private _updateRole(): void {
+        if (this.withoutNotification) {
+            this.removeAttribute('role');
+            return;
+        }
+        if (this.urgent !== undefined) {
+            this.role = this.urgent ? 'alert' : 'status';
+            return;
+        }
+        this.role = ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status';
+    }
+
+    private static readonly _ROLE_BY_VARIANT: Record<string, 'alert' | 'status'> = {
+        error: 'alert',
+        warning: 'alert',
+        success: 'status',
+        info: 'status',
+    };
 
     private static readonly _ICON_PATHS: Record<ArAlertVariant, string> = {
         success: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
@@ -119,8 +169,9 @@ export class ArAlert extends LitElement {
         error: 'M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z',
     };
 
-    protected _defaultIcon(): TemplateResult {
-        const path = ArAlert._ICON_PATHS[this.variant ?? ArAlert.DEFAULT_VARIANT];
+    protected _defaultIcon(): TemplateResult | typeof nothing {
+        const path = (ArAlert._ICON_PATHS as Record<string, string>)[this.variant];
+        if (path === undefined) return nothing;
         return html` <svg
             aria-hidden="true"
             part="icon-svg"
@@ -152,57 +203,64 @@ export class ArAlert extends LitElement {
             <div part="body" class="alert-body">
                 <slot></slot>
             </div>
-            ${this.canBeHidden
-                ? html` <button
-                      part="close"
-                      @click=${this._hide}
-                      type="button"
-                      aria-label="Fermer l'alerte"
-                  >
-                      <slot name="close-icon">${this._defaultCloseIcon()}</slot>
-                  </button>`
-                : nothing}`;
+            ${
+                this.canBeHidden
+                    ? html` <button
+                          part="close-button action-button"
+                          @click=${this._hide}
+                          type="button"
+                          aria-label=${this.localize.term('closeAlert')}
+                      >
+                          <slot name="close-icon">${this._defaultCloseIcon()}</slot>
+                      </button>`
+                    : nothing
+            }`;
     }
 
     /** Indique si l'alerte peut être fermée (next-focus défini et non vide) */
     get canBeHidden(): boolean {
-        return this.nextFocus !== undefined && this.nextFocus?.replaceAll(' ', '') !== '';
+        return this.nextFocus != null && this.nextFocus.replaceAll(' ', '') !== '';
+    }
+
+    private _shouldAnimate(): boolean {
+        // transitionend ne se déclenche pas si duration=0s (défaut headless sans thème).
+        // On vérifie la durée calculée pour éviter que la fermeture reste bloquée indéfiniment.
+        const d = parseFloat(getComputedStyle(this).transitionDuration) || 0;
+        return !prefersReducedMotion() && d > 0;
     }
 
     private _hide = (): void => {
         if (!this.canBeHidden) return;
         this.hiding = true;
-        if (prefersReducedMotion()) {
-            this._finishHide();
-        }
+        // Le passage de l'état :state(hiding) par Lit n'est pas synchrone : on attend
+        // updateComplete pour qu'il ait pu matcher avant de mesurer la durée de transition.
+        void this.updateComplete.then(() => {
+            if (!this._shouldAnimate()) {
+                this._finishHide();
+            }
+        });
     };
 
     /** Supprime l'alerte du DOM et reporte le focus après la fin de la transition CSS */
     private _finishHide = (): void => {
-        if (!this.canBeHidden) return;
+        if (!this.canBeHidden || !this.hiding) return;
+        // Idempotent : le thème anime opacity ET transform, donc `transitionend` se déclenche
+        // deux fois (une par propriété) — sans ce reset, le second appel repasserait la garde.
+        this.hiding = false;
 
-        if (this.hiding) {
-            this.dispatchEvent(
-                new CustomEvent('ar-alert-close', { bubbles: true, composed: true }),
-            );
-            this.remove();
-        }
+        this.dispatchEvent(new CustomEvent('ar-alert-close', { bubbles: true, composed: true }));
+        this.remove();
 
         const $focusableElement = document.getElementById(
             `${(this.nextFocus as string).replace('#', '')}`,
         );
         if (!$focusableElement) {
-            console.error(
-                `${ArAlert.NAME} - L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
+            warn(
+                'ar-alert',
+                `L'id "${this.nextFocus}" spécifié via 'next-focus' n'est pas présent dans la page.`,
             );
             return;
         }
         $focusableElement.focus();
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-alert': ArAlert;
-    }
 }

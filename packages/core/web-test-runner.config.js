@@ -7,6 +7,14 @@ export default {
     // *.a11y.test.ts    : tests d'accessibilité axe-core par composant
     files: 'src/**/*.{browser,a11y}.test.{js,ts}',
 
+    // Défaut WTR (30000ms) trop juste sur les runners CI partagés : esbuild transpile
+    // les ~27 fichiers et Chromium démarre plusieurs pages en même temps que le runner
+    // subit un cold-start CPU throttlé — les tout premiers fichiers programmés
+    // (typiquement les 1-2 premiers de la file) peuvent dépasser 30s pour la seule
+    // création de page, sans rapport avec le contenu des tests eux-mêmes (aucune
+    // reproduction locale, même répétée).
+    browserStartTimeout: 60000,
+
     // Chromium uniquement en CI ; WebKit peut être ajouté plus tard
     // En CI : utilise google-chrome-stable préinstallé sur le runner (évite le téléchargement).
     // --no-sandbox requis sur les runners Linux (pas de user namespace dans les conteneurs).

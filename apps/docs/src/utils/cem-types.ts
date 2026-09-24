@@ -10,6 +10,13 @@
 
 // ─── Membres d'un composant (propriétés, méthodes) ───────────────────────────
 
+export interface CemParameter {
+    name: string;
+    type?: { text: string };
+    default?: string;
+    optional?: boolean;
+}
+
 export interface CemMember {
     kind: string;
     name: string;
@@ -21,6 +28,8 @@ export interface CemMember {
     type?: { text: string };
     default?: string;
     description?: string;
+    parameters?: CemParameter[];
+    return?: { type?: { text: string } };
 }
 
 // ─── Autres éléments d'API ────────────────────────────────────────────────────
@@ -30,6 +39,7 @@ export interface CemAttribute {
     type?: { text: string };
     description?: string;
     default?: string;
+    fieldName?: string;
 }
 
 export interface CemEvent {
@@ -54,6 +64,11 @@ export interface CemSlot {
     description?: string;
 }
 
+export interface CemCssState {
+    name: string;
+    description?: string;
+}
+
 // ─── Déclaration complète d'un composant ─────────────────────────────────────
 
 export interface CemDeclaration {
@@ -68,11 +83,14 @@ export interface CemDeclaration {
     events?: CemEvent[];
     cssParts?: CemCssPart[];
     cssProperties?: CemCssProperty[];
+    cssStates?: CemCssState[];
     slots?: CemSlot[];
     /** Extension JSDoc @display — contrôle le mode d'affichage de la page */
     'x-display'?: 'demo' | 'docs';
     /** Extension JSDoc @parent — tag name du composant parent */
     'x-parent'?: string;
+    /** Extension JSDoc @localized — le composant a des libellés traduits via LocalizeController */
+    'x-localized'?: boolean;
 }
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────
@@ -95,6 +113,13 @@ export function getCustomElements(manifest: unknown): CemDeclaration[] {
     return (m.modules ?? [])
         .flatMap((mod) => mod.declarations ?? [])
         .filter((d) => d.kind === 'class' && d.customElement === true);
+}
+
+/** Méthodes publiques d'un composant — exclut les membres privés/protégés et les non-méthodes. */
+export function getPublicMethods(component: CemDeclaration): CemMember[] {
+    return (component.members ?? []).filter(
+        (m) => m.kind === 'method' && m.privacy !== 'private' && m.privacy !== 'protected',
+    );
 }
 
 // ─── Helpers détection des contrôles playground ───────────────────────────────
@@ -122,6 +147,7 @@ export function hasUndefined(typeText: string): boolean {
 /** Supprime les guillemets encadrant les string literals TypeScript (`'foo'` → `foo`). */
 function stripQuotes(val: string | undefined): string | undefined {
     if (!val) return val;
+    if (val === 'undefined') return undefined;
     return val.replace(/^(['"`])(.*)\1$/, '$2');
 }
 
@@ -148,7 +174,7 @@ export function buildControls(members: CemMember[]): CemControl[] {
                 default: stripQuotes(m.default),
                 controlType: stringUnion
                     ? ('select' as const)
-                    : typeText === 'boolean'
+                    : typeText === 'boolean' || typeText === 'boolean | undefined'
                       ? ('checkbox' as const)
                       : typeText === 'number' || typeText === 'number | undefined'
                         ? ('number' as const)

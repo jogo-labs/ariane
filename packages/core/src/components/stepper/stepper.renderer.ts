@@ -1,189 +1,132 @@
-import { html, nothing, type TemplateResult } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
+import { html, type TemplateResult } from 'lit';
 import { type NavigationNode, type NavigationMode } from '../../types/navigation-nodes.js';
+import type { IndicatorState } from '../stepper-item/stepper-item.js';
 
 /* ------------------------------------------------ */
 /* TYPES                                            */
 /* ------------------------------------------------ */
 
-// Contexte nécessaire au rendu mobile, fourni par ft-stepper.
-// Séparé des params communs pour que renderDesktop reste minimal.
+// Contexte nécessaire au rendu mobile, fourni par ar-stepper.
 export interface MobileRenderContext {
-    currentStepIndex: number;
     currentStepLabel: string | undefined;
     currentSubStepLabel: string | undefined;
+    currentStepStatus: string;
     onToggle: () => void;
 }
 
 /* ------------------------------------------------ */
-/* SHARED HELPERS                                   */
+/* RENDER-STATE — poussé sur chaque ArStepperItem   */
 /* ------------------------------------------------ */
 
-// Un parent est "actif" si lui-même OU l'un de ses enfants est current.
+// Un groupe est "courant" si lui-même OU l'un de ses enfants l'est.
 // Le state engine aplatit les noeuds en DFS et marque le parent 'completed'
 // dès qu'un enfant est current → on ne peut pas se fier uniquement à step.state.
-function isGroupActive(node: NavigationNode, mode: NavigationMode): boolean {
-    return (
-        node.state === 'current' ||
-        mode === 'edit' ||
-        node.children.some((child) => child.state === 'current')
-    );
+function isGroupCurrent(node: NavigationNode): boolean {
+    return node.state === 'current' || node.children.some((child) => child.state === 'current');
 }
 
-function renderStepText(label: string, order: number, isSubstep = false): TemplateResult {
-    return html`
-        <span class="stepper-item-bullet" aria-hidden="true"></span>
-        <span class="sr-only">${isSubstep ? 'sous-' : ''}étape ${order}:</span>
-        <span class="stepper-item-label">${label}</span>
-    `;
-}
-
-/* ------------------------------------------------ */
-/* STEP / SUBSTEP                                   */
-/* ------------------------------------------------ */
-
-function renderSubStep(
-    sub: NavigationNode,
-    index: number,
-    mode: NavigationMode,
-    onClickLink: (e: MouseEvent) => void,
-): TemplateResult {
-    const order = index + 1;
-    const isActive = sub.state === 'current';
-    const isCompleted = sub.state === 'completed';
-    const isEditMode = mode === 'edit';
-
-    return html`
-        <li
-            class="stepper-item${isActive ? ' active' : ''}"
-            aria-current=${isActive ? 'step' : nothing}
-        >
-            ${isCompleted || isEditMode
-                ? html`
-                      <a
-                          class="stepper-item-inner stepper-link"
-                          data-substep-order=${order}
-                          data-path=${sub.path}
-                          href=${sub.href ?? 'javascript:;'}
-                          @click=${onClickLink}
-                      >
-                          ${renderStepText(sub.label, order, true)}
-                      </a>
-                  `
-                : html`
-                      <div class="stepper-item-inner">
-                          ${renderStepText(sub.label, order, true)}
-                      </div>
-                  `}
-        </li>
-    `;
-}
-
-function renderStep(
-    step: NavigationNode,
-    index: number,
-    mode: NavigationMode,
-    onClickLink: (e: MouseEvent) => void,
-): TemplateResult {
-    const order = index + 1;
-    const active = isGroupActive(step, mode);
-    // Un parent complété dont le groupe est actif ne doit pas être rendu comme lien
-    const isCompleted =
-        (mode === 'edit' && step.state !== 'current') || (step.state === 'completed' && !active);
-
-    return html`
-        <li
-            class="stepper-item${active ? ' active' : ''}"
-            aria-current=${active ? 'step' : nothing}
-        >
-            ${isCompleted
-                ? html`
-                      <a
-                          class="stepper-item-inner stepper-link"
-                          data-path=${step.path}
-                          href=${step.href ?? '#'}
-                          @click=${onClickLink}
-                      >
-                          ${renderStepText(step.label, order)}
-                      </a>
-                  `
-                : html`
-                      <div class="stepper-item-inner">${renderStepText(step.label, order)}</div>
-                  `}
-            ${(active || mode === 'edit') && step.children.length
-                ? html`
-                      <ol class="list-unstyled stepper-list">
-                          ${step.children.map((sub, i) => renderSubStep(sub, i, mode, onClickLink))}
-                      </ol>
-                  `
-                : nothing}
-        </li>
-    `;
-}
-
-/* ------------------------------------------------ */
-/* STEP LIST (shared between desktop and mobile)    */
-/* ------------------------------------------------ */
-
-function renderStepList(
-    steps: NavigationNode[],
-    cssClass: string,
-    mode: NavigationMode,
-    onClickLink: (e: MouseEvent) => void,
-): TemplateResult {
-    return html`
-        <ol class="stepper-list list-unstyled ${cssClass}">
-            ${repeat(
-                steps,
-                (step) => step.path,
-                (step, index) => renderStep(step, index, mode, onClickLink),
-            )}
-        </ol>
-    `;
-}
-
-/* ------------------------------------------------ */
-/* DESKTOP                                          */
-/* ------------------------------------------------ */
-
-export function renderDesktop(
+/**
+ * Calcule le render-state de chaque étape/sous-étape depuis l'arbre `NavigationNode` et le pousse
+ * directement sur l'instance `ArStepperItem` correspondante (`node.item`). Remplace l'ancienne
+ * reconstruction HTML — la logique de calcul (current/completed/lien/sous-étapes visibles) est
+ * portée à l'identique depuis l'ancien `renderStep`/`renderSubStep`.
+ */
+export function pushItemRenderState(
     steps: NavigationNode[],
     mode: NavigationMode,
-    onClickLink: (e: MouseEvent) => void,
-): TemplateResult {
-    return renderStepList(steps, 'stepper-desktop', mode, onClickLink);
+    stepLabel: (order: number, isSubstep: boolean) => string,
+): void {
+    steps.forEach((step, index) => {
+        const order = index + 1;
+        const isCurrent = isGroupCurrent(step);
+        const isCompleted =
+            !isCurrent && (mode === 'edit' ? step.state !== 'current' : step.state === 'completed');
+        const indicatorState: IndicatorState = isCurrent
+            ? 'current'
+            : step.state === 'completed'
+              ? 'completed'
+              : 'default';
+        const showSubsteps = (isCurrent || mode === 'edit') && step.children.length > 0;
+
+        step.item.setRenderState({
+            indicatorState,
+            isLink: isCompleted,
+            showSubsteps,
+            srLabel: stepLabel(order, false),
+        });
+
+        step.children.forEach((sub, subIndex) => {
+            const subOrder = subIndex + 1;
+            const subIsCurrent = sub.state === 'current';
+            const subIsCompleted = sub.state === 'completed';
+            // La sous-étape courante ne doit jamais être un lien, y compris en mode edit
+            // (on ne navigue pas vers la page où l'on se trouve déjà).
+            const isEditableLink = mode === 'edit' && !subIsCurrent;
+            const subIndicatorState: IndicatorState = subIsCurrent
+                ? 'current'
+                : subIsCompleted
+                  ? 'completed'
+                  : 'default';
+
+            sub.item.setRenderState({
+                indicatorState: subIndicatorState,
+                isLink: subIsCompleted || isEditableLink,
+                showSubsteps: false,
+                srLabel: stepLabel(subOrder, true),
+            });
+        });
+    });
 }
 
 /* ------------------------------------------------ */
-/* MOBILE                                           */
+/* CHROME — liste (desktop) et dropdown (mobile)    */
 /* ------------------------------------------------ */
 
-export function renderMobile(
-    steps: NavigationNode[],
-    ctx: MobileRenderContext,
-    mode: NavigationMode,
-    onClickLink: (e: MouseEvent) => void,
-): TemplateResult {
+function renderStepList(cssClass: string): TemplateResult {
+    return html`
+        <div role="list" part="list" class="list-unstyled ${cssClass}">
+            <slot></slot>
+        </div>
+    `;
+}
+
+export function renderDesktop(): TemplateResult {
+    return renderStepList('desktop');
+}
+
+function defaultTriggerIcon(): TemplateResult {
+    return html`<svg
+        aria-hidden="true"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+    >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"></path>
+    </svg>`;
+}
+
+export function renderMobile(ctx: MobileRenderContext): TemplateResult {
     const subLabel = ctx.currentSubStepLabel ? ` | ${ctx.currentSubStepLabel}` : '';
 
     return html`
-        <div class="stepper-dropdown">
+        <div class="dropdown">
             <button
                 type="button"
                 part="trigger"
-                class="btn btn-secondary btn-block"
                 aria-controls="stepper-dropdown-menu"
                 @click=${ctx.onToggle}
             >
-                <span class="btn-content d-inline-flex flex-column">
-                    <span> Étape ${ctx.currentStepIndex + 1} / ${steps.length} (en cours) </span>
-                    <span class="text-primary emphasis"> ${ctx.currentStepLabel}${subLabel} </span>
+                <span class="trigger-text">
+                    <span part="trigger-status"> ${ctx.currentStepStatus} </span>
+                    <span part="trigger-label"> ${ctx.currentStepLabel}${subLabel} </span>
+                </span>
+                <span part="trigger-icon" aria-hidden="true">
+                    <slot name="trigger-icon">${defaultTriggerIcon()}</slot>
                 </span>
             </button>
 
-            <div id="stepper-dropdown-menu" part="panel" class="stepper-dropdown-panel">
-                ${renderStepList(steps, 'stepper-mobile', mode, onClickLink)}
-            </div>
+            <div id="stepper-dropdown-menu" part="panel">${renderStepList('mobile')}</div>
         </div>
     `;
 }

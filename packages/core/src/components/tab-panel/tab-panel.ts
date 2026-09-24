@@ -1,20 +1,20 @@
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
+import { property } from 'lit/decorators.js';
 import { ContextConsumer } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import styles from './tab-panel.styles.js';
 
 /**
- * @summary Panneau de contenu pour ar-tab-group.
+ * @summary Contient le contenu affiché pour un onglet donné dans un groupe d'onglets.
  * @parent ar-tab-group
  * @display docs
  *
  * @slot - Contenu du panel.
  *
- * @csspart base - Wrapper du slot.
+ * @csspart tab-panel - Racine du composant.
  */
-@customElement('ar-tab-panel')
-export class ArTabPanel extends LitElement {
+export class ArTabPanel extends ArianeElement {
     static override styles = [styles];
 
     /** Nom correspondant à l'attribut `panel` du ar-tab associé. Requis. */
@@ -43,12 +43,6 @@ export class ArTabPanel extends LitElement {
     }
 
     override render() {
-        return html`<div part="base"><slot></slot></div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab-panel': ArTabPanel;
+        return html`<div part="tab-panel"><slot></slot></div>`;
     }
 }

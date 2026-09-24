@@ -1,0 +1,1310 @@
+/**
+ * Thème "default-old" — GELÉ (issue #201, 2026-09-15).
+ *
+ * Ancienne palette (violet/cobalt) du thème par défaut, avant le
+ * retravail de #201 qui l'a alignée sur l'identité visuelle ambre/Voûte
+ * du chantier #110. Conservé tel quel pour réemploi futur — ce fichier
+ * n'est PLUS maintenu : la validation CEM (`cem.config.js`) ne le
+ * couvre pas (elle pointe explicitement sur `default.css`), et aucun
+ * nouveau token --ar-* introduit après le 2026-09-15 n'y sera ajouté.
+ * Le thème actif est désormais `default.css`.
+ *
+ * Utilise @layer pour éviter les conflits de spécificité avec les styles utilisateur.
+ * Le bloc `:root` de base doit être déclaré avant les règles `[data-theme='dark']`/`[data-theme='light']` qui suivent (voir plus bas).
+ *
+ * Usage :
+ *   <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/default-old.css">
+ *   ou
+ *   import '@ariane-ui/core/themes/default-old.css'; // via bundler
+ */
+@layer ariane.theme {
+    :root {
+        /* Suit prefers-color-scheme par défaut ; [data-theme] (ci-dessous)
+           le fige explicitement sur light ou dark, à :root comme sur tout
+           conteneur descendant — c'est ce qui pilote la résolution de
+           chaque light-dark() de ce fichier. */
+        color-scheme: light dark;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 1. PALETTE BRUTE
+         * Couleurs de base — ne pas utiliser directement dans les composants.
+         * Passer par les tokens sémantiques (sections 2 et 3).
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Primary (bleu France Travail) — 05=sombre → 95=clair */
+        --ar-color-primary-05: #010105 /* oklch(7.47% 0.022 279.71) */;
+        --ar-color-primary-10: #04071c /* oklch(14.05% 0.046 270.71) */;
+        --ar-color-primary-20: #0f1438 /* oklch(21.15% 0.070 272.98) */;
+        --ar-color-primary-30: #1b2256 /* oklch(27.98% 0.094 273.00) */;
+        --ar-color-primary-40: #283276 /* oklch(35.06% 0.116 272.63) */;
+        --ar-color-primary-50: #434fa7 /* oklch(46.62% 0.141 273.80) */;
+        --ar-color-primary-60: #707bcd /* oklch(61.04% 0.125 276.28) */;
+        --ar-color-primary-70: #a1abf9 /* oklch(76.33% 0.112 277.78) */;
+        --ar-color-primary-80: #cdd2ff /* oklch(87.46% 0.062 280.03) */;
+        --ar-color-primary-90: #eaecfb /* oklch(94.60% 0.020 279.87) */;
+        --ar-color-primary-95: #f4f5ff /* oklch(97.50% 0.012 280.00) */;
+
+        /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
+        --ar-color-white: #ffffff /* oklch(100% 0 0) */;
+
+        /* Neutral — 05=sombre → 95=clair (même convention que les autres hues) */
+        --ar-color-neutral-05: #0d0d0c /* oklch(15.79% 0.000 259.52) */;
+        --ar-color-neutral-10: #171717 /* oklch(20.46% 0.000 263.28) */;
+        --ar-color-neutral-20: #2c2d30 /* oklch(29.82% 0.005 270.80) */;
+        --ar-color-neutral-30: #44454b /* oklch(39.17% 0.010 278.32) */;
+        --ar-color-neutral-40: #5b5d65 /* oklch(47.94% 0.013 274.65) */;
+        --ar-color-neutral-50: #888b99 /* oklch(63.89% 0.021 276.13) */;
+        --ar-color-neutral-60: #9ea1ae /* oklch(71.11% 0.018 276.08) */;
+        --ar-color-neutral-70: #b5b8c3 /* oklch(78.34% 0.016 276.04) */;
+        --ar-color-neutral-80: #cdcfd8 /* oklch(85.56% 0.013 276.00) */;
+        --ar-color-neutral-90: #e6e7ec /* oklch(92.86% 0.007 277.00) */;
+        --ar-color-neutral-95: #f5f5f8 /* oklch(97.10% 0.004 285.86) */;
+
+        /* Green — utilisé pour success (Webawesome bright) */
+        --ar-color-green-05: #00160d /* oklch(17.74% 0.037 165.47) */;
+        --ar-color-green-10: #002317 /* oklch(22.71% 0.047 165.92) */;
+        --ar-color-green-20: #003a28 /* oklch(30.89% 0.065 165.46) */;
+        --ar-color-green-30: #015038 /* oklch(38.23% 0.080 164.89) */;
+        --ar-color-green-40: #036648 /* oklch(45.24% 0.095 164.51) */;
+        --ar-color-green-50: #0a8560 /* oklch(54.74% 0.113 164.94) */;
+        --ar-color-green-60: #19a87d /* oklch(65.11% 0.130 166.01) */;
+        --ar-color-green-70: #29c596 /* oklch(73.49% 0.142 166.89) */;
+        --ar-color-green-80: #3fe2b2 /* oklch(81.85% 0.149 168.50) */;
+        --ar-color-green-90: #b1f3de /* oklch(91.42% 0.072 172.95) */;
+        --ar-color-green-95: #dbfaf0 /* oklch(96.01% 0.035 174.15) */;
+
+        /* Yellow — utilisé pour warning (Webawesome bright) */
+        --ar-color-yellow-05: #1d0f00 /* oklch(18.39% 0.039 71.95) */;
+        --ar-color-yellow-10: #2d1901 /* oklch(23.51% 0.050 68.78) */;
+        --ar-color-yellow-20: #4a2c01 /* oklch(32.32% 0.069 69.30) */;
+        --ar-color-yellow-30: #643d03 /* oklch(39.73% 0.085 68.82) */;
+        --ar-color-yellow-40: #7d4f04 /* oklch(46.87% 0.099 70.54) */;
+        --ar-color-yellow-50: #a56804 /* oklch(57.03% 0.123 69.45) */;
+        --ar-color-yellow-60: #d08402 /* oklch(67.67% 0.147 69.48) */;
+        --ar-color-yellow-70: #f29c00 /* oklch(76.13% 0.164 70.48) */;
+        --ar-color-yellow-80: #ffbf18 /* oklch(84.07% 0.169 83.45) */;
+        --ar-color-yellow-90: #ffe579 /* oklch(92.18% 0.131 96.09) */;
+        --ar-color-yellow-95: #fff4c0 /* oklch(96.32% 0.068 97.50) */;
+
+        /* Red — utilisé pour danger (Webawesome bright) */
+        --ar-color-red-05: #2f0000 /* oklch(19.17% 0.079 29.23) */;
+        --ar-color-red-10: #450002 /* oklch(24.55% 0.100 27.41) */;
+        --ar-color-red-20: #680d0e /* oklch(33.45% 0.124 26.78) */;
+        --ar-color-red-30: #861d1c /* oklch(40.91% 0.141 26.45) */;
+        --ar-color-red-40: #a52c2b /* oklch(48.27% 0.158 25.74) */;
+        --ar-color-red-50: #d04442 /* oklch(58.51% 0.177 25.15) */;
+        --ar-color-red-60: #f76563 /* oklch(69.08% 0.180 23.79) */;
+        --ar-color-red-70: #ff8e90 /* oklch(76.90% 0.137 19.63) */;
+        --ar-color-red-80: #ffb7b7 /* oklch(84.65% 0.084 18.96) */;
+        --ar-color-red-90: #ffdddd /* oklch(92.57% 0.038 17.86) */;
+        --ar-color-red-95: #ffefef /* oklch(96.48% 0.017 17.46) */;
+
+        /* Orange (Webawesome bright) */
+        --ar-color-orange-05: oklch(18.82% 0.061 55);
+        --ar-color-orange-10: oklch(24.08% 0.077 54);
+        --ar-color-orange-20: oklch(32.94% 0.099 52);
+        --ar-color-orange-30: oklch(40.38% 0.116 50);
+        --ar-color-orange-40: oklch(47.62% 0.132 48.51);
+        --ar-color-orange-50: #bf5712 /* oklch(57.83% 0.152 47.33) */;
+        --ar-color-orange-60: #e97331 /* oklch(68.36% 0.165 46.50) */;
+        --ar-color-orange-70: oklch(76.55% 0.165 42.51);
+        --ar-color-orange-80: oklch(84.39% 0.122 47.98);
+        --ar-color-orange-90: oklch(92.4% 0.08 53.06);
+        --ar-color-orange-95: oklch(96.41% 0.04 53.48);
+
+        /* Cyan (Webawesome bright) */
+        --ar-color-cyan-05: #00151a /* oklch(17.99% 0.032 213.85) */;
+        --ar-color-cyan-10: #002129 /* oklch(22.85% 0.041 217.17) */;
+        --ar-color-cyan-20: #003843 /* oklch(31.37% 0.056 215.61) */;
+        --ar-color-cyan-30: #014c5a /* oklch(38.37% 0.068 215.53) */;
+        --ar-color-cyan-40: #056273 /* oklch(45.73% 0.080 215.29) */;
+        --ar-color-cyan-50: #118095 /* oklch(55.34% 0.094 215.17) */;
+        --ar-color-cyan-60: #1fa3b9 /* oklch(65.92% 0.109 212.40) */;
+        --ar-color-cyan-70: #2fbfd5 /* oklch(74.14% 0.119 210.50) */;
+        --ar-color-cyan-80: #51dcee /* oklch(82.70% 0.120 207.31) */;
+        --ar-color-cyan-90: #a6f2fa /* oklch(91.44% 0.075 204.25) */;
+        --ar-color-cyan-95: #dbf9fc /* oklch(96.15% 0.031 203.97) */;
+
+        /* Indigo (Webawesome bright) */
+        --ar-color-indigo-05: #080f2f /* oklch(18.55% 0.065 269.54) */;
+        --ar-color-indigo-10: #101a45 /* oklch(23.86% 0.082 269.36) */;
+        --ar-color-indigo-20: #1e2d6c /* oklch(32.51% 0.111 269.20) */;
+        --ar-color-indigo-30: #2a3f8f /* oklch(39.97% 0.135 268.52) */;
+        --ar-color-indigo-40: #3851b3 /* oklch(47.27% 0.158 268.81) */;
+        --ar-color-indigo-50: #516ed8 /* oklch(57.14% 0.165 269.13) */;
+        --ar-color-indigo-60: #728dff /* oklch(67.66% 0.170 271.19) */;
+        --ar-color-indigo-70: #95abff /* oklch(75.79% 0.124 271.99) */;
+        --ar-color-indigo-80: #bac8ff /* oklch(84.11% 0.079 273.50) */;
+        --ar-color-indigo-90: #dce5ff /* oklch(92.31% 0.037 270.47) */;
+        --ar-color-indigo-95: #edf2ff /* oklch(96.12% 0.018 269.09) */;
+
+        /* Purple (Webawesome bright) */
+        --ar-color-purple-05: #150047 /* oklch(19.86% 0.117 283.68) */;
+        --ar-color-purple-10: #250161 /* oklch(25.28% 0.144 287.73) */;
+        --ar-color-purple-20: #371f7a /* oklch(33.31% 0.144 287.97) */;
+        --ar-color-purple-30: #493590 /* oklch(40.49% 0.143 288.41) */;
+        --ar-color-purple-40: #5c4ba7 /* oklch(47.82% 0.142 288.32) */;
+        --ar-color-purple-50: #7b65cb /* oklch(57.62% 0.152 290.77) */;
+        --ar-color-purple-60: #9e83f2 /* oklch(68.28% 0.160 292.86) */;
+        --ar-color-purple-70: #b8a0fe /* oklch(76.29% 0.134 294.76) */;
+        --ar-color-purple-80: #d1c0ff /* oklch(84.32% 0.088 296.84) */;
+        --ar-color-purple-90: #eae2ff /* oklch(92.79% 0.040 298.23) */;
+        --ar-color-purple-95: #f3f0ff /* oklch(96.18% 0.020 295.19) */;
+
+        /* Pink (Webawesome bright) */
+        --ar-color-pink-05: #240033 /* oklch(19.65% 0.098 313.47) */;
+        --ar-color-pink-10: #370047 /* oklch(24.98% 0.122 316.48) */;
+        --ar-color-pink-20: #580a68 /* oklch(34.10% 0.153 319.60) */;
+        --ar-color-pink-30: #6d247e /* oklch(41.18% 0.155 319.42) */;
+        --ar-color-pink-40: #823b94 /* oklch(48.33% 0.153 319.08) */;
+        --ar-color-pink-50: #a258b5 /* oklch(58.35% 0.156 319.13) */;
+        --ar-color-pink-60: #c576db /* oklch(68.84% 0.164 318.62) */;
+        --ar-color-pink-70: #e38ef8 /* oklch(77.16% 0.170 319.48) */;
+        --ar-color-pink-80: #edb8fa /* oklch(85.15% 0.106 319.58) */;
+        --ar-color-pink-90: #f4defb /* oklch(92.70% 0.045 317.99) */;
+        --ar-color-pink-95: #f8effc /* oklch(96.29% 0.020 315.67) */;
+
+        /* Blue — utilisé pour info (Webawesome bright) */
+        --ar-color-blue-05: #031225 /* oklch(18.05% 0.045 253.25) */;
+        --ar-color-blue-10: #061e38 /* oklch(23.25% 0.059 252.80) */;
+        --ar-color-blue-20: #103359 /* oklch(31.79% 0.079 253.15) */;
+        --ar-color-blue-30: #194777 /* oklch(39.27% 0.095 252.36) */;
+        --ar-color-blue-40: #235a96 /* oklch(46.27% 0.113 253.15) */;
+        --ar-color-blue-50: #3178c0 /* oklch(56.35% 0.132 251.63) */;
+        --ar-color-blue-60: #4a99e4 /* oklch(66.70% 0.136 249.55) */;
+        --ar-color-blue-70: #5bb5fe /* oklch(74.85% 0.137 245.56) */;
+        --ar-color-blue-80: #93d0ff /* oklch(83.32% 0.091 242.30) */;
+        --ar-color-blue-90: #ceeaff /* oklch(92.32% 0.041 240.38) */;
+        --ar-color-blue-95: #e7f5ff /* oklch(96.27% 0.020 238.66) */;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 2. VARIANTS SÉMANTIQUES D'ÉTAT
+         * Alias vers la palette brute — permet de remapper
+         * success/danger/warning/info sur une autre hue sans
+         * toucher aux composants.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Success → green */
+        --ar-color-success-05: var(--ar-color-green-05);
+        --ar-color-success-10: var(--ar-color-green-10);
+        --ar-color-success-20: var(--ar-color-green-20);
+        --ar-color-success-30: var(--ar-color-green-30);
+        --ar-color-success-40: var(--ar-color-green-40);
+        --ar-color-success-50: var(--ar-color-green-50);
+        --ar-color-success-60: var(--ar-color-green-60);
+        --ar-color-success-70: var(--ar-color-green-70);
+        --ar-color-success-80: var(--ar-color-green-80);
+        --ar-color-success-90: var(--ar-color-green-90);
+        --ar-color-success-95: var(--ar-color-green-95);
+
+        /* Warning → yellow */
+        --ar-color-warning-05: var(--ar-color-yellow-05);
+        --ar-color-warning-10: var(--ar-color-yellow-10);
+        --ar-color-warning-20: var(--ar-color-yellow-20);
+        --ar-color-warning-30: var(--ar-color-yellow-30);
+        --ar-color-warning-40: var(--ar-color-yellow-40);
+        --ar-color-warning-50: var(--ar-color-yellow-50);
+        --ar-color-warning-60: var(--ar-color-yellow-60);
+        --ar-color-warning-70: var(--ar-color-yellow-70);
+        --ar-color-warning-80: var(--ar-color-yellow-80);
+        --ar-color-warning-90: var(--ar-color-yellow-90);
+        --ar-color-warning-95: var(--ar-color-yellow-95);
+
+        /* Danger → red */
+        --ar-color-danger-05: var(--ar-color-red-05);
+        --ar-color-danger-10: var(--ar-color-red-10);
+        --ar-color-danger-20: var(--ar-color-red-20);
+        --ar-color-danger-30: var(--ar-color-red-30);
+        --ar-color-danger-40: var(--ar-color-red-40);
+        --ar-color-danger-50: var(--ar-color-red-50);
+        --ar-color-danger-60: var(--ar-color-red-60);
+        --ar-color-danger-70: var(--ar-color-red-70);
+        --ar-color-danger-80: var(--ar-color-red-80);
+        --ar-color-danger-90: var(--ar-color-red-90);
+        --ar-color-danger-95: var(--ar-color-red-95);
+
+        /* Info → blue */
+        --ar-color-info-05: var(--ar-color-blue-05);
+        --ar-color-info-10: var(--ar-color-blue-10);
+        --ar-color-info-20: var(--ar-color-blue-20);
+        --ar-color-info-30: var(--ar-color-blue-30);
+        --ar-color-info-40: var(--ar-color-blue-40);
+        --ar-color-info-50: var(--ar-color-blue-50);
+        --ar-color-info-60: var(--ar-color-blue-60);
+        --ar-color-info-70: var(--ar-color-blue-70);
+        --ar-color-info-80: var(--ar-color-blue-80);
+        --ar-color-info-90: var(--ar-color-blue-90);
+        --ar-color-info-95: var(--ar-color-blue-95);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 3. TOKENS SÉMANTIQUES
+         * Relient palette → intention. Ce sont ces tokens que
+         * les composants et les thèmes surchargent.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Interaction */
+        --ar-color-interactive: light-dark(var(--ar-color-primary-40), var(--ar-color-primary-70));
+        --ar-color-interactive-hover: light-dark(
+            var(--ar-color-primary-30),
+            var(--ar-color-primary-80)
+        );
+        --ar-color-interactive-active: light-dark(
+            var(--ar-color-primary-20),
+            var(--ar-color-primary-80)
+        );
+        --ar-color-interactive-subtle: light-dark(
+            var(--ar-color-primary-95),
+            var(--ar-color-primary-20)
+        );
+
+        /* Texte */
+        --ar-color-text: light-dark(#2e2e31, var(--ar-color-neutral-95));
+        --ar-color-text-muted: light-dark(var(--ar-color-neutral-40), var(--ar-color-neutral-80));
+        --ar-color-text-inverse: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
+
+        /* Surface */
+        --ar-color-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
+        --ar-color-bg-subtle: light-dark(var(--ar-color-neutral-95), var(--ar-color-neutral-30));
+
+        /* Bordure */
+        --ar-color-border: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-40));
+
+        /* Focus */
+        --ar-focus-ring-color: var(--ar-color-interactive);
+        --ar-focus-ring-offset: 2px;
+
+        /* États — tokens d'usage */
+        --ar-color-success-bg: light-dark(var(--ar-color-success-95), var(--ar-color-success-10));
+        --ar-color-success-text: light-dark(var(--ar-color-success-40), var(--ar-color-success-70));
+        --ar-color-success-border: light-dark(
+            var(--ar-color-success-90),
+            var(--ar-color-success-40)
+        );
+        --ar-color-warning-bg: light-dark(var(--ar-color-warning-95), var(--ar-color-warning-10));
+        --ar-color-warning-text: light-dark(var(--ar-color-warning-40), var(--ar-color-warning-70));
+        --ar-color-warning-border: light-dark(
+            var(--ar-color-warning-90),
+            var(--ar-color-warning-40)
+        );
+        --ar-color-danger-bg: light-dark(var(--ar-color-danger-95), var(--ar-color-danger-10));
+        --ar-color-danger-text: light-dark(var(--ar-color-danger-40), var(--ar-color-danger-70));
+        --ar-color-danger-border: light-dark(var(--ar-color-danger-90), var(--ar-color-danger-40));
+        --ar-color-info-bg: light-dark(var(--ar-color-info-95), var(--ar-color-info-10));
+        --ar-color-info-text: light-dark(var(--ar-color-info-40), var(--ar-color-info-70));
+        --ar-color-info-border: light-dark(var(--ar-color-info-90), var(--ar-color-info-40));
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 4. TOKENS GLOBAUX — TYPOGRAPHIE
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        --ar-font-size-sm: 0.875rem;
+        --ar-font-size-md: 1rem;
+        --ar-font-size-lg: 1.125rem;
+
+        --ar-font-weight-normal: 400;
+        --ar-font-weight-medium: 500;
+        --ar-font-weight-bold: 700;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 5. TOKENS GLOBAUX — ESPACEMENT & FORME
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        --ar-spacing-xs: 0.25rem;
+        --ar-spacing-sm: 0.5rem;
+        --ar-spacing-md: 1rem;
+        --ar-spacing-lg: 1.5rem;
+        --ar-spacing-xl: 2rem;
+
+        --ar-border-radius-sm: 0.25rem;
+        --ar-border-radius-md: 0.375rem;
+        --ar-border-radius-lg: 0.5rem;
+        --ar-border-radius-xl: 0.75rem;
+        --ar-border-radius-full: 9999px;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 6. TOKENS GÉNÉRIQUES MUTUALISÉS
+         * Mutualisation de thème pure : jamais consommés dans un .styles.ts
+         * ou un .ts de composant (contrairement à panel.styles.ts ou
+         * --ar-anchor-*, qui pilotent un mécanisme interne). Chacun est le
+         * point d'entrée public d'un preset externe (buttons.css,
+         * fields.css), réutilisé ici pour garder les ::part() du thème
+         * visuellement cohérents avec lui.
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* Button — Partagé (stepper) */
+        --ar-button-bg: var(--ar-color-interactive);
+        --ar-button-bg-hover: var(--ar-color-interactive-hover);
+        --ar-button-color: var(--ar-color-text-inverse);
+        --ar-button-border-color: var(--ar-color-interactive);
+        --ar-button-danger-bg: var(--ar-color-danger-50);
+        --ar-button-danger-color: var(--ar-color-text-inverse);
+        --ar-button-secondary-bg: light-dark(var(--ar-color-white), var(--ar-color-neutral-30));
+        --ar-button-secondary-bg-hover: light-dark(
+            var(--ar-color-neutral-40),
+            var(--ar-color-neutral-40)
+        );
+        --ar-button-disabled-bg: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-30));
+        --ar-button-disabled-border: light-dark(
+            var(--ar-color-neutral-80),
+            var(--ar-color-neutral-40)
+        );
+        --ar-button-disabled-color: #71747f;
+        --ar-button-disabled-icon-color: #9ea2b3;
+        --ar-button-tertiary-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+        --ar-button-tertiary-bg-hover: light-dark(rgba(18, 20, 55, 0.7), rgba(255, 255, 255, 0.15));
+        --ar-button-tertiary-bg-active: light-dark(rgba(18, 20, 55, 0.8), rgba(255, 255, 255, 0.2));
+        --ar-button-tertiary-bg-focus: light-dark(
+            rgba(26, 26, 26, 0.05),
+            rgba(255, 255, 255, 0.08)
+        );
+        --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+        --ar-button-link-color: #2458e5;
+        --ar-button-focus-ring-color: var(--ar-color-neutral-20);
+        --ar-button-border-radius: var(--ar-border-radius-md);
+        --ar-button-font-weight: var(--ar-font-weight-medium);
+        --ar-button-height: 2.5rem;
+        --ar-button-padding-x: 1rem;
+        --ar-button-border-radius-pill: 0.75rem;
+        --ar-button-ratio-square-width: 2.5rem;
+        --ar-button-transition-duration: 0.15s;
+
+        /* Input — preset fields.css, réutilisé par ar-datepicker::part(input) */
+        --ar-input-border-color: var(--ar-color-border);
+        --ar-input-radius: var(--ar-border-radius-md);
+        --ar-input-bg: var(--ar-color-bg);
+        --ar-input-color: var(--ar-color-text);
+        --ar-input-font-size: var(--ar-font-size-md);
+        --ar-input-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-input-disabled-bg: var(--ar-color-bg-subtle);
+
+        /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
+           interne d'ar-datepicker::part(datepicker) */
+        --ar-field-gap: 0.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * 7. TOKENS COMPOSANTS
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Panel
+         * Partagé - dropdown, breadcrumb, stepper, datepicker
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-panel-bg: var(--ar-color-bg);
+        --ar-panel-text: var(--ar-color-text);
+        --ar-panel-border-color: var(--ar-color-border);
+        --ar-panel-radius: var(--ar-border-radius-md);
+        --ar-panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        --ar-panel-padding: 0.25rem;
+        --ar-panel-min-width: 18rem;
+        --ar-panel-max-width: 18rem;
+        --ar-panel-show-duration: 0.2s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Anchor
+         * Partagé — positionnement des composants ancrés / popovers)
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* anchor ( */
+        --ar-anchor-distance: 4px;
+        --ar-anchor-offset: 0px;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Alert
+         * Voir les règles complémentaires pour les variants ci-dessous
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-alert-color: var(--ar-color-text);
+        --ar-alert-close-size: 2rem;
+        --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
+        --ar-alert-hide-transition-duration: 0.33s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Breadcrumb
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-breadcrumb-distance: var(--ar-anchor-distance);
+        --ar-breadcrumb-offset: var(--ar-anchor-offset);
+        --ar-breadcrumb-mobile-separator-color: var(--ar-color-neutral-90);
+        --ar-breadcrumb-toggle-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+        --ar-breadcrumb-toggle-bg-hover: light-dark(
+            rgba(18, 20, 55, 0.7),
+            rgba(255, 255, 255, 0.15)
+        );
+        --ar-breadcrumb-toggle-bg-pressed: light-dark(
+            rgba(18, 20, 55, 0.8),
+            rgba(255, 255, 255, 0.2)
+        );
+        --ar-breadcrumb-toggle-bg-focus: light-dark(
+            rgba(26, 26, 26, 0.05),
+            rgba(255, 255, 255, 0.08)
+        );
+        --ar-breadcrumb-toggle-min-size: 2.5rem;
+        --ar-breadcrumb-toggle-transition-duration: 0.15s;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Stepper
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-stepper-distance: var(--ar-anchor-distance);
+        --ar-stepper-offset: var(--ar-anchor-offset);
+        --ar-stepper-label-color: var(--ar-color-text-muted);
+        --ar-stepper-bullet-color: var(--ar-color-interactive);
+        --ar-stepper-bullet-bg: var(--ar-color-primary-80);
+        --ar-stepper-bullet-border-color: var(--ar-color-neutral-80);
+        --ar-stepper-bullet-hover-bg: var(--ar-color-text-muted);
+        --ar-stepper-link-hover-bullet-color: var(--ar-color-interactive);
+        --ar-stepper-link-hover-label-color: var(--ar-color-text);
+        --ar-stepper-link-hover-bullet-text-color: var(--ar-color-text-inverse);
+        --ar-stepper-link-focus-outline-color: var(--ar-color-interactive);
+        --ar-stepper-current-header-color: var(--ar-color-interactive);
+        --ar-stepper-gap: 1.5rem;
+        --ar-stepper-substep-gap: 1rem;
+        --ar-stepper-connector-color: var(--ar-color-neutral-80);
+        --ar-stepper-toggle-transition-duration: 0.15s;
+        --ar-stepper-toggle-min-size: 2.5rem;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Progressbar
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-progressbar-track-color: var(--ar-color-bg-subtle);
+        --ar-progressbar-fill-color: var(--ar-color-interactive);
+        --ar-progressbar-max-width: 500px;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Pagination
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-pagination-button-size: 2.5rem;
+        --ar-pagination-transition-duration: var(--ar-button-transition-duration);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Spinner
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-spinner-stroke-color: currentColor;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tooltip
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-tooltip-distance: 10px;
+        --ar-tooltip-offset: var(--ar-anchor-offset);
+        --ar-tooltip-bg: light-dark(var(--ar-color-neutral-20), var(--ar-color-neutral-80));
+        --ar-tooltip-color: light-dark(var(--ar-color-white), var(--ar-color-neutral-10));
+        --ar-tooltip-arrow-size: 6px;
+        --ar-tooltip-show-duration: var(--ar-panel-show-duration);
+        --ar-tooltip-radius: var(--ar-border-radius-sm);
+        --ar-tooltip-padding: 0.375rem 0.625rem;
+        --ar-tooltip-font-size: 0.8125rem;
+        --ar-tooltip-line-height: 1.4;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dropdown
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-dropdown-distance: var(--ar-anchor-distance);
+        --ar-dropdown-offset: var(--ar-anchor-offset);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dialog
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-dialog-spacing: 1.25rem;
+        /* --ar-dialog-spacing-block / --ar-dialog-spacing-inline : points d'extension
+           optionnels, consommés avec fallback dans dialog.styles.ts (padding-block/-inline
+           de [part='body']). Volontairement non déclarés ici — --ar-dialog-spacing suffit
+           par défaut ; les définir permet de différencier le padding vertical/horizontal
+           sans surcharge globale de --ar-dialog-spacing. */
+        --ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
+        --ar-dialog-bg: var(--ar-color-bg);
+        --ar-dialog-color: var(--ar-color-text);
+        --ar-dialog-close-size: 2.5rem;
+        --ar-dialog-close-transition-duration: var(--ar-button-transition-duration);
+        --ar-dialog-shake-outline-color: var(--ar-color-danger-text);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Collapse
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-collapse-duration: 400ms;
+        --ar-collapse-easing: ease;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Charcounter
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-charcounter-warning-weight: 600;
+        --ar-charcounter-error-weight: 700;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tablesort
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-table-sort-indicator-size: 0.65rem;
+        --ar-table-sort-indicator-color: var(--ar-color-text-muted, #9ca3af);
+        --ar-table-sort-indicator-active-color: var(--ar-color-interactive, #2563eb);
+        --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted, #9ca3af);
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Tab
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        --ar-tab-padding-x: 1.5rem;
+        --ar-tab-padding-y: 1rem;
+
+        --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-interactive);
+
+        --ar-tab-focus-ring-offset: -2px;
+        --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
+
+        --ar-tab-group-border-color: var(--ar-color-border);
+        --ar-tab-group-border-top-width: 0;
+        --ar-tab-group-border-bottom-width: 1px;
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Datepicker
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+        --ar-datepicker-distance: var(--ar-anchor-distance);
+        --ar-datepicker-offset: var(--ar-anchor-offset);
+        /* --ar-color-danger-text (pas red-50 directement) : même convention que
+           ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
+        --ar-datepicker-error-color: light-dark(
+            var(--ar-color-danger-text),
+            var(--ar-color-red-40)
+        );
+
+        /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
+           dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
+           taille plus généreuse (25rem) que la valeur par défaut partagée (18rem) — même
+           précédent que le min-width littéral d'ar-dropdown::part(panel) (10rem, cf. plus bas). */
+        --ar-datepicker-panel-max-width: 25rem;
+
+        --ar-datepicker-nav-button-border-color: transparent;
+        --ar-datepicker-nav-button-focus-ring-color: var(--ar-focus-ring-color);
+
+        --ar-datepicker-footer-button-border-color: var(--ar-color-border);
+        --ar-datepicker-footer-button-focus-ring-color: var(--ar-focus-ring-color);
+
+        --ar-datepicker-day-other-month-color: var(--ar-color-neutral-50);
+
+        --ar-datepicker-day-size: 2.5rem;
+
+        --ar-datepicker-day-today-color: light-dark(
+            var(--ar-color-primary-40),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-today-border: light-dark(
+            var(--ar-color-primary-50),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-today-bg: var(--ar-panel-bg);
+
+        --ar-datepicker-day-hover-bg: light-dark(
+            var(--ar-color-primary-50),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-hover-color: light-dark(
+            var(--ar-color-white),
+            var(--ar-color-text-inverse)
+        );
+
+        --ar-datepicker-day-focus-ring-color: var(--ar-focus-ring-color);
+        --ar-datepicker-day-focus-ring-width: 2px;
+        --ar-datepicker-day-focus-ring-offset: 0;
+        --ar-datepicker-day-focus-border-color: var(--ar-panel-bg);
+        --ar-datepicker-day-border-color: transparent;
+        --ar-datepicker-day-color: var(--ar-color-text);
+        --ar-datepicker-day-bg: transparent;
+
+        --ar-datepicker-day-selected-bg: light-dark(
+            var(--ar-color-primary-40),
+            var(--ar-color-primary-70)
+        );
+        --ar-datepicker-day-selected-color: light-dark(
+            var(--ar-color-white),
+            var(--ar-color-text-inverse)
+        );
+
+        --ar-datepicker-input-error-border-color: light-dark(
+            var(--ar-color-red-50),
+            var(--ar-color-red-40)
+        );
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * THÈME SOMBRE
+     * Les tokens qui varient entre clair et sombre sont directement
+     * déclarés via light-dark() ci-dessus, piloté par color-scheme.
+     * Les deux règles ci-dessous ne posent que color-scheme — c'est ce
+     * qui fait choisir à light-dark() sa branche claire ou sombre.
+     * Elles s'appliquent à :root (racine du document) mais aussi à tout
+     * conteneur portant data-theme, ce qui scope les tokens --ar-* à ce
+     * seul sous-arbre (issue #203) : un consommateur peut ainsi forcer
+     * un widget, une prévisualisation ou toute portion de page en clair
+     * ou en sombre indépendamment du reste du document.
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* Thème sombre actif manuellement */
+    :root[data-theme='dark'],
+    [data-theme='dark'] {
+        color-scheme: dark;
+    }
+
+    /* Thème clair forcé — utile pour s'extraire d'un sombre ambiant
+       (ancêtre en data-theme="dark", ou prefers-color-scheme: dark) */
+    :root[data-theme='light'],
+    [data-theme='light'] {
+        color-scheme: light;
+    }
+
+    /* build-split-anchor: components — ne pas renommer, cf. scripts/build-css.js */
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * THÈME COMPOSANTS
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* Datepicker */
+    ar-datepicker {
+        &::part(datepicker) {
+            gap: var(--ar-field-gap);
+        }
+
+        &::part(panel) {
+            width: 20rem;
+            padding: 1rem;
+        }
+
+        &::part(nav-button) {
+            width: 2rem;
+            height: 2rem;
+            background: transparent;
+            border-width: 0px;
+            color: var(--ar-color-text);
+            border-radius: var(--ar-border-radius-sm);
+        }
+
+        &::part(nav-button):hover {
+            background: color-mix(in srgb, var(--ar-color-text) 8%, transparent);
+        }
+
+        &::part(nav-button):active {
+            background: color-mix(in srgb, var(--ar-color-text) 14%, transparent);
+        }
+
+        &::part(nav-button):focus-visible {
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(footer) {
+            margin: 0;
+            padding: 0.75rem 0 0;
+            background: transparent;
+            gap: 0.5rem;
+        }
+
+        &::part(footer-button) {
+            background: transparent;
+            border-width: 1px;
+            color: var(--ar-color-interactive);
+            border-radius: var(--ar-border-radius-md);
+            padding: 0.375rem 0.75rem;
+        }
+
+        &::part(footer-button):hover {
+            background: color-mix(in srgb, var(--ar-color-interactive) 10%, transparent);
+            border-color: var(--ar-color-interactive);
+        }
+
+        &::part(footer-button):active {
+            background: color-mix(in srgb, var(--ar-color-interactive) 18%, transparent);
+        }
+
+        &::part(footer-button):focus-visible {
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(header) {
+            font-size: 1rem;
+            margin: 0;
+            padding: 0 0 0.75rem;
+            border-radius: 0;
+            background: transparent;
+            gap: 0.25rem;
+        }
+
+        &::part(label) {
+            font-size: var(--ar-font-size-sm);
+            font-weight: var(--ar-font-weight-medium);
+            color: var(--ar-color-text);
+        }
+
+        &::part(hint) {
+            font-size: var(--ar-font-size-sm);
+            color: var(--ar-color-text-muted);
+        }
+
+        &::part(error) {
+            font-size: var(--ar-font-size-sm);
+            color: var(--ar-datepicker-error-color);
+        }
+
+        &::part(input) {
+            height: var(--ar-button-height);
+            box-sizing: border-box;
+            padding: 0 0.75rem;
+            border: 1px solid var(--ar-input-border-color);
+            border-inline-end: none;
+            border-start-start-radius: var(--ar-input-radius);
+            border-end-start-radius: var(--ar-input-radius);
+            background: var(--ar-input-bg);
+            color: var(--ar-input-color);
+            font-size: var(--ar-input-font-size);
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        &::part(input):focus-visible {
+            outline: 2px solid var(--ar-input-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+            border-color: var(--ar-color-interactive);
+        }
+
+        &::part(input):read-only {
+            background: var(--ar-color-bg-subtle);
+            cursor: default;
+        }
+
+        &::part(input):disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--ar-input-disabled-bg);
+        }
+
+        &::part(trigger) {
+            width: var(--ar-button-height);
+            height: var(--ar-button-height);
+            background: var(--ar-color-interactive);
+            color: var(--ar-color-text-inverse);
+            border: 1px solid var(--ar-color-interactive);
+            border-start-end-radius: var(--ar-border-radius-md);
+            border-end-end-radius: var(--ar-border-radius-md);
+            cursor: pointer;
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease;
+        }
+
+        &::part(trigger):hover:not(:disabled) {
+            background: var(--ar-color-interactive-hover);
+            border-color: var(--ar-color-interactive-hover);
+        }
+
+        &::part(trigger):active:not(:disabled) {
+            background: var(--ar-color-interactive-active);
+            border-color: var(--ar-color-interactive-active);
+        }
+
+        &::part(trigger):focus-visible {
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(trigger):disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* neutral-60 (~2.6:1 sur blanc) — distinction visuelle prioritaire sur AA strict */
+        &::part(weekday) {
+            color: var(--ar-color-neutral-50);
+            font-size: 0.75rem;
+            text-align: center;
+            font-weight: normal;
+            padding-block: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        &::part(day) {
+            font-size: 1rem;
+            border-radius: var(--ar-border-radius-lg);
+            border-width: 2px;
+        }
+    }
+
+    /* Stepper */
+    ar-stepper {
+        &::part(trigger) {
+            border-radius: var(--ar-border-radius-xl);
+            border: 1px solid var(--ar-color-neutral-40);
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+            color: var(--ar-color-text);
+            gap: 0.25rem;
+            background-color: var(--ar-color-bg-subtle);
+        }
+
+        &::part(trigger):hover {
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
+        }
+
+        &::part(trigger):active:not(:disabled) {
+            background-color: var(--ar-color-neutral-30);
+            border-color: transparent;
+            color: var(--ar-color-white);
+        }
+
+        &::part(trigger):focus-visible {
+            background-color: var(--ar-color-neutral-40);
+            color: var(--ar-color-white);
+            outline: 2px solid var(--ar-focus-ring-color);
+            outline-offset: var(--ar-focus-ring-offset);
+        }
+
+        &::part(panel) {
+            padding: 0.75rem;
+        }
+
+        &::part(step-link) {
+            color: var(--ar-color-interactive);
+            text-decoration: underline;
+        }
+
+        &::part(step-link):hover,
+        &::part(step-link):focus {
+            color: var(--ar-color-text-muted);
+            text-decoration: none;
+        }
+
+        &::part(step-link):focus {
+            border-radius: 0.125rem;
+        }
+
+        &::part(step-link--current) {
+            color: var(--ar-color-interactive);
+        }
+
+        &::part(bullet) {
+            border-radius: var(--ar-border-radius-xl);
+        }
+
+        &::part(bullet--current) {
+            background-color: var(--ar-color-interactive);
+            color: var(--ar-color-text-inverse);
+            box-shadow: none;
+        }
+    }
+
+    /* Alert */
+    ar-alert {
+        padding: 1rem;
+        border-radius: var(--ar-border-radius-xl);
+        border-width: 1px;
+        border-style: solid;
+        column-gap: 0.75rem;
+
+        /* Customisation */
+        &::part(close-button) {
+            border-radius: var(--ar-border-radius-md);
+            color: currentColor;
+            background-color: color-mix(in srgb, currentColor 8%, transparent);
+            opacity: 0.75;
+            position: relative;
+            top: -0.2rem;
+            inset-inline-end: -0.2rem;
+        }
+
+        &::part(close-button):hover {
+            background-color: color-mix(in srgb, currentColor 20%, transparent);
+            opacity: 1;
+        }
+
+        &::part(close-button):focus-visible {
+            opacity: 1;
+        }
+
+        &::part(icon) {
+            font-size: 1.5em;
+        }
+        &[hiding] {
+            opacity: 0;
+            transform: scale(0.75);
+        }
+
+        /* presets par variant */
+        &[variant='info'] {
+            --ar-alert-bg: var(--ar-color-info-bg);
+            --ar-alert-border: var(--ar-color-info-border);
+            --ar-alert-icon: var(--ar-color-info-text);
+        }
+
+        &[variant='warning'] {
+            --ar-alert-bg: var(--ar-color-warning-bg);
+            --ar-alert-border: var(--ar-color-warning-border);
+            --ar-alert-icon: var(--ar-color-warning-text);
+        }
+
+        &[variant='error'] {
+            --ar-alert-bg: var(--ar-color-danger-bg);
+            --ar-alert-border: var(--ar-color-danger-border);
+            --ar-alert-icon: var(--ar-color-danger-text);
+        }
+
+        &[variant='success'] {
+            --ar-alert-bg: var(--ar-color-success-bg);
+            --ar-alert-border: var(--ar-color-success-border);
+            --ar-alert-icon: var(--ar-color-success-text);
+        }
+    }
+
+    ar-dialog {
+        &::part(dialog) {
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 20px 50px -8px rgba(0, 0, 0, 0.2);
+        }
+
+        &:not([mode='drawer'])::part(dialog) {
+            border-radius: var(--ar-border-radius-lg);
+        }
+
+        &::part(close-button) {
+            border-radius: var(--ar-border-radius-md);
+            color: currentColor;
+            background-color: color-mix(in srgb, currentColor 8%, transparent);
+        }
+
+        &::part(close-button):hover {
+            background-color: color-mix(in srgb, currentColor 20%, transparent);
+        }
+
+        &::part(title) {
+            font-size: var(--ar-font-size-md);
+        }
+
+        &::part(header) {
+            gap: 0.75rem;
+            padding: 1.25rem 1.25rem 0;
+        }
+
+        &::part(footer) {
+            gap: 0.75rem;
+            padding: 0 1.25rem 1.25rem;
+        }
+
+        &[size='sm'] {
+            --ar-dialog-width: 360px;
+        }
+        &[size='lg'] {
+            --ar-dialog-width: 800px;
+        }
+        &[size='xl'] {
+            --ar-dialog-width: 1140px;
+        }
+
+        &[mode='drawer'][size='sm'] {
+            --ar-dialog-width: 360px;
+        }
+        &[mode='drawer'][size='lg'] {
+            --ar-dialog-width: 960px;
+        }
+        &[mode='drawer'][size='xl'] {
+            --ar-dialog-width: 1440px;
+        }
+    }
+
+    ar-breadcrumb {
+        &::part(list) {
+            color: var(--ar-color-text);
+        }
+
+        &::part(current) {
+            font-weight: 700;
+        }
+
+        &::part(separator) {
+            background-color: var(--ar-color-neutral-80);
+        }
+
+        &::part(bullet) {
+            border-radius: var(--ar-border-radius-full);
+            background-color: var(--ar-color-neutral-80);
+            box-shadow: 0 0 0 2px var(--ar-color-bg);
+        }
+
+        &::part(bullet--current) {
+            background-color: var(--ar-color-interactive);
+        }
+
+        &::part(home),
+        &::part(trigger) {
+            border-radius: var(--ar-border-radius-xl);
+            font-size: var(--ar-font-size-md);
+            line-height: 1;
+            font-weight: 500;
+            color: var(--ar-color-text);
+        }
+
+        &::part(home):hover,
+        &::part(trigger):hover,
+        &::part(home):active,
+        &::part(trigger):active {
+            color: var(--ar-color-white);
+        }
+
+        &::part(home) {
+            padding: 0 1rem;
+            text-decoration: none;
+        }
+
+        &::part(trigger) {
+            margin-inline-start: 0.5rem;
+        }
+    }
+
+    ar-dropdown {
+        &::part(panel) {
+            /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width : un menu
+               dropdown reste lisible plus étroit qu'un panel de disclosure générique
+               (breadcrumb, stepper). */
+            min-width: 10rem;
+        }
+    }
+
+    /* ar-dropdown-item n'a aucun style interne (:host { display: contents }) : le
+       bouton/lien slotté est un vrai nœud du light DOM, ciblé ici directement
+       (::slotted() est hors de portée depuis une feuille externe au shadow root
+       propriétaire du slot). */
+    ar-dropdown-item {
+        :is(button, a):not(:disabled):not([aria-disabled='true']) {
+            display: block;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font: inherit;
+            color: var(--ar-color-text);
+            text-align: left;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--ar-border-radius-sm);
+            transition: background-color var(--ar-button-transition-duration);
+
+            &:hover {
+                background-color: var(--ar-color-bg-subtle);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--ar-focus-ring-color);
+                outline-offset: var(--ar-focus-ring-offset);
+            }
+        }
+    }
+
+    ar-pagination {
+        &:not([compact])::part(list) {
+            column-gap: 0.25rem;
+        }
+
+        &::part(page-label) {
+            padding-right: 0.5rem;
+        }
+
+        &::part(link),
+        &::part(prev),
+        &::part(next) {
+            background-color: var(--ar-button-tertiary-bg);
+            color: var(--ar-color-text);
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(prev),
+        &::part(next),
+        &::part(select) {
+            border-radius: var(--ar-border-radius-lg);
+        }
+
+        &[compact]::part(prev) {
+            border-radius: var(--ar-border-radius-xl) 0 0 var(--ar-border-radius-lg);
+            border-right: 1px solid var(--ar-color-neutral-80);
+        }
+
+        &[compact]::part(next) {
+            border-radius: 0 var(--ar-border-radius-xl) var(--ar-border-radius-lg) 0;
+        }
+
+        /* Ordre volontaire : :focus-visible avant :hover avant :active, à spécificité égale, pour
+           qu'un état combiné (ex. clic — hover + focus simultanés) retienne toujours le fond de
+           l'état le plus fort visuellement plutôt qu'un fond issu d'une autre origine de valeur
+           qui pourrait entrer en collision avec la couleur pilotée par :hover — même schéma que
+           le correctif ar-breadcrumb (#157, `:focus` déclaré après `:hover` y avait produit une
+           icône blanche sur fond quasi blanc). `:focus-visible` (pas `:focus`) évite en plus que
+           ce fond s'applique sur un simple clic souris, réservé au cas clavier/programmatique. */
+        &::part(link):focus-visible,
+        &::part(prev):focus-visible,
+        &::part(next):focus-visible,
+        &::part(select):focus-visible {
+            background-color: var(--ar-button-tertiary-bg-focus);
+        }
+
+        &::part(link):hover,
+        &::part(prev):hover,
+        &::part(next):hover,
+        &::part(select):hover {
+            background-color: var(--ar-button-tertiary-bg-hover);
+            color: var(--ar-color-white);
+        }
+
+        &::part(link):active,
+        &::part(prev):active,
+        &::part(next):active,
+        &::part(select):active {
+            background-color: var(--ar-button-tertiary-bg-active);
+            color: var(--ar-color-white);
+        }
+
+        /* Spécificité égale aux variantes :focus-visible/:hover/:active ci-dessus (pseudo-élément
+           + pseudo-classe) requise pour gagner la cascade : ::part(nav-button--disabled) seul
+           (spécificité pseudo-élément uniquement) perdrait face à ::part(prev):hover malgré
+           un ordre de déclaration ultérieur. */
+        &::part(nav-button--disabled),
+        &::part(nav-button--disabled):hover,
+        &::part(nav-button--disabled):active,
+        &::part(nav-button--disabled):focus-visible {
+            background-color: var(--ar-button-disabled-bg);
+            color: var(--ar-button-disabled-color);
+        }
+
+        /* Flèche custom en `currentColor` (gradients, pas une image figée) : s'adapte
+           automatiquement à chaque état (couleur de texte blanche au survol/pressé ci-dessus)
+           sans dupliquer une image par état, et fonctionne à l'identique sur tous les
+           navigateurs — contrairement à `::before`/`::after` sur `<select>`, peu fiable
+           cross-browser (Safari/Firefox ne les rendent pas systématiquement sur les contrôles de
+           formulaire). `appearance: none` est posé en structurel dans `pagination.styles.ts`.
+           Positionnement en propriétés physiques (`right`), pas logiques : limite connue et
+           acceptée pour un premier jet, à revisiter si un besoin RTL réel émerge. */
+        &::part(select) {
+            background-color: var(--ar-button-tertiary-bg);
+            color: var(--ar-color-text);
+            padding: 0 2rem 0 0.75rem;
+            background-image:
+                linear-gradient(45deg, transparent 50%, currentColor 50%),
+                linear-gradient(135deg, currentColor 50%, transparent 50%);
+            background-position:
+                calc(100% - 1.1rem) center,
+                calc(100% - 0.75rem) center;
+            background-size: 0.35rem 0.35rem;
+            background-repeat: no-repeat;
+        }
+
+        /* `:open` — état exposé par le <select> natif quand son picker est affiché (Baseline
+           2026, "newly available" depuis mai 2026 : Chrome, Firefox et Safari 26.5+ le
+           supportent tous désormais). Amélioration progressive pure : un navigateur qui ne
+           reconnaît pas `:open` ignore silencieusement cette règle et garde la flèche vers le
+           bas dans tous les cas, sans casse. Inverse la flèche vers le haut — angles +180°
+           (45°→225°, 135°→315°) ET positions permutées : les deux sont nécessaires pour un
+           vrai miroir vertical du chevron (vérifié empiriquement au rendu ; +180° seul sur les
+           angles sans permuter les positions produit deux coins disjoints, pas un chevron). */
+        &::part(select):open {
+            background-image:
+                linear-gradient(225deg, transparent 50%, currentColor 50%),
+                linear-gradient(315deg, currentColor 50%, transparent 50%);
+            background-position:
+                calc(100% - 0.75rem) center,
+                calc(100% - 1.1rem) center;
+        }
+
+        /* Même couleur de texte que link/prev/next (`--ar-color-text`) : le label doit rester
+           visuellement cohérent avec le reste du composant, bien qu'il ne soit pas interactif
+           (pas de background-color ni d'état hover/focus/active, contrairement aux parts
+           cliquables ci-dessus). */
+        &::part(label) {
+            color: var(--ar-color-text);
+        }
+
+        &::part(current) {
+            background-color: var(--ar-color-bg);
+            color: var(--ar-color-interactive);
+            border: 1px solid var(--ar-color-interactive);
+            font-weight: 700;
+        }
+
+        &::part(ellipsis) {
+            color: var(--ar-color-text-muted);
+            cursor: default;
+        }
+
+        &::part(link),
+        &::part(current),
+        &::part(ellipsis) {
+            padding: 0 0.75rem;
+        }
+    }
+
+    ar-table-sort {
+        &::part(sort-button) {
+            gap: 0.375rem;
+        }
+
+        &::part(sort-button--pending) {
+            cursor: wait;
+        }
+
+        &::part(indicator) {
+            gap: 3px;
+        }
+    }
+
+    ar-charcounter {
+        &::part(count) {
+            color: var(--ar-color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        &::part(count--warning) {
+            color: var(--ar-color-warning-text);
+        }
+
+        &::part(count--error) {
+            color: var(--ar-color-danger-text);
+        }
+    }
+
+    ar-progressbar {
+        &::part(progressbar) {
+            row-gap: 0.75rem;
+        }
+
+        &::part(label) {
+            column-gap: 2rem;
+        }
+
+        &::part(percent) {
+            color: var(--ar-color-text-muted);
+        }
+
+        &::part(track),
+        &::part(bar) {
+            border-radius: 50rem;
+        }
+    }
+
+    ar-tab-group {
+        &::part(tab-group) {
+            gap: 0;
+        }
+    }
+
+    ar-tab {
+        border-radius: 0;
+        font-weight: var(--ar-font-weight-normal);
+
+        &::part(tab) {
+            color: var(--ar-color-text-muted);
+            background: transparent;
+        }
+
+        &::part(tab--selected) {
+            color: var(--ar-color-interactive);
+            background: transparent;
+        }
+
+        &:hover:not([disabled]):not([active])::part(tab) {
+            color: var(--ar-color-text);
+            background: var(--ar-color-bg-subtle);
+        }
+    }
+
+    ar-tab[disabled] {
+        opacity: 0.5;
+    }
+}

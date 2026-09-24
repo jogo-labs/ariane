@@ -1,5 +1,6 @@
-import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
+import { property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
 import { warn } from '../../utils/warn.js';
 import styles from './tooltip.styles.js';
@@ -19,7 +20,7 @@ export type ArTooltipPlacement =
     | 'left-end';
 
 /**
- * @summary Bulle d'information non-interactive déclenchée sur hover et focus.
+ * @summary Affiche une information contextuelle brève, non interactive, quand l'utilisateur survole ou focus un élément cible.
  *
  * Implémente WCAG 1.4.13 (Content on Hover or Focus) : la bulle reste
  * accessible quand le pointeur se déplace du trigger vers la bulle.
@@ -29,19 +30,27 @@ export type ArTooltipPlacement =
  *
  * @slot - Texte du tooltip.
  *
- * @csspart bubble - Le panel flottant.
- * @csspart arrow  - Le caret directionnel.
+ * @csspart tooltip - Racine du composant.
+ * @csspart arrow   - Le caret directionnel.
  *
- * @cssprop [--ar-tooltip-bg=#1a1a1a]                  - Fond de la bulle.
- * @cssprop [--ar-tooltip-color=#fff]                  - Couleur du texte.
- * @cssprop [--ar-tooltip-border-radius=0.25rem]        - Arrondi.
- * @cssprop [--ar-tooltip-padding=0.375rem 0.625rem]    - Marge interne.
- * @cssprop [--ar-tooltip-font-size=0.8125rem]          - Taille de police.
- * @cssprop [--ar-tooltip-max-width=18rem]              - Largeur maximale.
- * @cssprop [--ar-tooltip-arrow-size=6px]               - Taille du caret.
+ * @cssprop --ar-tooltip-bg - Fond de la bulle (repli système `Canvas` si aucun thème n'est chargé).
+ * @cssprop --ar-tooltip-color - Couleur du texte (repli système `CanvasText` si aucun thème n'est chargé).
+ * @cssprop --ar-tooltip-radius - Rayon de bordure de la bulle.
+ * @cssprop --ar-tooltip-padding - Espacement interne de la bulle.
+ * @cssprop --ar-tooltip-font-size - Taille de police du texte de la bulle.
+ * @cssprop --ar-tooltip-line-height - Interligne du texte de la bulle.
+ * @cssprop --ar-tooltip-arrow-size - Taille du caret.
+ * @cssprop --ar-tooltip-show-duration - Durée de l'animation d'apparition de la bulle (cascade vers --ar-panel-show-duration).
+ * @cssprop --ar-tooltip-distance - Espacement entre le trigger et la bulle.
+ * @cssprop --ar-tooltip-offset - Décalage latéral de la bulle.
+ *
+ * Pas d'events show/hide annulables : un tooltip n'a pas de raison métier de bloquer
+ * son affichage (contrairement à un dialog ou un menu), contrairement à
+ * ar-dropdown/ar-dialog/ar-breadcrumb.
+ * @event {CustomEvent} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
+ * @event {CustomEvent} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
  */
-@customElement('ar-tooltip')
-export class ArTooltip extends LitElement {
+export class ArTooltip extends ArianeElement {
     static override styles = [styles];
 
     /** ID du trigger dans le light DOM. Requis. */
@@ -49,12 +58,6 @@ export class ArTooltip extends LitElement {
 
     /** Placement Floating UI (12 valeurs, ex: "top", "bottom-start"). */
     @property({ reflect: true }) placement: ArTooltipPlacement = 'top';
-
-    /** Espacement trigger→bulle en px. */
-    @property({ reflect: true, type: Number }) distance = 6;
-
-    /** Décalage latéral en px. */
-    @property({ reflect: true, type: Number }) offset = 0;
 
     /** Délai avant affichage en ms (WCAG 1.4.13). */
     @property({
@@ -84,9 +87,12 @@ export class ArTooltip extends LitElement {
     /** Désactive complètement le tooltip. */
     @property({ reflect: true, type: Boolean }) disabled = false;
 
-    @query('[part="bubble"]') private _bubble!: HTMLElement;
+    @query('[part="tooltip"]') private _bubble!: HTMLElement;
 
-    private readonly _tooltip = new TooltipController(this, { placement: 'top', distance: 6 });
+    private readonly _tooltip = new TooltipController(this, {
+        placement: 'top',
+        cssVarPrefix: 'tooltip',
+    });
     private _trigger: HTMLElement | null = null;
     private _showTimer = 0;
     private _hideTimer = 0;
@@ -103,12 +109,10 @@ export class ArTooltip extends LitElement {
             this._attachTrigger();
         }
         if (changed.has('placement')) this._tooltip.setPlacement(this.placement);
-        if (changed.has('distance')) this._tooltip.setDistance(this.distance);
-        if (changed.has('offset')) this._tooltip.setOffset(this.offset);
         if (changed.has('disabled') && this.disabled) {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
-            this._tooltip.hide();
+            this._hide();
         }
         if (changed.has('withoutArrow')) {
             const arrowEl = this.withoutArrow
@@ -129,7 +133,7 @@ export class ArTooltip extends LitElement {
     override render(): TemplateResult {
         return html`
             <div
-                part="bubble"
+                part="tooltip"
                 popover="manual"
                 role="tooltip"
                 @mouseenter=${this._handleBubbleMouseEnter}
@@ -143,7 +147,9 @@ export class ArTooltip extends LitElement {
 
     private _attachTrigger(): void {
         if (!this.for) return;
-        const trigger = document.getElementById(this.for);
+        const root = this.getRootNode();
+
+        const trigger = (root as typeof document).getElementById(this.for);
         if (!trigger) {
             warn('ar-tooltip', `Aucun élément trouvé avec l'id "${this.for}".`);
             return;
@@ -164,22 +170,46 @@ export class ArTooltip extends LitElement {
         this._trigger.removeEventListener('blur', this._handleBlur);
         this._trigger.removeAttribute('aria-describedby');
         this._trigger = null;
+        this._hide();
+    }
+
+    private _show(): void {
+        if (this._tooltip.isOpen) return;
+        void this._tooltip.show().then(() => {
+            this._emit('ar-tooltip-shown');
+        });
+    }
+
+    private _hide(): void {
+        if (!this._tooltip.isOpen) return;
         this._tooltip.hide();
+        this._emit('ar-tooltip-hidden');
+    }
+
+    private _emit(name: string): void {
+        this.dispatchEvent(
+            new CustomEvent(name, {
+                bubbles: true,
+                composed: true,
+                detail: { id: this.id || undefined },
+            }),
+        );
     }
 
     private _scheduleShow(): void {
         if (this.disabled) return;
         clearTimeout(this._hideTimer);
+        // Listener attaché avant le délai : Escape pendant showDelay doit aussi annuler l'affichage.
+        document.addEventListener('keydown', this._handleKeyDown);
         this._showTimer = window.setTimeout(() => {
-            void this._tooltip.show();
-            document.addEventListener('keydown', this._handleKeyDown);
+            this._show();
         }, this.showDelay);
     }
 
     private _scheduleHide(): void {
         clearTimeout(this._showTimer);
         this._hideTimer = window.setTimeout(() => {
-            this._tooltip.hide();
+            this._hide();
             document.removeEventListener('keydown', this._handleKeyDown);
         }, this.hideDelay);
     }
@@ -201,14 +231,8 @@ export class ArTooltip extends LitElement {
         if (e.key === 'Escape') {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
-            this._tooltip.hide();
+            this._hide();
             document.removeEventListener('keydown', this._handleKeyDown);
         }
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tooltip': ArTooltip;
-    }
 }

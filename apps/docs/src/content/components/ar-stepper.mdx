@@ -1,25 +1,24 @@
 ---
 tagName: ar-stepper
 title: Stepper
-description: Composant de navigation par étapes avec support de sous-étapes, responsive et accessible.
 playgroundTemplate: default
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Stepper à 3 étapes avec sous-étapes, sous-étape « Mes coordonnées » active.
       html: |
-          <ar-stepper current-path="etape-1-2">
+          <ar-stepper current-path="etape-1-3">
             <!-- Étape 1 -->
-            <ar-stepper-item path="etape-1" label="Mes informations" href="#">
-                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#"></ar-stepper-item>
-                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#"></ar-stepper-item>
+            <ar-stepper-item path="etape-1" label="Mes informations" href="/etape-1">
+                <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#etape-1-1"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#etape-1-2"></ar-stepper-item>
+                <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#etape-1-3"></ar-stepper-item>
             </ar-stepper-item>
 
             <!-- Étape 2 -->
-            <ar-stepper-item path="etape-2" label="Mes préférences" href="#">
-                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="#etape-2-1"></ar-stepper-item>
-                <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
+            <ar-stepper-item path="etape-2" label="Mes préférences" href="/etape-2">
+                <ar-stepper-item path="etape-2-1" label="Mes notifications" href="/etape-2-1"></ar-stepper-item>
+                <ar-stepper-item path="etape-2-2" label="Mes langues" href="/etape-2-2"></ar-stepper-item>
             </ar-stepper-item>
 
             <!-- Étape 3 -->
@@ -27,7 +26,7 @@ variants:
           </ar-stepper>
     - name: edit
       label: Mode édition
-      description: Rendu par défaut du composant.
+      description: Même structure en mode édition — toutes les étapes passées sont cliquables.
       html: |
           <ar-stepper current-path="etape-1-2" mode="edit">
             <!-- Étape 1 -->
@@ -46,11 +45,42 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
-    - name: align-right
-      label: Alignement droite
-      description: Le stepper peut être aligné à droite en mode desktop via l'attribut align.
+    - name: information-after-label
+      label: Information après label
+      description: Ajouter une information complémentaire au label d'une sous-étape
       html: |
-          <ar-stepper current-path="etape-1-2" align="right">
+          <ar-stepper current-path="etape-1-1" mode="edit">
+              <!-- Étape 1 -->
+              <ar-stepper-item path="etape-1" label="Mes informations" href="#">
+                  <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
+                  <ar-stepper-item path="etape-1-2" label="Mes coordonnées" href="#">
+                      <span slot="after-label">
+                          <span id="etape-1-2-info">
+                              <span class="sr-only">Cette étape nécessite votre attention</span>
+                              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="24" height="24" style="display:block; color:var(--ar-stepper-item-current-header-color)">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"></path>
+                              </svg>
+                          </span>
+                          <ar-tooltip for="etape-1-2-info">Texte d'aide contextuelle</ar-tooltip>
+                      </span>
+                  </ar-stepper-item>
+                  <ar-stepper-item path="etape-1-3" label="Mes identifiants" href="#"></ar-stepper-item>
+              </ar-stepper-item>
+
+              <!-- Étape 2 -->
+              <ar-stepper-item path="etape-2" label="Mes préférences" href="#">
+                  <ar-stepper-item path="etape-2-1" label="Mes notifications" href="#etape-2-1"></ar-stepper-item>
+                  <ar-stepper-item path="etape-2-2" label="Mes langues" href="#etape-2-2"></ar-stepper-item>
+              </ar-stepper-item>
+
+              <!-- Étape 3 -->
+              <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
+          </ar-stepper>
+    - name: reverse-align
+      label: Alignement inversé
+      description: Inverse l'alignement de la liste d'étapes en mode desktop. S'appuie sur des règles posées sur les parts control et indicator d'ar-stepper-item — un thème qui les redéfinit peut désactiver l'inversion.
+      html: |
+          <ar-stepper current-path="etape-1-2" reverse-align>
             <!-- Étape 1 -->
             <ar-stepper-item path="etape-1" label="Mes informations" href="#">
                 <ar-stepper-item path="etape-1-1" label="Mon état civil" href="#"></ar-stepper-item>
@@ -65,6 +95,13 @@ variants:
             <!-- Étape 3 -->
             <ar-stepper-item path="etape-3" label="Récapitulatif"></ar-stepper-item>
           </ar-stepper>
+pageScript: |
+    <script>
+        document.addEventListener('ar-stepper-step-change', (e) => {
+            /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+            e.target.currentPath = e.detail.to;
+        });
+    </script>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -79,16 +116,23 @@ import WcagRef from '../../components/WcagRef.astro';
 - L'état courant (`current-path`) est reflété visuellement et structurellement — les items
   actifs, complétés et désactivés sont distingués.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Labels descriptifs sur chaque `ar-stepper-item`.** Le `label` est le seul texte vocalisé
   pour chaque étape — évitez les labels génériques ("Étape 1") au profit de libellés métier
   ("Mes informations", "Récapitulatif").
 - **`current-path` doit correspondre au `path` d'un item existant.** Une valeur incorrecte
   n'active aucun item — aucun feedback visuel ni vocal ne signale l'étape courante.
-- **Les items sans `href` ne sont pas des liens.** Un item sans destination est rendu comme
-  un élément non interactif — ne pas en faire la cible de `current-path` si l'utilisateur
-  doit pouvoir y naviguer.
+- **`href` détermine l'élément rendu pour une étape cliquable.** Un `href` réel (ex. `/etape-2`)
+  produit un lien `<a>` : la navigation native a lieu, sauf si `ar-stepper-step-change` est
+  annulé. Un `href` absent ou égal à `#` produit un `<button>` : aucune navigation native, tout
+  passe par l'événement (routeur de framework, navigation asynchrone). Un Ctrl/Cmd/Maj/Alt + clic
+  sur un lien réel ouvre un nouvel onglet sans émettre `ar-stepper-step-change`.
+- **Mettre à jour `current-path` de façon synchrone (ou quasi-synchrone) dans le handler de
+  `ar-stepper-step-change`.** Le focus n'est restauré sur la nouvelle étape courante que si
+  cette mise à jour arrive dans le même tick microtask que l'event (cas des frameworks
+  synchrones ou quasi-synchrones, ex. `nextTick` de Vue) — sinon le focus n'est pas restauré,
+  silencieusement.
 
 ## Comportement responsive
 
@@ -105,3 +149,69 @@ se déplace dans l'élément ciblé sur desktop, et revient à sa position d'ori
 <aside id="stepper-sidebar"></aside>
 <ar-stepper desktop-target="stepper-sidebar" desktop-from="992"> ... </ar-stepper>
 ```
+
+## Utilisation
+
+### Écouter le changement d'étape
+
+Lorsque l'utilisateur souhaite changer d'étape, un événement `ar-stepper-step-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `currentPath` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'étape active du stepper.
+
+```js
+document.addEventListener('ar-stepper-step-change', (e) => {
+    /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
+    e.target.currentPath = e.detail.to;
+});
+```
+
+### Mode `create` vs `edit`
+
+La prop `mode` détermine quelles étapes sont cliquables. En mode **`create`** (défaut), seules les
+étapes déjà **complétées** (avant l'étape courante) sont cliquables — navigation linéaire, cohérente
+avec un parcours de création où les étapes suivantes n'ont pas encore de contenu à afficher. Voir la
+variante _Mode édition_ pour le mode `edit`.
+
+### Contenu additionnel après le label (`after-label`)
+
+Chaque `ar-stepper-item` expose un slot nommé `after-label` pour afficher un contenu additif à
+côté du label — un badge de statut, une icône, une pastille de compteur. Ce contenu s'ajoute au
+label sans jamais le remplacer : il reste toujours lu séparément par les lecteurs d'écran
+(annoncé via `aria-describedby`), le label demeure donc le seul texte vocalisé pour identifier
+l'étape.
+
+```html
+<ar-stepper-item path="etape-1-1" label="Mon état civil" href="#">
+    <span slot="after-label">🔒 Verrouillé</span>
+</ar-stepper-item>
+```
+
+### Indicateur personnalisé (`indicator`)
+
+Par défaut, chaque étape affiche son numéro (via un compteur CSS). Le slot nommé `indicator`
+permet de remplacer entièrement ce contenu — une icône, une coche — sans dépendre d'un thème :
+purement décoratif (`aria-hidden`), il ne modifie jamais l'information de position, toujours
+portée séparément par du texte masqué visuellement.
+
+```html
+<ar-stepper-item path="etape-1" label="Informations">
+    <span slot="indicator">✓</span>
+</ar-stepper-item>
+```
+
+### Navigation synchronisée au scroll (`follow-scroll`)
+
+Avec `follow-scroll`, la prop `current-path` se met à jour automatiquement pendant que l'utilisateur scrolle la page : le stepper détecte quelle section est visible et se synchronise sans action de votre part.
+
+```html
+<ar-stepper follow-scroll>...</ar-stepper>
+```
+
+### Navigation programmatique
+
+Mettre à jour `current-path` depuis l'extérieur pilote le stepper comme un clic utilisateur :
+
+```js
+document.querySelector('ar-stepper').currentPath = '#etape-2';
+```
+
+En mode `create`, cette mise à jour ne rend pas les étapes suivantes cliquables pour autant — seul `mode="edit"` lève cette restriction.

@@ -1,5 +1,6 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, nothing, type PropertyValues } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
+import { property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
 import type { ArTab } from '../tab/tab.js';
@@ -8,27 +9,25 @@ import { warn } from '../../utils/warn.js';
 import styles from './tab-group.styles.js';
 
 /**
- * @summary Groupe d'onglets accessibles — pattern WAI-ARIA Tabs complet.
+ * @summary Organise du contenu associé dans un même conteneur qui affiche un panneau à la fois, avec des onglets pour naviguer entre eux.
  * @display demo
  *
  * @slot - ar-tab et ar-tab-panel enfants.
  *
- * @csspart base - Conteneur racine.
- * @csspart nav  - Zone scrollable (overflow-x: auto).
- * @csspart tabs - div[role="tablist"].
+ * @csspart tab-group - Racine du composant.
+ * @csspart nav       - Zone scrollable (overflow-x: auto).
+ * @csspart tabs      - div[role="tablist"].
  *
  * Les classes `has-overflow-start` et `has-overflow-end` sont ajoutées automatiquement sur l'hôte
  * quand le contenu de la tablist déborde à gauche ou à droite.
  *
- * @cssprop --ar-tab-group-gap - Espacement entre tablist et panels.
  * @cssprop --ar-tab-group-border-top-width - Épaisseur du trait séparateur en haut de la la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-bottom-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-color - Couleur du trait séparateur sous la tablist.
  *
  * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
  */
-@customElement('ar-tab-group')
-export class ArTabGroup extends LitElement {
+export class ArTabGroup extends ArianeElement {
     static override styles = [styles];
 
     /** Nom de l'onglet actif. Si absent, le premier onglet non-disabled s'active. */
@@ -45,6 +44,7 @@ export class ArTabGroup extends LitElement {
     private _panels: ArTabPanel[] = [];
     private readonly _prefix = Math.random().toString(36).slice(2, 9);
     private _initialized = false;
+    private _hasUpdatedOnce = false;
     private _resizeObserver?: ResizeObserver | undefined;
     private _scrollHintsUnlisten?: (() => void) | undefined;
 
@@ -67,6 +67,17 @@ export class ArTabGroup extends LitElement {
                 const newActive = this._effectiveActive;
                 this.active = newActive;
                 this._emit('ar-tab-group-change', { active: newActive });
+            }
+        },
+        notifyTabChanged: (tab: ArTab) => {
+            const wasActive = tab.panel === this.active;
+            this._syncAll();
+            if (wasActive && tab.disabled) {
+                const newActive = this._effectiveActive;
+                if (newActive !== this.active) {
+                    this.active = newActive;
+                    this._emit('ar-tab-group-change', { active: newActive });
+                }
             }
         },
         registerPanel: (panel: ArTabPanel) => {
@@ -96,8 +107,13 @@ export class ArTabGroup extends LitElement {
     override updated(changed: PropertyValues<this>): void {
         if (changed.has('active')) {
             this._syncAll();
-            this._scrollActiveTabIntoView();
+            // Ne pas scroller au tout premier rendu : `changed.has('active')` est déjà vrai
+            // dès ce cycle si l'attribut initial diffère de la valeur par défaut.
+            if (this._hasUpdatedOnce) {
+                this._scrollActiveTabIntoView();
+            }
         }
+        this._hasUpdatedOnce = true;
     }
 
     override connectedCallback(): void {
@@ -120,7 +136,7 @@ export class ArTabGroup extends LitElement {
 
     override render() {
         return html`
-            <div part="base">
+            <div part="tab-group">
                 <div part="nav">
                     <div part="tabs" role="tablist" aria-label=${this.label || nothing}>
                         <slot name="tab"></slot>
@@ -147,6 +163,7 @@ export class ArTabGroup extends LitElement {
             tab.id = `${pfx}-tab-${tab.panel}`;
             tab.setAttribute('aria-controls', `${pfx}-panel-${tab.panel}`);
             tab.setAttribute('aria-selected', String(isActive));
+            tab.active = isActive;
             tab.setAttribute('tabindex', isActive ? '0' : '-1');
             if (tab.disabled) {
                 tab.setAttribute('aria-disabled', 'true');
@@ -266,11 +283,5 @@ export class ArTabGroup extends LitElement {
         nav.addEventListener('scroll', update, { passive: true });
         this._scrollHintsUnlisten = () => nav.removeEventListener('scroll', update);
         update();
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-tab-group': ArTabGroup;
     }
 }

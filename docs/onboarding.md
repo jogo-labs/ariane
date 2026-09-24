@@ -120,8 +120,8 @@ export class ArSpinner extends LitElement {
     label: string = 'Chargement…';
 
     override render() {
-        // part="base" expose cet élément via ::part(base) pour le styling externe
-        return html`<span part="base" role="status" aria-label=${this.label}></span>`;
+        // part="spinner" expose cet élément via ::part(spinner) pour le styling externe
+        return html`<span part="spinner" role="status" aria-label=${this.label}></span>`;
     }
 }
 
@@ -159,13 +159,13 @@ this.dispatchEvent(
 
 ### Nommage — cohérence stricte
 
-| Élément          | Convention                | Exemple              |
-| ---------------- | ------------------------- | -------------------- |
-| Tag HTML         | `ar-<name>`               | `ar-alert`           |
-| Classe           | `Ar<Name>`                | `ArAlert`            |
-| Événements       | `ar-<event>`              | `ar-alert-close`     |
-| CSS custom props | `--ar-<composant>-<prop>` | `--ar-alert-padding` |
-| CSS parts        | `part="base"`             | `part="label"`       |
+| Élément          | Convention                | Exemple                 |
+| ---------------- | ------------------------- | ----------------------- |
+| Tag HTML         | `ar-<name>`               | `ar-alert`              |
+| Classe           | `Ar<Name>`                | `ArAlert`               |
+| Événements       | `ar-<event>`              | `ar-alert-close`        |
+| CSS custom props | `--ar-<composant>-<prop>` | `--ar-alert-close-size` |
+| CSS parts        | `part="base"`             | `part="label"`          |
 
 ### Thémabilité
 
@@ -173,12 +173,15 @@ Les aspects visuels sont exposés via CSS custom properties. Les utilisateurs pe
 
 ```css
 ar-alert {
-    --ar-alert-border-radius: 0.5rem;
-    --ar-alert-padding: 0.75rem;
+    --ar-alert-close-size: 2.5rem;
+    --ar-alert-info-bg: #e0f2fe;
 }
 ```
 
-Les valeurs globales (couleurs, espacements, typographie) vivent dans `packages/core/src/styles/themes/default.css` et se surchargent via `:root`.
+Les valeurs globales (couleurs, espacements, typographie) vivent dans les fragments sous
+`packages/core/src/styles/themes/ariane/` (`_palette.css`, `_semantic-tokens.css`,
+`_global-tokens.css`, `shared/`, `components/`) — `ariane.css` n'en est que la liste
+d'`@import` — et se surchargent via `:root`.
 
 ---
 

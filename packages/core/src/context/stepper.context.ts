@@ -8,6 +8,7 @@ export interface StepperRegistry {
     unregisterItem(item: ArStepperItem): void;
 
     notifyItemChanged(item: ArStepperItem, attribute: StepperItemAttribute): void;
+    notifyItemActivated(item: ArStepperItem, event: MouseEvent): void;
 }
 
 // Clé unique par instance de module → pas de collision entre composants

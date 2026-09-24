@@ -1,7 +1,7 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
 import rootPkg from '../../../../package.json';
-import { version } from '../../../../packages/core/package.json';
+import { version as coreVersion } from '../../../../packages/core/package.json';
 
 interface Props {
     title: string;
@@ -28,35 +28,55 @@ const {
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
 
-        <!-- Inter — haute probabilité de cache navigateur -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <!-- Bunny Fonts (pas Google Fonts) : même API css2, un seul host
+             (pas de séparation css/statique type gstatic), sans tracking
+             IP côté Google. Le bénéfice de cache partagé inter-sites d'un
+             CDN de polices public n'existe plus depuis le partitionnement
+             du cache HTTP par site (Chrome/Firefox/Safari, ~2020) — ce
+             n'était donc plus un argument pour rester sur Google Fonts. -->
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link href="https://fonts.bunny.net/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         <!-- Évite le flash de thème au chargement -->
         <script is:inline>
             (function () {
                 var stored = localStorage.getItem('ariane-theme') || 'system';
-                var theme = stored === 'system'
-                    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-                    : stored;
-                document.documentElement.setAttribute('data-theme', theme);
+                if (stored === 'light' || stored === 'dark') {
+                    document.documentElement.setAttribute('data-theme', stored);
+                }
                 document.documentElement.dataset.themeMode = stored;
             })();
         </script>
 
-        {/* ── highlight.js — chargé une seule fois, colore tous les blocs de la page ── */}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css" />
+        {/* ── highlight.js — tokenisation uniquement (chargé une seule fois, tous les
+             blocs de la page) ; la coloration vient de doc-code-block.css, pas d'un
+             thème CDN — cf. palette --doc-code-* */}
         <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
 
         <!-- Thème par défaut de la librairie -->
-        <link rel="stylesheet" href="/themes/default.css" />
+        <link rel="stylesheet" href="/themes/ariane.css" />
+
+        <!-- Classes de bouton prêtes à l'emploi (.ar-btn-*), pour le HTML consommateur -->
+        <link rel="stylesheet" href="/presets/buttons.css" />
+
+        <!-- Classes de champ prêtes à l'emploi (.ar-input/.ar-label), pour le HTML consommateur -->
+        <link rel="stylesheet" href="/presets/fields.css" />
 
         <!-- Composants web du DS (nécessaires pour les demos) -->
         <script type="module" src="/cdn/index.js"></script>
-        <script src="/js/playground.js" is:inline></script>
+        <script type="module" src="/js/playground.js" is:inline></script>
 
         <style is:global>
+            a:focus-visible,
+            button:focus-visible,
+            input:focus-visible,
+            select:focus-visible,
+            summary:focus-visible {
+                outline: 2px solid var(--doc-accent);
+                outline-offset: 2px;
+                border-radius: 2px;
+            }
+
             .sr-only {
                 position: absolute;
                 width: 1px;
@@ -68,70 +88,61 @@ const {
                 white-space: nowrap;
                 border-width: 0;
             }
+
+            /* Cible d'ancre (lien TOC, hash d'URL) : réserve l'espace du header
+               sticky pour que le titre/la section visée n'atterrisse pas dessous.
+               La bannière alpha n'est pas sticky (position: relative, défile avec
+               le contenu) — seul --doc-header-h compte une fois qu'on a scrollé.
+               Couvre les titres narratifs (h2/h3 de NarrativeHeading/Subheading),
+               les titres sr-only de l'API (ComponentApi.astro), et les <section
+               id> qui servent elles-mêmes de cible (Exemples, Playground,
+               Référence API dans Playground.astro). */
+            :where(.heading-anchor, article, section, .section-title, .subsection-title)[id] {
+                scroll-margin-top: calc(var(--doc-header-h) + var(--doc-alpha-banner-h) + 1rem);
+            }
+
+            .narrative a {
+                color: var(--doc-accent);
+            }
+
+            .narrative a:visited {
+                color: var(--doc-text-muted);
+            }
+
+            .narrative a:hover {
+                color: var(--doc-accent-hover);
+            }
+
+            .narrative a:active {
+                color: var(--doc-accent);
+            }
+
+            /* Masque tout élément custom non défini, où qu'il soit dans la page (nav du
+               header, démos de composant injectées via `set:html` — ces dernières ne
+               portent jamais l'attribut de scope Astro, donc un sélecteur scopé par
+               composant ne les matcherait jamais). Évite le flash de contenu slotté non
+               stylé le temps que /cdn/index.js définisse les custom elements.
+               :not(:defined) ne matche jamais les éléments HTML natifs (toujours
+               "defined"), donc ce sélecteur ne cible que les custom elements réellement en
+               attente d'hydratation — sans risque d'affecter le reste de la page. */
+            *:not(:defined) {
+                visibility: hidden;
+            }
         </style>
         <style>
+            @import '../styles/doc-tokens.css';
+            /* Les règles .hljs-* de coloration syntaxique doivent atteindre TOUTE
+               page, y compris celles qui rendent <pre><code> directement sans
+               passer par CodeBlock.astro (getting-started/*, theming/*) — Astro
+               ne bundle le <style> d'un composant que sur les pages qui le
+               rendent réellement, donc sans cet import ici, ces pages n'auraient
+               jamais reçu les règles (seulement les tokens --doc-code-*, sans
+               effet seuls). Import supplémentaire à celui de CodeBlock.astro :
+               même règles chargées deux fois sur les pages qui utilisent les
+               deux, sans conflit (:global(), donc idempotent). */
+            @import '../styles/doc-code-block.css';
+
             *, *::before, *::after { box-sizing: border-box; }
-
-            .alpha-banner {
-                position:        relative;
-                z-index:         200;
-                width:           100%;
-                height:          var(--doc-alpha-banner-h);
-                overflow:        hidden;
-                background:      #92400e;
-                color:           #fef3c7;
-                text-align:      center;
-                font-size:       0.8rem;
-                padding:         0.4rem 1rem;
-                letter-spacing:  0.01em;
-            }
-
-            .alpha-banner a {
-                color:           inherit;
-                font-weight:     600;
-                text-underline-offset: 2px;
-            }
-
-            :root {
-                /* Palette light — crème/violet */
-                --doc-bg:             #fafaf8;
-                --doc-nav-bg:         #fafaf8;
-                --doc-text:           #1a1a1a;
-                --doc-text-muted:     #6b7280;
-                --doc-text-subtle:    #4b5563;
-                --doc-border:         #e8e6e0;
-                --doc-nav-border:     #e8e6e0;
-                --doc-accent:         #7c3aed;
-                --doc-accent-bg:      #f3efff;
-                --doc-accent-border:  #e0d0ff;
-                --doc-code-bg:        #f3f4f6;
-                --doc-code-block-bg:  #0d1219;
-                --doc-header-bg:      rgba(250,250,248,0.92);
-                --doc-header-h:       3.25rem;
-                --doc-alpha-banner-h: 2rem;
-                --doc-swatch-outline: 1px solid rgba(0, 0, 0, 0.25);
-                --doc-nav-bg-hover: #f3efff;
-            }
-
-            [data-theme="dark"] {
-                --doc-bg:             #161b22;
-                --doc-nav-bg:         #161b22;
-                --doc-text:           #e6edf3;
-                --doc-text-muted:     #8b949e;
-                --doc-text-subtle:    #cdd6f4;
-                --doc-border:         #30363d;
-                --doc-nav-border:     #30363d;
-                --doc-header-bg:      rgba(22,27,34,0.92);
-                --doc-accent:         #a78bfa;
-                --doc-accent-bg:      #2d2040;
-                --doc-accent-border:  #4c3280;
-                --doc-cta-bg:         #2d2040;
-                --doc-cta-border:     #30215a;
-                --doc-code-bg:        #1e1e2e;
-                --doc-code-block-bg:  #0d1219;
-                --doc-swatch-outline: 1px solid rgba(255, 255, 255, 0.25);
-                --doc-nav-bg-hover: #21262d;
-            }
 
             html {
                 /* Le motif de fond est sur html pour ne pas être masqué par body */
@@ -143,29 +154,87 @@ const {
                 margin:     0;
                 min-height: 100vh;
                 color:      var(--doc-text);
-                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                font-family: var(--doc-font-body);
                 transition: color 0.2s;
+                line-height: 1.65;
+            }
+
+            .skip-link {
+                position:        absolute;
+                top:             -3rem;
+                left:            0.5rem;
+                z-index:         1000;
+                padding:         0.5rem 1rem;
+                background:      var(--doc-accent);
+                color:           var(--doc-paper);
+                border:          none;
+                border-radius:   0 0 0.4rem 0.4rem;
+                text-decoration: none;
+                font-family:     inherit;
+                font-size:       0.85rem;
+                font-weight:     var(--doc-font-weight-semibold);
+                cursor:          pointer;
+                transition:      top 0.15s ease;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* Le lien d'évitement vers la nav a deux variantes selon le
+               breakpoint (cf. #burger-btn/.nav-column ci-dessus) : sur
+               desktop la nav est une colonne visible, un simple <a href>
+               suffit ; sur mobile elle est masquée dans l'ar-dialog tant
+               qu'il n'est pas ouvert — la variante mobile est un bouton qui
+               l'ouvre (data-ar-dialog-open) au lieu de sauter vers une
+               cible non focusable. Une seule des deux existe dans l'ordre
+               de tabulation à la fois. */
+            @media (min-width: 821px) {
+                .skip-link--nav-mobile { display: none; }
+            }
+            @media (max-width: 820px) {
+                .skip-link--nav-desktop { display: none; }
+            }
+
+            .alpha-banner {
+                width:           100%;
+                min-height:      var(--doc-alpha-banner-h);
+                background: var(--doc-ember);
+                color: var(--doc-ink);
+                text-align:      center;
+                font-size:       0.8rem;
+                padding:         0.4rem 1rem;
+                letter-spacing:  0.01em;
+
+                a {
+                    color:           inherit;
+                    font-weight:     var(--doc-font-weight-semibold);
+                    text-underline-offset: 2px;
+                }
             }
 
             /* ── Header (toujours visible) ──────────────── */
 
             .site-header {
-                display:         flex;
                 position:        sticky;
                 top:             0;
                 z-index:         100;
-                height:          var(--doc-header-h);
-                background:      var(--doc-header-bg);
-                backdrop-filter: blur(8px);
-                border-bottom:   1px solid var(--doc-nav-border);
-                padding:         0 1rem;
-                align-items:     center;
-                justify-content: space-between;
 
                 h1 {
                     display: flex;
                     margin: -.2rem 0 0;
                 }
+            }
+
+            .header-container {
+                display:         flex;
+                height:          var(--doc-header-h);
+                background:      var(--doc-header-bg);
+                backdrop-filter: blur(8px);
+                box-shadow:      inset 0 -1px 0 var(--doc-rail);
+                padding:         0 1rem;
+                align-items:     center;
+                justify-content: space-between;
             }
 
             .header-left {
@@ -175,29 +244,58 @@ const {
             }
 
             .header-brand {
-                font-weight:     800;
-                font-size:       1.5rem;
-                letter-spacing:  -0.02em;
-                color:           var(--doc-text);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: var(--doc-font-weight-semibold);
+                font-size: 1.2rem;
+                letter-spacing: -0.03em;
+                color: var(--doc-text);
                 text-decoration: none;
             }
 
             .header-brand .brand-accent {
-                color: var(--ar-color-interactive, #2563eb);
+                color: var(--ar-color-interactive);
+            }
+
+            .brand-mark {
+                display: block;
+                flex: none;
+                color: var(--doc-text);
+            }
+
+            .header-version {
+                font-family: var(--doc-font-mono);
+                font-size: 0.68rem;
+                color: var(--doc-text-muted);
+                border: 1px solid var(--doc-border);
+                border-radius: 999px;
+                padding: 0.05rem 0.45rem;
+                margin-left: 0.5rem;
+            }
+
+            .header-search[aria-disabled='true'] {
+                cursor: not-allowed;
+                opacity: 0.55;
+            }
+
+            .header-search[aria-disabled='true']:hover {
+                background: transparent;
+                color:      var(--doc-text-muted);
             }
 
             .header-actions {
                 display:     flex;
                 align-items: center;
-                gap:         0.5rem;
+                gap:         0.25rem;
             }
 
             .icon-btn {
                 display:         flex;
                 align-items:     center;
                 justify-content: center;
-                width:           2rem;
-                height:          2rem;
+                width:           2.5rem;
+                height:          2.5rem;
                 background:      transparent;
                 border:          1px solid var(--doc-border);
                 border-radius:   0.4rem;
@@ -205,121 +303,119 @@ const {
                 color:           var(--doc-text-muted);
                 transition:      background 0.15s, color 0.15s;
                 text-decoration: none;
+                gap: 0.35rem;
+
+                &:hover {
+                    background: var(--doc-nav-bg);
+                    color:      var(--doc-text);
+                }
             }
 
-            .icon-btn:hover {
-                background: var(--doc-nav-bg);
-                color:      var(--doc-text);
+            .icon-btn--nav {
+                border: none;
+                border-radius: 100%;
+
+                &:hover {
+                    background-color: var(--doc-nav-bg-hover)
+                }
             }
 
-            .brand-dot {
-                display:        inline-block;
-                font-size:      0.55rem;
-                color:          var(--doc-accent, #7c3aed);
-                margin-left:    3px;
-                vertical-align: middle;
-                position:       relative;
-                top:            -2px;
+            .theme-trigger-chevron {
+                font-size:   0.55rem;
+                color:       var(--doc-text-muted);
+                margin-left: 2px;
             }
 
-            .header-version {
-                font-size:     0.7rem;
-                font-weight:   500;
-                color:         var(--doc-text-muted, #6b7280);
-                background:    var(--doc-accent-bg, #f3efff);
-                border:        1px solid var(--doc-accent-border, #e0d0ff);
-                padding:       1px 8px;
-                border-radius: 20px;
-            }
-
-            .theme-toggle {
-                display:       flex;
-                gap:           1px;
-                border:        1px solid var(--doc-border, #e8e6e0);
-                border-radius: 7px;
-                background:    var(--doc-nav-bg, #fafaf8);
-                padding:       2px;
-            }
-
-            .theme-btn {
-                width:           26px;
-                height:          26px;
-                border-radius:   5px;
-                border:          none;
-                background:      transparent;
+            .theme-menu-item {
                 display:         flex;
                 align-items:     center;
-                justify-content: center;
+                gap:             0.5rem;
+                width:           100%;
+                padding:         0.4rem 0.75rem;
+                background:      transparent;
+                border:          none;
+                border-radius:   0.3rem;
                 cursor:          pointer;
-                font-size:       0.72rem;
-                color:           var(--doc-text-muted, #6b7280);
-                transition:      background 0.12s, color 0.12s;
+                font-size:       0.85rem;
+                font-family:     inherit;
+                color:           var(--doc-text);
+                text-align:      left;
+                white-space:     nowrap;
             }
 
-            .theme-btn.active {
-                background: #fff;
-                color:      var(--doc-accent, #7c3aed);
-                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            .theme-menu-item:hover {
+                background: var(--doc-nav-bg-hover);
             }
 
-            [data-theme="dark"] .theme-btn.active {
-                background: var(--doc-accent-bg, #2d2040);
-                color:      var(--doc-accent, #a78bfa);
-            }
-
-            /* ── Overlay drawer ─────────────────────────── */
-
-            .nav-overlay {
-                display:        none;
-                position:       fixed;
-                inset:          0;
-                background:     rgba(0, 0, 0, 0.4);
-                z-index:        200;
-                opacity:        0;
-                pointer-events: none;
-                transition:     opacity 0.2s;
-            }
-
-            .nav-overlay.open {
-                pointer-events: auto;
+            .theme-menu-item[aria-current="true"] {
+                color:       var(--doc-accent);
+                font-weight: var(--doc-font-weight-semibold);
             }
 
             /* ── Layout body ────────────────────────────── */
 
-            .layout-body {
-                height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
-            }
-
             .layout-body.with-nav {
                 display:               grid;
-                grid-template-columns: 270px 1fr;
-                max-width:             1640px;
+                grid-template-columns: 300px minmax(0, 1fr);
+                max-width:             1560px;
                 margin:                0 auto;
             }
 
             .layout-body.with-nav.with-toc {
-                grid-template-columns: 270px 1fr 180px;
+                grid-template-columns: 300px minmax(0, 1fr) 220px;
+            }
+
+            @media (min-width: 1440px) {
+                .layout-body.with-nav.with-toc {
+                    grid-template-columns: 300px minmax(0, 1fr) 300px;
+                }
             }
 
             .nav-column {
-                height:     100%;
+                position:   sticky;
+                top:        calc(var(--doc-header-h) + var(--doc-alpha-banner-h));
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
                 overflow-y: auto;
                 display:    flex;
                 flex-direction: column;
                 flex-grow:  1;
+                min-width:  0;
+                scrollbar-width: thin;
+                scrollbar-color: var(--doc-border) transparent;
+            }
+
+            #site-nav-column-mobile {
+                &::part(dialog) {
+                    background: var(--doc-bg);
+                }
+
+                &::part(title) {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    white-space: nowrap;
+                }
+
+                &::part(header) {
+                    justify-content: flex-end;
+                }
+
+                nav {
+                    padding-block-start: 0;
+                }
             }
 
             main {
-                padding:    0;
-                height:     100%;
-                overflow-y: auto;
+                padding:   0;
+                min-width: 0;
             }
 
             /* Contenu centré dans main */
             .main-inner {
-                padding:   4rem 3rem;
-                max-width: 1100px;
-                margin:    0 auto;
+                padding:   2.75rem 3.25rem 6rem;
+                max-width: 860px;
             }
 
             .layout-body:not(.with-nav) main {
@@ -332,38 +428,41 @@ const {
             }
 
             .toc-column {
-                height:     100%;
+                position:   sticky;
+                top:        calc(var(--doc-header-h) + var(--doc-alpha-banner-h));
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
                 overflow-y: auto;
-                padding:    3rem 0.5rem 3rem 0;
+                padding:    3rem 1rem 3rem 0;
+                min-width:  0;
             }
 
             /* ── Responsive ─────────────────────────────── */
 
-            /* Sur desktop : burger masqué, nav-overlay masqué */
-            #burger-btn   { display: none; }
-            .nav-overlay  { display: none; }
+            /* Sur desktop : burger masqué */
+            #burger-btn    { display: none; }
 
-            @media (max-width: 768px) {
+            /* ── TOC : repli dans le flux, indépendant du drawer nav ──── */
+            @media (max-width: 1180px) {
+                .layout-body.with-nav.with-toc {
+                    grid-template-columns: 270px minmax(0, 1fr);
+                }
+
+                .toc-column {
+                    display: none;
+                }
+            }
+
+            /* ── Nav : drawer plein écran ─────────────────────────────── */
+            @media (max-width: 820px) {
                 #burger-btn  { display: flex; }
-                .nav-overlay { display: block; }
 
                 .layout-body.with-nav {
                     display: block;
                 }
 
                 .nav-column {
-                    position:   fixed;
-                    top:        0;
-                    left:       0;
-                    height:     100vh;
-                    width:      280px;
-                    z-index:    300;
-                    transform:  translateX(-100%);
-                    transition: transform 0.25s ease;
+                    display: none;
                 }
-
-                .nav-column.open  { transform: translateX(0); }
-                .nav-overlay.open { opacity: 1; }
 
                 .layout-body {
                     height:     auto;
@@ -379,76 +478,130 @@ const {
 
                 .main-inner,
                 .layout-body.with-toc .main-inner {
-                    padding:   1.5rem 1rem;
-                    max-width: 100%;
+                    padding: 2.5rem 2rem 4rem;
+                    max-width: 860px;
                 }
-
-                .toc-column { display: none; }
             }
         </style>
     </head>
     <body>
-        <div class="alpha-banner" role="banner">
-            Librairie en cours de développement — API instable, ne pas utiliser en production.
-            <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
-        </div>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        {showToc && <a href="#toc" class="skip-link">Aller au sommaire</a>}
+
 
         <!-- Header permanent (desktop + mobile) -->
         <header class="site-header">
-            <div class="header-left">
-                <!-- Burger : visible uniquement en mobile, et seulement si nav présente -->
-                {showNav && (
-                    <button class="icon-btn" id="burger-btn" aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="site-nav-column">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="3" y1="6" x2="21" y2="6"/>
-                            <line x1="3" y1="12" x2="21" y2="12"/>
-                            <line x1="3" y1="18" x2="21" y2="18"/>
+            <div class="alpha-banner" role="status">
+                Librairie en cours de développement — API instable, ne pas utiliser en production. <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
+            </div>
+            <div class="header-container">
+                <div class="header-left">
+                    <!-- Burger : visible uniquement en mobile, et seulement si nav présente -->
+                    {showNav && (
+                        <button class="icon-btn icon-btn--nav" id="burger-btn" data-ar-dialog-open="site-nav-column-mobile" aria-label="Ouvrir la navigation">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="3" y1="6" x2="21" y2="6"/>
+                                <line x1="3" y1="12" x2="21" y2="12"/>
+                                <line x1="3" y1="18" x2="21" y2="18"/>
+                            </svg>
+                        </button>
+                    )}
+                    <h1>
+                        <a href="/" class="header-brand">
+                            <svg width="24" height="24" viewBox="0 0 22 22" aria-hidden="true" class="brand-mark">
+                                <path d="M2 18 C7 18 8 7 13 7 C17 7 19 11 20 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                                <circle cx="13" cy="7" r="3" fill="var(--doc-bead)" />
+                            </svg>
+                            {rootPkg.config.displayName}
+                        </a>
+                    </h1>
+                    <span class="header-version">v{coreVersion}</span>
+                </div>
+                <div class="header-actions">
+                    {/* Recherche à implémenter dans une future version, pas prioritaire
+                    <button
+                        type="button"
+                        class="icon-btn header-search"
+                        aria-disabled="true"
+                        title="Recherche — prévue, non active"
+                    >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <span class="sr-only">Recherche (à venir)</span>
+                    </button>
+                    */}
+                    <!-- Lien GitHub -->
+                    <a
+                        href="https://github.com/jogo-labs/ariane"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="icon-btn icon-btn--nav header-github"
+                        aria-label="Code source sur GitHub (nouvel onglet)"
+                        title="Code source sur GitHub (nouvel onglet)"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/></svg>
+                    </a>
+                    <!-- Trigger thème -->
+                    <button class="icon-btn icon-btn--nav" id="theme-trigger" aria-label="Thème : Automatique" title="Thème : Automatique">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect width="20" height="14" x="2" y="3" rx="2"/>
+                            <path d="M8 21h8M12 17v4"/>
                         </svg>
                     </button>
-                )}
-                <h1>
-                    <a href="/" class="header-brand">
-                        {rootPkg.config.displayName}<span class="brand-dot">●</span>
-                    </a>
-                </h1>
-                <span class="header-version">v{version}</span>
-            </div>
-            <div class="header-actions">
-                <!-- Lien GitHub -->
-                <a
-                    href="https://github.com/jogo-labs/ariane"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="icon-btn header-github"
-                    aria-label="Code source sur GitHub (nouvel onglet)"
-                    title="Code source sur GitHub (nouvel onglet)"
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/></svg>
-                </a>
-                <!-- Toggle thème groupé -->
-                <div class="theme-toggle" role="group" aria-label="Thème d'affichage">
-                    <button class="theme-btn" data-theme-mode="light" aria-label="Thème clair" title="Thème clair" aria-pressed="false">☀</button>
-                    <button class="theme-btn" data-theme-mode="system" aria-label="Thème automatique" title="Thème automatique" aria-pressed="false">⬤</button>
-                    <button class="theme-btn" data-theme-mode="dark" aria-label="Thème sombre" title="Thème sombre" aria-pressed="false">☾</button>
+                    <!-- Dropdown thème (display:contents — sans impact sur le layout) -->
+                    <ar-dropdown id="theme-dropdown" for="theme-trigger" placement="bottom-end">
+                        <ar-dropdown-item data-theme-mode="light">
+                            <button class="theme-menu-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                Clair
+                            </button>
+                        </ar-dropdown-item>
+                        <ar-dropdown-item data-theme-mode="dark">
+                            <button class="theme-menu-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+                                Sombre
+                            </button>
+                        </ar-dropdown-item>
+                        <hr style="border:none;border-top:1px solid var(--doc-border);margin:.25rem 0;">
+                        <ar-dropdown-item data-theme-mode="system">
+                            <button class="theme-menu-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                                Automatique
+                            </button>
+                        </ar-dropdown-item>
+                    </ar-dropdown>
                 </div>
             </div>
         </header>
 
-        <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+        {showNav && (
+            <ar-dialog id="site-nav-column-mobile" label="Menu de navigation" mode="drawer" placement="left">
+                <SiteNav currentPath={currentPath} />
+            </ar-dialog>
+        )}
 
         <div class={['layout-body', showNav ? 'with-nav' : '', showToc ? 'with-toc' : ''].filter(Boolean).join(' ')}>
             {showNav && (
-                <div class="nav-column" id="site-nav-column">
+                <div class="nav-column" id="site-nav-column" tabindex="-1">
                     <SiteNav currentPath={currentPath} />
                 </div>
             )}
-            <main>
+            <main id="main-content" tabindex="-1">
                 <div class="main-inner">
+                    {showNav && (
+                        <>
+                            <a href="#site-nav-column" class="skip-link skip-link--nav-desktop">Aller à la liste des composants</a>
+                            <button type="button" class="skip-link skip-link--nav-mobile" data-ar-dialog-open="site-nav-column-mobile">Ouvrir la liste des composants</button>
+                        </>
+                    )}
+                    {showToc && <a href="#toc" class="skip-link">Aller au menu de la page</a>}
                     <slot />
                 </div>
             </main>
             {showToc && (
-                <aside class="toc-column">
+                <aside class="toc-column" id="toc" tabindex="-1">
                     <slot name="toc" />
                 </aside>
             )}
@@ -457,65 +610,59 @@ const {
         <script>
             // ── Thème (Light / Auto / Dark) ────────────────────────────────────────
 
-            function resolveTheme(mode: string): 'light' | 'dark' {
-                if (mode === 'dark')  return 'dark';
-                if (mode === 'light') return 'light';
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const THEME_ICONS: Record<string, string> = {
+                light:  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+                dark:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>',
+                system: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+            };
+
+            const THEME_LABELS: Record<string, string> = {
+                light:  'Clair',
+                dark:   'Sombre',
+                system: 'Automatique',
+            };
+
+            function setTriggerIcon(mode: string) {
+                const trigger = document.getElementById('theme-trigger');
+                if (!trigger) return;
+                const icon = THEME_ICONS[mode] ?? THEME_ICONS.system;
+                trigger.innerHTML = icon;
+                const label = `Thème : ${THEME_LABELS[mode] ?? 'Automatique'}`;
+                trigger.setAttribute('aria-label', label);
+                trigger.setAttribute('title', label);
             }
 
             function applyMode(mode: string) {
-                const theme = resolveTheme(mode);
-                document.documentElement.setAttribute('data-theme', theme);
+                if (mode === 'light' || mode === 'dark') {
+                    document.documentElement.setAttribute('data-theme', mode);
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
                 document.documentElement.dataset.themeMode = mode;
-
-                // Mettre à jour le bouton actif dans le toggle groupé
-                document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
-                    const isActive = btn.dataset.themeMode === mode;
-                    btn.classList.toggle('active', isActive);
-                    btn.setAttribute('aria-pressed', String(isActive));
+                setTriggerIcon(mode);
+                document.querySelectorAll<HTMLElement>('ar-dropdown-item[data-theme-mode]').forEach((item) => {
+                    const btn = item.querySelector<HTMLElement>('button');
+                    if (!btn) return;
+                    if (item.dataset.themeMode === mode) {
+                        btn.setAttribute('aria-current', 'true');
+                    } else {
+                        btn.removeAttribute('aria-current');
+                    }
                 });
             }
 
             const savedMode = localStorage.getItem('ariane-theme') || 'system';
             applyMode(savedMode);
 
-            document.querySelectorAll<HTMLButtonElement>('.theme-btn').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const mode = btn.dataset.themeMode || 'system';
+            document.querySelectorAll<HTMLElement>('ar-dropdown-item[data-theme-mode]').forEach((item) => {
+                item.addEventListener('click', () => {
+                    const mode = item.dataset.themeMode || 'system';
                     localStorage.setItem('ariane-theme', mode);
                     applyMode(mode);
+                    const dd = document.getElementById('theme-dropdown') as HTMLElement & { open?: boolean };
+                    if (dd) dd.open = false;
                 });
             });
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('ariane-theme') || 'system') === 'system') {
-                    applyMode('system');
-                }
-            });
-
-            // ── Nav burger ─────────────────────────────────────────────────────────
-
-            const burgerBtn  = document.getElementById('burger-btn');
-            const navOverlay = document.getElementById('nav-overlay');
-            const navColumn  = document.getElementById('site-nav-column');
-
-            function openNav() {
-                navColumn?.classList.add('open');
-                navOverlay?.classList.add('open');
-                burgerBtn?.setAttribute('aria-expanded', 'true');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeNav() {
-                navColumn?.classList.remove('open');
-                navOverlay?.classList.remove('open');
-                burgerBtn?.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
-            }
-
-            burgerBtn?.addEventListener('click', openNav);
-            navOverlay?.addEventListener('click', closeNav);
-            navColumn?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeNav));
         </script>
     </body>
 </html>

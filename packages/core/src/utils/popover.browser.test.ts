@@ -11,6 +11,9 @@ class TestPopoverHost extends LitElement {
         this.updateCount++;
         return super.requestUpdate();
     }
+    override render() {
+        return html`<slot></slot>`;
+    }
 }
 
 declare global {
@@ -143,6 +146,48 @@ describe('Popover', () => {
             await popover.show();
             popover.destroy();
             expect(panel.matches(':popover-open')).to.equal(false);
+        });
+    });
+
+    describe('distance / offset — fonction résolue à chaque repositionnement', () => {
+        function parseTranslate(transform: string): { x: number; y: number } {
+            const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+            if (!match) throw new Error(`transform inattendu: ${transform}`);
+            return { x: Number(match[1]), y: Number(match[2]) };
+        }
+
+        it('distance en fonction est résolue et prise en compte au recalcul (autoUpdate)', async () => {
+            let distance = 0;
+            const { panel, popover } = await setupPopover({
+                placement: 'bottom-start',
+                distance: () => distance,
+            });
+            await popover.show();
+            const y0 = parseTranslate(panel.style.transform).y;
+
+            distance = 20;
+            window.dispatchEvent(new Event('resize'));
+            await aTimeout(50);
+            const y1 = parseTranslate(panel.style.transform).y;
+
+            expect(y1 - y0).to.be.closeTo(20, 1);
+        });
+
+        it('offset en fonction est résolu et pris en compte au recalcul (autoUpdate)', async () => {
+            let lateral = 0;
+            const { panel, popover } = await setupPopover({
+                placement: 'bottom-start',
+                offset: () => lateral,
+            });
+            await popover.show();
+            const x0 = parseTranslate(panel.style.transform).x;
+
+            lateral = 15;
+            window.dispatchEvent(new Event('resize'));
+            await aTimeout(50);
+            const x1 = parseTranslate(panel.style.transform).x;
+
+            expect(x1 - x0).to.be.closeTo(15, 1);
         });
     });
 });

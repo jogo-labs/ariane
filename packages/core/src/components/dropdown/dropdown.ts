@@ -1,8 +1,11 @@
-import { LitElement, html, type TemplateResult, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { html, type TemplateResult, type PropertyValues } from 'lit';
+import { ToggleController } from '../../controllers/toggle.controller.js';
+import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import type { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
+import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
 
@@ -21,7 +24,7 @@ export type ArDropdownPlacement =
     | 'left-end';
 
 /**
- * @summary Mécanisme de disclosure accessible basé sur l'API popover native.
+ * @summary Affiche un panneau contextuel déclenché par un bouton, positionné automatiquement autour de lui. À utiliser pour des menus d'actions, des filtres, ou tout contenu additionnel qui ne justifie pas un dialog.
  * @display demo
  *
  * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).
@@ -29,21 +32,29 @@ export type ArDropdownPlacement =
  *
  * @csspart panel - Le panel flottant.
  *
- * @cssprop [--ar-dropdown-min-width=10rem] - Largeur minimale du panel.
- * @cssprop [--ar-dropdown-max-width=var(--ar-panel-max-width,18rem)] - Largeur maximale (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-dropdown-padding=var(--ar-panel-padding,0.25rem)] - Marge interne (cascade vers --ar-panel-padding).
- * @cssprop [--ar-dropdown-bg=var(--ar-panel-bg)] - Fond du panel (cascade vers --ar-panel-bg).
- * @cssprop [--ar-dropdown-border-color=var(--ar-panel-border-color)] - Bordure (cascade vers --ar-panel-border-color).
- * @cssprop [--ar-dropdown-border-radius=var(--ar-panel-radius)] - Arrondi (cascade vers --ar-panel-radius).
- * @cssprop [--ar-dropdown-shadow=var(--ar-panel-shadow)] - Ombre (cascade vers --ar-panel-shadow).
+ * @cssprop --ar-dropdown-distance - Espacement entre le trigger et le panel (axe principal).
+ * @cssprop --ar-dropdown-offset - Décalage latéral du panel (axe transversal).
+ * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-radius - Rayon de bordure du panel partagé.
+ * @cssprop --ar-panel-shadow - Ombre portée du panel partagé.
+ * @cssprop --ar-panel-padding - Espacement interne du panel partagé.
+ * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
+ * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
+ * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
- * @event {CustomEvent} ar-dropdown-show    - Émis avant l'ouverture (annulable).
- * @event {CustomEvent} ar-dropdown-shown   - Émis après l'ouverture.
- * @event {CustomEvent} ar-dropdown-hide    - Émis avant la fermeture (annulable).
- * @event {CustomEvent} ar-dropdown-hidden  - Émis après la fermeture.
+ * @cssState open     - Le panel est ouvert.
+ * @cssState disabled - Le composant est désactivé.
+ *
+ * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
+ * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
+ * @event {CustomEvent} ar-dropdown-shown          - Émis après l'ouverture.
+ * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
+ * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
+ * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
  */
-@customElement('ar-dropdown')
-export class ArDropdown extends LitElement {
+export class ArDropdown extends ArianeElement {
     static override styles = [panelStyles, styles];
 
     /** Ouvre ou ferme le panel. */
@@ -62,12 +73,6 @@ export class ArDropdown extends LitElement {
      */
     @property({ attribute: 'no-scroll-lock', reflect: true, type: Boolean }) noScrollLock = false;
 
-    /** Espacement en pixels entre le trigger et le panel (axe principal). */
-    @property({ reflect: true, type: Number }) distance = 4;
-
-    /** Décalage latéral en pixels du panel par rapport au trigger (axe transversal). */
-    @property({ reflect: true, type: Number }) offset = 0;
-
     /**
      * ID d'un élément déclencheur externe (light DOM). Quand défini, le slot
      * `trigger` est ignoré.
@@ -77,6 +82,7 @@ export class ArDropdown extends LitElement {
     @query('[part="panel"]') private _panel!: HTMLElement;
 
     private readonly _popover = new AnchoredController(this, {
+        cssVarPrefix: 'dropdown',
         onExternalClose: () => {
             this.open = false;
         },
@@ -87,6 +93,16 @@ export class ArDropdown extends LitElement {
     private _activeIndex = -1;
     private _externalTrigger: HTMLElement | null = null;
     private readonly _uniqueId = Math.random().toString(36).slice(2, 9);
+
+    constructor() {
+        super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
+        new ToggleController(this, {
+            eventPrefix: 'ar-dropdown',
+            onShow: () => this._onShow(),
+            onHide: () => this._onHide(),
+        });
+    }
 
     override firstUpdated(): void {
         if (this.for) {
@@ -106,21 +122,20 @@ export class ArDropdown extends LitElement {
                 this._externalTrigger = trigger;
             }
         }
-        if (this.open) this._show();
     }
 
     override updated(changed: PropertyValues<this>): void {
+        if (changed.has('open')) {
+            this.toggleState('open', this.open);
+        }
+        if (changed.has('disabled')) {
+            this.toggleState('disabled', this.disabled);
+        }
         if (changed.has('placement')) {
             this._popover.setPlacement(this.placement);
         }
         if (changed.has('noScrollLock')) {
             this._popover.setLockScroll(!this.noScrollLock);
-        }
-        if (changed.has('distance')) {
-            this._popover.setDistance(this.distance);
-        }
-        if (changed.has('offset')) {
-            this._popover.setOffset(this.offset);
         }
         if (changed.has('for')) {
             this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);
@@ -136,10 +151,6 @@ export class ArDropdown extends LitElement {
                     this._externalTrigger = newTrigger;
                 }
             }
-        }
-        if (changed.has('open')) {
-            if (this.open) this._show();
-            else this._hide();
         }
     }
 
@@ -161,7 +172,8 @@ export class ArDropdown extends LitElement {
 
     private get _resolvedTrigger(): HTMLElement | null {
         if (this.for) {
-            return document.getElementById(this.for);
+            const root = this.getRootNode() as Document | ShadowRoot;
+            return root.getElementById(this.for);
         }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
@@ -189,7 +201,9 @@ export class ArDropdown extends LitElement {
     }
 
     private _detectMenuMode(): void {
-        this._menuItems = [...this.querySelectorAll<ArDropdownItem>('ar-dropdown-item')];
+        this._menuItems = [...this.querySelectorAll('*')].filter(
+            (el): el is ArDropdownItem => el instanceof ArDropdownItem,
+        );
         this._menuMode = this._menuItems.length > 0;
         if (this._panel) {
             if (this._menuMode) {
@@ -206,39 +220,23 @@ export class ArDropdown extends LitElement {
         this.open = !this.open;
     };
 
-    private _show(): void {
-        const showEv = this._emit('ar-dropdown-show');
-        if (showEv.defaultPrevented) {
-            this.open = false;
-            return;
-        }
+    private _onShow(): void {
         this._detectMenuMode();
         this._panel?.addEventListener('keydown', this._handlePanelKeyDown);
         if (this._menuMode) this._activateMenuListeners();
         void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
-            this._emit('ar-dropdown-shown');
+            emitToggleEvent(this, 'ar-dropdown-shown', { cancelable: false });
         });
     }
 
-    private _hide(): void {
-        const hideEv = this._emit('ar-dropdown-hide');
-        if (hideEv.defaultPrevented) {
-            this.open = true;
-            return;
-        }
+    private _onHide(): void {
         this._panel?.removeEventListener('keydown', this._handlePanelKeyDown);
         this._removeMenuListeners();
         this._activeIndex = -1;
         this._popover.hide();
         this._resolvedTrigger?.focus();
-        this._emit('ar-dropdown-hidden');
-    }
-
-    private _emit(name: string): CustomEvent {
-        const e = new CustomEvent(name, { bubbles: true, composed: true, cancelable: true });
-        this.dispatchEvent(e);
-        return e;
+        emitToggleEvent(this, 'ar-dropdown-hidden', { cancelable: false });
     }
 
     private _activateMenuListeners(): void {
@@ -294,11 +292,5 @@ export class ArDropdown extends LitElement {
         });
         this._activeIndex = clamped;
         items[clamped].focus({ preventScroll: true });
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-dropdown': ArDropdown;
     }
 }

@@ -1,15 +1,16 @@
 import { arrow, computePosition, flip, hide, offset, shift, autoUpdate } from '@floating-ui/dom';
 import type { Placement } from '@floating-ui/dom';
 import type { ReactiveControllerHost } from 'lit';
+import { warn } from './warn.js';
 
 type PopoverPanel = HTMLElement & { showPopover(): void; hidePopover(): void };
 
 export interface PopoverOptions {
     placement?: Placement;
-    /** Espacement perpendiculaire trigger→panel (mainAxis). Défaut : 4. */
-    distance?: number;
-    /** Décalage latéral (crossAxis). Défaut : 0. */
-    offset?: number;
+    /** Espacement perpendiculaire trigger→panel (mainAxis) en px, statique ou résolu à chaque repositionnement. Défaut : 0. */
+    distance?: number | (() => number);
+    /** Décalage latéral (crossAxis) en px, statique ou résolu à chaque repositionnement. Défaut : 0. */
+    offset?: number | (() => number);
     popoverType?: 'auto' | 'manual';
     /** Appelé lors du light-dismiss natif (popoverType 'auto' uniquement). */
     onExternalClose?: () => void;
@@ -32,7 +33,7 @@ export class Popover {
         this._host = host;
         this._opts = {
             placement: options.placement ?? 'bottom-start',
-            distance: options.distance ?? 4,
+            distance: options.distance ?? 0,
             offset: options.offset ?? 0,
             popoverType: options.popoverType ?? 'auto',
             ...(options.onExternalClose !== undefined && {
@@ -50,14 +51,6 @@ export class Popover {
         this._opts.placement = v;
     }
 
-    setDistance(v: number): void {
-        this._opts.distance = v;
-    }
-
-    setOffset(v: number): void {
-        this._opts.offset = v;
-    }
-
     setArrow(el: HTMLElement | null): void {
         if (el) {
             this._opts.arrowEl = el;
@@ -66,11 +59,11 @@ export class Popover {
         }
     }
 
-    attach(trigger: HTMLElement, panel: HTMLElement): void {
+    attach(trigger: HTMLElement, panel: HTMLElement, anchor?: HTMLElement): void {
         if (this._panel && this._opts.popoverType === 'auto') {
             this._panel.removeEventListener('toggle', this._onToggle);
         }
-        this._trigger = trigger;
+        this._trigger = anchor ?? trigger;
         this._panel = panel;
         if (!panel.id) panel.id = `ar-popover-${crypto.randomUUID().slice(0, 8)}`;
         panel.setAttribute('popover', this._opts.popoverType);
@@ -81,7 +74,7 @@ export class Popover {
 
     show(): Promise<void> {
         if (!this._panel || !this._trigger) {
-            console.warn('[Popover] show() called before attach()');
+            warn('Popover', 'show() called before attach()');
             return Promise.resolve();
         }
         if (this._isOpen) return Promise.resolve();
@@ -141,7 +134,10 @@ export class Popover {
                 placement: this._opts.placement,
                 strategy: 'absolute',
                 middleware: [
-                    offset({ mainAxis: this._opts.distance, crossAxis: this._opts.offset }),
+                    offset({
+                        mainAxis: this._resolve(this._opts.distance),
+                        crossAxis: this._resolve(this._opts.offset),
+                    }),
                     flip(),
                     ...(arrowEl ? [arrow({ element: arrowEl })] : []),
                     shift({ padding: 4 }),
@@ -171,6 +167,10 @@ export class Popover {
                 [staticSide]: `-${halfSize}px`,
             });
         }
+    }
+
+    private _resolve(v: number | (() => number)): number {
+        return typeof v === 'function' ? v() : v;
     }
 
     private _roundByDPR(value: number): number {

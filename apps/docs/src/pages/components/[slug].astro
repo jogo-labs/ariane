@@ -5,9 +5,15 @@ import Playground from '../../components/Playground.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeList from '../../components/NarrativeList.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 import manifest from '@cem';
 import { getSlug } from '../../utils/tag-name.ts';
-import { type CemDeclaration, getCustomElements, buildControls } from '../../utils/cem-types.ts';
+import {
+    type CemDeclaration,
+    getCustomElements,
+    getPublicMethods,
+    buildControls,
+} from '../../utils/cem-types.ts';
 
 type MdxEntry = Awaited<ReturnType<typeof getCollection<'components'>>>[number];
 
@@ -29,16 +35,26 @@ export async function getStaticPaths() {
 
 const { component, mdx } = Astro.props as {
     component: CemDeclaration;
-    mdx: MdxEntry | null;
+    mdx:       MdxEntry | null;
 };
 
 const { Content, headings } = mdx ? await render(mdx) : { Content: null, headings: [] };
+// Certaines pages sous-composant n'ont pas de contenu narratif (uniquement le frontmatter :
+// description + parentUsage) — éviter une <section class="narrative"> vide qui ouvrirait quand
+// même un row-gap dans .page-container (flex column).
+const hasNarrative = !!mdx?.body?.trim();
 
-const variants    = mdx?.data.variants ?? [];
-const pageTitle   = mdx?.data.title ?? component.name;
-const pageDesc    = mdx?.data.description ?? component.summary;
-const displayMode = component['x-display'] ?? 'demo';
-const parentTag   = component['x-parent'];
+const variants      = mdx?.data.variants ?? [];
+const pageTitle     = mdx?.data.title ?? component.name;
+const pageDesc      = component.summary;
+const displayMode   = component['x-display'] ?? 'demo';
+const parentTag     = component['x-parent'];
+const relatedTokens = mdx?.data.relatedTokens ?? [];
+const pageScript = mdx?.data.pageScript;
+
+const slug = getSlug(component.tagName!);
+const sourceUrl = `https://github.com/jogo-labs/ariane/blob/main/packages/core/src/components/${slug}/${slug}.ts`;
+const reportIssueUrl = `https://github.com/jogo-labs/ariane/issues/new?title=${encodeURIComponent(`Doc ${component.tagName} : `)}`;
 
 // ─── HTML initial du playground ───────────────────────────────────────────────
 
@@ -53,11 +69,52 @@ const rawPlaygroundHtml = playgroundVariant?.html ?? '';
 const playgroundHtml = rawPlaygroundHtml
     .replace(/\bid="([\w-]+)"/g, 'id="pg-$1"')
     .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"')
-    .replace(/\bfor="([\w-]+)"/g, 'for="pg-$1"');
+    .replace(/\bfor="([\w-]+)"/g, 'for="pg-$1"')
+    .replace(/\bgetElementById\((['"])([\w-]+)\1\)/g, "getElementById('pg-$2')");
 
 // ─── Contrôles du playground ──────────────────────────────────────────────────
 
 const controls = buildControls(component.members ?? []);
+
+// ─── Sous-sections de la Référence API ─────────────────────────────────────────
+//
+// Deux groupes distincts (#233) : Configuration (API de pilotage) et Personnalisation
+// (API de style depuis l'extérieur) — chacun un ar-tab-group séparé dans ComponentApi.astro.
+// Ces deux groupes n'ont pas leur propre entrée TOC (bruit sans plus-value, collés à leurs
+// sous-catégories) : seules les sous-catégories (Attributs, Slots, CSS Parts…) sont listées,
+// au même niveau qu'Import/Traduction, pour un accès direct/linkable à chacune. Chaque entrée
+// reflète exactement la condition d'affichage ET l'ordre des onglets de ComponentApi.astro —
+// une section absente (ex. pas de slot) ne doit pas apparaître dans la TOC.
+const panelProps = (component.cssProperties ?? []).filter((p) => p.name.startsWith('--ar-panel-'));
+const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWith('--ar-panel-'));
+
+const apiTocEntries = [
+    { id: 'api-import', label: 'Import', level: 2 as const },
+    component['x-localized']
+        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
+        : null,
+    component.attributes && component.attributes.length > 0
+        ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
+        : null,
+    component.slots && component.slots.length > 0
+        ? { id: 'api-slots', label: 'Slots', level: 2 as const }
+        : null,
+    component.events && component.events.length > 0
+        ? { id: 'api-evenements', label: 'Événements', level: 2 as const }
+        : null,
+    getPublicMethods(component).length > 0
+        ? { id: 'api-methodes', label: 'Méthodes', level: 2 as const }
+        : null,
+    component.cssParts && component.cssParts.length > 0
+        ? { id: 'api-css-parts', label: 'CSS Parts', level: 2 as const }
+        : null,
+    component.cssStates && component.cssStates.length > 0
+        ? { id: 'api-css-states', label: 'CSS Custom States', level: 2 as const }
+        : null,
+    (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
+        ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
+        : null,
+].filter((entry) => entry !== null);
 
 // ─── TOC ──────────────────────────────────────────────────────────────────────
 //
@@ -66,12 +123,13 @@ const controls = buildControls(component.members ?? []);
 // L'id utilisé ici doit correspondre exactement à celui posé par NarrativeHeading.astro,
 // qui utilise le même algorithme (github-slugger) pour garantir la synchronisation.
 
+// Les h3 sont dépliés en sous-menu sous leur h2 parent (comme les variantes sous Exemples).
 const narrativeTocEntries = headings
-    .filter((h: { depth: number }) => h.depth === 2)
-    .map((h: { slug: string; text: string }) => ({
+    .filter((h: { depth: number }) => h.depth === 2 || h.depth === 3)
+    .map((h: { depth: number; slug: string; text: string }) => ({
         id:    h.slug,
         label: h.text,
-        level: 1 as const,
+        level: h.depth === 2 ? (1 as const) : (2 as const),
     }));
 
 const tocEntries = [
@@ -90,12 +148,14 @@ const tocEntries = [
         ? [{ id: 'playground', label: 'Playground', level: 1 as const }]
         : []),
     { id: 'reference-api', label: 'Référence API', level: 1 as const },
+    ...apiTocEntries,
 ];
 ---
 
 <Layout
     title={pageTitle}
-    currentPath={'/components/' + getSlug(component.tagName!)}
+    description={pageDesc}
+    currentPath={'/components/' + slug}
     showToc={true}
 >
     {/* TOC mobile : visible uniquement sur mobile, injectée dans le flux principal */}
@@ -105,25 +165,59 @@ const tocEntries = [
 
     <div class="page-container">
         <div class="page-header">
-            <h3 class="page-title">{pageTitle}</h3>
-
-            <div class="meta">
-                <code>&lt;{component.tagName}&gt;</code>
+            <div class="title-row">
+                <h2 class="page-title">{pageTitle}</h2>
+                {/* Toujours "Alpha" dans ce chantier — cf. Global Constraints,
+                    aucune donnée de maturité par composant n'existe encore. */}
+                <span class="status status-alpha">Alpha</span>
             </div>
 
             {pageDesc && <p class="summary">{pageDesc}</p>}
+
+            <ul class="meta">
+                <li>
+                    <a href={sourceUrl} target="_blank" rel="noopener noreferrer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+                        <span>Source</span>
+                        <span class="sr-only"> (ouvre dans un nouvel onglet)</span>
+                    </a>
+                </li>
+                <li>
+                    <a href={reportIssueUrl} target="_blank" rel="noopener noreferrer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+                        <span>Signaler un écart</span>
+                        <span class="sr-only"> (ouvre dans un nouvel onglet)</span>
+                    </a>
+                </li>
+            </ul>
+
+            {/* ── Encart parent pour les sous-composants ── */}
+            {parentTag && (
+                <p class="parent-notice">
+                    Ce composant doit être utilisé en tant qu'enfant de <code>&lt;{parentTag}&gt;</code>.<br />
+                    Merci de voir la <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>documentation du composant {parentTag}</a> pour voir les exemples d'utilisation.
+                </p>
+            )}
         </div>
 
         {/*
           * Contenu narratif du MDX (usage, accessibilité…).
           * Les composants custom remplacent les éléments HTML natifs générés par le MDX :
-          *   - h2 → NarrativeHeading : pose un id slugifié pour les ancres TOC
-          *   - ul → NarrativeList    : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
+          *   - h2 → NarrativeHeading   : rendu en <h3> (sections, enfant de .page-title en h2),
+          *                               pose un id slugifié pour les ancres TOC
+          *   - h3 → NarrativeSubheading : rendu en <h4> (sous-sections), même mécanisme d'id
+          *   - ul → NarrativeList      : ajoute .narrative-list pour le ciblage CSS sans sélecteur de tag
           * Voir apps/docs/CONTRIBUTING.md § "Contenu narratif MDX" pour la documentation complète.
           */}
-        {Content && (
+        {Content && hasNarrative && (
             <section class="narrative">
-                <Content components={{ ul: NarrativeList, h2: NarrativeHeading }} />
+                <Content
+                    components={{
+                        ul: NarrativeList,
+                        h2: NarrativeHeading,
+                        h3: NarrativeSubheading,
+                    }}
+                />
             </section>
         )}
 
@@ -135,7 +229,9 @@ const tocEntries = [
             playgroundHtml={playgroundHtml}
             controls={controls}
             component={component}
+            relatedTokens={relatedTokens}
         />
+        {pageScript && <Fragment set:html={pageScript} />}
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
@@ -144,42 +240,176 @@ const tocEntries = [
 <style>
     @import '../../styles/doc-prose.css';
 
+    .title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .title-row .page-title {
+        margin: 0;
+        font-family: var(--doc-font-mono);
+    }
+
+    .status {
+        position: relative;
+        top: 3px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+        font-size: 0.68rem;
+        font-weight: var(--doc-font-weight-semibold);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 0.12rem 0.55rem;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+    }
+
+    .status::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-alpha {
+        color: var(--doc-alpha);
+    }
+    .status-stable {
+        color: var(--doc-stable);
+    }
+
+    /* ── Meta — une seule ligne desktop, empilée en mobile ─────────── */
+
+    .meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 1.5rem;
+        row-gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .meta li {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        color: var(--doc-text-muted);
+        position: relative;
+    }
+
+    /* Séparateur : seulement entre items d'une ligne réelle (desktop) —
+       retiré en mobile où l'empilement fait déjà office de séparation. */
+    .meta li:not(:first-child)::before {
+        content: '';
+        position: absolute;
+        inset-inline-start: -0.85rem;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--doc-text-muted);
+        opacity: 0.5;
+    }
+
+    .meta svg {
+        flex: none;
+        opacity: 0.75;
+    }
+
+    .meta a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--doc-accent);
+        text-decoration: none;
+    }
+
+    /* Seul le texte est souligné, pas l'icône. */
+    .meta a span:not(.sr-only) {
+        border-bottom: 1px solid var(--doc-accent);
+    }
+
+    .meta a:hover {
+        color: var(--doc-accent-hover);
+    }
+
+    .meta a:hover span:not(.sr-only) {
+        border-color: var(--doc-accent-hover);
+    }
+
+    .meta a:hover svg {
+        opacity: 1;
+    }
+
+    @media (max-width: 560px) {
+        .meta li:not(:first-child)::before {
+            content: none;
+        }
+    }
+
+    /* ── Encart parent ───────────────────────────────── */
+
+    .parent-notice {
+        margin:        1rem 0 0;
+    }
+
     /* La version desktop de la TOC inline est masquée — seul le <details> mobile s'affiche */
     .toc-mobile-inline { display: none; }
-    @media (max-width: 768px) {
+    @media (max-width: 1180px) {
         .toc-mobile-inline { display: block; }
     }
 
-    .narrative :global(h2) {
-        font-size: 1.25rem;
-        font-weight: 600;
-        border-bottom: 2px solid var(--doc-border, #e5e7eb);
-        padding-bottom: 1rem;
-        margin: 2rem 0 1rem;
-        color: var(--doc-text, #111827);
+    /* Tables narratives (contenu MDX libre) — style propre à ce fichier ;
+       ComponentApi.astro n'utilise plus de tableau HTML pour l'API (lignes
+       de vie, cf. spec §5), ces styles ne s'appliquent donc qu'ici. */
+    .narrative :global(table) {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
     }
 
-    .narrative :global(h2:first-child) { margin-top: 0; }
-
-    .narrative :global(h3) {
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: var(--doc-text-subtle, #374151);
-        margin: 1.25rem 0 0.5rem;
+    .narrative :global(th) {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        background: var(--doc-nav-bg);
+        color: var(--doc-text);
+        font-weight: var(--doc-font-weight-semibold);
+        border-bottom: 1px solid var(--doc-border);
     }
 
-    .narrative :global(p) {
-        font-size: 0.9rem;
-        line-height: 1.75;
-        color: var(--doc-text, #374151);
-        margin: 0;
+    .narrative :global(td) {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--doc-border);
+        vertical-align: top;
+        color: var(--doc-text);
     }
 
-    .narrative :global(.narrative-list) {
-        font-size: 0.9rem;
-        line-height: 1.75;
-        color: var(--doc-text, #374151);
-        margin: 0;
-        padding-left: 1.25rem;
+    .narrative :global(td code),
+    .narrative :global(th code) {
+        font-family: var(--doc-font-mono);
+        font-size: 0.8rem;
+        background: var(--doc-accent-bg);
+        color: var(--doc-accent);
+        padding: 0.1em 0.35em;
+        border-radius: 0.25em;
+    }
+
+    .narrative :global(kbd) {
+        font-family: var(--doc-font-mono);
+        font-size: var(--doc-font-size-xs);
+        background: var(--doc-nav-bg);
+        color: var(--doc-text);
+        border: 1px solid var(--doc-border);
+        border-radius: var(--doc-radius-sm);
+        padding: 0.15em 0.45em;
+        box-shadow: 0 1px 0 var(--doc-border);
+        white-space: nowrap;
     }
 </style>

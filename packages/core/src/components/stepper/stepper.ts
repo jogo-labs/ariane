@@ -1,16 +1,9 @@
-import {
-    LitElement,
-    html,
-    type TemplateResult,
-    type CSSResultGroup,
-    type PropertyValues,
-} from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { html, type TemplateResult, type CSSResultGroup, type PropertyValues } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
 import resetStyles from '../../styles/components/reset.styles.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './stepper.styles.js';
 
@@ -19,19 +12,31 @@ import { announceA11y } from '../../a11y/announce-a11y.js';
 import { NavigationTreeController } from '../../controllers/navigation-tree.controller.js';
 import { ScrollFollowController } from '../../controllers/scroll-follow.controller.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
-import { renderDesktop, renderMobile } from './stepper.renderer.js';
-import { type ArStepperItem } from '../stepper-item/stepper-item.js';
+import { renderDesktop, renderMobile, pushItemRenderState } from './stepper.renderer.js';
+import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
-/** Détail de l'événement émis lors d'un changement d'étape */
+/** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail {
-    /** Chemin (`href`) de l'étape sélectionnée */
-    path: string;
+    /**
+     * Chemin de l'étape courante avant la transition. Peut être `''` si le stepper
+     * est monté sans `current-path` initial et que `currentPath` est assigné pour la
+     * première fois.
+     */
+    from: string;
+    /** Chemin de l'étape cible (demandée sur `-change`, confirmée sur `-changed`) */
+    to: string;
 }
 
 /**
- * @summary Stepper de navigation accessible avec téléportation DOM adaptive.
+ * @summary Affiche la progression de l'utilisateur à travers une séquence d'étapes, avec prise en charge des sous-étapes. À utiliser pour des parcours de création ou de modification en plusieurs étapes.
  * @display demo
+ * @localized
  *
  * Les étapes sont déclarées via des éléments `<ar-stepper-item>` enfants.
  * Le composant les collecte automatiquement via `@lit/context` et construit
@@ -42,55 +47,54 @@ export interface ArStepperStepChangeDetail {
  * d'origine ; au-dessus il se déplace dans l'élément cible et affiche la liste verticale.
  *
  * @slot - Un ou plusieurs composant <ar-stepper-items>, potentiellement imbriqués pour créer des sous-étapes.
+ * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace le chevron SVG par défaut.
  *
- * @csspart nav          - L'élément `<nav>` englobant.
- * @csspart list         - La liste des étapes (desktop).
- * @csspart step         - Une étape de premier niveau.
- * @csspart substep      - Une sous-étape.
- * @csspart step-link    - Le lien d'une étape.
- * @csspart dropdown     - Le conteneur dropdown.
- * @csspart trigger      - Le bouton d'ouverture du panel mobile.
- * @csspart panel        - Le panel mobile flottant.
+ * @csspart stepper - Racine du composant.
+ * @csspart list    - Le conteneur `role="list"` des étapes.
+ * @csspart trigger - Le bouton d'ouverture du panel mobile.
+ * @csspart trigger-status - Le statut d'avancement affiché dans le bouton d'ouverture (ex. « Étape 2 / 5 (en cours) »).
+ * @csspart trigger-label - Le libellé de l'étape (et sous-étape) courante affiché dans le bouton d'ouverture.
+ * @csspart trigger-icon - Le conteneur de l'icône du bouton d'ouverture (chevron par défaut, ou contenu du slot `trigger-icon`) — cible d'une éventuelle rotation à l'ouverture.
+ * @csspart panel   - Le panel mobile flottant.
  *
- * @cssprop [--ar-stepper-panel-min-width=var(--ar-panel-min-width,18rem)]                    - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop [--ar-stepper-panel-max-width=var(--ar-panel-max-width,18rem)]                    - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
- * @cssprop [--ar-stepper-gap=1.5rem]                                                         - Hauteur du connecteur entre les étapes principales.
- * @cssprop [--ar-stepper-substep-gap=1rem]                                                   - Hauteur du connecteur entre les sous-étapes.
- * @cssprop [--ar-stepper-connector-color=var(--ar-color-neutral-80)]                         - Couleur du connecteur pointillé entre les étapes.
- * @cssprop [--ar-stepper-active-bullet-bg=var(--ar-color-interactive)]                       - Fond de la puce de l'étape active.
- * @cssprop [--ar-stepper-active-bullet-color=var(--ar-color-text-inverse)]                   - Couleur du numéro dans la puce active.
- * @cssprop [--ar-stepper-bullet-bg=var(--ar-color-primary-80)]                               - Fond des puces des étapes visitables.
- * @cssprop [--ar-stepper-bullet-color=var(--ar-color-interactive)]                           - Couleur du numéro dans les puces visitables.
- * @cssprop [--ar-stepper-bullet-border-color=var(--ar-color-neutral-80)]                     - Bordure des puces des étapes suivantes.
- * @cssprop [--ar-stepper-bullet-hover-bg=var(--ar-color-text-muted)]                         - Fond de la puce au survol.
- * @cssprop [--ar-stepper-bullet-radius=0.75rem]                                              - Border-radius de la puce.
- * @cssprop [--ar-stepper-label-color=var(--ar-color-text-muted)]                             - Couleur des labels des étapes inactives.
- * @cssprop [--ar-stepper-active-label-color=var(--ar-color-interactive)]                     - Couleur du label de l'étape active.
+ * @cssprop --ar-stepper-distance - Espacement entre le trigger et le panel mobile.
+ * @cssprop --ar-stepper-offset - Décalage latéral du panel mobile.
+ * @cssprop --ar-stepper-toggle-transition-duration - Durée de la transition de fond du bouton d'ouverture (respecte `prefers-reduced-motion`).
+ * @cssprop --ar-stepper-toggle-min-size - Taille de cible minimale du bouton d'ouverture (WCAG 2.5.8).
+ * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-radius - Rayon de bordure du panel partagé.
+ * @cssprop --ar-panel-shadow - Ombre portée du panel partagé.
+ * @cssprop --ar-panel-padding - Espacement interne du panel partagé.
+ * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
+ * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
+ * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
- * @event {CustomEvent<{ path: string }>} ar-stepper-step-changed - Émis au clic sur une étape.
+ * @cssState open - Le panel mobile est ouvert.
+ *
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-change - Émis avant le
+ *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
+ *   `currentPath` ne change pas. Contient `from` et `to`. @cancelable
+ * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
+ *   `currentPath` a réellement changé (réassignation externe en réponse à
+ *   `ar-stepper-step-change`, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
  */
-@customElement('ar-stepper')
-export class ArStepper extends LitElement {
-    static override styles: CSSResultGroup = [
-        resetStyles,
-        utilitiesStyles,
-        buttonStyles,
-        panelStyles,
-        styles,
-    ];
+export class ArStepper extends ArianeElement {
+    static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];
+
+    private readonly localize = new LocalizeController(this);
 
     /**
      * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
-     * @attr current-path
      */
-    @property({ type: String, attribute: 'current-path' })
+    @property({ type: String, attribute: 'current-path', reflect: true })
     currentPath = '';
 
     /**
      * Mode de navigation : `create` (formulaire de création) ou `edit` (modification).
      * Détermine quelles étapes sont accessibles au clic.
-     * @attr mode
      */
     @property({ type: String, attribute: 'mode', useDefault: true })
     mode: 'create' | 'edit' = 'create';
@@ -98,21 +102,18 @@ export class ArStepper extends LitElement {
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
      * automatiquement quand l'utilisateur scrolle vers une section de la page.
-     * @attr follow-scroll
      */
     @property({ type: Boolean, attribute: 'follow-scroll' })
     followScroll = false;
 
     /**
      * ID de l'élément cible qui accueille le stepper en mode desktop.
-     * @attr desktop-target
      */
     @property({ type: String, attribute: 'desktop-target', reflect: true })
     desktopTarget?: string;
 
     /**
      * Breakpoint desktop à partir duquel la téléportation est activée.
-     * @attr desktop-from
      */
     @property({ type: Number, attribute: 'desktop-from', reflect: true })
     desktopFrom = 992;
@@ -120,19 +121,18 @@ export class ArStepper extends LitElement {
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
      * Sans effet en mode desktop.
-     * @attr open
-     * @default false
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     /**
-     * Alignement de la liste d'étapes : `left` (défaut) ou `right`.
-     * **Note** — l'alignement `right` ne s'applique qu'en mode desktop (rendu liste verticale).
-     * En mode mobile (dropdown), les items restent alignés à gauche.
-     * @attr align
+     * Inverse l'alignement de la liste d'étapes en mode desktop. Sans effet en mode
+     * mobile (dropdown).
+     *
+     * S'appuie sur des règles posées sur les parts `control` et `indicator` d'ar-stepper-item —
+     * un thème qui les redéfinit peut désactiver l'inversion.
      */
-    @property({ type: String, attribute: 'align', reflect: true })
-    align: 'left' | 'right' = 'left';
+    @property({ attribute: 'reverse-align', reflect: true, type: Boolean })
+    reverseAlign: boolean = false;
 
     @state()
     private _currentStepIndex = 0;
@@ -148,6 +148,14 @@ export class ArStepper extends LitElement {
     private _mediaQueryList: MediaQueryList | undefined;
     private _responsiveQuery: string | undefined;
     private _dropdownAttached = false;
+    // Distingue le tout premier cycle updated() (où `currentPath` "change" par rapport à sa
+    // valeur pré-upgrade non définie) des transitions réelles ultérieures. `this.hasUpdated`
+    // (natif Lit) ne convient pas ici : Lit le passe à `true` AVANT d'invoquer updated() sur
+    // ce tout premier cycle, donc il vaut déjà `true` pendant son exécution — vérifié
+    // empiriquement contre @lit/reactive-element (hasUpdated est assigné dans _$didUpdate()
+    // avant l'appel à updated()). Même pattern que ArPagination._hasRenderedOnce.
+    private _hasRenderedOnce = false;
+    private _pendingFocusPath: string | undefined;
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -159,6 +167,7 @@ export class ArStepper extends LitElement {
     private readonly _popover = new AnchoredController(this, {
         lockScroll: false,
         popupMode: 'menu',
+        cssVarPrefix: 'stepper',
         onExternalClose: () => {
             this.open = false;
         },
@@ -188,6 +197,9 @@ export class ArStepper extends LitElement {
                 this.rebuildTree();
             }
         },
+        notifyItemActivated: (item, event) => {
+            this.onItemActivated(item, event);
+        },
     };
 
     protected readonly _provider = new ContextProvider(this, {
@@ -199,7 +211,6 @@ export class ArStepper extends LitElement {
 
     override connectedCallback() {
         super.connectedCallback();
-
         if (!this._originalParent && this.parentNode) {
             this._originalParent = this.parentNode;
             this._originalNextSibling = this.nextSibling;
@@ -208,8 +219,15 @@ export class ArStepper extends LitElement {
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
         this.setupResponsiveMode();
 
-        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt
-        customElements.whenDefined('ar-stepper-item').then(() => {
+        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
+        // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
+        // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
+        const tags = new Set(
+            [...this.querySelectorAll('*')]
+                .map((el) => el.localName)
+                .filter((tag) => tag.includes('-')),
+        );
+        Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() => {
             if (!this.isConnected) return;
             this.collectExistingItems();
         });
@@ -222,6 +240,9 @@ export class ArStepper extends LitElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
+        if (changed.has('open')) {
+            this.toggleState('open', this.open);
+        }
         if (!this._isDesktop && !this._dropdownAttached) {
             void this.updateComplete.then(() => {
                 this._dropdownAttached = this._attachDropdown();
@@ -239,6 +260,28 @@ export class ArStepper extends LitElement {
                 });
             }
         }
+        if (this._hasRenderedOnce && changed.has('currentPath')) {
+            const from = changed.get('currentPath') as string;
+            const to = this.currentPath;
+            if (from !== to) {
+                this._emitChanged({ from, to });
+                announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
+                if (to === this._pendingFocusPath) {
+                    // L'item cible vient de recevoir son nouveau render-state (indicatorState,
+                    // isLink…) via pushItemRenderState() dans willUpdate(), mais son propre
+                    // cycle de rendu (LitElement séparé, Task 2) n'a pas encore tourné : son
+                    // shadow DOM reflète encore l'ancien contrôle (ex. <a> avant un swap vers
+                    // <div>). Attendre son updateComplete évite de focaliser un noeud sur le
+                    // point d'être remplacé (ce qui perdrait le focus).
+                    const item = this.navigation.currentNode?.item;
+                    if (item) {
+                        void item.updateComplete.then(() => item.focusControl());
+                    }
+                }
+            }
+        }
+        this._hasRenderedOnce = true;
+        this._pendingFocusPath = undefined;
     }
 
     private _attachDropdown(): boolean {
@@ -269,6 +312,11 @@ export class ArStepper extends LitElement {
         if (changed.has('desktopTarget') || changed.has('desktopFrom')) {
             this.setupResponsiveMode();
         }
+        if (this.navigation.tree.length) {
+            const stepLabel = (order: number, isSubstep: boolean): string =>
+                this.localize.term('stepLabel', order, isSubstep);
+            pushItemRenderState(this.navigation.tree, this.mode, stepLabel);
+        }
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -282,28 +330,21 @@ export class ArStepper extends LitElement {
         }
 
         const content = this._isDesktop
-            ? renderDesktop(steps, this.mode, this.onClickLink)
-            : renderMobile(
-                  steps,
-                  {
-                      currentStepIndex: this._currentStepIndex,
-                      currentStepLabel: this.getCurrentStepLabel(),
-                      currentSubStepLabel: this.getCurrentSubStepLabel(),
-                      onToggle: this._onDropdownToggle,
-                  },
-                  this.mode,
-                  this.onClickLink,
-              );
+            ? renderDesktop()
+            : renderMobile({
+                  currentStepLabel: this.getCurrentStepLabel(),
+                  currentSubStepLabel: this.getCurrentSubStepLabel(),
+                  currentStepStatus: this.localize.term(
+                      'currentStepStatus',
+                      this._currentStepIndex + 1,
+                      steps.length,
+                  ),
+                  onToggle: this._onDropdownToggle,
+              });
 
-        return html` <nav
-            part="nav"
-            class="stepper-nav"
-            role="navigation"
-            aria-labelledby="label-nav"
-        >
-            <p id="label-nav" class="sr-only">Étapes du formulaire</p>
+        return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
+            <p id="label-nav" class="sr-only">${this.localize.term('stepperNavLabel')}</p>
             ${content}
-            <slot></slot>
         </nav>`;
     }
 
@@ -330,9 +371,9 @@ export class ArStepper extends LitElement {
 
     /** Collecte les items déjà présents dans le light DOM (cas du premier render) */
     private collectExistingItems(): void {
-        this.querySelectorAll<ArStepperItem>('ar-stepper-item').forEach((item) =>
-            item.setRegistry(this._registry),
-        );
+        [...this.querySelectorAll('*')]
+            .filter((el): el is ArStepperItem => el instanceof ArStepperItem)
+            .forEach((item) => item.setRegistry(this._registry));
     }
 
     private setupResponsiveMode(): void {
@@ -436,35 +477,45 @@ export class ArStepper extends LitElement {
         return this.navigation.tree.flatMap((step) => step.children.map((sub) => sub.path));
     }
 
+    private _emitChanged(detail: ArStepperStepChangeDetail): void {
+        this.dispatchEvent(
+            new CustomEvent<ArStepperStepChangeDetail>('ar-stepper-step-changed', {
+                bubbles: true,
+                composed: true,
+                detail,
+            }),
+        );
+    }
+
     // ── Events ───────────────────────────────────────────────────────────────
 
-    private onClickLink = (event: MouseEvent): void => {
-        const path = (event.target as HTMLElement).closest('a')?.dataset['path'];
-        if (!path) return;
+    private onItemActivated(item: ArStepperItem, event: MouseEvent): void {
+        this._pendingFocusPath = item.path;
 
-        const detail: ArStepperStepChangeDetail = { path };
+        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: item.path };
 
-        // Double dispatch : nom court pour usage interne, nom préfixé pour usage externe
-        this.dispatchEvent(
-            new CustomEvent('step-changed', { bubbles: true, composed: true, detail }),
+        const proceed = this.dispatchEvent(
+            new CustomEvent('ar-stepper-step-change', {
+                bubbles: true,
+                composed: true,
+                cancelable: true,
+                detail,
+            }),
         );
-        this.dispatchEvent(
-            new CustomEvent('ar-stepper-step-changed', { bubbles: true, composed: true, detail }),
-        );
+        if (!proceed) {
+            this._pendingFocusPath = undefined;
+            event.preventDefault();
+        }
 
-        const stepLabel =
-            this.navigation.tree.flatMap((s) => [s, ...s.children]).find((s) => s.path === path)
-                ?.label ?? path;
-        announceA11y(stepLabel, 'polite');
-    };
+        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
+        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
+        // fenêtre "un seul cycle" même si le consommateur ignore l'event. Placé après le
+        // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
+        // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
+        this.requestUpdate();
+    }
 
     private handleScrollChange = (event: CustomEvent<string>): void => {
         this.currentPath = event.detail;
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-stepper': ArStepper;
-    }
 }

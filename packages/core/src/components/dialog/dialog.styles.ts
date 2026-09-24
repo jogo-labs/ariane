@@ -9,45 +9,23 @@ export default [
         :host {
             display: block;
 
-            /* Taille modale par défaut (md = 500px). Surchargeable par --width sur l'instance. */
-            --width: 500px;
+            /* Taille par défaut (repli fonctionnel sans thème) — les paliers sm/lg/xl sont
+               une taxonomie fournie par ariane.css, pas une exigence du composant. */
+            /* functional-default: largeur modale non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 500px;
         }
 
-        /* Tailles modal */
-        :host([size='sm']) {
-            --width: 360px;
-        }
-        :host([size='md']) {
-            --width: 500px;
-        }
-        :host([size='lg']) {
-            --width: 800px;
-        }
-        :host([size='xl']) {
-            --width: 1140px;
-        }
-
-        /* Tailles drawer — ont priorité sur les valeurs modal via la spécificité */
+        /* Taille par défaut du drawer — a priorité sur la valeur modal via la spécificité */
         :host([mode='drawer']) {
-            --width: 720px;
-        }
-        :host([mode='drawer'][size='sm']) {
-            --width: 360px;
-        }
-        :host([mode='drawer'][size='md']) {
-            --width: 720px;
-        }
-        :host([mode='drawer'][size='lg']) {
-            --width: 960px;
-        }
-        :host([mode='drawer'][size='xl']) {
-            --width: 1440px;
+            /* functional-default: largeur drawer non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
+            --ar-dialog-width: 720px;
         }
 
         /* ── Backdrop ─────────────────────────────────────────────────────────── */
 
         dialog::backdrop {
-            background: rgba(0, 0, 0, 0.5);
+            /* a11y-fallback: sans thème chargé, le backdrop serait transparent (défaut UA de ::backdrop) — perte de l'indication visuelle de modalité */
+            background: var(--ar-dialog-backdrop, rgba(0, 0, 0, 0.5));
             opacity: 0;
             transition: opacity 0.25s ease;
         }
@@ -74,19 +52,23 @@ export default [
             border: none;
             padding: 0;
             overflow: hidden;
-            background: var(--ar-color-bg, #fff);
-            color: var(--ar-color-text, #2e2e31);
-            box-shadow:
-                0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 20px 50px -8px rgba(0, 0, 0, 0.2);
+            background: var(--ar-dialog-bg, Canvas);
+            color: var(--ar-dialog-color, CanvasText);
+            /* max-width: override le défaut UA qui plafonne à calc(100% - 6px - 2em) —
+               même raison que l'override de max-height plus bas. Posé ici (commun aux deux
+               modes) car chaque mode a sa propre logique de width ci-dessous, mais tous
+               deux ont besoin de désactiver ce plafond natif pour que leur propre valeur
+               s'applique sans interférence. */
+            max-width: 100%;
         }
 
         /* ── Modal ────────────────────────────────────────────────────────────── */
 
         :host(:not([mode='drawer'])) dialog {
-            border-radius: 0.5rem;
-            /* max-width artificiel : la modale ne prend jamais toute la largeur même sur mobile */
-            width: min(var(--width), calc(100vw - 2rem));
+            /* Marge latérale conservée à toutes les tailles d'écran, y compris mobile :
+               un modal flotte au centre de la page (contrairement au drawer, ancré à un
+               bord) — un plein écran collé aux bords rend mal visuellement dans ce cas. */
+            width: min(var(--ar-dialog-width), calc(100vw - 2rem));
             max-height: min(90vh, calc(100dvh - 2rem));
         }
 
@@ -101,8 +83,12 @@ export default [
         /* ── Drawer ───────────────────────────────────────────────────────────── */
 
         :host([mode='drawer']) dialog {
-            /* Sur petit écran, le drawer peut occuper 100% de la largeur */
-            width: min(var(--width), 100vw);
+            /* min() encode nativement le mobile-first, sans media query : quand
+               --ar-dialog-width dépasse 100% (petit écran), le drawer occupe toute la
+               largeur (ancré à un bord, le plein écran y reste cohérent contrairement au
+               modal) ; au-delà, il est contraint à sa taille de palier. Le calcul est
+               déjà continu et réactif au redimensionnement, pas besoin de palier fixe. */
+            width: min(var(--ar-dialog-width), 100%);
             height: 100dvh;
             /* max-height: override le défaut UA qui plafonne à calc(100% - 6px - 2em) */
             max-height: 100dvh;
@@ -140,25 +126,47 @@ export default [
         header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            padding: 1.25rem 1.25rem 0;
             flex-shrink: 0;
         }
 
         h1 {
             margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-            line-height: 1.4;
-            color: inherit;
+            margin-inline-end: auto;
         }
 
-        button {
+        [part='header-actions'] {
+            display: flex;
+            align-items: center;
+            /* Absorbe l'espace disponible seulement quand h1 est hors flux (::part(title) en
+               position: absolute — cf. doc "titre sr-only") : sinon, margin-inline-end: auto sur
+               h1 consomme déjà tout l'espace libre en priorité sur les marges auto (spec flexbox,
+               résolu avant la distribution flex-grow), donc ce flex: 1 reste sans effet visuel
+               tant que le titre est visible et en flux normal. */
+            flex: 1;
+            /* Garde le contenu collé au bouton close (comme un slot vide) même quand ce
+               conteneur grandit — sans ça, un slot avec un seul petit bouton se retrouverait
+               plaqué au début du header plutôt qu'à côté du close une fois ce flex: 1 actif. */
+            justify-content: flex-end;
+        }
+
+        [part~='close-button'] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
-            align-self: flex-start;
-            /* @EvolutionDesign: taille forcée à 40×40 en attendant la migration vers la nouvelle charte */
-            min-height: 2.5rem;
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            width: var(--ar-dialog-close-size, 2.5rem);
+            /* a11y-fallback: WCAG 2.5.8 (Target Size Minimum) — sans thème chargé, le bouton perdrait sa taille de cible tactile */
+            height: var(--ar-dialog-close-size, 2.5rem);
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            transition: background-color var(--ar-dialog-close-transition-duration);
+        }
+
+        [part~='close-button']:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
         }
 
         svg {
@@ -173,8 +181,8 @@ export default [
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            padding-block: var(--spacing-block, var(--spacing, 1.25rem));
-            padding-inline: var(--spacing-inline, var(--spacing, 1.25rem));
+            padding-block: var(--ar-dialog-spacing-block, var(--ar-dialog-spacing));
+            padding-inline: var(--ar-dialog-spacing-inline, var(--ar-dialog-spacing));
         }
 
         /* ── Footer ───────────────────────────────────────────────────────────── */
@@ -184,8 +192,6 @@ export default [
             align-items: center;
             justify-content: flex-end;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            padding: 0 1.25rem 1.25rem;
             flex-shrink: 0;
         }
 
@@ -199,14 +205,15 @@ export default [
 
         @media (prefers-reduced-motion: reduce) {
             dialog,
-            dialog::backdrop {
+            dialog::backdrop,
+            [part~='close-button'] {
                 animation: none !important;
                 transition: none !important;
             }
 
             dialog.shake {
                 animation: none;
-                outline: 3px solid var(--ar-color-danger, #d04442);
+                outline: 3px solid var(--ar-dialog-shake-outline-color);
                 outline-offset: 2px;
             }
         }

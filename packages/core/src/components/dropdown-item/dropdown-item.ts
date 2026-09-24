@@ -1,17 +1,16 @@
-import { LitElement, html, css, type TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { html, css, type TemplateResult } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
 
 const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 /**
- * @summary Élément enfant de ar-dropdown. Active le mode menu et pose les attributs ARIA sur son enfant focusable.
+ * @summary Représente une action individuelle dans un panneau ar-dropdown utilisé en mode menu.
  * @parent ar-dropdown
  * @display docs
  *
  * @slot - Un bouton ou un lien — reçoit automatiquement role="menuitem" et tabIndex=-1.
  */
-@customElement('ar-dropdown-item')
-export class ArDropdownItem extends LitElement {
+export class ArDropdownItem extends ArianeElement {
     static override styles = [
         css`
             :host {
@@ -32,11 +31,5 @@ export class ArDropdownItem extends LitElement {
         if (!focusable) return;
         focusable.setAttribute('role', 'menuitem');
         focusable.tabIndex = -1;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-dropdown-item': ArDropdownItem;
     }
 }

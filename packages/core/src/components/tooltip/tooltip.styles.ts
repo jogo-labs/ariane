@@ -6,7 +6,7 @@ const tooltipStyles = css`
         display: contents;
     }
 
-    [part='bubble'] {
+    [part='tooltip'] {
         /* Popover positioning reset */
         position: absolute;
         inset: 0 auto auto 0;
@@ -14,41 +14,47 @@ const tooltipStyles = css`
 
         /* Box model */
         box-sizing: border-box;
-        padding: var(--ar-tooltip-padding, 0.375rem 0.625rem);
-        max-width: var(--ar-tooltip-max-width, 18rem);
+        padding: var(--ar-tooltip-padding);
+        border-radius: var(--ar-tooltip-radius);
+
+        /* a11y-fallback: évite un débordement horizontal (WCAG 1.4.10 Reflow) sur un viewport
+           étroit, avec ou sans thème chargé — calc(100vw - 2rem) borne la largeur sur mobile.
+           Personnalisable via ::part(tooltip) { max-width: ... } si besoin. */
+        max-width: min(18rem, calc(100vw - 2rem));
 
         /* overflow: visible requis pour que le caret (position: absolute) dépasse de la bulle */
         overflow: visible;
 
         /* Visual */
-        background-color: var(--ar-tooltip-bg, #1a1a1a);
-        color: var(--ar-tooltip-color, #fff);
+        background-color: var(--ar-tooltip-bg, Canvas);
+        color: var(--ar-tooltip-color, CanvasText);
         border: none;
-        border-radius: var(--ar-tooltip-border-radius, 0.25rem);
-        font-size: var(--ar-tooltip-font-size, 0.8125rem);
-        line-height: 1.4;
         word-break: break-word;
+
+        /* Typography */
+        font-size: var(--ar-tooltip-font-size);
+        line-height: var(--ar-tooltip-line-height);
     }
 
-    [part='bubble']:not(:popover-open) {
+    [part='tooltip']:not(:popover-open) {
         display: none;
     }
 
-    [part='bubble']:popover-open {
-        animation: arPanelShow 0.15s ease-out;
+    [part='tooltip']:popover-open {
+        animation: arPanelShow var(--ar-tooltip-show-duration) ease-out;
     }
 
     @media (prefers-reduced-motion: reduce) {
-        [part='bubble']:popover-open {
+        [part='tooltip']:popover-open {
             animation: none;
         }
     }
 
     [part='arrow'] {
         position: absolute;
-        width: var(--ar-tooltip-arrow-size, 6px);
-        height: var(--ar-tooltip-arrow-size, 6px);
-        background-color: var(--ar-tooltip-bg, #1a1a1a);
+        width: var(--ar-tooltip-arrow-size);
+        height: var(--ar-tooltip-arrow-size);
+        background-color: var(--ar-tooltip-bg, Canvas);
         transform: rotate(45deg);
         pointer-events: none;
     }

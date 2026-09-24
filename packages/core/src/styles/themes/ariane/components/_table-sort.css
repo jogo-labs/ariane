@@ -1,0 +1,23 @@
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Tablesort
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-table-sort-indicator-size: 0.65rem;
+    --ar-table-sort-indicator-color: var(--ar-color-text-muted);
+    --ar-table-sort-indicator-active-color: var(--ar-color-primary-70);
+    --ar-table-sort-indicator-pending-color: var(--ar-color-text-muted);
+}
+
+ar-table-sort {
+    &::part(sort-button) {
+        gap: 0.375rem;
+    }
+
+    &::part(sort-button--pending) {
+        cursor: wait;
+    }
+
+    &::part(indicator) {
+        gap: 3px;
+    }
+}

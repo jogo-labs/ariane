@@ -1,18 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArDropdown } from './dropdown.js';
-import { fixture, waitForUpdate, getPart } from '../../test-utils.js';
-import './dropdown.js';
-import '../dropdown-item/dropdown-item.js';
-
-// happy-dom does not implement the Popover API — mock showPopover/hidePopover on the panel.
-function mockPanelPopover(el: ArDropdown): void {
-    const panel = getPart(el, 'panel') as HTMLElement | null;
-    if (!panel) return;
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).showPopover =
-        vi.fn();
-    (panel as HTMLElement & { showPopover: () => void; hidePopover: () => void }).hidePopover =
-        vi.fn();
-}
+import { fixture, waitForUpdate, getPart, mockPopoverPanel } from '../../test-utils.js';
+import './index.js';
+import '../dropdown-item/index.js';
 
 describe('ArDropdown', () => {
     let el: ArDropdown;
@@ -46,8 +36,6 @@ describe('ArDropdown', () => {
         it('placement="bottom-start"', () => expect(el.placement).toBe('bottom-start'));
         it('disabled=false', () => expect(el.disabled).toBe(false));
         it('noScrollLock=false', () => expect(el.noScrollLock).toBe(false));
-        it('distance=4', () => expect(el.distance).toBe(4));
-        it('offset=0', () => expect(el.offset).toBe(0));
         it('for=""', () => expect(el.for).toBe(''));
     });
 
@@ -59,7 +47,7 @@ describe('ArDropdown', () => {
         });
 
         it('open reflète en attribut', async () => {
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             el.open = true;
             await waitForUpdate(el);
             expect(el.hasAttribute('open')).toBe(true);
@@ -83,18 +71,6 @@ describe('ArDropdown', () => {
             expect(el.hasAttribute('no-scroll-lock')).toBe(true);
         });
 
-        it('distance reflète en attribut', async () => {
-            el.distance = 12;
-            await waitForUpdate(el);
-            expect(el.getAttribute('distance')).toBe('12');
-        });
-
-        it('offset reflète en attribut', async () => {
-            el.offset = 8;
-            await waitForUpdate(el);
-            expect(el.getAttribute('offset')).toBe('8');
-        });
-
         it('for reflète en attribut', async () => {
             el.for = 'mon-btn';
             await waitForUpdate(el);
@@ -109,7 +85,7 @@ describe('ArDropdown', () => {
             el = await fixture(
                 '<ar-dropdown><button slot="trigger">Trigger</button></ar-dropdown>',
             );
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
         });
 
         it('émet ar-dropdown-show avant ouverture', async () => {
@@ -145,6 +121,83 @@ describe('ArDropdown', () => {
             await waitForUpdate(el);
             expect(el.open).toBe(true);
         });
+
+        it("n'émet pas ar-dropdown-hide/-hidden quand ar-dropdown-show est annulé", async () => {
+            el.addEventListener('ar-dropdown-show', (e) => e.preventDefault());
+            const hideHandler = vi.fn();
+            const hiddenHandler = vi.fn();
+            el.addEventListener('ar-dropdown-hide', hideHandler);
+            el.addEventListener('ar-dropdown-hidden', hiddenHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(hideHandler).not.toHaveBeenCalled();
+            expect(hiddenHandler).not.toHaveBeenCalled();
+        });
+
+        it('émet ar-dropdown-show-prevented (non cancelable) quand ar-dropdown-show est annulé', async () => {
+            el.addEventListener('ar-dropdown-show', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-dropdown-show-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = true;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+            expect(event?.detail).toEqual({ id: undefined });
+        });
+
+        it('émet ar-dropdown-hide-prevented (non cancelable) quand ar-dropdown-hide est annulé', async () => {
+            el.open = true;
+            await waitForUpdate(el);
+            el.addEventListener('ar-dropdown-hide', (e) => e.preventDefault());
+            let event: CustomEvent | undefined;
+            el.addEventListener('ar-dropdown-hide-prevented', (e) => {
+                event = e as CustomEvent;
+            });
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(event).toBeDefined();
+            expect(event?.cancelable).toBe(false);
+            expect(event?.detail).toEqual({ id: undefined });
+        });
+
+        it("n'émet pas ar-dropdown-show/-shown quand ar-dropdown-hide est annulé", async () => {
+            el.open = true;
+            await waitForUpdate(el);
+
+            el.addEventListener('ar-dropdown-hide', (e) => e.preventDefault());
+            const showHandler = vi.fn();
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-show', showHandler);
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = false;
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+
+            expect(showHandler).not.toHaveBeenCalled();
+            expect(shownHandler).not.toHaveBeenCalled();
+        });
+
+        it("n'émet ar-dropdown-show qu'une fois quand open est déjà vrai au premier rendu", async () => {
+            // Écoute posée avant connexion : fixture() connecte puis résout après le premier
+            // rendu, trop tard pour capter un événement émis dès firstUpdated()/updated().
+            const openEl = document.createElement('ar-dropdown') as ArDropdown;
+            openEl.innerHTML = '<button slot="trigger">Trigger</button>';
+            openEl.open = true;
+            const handler = vi.fn();
+            openEl.addEventListener('ar-dropdown-show', handler);
+            document.body.appendChild(openEl);
+            await waitForUpdate(openEl);
+            expect(handler).toHaveBeenCalledOnce();
+            openEl.remove();
+        });
     });
 
     // ── Disabled ─────────────────────────────────────────────────────────────
@@ -154,7 +207,7 @@ describe('ArDropdown', () => {
             el = await fixture(
                 '<ar-dropdown disabled><button slot="trigger">Trigger</button></ar-dropdown>',
             );
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const trigger = el.querySelector<HTMLButtonElement>('button');
             trigger?.click();
             await waitForUpdate(el);
@@ -178,7 +231,7 @@ describe('ArDropdown', () => {
         it("bloque overflowY des ancêtres scroll à l'ouverture", async () => {
             el = await fixture('<ar-dropdown><button slot="trigger">T</button></ar-dropdown>');
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -189,7 +242,7 @@ describe('ArDropdown', () => {
         it('restaure overflowY des ancêtres à la fermeture', async () => {
             el = await fixture('<ar-dropdown><button slot="trigger">T</button></ar-dropdown>');
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -206,7 +259,7 @@ describe('ArDropdown', () => {
             );
             await waitForUpdate(el);
             container.appendChild(el);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             el.open = true;
             await waitForUpdate(el);
@@ -236,7 +289,7 @@ describe('ArDropdown', () => {
 
         it('le clic sur le trigger externe ouvre le dropdown', async () => {
             el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
 
             externalBtn.click();
             await waitForUpdate(el);
@@ -271,7 +324,7 @@ describe('ArDropdown', () => {
                     <button slot="trigger">Menu</button>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             // Append items after fixture to trigger slotchange
             const item1 = document.createElement('ar-dropdown-item');
             item1.innerHTML = '<button>Item 1</button>';
@@ -291,7 +344,7 @@ describe('ArDropdown', () => {
                     <p>Contenu libre</p>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             await waitForUpdate(el);
             const panel = getPart(el, 'panel');
             expect(panel?.getAttribute('role')).toBeNull();
@@ -303,7 +356,7 @@ describe('ArDropdown', () => {
                     <button slot="trigger">Menu</button>
                 </ar-dropdown>
             `);
-            mockPanelPopover(el);
+            mockPopoverPanel(el);
             const item1 = document.createElement('ar-dropdown-item');
             item1.innerHTML = '<button>Item 1</button>';
             const hr = document.createElement('hr');
@@ -362,6 +415,61 @@ describe('ArDropdown', () => {
 
             conflictBtn.remove();
             spy.mockRestore();
+        });
+    });
+
+    // ── for en shadow DOM ────────────────────────────────────────────────────
+
+    describe('for en shadow DOM', () => {
+        it('résout le trigger via getRootNode() quand ar-dropdown est dans un shadow root', async () => {
+            class HostWithShadow extends HTMLElement {
+                constructor() {
+                    super();
+                    const root = this.attachShadow({ mode: 'open' });
+                    root.innerHTML = `
+                        <button id="trigger-in-shadow">Ouvrir</button>
+                        <ar-dropdown for="trigger-in-shadow">
+                            <div>Contenu</div>
+                        </ar-dropdown>
+                    `;
+                }
+            }
+            if (!customElements.get('ar-test-shadow-host')) {
+                customElements.define('ar-test-shadow-host', HostWithShadow);
+            }
+            const host = document.createElement('ar-test-shadow-host');
+            document.body.appendChild(host);
+
+            const dropdown = host.shadowRoot!.querySelector('ar-dropdown') as ArDropdown;
+            mockPopoverPanel(dropdown);
+            await waitForUpdate(dropdown);
+
+            const trigger = host.shadowRoot!.getElementById(
+                'trigger-in-shadow',
+            ) as HTMLButtonElement;
+            trigger.click();
+            await waitForUpdate(dropdown);
+
+            expect(dropdown.open).toBe(true);
+
+            host.remove();
+        });
+    });
+
+    describe('detail des events de cycle de vie', () => {
+        it('ar-dropdown-shown porte detail.id', async () => {
+            el = await fixture('<ar-dropdown id="my-dropdown"><div>Contenu</div></ar-dropdown>');
+            mockPopoverPanel(el);
+            const shownHandler = vi.fn();
+            el.addEventListener('ar-dropdown-shown', shownHandler);
+
+            el.open = true;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(shownHandler).toHaveBeenCalledOnce();
+            const event = shownHandler.mock.calls[0][0] as CustomEvent;
+            expect(event.detail).toEqual({ id: 'my-dropdown' });
         });
     });
 });

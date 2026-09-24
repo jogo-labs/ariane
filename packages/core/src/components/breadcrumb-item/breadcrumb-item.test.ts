@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type ArBreadcrumbItem } from './breadcrumb-item.js';
-import { fixture, waitForUpdate } from '../../test-utils.js';
-import './breadcrumb-item.js';
+import type { ArBreadcrumbItem } from './breadcrumb-item.js';
+import { fixture, getPart, waitForUpdate } from '../../test-utils.js';
+import './index.js';
 
 describe('ArBreadcrumbItem', () => {
     let el: ArBreadcrumbItem;
@@ -11,9 +11,284 @@ describe('ArBreadcrumbItem', () => {
     // ── Rendu ─────────────────────────────────────────────────────────────────
 
     describe('rendu', () => {
-        it("n'a pas de shadow DOM (createRenderRoot retourne this)", async () => {
+        it('a un shadow DOM', async () => {
             el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
-            expect(el.shadowRoot).toBeNull();
+            expect(el.shadowRoot).not.toBeNull();
+        });
+
+        it("ne rend rien tant qu'il n'a pas reçu d'état de rendu", async () => {
+            el = await fixture(
+                '<ar-breadcrumb-item label="Accueil" href="/"></ar-breadcrumb-item>',
+            );
+            expect(el.shadowRoot?.querySelector('.item')).toBeNull();
+            expect(getPart(el, 'link')).toBeNull();
+        });
+
+        it('rend un lien part="link" avec le bon href quand il est intermédiaire', async () => {
+            el = await fixture(
+                '<ar-breadcrumb-item label="Catégorie" href="/cat"></ar-breadcrumb-item>',
+            );
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            const link = getPart(el, 'link');
+            expect(link?.tagName.toLowerCase()).toBe('a');
+            expect(link?.getAttribute('href')).toBe('/cat');
+            expect(link?.textContent?.trim()).toBe('Catégorie');
+        });
+
+        it("n'a pas d'attribut href sur le lien quand href est absent", async () => {
+            el = await fixture('<ar-breadcrumb-item label="Catégorie"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            const link = getPart(el, 'link');
+            expect(link).not.toBeNull();
+            expect(link?.hasAttribute('href')).toBe(false);
+        });
+
+        it('rend un span part="current" (pas un lien) quand il est le dernier', async () => {
+            el = await fixture(
+                '<ar-breadcrumb-item label="Page courante" href="/x"></ar-breadcrumb-item>',
+            );
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            const current = getPart(el, 'current');
+            expect(current?.tagName.toLowerCase()).toBe('span');
+            expect(current?.textContent?.trim()).toBe('Page courante');
+            expect(getPart(el, 'link')).toBeNull();
+        });
+
+        it('desktop : rend un séparateur part="separator" sauf sur le premier item', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')).toBeNull();
+
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')).not.toBeNull();
+            expect(getPart(el, 'separator')?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it("mobile : rend un indicateur à la place du séparateur, avec la variante d'état sur le dernier", async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')).toBeNull();
+            expect(getPart(el, 'indicator')?.getAttribute('part')).toBe('indicator');
+            expect(getPart(el, 'indicator')?.getAttribute('aria-hidden')).toBe('true');
+
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: true,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'indicator')?.getAttribute('part')).toBe(
+                'indicator indicator--current',
+            );
+        });
+
+        it('mobile : le premier item ne rend rien et porte hidden', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: false,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(el.shadowRoot?.querySelector('.item')).toBeNull();
+            expect(el.hasAttribute('hidden')).toBe(true);
+        });
+
+        it('desktop : le premier item ne porte pas hidden', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(false);
+        });
+
+        it('desktop : le séparateur par défaut est un « / » visible', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it('desktop : clone le nœud séparateur fourni, sans le déplacer ni garder son attribut slot', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.setAttribute('slot', 'separator');
+            source.textContent = '›';
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+            });
+            await waitForUpdate(el);
+
+            const rendered = getPart(el, 'separator');
+            expect(rendered?.textContent?.trim()).toBe('›');
+            const clone = rendered?.firstElementChild as HTMLElement;
+            expect(clone).not.toBe(source);
+            expect(clone.hasAttribute('slot')).toBe(false);
+            expect(source.getAttribute('slot')).toBe('separator');
+        });
+
+        it('ne re-clone pas un nœud séparateur déjà cloné, même si son contenu a changé', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.textContent = '›';
+            const base = {
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+            };
+            el.setRenderState(base);
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('›');
+
+            source.textContent = '»';
+            el.setRenderState({ ...base });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('›');
+        });
+
+        it('retombe sur « / » quand le nœud séparateur disparaît', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            const source = document.createElement('span');
+            source.textContent = '›';
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: source,
+            });
+            await waitForUpdate(el);
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'separator')?.textContent?.trim()).toBe('/');
+        });
+
+        it('ne rend jamais de part="connector" — le trait reliant les puces est porté par ar-breadcrumb', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: true,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(getPart(el, 'connector')).toBeNull();
+        });
+    });
+
+    // ── Attributs d'hôte ──────────────────────────────────────────────────────
+
+    describe("attributs d'hôte", () => {
+        it('pose role="listitem"', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: true,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: false,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(el.getAttribute('role')).toBe('listitem');
+        });
+
+        it('pose role="listitem" dès la connexion, avant tout rendu', () => {
+            el = document.createElement('ar-breadcrumb-item') as ArBreadcrumbItem;
+            document.body.appendChild(el);
+            expect(el.getAttribute('role')).toBe('listitem');
+        });
+
+        it('pose aria-current="page" sur le dernier item seulement', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A"></ar-breadcrumb-item>');
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: true,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(el.getAttribute('aria-current')).toBe('page');
+
+            el.setRenderState({
+                isFirst: false,
+                isCurrent: false,
+                isMobile: false,
+                hasPrevious: true,
+                separator: undefined,
+            });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('aria-current')).toBe(false);
         });
     });
 
@@ -153,12 +428,84 @@ describe('ArBreadcrumbItem', () => {
         });
 
         it("ne notifie pas si aucun registry n'est défini", async () => {
-            // Pas d'appel à setRegistry — ne doit pas planter
             el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
-            el.label = 'Autre';
+            expect(() => {
+                el.label = 'Autre';
+            }).not.toThrow();
             await waitForUpdate(el);
-            // Si on arrive ici sans exception, le test passe
-            expect(el.label).toBe('Autre');
+        });
+
+        it('notifie quand href passe de undefined à une valeur après le premier rendu', async () => {
+            el = await fixture('<ar-breadcrumb-item label="Accueil"></ar-breadcrumb-item>');
+            const registry = {
+                registerItem: vi.fn(),
+                unregisterItem: vi.fn(),
+                notifyItemChanged: vi.fn(),
+            };
+            el.setRegistry(registry);
+            registry.notifyItemChanged.mockClear();
+
+            el.href = '/x';
+            await waitForUpdate(el);
+            expect(registry.notifyItemChanged).toHaveBeenCalledOnce();
+        });
+
+        it('ne notifie pas pendant le rendu initial', async () => {
+            const registry = {
+                registerItem: vi.fn(),
+                unregisterItem: vi.fn(),
+                notifyItemChanged: vi.fn(),
+            };
+            el = document.createElement('ar-breadcrumb-item') as ArBreadcrumbItem;
+            el.label = 'Accueil';
+            el.href = '/';
+            el.setRegistry(registry);
+            document.body.appendChild(el);
+            await waitForUpdate(el);
+            expect(registry.notifyItemChanged).not.toHaveBeenCalled();
+        });
+    });
+
+    // ── hidden et role appartenant à l'auteur ─────────────────────────────────
+
+    describe('hidden et role', () => {
+        const desktop = {
+            isFirst: false,
+            isCurrent: false,
+            isMobile: false,
+            hasPrevious: true,
+            separator: undefined,
+        };
+
+        it("conserve un hidden posé par l'auteur lors des mises à jour", async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState(desktop);
+            await waitForUpdate(el);
+            el.hidden = true;
+            el.label = 'B';
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(true);
+        });
+
+        it('masque le premier item en mobile puis retire hidden en desktop', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A" href="/a"></ar-breadcrumb-item>');
+            el.setRenderState({ ...desktop, isFirst: true, isMobile: true, hasPrevious: false });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(true);
+
+            el.setRenderState({ ...desktop, isFirst: true, hasPrevious: false });
+            await waitForUpdate(el);
+            expect(el.hasAttribute('hidden')).toBe(false);
+        });
+
+        it("garde le role posé par l'auteur", async () => {
+            el = await fixture('<ar-breadcrumb-item role="none" label="A"></ar-breadcrumb-item>');
+            expect(el.getAttribute('role')).toBe('none');
+        });
+
+        it('pose role="listitem" par défaut', async () => {
+            el = await fixture('<ar-breadcrumb-item label="A"></ar-breadcrumb-item>');
+            expect(el.getAttribute('role')).toBe('listitem');
         });
     });
 });

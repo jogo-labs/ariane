@@ -11,6 +11,8 @@
  * le cast fourni à l'appel (ex: `fixture<ArAlert>(...)`).
  */
 
+import { vi } from 'vitest';
+
 /** Alias pour contourner le protected de `updateComplete` dans LitElement. */
 type LitEl = { updateComplete: Promise<boolean> };
 
@@ -54,19 +56,20 @@ export async function waitForUpdate(el: Element): Promise<void> {
  *
  * Utiliser pour les assertions négatives (`expect(...).toBeNull()`).
  * Pour les assertions positives avec chaînage, préférer `requirePart`.
+ *
+ * ⚠️ `happy-dom` (environnement DOM de ce projet pour Vitest) a une implémentation
+ * non conforme à la spec de `~=` : elle scinde aussi sur les tirets, pas seulement
+ * sur les espaces. Chercher un token court qui est aussi le suffixe d'un autre part
+ * de l'arbre (ex. `"current"` alors que `"item--current"` existe) peut donc donner
+ * un faux positif dans les tests, alors qu'un vrai navigateur ne matcherait pas.
+ * Toujours passer un seul token exact, jamais une chaîne à espaces (un appel
+ * multi-mots ne matche jamais rien selon la spec `~=`, mais peut passer à tort
+ * sous happy-dom).
  */
 export function getPart(el: Element, part: string): Element | null {
-    return el.shadowRoot?.querySelector(`[part="${part}"]`) ?? null;
+    return el.shadowRoot?.querySelector(`[part~="${part}"]`) ?? null;
 }
 
-/**
- * Retourne un élément du Shadow DOM ciblé par son attribut `part="…"`.
- * Lance une erreur de test si le part est absent.
- *
- * Utiliser quand le part est censé exister et qu'on veut enchaîner des
- * appels dessus (`.getAttribute`, `.classList`, `.click()`, etc.)
- * sans avoir à gérer le cas `null` dans chaque assertion.
- */
 /**
  * Retourne le shadowRoot d'un élément.
  * Lance une erreur de test si le shadowRoot est absent.
@@ -76,9 +79,37 @@ export function requireShadow(el: Element): ShadowRoot {
     return el.shadowRoot;
 }
 
+/**
+ * Retourne un élément du Shadow DOM ciblé par son attribut `part="…"`.
+ * Lance une erreur de test si le part est absent.
+ *
+ * Utiliser quand le part est censé exister et qu'on veut enchaîner des
+ * appels dessus (`.getAttribute`, `.classList`, `.click()`, etc.)
+ * sans avoir à gérer le cas `null` dans chaque assertion.
+ *
+ * ⚠️ Même mise en garde `~=`/happy-dom que `getPart` — toujours un seul token exact.
+ */
 export function requirePart(el: Element, part: string): Element {
-    const found = el.shadowRoot?.querySelector(`[part="${part}"]`);
+    const found = el.shadowRoot?.querySelector(`[part~="${part}"]`);
     if (!found)
         throw new Error(`Part "${part}" not found in shadow DOM of <${el.tagName.toLowerCase()}>`);
     return found;
+}
+
+/**
+ * happy-dom n'implémente pas l'API Popover native (`showPopover`/`hidePopover`) — mock ces
+ * méthodes sur le part flottant d'un composant (`ar-dropdown`, `ar-breadcrumb`, `ar-tooltip`…)
+ * pour que `Popover.isOpen` (utils/popover.ts) reflète un état réel dans les tests unitaires.
+ *
+ * Le comportement natif complet (`:popover-open`, light-dismiss, événement `toggle`) reste
+ * couvert par les tests navigateur (`*.browser.test.ts`, WTR) — ne pas chercher à le simuler ici.
+ *
+ * @param part - Nom du `part` shadow DOM portant `popover="auto"` (défaut : "panel").
+ */
+export function mockPopoverPanel(el: Element, part = 'panel'): void {
+    const target = getPart(el, part) as
+        (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null;
+    if (!target) return;
+    target.showPopover = vi.fn();
+    target.hidePopover = vi.fn();
 }

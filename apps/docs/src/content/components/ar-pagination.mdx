@@ -1,28 +1,39 @@
 ---
 tagName: ar-pagination
 title: Pagination
-description: Description du composant ar-pagination.
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Pagination sans attributs (valeurs par défaut du composant).
       html: |
           <ar-pagination></ar-pagination>
     - name: 20-pages
       label: 20 pages
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 10 active (milieu de la liste).
       html: |
           <ar-pagination current="10" total="20"></ar-pagination>
     - name: 20-pages-start
       label: 20 pages (current en début)
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 5 active (début de la liste).
       html: |
           <ar-pagination current="5" total="20"></ar-pagination>
     - name: 20-pages-end
       label: 20 pages (current en fin)
-      description: Rendu par défaut du composant.
+      description: Pagination à 20 pages, page 18 active (fin de la liste).
       html: |
           <ar-pagination current="18" total="20"></ar-pagination>
+    - name: compact
+      label: Mode compact
+      description: Mode compact — uniquement précédent/suivant et un label de position, identique en mobile et desktop.
+      html: |
+          <ar-pagination compact current="4" total="12"></ar-pagination>
+pageScript: |
+    <script>
+        document.addEventListener('ar-pagination-page-change', (e) => {
+            /* Mettez à jour le contenu de la page, puis la page active du composant */
+            e.target.current = e.detail.to;
+        });
+    </script>
 ---
 
 import WcagRef from '../../components/WcagRef.astro';
@@ -31,26 +42,48 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-- `role="navigation"` et `aria-labelledby` posés sur le conteneur — la région est annoncée
-  par les lecteurs d'écran comme zone de navigation.
+- `role="navigation"` et `aria-labelledby` posés sur le conteneur, dont le nom inclut la position
+  courante ("Pagination, page 4 sur 12") — repérable immédiatement en navigation par régions,
+  sans avoir à explorer les liens pour savoir où on en est.
 - Les boutons "précédent" et "suivant" ont `aria-disabled` synchronisé avec leur état désactivé —
     <WcagRef
         criterion="4.1.2"
         summary="Name, Role, Value : tout composant UI doit exposer son nom, rôle et valeur (états inclus) aux technologies d'assistance."
     />
+- Chaque lien de page et les boutons "précédent"/"suivant" indiquent le nombre total de pages
+  ("Page 4 sur 12") — la position dans la liste (début, milieu, fin) est compréhensible en
+  navigation clavier/lecteur d'écran, sans avoir à deviner si une page est la dernière.
+- La page active porte `aria-current="page"`.
 - Les séparateurs et points de suspension sont masqués aux lecteurs d'écran (`aria-hidden`).
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Annoncer le changement de page.** La pagination ne gère pas le rechargement de contenu —
-  c'est à l'intégrateur d'annoncer le nouveau contenu chargé (via une live region ou un focus
+  c'est à vous d'annoncer le nouveau contenu chargé (via une live region ou un focus
   management) pour que l'utilisateur clavier sache que la page a changé.
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
+- **`current` ne change que si vous le réassignez.** Le focus et l'annonce aria-live suivent
+  cette réassignation — mettez-la à jour de façon synchrone (voir la section Utilisation) pour
+  qu'ils restent cohérents avec l'action de l'utilisateur.
 
 ## Comportement responsive
 
-En dessous de **640px**, le composant réduit automatiquement le nombre de pages affichées :
+Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
+Lorsque l'espace disponible n'est plus jugé suffisant, les numéros de page sont remplacés par un `<select>` de saut de page,
+peuplé du même jeu de pages qu'à largeur confortable — sauf en mode `compact`, qui ne bascule jamais et reste identique quelle
+que soit la largeur. Ce mode n'offre donc aucun filet de sécurité anti-débordement à largeur extrême (contrairement au mode
+adaptatif par défaut) : à vous de vérifier que le label et les boutons prev/next restent lisibles dans le contexte d'usage visé
+(ex. panneau de détail, drawer).
 
-- Seules les pages **précédente**, **active**, **suivante** et les deux voisines directes restent visibles.
-- Les autres pages sont masquées — aucune configuration nécessaire.
+## Utilisation
+
+Lorsque l'utilisateur souhaite changer de page, un événement `ar-pagination-page-change` est émis avec `{ from, to }` dans `event.detail`.
+Mettez à jour la propriété `current` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'état du composant de pagination.
+
+```js
+document.addEventListener('ar-pagination-page-change', (e) => {
+    /* Mettez à jour le contenu de la page, puis la page active du composant */
+    e.target.current = e.detail.to;
+});
+```

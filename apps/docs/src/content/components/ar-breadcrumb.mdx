@@ -1,25 +1,36 @@
 ---
 tagName: ar-breadcrumb
 title: Breadcrumb
-description: Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
 variants:
     - name: default
       label: Par défaut
-      description: Rendu par défaut du composant.
+      description: Fil d'ariane avec 3 niveaux, le dernier élément actif.
       html: |
           <ar-breadcrumb>
-            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item 1" href="/item-1"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item 2" href="/item-2"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item actuel"></ar-breadcrumb-item>
           </ar-breadcrumb>
-    - name: dark
-      label: Thème sombre
-      description: Variante avec le thème sombre activé.
+    - name: custom-separator
+      label: Séparateur personnalisé
+      description: Un contenu posé dans le slot separator remplace le « / » par défaut ; il est cloné entre chaque item.
       html: |
-          <ar-breadcrumb dark>
-            <ar-breadcrumb-item label="Accueil Espace Personnel" href="/accueil"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Mon journal de recherche d'emploi" href="/journal"></ar-breadcrumb-item>
-            <ar-breadcrumb-item label="Publiez vos offres d'emploi"></ar-breadcrumb-item>
+          <ar-breadcrumb>
+            <span slot="separator">›</span>
+            <ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item-1" href="/journal"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item actuel"></ar-breadcrumb-item>
+          </ar-breadcrumb>
+    - name: custom-separator-icon
+      label: Séparateur en icône
+      description: Une icône SVG comme séparateur ; le contenu slotté fixe sa propre taille (width et height).
+      html: |
+          <ar-breadcrumb>
+            <svg slot="separator" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <ar-breadcrumb-item label="Accueil" href="/accueil"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item-1" href="/journal"></ar-breadcrumb-item>
+            <ar-breadcrumb-item label="Item actuel"></ar-breadcrumb-item>
           </ar-breadcrumb>
 ---
 
@@ -42,7 +53,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - En mobile, le bouton "dropdown" expose son état via `aria-expanded`. Son label est vocalisé
   via une classe `.sr-only` — accessible sans être visible.
 
-### À la charge de l'auteur
+### À votre charge
 
 - **Labels descriptifs sur chaque item.** Le `label` est le seul texte vocalisé — évitez les
   labels génériques ("Page 1", "Étape") au profit de libellés qui situent l'utilisateur
@@ -57,3 +68,17 @@ En dessous de **768px**, le composant bascule automatiquement vers un affichage 
 - Le dropdown expose son état via `aria-expanded` — le comportement clavier et vocal est géré automatiquement.
 
 Pour observer ce rendu, utiliser les DevTools du navigateur en mode responsive.
+
+## Utilisation
+
+### Écouter l'ouverture/fermeture du dropdown mobile
+
+En dessous de 768px, `ar-breadcrumb` émet `ar-breadcrumb-show`/`ar-breadcrumb-shown` (annulable puis confirmé) et `ar-breadcrumb-hide`/`ar-breadcrumb-hidden` à chaque changement d'état du dropdown condensé, avec `detail: { id }` :
+
+```js
+const breadcrumb = document.querySelector('ar-breadcrumb');
+breadcrumb.addEventListener('ar-breadcrumb-shown', () => console.log('Dropdown ouvert'));
+breadcrumb.addEventListener('ar-breadcrumb-hidden', () => console.log('Dropdown fermé'));
+```
+
+Ces événements se déclenchent à chaque changement d'état du dropdown : clic sur le bouton toggle, mise à jour programmatique de la prop `open`, ou fermeture externe (clic en dehors, `Escape`) — pratique pour synchroniser un état d'UI externe ou pour de l'analytics.

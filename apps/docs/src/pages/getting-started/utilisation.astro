@@ -1,25 +1,29 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+import NextStep from '../../components/NextStep.astro';
 
 const tocEntries = [
-    { id: 'composants',       label: 'Utiliser les composants', level: 1 as const },
-    { id: 'chargement',       label: 'Attendre le chargement',  level: 1 as const },
-    { id: 'headless',         label: 'Modèle headless',         level: 1 as const },
-    { id: 'personnalisation', label: 'Personnalisation CSS',    level: 1 as const },
-    { id: 'tokens',           label: 'Design Tokens',           level: 1 as const },
+    { id: 'composants',  label: 'Utiliser les composants',  level: 1 as const },
+    { id: 'chargement',  label: 'Attendre le chargement',   level: 1 as const },
+    { id: 'attributs',   label: 'Attributs & propriétés',   level: 1 as const },
+    { id: 'slots',       label: 'Slots',                    level: 1 as const },
+    { id: 'evenements',  label: 'Événements',                level: 1 as const },
+    { id: 'methodes',    label: 'Méthodes',                  level: 1 as const },
+    { id: 'ide-autocomplete', label: 'Autocomplétion IDE',   level: 1 as const },
 ];
 
-const codeHtml = `<ar-alert version="success">
-  <span slot="title">Succès</span>
-  <span slot="content">Votre message a bien été envoyé.</span>
+const codeHtml = `<ar-alert variant="success">
+  Votre message a bien été envoyé.
 </ar-alert>
 
 <ar-spinner></ar-spinner>`;
 
 const codeWhenDefined = `await customElements.whenDefined('ar-alert');
 const alert = document.querySelector('ar-alert');
-alert.setAttribute('version', 'success');`;
+alert.setAttribute('variant', 'success');`;
 
 const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
 await whenAllDefined();
@@ -33,19 +37,54 @@ const codeWhenAllDefinedCdn = `const tags = [...new Set(
 await Promise.all(tags.map(tag => customElements.whenDefined(tag)));
 // Tous les composants ar-* sont prêts`;
 
-const codeCustomProps = `ar-alert {
-    --ar-alert-info-bg:   #f5f0ff;
-    --ar-alert-info-icon: #7c3aed;
-}`;
+const codeAttribute = `<ar-pagination current="1" total="10"></ar-pagination>`;
 
-const codeTokens = `:root {
-    --ar-color-interactive: #7c3aed;
-    --ar-border-radius-md:  0.75rem;
+const codeBooleanAttribute = `<!-- Ces deux écritures activent "compact" -->
+<ar-pagination compact></ar-pagination>
+<ar-pagination compact="false"></ar-pagination>
+
+<!-- Seule l'absence de l'attribut le désactive -->
+<ar-pagination></ar-pagination>`;
+
+const codeJsProperty = `const datepicker = document.querySelector('ar-datepicker');
+
+// Désactive les dimanches
+datepicker.isDateDisabled = (date) => date.getDay() === 0;`;
+
+const codeDefaultSlot = `<ar-dialog label="Confirmation">
+  <p>Voulez-vous vraiment supprimer cet élément ?</p>
+</ar-dialog>`;
+
+const codeNamedSlot = `<ar-collapse>
+  <button slot="trigger">Afficher les détails</button>
+  <p>Contenu affiché/masqué au clic sur le déclencheur.</p>
+</ar-collapse>`;
+
+const codeEventListener = `const pagination = document.querySelector('ar-pagination');
+
+pagination.addEventListener('ar-pagination-page-changed', (event) => {
+    console.log(\`Page changée : \${event.detail.from} → \${event.detail.to}\`);
+});`;
+
+const codeMethodCall = `<ar-collapse>
+    <button slot="trigger" class="ar-btn ar-btn-secondary">Révéler le contenu</button>
+    <p>Contenu qui se révèle à l'ouverture</p>
+</ar-collapse>
+
+<script>
+    const collapse = document.querySelector('ar-collapse');
+    collapse.show();
+</script>`;
+
+const codeVsCodeSettings = `{
+    "html.customData": ["node_modules/@ariane-ui/core/dist/vscode.html-custom-data.json"],
+    "css.customData": ["node_modules/@ariane-ui/core/dist/vscode.css-custom-data.json"]
 }`;
 ---
 
 <Layout
     title="Utilisation"
+    description="Configurer un composant Ariane : attributs, propriétés, slots, événements, méthodes."
     currentPath="/getting-started/utilisation"
     showToc={true}
 >
@@ -53,98 +92,127 @@ const codeTokens = `:root {
         <div class="page-header">
             <h2 class="page-title">Utilisation</h2>
             <p class="summary">
-                Ces exemples supposent que vous avez suivi le
-                <a href="/getting-started/quickstart">Démarrage rapide</a>.
+                Ces exemples supposent que vous avez suivi le guide de <a href="/getting-started/quickstart">Démarrage rapide</a>.<br />
                 Ils s'appliquent quel que soit le mode d'intégration (CDN ou npm).
             </p>
         </div>
 
-        <section id="composants" class="main-section">
-            <div>
-                <h3 class="section-title">Utiliser les composants</h3>
-                <p>
-                    Les composants sont des Custom Elements natifs — ils s'utilisent directement
-                    en HTML, aucun framework requis.
-                </p>
-            </div>
+        <div class="narrative">
+            <NarrativeHeading id="composants">Utiliser les composants</NarrativeHeading>
+            <p>
+                Les composants sont des Custom Elements natifs — ils s'utilisent directement
+                en HTML, aucun framework requis.
+            </p>
             <pre><code class="language-html" set:text={codeHtml} /></pre>
-        </section>
 
-        <section id="chargement" class="main-section">
-            <div>
-                <h3 class="section-title">Attendre le chargement</h3>
-                <p>
-                    Les Custom Elements s'enregistrent de manière asynchrone. Si votre code
-                    JavaScript interagit avec un composant au chargement de la page, attendez
-                    qu'il soit défini avant d'agir dessus.
-                </p>
-            </div>
-
-            <section class="subsection">
-                <h4 class="subsection-title">Un composant individuel</h4>
-                <pre><code class="language-js" set:text={codeWhenDefined} /></pre>
-            </section>
-
-            <section class="subsection">
-                <h4 class="subsection-title">Tous les composants Ariane présents dans la page</h4>
-                <p>Via npm :</p>
-                <pre><code class="language-js" set:text={codeWhenAllDefinedNpm} /></pre>
-                <p>Via CDN (sans import) :</p>
-                <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
-            </section>
-        </section>
-
-        <section id="headless" class="main-section">
-            <div>
-                <h3 class="section-title">Modèle headless</h3>
-                <p>
-                    Ariane est une librairie <strong>headless</strong> : les composants ne portent
-                    aucun style visuel par défaut. Couleurs, espacements et typographie proviennent
-                    exclusivement du fichier de thème chargé séparément.
-                </p>
-                <p>
-                    Sans thème, les composants fonctionnent (accessibilité, interactions, slots)
-                    mais leur rendu visuel est indéfini. C'est intentionnel — Ariane est une
-                    fondation sur laquelle construire un design system, pas un kit d'UI clé en main.
-                </p>
-                <p>
-                    Les exemples de cette documentation utilisent <code>themes/default.css</code>.
-                    Vous pouvez le remplacer par votre propre thème en définissant les tokens CSS
-                    de chaque composant sur <code>:root</code>.
-                </p>
-            </div>
-        </section>
-
-        <section id="personnalisation" class="main-section">
-            <div>
-                <h3 class="section-title">Personnalisation CSS</h3>
-                <p>
-                    Chaque composant expose des <strong>CSS Custom Properties</strong> pour adapter
-                    l'apparence sans surcharger les styles internes.
-                </p>
-            </div>
-            <pre><code class="language-css" set:text={codeCustomProps} /></pre>
+            <NarrativeHeading id="chargement">Attendre le chargement</NarrativeHeading>
             <p>
-                Les propriétés disponibles par composant sont listées dans la section
-                <strong>Référence API</strong> de chaque page de composant.
+                Les Custom Elements s'enregistrent de manière asynchrone. Si votre code
+                JavaScript interagit avec un composant au chargement de la page, attendez
+                qu'il soit défini avant d'agir dessus.
             </p>
-        </section>
 
-        <section id="tokens" class="main-section">
-            <div>
-                <h3 class="section-title">Design Tokens</h3>
-                <p>
-                    Les valeurs globales (couleurs, espacements, typographie) viennent du fichier
-                    de thème <code>themes/default.css</code>. Surchargez-les via <code>:root</code>
-                    pour modifier l'ensemble de la librairie :
-                </p>
-            </div>
-            <pre><code class="language-css" set:text={codeTokens} /></pre>
+            <NarrativeSubheading>Un composant individuel</NarrativeSubheading>
+            <pre><code class="language-js" set:text={codeWhenDefined} /></pre>
+
+            <NarrativeSubheading>Tous les composants Ariane présents dans la page</NarrativeSubheading>
+            <p>Via npm :</p>
+            <pre><code class="language-js" set:text={codeWhenAllDefinedNpm} /></pre>
+            <p>Via CDN (sans import) :</p>
+            <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
+
+            <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
             <p>
-                Consultez la page <a href="/foundations/tokens">Design Tokens</a> pour la liste
-                complète des variables disponibles.
+                Comme tout élément HTML, les composants Ariane se configurent par <strong>attributs</strong>
+                (valeur texte, visible dans le HTML) ou par <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
+                y compris un objet ou une fonction).
             </p>
-        </section>
+            <pre><code class="language-html" set:text={codeAttribute} /></pre>
+            <p>
+                Les attributs booléens suivent la convention native : leur simple
+                présence suffit à activer le comportement, peu importe leur valeur.
+            </p>
+            <pre><code class="language-html" set:text={codeBooleanAttribute} /></pre>
+            <p class="hint">
+                Une <strong>propriété</strong> ne se pose qu'en JavaScript, jamais en
+                attribut HTML — c'est le cas dès que la valeur n'est pas une chaîne de
+                caractères (fonction, tableau, objet). Par exemple, <code>ar-datepicker</code> expose
+                une propriété <code>isDateDisabled</code> pour désactiver certaines dates :
+            </p>
+            <pre><code class="language-js" set:text={codeJsProperty} /></pre>
+            <p class="hint">
+                La liste complète des attributs et propriétés de chaque composant est
+                documentée dans sa <strong>Référence API</strong>, section
+                « Attributs & Propriétés ».
+            </p>
+
+            <NarrativeHeading id="slots">Slots</NarrativeHeading>
+            <p>
+                Les <code>&lt;slot&gt;</code> permettent de projeter votre propre
+                contenu à un emplacement précis du composant. Le <strong>slot par
+                défaut</strong> (sans attribut <code>slot</code>) reçoit le contenu
+                principal :
+            </p>
+            <pre><code class="language-html" set:text={codeDefaultSlot} /></pre>
+            <p>
+                Un <strong>slot nommé</strong> cible un emplacement spécifique via
+                l'attribut <code>slot</code> sur l'élément projeté — par exemple, le
+                déclencheur d'<code>ar-collapse</code> :
+            </p>
+            <pre><code class="language-html" set:text={codeNamedSlot} /></pre>
+            <p class="hint">
+                Les slots disponibles pour chaque composant sont documentés dans la partie <strong>Référence API</strong>, section « Slots ».
+            </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/fr/docs/Web/API/Web_components/Using_templates_and_slots"
+                target="_blank" rel="noopener">documentation complète sur MDN</a>.
+            </p>
+
+            <NarrativeHeading id="evenements">Événements</NarrativeHeading>
+            <p>
+                Les composants Ariane émettent des <code>CustomEvent</code> standards,
+                préfixés par le nom du tag (<code>ar-pagination-page-changed</code>, <code>ar-collapse-shown</code>...). Écoutez-les comme n'importe quel
+                événement DOM :
+            </p>
+            <pre><code class="language-js" set:text={codeEventListener} /></pre>
+            <p>
+                Les événements <strong>annulables</strong> sont indiqués dans la colonne « Annulable » de leur partie <strong>Référence API</strong>.
+            </p>
+            <p class="hint">
+                La liste complète des événements de chaque composant, avec le type de leur <code>detail</code>, est documentée dans la partie <strong>Référence API</strong>, section
+                « Événements ».
+            </p>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
+                target="_blank" rel="noopener">documentation complète sur MDN</a>.
+            </p>
+
+            <NarrativeHeading id="methodes">Méthodes</NarrativeHeading>
+            <p>
+                Certaines actions s'appellent directement en JavaScript sur l'élément,
+                une fois le composant défini :
+            </p>
+            <pre><code class="language-html" set:text={codeMethodCall} /></pre>
+            <p class="hint">
+                La liste des méthodes disponibles par composant est documentée dans sa partie <strong>Référence API</strong>, section « Méthodes ». <br />
+                Voir aussi la section précédente <a href="#chargement">Attendre le chargement</a> pour garantir que le
+                composant est prêt avant d'appeler une méthode.
+            </p>
+
+            <NarrativeHeading id="ide-autocomplete">Autocomplétion IDE</NarrativeHeading>
+            <p>
+                Le paquet npm publie des fichiers de données VS Code générés automatiquement
+                depuis le Custom Elements Manifest — autocomplétion des tags <code>ar-*</code>,
+                de leurs attributs, et des custom properties CSS (<code>--ar-*</code>).
+                Référencez-les dans le <code>.vscode/settings.json</code> de votre projet :
+            </p>
+            <pre><code class="language-json" set:text={codeVsCodeSettings} /></pre>
+        </div>
+
+        <NextStep
+            label="Prochaine étape :"
+            links={[{ href: '/theming/overview', label: 'Appliquez un style à vos composants' }]}
+        />
     </div>
 
     <TableOfContents entries={tocEntries} slot="toc" />
@@ -152,15 +220,4 @@ const codeTokens = `:root {
 
 <style>
     @import '../../styles/doc-prose.css';
-
-    .page-summary {
-        margin-top: 0.5rem;
-        color: var(--doc-text-muted);
-    }
-
-    .hint {
-        font-size: 0.875rem;
-        color: var(--doc-text-muted);
-        margin-top: -0.5rem;
-    }
 </style>

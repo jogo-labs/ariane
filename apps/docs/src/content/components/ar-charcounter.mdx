@@ -1,0 +1,91 @@
+---
+tagName: ar-charcounter
+title: Char Counter
+playgroundTemplate: default
+variants:
+    - name: default
+      label: Par défaut
+      description: |
+          Compteur lié à un champ texte via `for`. Affiche le nombre de caractères restants.
+          Passe en état `warning` quand il reste ≤ 20 % de la limite (seuil par défaut),
+          puis en état `error` quand la limite est dépassée.
+      html: |
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-default">Message</label>
+              <textarea class="ar-input" id="cc-default" rows="3"></textarea>
+              <ar-charcounter id="cc-default-counter" for="cc-default" max="100"></ar-charcounter>
+          </div>
+    - name: warning
+      label: Seuil d'avertissement personnalisé
+      description: |
+          `warn-threshold="15"` déclenche l'état `warning` quand il reste ≤ 15 caractères.
+          La zone de texte est pré-remplie pour illustrer l'état d'avertissement (45 caractères sur 60).
+      html: |
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-warn">Description</label>
+              <textarea class="ar-input" id="cc-warn" rows="3">Voici un exemple de texte assez long pour déclencher</textarea>
+              <ar-charcounter id="cc-warn-counter" for="cc-warn" max="60" warn-threshold="15"></ar-charcounter>
+          </div>
+    - name: icon
+      label: Icônes dans les slots
+      description: |
+          Les slots `warning-icon` et `error-icon` permettent d'ajouter un signal non-couleur
+          conforme WCAG 1.4.1. Le contenu du slot est rendu à côté du compteur dans l'état correspondant.
+      html: |
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-icon">Commentaire</label>
+              <textarea class="ar-input" id="cc-icon" rows="3"></textarea>
+              <ar-charcounter id="cc-icon-counter" for="cc-icon" max="80">
+                  <span slot="warning-icon" aria-hidden="true">⚠️</span>
+                  <span slot="error-icon" aria-hidden="true">❌</span>
+              </ar-charcounter>
+          </div>
+    - name: label
+      label: Label personnalisé
+      description: |
+          La prop `label` accepte la syntaxe `"singulier|pluriel"` — le composant choisit
+          automatiquement la forme selon le nombre de caractères restants. Le même label
+          est utilisé dans les annonces `aria-live` : l'annonce de passage en avertissement
+          dit par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
+          Sans pipe, le label est utilisé tel quel (compatibilité descendante).
+      html: |
+          <div class="ar-field-group" style="max-width:400px;">
+              <label class="ar-label" for="cc-label">Bio</label>
+              <textarea class="ar-input" id="cc-label" rows="3"></textarea>
+              <ar-charcounter id="cc-label-counter" for="cc-label" max="150" label="character remaining|characters remaining"></ar-charcounter>
+          </div>
+---
+
+import WcagRef from '../../components/WcagRef.astro';
+
+## Accessibilité
+
+### Pris en charge automatiquement
+
+`ar-charcounter` gère les annonces et états sémantiques sans intervention de votre part :
+
+- Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés.
+- Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants et le label pluralisé — par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
+- Une région `aria-live="assertive"` annonce le dépassement avec son ampleur dès que l'état `error` est atteint — par exemple _"Limite dépassée de 1 caractère"_ ou _"Limite dépassée de 3 caractères"_.
+- Les régions `aria-live` sont vidées au retour à l'état `normal` (ou lors de la transition `error → warning`), ce qui garantit la ré-annonce si l'utilisateur repasse dans le même état.
+- L'attribut `data-ar-char-state` (`"warning"` ou `"error"`) est posé sur le champ observé et sur ses `<label>` liés — retiré automatiquement au retour à l'état `normal`. Il vous permet de styler le champ en réponse à l'état sans JavaScript supplémentaire.
+
+Les critères WCAG suivants sont implémentés :
+
+- le compteur est lié programmatiquement au champ via `aria-describedby` géré automatiquement (<WcagRef criterion="1.3.1" summary="Info and Relationships : le compteur lié via aria-describedby est disponible programmatiquement pour les technologies d'assistance." />)
+- les régions `aria-live` annoncent le passage en avertissement et le dépassement de limite sans déplacer le focus (<WcagRef criterion="4.1.3" summary="Status Messages : les régions aria-live annoncent warning et error sans déplacer le focus." />)
+
+### À votre charge
+
+- `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
+
+```js
+form.addEventListener('submit', (e) => {
+    if (textarea.value.length > max) {
+        e.preventDefault();
+        textarea.setAttribute('aria-invalid', 'true');
+    }
+});
+```
+
+- L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="1.4.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.

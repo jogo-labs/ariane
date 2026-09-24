@@ -1,7 +1,7 @@
-import { LitElement, type TemplateResult, html, type CSSResultGroup } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { type TemplateResult, html, type CSSResultGroup } from 'lit';
+import { ArianeElement } from '../../base/ariane-element.js';
+import { property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import utilitiesStyles from '../../styles/utilities.styles.js';
 import { warn } from '../../utils/warn.js';
 import styles from './progressbar.styles.js';
 
@@ -12,7 +12,7 @@ export class ArProgressbarConfig {
 }
 
 /**
- * @summary Barre de progression accessible avec label et affichage du pourcentage.
+ * @summary Affiche l'avancement d'une opération en cours sous forme de barre horizontale. À utiliser pour un upload de fichier, un parcours en plusieurs étapes, ou toute tâche à progression mesurable.
  * @display demo
  *
  * La valeur de `percent` est automatiquement bornée entre 0 et 100.
@@ -20,27 +20,22 @@ export class ArProgressbarConfig {
  *
  * @slot - Label décrivant ce que mesure la barre (ex: "Chargement du fichier").
  *
- * @csspart container    - Le `<div>` englobant l'ensemble du composant.
+ * @csspart progressbar  - Racine du composant.
  * @csspart label        - Le `<p>` contenant le slot et le pourcentage.
  * @csspart label-text   - Le `<span>` autour du slot.
  * @csspart percent      - Le `<strong>` affichant la valeur numérique du pourcentage.
  * @csspart track        - Le `<div>` représentant le fond de la barre (rail).
  * @csspart bar          - Le `<div>` représentant la progression (la partie remplie).
  *
- * @cssprop [--ar-progressbar-track-color=var(--ar-color-bg-subtle)]   - Couleur du rail (fond).
- * @cssprop [--ar-progressbar-fill-color=var(--ar-color-interactive)]  - Couleur de la progression.
- * @cssprop [--ar-progressbar-percent-color=var(--ar-color-text-muted)] - Couleur du texte du pourcentage.
+ * @cssprop --ar-progressbar-track-color - Couleur du rail (fond). Repli `ButtonFace` si aucun thème n'est chargé (WCAG 1.4.11).
+ * @cssprop --ar-progressbar-fill-color - Couleur de la progression. Repli `ButtonText` si aucun thème n'est chargé (WCAG 1.4.11).
+ * @cssprop --ar-progressbar-max-width - Largeur maximale du composant. Repli `500px` si aucun thème n'est chargé — sans plafond, le pourcentage peut s'éloigner visuellement de son label sur un conteneur très large.
  */
-@customElement('ar-progressbar')
-export class ArProgressbar extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, styles];
-
-    /** Nom du composant affiché dans les logs */
-    static readonly NAME = 'ArProgressbar';
+export class ArProgressbar extends ArianeElement {
+    static override styles: CSSResultGroup = [styles];
 
     /**
      * Pourcentage de complétion. Automatiquement borné entre 0 et 100.
-     * @attr percent
      */
     @property({ reflect: true, useDefault: true, type: Number })
     percent = 0;
@@ -62,17 +57,16 @@ export class ArProgressbar extends LitElement {
         // Clamp défensif : même si la propriété est bornée, une valeur HTML arbitraire peut passer
         const percentValue = Math.max(0, Math.min(100, this.percent));
 
-        return html` <div part="container" class="progressbar-container">
-            <p part="label" id="progressbar-label" class="progress-label">
-                <span part="label-text" class="content-label">
+        return html` <div part="progressbar">
+            <p part="label" id="progressbar-label">
+                <span part="label-text">
                     <slot></slot>
                 </span>
-                <strong part="percent" class="progress-percent">${percentValue}%</strong>
+                <strong part="percent">${percentValue}%</strong>
             </p>
-            <div part="track" class="progress d-inline-flex">
+            <div part="track">
                 <div
                     part="bar"
-                    class="progress-bar"
                     style=${styleMap({ width: percentValue + '%' })}
                     role="progressbar"
                     aria-labelledby="progressbar-label"
@@ -82,11 +76,5 @@ export class ArProgressbar extends LitElement {
                 ></div>
             </div>
         </div>`;
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-progressbar': ArProgressbar;
     }
 }

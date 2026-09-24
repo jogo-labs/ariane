@@ -2,14 +2,14 @@
  * doc-table.css
  *
  * Styles partagés pour les tableaux et titres de section de la documentation :
- * utilisés par ComponentApi.astro et tokens.astro.
+ * utilisés par ComponentApi.astro et personnalisation-avancee.astro.
  */
 
 .table-wrap {
     overflow-x: auto;
 }
 
-.subsection-title + .table-wrap {
+.subsection-title-row + .table-wrap {
     margin-top: 1rem;
 }
 
@@ -22,35 +22,34 @@ table {
 th {
     text-align: left;
     padding: 0.5rem 0.75rem;
-    background: var(--doc-nav-bg, #f9fafb);
-    color: var(--doc-text, #111827);
-    font-weight: 600;
-    border-bottom: 1px solid var(--doc-border, #e5e7eb);
+    background: var(--doc-nav-bg);
+    color: var(--doc-text);
+    font-weight: var(--doc-font-weight-semibold);
+    border-bottom: 1px solid var(--doc-border);
 }
 
 td {
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--doc-border, #f3f4f6);
+    border-bottom: 1px solid var(--doc-border);
     vertical-align: top;
-    color: var(--doc-text, #111827);
+    color: var(--doc-text);
+}
+
+/* La première colonne (Nom) se cale sur son contenu (nom de token/attribut,
+   généralement court et sans espace) au lieu de rétrécir sous la pression
+   d'une colonne Description longue — les colonnes suivantes se partagent
+   l'espace restant. */
+th:first-child,
+td:first-child {
+    width: 1%;
+    white-space: nowrap;
 }
 
 code {
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-family: var(--doc-font-mono);
     font-size: 0.8rem;
-    background: var(--doc-accent-bg, #f3efff);
-    color: var(--doc-accent, #7c3aed);
+    background: var(--doc-accent-bg);
+    color: var(--doc-accent);
     padding: 0.1em 0.35em;
     border-radius: 0.25em;
-}
-
-.swatch {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 4px;
-    outline: var(--doc-swatch-outline, 1px solid rgba(0, 0, 0, 0.25));
-    outline-offset: 1px;
-    vertical-align: middle;
-    margin-right: 0.5rem;
 }

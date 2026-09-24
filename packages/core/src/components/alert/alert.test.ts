@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ArAlert } from './alert.js';
 import { fixture, waitForUpdate, getPart, requirePart, requireShadow } from '../../test-utils.js';
-import './alert.js';
+import './index.js';
+
+// LocalizeController résout la langue via document.documentElement.lang, avec
+// navigator.language comme secours (happy-dom retourne 'en-US' par défaut).
+// En production, le site de doc pose lang="fr" sur <html> ; on reproduit ça ici
+// pour que les assertions FR par défaut restent valides sans lang explicite.
+document.documentElement.lang = 'fr';
 
 describe('ArAlert', () => {
     let el: ArAlert;
@@ -50,7 +56,7 @@ describe('ArAlert', () => {
         });
 
         it('le bouton close est absent sans next-focus', () => {
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
     });
 
@@ -76,9 +82,9 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('alert');
         });
 
-        it('variant="success" donne role="alert" au host', async () => {
+        it('variant="success" donne role="status" au host', async () => {
             el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
+            expect(el.getAttribute('role')).toBe('status');
         });
 
         it('variant="info" donne role="status" au host', async () => {
@@ -86,10 +92,121 @@ describe('ArAlert', () => {
             expect(el.getAttribute('role')).toBe('status');
         });
 
+        it('un variant custom inconnu donne role="status" (défaut sûr)', async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
         it('without-notification supprime le role du host', async () => {
             el = await fixture('<ar-alert without-notification></ar-alert>');
-            // Lit utilise `nothing` pour ne pas rendre l'attribut du tout
             expect(el.hasAttribute('role')).toBe(false);
+        });
+    });
+
+    // ── Prop urgent (override du rôle) ──────────────────────────────────────
+
+    describe('prop urgent', () => {
+        it('urgent est undefined par défaut', async () => {
+            el = await fixture('<ar-alert></ar-alert>');
+            expect(el.urgent).toBeUndefined();
+        });
+
+        it('la seule présence de l\'attribut urgent force role="alert"', async () => {
+            el = await fixture('<ar-alert variant="success" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent en absence ne force pas role="status" (retombe sur la table)', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+        });
+
+        it('urgent=false (JS) force role="status" même sur un variant "error"', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            el.urgent = false;
+            await waitForUpdate(el);
+            expect(el.getAttribute('role')).toBe('status');
+        });
+
+        it("urgent est prioritaire sur withoutNotification=false mais pas l'inverse", async () => {
+            el = await fixture(
+                '<ar-alert variant="success" urgent without-notification></ar-alert>',
+            );
+            expect(el.hasAttribute('role')).toBe(false);
+        });
+
+        it("removeAttribute('urgent') retombe sur undefined (pas sur false)", async () => {
+            el = await fixture('<ar-alert variant="error" urgent></ar-alert>');
+            expect(el.getAttribute('role')).toBe('alert');
+            el.removeAttribute('urgent');
+            await waitForUpdate(el);
+            expect(el.urgent).toBeUndefined();
+            expect(el.getAttribute('role')).toBe('alert'); // retombe sur la table (error -> alert), pas force à status
+        });
+    });
+
+    // ── Avertissement role manuel ─────────────────────────────────────────────
+
+    describe('avertissement role manuel', () => {
+        it('avertit si role est posé manuellement dans le markup initial', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="error"></ar-alert>');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit pas si role n'est pas posé dans le markup initial", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert></ar-alert>');
+                // Le warning pour variant custom ne doit pas être appelé (pas de variant custom)
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it('role posé manuellement est bien écrasé par la logique interne malgré le warning', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="info"></ar-alert>');
+                expect(el.getAttribute('role')).toBe('status');
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("n'avertit qu'une seule fois, même si variant change ensuite", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner"></ar-alert>');
+                expect(spy).toHaveBeenCalledOnce();
+                spy.mockClear();
+
+                el.variant = 'info';
+                await waitForUpdate(el);
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
+        });
+
+        it("l'avertissement n'empêche pas la fermeture du role par withoutNotification", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" without-notification></ar-alert>');
+                expect(el.hasAttribute('role')).toBe(false);
+                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
+                expect(spy.mock.calls[0][0]).toContain('role="banner"');
+            } finally {
+                spy.mockRestore();
+            }
         });
     });
 
@@ -138,6 +255,36 @@ describe('ArAlert', () => {
             expect(assigned).toHaveLength(1);
             expect((assigned[0] as HTMLElement).dataset.custom).toBe('true');
         });
+
+        it("n'affiche pas d'icône par défaut pour un variant custom inconnu", async () => {
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(requireShadow(el).querySelector('slot[name="icon"] svg')).toBeNull();
+        });
+
+        it('logue un avertissement pour un variant custom inconnu', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="promo"></ar-alert>');
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('promo'));
+            spy.mockRestore();
+        });
+
+        it("n'avertit pas pour un variant connu", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-alert variant="success"></ar-alert>');
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
+
+        it('n\'avertit pas pour un variant custom si slot="icon" est fourni', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture(`
+                <ar-alert variant="promo">
+                    <svg slot="icon" aria-hidden="true"></svg>
+                </ar-alert>
+            `);
+            expect(spy).not.toHaveBeenCalled();
+            spy.mockRestore();
+        });
     });
 
     // ── Bouton close ──────────────────────────────────────────────────────────
@@ -145,27 +292,36 @@ describe('ArAlert', () => {
     describe('bouton close', () => {
         it("n'est pas rendu sans l'attribut next-focus", async () => {
             el = await fixture('<ar-alert></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it('est rendu quand next-focus est défini', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            expect(getPart(el, 'close')).not.toBeNull();
+            expect(getPart(el, 'close-button')).not.toBeNull();
         });
 
         it("n'est pas rendu si next-focus est une chaîne vide", async () => {
             el = await fixture('<ar-alert next-focus=""></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it("n'est pas rendu si next-focus ne contient que des espaces", async () => {
             el = await fixture('<ar-alert next-focus="   "></ar-alert>');
-            expect(getPart(el, 'close')).toBeNull();
+            expect(getPart(el, 'close-button')).toBeNull();
         });
 
         it('le bouton close a aria-label="Fermer l\'alerte"', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            expect(requirePart(el, 'close').getAttribute('aria-label')).toBe("Fermer l'alerte");
+            expect(requirePart(el, 'close-button').getAttribute('aria-label')).toBe(
+                "Fermer l'alerte",
+            );
+        });
+
+        it('porte le part combiné "close-button action-button"', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(requirePart(el, 'close-button').getAttribute('part')).toBe(
+                'close-button action-button',
+            );
         });
 
         it('reflète next-focus en attribut HTML', async () => {
@@ -198,6 +354,23 @@ describe('ArAlert', () => {
             el = await fixture('<ar-alert next-focus="   "></ar-alert>');
             expect(el.canBeHidden).toBe(false);
         });
+
+        it('redevient false après retrait de next-focus (attribut supprimé, pas juste vidé)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            expect(el.canBeHidden).toBe(true);
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            expect(el.nextFocus).toBeNull();
+            expect(el.canBeHidden).toBe(false);
+        });
+
+        it('ne plante pas si on ferme après que next-focus a été retiré (nextFocus null)', async () => {
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.removeAttribute('next-focus');
+            await waitForUpdate(el);
+            // canBeHidden est false donc le bouton close n'est pas rendu — pas d'appel possible à _hide()
+            expect(getPart(el, 'close-button')).toBeNull();
+        });
     });
 
     // ── Fermeture ─────────────────────────────────────────────────────────────
@@ -205,32 +378,83 @@ describe('ArAlert', () => {
     describe('fermeture', () => {
         it('un clic sur close passe hiding à true', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            // Force une durée de transition non nulle (simule un thème chargé) : sans thème,
+            // _shouldAnimate() renvoie false et _finishHide() s'exécute de façon synchrone,
+            // ce qui repasserait hiding à false avant même l'assertion ci-dessous.
+            el.style.transitionDuration = '0.3s';
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            // hiding est un protected property — on y accède via cast
+            // hiding est un @state() privé — on y accède via cast. Sa réflexion en :state(hiding)
+            // CSS externe est couverte par alert.browser.test.ts (happy-dom n'implémente pas :state()).
             expect((el as unknown as { hiding: boolean }).hiding).toBe(true);
         });
 
-        it('hiding=true applique l\'attribut "hiding" sur le host', async () => {
+        it('émet ar-alert-close après transitionend quand hiding=true (thème avec transition réelle)', async () => {
             el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
-            (requirePart(el, 'close') as HTMLButtonElement).click();
-            await waitForUpdate(el);
-            expect(el.hasAttribute('hiding')).toBe(true);
-        });
-
-        it('émet ar-alert-close après transitionend quand hiding=true', async () => {
-            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            // Force une durée de transition non nulle (simule un thème chargé) pour exercer
+            // le chemin asynchrone : sans ça, _shouldAnimate() renverrait false en happy-dom
+            // (aucune feuille de style chargée) et la fermeture serait synchrone.
+            el.style.transitionDuration = '0.3s';
             const handler = vi.fn();
             el.addEventListener('ar-alert-close', handler);
 
             // Simule le clic → hiding=true
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
+
+            // La fermeture attend bien la transition : rien n'est émis avant transitionend.
+            expect(handler).not.toHaveBeenCalled();
 
             // Simule la fin de la transition CSS (transitionend)
             el.dispatchEvent(new Event('transitionend'));
 
             expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('ignore un second transitionend dans la même tâche (thème anime opacity ET transform)', async () => {
+            // Régression #129 : le thème déclenche la transition sur deux propriétés
+            // simultanément (opacity + transform). Par spec, `transitionend` se déclenche
+            // une fois PAR PROPRIÉTÉ transitionnée — donc deux fois de suite ici. Sans reset
+            // de `hiding` dans `_finishHide`, le second appel repasserait la garde et
+            // ré-émettrait ar-alert-close / redonnerait le focus une seconde fois.
+            el = await fixture('<ar-alert next-focus="btn-retour"></ar-alert>');
+            el.style.transitionDuration = '0.3s';
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+
+            // Simule les deux transitionend (opacity, puis transform) dans la même tâche.
+            el.dispatchEvent(new Event('transitionend'));
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it("ferme instantanément (sans transitionend) quand aucun thème n'est chargé (durée de transition à 0)", async () => {
+            // Régression #129 : si ariane.css n'est pas chargé, la transition CSS externalisée
+            // (opacity/transform) ne s'applique jamais et la durée calculée reste à 0 — sans
+            // garde JS, transitionend ne se déclencherait jamais et l'alerte resterait bloquée.
+            const target = document.createElement('button');
+            target.id = 'btn-retour-sans-theme';
+            document.body.appendChild(target);
+
+            el = await fixture('<ar-alert next-focus="btn-retour-sans-theme"></ar-alert>');
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+
+            // Aucun style inline, aucune feuille de thème chargée en environnement de test :
+            // getComputedStyle(el).transitionDuration vaut '' (→ 0) en happy-dom par défaut.
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+
+            // La fermeture doit être synchrone : pas de transitionend nécessaire.
+            expect(handler).toHaveBeenCalledOnce();
+            expect(el.isConnected).toBe(false);
+            expect(document.activeElement).toBe(target);
+
+            target.remove();
         });
 
         it("n'émet pas ar-alert-close si hiding=false au transitionend", async () => {
@@ -244,13 +468,32 @@ describe('ArAlert', () => {
             expect(handler).not.toHaveBeenCalled();
         });
 
-        it('logue une erreur si next-focus pointe vers un ID inexistant', async () => {
-            const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        it('un transitionend qui bubble sans clic sur close (hiding=false) ne vole pas le focus', async () => {
+            const target = document.createElement('button');
+            target.id = 'btn-cible-survol';
+            document.body.appendChild(target);
+
+            el = await fixture('<ar-alert next-focus="btn-cible-survol"></ar-alert>');
+            const initiallyFocused = document.activeElement;
+
+            // Simule un transitionend qui bubble jusqu'à l'hôte SANS clic préalable sur le bouton
+            // close (ex: transition CSS de survol/focus sur le bouton lui-même) — hiding reste false.
+            el.dispatchEvent(new Event('transitionend'));
+
+            expect(document.activeElement).toBe(initiallyFocused);
+            expect(document.activeElement).not.toBe(target);
+
+            target.remove();
+        });
+
+        it('logue un avertissement si next-focus pointe vers un ID inexistant', async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture('<ar-alert next-focus="id-inexistant"></ar-alert>');
 
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
+            // synchroniquement au clic — pas besoin de simuler transitionend.
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            el.dispatchEvent(new Event('transitionend'));
 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy.mock.calls[0][0]).toContain('id-inexistant');
@@ -265,13 +508,22 @@ describe('ArAlert', () => {
 
             el = await fixture('<ar-alert next-focus="btn-retour-focus"></ar-alert>');
 
-            (requirePart(el, 'close') as HTMLButtonElement).click();
+            // Sans thème chargé (durée de transition à 0 en happy-dom), la fermeture se termine
+            // synchroniquement au clic — pas besoin de simuler transitionend.
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
             await waitForUpdate(el);
-            el.dispatchEvent(new Event('transitionend'));
 
             expect(document.activeElement).toBe(target);
 
             target.remove();
+        });
+    });
+
+    describe('traduction', () => {
+        it('lang="en" traduit aria-label du bouton close', async () => {
+            document.body.innerHTML = '<div id="target"></div>';
+            el = await fixture('<ar-alert next-focus="target" lang="en">Message</ar-alert>');
+            expect(requirePart(el, 'close-button').getAttribute('aria-label')).toBe('Close alert');
         });
     });
 });

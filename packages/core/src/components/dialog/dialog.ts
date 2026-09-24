@@ -1,24 +1,23 @@
-import {
-    LitElement,
-    nothing,
-    type TemplateResult,
-    html,
-    type CSSResultGroup,
-    type PropertyValues,
-} from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { nothing, type TemplateResult, html, type CSSResultGroup, type PropertyValues } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
+import resetStyles from '../../styles/components/reset.styles.js';
 import styles from './dialog.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+import { ArianeElement } from '../../base/ariane-element.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /** Evènements envoyés par le webcomposant ArDialog */
 export type ArDialogEvents =
     | 'ar-dialog-show'
+    | 'ar-dialog-show-prevented'
     | 'ar-dialog-shown'
     | 'ar-dialog-hide'
     | 'ar-dialog-hide-prevented'
@@ -30,8 +29,6 @@ export type ArDialogEvents =
 
 const _dialogStack: ArDialog[] = [];
 
-const DEFAULT_DIALOG_LABEL = 'Dialogue';
-
 if (typeof document !== 'undefined') {
     document.addEventListener(
         'click',
@@ -39,96 +36,106 @@ if (typeof document !== 'undefined') {
             const trigger = (e.target as Element).closest('[data-ar-dialog-open]');
             if (!trigger) return;
             const id = trigger.getAttribute('data-ar-dialog-open');
-            const target = id ? (document.getElementById(id) as ArDialog | null) : null;
-            if (target?.tagName === 'AR-DIALOG') target.open = true;
+            const target = id ? document.getElementById(id) : null;
+            if (target instanceof ArDialog) target.open = true;
         },
         { capture: true },
     );
 }
 
 /**
- * @summary Boîte de dialogue modale ou panneau latéral (drawer), accessible et animée.
+ * @summary Apparaît au-dessus de la page (modal) ou glisse depuis le bord de l'écran (drawer) pour capter l'attention de l'utilisateur. À utiliser pour des confirmations, formulaires, menus de navigation, ou toute tâche focalisée qui interrompt le flux principal.
+ * @localized
  *
- * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire.
+ * @slot label - Titre du dialog. Remplace la propriété `label` si du HTML est nécessaire. Sans effet si `without-header` est actif.
+ * @slot header-actions - Actions additionnelles dans le header, positionnées avant le bouton de fermeture (ex. bouton plein écran, menu). Retiré du DOM si `without-header` est actif.
  * @slot - Contenu principal du dialog.
  * @slot footer - Actions du dialog (boutons). Absent du DOM si non fourni.
+ * @slot close-icon - Icône du bouton de fermeture. Remplace le SVG "×" par défaut. Retiré du DOM si `without-header` est actif.
  *
  * @csspart dialog - L'élément <dialog> racine.
- * @csspart header - L'en-tête contenant le titre et le bouton de fermeture.
+ * @csspart header - L'en-tête contenant le titre et le bouton de fermeture. Absent du DOM si `without-header` est actif.
+ * @csspart header-actions - Le conteneur des actions additionnelles du header (slot `header-actions`). Absent du DOM si le slot est vide ou si `without-header` est actif.
  * @csspart title - Le titre du dialog.
+ * @csspart close-button - Le bouton de fermeture dans l'en-tête. Absent du DOM si `without-header` est actif.
+ * @csspart action-button - Porté par `close-button` : bouton qui déclenche une action ponctuelle.
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
- * @cssprop [--width=500px (modal) ou 720px (drawer)] - Largeur du dialog. Prend le pas sur les tailles prédéfinies.
- * @cssprop [--spacing=1.25rem] - Padding interne (block et inline) de la zone de contenu.
- * @cssprop [--spacing-block] - Padding haut/bas. Prend le pas sur `--spacing` si défini.
- * @cssprop [--spacing-inline] - Padding gauche/droite. Prend le pas sur `--spacing` si défini.
+ * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur les tailles prédéfinies pour une règle au moins aussi spécifique que `[size='...']` (ex. `ar-dialog[size='sm']`) — un simple `ar-dialog { }` est moins spécifique et perd face au preset de thème quand `size` est défini.
+ * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
+ * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
+ * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
+ * @cssprop --ar-dialog-backdrop - Couleur de fond du voile derrière le dialog (mode modal).
+ * @cssprop --ar-dialog-close-size - Taille (width/height) du bouton de fermeture.
+ * @cssprop --ar-dialog-close-transition-duration - Durée de la transition (background-color) du bouton de fermeture au survol.
+ * @cssprop --ar-dialog-bg - Fond du dialog (cascade vers --ar-color-bg). Repli `Canvas` si aucun thème n'est chargé — sans thème et sans bordure (le dialog natif perd son style UA par défaut), le contenu flotte sinon sans surface visible.
+ * @cssprop --ar-dialog-color - Couleur du texte du dialog (cascade vers --ar-color-text). Repli `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-dialog-shake-outline-color - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce` (cascade vers --ar-color-danger-text).
  *
- * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. Annulable.
+ * @cssState open - Le dialog est ouvert.
+ *
+ * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
+ * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
  * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
- * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. Annulable.
+ * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. @cancelable
  * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
  * @event {CustomEvent} ar-dialog-hidden - Émis après la fermeture (après animation).
- * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. Annulable.
+ * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
  * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
- * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. Annulable.
+ * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  */
-@customElement('ar-dialog')
-export class ArDialog extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, buttonStyles, styles];
+export class ArDialog extends ArianeElement {
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];
 
     // ── Public properties ──────────────────────────────────────────────────────
 
+    private readonly localize = new LocalizeController(this);
+
     /**
      * Visibilité du composant.
-     * @attr open
-     * @default false
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
     /**
      * Si présent, un clic sur le backdrop ferme le dialog.
      * Par défaut, le backdrop est statique et ne déclenche pas la fermeture.
-     *
-     * @attr close-on-backdrop
-     * @default false
      */
     @property({ reflect: true, type: Boolean, attribute: 'close-on-backdrop' })
     closeOnBackdrop: boolean = false;
 
     /**
      * Titre affiché dans le header. Pour du HTML, utiliser `slot="label"`.
-     *
-     * @attr label
-     * @default ''
      */
     @property({ reflect: true }) label = '';
 
     /**
+     * Si présent, retire entièrement le header (titre, actions, bouton de fermeture) du DOM.
+     * La propriété `label` devient alors le seul nom accessible du dialog (`aria-label`) —
+     * elle est requise dans ce mode, le slot `label` (HTML) est sans effet.
+     */
+    @property({ reflect: true, type: Boolean, attribute: 'without-header' })
+    withoutHeader: boolean = false;
+
+    /**
      * Mode d'affichage : `modal` (centré avec backdrop) ou `drawer` (panneau latéral).
-     *
-     * @attr mode
-     * @default 'modal'
      */
     @property({ reflect: true, type: String })
     mode: 'modal' | 'drawer' = 'modal';
 
     /**
      * Côté d'affichage du drawer. Sans effet en mode `modal`.
-     *
-     * @attr placement
-     * @default 'right'
      */
     @property({ reflect: true, type: String })
     placement: 'left' | 'right' = 'right';
 
     /**
-     * Taille du dialog. Les valeurs correspondent à des largeurs CSS prédéfinies.
-     * Utilisez `--width` pour une valeur personnalisée.
-     *
-     * @attr size
-     * @default 'md'
+     * Taille du dialog. Les paliers `sm`/`lg`/`xl` sont définis par le thème —
+     * sans thème chargé, seule la taille par défaut du composant s'applique.
+     * Utilisez `--ar-dialog-width` pour une valeur personnalisée. Un `ar-dialog { }` non qualifié
+     * doit néanmoins être au moins aussi spécifique que `[size='...']` (ou utiliser `!important`,
+     * ou omettre `size`) pour l'emporter de façon fiable sur un palier de thème.
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
@@ -136,20 +143,17 @@ export class ArDialog extends LitElement {
     /**
      * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
      * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
-     *
-     * @attr prevented-message
-     * @default 'Fermeture bloquée.'
+     * Traduit automatiquement selon `lang` si non personnalisé.
      */
-    @property({ reflect: true, attribute: 'prevented-message' }) preventedMessage =
-        'Fermeture bloquée.';
+    @property({ reflect: true, useDefault: true, attribute: 'prevented-message' })
+    preventedMessage: string | undefined = undefined;
 
     /**
-     * Label accessible du bouton de fermeture. À adapter pour la langue de l'interface.
-     *
-     * @attr close-label
-     * @default 'Fermer'
+     * Label accessible du bouton de fermeture. Traduit automatiquement selon `lang` si non
+     * personnalisé.
      */
-    @property({ reflect: true, attribute: 'close-label' }) closeLabel = 'Fermer';
+    @property({ reflect: true, useDefault: true, attribute: 'close-label' })
+    closeLabel: string | undefined = undefined;
 
     // ── Private state ──────────────────────────────────────────────────────────
 
@@ -168,11 +172,18 @@ export class ArDialog extends LitElement {
     /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
     private _triggerElement: Element | null = null;
 
-    private readonly _slotController = new HasSlotController(this, 'footer', 'label');
+    private readonly _slotController = new HasSlotController(
+        this,
+        'footer',
+        'label',
+        'header-actions',
+    );
     private _hasWarnedMissingLabel = false;
+    private _hasWarnedSlotLabelIgnored = false;
+    private _hasWarnedNoCloseMechanism = false;
 
     private _getHeadingLabel(): string {
-        return (this.label ?? '').trim() || DEFAULT_DIALOG_LABEL;
+        return (this.label ?? '').trim() || this.localize.term('dialogDefaultLabel');
     }
 
     private _warnIfMissingLabel(): void {
@@ -183,6 +194,32 @@ export class ArDialog extends LitElement {
         warn(
             'ar-dialog',
             'Aucun libellé accessible fourni. Ajoutez la propriété "label" ou un enfant direct avec slot="label".',
+        );
+    }
+
+    private _warnIfSlotLabelIgnored(): void {
+        if (this._hasWarnedSlotLabelIgnored) return;
+        if (!this.withoutHeader) return;
+        if ((this.label ?? '').trim()) return;
+        if (!this._slotController.test('label')) return;
+
+        this._hasWarnedSlotLabelIgnored = true;
+        warn(
+            'ar-dialog',
+            'slot="label" est ignoré quand without-header est actif (aria-label ne peut contenir que du texte brut). Utilisez la propriété "label".',
+        );
+    }
+
+    private _warnIfNoCloseMechanism(): void {
+        if (this._hasWarnedNoCloseMechanism) return;
+        if (!this.withoutHeader) return;
+        if (this.closeOnBackdrop) return;
+        if (this.querySelector('[data-ar-dismiss], [data-ar-accept]')) return;
+
+        this._hasWarnedNoCloseMechanism = true;
+        warn(
+            'ar-dialog',
+            'without-header est actif sans close-on-backdrop ni élément [data-ar-dismiss]/[data-ar-accept] dans le contenu : seule la touche Échap permet de fermer ce dialog.',
         );
     }
 
@@ -202,6 +239,7 @@ export class ArDialog extends LitElement {
 
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
+        this._warnIfSlotLabelIgnored();
         if (
             (changedProperties.has('placement') || changedProperties.has('mode')) &&
             this.mode === 'modal' &&
@@ -215,6 +253,7 @@ export class ArDialog extends LitElement {
             } else if (!this.open && this.dialog?.open) {
                 this._scheduleClose();
             }
+            this.toggleState('open', this.open);
         }
     }
 
@@ -222,12 +261,14 @@ export class ArDialog extends LitElement {
 
     override render(): TemplateResult {
         const headingLabel = this._getHeadingLabel();
+        const closeButtonLabel = this.closeLabel?.trim() || this.localize.term('closeDialog');
 
         return html`
             <dialog
                 part="dialog"
                 role="dialog"
-                aria-labelledby="dialog-heading"
+                aria-labelledby=${this.withoutHeader ? nothing : 'dialog-heading'}
+                aria-label=${this.withoutHeader ? headingLabel : nothing}
                 aria-describedby="dialog-body"
                 aria-modal="true"
                 ?inert=${!this.open || this._isClosing}
@@ -236,41 +277,58 @@ export class ArDialog extends LitElement {
                 @pointerdown=${this._handleDialogPointerDown}
                 @pointerup=${this._handleDialogPointerUp}
             >
-                <header part="header">
-                    <h1 part="title" id="dialog-heading">
-                        ${this._slotController.test('label')
-                            ? html`<slot name="label"></slot>`
-                            : headingLabel}
-                    </h1>
-                    <button
-                        type="button"
-                        class="btn btn-tertiary light btn-ratio-square"
-                        data-ar-dismiss
-                    >
-                        <svg
-                            aria-hidden="true"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18 18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                        <span class="btn-content sr-only">${this.closeLabel}</span>
-                    </button>
-                </header>
+                ${
+                    this.withoutHeader
+                        ? nothing
+                        : html`<header part="header">
+                              <h1 part="title" id="dialog-heading">
+                                  ${
+                                      this._slotController.test('label')
+                                          ? html`<slot name="label"></slot>`
+                                          : headingLabel
+                                  }
+                              </h1>
+                              ${
+                                  this._slotController.test('header-actions')
+                                      ? html`<div part="header-actions">
+                                            <slot name="header-actions"></slot>
+                                        </div>`
+                                      : nothing
+                              }
+                              <button
+                                  part="close-button action-button"
+                                  type="button"
+                                  data-ar-dismiss
+                              >
+                                  <slot name="close-icon">
+                                      <svg
+                                          aria-hidden="true"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          stroke-width="1.5"
+                                          stroke="currentColor"
+                                      >
+                                          <path
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M6 18 18 6M6 6l12 12"
+                                          ></path>
+                                      </svg>
+                                  </slot>
+                                  <span class="sr-only">${closeButtonLabel}</span>
+                              </button>
+                          </header>`
+                }
                 <div part="body" id="dialog-body">
                     <slot></slot>
                 </div>
-                ${this._slotController.test('footer')
-                    ? html`<footer part="footer">
-                          <slot name="footer"></slot>
-                      </footer>`
-                    : nothing}
+                ${
+                    this._slotController.test('footer')
+                        ? html`<footer part="footer">
+                              <slot name="footer"></slot>
+                          </footer>`
+                        : nothing
+                }
             </dialog>
         `;
     }
@@ -307,7 +365,7 @@ export class ArDialog extends LitElement {
     }
 
     private _announcePrevented(): void {
-        const message = this.preventedMessage.trim() || 'Fermeture bloquée.';
+        const message = this.preventedMessage?.trim() || this.localize.term('closingBlocked');
         announceA11y(message, 'assertive');
     }
 
@@ -401,10 +459,12 @@ export class ArDialog extends LitElement {
 
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
+        this._warnIfNoCloseMechanism();
         this._triggerElement = document.activeElement;
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
             this._triggerElement = null;
+            this._emit('ar-dialog-show-prevented');
             void this.updateComplete.then(() => {
                 if (this.isConnected && this.open && !this.dialog?.open) {
                     this.open = false;
@@ -511,11 +571,5 @@ export class ArDialog extends LitElement {
         this._triggerElement = null;
         (trigger as HTMLElement | null)?.focus?.();
         this.updateComplete.then(() => this._emit('ar-dialog-hidden'));
-    }
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-dialog': ArDialog;
     }
 }

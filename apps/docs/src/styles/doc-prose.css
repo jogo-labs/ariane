@@ -9,157 +9,493 @@
     display: flex;
     flex-direction: column;
     row-gap: 4rem;
+    line-height: 1.6;
 }
 
 .page-header {
+    padding-block-end: 2rem;
+    border-bottom: 1px solid var(--doc-rail);
+
     .meta {
         display: flex;
-        font-size: 1rem;
-        margin-top: 1rem;
+        font-size: var(--doc-font-size-sm);
     }
 
-    .summary,
-    .callout {
+    .summary {
+        margin-block-start: 0.75rem;
+    }
+
+    .meta,
+    .doc-callout-alert {
         margin-top: 1.5rem;
     }
 }
 
-.page-title {
-    color: var(--doc-text, #111827);
-    font-size: 2rem;
+/* ── Rythme vertical ──────────────────────────────────────────────────
+ * Règles : (1) séparation (avant un titre) vs groupement (entre éléments
+ * de contenu liés) sont deux natures d'espacement distinctes ; (2) le
+ * margin-top d'un titre est toujours strictement supérieur à son
+ * margin-bottom (un titre colle à ce qu'il introduit) ; (3) le poids de
+ * la coupure suit le niveau (section > sous-section) ; (4) owl-selector :
+ * l'espacement ne s'applique qu'entre éléments adjacents, jamais en
+ * margin-bottom fixe ; (5) le premier titre après .page-title n'a pas de
+ * double espace. */
+
+:global(.page-title) {
+    color: var(--doc-text);
+    font-size: var(--doc-font-size-xxl);
+    font-weight: var(--doc-font-weight-medium);
+    /* Un titre display n'a pas la lecture d'un paragraphe — hérite sinon
+       la line-height de body (1.65), pensée pour du texte courant, jamais
+       calibrée pour un si grand corps : le résultat traîne un espace
+       vide énorme entre les lignes dès que le titre passe sur 2 lignes
+       (systématique en mobile, où la largeur disponible est faible). */
+    line-height: 1.15;
     margin: 0;
+    text-wrap: balance;
 }
 
-.page-title + .page-content {
-    margin-top: 1.5rem;
-}
-
-.main-section,
-.subsection {
-    display: flex;
-    flex-direction: column;
-}
-
-.main-section {
-    gap: 2rem;
-}
-
-.subsection {
-    gap: 1rem;
-
-    p {
-        margin: 0;
+/* Le mono (pages composant) est visuellement plus large à taille égale
+   que la police display (prose) — l'ancien plancher à 3rem faisait
+   déborder les titres longs sur 2 lignes dès un mobile standard
+   (ex. "Breadcrumb Item"), avec le même effet d'espace vide décrit
+   ci-dessus, même une fois la line-height resserrée. */
+@media (max-width: 640px) {
+    :global(.page-title) {
+        font-size: 2rem;
     }
 }
 
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    border-bottom: 2px solid var(--doc-border, #e5e7eb);
-    padding-bottom: 1rem;
-    margin: 0 0 2rem;
-    color: var(--doc-text, #111827);
+/* .section-title-row / .subsection-title-row : wrapper flex autour du titre
+   ET de son HeadingAnchor (#218), tous deux enfants directs — l'ancre n'est
+   PAS un descendant du <h3>/<h4> lui-même. Nécessaire pour l'accessibilité :
+   un descendant portant son propre aria-label (le lien de l'ancre) contribue
+   ce label — pas son texte brut « # » — au nom accessible calculé de tout
+   ancêtre qui l'englobe. Si l'ancre restait dans le <h3>, un lecteur d'écran
+   naviguant par titre (touche H) entendrait le titre dupliqué : « Api Lien
+   direct vers « Api » » au lieu de « Api » seul. Sortir l'ancre du titre
+   (siblings dans ce wrapper plutôt qu'enfant) élimine la pollution à la
+   source ; .heading-anchor porte son propre aria-label pour son propre nom
+   accessible de lien, sans jamais remonter dans celui du titre. */
+:global(.section-title-row) {
+    position: relative;
+    padding-top: 1.1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.subsection-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--doc-text-subtle, #374151);
+/* Le fil se prolonge en amorce horizontale — réservée au h2. Le h3
+   (.subsection-title-row, inchangé ci-dessous) n'en porte pas : si le repère
+   apparaît à tous les niveaux, il perd sa valeur de marqueur de section. */
+:global(.section-title-row)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 3px;
+    background: var(--doc-rail-live);
+}
+
+/* display:flex ici aussi (pas seulement sur .section-title-row) : le titre
+   peut contenir plus que du texte — ex. <NarrativeHeading>Via CDN <span
+   class="badge">Recommandé</span></NarrativeHeading> sur le quickstart —
+   et sans ce flex sur le <h3> lui-même, le badge (inline-flex) retombe en
+   alignement de ligne de base par défaut au lieu d'être centré avec le
+   texte du titre. */
+:global(.section-title) {
+    font-size: var(--doc-font-size-lg);
+    font-weight: var(--doc-font-weight-semibold);
+    margin: 0;
+    color: var(--doc-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+:global(.subsection-title-row) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* display:flex ici aussi, même raison que .section-title ci-dessus (contenu
+   du titre potentiellement mixte texte + badge, pas seulement du texte). */
+:global(.subsection-title) {
+    font-size: var(--doc-font-size-md);
+    font-weight: var(--doc-font-weight-semibold);
+
+    /* color: var(--doc-text-subtle); */
     margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.summary {
-    font-size: 1.05rem;
-    color: var(--doc-text-muted, #4b5563);
-    margin: 0;
-}
-
-/* p {
-    color: var(--doc-text, #374151);
-    margin-bottom: 0.75rem;
-    line-height: 1.65;
-} */
-
-ul {
-    font-size: 0.95rem;
-    color: var(--doc-text, #374151);
-    padding-left: 1.25rem;
-    line-height: 1.8;
-}
-
-a {
-    color: var(--doc-accent, #7c3aed);
+/* Ancre de lien direct sur un titre (HeadingAnchor.astro, #218) — enfant flex
+   du wrapper .section-title-row/.subsection-title-row (sibling du titre, pas
+   descendant). Visible en continu par défaut (pas de survol sur tactile —
+   opacité 1, valeur initiale CSS, rien à poser explicitement) ; masquée
+   jusqu'au survol du titre pour les pointeurs fins (révélée à 0.85, teinte
+   lavée), puis pleinement visible (1) au survol direct de l'ancre
+   elle-même. :focus-visible reste toujours visible même masquée — le survol
+   seul ne garantit jamais l'accessibilité clavier/tactile d'un élément qui
+   se révèle au hover (même précaution que .copy-btn). */
+:global(.heading-anchor) {
+    color: var(--doc-text-muted);
     text-decoration: none;
+    transition: opacity 0.35s;
 }
 
-a:hover {
-    text-decoration: underline;
+:global(.section-title + .heading-anchor) {
+    font-size: var(--doc-font-size-lg);
 }
 
-pre {
-    background: var(--doc-code-block-bg, #1e1e2e);
+:global(.subsection-title + .heading-anchor) {
+    font-size: var(--doc-font-size-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    :global(.heading-anchor) {
+        opacity: 0;
+    }
+
+    :global(:is(.section-title-row, .subsection-title-row):hover .heading-anchor) {
+        opacity: 0.85;
+    }
+
+    /* Le préfixe ancêtre :is(...):hover est nécessaire ICI malgré la
+       redondance logique (survoler l'ancre implique déjà survoler son
+       ancêtre) : il sert à égaler la spécificité de la règle à 0.85
+       ci-dessus (0,3,0) — un simple .heading-anchor:hover (0,2,0) perd
+       face à elle et reste bloqué à 0.85 au lieu de passer à 1. */
+    :global(:is(.section-title-row, .subsection-title-row):hover .heading-anchor:hover),
+    :global(.heading-anchor):focus-visible {
+        opacity: 1;
+    }
+}
+
+.narrative :global(strong) {
+    font-weight: var(--doc-font-weight-bold);
+    color: var(--doc-text);
+}
+
+.narrative :global(p) {
+    font-size: var(--doc-font-size-sm);
+    line-height: 1.75;
+    color: var(--doc-text-muted);
+    margin: 0;
+}
+
+.narrative :global(:not(pre) code) {
+    font-family: var(--doc-font-mono);
+    font-size: 0.9em;
+    background: var(--doc-surface);
+    padding: 0.05rem 0.3rem;
+    border-radius: var(--doc-radius-sm);
+    color: var(--doc-text);
+}
+
+.narrative :global(pre code) {
+    /* Contenu MDX : ce <pre><code> est rendu par le compilateur MDX, pas par
+       [slug].astro — il porte un attribut de scope Astro différent (interne
+       au MDX), donc les règles génériques `pre`/`pre code` plus bas dans ce
+       fichier (scopées à [slug].astro) ne le matchent jamais. On repose donc
+       ici, sous des sélecteurs globaux dédiés au contenu narratif, les mêmes
+       règles que celles qui stylent les autres blocs de code du site — cf.
+       `.code-block`/`.code-block pre code` dans doc-code-block.css : le fond
+       va sur le bloc (`pre`, élément de bloc), jamais sur `code` (inline),
+       sous peine d'un bandeau de fond par ligne au lieu d'un rectangle plein. */
+    background: transparent;
+    color: var(--doc-code-base);
+    font-family: var(--doc-font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+}
+
+.narrative :global(pre) {
+    background-color: var(--doc-code-block-bg);
     border-radius: 0.5rem;
     padding: 1rem 1.25rem;
     overflow-x: auto;
     margin: 0;
 }
 
+.narrative :global(.narrative-list) {
+    font-size: var(--doc-font-size-sm);
+    line-height: 1.75;
+    color: var(--doc-text-muted);
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style: none;
+}
+
+.narrative :global(.narrative-list li) {
+    position: relative;
+}
+
+.narrative :global(.narrative-list li)::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -1rem;
+    top: 0.65em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--doc-rail-live);
+}
+
+/* Owl-selector overrides — déclarées après les règles de base ci-dessus
+ * (qui posent margin: 0 sur les titres/le contenu narratif) : elles
+ * doivent gagner la cascade pour ces mêmes éléments. `:where()` reste
+ * utilisé pour la partie qui ne cible pas l'élément stylé lui-même
+ * (matcher du sibling précédent — `.page-title`, `.section-title-row`,
+ * `.subsection-title-row`, contexte ancêtre `.narrative`) — sa spécificité
+ * n'a pas besoin d'être renforcée. `:is()` est en revanche systématiquement
+ * utilisé pour la partie qui cible l'élément stylé lui-même, à gauche du
+ * `>` (`.section-title-row`/`h3`, `.subsection-title-row`/`h4`) COMME à
+ * droite du `+` (liste explicite des éléments de contenu légitimes — jamais
+ * de `*` générique, qui retombe à spécificité nulle) : `:is()` propage la
+ * spécificité du sélecteur le plus spécifique de sa liste, contrairement
+ * à `:where()` et à `*` qui sont toujours à spécificité nulle — nécessaire
+ * ici pour battre `.narrative p { margin: 0 }`, `.narrative .narrative-list
+ * { margin: 0 }`, etc. sur le même élément. */
+
+/* Préfixe ancêtre (`.page-header` / `.narrative`) laissé HORS de `:global()` :
+ * Astro le scope (attribut data-astro-cid-*) comme n'importe quel sélecteur
+ * de style local, ce qui ajoute la spécificité nécessaire pour battre les
+ * règles de base scopées ci-dessus (`.summary[data-astro-cid] { margin: 0 }`,
+ * `.narrative[data-astro-cid] p { margin: 0 }`, etc.) — un `:global()` pur,
+ * sans préfixe scopé, reste à spécificité quasi nulle et ne peut pas gagner
+ * la cascade face à ces règles. */
+
+.page-header
+    :global(
+        :where(.page-title)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+.narrative
+    :global(
+        :where(.section-title-row)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-subsection);
+}
+
+.narrative
+    :global(
+        :where(.subsection-title-row)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap, .doc-callout-alert, .summary)
+    ) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+:global(.narrative > :is(.section-title-row, h3)) {
+    margin-top: var(--doc-space-section);
+}
+
+:global(.narrative > :is(.section-title-row, h3):first-child) {
+    margin-top: 0;
+}
+
+/* h4:not(.subsection-title) exclut le <h4> qu'un .subsection-title-row
+   contient déjà — sans combinateur `>` (nécessaire ici, contrairement à la
+   règle h3 ci-dessus, car un h4 peut être imbriqué plus profond dans
+   .narrative), le <h4 class="subsection-title"> matcherait DEUX fois cette
+   règle : une fois via son wrapper .subsection-title-row, une fois via
+   l'alternative h4 — doublant visuellement l'espace au-dessus du titre. */
+:global(.narrative :is(.subsection-title-row, h4:not(.subsection-title))) {
+    margin-top: var(--doc-space-subsection);
+}
+
+.narrative
+    :global(
+        :where(p, ul, ol, pre, table, .table-wrap)
+            + :is(p, ul, ol, pre, table, .narrative-list, .table-wrap)
+    ) {
+    margin-top: var(--doc-space-paragraph);
+}
+
+.summary {
+    font-size: 1rem;
+    color: var(--doc-text-muted);
+    max-width: 62ch;
+    text-wrap: pretty;
+    margin: 0;
+}
+
+.hint {
+    font-size: 0.875rem;
+    color: var(--doc-text-muted);
+}
+
+/* p {
+    color: var(--doc-text);
+    margin-bottom: 0.75rem;
+    line-height: 1.65;
+} */
+
+ul {
+    font-size: 0.95rem;
+    color: var(--doc-text);
+    padding-left: 1.25rem;
+    line-height: 1.8;
+}
+
+a {
+    color: var(--doc-accent);
+    /* Un lien dans du texte courant ne doit pas être distingué par la seule
+       couleur (WCAG 1.4.1) — soulignement permanent, pas seulement au survol. */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+a:visited {
+    color: var(--doc-link-visited);
+}
+
+a:active {
+    color: var(--doc-accent);
+}
+
+pre {
+    background: var(--doc-code-block-bg);
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 0;
+}
+
+code {
+    font-family: var(--doc-font-mono);
+    font-size: 0.9em;
+    background: var(--doc-surface);
+    padding: 0.05rem 0.3rem;
+    border-radius: var(--doc-radius-sm);
+    color: var(--doc-text);
+}
+
 pre code {
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-family: var(--doc-font-mono);
     font-size: 0.82rem;
     line-height: 1.6;
-    color: #cdd6f4;
+    color: var(--doc-code-base);
     background: transparent;
     padding: 0;
 }
 
 .badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.15em 0.5em;
-    border-radius: 0.25rem;
-    background: var(--doc-accent-bg, #f3efff);
-    color: var(--doc-accent, #7c3aed);
-    border: 1px solid var(--doc-accent-border, #e0d0ff);
-    letter-spacing: 0.02em;
-}
-
-.callout {
-    padding: 1rem 1.25rem;
-    background: var(--doc-accent-bg, rgba(243, 239, 255, 0.5));
-    border: 1px solid var(--doc-accent-border, #e0d0ff);
-    border-radius: 0.5rem;
-}
-
-.callout-title {
-    font-size: 0.75rem;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.68rem;
+    font-weight: var(--doc-font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--doc-accent, #7c3aed);
-    margin: 0 0 0.6rem;
+    padding: 0.2em 0.6em;
+    border-radius: 999px;
+    background: var(--doc-accent-bg);
+    color: var(--doc-accent);
 }
 
-.callout ul {
+.badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.doc-callout-alert {
+    /* Filet vertical plutôt qu'une carte — cohérent avec la légèreté
+       demandée pour les blocs de contenu (cf. spec section 4). */
+    --ar-alert-bg: transparent;
+    --ar-alert-border: transparent;
+    --ar-alert-icon: var(--doc-accent);
+    --ar-alert-color: var(--doc-text);
+    background-color: var(--doc-surface);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-inline-start: 3px solid var(--doc-rail-live);
+    padding-inline-start: 1rem;
+    margin-top: 1rem;
+
+    p {
+        margin: 0;
+        font-size: var(--doc-font-size-sm);
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: var(--doc-text);
+    }
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+    }
+}
+
+.doc-callout-alert-title {
+    font-size: var(--doc-font-size-xs);
+    font-weight: var(--doc-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--doc-accent);
+    padding: 0 0 0.4rem;
     margin: 0;
-    padding-left: 1.25rem;
-    font-size: 0.875rem;
-    line-height: 1.7;
-    color: var(--doc-text, #374151);
+}
+
+.doc-callout-alert-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    p {
+        margin: 0;
+    }
 }
 
 .badge-subtle {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: var(--doc-font-weight-semibold);
     padding: 0.15em 0.5em;
     border-radius: 0.25rem;
-    background: color-mix(in srgb, var(--doc-border, #e5e7eb) 80%, transparent);
-    color: var(--doc-text-muted, #6b7280);
+    background: color-mix(in srgb, var(--doc-border) 80%, transparent);
+    /* var(--doc-text-muted) échoue le contraste AA sur ce fond clair (axe-core) */
+    color: var(--doc-text);
     letter-spacing: 0.02em;
+}
+
+/* ── NextStep ──────────────────────────────────────────────────────────
+ * .next-step est rendu par un composant séparé (NextStep.astro) : comme
+ * pour .section-title-row/.subsection-title-row, `:global()` est nécessaire pour
+ * que la règle matche à travers la frontière de scope Astro. Le préfixe
+ * `.page-container` reste HORS `:global()` — il est écrit directement dans
+ * chaque page important ce fichier, donc porte bien le scope de CETTE
+ * page, ce qui ajoute la spécificité nécessaire sans rien casser. */
+
+.page-container :global(.next-step) {
+    margin-top: var(--doc-space-section);
+    padding-top: var(--doc-space-subsection);
+    border-top: 1px solid var(--doc-border);
+    font-size: var(--doc-font-size-sm);
+    color: var(--doc-text);
+}
+
+.page-container :global(.next-step ul) {
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+}
+
+.page-container :global(.next-step li + li) {
+    margin-top: 0.35rem;
 }

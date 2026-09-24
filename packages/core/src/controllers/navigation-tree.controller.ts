@@ -2,9 +2,23 @@ import { type ReactiveController, type ReactiveControllerHost } from 'lit';
 
 import { type NavigationNode } from '../types/navigation-nodes.js';
 
-import { type ArStepperItem } from '../components/stepper-item/stepper-item.js';
+import { ArStepperItem } from '../components/stepper-item/stepper-item.js';
 
 import { computeNavigationStates } from '../state/navigation-state.engine.js';
+
+import { warn } from '../utils/warn.js';
+
+function closestInstanceOf<T extends HTMLElement>(
+    el: HTMLElement,
+    ctor: new (...args: never[]) => T,
+): T | null {
+    let current = el.parentElement;
+    while (current) {
+        if (current instanceof ctor) return current;
+        current = current.parentElement;
+    }
+    return null;
+}
 
 export class NavigationTreeController implements ReactiveController {
     private host: ReactiveControllerHost;
@@ -46,13 +60,14 @@ export class NavigationTreeController implements ReactiveController {
 
         sorted.forEach((item) => {
             if (this.nodeMap.has(item.path)) {
-                console.warn(`[ar-stepper] duplicate path "${item.path}"`);
+                warn('ar-stepper', `duplicate path "${item.path}"`);
             }
 
             const node: NavigationNode = {
                 path: item.path,
                 label: item.label,
                 href: item.href,
+                item,
 
                 children: [],
                 state: 'idle',
@@ -64,9 +79,7 @@ export class NavigationTreeController implements ReactiveController {
         });
 
         sorted.forEach((item) => {
-            const parentItem = item.parentElement?.closest(
-                'ar-stepper-item',
-            ) as ArStepperItem | null;
+            const parentItem = closestInstanceOf(item, ArStepperItem);
 
             if (!parentItem) return;
 

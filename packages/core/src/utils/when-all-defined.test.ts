@@ -14,6 +14,7 @@ function appendElement(tag: string): Element {
 describe('whenAllDefined', () => {
     afterEach(() => {
         document.body.innerHTML = '';
+        delete window.ARIANE_CONFIG;
         vi.restoreAllMocks();
     });
 
@@ -61,9 +62,25 @@ describe('whenAllDefined', () => {
 
         await whenAllDefined();
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith('ar-alert');
         expect(spy).not.toHaveBeenCalledWith('my-button');
+    });
+
+    it('utilise le préfixe configuré via window.ARIANE_CONFIG par défaut', async () => {
+        window.ARIANE_CONFIG = { prefix: 'acme' };
+        appendElement('acme-alert');
+        appendElement('ar-alert');
+
+        const spy = vi
+            .spyOn(customElements, 'whenDefined')
+            .mockResolvedValue(class {} as CustomElementConstructor);
+
+        await whenAllDefined();
+
+        expect(spy).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith('acme-alert');
+        expect(spy).not.toHaveBeenCalledWith('ar-alert');
     });
 
     it('accepte un préfixe personnalisé', async () => {
@@ -76,7 +93,7 @@ describe('whenAllDefined', () => {
 
         await whenAllDefined('my-');
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith('my-button');
         expect(spy).not.toHaveBeenCalledWith('ar-alert');
     });

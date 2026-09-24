@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ArProgressbar } from './progressbar.js';
 import { fixture, waitForUpdate, getPart, requirePart } from '../../test-utils.js';
-import './progressbar.js';
+import './index.js';
 
 describe('ArProgressbar', () => {
     let el: ArProgressbar;
@@ -19,8 +19,8 @@ describe('ArProgressbar', () => {
             expect(el.shadowRoot).not.toBeNull();
         });
 
-        it('contient un part="container"', () => {
-            expect(getPart(el, 'container')).not.toBeNull();
+        it('contient un part="progressbar"', () => {
+            expect(getPart(el, 'progressbar')).not.toBeNull();
         });
 
         it('contient un part="track"', () => {

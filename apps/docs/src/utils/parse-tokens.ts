@@ -23,23 +23,10 @@ export interface PaletteHue {
 }
 
 // Hues reconnues dans l'ordre d'affichage
-const PALETTE_HUES = [
-    'primary',
-    'neutral',
-    'green',
-    'yellow',
-    'red',
-    'blue',
-    'orange',
-    'cyan',
-    'indigo',
-    'purple',
-    'pink',
-] as const;
+const PALETTE_HUES = ['primary', 'neutral', 'green', 'yellow', 'red', 'blue'] as const;
 
 // Regex pour détecter un stop de palette brute : --ar-color-{hue}-{number}
-const PALETTE_TOKEN_RE =
-    /^--ar-color-(primary|neutral|green|yellow|red|blue|orange|cyan|indigo|purple|pink)-(\d+)$/;
+const PALETTE_TOKEN_RE = /^--ar-color-(primary|neutral|green|yellow|red|blue)-(\d+)$/;
 
 // Filtre les alias sémantiques internes (--ar-color-success-05…-95, etc.)
 // Ces tokens sont des alias vers la palette — ne pas les afficher

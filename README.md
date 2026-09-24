@@ -28,7 +28,7 @@ Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil 
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
 
 > En développement local, remplacez `autoloader.prod.js` par `autoloader.js` pour obtenir des avertissements détaillés dans la console.
@@ -39,7 +39,7 @@ Charge tous les composants en une seule requête.
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/themes/default.css" />
+<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
 
 ### Via npm _(avec bundler)_
@@ -50,7 +50,7 @@ npm install @ariane-ui/core
 
 ```typescript
 import '@ariane-ui/core';
-import '@ariane-ui/core/themes/default.css';
+import '@ariane-ui/core/themes/ariane.css';
 
 // ou import individuel (tree-shaking)
 import '@ariane-ui/core/dist/components/button/button.js';
@@ -69,7 +69,7 @@ ar-alert {
 }
 ```
 
-Les valeurs par défaut viennent du fichier de thème (`themes/default.css`).
+Les valeurs par défaut viennent du fichier de thème (`themes/ariane.css`).
 Consultez la page **Design Tokens** du site de documentation pour la liste complète.
 
 ---

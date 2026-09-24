@@ -4,9 +4,9 @@
  */
 import { fixture, html, expect } from '@open-wc/testing';
 import type { ArTabGroup } from './tab-group.js';
-import './tab-group.js';
-import '../tab/tab.js';
-import '../tab-panel/tab-panel.js';
+import './index.js';
+import '../tab/index.js';
+import '../tab-panel/index.js';
 
 describe('ar-tab-group — accessibilité', () => {
     // ── Rôles ARIA ─────────────────────────────────────────────────────────

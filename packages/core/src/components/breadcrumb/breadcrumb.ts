@@ -1,49 +1,71 @@
-import {
-    LitElement,
-    type TemplateResult,
-    html,
-    type CSSResultGroup,
-    nothing,
-    type PropertyValues,
-} from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { type TemplateResult, html, nothing, type CSSResultGroup, type PropertyValues } from 'lit';
+import { property, query, state } from 'lit/decorators.js';
+import { ToggleController } from '../../controllers/toggle.controller.js';
+import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { ArianeElement } from '../../base/ariane-element.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
+import resetStyles from '../../styles/components/reset.styles.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
-import buttonStyles from '../../styles/components/button.styles.js';
 import styles from './breadcrumb.styles.js';
 
 import { breadcrumbContext } from '../../context/breadcrumb.context.js';
-import { type ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
+import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
+import { LocalizeController } from '../../controllers/localize.controller.js';
+// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import '../../translations/fr.js';
+import '../../translations/en.js';
 
 /**
- * @summary Fil d'ariane accessible avec affichage adaptatif mobile/desktop.
+ * @summary Affiche un fil de liens qui montre à l'utilisateur sa position dans la hiérarchie du site, avec un affichage adapté au mobile et au desktop.
  * @display demo
+ * @localized
  *
  * En dessous de 768px de largeur de viewport, les liens intermédiaires sont masqués
  * derrière un dropdown. Le premier lien reste toujours visible sous forme d'un bouton
  * "Retour".
  *
- * @csspart nav        - L'élément `<nav>` englobant.
- * @csspart list       - L'élément `<ol>` de la liste des liens (desktop).
- * @csspart item       - Chaque `<li>` de la liste.
- * @csspart link       - Les `<a>` de navigation.
- * @csspart current    - Le `<span>` de la page courante (dernier élément, non cliquable).
+ * @csspart breadcrumb - Racine du composant.
+ * @csspart list       - Le conteneur `role="list"` des liens (desktop ou mobile).
+ * @csspart list--desktop - La liste desktop (variante d'état de `list`).
+ * @csspart list--mobile  - La liste mobile, affichée dans le panel (variante d'état de `list`).
+ * @csspart connector  - Point d'ancrage décoratif pour le trait reliant les puces des items dans
+ *   le panel mobile — position verticale, géométrie et couleur à la charge du thème.
+ * @csspart home       - Le lien "Retour" vers le premier item (mobile uniquement).
  * @csspart trigger    - Le bouton d'ouverture du panel mobile.
  * @csspart panel      - Le panel mobile flottant.
  *
- * @cssprop [--ar-breadcrumb-separator-color=var(--ar-color-neutral-80)] - Couleur du séparateur entre les items (desktop).
- * @cssprop [--ar-breadcrumb-bullet-color=var(--ar-color-neutral-80)] - Couleur des puces de la liste mobile.
- * @cssprop [--ar-breadcrumb-panel-min-width=var(--ar-panel-min-width,18rem)] - Largeur min du panel mobile (cascade vers --ar-panel-min-width).
- * @cssprop [--ar-breadcrumb-panel-max-width=var(--ar-panel-max-width,18rem)] - Largeur max du panel mobile (cascade vers --ar-panel-max-width).
+ * @slot home-icon    - Icône du bouton "Retour" (mobile). Remplace le chevron SVG par défaut.
+ * @slot separator    - Séparateur entre les items en desktop (« / » par défaut).
+ * @slot trigger-icon - Icône du bouton d'ouverture du panel (mobile). Remplace les 3 points SVG par défaut.
  *
- * @event {CustomEvent} ar-breadcrumb-open  - Émis à l'ouverture du dropdown mobile.
- * @event {CustomEvent} ar-breadcrumb-close - Émis à la fermeture du dropdown mobile.
+ * @cssprop --ar-breadcrumb-distance - Espacement entre le trigger et le panel mobile.
+ * @cssprop --ar-breadcrumb-offset - Décalage latéral du panel mobile.
+ * @cssprop --ar-breadcrumb-toggle-min-size - Taille minimale (largeur/hauteur) du bouton retour/trigger mobile, repli WCAG 2.5.8 si aucun thème n'est chargé.
+ * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-text - Couleur du texte du panel partagé. Repli système `CanvasText` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-border-color - Couleur de bordure du panel partagé. Repli système `ButtonBorder` si aucun thème n'est chargé.
+ * @cssprop --ar-panel-radius - Rayon de bordure du panel partagé.
+ * @cssprop --ar-panel-shadow - Ombre portée du panel partagé.
+ * @cssprop --ar-panel-padding - Espacement interne du panel partagé.
+ * @cssprop --ar-panel-min-width - Largeur minimale du panel partagé.
+ * @cssprop --ar-panel-max-width - Largeur maximale du panel partagé.
+ * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
+ *
+ * @cssState open - Le panel mobile est ouvert.
+ *
+ * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
+ * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
+ * @event {CustomEvent} ar-breadcrumb-shown          - Émis après l'ouverture du dropdown mobile.
+ * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. @cancelable
+ * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
+ * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  */
-@customElement('ar-breadcrumb')
-export class ArBreadcrumb extends LitElement {
-    static override styles: CSSResultGroup = [utilitiesStyles, panelStyles, buttonStyles, styles];
+export class ArBreadcrumb extends ArianeElement {
+    static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, panelStyles, styles];
+
+    private readonly localize = new LocalizeController(this);
 
     static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
 
@@ -52,7 +74,6 @@ export class ArBreadcrumb extends LitElement {
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
      * Sans effet en mode desktop.
-     * @attr open
      */
     @property({ reflect: true, type: Boolean }) open: boolean = false;
 
@@ -83,13 +104,23 @@ export class ArBreadcrumb extends LitElement {
         lockScroll: false,
         popupMode: 'menu',
         placement: 'bottom-end',
+        cssVarPrefix: 'breadcrumb',
         onExternalClose: () => {
             this.open = false;
-            this.dispatchEvent(
-                new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-            );
         },
     });
+
+    constructor() {
+        super();
+        // s'enregistre lui-même via host.addController(), pas besoin de conserver la référence
+        new ToggleController(this, {
+            eventPrefix: 'ar-breadcrumb',
+            shouldToggle: () => this.isMobile,
+            skipInitialTransition: true,
+            onShow: () => this._onShow(),
+            onHide: () => this._onHide(),
+        });
+    }
 
     // ---------------------------------------------------------------------------
     // Lifecycle
@@ -98,12 +129,35 @@ export class ArBreadcrumb extends LitElement {
     override connectedCallback(): void {
         super.connectedCallback();
         ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
-        customElements.whenDefined('ar-breadcrumb-item').then(() => this._collectExistingItems());
+        // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
+        // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
+        // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
+        const tags = new Set(
+            [...this.querySelectorAll('*')]
+                .map((el) => el.localName)
+                .filter((tag) => tag.includes('-')),
+        );
+        Promise.all([...tags].map((tag) => customElements.whenDefined(tag))).then(() =>
+            this._collectExistingItems(),
+        );
     }
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
+    }
+
+    override willUpdate(changed: PropertyValues<this>): void {
+        this._pushRenderState();
+        // Le panel mobile disparaît du rendu en desktop : fermer directement le popover (avant que
+        // son nœud ne soit retiré du DOM par le rendu) pour garder son état interne synchronisé, et
+        // resynchroniser `open` sur son absence. Appel direct à `_popover.hide()` plutôt que via
+        // ToggleController, qui ignore ce changement (shouldToggle gate sur isMobile) — on évite
+        // ainsi tout événement `ar-breadcrumb-hide` parasite.
+        if ((changed as Map<PropertyKey, unknown>).has('isMobile') && !this.isMobile) {
+            this._popover.hide();
+            this.open = false;
+        }
     }
 
     override firstUpdated(): void {
@@ -116,18 +170,8 @@ export class ArBreadcrumb extends LitElement {
                 if (this.isConnected) this._attachDropdown();
             });
         }
-        if (changed.has('open') && changed.get('open') !== undefined && this.isMobile) {
-            if (this.open) {
-                void this._popover.show();
-                this.dispatchEvent(
-                    new CustomEvent('ar-breadcrumb-open', { bubbles: true, composed: true }),
-                );
-            } else {
-                this._popover.hide();
-                this.dispatchEvent(
-                    new CustomEvent('ar-breadcrumb-close', { bubbles: true, composed: true }),
-                );
-            }
+        if (changed.has('open')) {
+            this.toggleState('open', this.open);
         }
     }
 
@@ -135,59 +179,63 @@ export class ArBreadcrumb extends LitElement {
     // Render
     // ---------------------------------------------------------------------------
 
+    private _defaultHomeIcon(): TemplateResult {
+        return html`<svg
+            aria-hidden="true"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"></path>
+        </svg>`;
+    }
+
+    private _defaultTriggerIcon(): TemplateResult {
+        return html`<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="5" cy="12" r="1.75"></circle>
+            <circle cx="12" cy="12" r="1.75"></circle>
+            <circle cx="19" cy="12" r="1.75"></circle>
+        </svg>`;
+    }
+
     override render(): TemplateResult | void {
         const items = this._orderedItems;
 
         if (items.length === 0) return;
 
-        const listTemplates: TemplateResult[] = items.map((item, index) => {
-            const isCurrent = index === items.length - 1;
-            return html` <li
-                part="item"
-                class="breadcrumb-item${isCurrent ? ' active' : ''}"
-                .ariaCurrent="${isCurrent ? 'page' : nothing}"
-            >
-                ${isCurrent
-                    ? html`<span part="current" class="breadcrumb-text">${item.label}</span>`
-                    : html`<a part="link" class="breadcrumb-link" href="${item.href}"
-                          >${item.label}</a
-                      >`}
-            </li>`;
-        });
+        const navLabel = this.localize.term('breadcrumbNavLabel');
+        const showLabel = this.localize.term('showBreadcrumb');
 
         return html`
-            <nav
-                part="nav"
-                class="breadcrumb-container"
-                role="navigation"
-                aria-labelledby="breadcrumb-label"
-            >
-                <p id="breadcrumb-label" class="sr-only">Vous êtes ici</p>
-                ${this.isMobile
-                    ? html`<div class="breadcrumb-dropdown">
-                          <a id="mobile-home-btn" class="btn btn-tertiary" href="${items[0]?.href}">
-                              <span aria-hidden="true" class="icon icon-chevron-sm-l"></span>
-                              <span class="btn-content">${items[0]?.label}</span>
-                          </a>
-                          <button
-                              @click=${this.open ? this._hide : this._show}
-                              type="button"
-                              part="trigger"
-                              class="btn btn-tertiary btn-ratio-square"
-                              id="breadcrumb-dropdown"
-                          >
-                              <span aria-hidden="true" class="icon icon-more">v</span>
-                              <span class="btn-content sr-only">Afficher le fil d'ariane</span>
-                          </button>
-                          <div part="panel" popover="auto" tabindex="-1">
-                              <ol class="breadcrumb breadcrumb-mobile">
-                                  ${listTemplates.slice(1)}
-                              </ol>
-                          </div>
-                      </div>`
-                    : html`<ol part="list" class="breadcrumb breadcrumb-desktop">
-                          ${listTemplates}
-                      </ol>`}
+            <nav part="breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
+                <p id="breadcrumb-label" class="sr-only">${navLabel}</p>
+                ${
+                    this.isMobile
+                        ? html`<div class="dropdown">
+                              <a part="home" href=${items[0]?.href ?? nothing}>
+                                  <slot name="home-icon">${this._defaultHomeIcon()}</slot>
+                                  <span>${items[0]?.label}</span>
+                              </a>
+                              <button
+                                  @click=${this._handleTriggerClick}
+                                  type="button"
+                                  part="trigger"
+                              >
+                                  <slot name="trigger-icon">${this._defaultTriggerIcon()}</slot>
+                                  <span class="sr-only">${showLabel}</span>
+                              </button>
+                              <div part="panel" popover="auto" tabindex="-1">
+                                  <div part="connector" aria-hidden="true"></div>
+                                  <div role="list" part="list list--mobile">
+                                      <slot></slot>
+                                  </div>
+                              </div>
+                          </div>`
+                        : html`<div role="list" part="list list--desktop">
+                              <slot></slot>
+                          </div>`
+                }
             </nav>
         `;
     }
@@ -197,15 +245,31 @@ export class ArBreadcrumb extends LitElement {
     // ---------------------------------------------------------------------------
 
     private get _orderedItems(): ArBreadcrumbItem[] {
-        return [...this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item')];
+        return [...this.querySelectorAll('*')].filter(
+            (el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem,
+        );
     }
 
     private _collectExistingItems(): void {
         const registry = this._provider.value;
         if (!registry) return;
-        this.querySelectorAll<ArBreadcrumbItem>('ar-breadcrumb-item').forEach((item) =>
-            item.setRegistry(registry),
-        );
+        [...this.querySelectorAll('*')]
+            .filter((el): el is ArBreadcrumbItem => el instanceof ArBreadcrumbItem)
+            .forEach((item) => item.setRegistry(registry));
+    }
+
+    private _pushRenderState(): void {
+        const items = this._orderedItems;
+        const separator = this.querySelector(':scope > [slot="separator"]') ?? undefined;
+        items.forEach((item, index) => {
+            item.setRenderState({
+                isFirst: index === 0,
+                isCurrent: index === items.length - 1,
+                isMobile: this.isMobile,
+                hasPrevious: this.isMobile ? index > 1 : index > 0,
+                separator,
+            });
+        });
     }
 
     private _scheduleRebuild(): void {
@@ -223,21 +287,22 @@ export class ArBreadcrumb extends LitElement {
         }
     }
 
-    private _show(): void {
-        this.open = true;
+    private _handleTriggerClick = (): void => {
+        this.open = !this.open;
+    };
+
+    private _onShow(): void {
+        void this._popover.show().then(() => {
+            emitToggleEvent(this, 'ar-breadcrumb-shown', { cancelable: false });
+        });
     }
 
-    private _hide(): void {
-        this.open = false;
+    private _onHide(): void {
+        this._popover.hide();
+        emitToggleEvent(this, 'ar-breadcrumb-hidden', { cancelable: false });
     }
 
     private _handleMediaChange = (): void => {
         this.isMobile = ArBreadcrumb.mobileQuery.matches;
     };
-}
-
-declare global {
-    interface HTMLElementTagNameMap {
-        'ar-breadcrumb': ArBreadcrumb;
-    }
 }

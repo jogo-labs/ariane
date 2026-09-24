@@ -1,0 +1,136 @@
+:root {
+    color-scheme: light dark;
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * 4. TOKENS GLOBAUX — TYPOGRAPHIE
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    --ar-font-size-sm: 0.875rem;
+    --ar-font-size-md: 1rem;
+    --ar-font-size-lg: 1.125rem;
+
+    --ar-font-weight-normal: 400;
+    --ar-font-weight-medium: 500;
+    --ar-font-weight-bold: 700;
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * 5. TOKENS GLOBAUX — ESPACEMENT & FORME
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    --ar-spacing-xs: 0.25rem;
+    --ar-spacing-sm: 0.5rem;
+    --ar-spacing-md: 1rem;
+    --ar-spacing-lg: 1.5rem;
+    --ar-spacing-xl: 2rem;
+
+    /* Progression plus généreuse (identité #110), sans copier telle quelle
+               l'échelle 4/12/20/40 de la doc (--doc-radius-*) : un bouton de
+               --ar-button-height (2.5rem=40px) avec un rayon de 40px deviendrait
+               une pilule complète, pas toujours voulu. Valeurs à confirmer par
+               revue visuelle (Task 7 de ce plan) — ajustable par paliers de 2px
+               si un composant semble disproportionné après capture. */
+    --ar-border-radius-sm: 0.25rem; /* 4px, inchangé */
+    --ar-border-radius-md: 0.5rem; /* 8px (était 6px) */
+    --ar-border-radius-lg: 0.875rem; /* 14px (était 8px) */
+    --ar-border-radius-xl: 1.5rem; /* 24px (était 12px) */
+    --ar-border-radius-full: 9999px;
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * 6. TOKENS GÉNÉRIQUES MUTUALISÉS
+             * Mutualisation de thème pure : jamais consommés dans un .styles.ts
+             * ou un .ts de composant (contrairement à panel.styles.ts ou
+             * --ar-anchor-*, qui pilotent un mécanisme interne). Chacun est le
+             * point d'entrée public d'un preset externe (buttons.css,
+             * fields.css), réutilisé ici pour garder les ::part() du thème
+             * visuellement cohérents avec lui.
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* Button — Partagé (stepper) */
+    --ar-button-primary-bg: var(--ar-color-primary-70);
+    --ar-button-primary-bg-hover: light-dark(
+        var(--ar-color-primary-60),
+        var(--ar-color-primary-80)
+    );
+    --ar-button-primary-bg-active: light-dark(
+        var(--ar-color-primary-80),
+        var(--ar-color-primary-60)
+    );
+    --ar-button-primary-color: var(--ar-color-neutral-10);
+    --ar-button-primary-border-color: var(--ar-color-primary-70);
+    --ar-button-danger-bg: var(--ar-color-danger-50);
+    --ar-button-danger-color: var(--ar-color-white);
+    --ar-button-secondary-bg: var(--ar-color-bg);
+    --ar-button-secondary-border-hover: light-dark(
+        var(--ar-color-neutral-40),
+        var(--ar-color-neutral-90)
+    );
+    --ar-button-secondary-bg-hover: var(--ar-color-bg-subtle);
+    --ar-button-disabled-bg: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-30));
+    --ar-button-disabled-border: light-dark(var(--ar-color-neutral-80), var(--ar-color-neutral-40));
+    --ar-button-disabled-color: var(--ar-color-neutral-50);
+    --ar-button-disabled-icon-color: var(--ar-color-neutral-60);
+    --ar-button-tertiary-bg: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.1));
+    --ar-button-tertiary-bg-hover: light-dark(rgba(26, 26, 26, 0.7), rgba(255, 255, 255, 0.15));
+    --ar-button-tertiary-bg-active: light-dark(rgba(26, 26, 26, 0.8), rgba(255, 255, 255, 0.2));
+    --ar-button-tertiary-bg-focus: light-dark(rgba(26, 26, 26, 0.05), rgba(255, 255, 255, 0.08));
+    --ar-button-tertiary-active-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+    --ar-button-link-color: var(--ar-color-interactive);
+    /* light-dark() explicite (pas une simple référence à neutral-20) : ce
+               token servait un seul gris sombre dans les deux modes — invisible
+               sur le nouveau fond sombre "vault" (contraste ~1.2:1). neutral-80
+               donne 10.74:1 sur vault ; neutral-20 reste inchangé côté clair. */
+    --ar-button-focus-ring-color: light-dark(
+        var(--ar-color-neutral-20),
+        var(--ar-color-neutral-80)
+    );
+    --ar-button-border-radius: var(--ar-border-radius-sm);
+    --ar-button-font-weight: var(--ar-font-weight-medium);
+    --ar-button-height: 2.5rem;
+    --ar-button-padding-x: 1rem;
+    --ar-button-ratio-square-width: 2.5rem;
+    --ar-button-transition-duration: 0.15s;
+
+    /* Input — preset fields.css, réutilisé par ar-datepicker::part(input) */
+    --ar-input-border-color: var(--ar-color-border);
+    --ar-input-radius: var(--ar-border-radius-md);
+    --ar-input-bg: var(--ar-color-bg);
+    --ar-input-color: var(--ar-color-text);
+    --ar-input-font-size: var(--ar-font-size-md);
+    --ar-input-focus-ring-color: var(--ar-focus-ring-color);
+    --ar-input-disabled-color: var(--ar-color-neutral-50);
+    --ar-input-disabled-bg: light-dark(
+        var(--ar-color-neutral-95),
+        color-mix(in oklab, var(--ar-color-vault), white 10%)
+    );
+    --ar-input-readonly-bg: var(--ar-color-bg-subtle);
+
+    /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
+               interne d'ar-datepicker::part(datepicker) */
+    --ar-field-gap: 0.5rem;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     * THÈME SOMBRE
+     * Les tokens qui varient entre clair et sombre sont directement
+     * déclarés via light-dark() ci-dessus, piloté par color-scheme.
+     * Les deux règles ci-dessous ne posent que color-scheme — c'est ce
+     * qui fait choisir à light-dark() sa branche claire ou sombre.
+     * Elles s'appliquent à :root (racine du document) mais aussi à tout
+     * conteneur portant data-theme, ce qui scope les tokens --ar-* à ce
+     * seul sous-arbre (issue #203) : un consommateur peut ainsi forcer
+     * un widget, une prévisualisation ou toute portion de page en clair
+     * ou en sombre indépendamment du reste du document.
+     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Thème sombre actif manuellement */
+:root[data-theme='dark'],
+[data-theme='dark'] {
+    color-scheme: dark;
+}
+
+/* Thème clair forcé — utile pour s'extraire d'un sombre ambiant
+       (ancêtre en data-theme="dark", ou prefers-color-scheme: dark) */
+:root[data-theme='light'],
+[data-theme='light'] {
+    color-scheme: light;
+}

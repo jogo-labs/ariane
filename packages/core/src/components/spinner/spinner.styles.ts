@@ -27,7 +27,7 @@ export default css`
         stroke-dasharray: 1, 200;
         stroke-dashoffset: 0;
         stroke-linecap: round;
-        stroke: var(--ar-spinner-stroke-color, currentColor);
+        stroke: var(--ar-spinner-stroke-color);
         animation: spinnerDash 1.5s ease-in-out infinite;
     }
 

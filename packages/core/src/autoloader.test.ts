@@ -45,7 +45,7 @@ describe('autoloader', () => {
         appendElement('ar-alert');
         await tick();
 
-        expect(mockAlertImport).toHaveBeenCalledTimes(1);
+        expect(mockAlertImport).toHaveBeenCalledOnce();
     });
 
     it('ne recharge pas le module si ar-alert est ajouté une seconde fois (loaded Set)', async () => {
@@ -56,7 +56,7 @@ describe('autoloader', () => {
         expect(mockAlertImport).not.toHaveBeenCalled();
     });
 
-    it('ne charge pas de module pour un tag inconnu de COMPONENT_MAP', async () => {
+    it('ne charge pas de module pour un tag inconnu de COMPONENT_DEFS', async () => {
         appendElement('ar-unknown');
         await tick();
 
@@ -80,5 +80,84 @@ describe('autoloader', () => {
         el.remove();
 
         expect(mockAlertImport).not.toHaveBeenCalled();
+    });
+});
+
+// ─── Préfixe configurable via window.ARIANE_CONFIG ─────────────────────────────
+
+describe('autoloader — préfixe configurable', () => {
+    afterEach(() => {
+        delete window.ARIANE_CONFIG;
+        document.body.innerHTML = '';
+        vi.resetModules();
+    });
+
+    it('charge un composant sous le tag ar-x par défaut sans config', async () => {
+        document.body.innerHTML = '<ar-spinner></ar-spinner>';
+        await import('./autoloader.js');
+        await customElements.whenDefined('ar-spinner');
+        expect(customElements.get('ar-spinner')).toBeDefined();
+    });
+
+    it('charge un composant sous le préfixe configuré via window.ARIANE_CONFIG', async () => {
+        window.ARIANE_CONFIG = { prefix: 'acme' };
+        document.body.innerHTML = '<acme-spinner></acme-spinner>';
+        await import('./autoloader.js');
+        await customElements.whenDefined('acme-spinner');
+        expect(customElements.get('acme-spinner')).toBeDefined();
+    });
+
+    it('charge un composant composé (stepper + stepper-item imbriqués) sous un préfixe personnalisé et le lien parent/enfant est bien reconstruit', async () => {
+        window.ARIANE_CONFIG = { prefix: 'acme' };
+        // Fixture IMBRIQUÉE : un <acme-stepper-item> enfant à l'intérieur d'un autre.
+        // Un fixture plat (un seul item) ne suffit pas à prouver le fix : l'item
+        // s'enregistre déjà auprès du stepper via le ContextConsumer (@lit/context),
+        // un mécanisme indépendant du nom de tag qui fonctionne même si le fallback
+        // `collectExistingItems()` / `closestInstanceOf()` est cassé. Seule une relation
+        // parent/enfant ENTRE DEUX items exerce `closestInstanceOf()` dans
+        // navigation-tree.controller.ts, qui avant le fix faisait
+        // `item.parentElement?.closest('ar-stepper-item')` — un tag hardcodé qui ne
+        // matche jamais sous le préfixe 'acme'.
+        document.body.innerHTML = `
+            <acme-stepper mode="edit">
+                <acme-stepper-item path="/a" label="A">
+                    <acme-stepper-item path="/a/b" label="B"></acme-stepper-item>
+                </acme-stepper-item>
+            </acme-stepper>
+        `;
+        await import('./autoloader.js');
+
+        await customElements.whenDefined('acme-stepper');
+        await customElements.whenDefined('acme-stepper-item');
+
+        expect(customElements.get('acme-stepper')).toBeDefined();
+        expect(customElements.get('acme-stepper-item')).toBeDefined();
+
+        const StepperItemClass = customElements.get('acme-stepper-item');
+        const items = document.querySelectorAll('acme-stepper-item');
+        expect(items).toHaveLength(2);
+        items.forEach((item) => expect(item).toBeInstanceOf(StepperItemClass));
+
+        const stepper = document.querySelector('acme-stepper') as HTMLElement & {
+            updateComplete: Promise<boolean>;
+        };
+        // Laisse le temps au fallback collectExistingItems() / au contexte de s'enregistrer
+        // et au rebuildTree() (queueMicrotask) de reconstruire l'arbre de navigation.
+        await stepper.updateComplete;
+        await stepper.updateComplete;
+        await tick();
+
+        // Preuve équivalente sous la nouvelle architecture : le parent "A" a bien construit le
+        // wrapper <div role="list" part="list list--substep"> dans son propre shadow DOM (posé uniquement
+        // quand showSubsteps est vrai, Task 3/4), ET "B" y est bien imbriqué en tant qu'enfant
+        // direct — les deux ne sont vrais que si buildFromItems() a correctement retrouvé le
+        // lien parent/enfant via closestInstanceOf() (aucun des deux niveaux ne pose plus
+        // d'attribut part sur son propre host, cf. #226 suivi).
+        const itemA = stepper.querySelector('acme-stepper-item[path="/a"]') as HTMLElement & {
+            shadowRoot: ShadowRoot | null;
+        };
+        const itemB = stepper.querySelector('acme-stepper-item[path="/a/b"]');
+        expect(itemA.shadowRoot?.querySelector('[part~="list--substep"]')).not.toBeNull();
+        expect(itemB?.matches('acme-stepper-item > acme-stepper-item')).toBe(true);
     });
 });

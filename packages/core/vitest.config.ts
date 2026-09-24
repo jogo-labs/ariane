@@ -11,7 +11,7 @@ export default defineConfig({
         environment: 'happy-dom',
 
         // *.browser.test.ts et *.a11y.test.ts sont gérés par @web/test-runner, pas Vitest
-        include: ['src/**/*.test.ts'],
+        include: ['src/**/*.test.ts', 'scripts/**/*.test.js'],
         exclude: ['src/**/*.browser.test.ts', 'src/**/*.a11y.test.ts'],
 
         // Rapport de couverture granulaire par fichier

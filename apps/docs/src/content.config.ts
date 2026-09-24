@@ -18,6 +18,19 @@ const variantSchema = z.object({
 });
 
 /**
+ * Note pointant vers les CSS Custom Properties d'un autre composant, applicables à
+ * celui-ci — cas d'un composant qui en imbrique un autre themable dans son propre
+ * shadow root (ex. ar-table-sort → ar-tooltip). Affichée dans la section CSS Custom
+ * Properties de la page, sous la table des tokens propres au composant.
+ */
+const relatedTokensSchema = z.object({
+    /** Tag du composant dont les tokens s'appliquent (ex: ar-tooltip) */
+    component: z.string(),
+    /** Explique pourquoi/comment ces tokens s'appliquent ici. Le lien vers la doc du composant est ajouté automatiquement. */
+    description: z.string(),
+});
+
+/**
  * Collection "components" — un fichier MDX par composant.
  * Le frontmatter définit les métadonnées et les variantes pré-configurées.
  */
@@ -28,14 +41,18 @@ const components = defineCollection({
         tagName: z.string(),
         /** Titre affiché en haut de la page */
         title: z.string(),
-        /** Description courte affichée sous le titre */
-        description: z.string().optional(),
         /** Nom de la variante dont le HTML initialise le playground interactif. Si absent, la première variante est utilisée. */
         playgroundTemplate: z.string().optional(),
         /** Variantes pré-configurées affichées dans le playground */
         // variants: z.array(variantSchema).default([]),
         // coerce : si le champ est absent ou null dans le MDX, on force un array vide
         variants: z.preprocess((val) => (Array.isArray(val) ? val : []), z.array(variantSchema)),
+        /** Tokens d'autres composants applicables ici (composant imbriqué en interne) */
+        relatedTokens: z.array(relatedTokensSchema).optional(),
+        /** Script injecté une fois en fin de page, hors des variantes — pour du JS de démo
+         *  page-level (ex. écouter un event et simuler la réaction attendue du consommateur)
+         *  sans le rattacher artificiellement à une variante précise. */
+        pageScript: z.string().optional(),
     }),
 });
 

@@ -20,7 +20,13 @@ const EXPECTED_PAGES = [
     'index.html',
     'getting-started/quickstart/index.html',
     'getting-started/utilisation/index.html',
-    'foundations/tokens/index.html',
+    'getting-started/frameworks/index.html',
+    'getting-started/traductions/index.html',
+    'theming/overview/index.html',
+    'theming/appliquer-un-theme/index.html',
+    'theming/personnalisation-avancee/index.html',
+    'theming/shadow-dom/index.html',
+    'theming/tag-customization/index.html',
 ];
 
 let hasError = false;

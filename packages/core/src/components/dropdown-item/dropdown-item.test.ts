@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { ArDropdownItem } from './dropdown-item.js';
 import { fixture, waitForUpdate } from '../../test-utils.js';
-import './dropdown-item.js';
+import './index.js';
 
 async function fixtureWithSlot(innerHtml: string): Promise<ArDropdownItem> {
     // Mount empty, then append child to trigger slotchange

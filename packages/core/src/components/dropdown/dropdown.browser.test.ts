@@ -11,8 +11,8 @@
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
 import type { ArDropdown } from './dropdown.js';
-import './dropdown.js';
-import '../dropdown-item/dropdown-item.js';
+import './index.js';
+import '../dropdown-item/index.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -193,6 +193,52 @@ describe('ar-dropdown — browser', () => {
             panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
             await aTimeout(20);
             expect(el.open).to.equal(false);
+        });
+    });
+
+    // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    describe('fallback CSS sans thème chargé', () => {
+        it('le panel a un fond, un texte et une bordure visibles même sans ariane.css', async () => {
+            el = await fixture(html`
+                <ar-dropdown>
+                    <button slot="trigger">Trigger</button>
+                    <p>Contenu</p>
+                </ar-dropdown>
+            `);
+            await openDropdown(el);
+            const panel = getPanel(el);
+            const computed = getComputedStyle(panel);
+
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // valeurs viennent uniquement du fallback système CSS4 posé dans
+            // panel.styles.ts, pas d'un thème.
+            expect(computed.backgroundColor).to.not.equal('');
+            expect(computed.backgroundColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.color).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('');
+            expect(computed.borderTopColor).to.not.equal('rgba(0, 0, 0, 0)');
+            expect(computed.borderTopWidth).to.equal('1px');
+        });
+    });
+
+    // ── :state() cumulés (généralisation #251) ────────────────────────────────
+
+    describe(':state() cumulés (open/disabled)', () => {
+        it('expose :state(open) synchronisé avec open', async () => {
+            el = await fixture(html`<ar-dropdown></ar-dropdown>`);
+            expect(el.matches(':state(open)')).to.equal(false);
+
+            el.open = true;
+            await el.updateComplete;
+            expect(el.matches(':state(open)')).to.equal(true);
+        });
+
+        it('expose :state(disabled) synchronisé avec disabled', async () => {
+            el = await fixture(html`<ar-dropdown></ar-dropdown>`);
+            el.disabled = true;
+            await el.updateComplete;
+            expect(el.matches(':state(disabled)')).to.equal(true);
         });
     });
 });

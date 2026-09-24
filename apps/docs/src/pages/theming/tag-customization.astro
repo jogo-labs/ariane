@@ -1,0 +1,67 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+
+const codePrefixConfig = `<script>
+  window.ARIANE_CONFIG = { prefix: 'acme' };
+</script>
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
+
+const codePrefixUsage = `<acme-alert variant="success">
+  Opération réussie.
+</acme-alert>`;
+
+const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
+
+customElements.define('acme-alert', ArAlert);`;
+
+---
+
+<Layout
+    title="Personnaliser le préfixe des tags"
+    description="Comment personnaliser le préfixe du tag des composants Ariane pour les adapter à votre projet."
+    currentPath="/theming/tag-customization"
+    showToc={false}
+>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Personaliser le préfixe des tags</h2>
+            <p class="summary">
+                Que ce soit pour éviter la collision avec une autre librairie, ou adopter votre propre convention de nommage,
+                Ariane vous permet de définir votre propre préfixe pour ses composants.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="cdn-tag-customization">Vous utilisez le CDN</NarrativeHeading>
+            <p>
+                Définissez <code>window.ARIANE_CONFIG.prefix</code>&nbsp;
+                <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
+            </p>
+            <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
+
+            <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
+            <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
+            <p class="hint">
+                Le préfixe définit ainsi est global et s'applique à tous les composants.
+                Le renommage libre par composant nécessite d'utiliser Ariane via le paquet npm.
+            </p>
+
+            <NarrativeHeading id="npm-tag-customization">Vous utilisez npm</NarrativeHeading>
+            <p>
+                Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
+                tags <code>ar-*</code> par défaut, importez les classes depuis <code>@ariane-ui/core/headless</code>,
+                puis vous appelez <code>customElements.define()</code> vous-même :
+            </p>
+            <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
+            <p class="hint">
+                Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
+                composant individuellement.
+            </p>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>

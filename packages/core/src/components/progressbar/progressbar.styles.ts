@@ -3,53 +3,35 @@ import { css } from 'lit';
 export default css`
     :host {
         display: block;
-        max-width: 500px;
-        min-width: 200px;
         box-sizing: border-box;
+        /* a11y-fallback: sans plafond, [part='label'] peut s'étirer sur un conteneur très large et éloigner visuellement le pourcentage de son label (lien a11y label/valeur) */
+        max-width: var(--ar-progressbar-max-width, 500px);
     }
 
-    .progressbar-container {
-        display: -webkit-box;
-        display: -ms-flexbox;
+    [part='progressbar'] {
         display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
         flex-direction: column;
-        row-gap: 0.75rem;
     }
 
-    .progress {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
+    [part='track'] {
         display: inline-flex;
         position: relative;
         height: 0.5rem;
-        background-color: var(--ar-progressbar-track-color, #e6e7ec);
-        border-radius: 50rem;
+        background-color: var(--ar-progressbar-track-color, ButtonFace);
     }
 
-    .progress-bar {
-        background-color: var(--ar-progressbar-fill-color, #283276);
-        border-radius: 50rem;
+    [part='bar'] {
+        background-color: var(--ar-progressbar-fill-color, ButtonText);
     }
 
-    .progress-label {
-        display: -webkit-inline-box;
-        display: -ms-inline-flexbox;
+    [part='label'] {
         display: inline-flex;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
         justify-content: space-between;
-        -ms-flex-wrap: nowrap;
         flex-wrap: nowrap;
-        -webkit-column-gap: 2rem;
-        -moz-column-gap: 2rem;
-        column-gap: 2rem;
         margin: 0;
     }
 
-    .progress-label .content-label {
+    [part='label-text'] {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
@@ -60,15 +42,13 @@ export default css`
     }
 
     @media (min-width: 576px) {
-        .progress-label .content-label {
+        [part='label-text'] {
             -webkit-line-clamp: none;
             line-clamp: none;
         }
     }
 
-    .progress-label .progress-percent {
-        color: var(--ar-progressbar-percent-color, #5b5d65);
-        -ms-flex-negative: 0;
+    [part='percent'] {
         flex-shrink: 0;
     }
 `;

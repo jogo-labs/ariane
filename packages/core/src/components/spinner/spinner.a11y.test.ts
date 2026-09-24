@@ -5,7 +5,7 @@
  * Tests d'accessibilité axe-core pour ar-spinner, via @web/test-runner (Chromium).
  */
 import { fixture, html, expect } from '@open-wc/testing';
-import './spinner.js';
+import './index.js';
 
 describe('ar-spinner — accessibilité', () => {
     it('en cours de chargement est accessible', async () => {
