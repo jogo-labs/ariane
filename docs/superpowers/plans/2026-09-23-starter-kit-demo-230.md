@@ -6,7 +6,7 @@
 
 **Architecture:** Un script générateur (`scripts/starter-kit/`) vit dans `ariane`, composé de fonctions pures testables : lecture manifest, lecture variants MDX, construction HTML (repris tels quels du design pré-#256), plus deux nouvelles fonctions de dérivation CSS (`deriveNeutralPalette`, `deriveNeutralGlobalTokens`) qui neutralisent uniquement les 11 valeurs de la palette primaire (en préservant leur luminosité, donc leur contraste) et les 4 valeurs de l'échelle de radius — tout le reste de l'arbre `packages/core/src/styles/themes/ariane/` (19 fragments) est copié verbatim, puisqu'il référence déjà les primitives via `var()`. Le flux de mise à jour reste manuel (niveau A) : le script écrit et committe dans un checkout frère du repo externe, le `push` reste un geste volontaire.
 
-**Tech Stack:** Node.js (scripts CLI, `node:test` pour les tests unitaires — zéro nouvelle dépendance de test), `gray-matter` (nouvelle dépendance, parsing du frontmatter YAML des `.mdx`), GitHub Pages ("Deploy from a branch"), `gh` CLI pour la création du repo externe.
+**Tech Stack:** Node.js (scripts CLI, Vitest pour les tests unitaires — convention déjà établie pour `packages/core/scripts/*.test.js`, cf. #256), `gray-matter` (nouvelle dépendance, parsing du frontmatter YAML des `.mdx`), GitHub Pages ("Deploy from a branch"), `gh` CLI pour la création du repo externe.
 
 **Spec:** `docs/superpowers/specs/2026-09-23-starter-kit-demo-230-design.md`
 
