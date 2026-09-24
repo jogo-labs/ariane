@@ -16,9 +16,21 @@ const NEUTRAL_RADIUS = {
  * (typographie, espacement, tokens génériques mutualisés bouton/input/panel)
  * passe inchangé — ce ne sont pas des choix d'identité visuelle.
  */
+const EXPECTED_RADIUS_COUNT = Object.keys(NEUTRAL_RADIUS).length;
+
 export function deriveNeutralGlobalTokens(globalTokensCssText) {
-    return globalTokensCssText.replace(
+    let replacedCount = 0;
+    const out = globalTokensCssText.replace(
         /--ar-border-radius-(sm|md|lg|xl):\s*[^;]+;(?:\s*\/\*[^*]*\*\/)?/g,
-        (match, size) => `--ar-border-radius-${size}: ${NEUTRAL_RADIUS[size]};`,
+        (match, size) => {
+            replacedCount++;
+            return `--ar-border-radius-${size}: ${NEUTRAL_RADIUS[size]};`;
+        },
     );
+    if (replacedCount !== EXPECTED_RADIUS_COUNT) {
+        throw new Error(
+            `deriveNeutralGlobalTokens : ${replacedCount}/${EXPECTED_RADIUS_COUNT} tokens border-radius remplacés — _global-tokens.css a-t-il changé de format ?`,
+        );
+    }
+    return out;
 }

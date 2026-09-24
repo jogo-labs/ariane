@@ -26,11 +26,28 @@ describe('syncStarterTheme', () => {
             );
             writeFileSync(
                 path.join(srcThemesDir, 'ariane', '_palette.css'),
-                `:root {\n    --ar-color-primary-40: oklch(52.43% 0.1108 74.71);\n}`,
+                `:root {\n` +
+                    `    --ar-color-primary-05: oklch(16.5% 0.035 70);\n` +
+                    `    --ar-color-primary-10: oklch(20% 0.035 70);\n` +
+                    `    --ar-color-primary-20: oklch(28% 0.035 70);\n` +
+                    `    --ar-color-primary-30: oklch(36% 0.035 70);\n` +
+                    `    --ar-color-primary-40: oklch(52.43% 0.1108 74.71);\n` +
+                    `    --ar-color-primary-50: oklch(60% 0.035 70);\n` +
+                    `    --ar-color-primary-60: oklch(68% 0.035 70);\n` +
+                    `    --ar-color-primary-70: oklch(76% 0.035 70);\n` +
+                    `    --ar-color-primary-80: oklch(84% 0.035 70);\n` +
+                    `    --ar-color-primary-90: oklch(92% 0.035 70);\n` +
+                    `    --ar-color-primary-95: oklch(96.5% 0.038 87);\n` +
+                    `    --ar-color-vault: oklch(23.54% 0.0334 273.44);\n` +
+                    `    --ar-color-vault-deep: oklch(18.99% 0.0249 273.04);\n}`,
             );
             writeFileSync(
                 path.join(srcThemesDir, 'ariane', '_global-tokens.css'),
-                `:root {\n    --ar-border-radius-md: 0.5rem;\n}`,
+                `:root {\n` +
+                    `    --ar-border-radius-sm: 0.25rem;\n` +
+                    `    --ar-border-radius-md: 0.5rem;\n` +
+                    `    --ar-border-radius-lg: 0.875rem;\n` +
+                    `    --ar-border-radius-xl: 1.5rem;\n}`,
             );
             writeFileSync(
                 path.join(srcThemesDir, 'ariane', 'components', '_alert.css'),

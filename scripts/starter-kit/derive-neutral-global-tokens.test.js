@@ -26,4 +26,14 @@ describe('deriveNeutralGlobalTokens', () => {
         expect(result).toMatch(/--ar-font-size-md: 1rem;/);
         expect(result).toMatch(/--ar-button-height: 2\.5rem;/);
     });
+
+    it('throw si moins de 4 tokens border-radius matchent (format inattendu)', () => {
+        const PARTIAL = `:root {
+    --ar-font-size-md: 1rem;
+    --ar-border-radius-sm: 0.25rem;
+    --ar-border-radius-md: 0.5rem;
+    --ar-border-radius-full: 9999px;
+}`;
+        expect(() => deriveNeutralGlobalTokens(PARTIAL)).toThrow(/tokens border-radius remplacés/);
+    });
 });

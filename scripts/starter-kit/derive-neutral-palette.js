@@ -27,22 +27,46 @@ const NEUTRAL_HUE = 250;
  * (Neutral/Green/Yellow/Red/Blue/White — hues sémantiques universelles, pas
  * une identité de marque) passe inchangé.
  */
+const EXPECTED_PRIMARY_COUNT = Object.keys(PRIMARY_CHROMA).length;
+
 export function deriveNeutralPalette(paletteCssText) {
+    let primaryReplacedCount = 0;
     let out = paletteCssText.replace(
         /--ar-color-primary-(\d{2}):\s*oklch\(([\d.]+%)\s+[\d.]+\s+[\d.]+\);/g,
         (match, step, lightness) => {
             const chroma = PRIMARY_CHROMA[step];
             if (!chroma) return match;
+            primaryReplacedCount++;
             return `--ar-color-primary-${step}: oklch(${lightness} ${chroma} ${NEUTRAL_HUE});`;
         },
     );
-    out = out.replace(
-        /--ar-color-vault:\s*oklch\([^)]*\);/,
-        '--ar-color-vault: var(--ar-color-neutral-10);',
-    );
-    out = out.replace(
-        /--ar-color-vault-deep:\s*oklch\([^)]*\);/,
-        '--ar-color-vault-deep: var(--ar-color-neutral-05);',
-    );
+    if (primaryReplacedCount !== EXPECTED_PRIMARY_COUNT) {
+        throw new Error(
+            `deriveNeutralPalette : ${primaryReplacedCount}/${EXPECTED_PRIMARY_COUNT} paliers primary remplacés — _palette.css a-t-il changé de format ?`,
+        );
+    }
+
+    let vaultReplaced = false;
+    out = out.replace(/--ar-color-vault:\s*oklch\([^)]*\);/, () => {
+        vaultReplaced = true;
+        return '--ar-color-vault: var(--ar-color-neutral-10);';
+    });
+    if (!vaultReplaced) {
+        throw new Error(
+            'deriveNeutralPalette : --ar-color-vault non substitué — _palette.css a-t-il changé de format ?',
+        );
+    }
+
+    let vaultDeepReplaced = false;
+    out = out.replace(/--ar-color-vault-deep:\s*oklch\([^)]*\);/, () => {
+        vaultDeepReplaced = true;
+        return '--ar-color-vault-deep: var(--ar-color-neutral-05);';
+    });
+    if (!vaultDeepReplaced) {
+        throw new Error(
+            'deriveNeutralPalette : --ar-color-vault-deep non substitué — _palette.css a-t-il changé de format ?',
+        );
+    }
+
     return out;
 }
