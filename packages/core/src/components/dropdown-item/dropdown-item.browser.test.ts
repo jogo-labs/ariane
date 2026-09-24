@@ -24,7 +24,11 @@ async function loadTheme(): Promise<HTMLLinkElement> {
 function* walkRules(rules: CSSRuleList): Generator<CSSRule> {
     for (const rule of rules) {
         yield rule;
-        if ('cssRules' in rule) yield* walkRules((rule as CSSGroupingRule).cssRules);
+        if (rule instanceof CSSImportRule) {
+            if (rule.styleSheet) yield* walkRules(rule.styleSheet.cssRules);
+        } else if ('cssRules' in rule) {
+            yield* walkRules((rule as CSSGroupingRule).cssRules);
+        }
     }
 }
 
