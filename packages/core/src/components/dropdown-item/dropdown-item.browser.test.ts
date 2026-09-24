@@ -1,6 +1,6 @@
 /// <reference types="mocha" />
 /**
- * Vérifie que `default.css` stylise le bouton/lien slotté dans `ar-dropdown-item` —
+ * Vérifie que `ariane.css` stylise le bouton/lien slotté dans `ar-dropdown-item` —
  * reset de base, hover et focus-visible (issue #199). `ar-dropdown-item` n'a
  * aucun style interne (`:host { display: contents }`), tout vient du thème,
  * ciblé directement sur le light DOM (`::slotted()` est inatteignable depuis
@@ -13,7 +13,7 @@ import './index.js';
 async function loadTheme(): Promise<HTMLLinkElement> {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = new URL('../../styles/themes/default.css', import.meta.url).href;
+    link.href = new URL('../../styles/themes/ariane.css', import.meta.url).href;
     document.head.appendChild(link);
     await new Promise<void>((resolve) => {
         link.addEventListener('load', () => resolve(), { once: true });

@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 /**
  * Vérifie que les classes `.ar-btn-*` de `presets/buttons.css` consomment
- * bien les tokens `--ar-button-*` de `themes/default.css` (issue #200).
+ * bien les tokens `--ar-button-*` de `themes/ariane.css` (issue #200).
  */
 import { expect } from '@open-wc/testing';
 
@@ -22,7 +22,7 @@ describe('presets/buttons.css', () => {
     let container: HTMLDivElement;
 
     before(async () => {
-        themeLink = await loadStylesheet('../themes/default.css');
+        themeLink = await loadStylesheet('../themes/ariane.css');
         presetsLink = await loadStylesheet('./buttons.css');
     });
 

@@ -14,7 +14,7 @@ describe('findPartStateOrderErrors', () => {
                 }
             }
         `;
-        const errors = findPartStateOrderErrors('default.css', source);
+        const errors = findPartStateOrderErrors('ariane.css', source);
         expect(errors).toHaveLength(1);
         expect(errors[0]).toContain('indicator--current');
         expect(errors[0]).toContain('indicator');
@@ -32,7 +32,7 @@ describe('findPartStateOrderErrors', () => {
                 }
             }
         `;
-        expect(findPartStateOrderErrors('default.css', source)).toEqual([]);
+        expect(findPartStateOrderErrors('ariane.css', source)).toEqual([]);
     });
 
     it('ignore un part sans base déclarée dans le même bloc (aucune fausse relation)', () => {
@@ -47,7 +47,7 @@ describe('findPartStateOrderErrors', () => {
                 }
             }
         `;
-        expect(findPartStateOrderErrors('default.css', source)).toEqual([]);
+        expect(findPartStateOrderErrors('ariane.css', source)).toEqual([]);
     });
 
     it('traite chaque bloc de composant indépendamment', () => {
@@ -70,7 +70,7 @@ describe('findPartStateOrderErrors', () => {
                 }
             }
         `;
-        const errors = findPartStateOrderErrors('default.css', source);
+        const errors = findPartStateOrderErrors('ariane.css', source);
         expect(errors).toHaveLength(1);
         expect(errors[0]).toContain('ar-one');
     });
@@ -87,7 +87,7 @@ describe('findPartStateOrderErrors', () => {
             '    }',
             '}',
         ].join('\n');
-        const errors = findPartStateOrderErrors('default.css', source);
+        const errors = findPartStateOrderErrors('ariane.css', source);
         expect(errors[0]).toContain(':2');
     });
 
@@ -103,6 +103,6 @@ describe('findPartStateOrderErrors', () => {
                 }
             }
         `;
-        expect(findPartStateOrderErrors('default.css', source)).toEqual([]);
+        expect(findPartStateOrderErrors('ariane.css', source)).toEqual([]);
     });
 });

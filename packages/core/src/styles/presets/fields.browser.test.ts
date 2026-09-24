@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 /**
  * Vérifie que les classes `.ar-input`/`.ar-label` de `presets/fields.css`
- * consomment bien les tokens `--ar-*` génériques de `themes/default.css`
+ * consomment bien les tokens `--ar-*` génériques de `themes/ariane.css`
  * (issue #209).
  */
 import { expect } from '@open-wc/testing';
@@ -23,7 +23,7 @@ describe('presets/fields.css', () => {
     let container: HTMLDivElement;
 
     before(async () => {
-        themeLink = await loadStylesheet('../themes/default.css');
+        themeLink = await loadStylesheet('../themes/ariane.css');
         presetsLink = await loadStylesheet('./fields.css');
     });
 

@@ -38,7 +38,7 @@ parallèle.
 ## Conséquences
 
 - Tous les tokens `--doc-*` non-couleur (rayons, easing, typo) sont
-  rationalisés sur le vocabulaire de `packages/core/src/styles/themes/default.css`
+  rationalisés sur le vocabulaire de `packages/core/src/styles/themes/ariane.css`
   (`--ar-border-radius-*`, `--ar-font-size-*`, etc.) — les deux systèmes
   n'ont aucun lien fonctionnel, mais une terminologie alignée facilite la
   lecture pour un mainteneur qui passe de l'un à l'autre.

@@ -381,7 +381,7 @@ describe('ar-datepicker — browser', () => {
             expect(getComputedStyle(day).height).to.equal(expectedPx);
         });
 
-        it('le panel a un fond, un texte et une bordure visibles même sans default.css', async () => {
+        it('le panel a un fond, un texte et une bordure visibles même sans ariane.css', async () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             await openPicker(el);
 
@@ -389,7 +389,7 @@ describe('ar-datepicker — browser', () => {
             if (!panel) throw new Error('[part="panel"] introuvable');
             const computed = getComputedStyle(panel);
 
-            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
             // valeurs viennent uniquement du fallback système CSS4 posé dans
             // panel.styles.ts (ar-datepicker ne redéclare pas background-color/
             // color/border-color), pas d'un thème.

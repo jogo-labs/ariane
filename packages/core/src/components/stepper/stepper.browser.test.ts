@@ -85,14 +85,14 @@ describe('ar-stepper — browser', () => {
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
 
     describe('fallback CSS sans thème chargé', () => {
-        it('le panel a un fond et une bordure visibles même sans default.css', async () => {
+        it('le panel a un fond et une bordure visibles même sans ariane.css', async () => {
             el = await mobileStepper();
             getTrigger(el).click();
             await aTimeout(50);
             const panel = getPanel(el);
             const computed = getComputedStyle(panel);
 
-            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
             // valeurs viennent uniquement du fallback système CSS4 posé dans
             // panel.styles.ts, pas d'un thème.
             expect(computed.backgroundColor).to.not.equal('');
@@ -171,7 +171,7 @@ describe('ar-stepper — browser', () => {
         });
 
         // La marge spécifique aux sous-étapes (avant : 12px/20px codés en dur dans le
-        // composant) est désormais une valeur de thème (default.css, sélecteur structurel
+        // composant) est désormais une valeur de thème (ariane.css, sélecteur structurel
         // ar-stepper-item > ar-stepper-item::part(indicator)) — sans thème chargé (ce test),
         // l'indicateur de sous-étape retombe sur la même marge par défaut que le
         // top-level, toujours exprimée en propriété logique.

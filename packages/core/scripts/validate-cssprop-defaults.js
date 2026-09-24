@@ -1,5 +1,5 @@
 /**
- * Extrait les tokens du thème par défaut (`src/styles/themes/default.css`) et
+ * Extrait les tokens du thème par défaut (`src/styles/themes/ariane.css`) et
  * vérifie que chaque token appartenant à un composant a bien une entrée
  * `@cssprop` dans son JSDoc — un trou de documentation silencieux.
  *
@@ -10,7 +10,7 @@
 const TOKEN_RE = /(--ar[\w-]+)\s*:\s*([^;]+)/g;
 
 /**
- * Marqueur du début des surcharges dark mode dans `default.css` : le bloc manuel
+ * Marqueur du début des surcharges dark mode dans `ariane.css` : le bloc manuel
  * `:root[data-theme='dark']` ou le bloc automatique `@media (prefers-color-scheme: dark)`.
  * Par convention, le thème de base (`:root`) est toujours déclaré avant ces blocs.
  */
@@ -20,7 +20,7 @@ const DARK_OVERRIDE_RE =
 /**
  * Remplace le contenu de chaque commentaire `/* ... *\/` par des espaces de même
  * longueur, pour que `DARK_OVERRIDE_RE` ne matche jamais une mention purement
- * documentaire (ex. le header de `default.css` qui cite littéralement
+ * documentaire (ex. le header de `ariane.css` qui cite littéralement
  * `:root[data-theme='dark']` en prose) tout en préservant les index d'origine —
  * indispensable puisque `darkStart` sert ensuite à découper la chaîne source non
  * modifiée via `.slice()`.
@@ -60,7 +60,7 @@ export function extractThemeTokens(css) {
 }
 
 /**
- * Détecte les tokens de default.css qui appartiennent à un composant (par
+ * Détecte les tokens de ariane.css qui appartiennent à un composant (par
  * préfixe de tag, ex. --ar-alert-* pour <ar-alert>) mais qui n'ont aucune
  * entrée @cssprop dans le JSDoc de ce composant — un trou de documentation
  * silencieux. Seule la présence d'une entrée cssProperties portant ce nom est
@@ -98,7 +98,7 @@ export function validateCssPropertyCoverage(customElementsManifest, themeTokens)
         const documented = (owner.cssProperties ?? []).some((prop) => prop.name === tokenName);
         if (!documented) {
             errors.push(
-                `${owner.name} : le token ${tokenName} est défini dans default.css mais n'a pas d'entrée @cssprop`,
+                `${owner.name} : le token ${tokenName} est défini dans ariane.css mais n'a pas d'entrée @cssprop`,
             );
         }
     }

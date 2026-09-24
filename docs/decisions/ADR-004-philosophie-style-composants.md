@@ -55,7 +55,7 @@ color: var(--ar-tab-color, currentColor);
 ```
 
 Ils constituent le contrat de personnalisation principal pour les consommateurs qui
-construisent un thème. Un fichier `default.css` au niveau du package fournit des valeurs
+construisent un thème. Un fichier `ariane.css` au niveau du package fournit des valeurs
 de thème de base.
 
 ### Couche 3 — `::part()` stratégiques

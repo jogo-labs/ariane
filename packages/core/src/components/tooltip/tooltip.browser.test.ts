@@ -174,7 +174,7 @@ describe('ar-tooltip — browser', () => {
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
 
     describe('fallback CSS sans thème chargé', () => {
-        it('la bulle et la flèche ont un fond visible même sans default.css', async () => {
+        it('la bulle et la flèche ont un fond visible même sans ariane.css', async () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn10">x</button>

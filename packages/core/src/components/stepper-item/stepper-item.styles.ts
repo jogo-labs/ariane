@@ -83,7 +83,7 @@ export default css`
     }
 
     /* Couleur et fond de l'indicateur au survol/focus : définis par le thème
-       (::part(indicator) dans default.css). */
+       (::part(indicator) dans ariane.css). */
     [part~='step-link']:is(:hover, :focus) .item-label {
         color: var(--ar-stepper-item-link-hover-label-color);
     }
@@ -99,7 +99,7 @@ export default css`
     }
 
     /* Le connecteur décoratif (ligne pointillée entre étapes) est un pseudo-élément du host
-       (::before/::after), défini par le thème dans default.css. */
+       (::before/::after), défini par le thème dans ariane.css. */
 
     .item-header {
         /* a11y-fallback: posé par ar-stepper seulement sous reverse-align, sinon layout normal */

@@ -118,14 +118,14 @@ describe('ar-breadcrumb — browser', () => {
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
 
     describe('fallback CSS sans thème chargé', () => {
-        it('le panel a un fond et une bordure visibles même sans default.css', async () => {
+        it('le panel a un fond et une bordure visibles même sans ariane.css', async () => {
             el = await mobileBreadcrumb();
             getBtn(el).click();
             await aTimeout(50);
             const panel = getPanel(el);
             const computed = getComputedStyle(panel);
 
-            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
             // valeurs viennent uniquement du fallback système CSS4 posé dans
             // panel.styles.ts, pas d'un thème.
             expect(computed.backgroundColor).to.not.equal('');
@@ -135,7 +135,7 @@ describe('ar-breadcrumb — browser', () => {
             expect(computed.borderTopWidth).to.equal('1px');
         });
 
-        it('le bouton home a une taille de cible tactile même sans default.css', async () => {
+        it('le bouton home a une taille de cible tactile même sans ariane.css', async () => {
             el = await mobileBreadcrumb();
             const home = el.shadowRoot?.querySelector<HTMLElement>('[part="home"]');
             if (!home) throw new Error('[part="home"] introuvable');
@@ -143,7 +143,7 @@ describe('ar-breadcrumb — browser', () => {
             expect(parseFloat(computed.minHeight)).to.be.greaterThan(0);
         });
 
-        it('le bouton trigger a une taille de cible tactile même sans default.css', async () => {
+        it('le bouton trigger a une taille de cible tactile même sans ariane.css', async () => {
             el = await mobileBreadcrumb();
             const trigger = getBtn(el);
             const computed = getComputedStyle(trigger);

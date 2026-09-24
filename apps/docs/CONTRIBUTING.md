@@ -197,7 +197,7 @@ apps/docs/
 └── public/
     ├── js/playground.js            ← Copier + manipulation attributs playground
     ├── cdn/                        ← Bundle CDN des composants (généré par core)
-    └── themes/default.css          ← Thème CSS (généré par core)
+    └── themes/ariane.css          ← Thème CSS (généré par core)
 ```
 
 ### Flux de données par page composant

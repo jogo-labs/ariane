@@ -433,7 +433,7 @@ describe('ArAlert', () => {
         });
 
         it("ferme instantanément (sans transitionend) quand aucun thème n'est chargé (durée de transition à 0)", async () => {
-            // Régression #129 : si default.css n'est pas chargé, la transition CSS externalisée
+            // Régression #129 : si ariane.css n'est pas chargé, la transition CSS externalisée
             // (opacity/transform) ne s'applique jamais et la durée calculée reste à 0 — sans
             // garde JS, transitionend ne se déclencherait jamais et l'alerte resterait bloquée.
             const target = document.createElement('button');

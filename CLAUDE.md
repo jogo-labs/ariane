@@ -19,7 +19,7 @@ Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorep
 ## Philosophie de conception
 
 - **Mobile-first** : toute décision d'API, de comportement ou de style part du cas mobile. Le desktop est une amélioration progressive, pas le point de départ. Avant d'ajouter une option, se demander si le comportement par défaut couvre déjà le cas mobile sans configuration.
-- **Headless** : aucun fallback cosmétique dans les composants (`var(--token)` sans valeur par défaut). Toutes les valeurs de design vont dans `themes/default.css`. Les fallbacks structurels (0px pour des compensations de layout) sont acceptables.
+- **Headless** : aucun fallback cosmétique dans les composants (`var(--token)` sans valeur par défaut). Toutes les valeurs de design vont dans `themes/ariane.css`. Les fallbacks structurels (0px pour des compensations de layout) sont acceptables.
 
 ## Common Commands
 

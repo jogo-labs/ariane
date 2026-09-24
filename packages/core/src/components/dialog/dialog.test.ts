@@ -772,7 +772,7 @@ describe('ArDialog', () => {
         it('sans thème, --ar-dialog-width vaut le repli littéral du composant (500px, mode modal)', async () => {
             el = await fixture('<ar-dialog size="sm"></ar-dialog>');
 
-            // La taxonomie sm/lg/xl est désormais une opinion du thème (default.css) —
+            // La taxonomie sm/lg/xl est désormais une opinion du thème (ariane.css) —
             // sans thème chargé, size="sm" n'a plus d'effet, seul le repli littéral du
             // composant s'applique (cf. ADR-005, amendement 2026-07-29, #129 lot 3b).
             expect(getComputedStyle(el).getPropertyValue('--ar-dialog-width').trim()).toBe('500px');
@@ -785,7 +785,7 @@ describe('ArDialog', () => {
         });
 
         it('quand le thème fournit la taxonomie de taille, la règle externe pilote --ar-dialog-width', async () => {
-            // happy-dom ne charge pas default.css : on simule la règle d'attribut que
+            // happy-dom ne charge pas ariane.css : on simule la règle d'attribut que
             // le thème fournit normalement dans le bloc ar-dialog { &[size='sm'] { ... } },
             // pour vérifier que la cascade externe l'emporte réellement (et pas
             // seulement que le composant expose --ar-dialog-width).

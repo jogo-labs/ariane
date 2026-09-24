@@ -12,24 +12,24 @@ const tocEntries = [
 ];
 
 const codeAdoptedStyleSheetsCdnComponent = `// mon-app.js — définition du composant, fichier séparé de la page
-import { defaultTheme } from 'https://unpkg.com/@ariane-ui/core/dist/styles/themes/default.js';
+import { arianeTheme } from 'https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.js';
 
 class MonApp extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
-        shadow.adoptedStyleSheets = [defaultTheme];
+        shadow.adoptedStyleSheets = [arianeTheme];
         shadow.append(document.createElement('ar-datepicker'));
     }
 }
 customElements.define('mon-app', MonApp);`;
 
 const codeAdoptedStyleSheetsNpmComponent = `// mon-app.js — définition du composant, fichier séparé de la page
-import { defaultTheme } from '@ariane-ui/core/themes/default.js';
+import { arianeTheme } from '@ariane-ui/core/themes/ariane.js';
 
 export class MonApp extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
-        shadow.adoptedStyleSheets = [defaultTheme];
+        shadow.adoptedStyleSheets = [arianeTheme];
         shadow.append(document.createElement('ar-datepicker'));
     }
 }

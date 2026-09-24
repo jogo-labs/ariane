@@ -577,7 +577,7 @@ describe('ArDatepicker', () => {
     });
 
     describe('fonds par défaut du calendrier (thème)', () => {
-        it("default.css définit un background pour ::part(header)/::part(footer), et les tokens color/background-color de la cellule jour (pas ::part(day) : un ::part() de l'outer stylesheet du thème l'emporterait sur les surcharges d'état .today/.selected/:hover du composant, cf #129)", async () => {
+        it("ariane.css définit un background pour ::part(header)/::part(footer), et les tokens color/background-color de la cellule jour (pas ::part(day) : un ::part() de l'outer stylesheet du thème l'emporterait sur les surcharges d'état .today/.selected/:hover du composant, cf #129)", async () => {
             // Lecture directe du fichier source : le thème n'est pas chargé dans
             // l'environnement de test (happy-dom), voir vitest.config.ts.
             // `new URL(relative, import.meta.url)` est évité car happy-dom remplace le
@@ -586,9 +586,12 @@ describe('ArDatepicker', () => {
             const { readFileSync } = await import('node:fs');
             const { fileURLToPath } = await import('node:url');
             const { dirname, join } = await import('node:path');
+            // ariane.css racine ne contient plus que des @import (source éclatée en
+            // fragments par concern, cf. build-css.js) : on lit directement le fragment
+            // du composant, qui porte les règles vérifiées ci-dessous.
             const themePath = join(
                 dirname(fileURLToPath(import.meta.url)),
-                '../../styles/themes/default.css',
+                '../../styles/themes/ariane/components/_datepicker.css',
             );
             const themeCss = readFileSync(themePath, 'utf-8');
             // Regex agnostiques du préfixe de sélecteur (flat `ar-datepicker::part(...)`
