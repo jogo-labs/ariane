@@ -9,7 +9,7 @@
  * @type {import('@custom-elements-manifest/analyzer').UserConfig}
  */
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
 import {
@@ -23,7 +23,10 @@ import {
 } from './scripts/validate-no-hardcoded-tokens.js';
 import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js';
 import { pruneDanglingCustomElementExports } from './scripts/prune-dangling-custom-element-exports.js';
-import { findDuplicateTokens } from './scripts/validate-no-duplicate-tokens.js';
+import {
+    buildDedupedTokenInventory,
+    findDuplicateTokens,
+} from './scripts/validate-no-duplicate-tokens.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -216,7 +219,20 @@ export default {
                     customElementsManifest,
                     themeTokens,
                 );
-                const duplicateTokenErrors = findDuplicateTokens(themeCss);
+                // Le garde-fou anti-doublon lit les fragments SOURCE individuellement
+                // (pas le CSS bundlé) : une redéclaration légitime d'un même token sous
+                // plusieurs sélecteurs à l'intérieur d'un seul fragment (ex.
+                // --ar-alert-bg une fois par variant) ne doit pas être signalée — seul un
+                // token apparaissant dans PLUSIEURS fragments distincts est une erreur.
+                const fragmentsDir = resolve(process.cwd(), 'src/styles/themes/ariane');
+                const fragmentContents = readdirSync(fragmentsDir, { recursive: true })
+                    .filter((relativePath) => relativePath.endsWith('.css'))
+                    .map((relativePath) =>
+                        readFileSync(resolve(fragmentsDir, relativePath), 'utf-8'),
+                    );
+                const duplicateTokenErrors = findDuplicateTokens(
+                    buildDedupedTokenInventory(fragmentContents),
+                );
 
                 // Valide qu'aucun composant n'assigne une valeur littérale à une
                 // custom property --ar-* dans ses *.styles.ts au lieu de référencer
