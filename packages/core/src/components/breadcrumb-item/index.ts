@@ -1,6 +1,8 @@
 import { ArBreadcrumbItem } from './breadcrumb-item.js';
 
-customElements.define('ar-breadcrumb-item', ArBreadcrumbItem);
+if (!customElements.get('ar-breadcrumb-item')) {
+    customElements.define('ar-breadcrumb-item', ArBreadcrumbItem);
+}
 
 declare global {
     interface HTMLElementTagNameMap {

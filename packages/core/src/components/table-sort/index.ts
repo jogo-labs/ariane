@@ -1,6 +1,8 @@
 import { ArTableSort } from './table-sort.js';
 
-customElements.define('ar-table-sort', ArTableSort);
+if (!customElements.get('ar-table-sort')) {
+    customElements.define('ar-table-sort', ArTableSort);
+}
 
 declare global {
     interface HTMLElementTagNameMap {

@@ -1,6 +1,8 @@
 import { ArTabGroup } from './tab-group.js';
 
-customElements.define('ar-tab-group', ArTabGroup);
+if (!customElements.get('ar-tab-group')) {
+    customElements.define('ar-tab-group', ArTabGroup);
+}
 
 declare global {
     interface HTMLElementTagNameMap {
