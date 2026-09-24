@@ -89,11 +89,23 @@ Implémentation : repérage de blocs de premier niveau par comptage d'accolades 
 
 Nouveau script (`packages/core/scripts/validate-no-duplicate-tokens.js` ou 4ᵉ vérification ajoutée au plugin CEM existant) : parcourt tous les fragments, extrait chaque déclaration `--ar-*`, erreur si un même nom de token apparaît dans plus d'un fragment (le dernier en ordre d'import écraserait silencieusement les autres — cf. spike, comportement `:root` cumulatif mais dernière déclaration du **même** nom qui gagne). Complète le filet de sécurité existant (couverture `@cssprop`, valeurs codées en dur, ordre part+état).
 
-### Résolution des fragments pour les validateurs CEM (pas de dépendance à l'ordre du build)
+### Les validateurs CEM lisent le bundle `dist/` déjà résolu — pas de résolveur maison
 
-`npm run build` exécute `build:manifest` (CEM, donc les validateurs) **avant** `build:css` — les validateurs ne peuvent pas dépendre du bundle `dist/` déjà généré. Nouvel utilitaire partagé `packages/core/scripts/resolve-theme-source.js` : lit le fichier d'entrée (`src/styles/themes/ariane.css`), résout récursivement chaque `@import url('...') layer(...);` par une lecture de fichier + concaténation de texte brut (pas une vraie résolution CSS — juste ce dont les validateurs ont besoin : le texte complet pour en extraire des noms de tokens/règles). Utilisé par les 3 validateurs existants (mise à jour du chemin en dur `src/styles/themes/default.css`) et par le nouveau garde-fou anti-doublon.
+Pas de nouvel utilitaire de résolution d'`@import` : ce serait dupliquer ce qu'esbuild fait déjà correctement dans `scripts/build-css.js` (résolution `@import`, gestion `@layer`, nesting). Vérifié dans `cem.config.js` : aucun mécanisme de résolution n'existe côté génération CEM elle-même (le lecteur actuel fait un `readFileSync` brut, cohérent avec un fichier unique) — donc pas de doublon avec l'analyzer, seulement un risque de doublon avec `build-css.js` qu'on évite en séquençant correctement le build plutôt qu'en réécrivant une résolution simplifiée.
 
-`scripts/build-css.js`, lui, continue d'utiliser la vraie résolution esbuild (déjà disponible, gère correctement `@layer`/nesting/minification) — pas besoin du même utilitaire là où un vrai bundler tourne déjà.
+**Séquencement** : dans `turbo.json`, la tâche `build:manifest` n'a aujourd'hui aucune dépendance déclarée sur `build:css` (qui elle-même n'en a aucune sur `build:manifest`) — sous Turbo, rien ne garantit leur ordre relatif, ils peuvent tourner en parallèle. Ajouter :
+
+```json
+"build:manifest": {
+    "dependsOn": ["build:css"],
+    "inputs": ["src/**/*.ts", "cem.config.js"],
+    "outputs": ["dist/custom-elements.json"]
+}
+```
+
+Et réordonner les scripts `build`/`build:dev` de `packages/core/package.json` (`build:css` avant `build:manifest`) pour que `npm run build` direct dans le package (hors Turbo) respecte le même ordre.
+
+Les 3 validateurs existants (couverture `@cssprop`, valeurs codées en dur, ordre part+état) et le nouveau garde-fou anti-doublon lisent alors `dist/styles/themes/ariane.css` (chemin en dur mis à jour depuis `src/styles/themes/default.css`) — déjà bundlé, `@import` résolus, un seul fichier texte à parser comme aujourd'hui. Minifié, mais l'extraction par regex des noms de tokens (`--ar-[\w-]+`) fonctionne aussi bien sur du CSS minifié que formaté — aucun changement nécessaire côté logique d'extraction des validateurs, seulement le chemin lu.
 
 ### Pas de compatibilité ascendante
 
