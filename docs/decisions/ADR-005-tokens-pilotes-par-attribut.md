@@ -8,7 +8,7 @@
 ADR-004 pose la répartition en 3 couches (styles internes fixes / tokens `--ar-*` / `::part()`)
 mais illustre la couche 2 avec un exemple aujourd'hui dépassé : `color: var(--ar-tab-color, currentColor)`,
 un fallback fonctionnel inline dans le composant. Depuis le chantier headless (#47, PR #90), la
-pratique a changé : `packages/core/src/styles/themes/default.css` est la seule source de valeurs de
+pratique a changé : `packages/core/src/styles/themes/ariane.css` est la seule source de valeurs de
 design, sans fallback dans les composants (cf. CLAUDE.md, section « Philosophie de conception »).
 Le reste d'ADR-004 (répartition en 3 couches) reste valide — seul cet exemple ponctuel est obsolète.
 
@@ -18,16 +18,16 @@ couvert par la règle « aucun fallback cosmétique » : des tokens dont la vale
 attribut du composant (`--ar-dialog-width` piloté par `size`/`mode`), codés en dur directement
 sur `:host([size='sm'])` etc. Ce cas n'est pas un fallback au sens d'ADR-004 (pas de
 `var(--token, valeur)` inline) mais une violation de même nature : une valeur de design présente
-dans le code du composant plutôt que dans `default.css`.
+dans le code du composant plutôt que dans `ariane.css`.
 
 ## Décision
 
 Amendement à ADR-004 : l'exemple `var(--ar-tab-color, currentColor)` ne doit plus être suivi —
 aucune valeur de repli, fonctionnelle ou cosmétique, ne doit apparaître dans le CSS d'un composant.
-Toute valeur de design vit dans `default.css`, consommée via `var(--token)` sans second argument.
+Toute valeur de design vit dans `ariane.css`, consommée via `var(--token)` sans second argument.
 
 Nouvelle règle pour les tokens pilotés par état/attribut : chaque état a son propre token
-`default.css`, nommé `--ar-<composant>-<propriété>-<état>` (ex. `--ar-dialog-width-sm`). Le
+`ariane.css`, nommé `--ar-<composant>-<propriété>-<état>` (ex. `--ar-dialog-width-sm`). Le
 composant sélectionne la valeur via `var()` dans ses règles d'attribut (`:host([attr='...'])`) —
 jamais de valeur littérale, même conditionnelle. Le token « consolidé » que ces règles alimentent
 (ex. `--ar-dialog-width`) reste public et documenté (`@cssprop`) s'il sert aussi de point de
@@ -40,7 +40,7 @@ est détectée dans un fichier `*.styles.ts`.
 ## Exception assumée : l'attribut `size`
 
 `size` (`sm`/`md`/`lg`/`xl`) sort de l'esprit headless, indépendamment de la règle ci-dessus sur
-le sourcing des tokens. Le sourcing est conforme (chaque palier vient d'un token `default.css`,
+le sourcing des tokens. Le sourcing est conforme (chaque palier vient d'un token `ariane.css`,
 rien n'est codé en dur) — ce qui sort du cadre, c'est l'existence même d'une taxonomie de tailles
 imposée par le composant : une librairie headless au sens strict n'a pas d'opinion sur les
 paliers de largeur d'un dialog, elle expose juste le point de surcharge (`--ar-dialog-width`) et
@@ -58,7 +58,7 @@ précédent générique.
 ## Conséquences
 
 - `dialog.styles.ts` migré : `--ar-dialog-spacing` et les 8 variantes de `--ar-dialog-width`
-  (`sm`/`md`/`lg`/`xl` × `modal`/`drawer`) sourcées depuis `default.css`.
+  (`sm`/`md`/`lg`/`xl` × `modal`/`drawer`) sourcées depuis `ariane.css`.
 - Tout nouveau composant avec une valeur pilotée par attribut doit suivre ce pattern dès sa
   conception — le garde-fou automatique le rappellera sinon au premier `npm run build:manifest`.
 - Pas de convention de nommage pour des tokens véritablement internes/non documentables — écartée
@@ -67,7 +67,7 @@ précédent générique.
 ## Amendement (2026-07-22) : fallback d'accessibilité sur les surfaces flottantes
 
 L'interdiction stricte de tout fallback (section « Décision » ci-dessus) suppose implicitement
-qu'un thème (`default.css` ou équivalent) est toujours chargé par le consommateur. En pratique,
+qu'un thème (`ariane.css` ou équivalent) est toujours chargé par le consommateur. En pratique,
 son absence rend certaines surfaces flottantes avec fond (dropdown/breadcrumb/stepper mobile/
 datepicker via `panel.styles.ts`, plus `ar-tooltip`) confuses ou inaccessibles : panel
 transparent qui se confond avec la page, texte illisible, cible tactile sous le seuil WCAG 2.5.8.
@@ -115,12 +115,12 @@ scopé :
    `::part()` n'est pas lisible en JS.
 3. Réutilisé ≥ 2 fois dans le `.styles.ts` du composant (vraie valeur DRY) → reste un token.
 4. Sinon (usage unique, pas de fallback critique) → la propriété n'est pas déclarée dans le
-   composant ; `default.css` la stylise directement, sans token scopé intermédiaire ni
+   composant ; `ariane.css` la stylise directement, sans token scopé intermédiaire ni
    `@cssprop` dédié — via une règle `::part()` si la propriété cible un élément interne portant
    un `part`, via une règle sur le tag lui-même (`ar-<composant> { ... }`) si elle cible `:host`
    (cf. correction ci-dessous — `:host` n'exclut plus la branche 4).
 
-Un token consommé **uniquement** par la propre règle `::part()` de `default.css` (jamais par
+Un token consommé **uniquement** par la propre règle `::part()` de `ariane.css` (jamais par
 le composant) n'est pas une vraie surface d'API — repli direct sur une valeur littérale dans
 la règle, pas de token `:root`.
 
@@ -253,7 +253,7 @@ répliquer un hover d'ancêtre sur un part différent sans JS dédié. Elle rest
 permanente d'ADR-005.
 
 **Nouveau garde-fou d'ordre** : les règles `::part()` de même spécificité se départagent par
-ordre de déclaration dans `default.css` — une règle de base doit toujours précéder ses parts
+ordre de déclaration dans `ariane.css` — une règle de base doit toujours précéder ses parts
 d'état dans le fichier. Vérifié automatiquement par
 `packages/core/scripts/validate-part-state-order.js` (heuristique fondée sur le délimiteur
 `--`), branché dans `cem.config.js`.
@@ -329,10 +329,10 @@ valeurs littérales jamais externalisées) :
 
 **Correction (même jour)** : `--ar-datepicker-gap` avait d'abord été conservé comme token (sous
 le nom `--ar-datepicker-field-gap`), au motif d'une réutilisation DRY entre le `gap` du `:host`
-et un `calc()` déjà présent dans la règle `::part(label)` de `default.css`
+et un `calc()` déjà présent dans la règle `::part(label)` de `ariane.css`
 (`margin-bottom: calc(0.5rem - var(--ar-datepicker-field-gap))`). Revu à la remarque du
 mainteneur : cette « réutilisation » n'est pas une exigence du composant (qui n'a besoin de la
-valeur qu'à un seul endroit, le `gap` du `:host`) mais un choix d'auteur propre à `default.css`
+valeur qu'à un seul endroit, le `gap` du `:host`) mais un choix d'auteur propre à `ariane.css`
 — un thème est un exemple de personnalisation, pas une spécification que le composant doit
 servir. Rien n'empêche un autre thème de faire le même calcul avec sa propre variable locale ;
 le composant n'a pas à garantir qu'ajuster une valeur en rééquilibre une autre dans un thème
@@ -440,7 +440,7 @@ Nuance par rapport à `variant` (qui est purement cosmétique) : la largeur d'un
 fonctionnelle — un dialog sans aucune contrainte de largeur peut casser le layout. Le composant
 garde donc **une seule valeur littérale de repli par mode** (`500px` modal, `720px` drawer,
 directement sur `--ar-dialog-width`, sans intermédiaire de token), tandis que les paliers nommés
-(`sm`/`lg`/`xl`) et leurs variantes drawer deviennent une opinion du thème (`default.css`),
+(`sm`/`lg`/`xl`) et leurs variantes drawer deviennent une opinion du thème (`ariane.css`),
 exactement comme les 4 presets de `variant` sur `ar-alert`. Sans thème, `size="sm"` n'a plus
 d'effet visible — symétrique avec `variant="warning"` sur `ar-alert` aujourd'hui, ce n'est plus
 un cas isolé.
@@ -468,12 +468,12 @@ raccourci.
 **Portée de cet amendement sur les sections antérieures du document** : au-delà de la section
 « Exception assumée : l'attribut `size` » (explicitement déclarée dépassée ci-dessus), cet
 amendement rend également caduques : l'exemple `--ar-dialog-width-sm` de la section « Décision »
-(qui illustrait le pattern « chaque état a son propre token `default.css` » — ce pattern reste
+(qui illustrait le pattern « chaque état a son propre token `ariane.css` » — ce pattern reste
 valide en général, mais n'est plus illustré par `--ar-dialog-width-sm`, qui n'existe plus) et la
 puce de « Conséquences » mentionnant « les 8 variantes de `--ar-dialog-width` (`sm`/`md`/`lg`/`xl`
-× `modal`/`drawer`) sourcées depuis `default.css` » — ces 8 tokens intermédiaires ont disparu,
+× `modal`/`drawer`) sourcées depuis `ariane.css` » — ces 8 tokens intermédiaires ont disparu,
 remplacés par les presets `ar-dialog[size='...']`/`ar-dialog[mode='drawer'][size='...']`
-directement dans le thème (cf. `default.css`) et la valeur de repli unique par mode portée par
+directement dans le thème (cf. `ariane.css`) et la valeur de repli unique par mode portée par
 `functional-default` ci-dessus.
 
 ## Amendement (2026-08-05) : `!important` comme verrou contre la surcharge consommateur
@@ -560,7 +560,7 @@ Simplification assumée : l'ancien `.btn-tertiary:active` partagé portait aussi
 reproduit dans le style bespoke `home`/`trigger` (seuls `background-color`/`color` par état, plus
 `:focus-visible` en `outline`), pour éviter de réimporter la complexité qu'on venait de découpler.
 
-**Résultat** : 19 tokens `default.css` initiaux → 11 restants (distance/offset lus en JS, panel
+**Résultat** : 19 tokens `ariane.css` initiaux → 11 restants (distance/offset lus en JS, panel
 bg/border-color pour le fallback a11y, 4 tokens toggle-bg redéfinis, mobile-separator-color
 bloqué par la contrainte 3 — pseudo-élément non converti —, 2 nouveaux tokens a11y/motion) ; 10
 supprimés (5 panel cosmétiques + color + bullet-color + bullet-ring-color + active-bullet-color +
@@ -585,11 +585,11 @@ suffit à couvrir le cas headless.
 
 Les 5 autres tokens migrés (`border-radius`, `shadow`, `padding`, `max-width`, `min-width`)
 suivent le schéma déjà établi lot 4 : règle `ar-dropdown { &::part(panel) {...} }` dans
-`default.css`, `min-width: 10rem` porté en littéral avec son commentaire justificatif conservé
+`ariane.css`, `min-width: 10rem` porté en littéral avec son commentaire justificatif conservé
 (valeur volontairement non cascadée depuis `--ar-panel-min-width` : un menu dropdown reste plus
 étroit qu'un panel générique).
 
-**Résultat** : 10 tokens `default.css` initiaux → 4 restants (`distance`/`offset` lus en JS par
+**Résultat** : 10 tokens `ariane.css` initiaux → 4 restants (`distance`/`offset` lus en JS par
 `AnchoredController`, `bg`/`border-color` pour le fallback a11y système `Canvas`/`ButtonBorder`) ;
 6 supprimés (`color` sans remplaçant + 5 migrés vers `::part(panel)`).
 
@@ -601,7 +601,7 @@ Détail complet : `docs/superpowers/specs/2026-07-31-dropdown-token-vs-part-129-
 Trouvé en clôturant le lot 5 (`ar-dropdown`, #129) : 3 des 4 composants consommant la feuille de
 style partagée `panel.styles.ts` (`ar-stepper`, `ar-breadcrumb`, `ar-dropdown` — le 4ᵉ,
 `ar-datepicker`, était déjà conforme sans décision consciente) redéclaraient dans leur bloc de
-thème `default.css` des propriétés dont la valeur ne divergeait jamais du token générique
+thème `ariane.css` des propriétés dont la valeur ne divergeait jamais du token générique
 `--ar-panel-*` déjà fourni par la base partagée. Une règle externe `ar-<composant>::part(panel)`
 l'emporte toujours sur la règle interne du shadow DOM indépendamment de la spécificité comparée
 (déclarations normales — l'inverse s'applique avec `!important`) — si elle redéclare exactement
@@ -620,7 +620,7 @@ scope).
 Effet de bord à noter : l'ajout de `min-width: var(--ar-panel-min-width);` à la base de
 `panel.styles.ts` s'applique aux 4 consommateurs de cette feuille partagée, y compris
 `ar-datepicker` qui n'avait jamais eu de `min-width` auparavant. Sous le thème par défaut c'est
-inerte — `ar-datepicker::part(panel)` fixe `width: 20rem` dans `default.css` et
+inerte — `ar-datepicker::part(panel)` fixe `width: 20rem` dans `ariane.css` et
 `max-width: 25rem` dans `datepicker.styles.ts`, tous deux supérieurs à
 `--ar-panel-min-width: 18rem` — mais c'est désormais un point de couplage réel entre le token
 générique `--ar-panel-min-width` et la largeur du calendrier, à garder en tête si ce token est
@@ -730,7 +730,7 @@ sur la balise l'emporte sur une règle interne `:host([attr])` — précédent `
 
 _Nettoyage_ : `--ar-tab-indicator-color`/`--ar-tab-indicator-width` étaient documentés en
 `@cssprop` mais jamais consommés via `var()` dans `tab.styles.ts` lui-même — utilisés seulement
-dans `default.css` pour composer `--ar-tab-active-shadow`. Même raisonnement que le nettoyage
+dans `ariane.css` pour composer `--ar-tab-active-shadow`. Même raisonnement que le nettoyage
 `ar-pagination` (lot 6) : ce n'est pas une vraie surface d'API du composant, seulement un détail
 d'implémentation du thème par défaut. Supprimés comme tokens publics, valeurs réinjectées
 directement dans la composition de `--ar-tab-active-shadow`. **Le même raisonnement a été
@@ -788,23 +788,23 @@ indivisible avec un autre token, lui, bloqué.
 d'`ar-charcounter` — à mentionner car ce chantier n'avait pas jusqu'ici explicitement signalé la
 couverture de tests des parts d'état comme faisant partie de sa mémoire institutionnelle.
 
-## Amendement (2026-09-08) : `@layer ariane.presets`, un second rôle pour `default.css`
+## Amendement (2026-09-08) : `@layer ariane.presets`, un second rôle pour `ariane.css`
 
 Jusqu'ici, tout le CSS publié par la librairie stylise le contrat intrinsèque des composants
-`ar-*` — tokens et `::part()` de `themes/default.css`, sous `@layer ariane.theme`. L'issue #200
-(tokens `--ar-button-tertiary-*`/`disabled` déclarés dans `default.css` mais jamais consommés
+`ar-*` — tokens et `::part()` de `themes/ariane.css`, sous `@layer ariane.theme`. L'issue #200
+(tokens `--ar-button-tertiary-*`/`disabled` déclarés dans `ariane.css` mais jamais consommés
 nulle part dans le thème publié — code mort trouvé en même temps que `button.styles.ts`, une
 feuille interne partagée qui n'était plus importée par aucun composant, supprimée par la même
 occasion) formalise un second rôle, jusqu'ici non écrit : des classes CSS **opt-in** qui
 stylisent du HTML que le consommateur écrit lui-même (un `<button>` slotté, par exemple), pas le
 composant.
 
-**Décision** : ce second rôle vit dans des fichiers séparés de `themes/default.css` — un par
+**Décision** : ce second rôle vit dans des fichiers séparés de `themes/ariane.css` — un par
 famille (`styles/presets/buttons.css` en premier, un futur `styles/presets/*.css` pour les
 inputs texte évoqués par #200), chacun exposé par son propre export npm
 (`./presets/*.css` → `dist/styles/presets/*.css`) et chargé via un `<link>` indépendant, sur le
 modèle de WebAwesome plutôt qu'un unique fichier fourre-tout. Un consommateur qui n'a besoin que
-des tokens/composants n'a rien de plus à charger que `themes/default.css`.
+des tokens/composants n'a rien de plus à charger que `themes/ariane.css`.
 
 Toutes ces classes partagent néanmoins **une seule couche de cascade**, `@layer ariane.presets`
 — déclarée dans chaque fichier séparément (`@layer` avec le même nom dans plusieurs fichiers
@@ -815,7 +815,7 @@ concret ajouterait de la complexité sans bénéfice — à reconsidérer si un 
 apparaît entre deux fichiers presets.
 
 **Nommage** : `.ar-btn-*` plutôt que `.btn-*` (déjà pris par Bootstrap/Bulma/Foundation/etc. —
-un consommateur chargeant `default.css` depuis un CDN à côté d'un de ces frameworks verrait ses
+un consommateur chargeant `ariane.css` depuis un CDN à côté d'un de ces frameworks verrait ses
 propres boutons restylisés silencieusement) et `presets` plutôt que `utility`/`utilitaires` :
 `.ar-btn-primary` compose plusieurs propriétés sous un nom sémantique (base + variantes), à
 l'opposé d'une classe utilitaire atomique (une propriété = une classe, ex. `.mt-4`) — le terme
@@ -838,7 +838,7 @@ ce ticket et masqué le manque qu'il doit corriger.
 
 `ar-dropdown-item` n'a aucun style interne (`:host { display: contents }`) : le bouton/lien
 slotté est un vrai nœud du light DOM, jamais un élément du shadow DOM du composant. Ni `::part()`
-ni `::slotted()` ne peuvent l'atteindre depuis `default.css` — `::part()` ne cible que des
+ni `::slotted()` ne peuvent l'atteindre depuis `ariane.css` — `::part()` ne cible que des
 éléments du shadow tree portant un `part`, et `::slotted()` n'est valide que depuis la feuille de
 style _propriétaire_ du slot (le composant lui-même, qui n'en a pas). Seul un sélecteur de
 descendance classique (`ar-dropdown-item button`) depuis le light DOM peut le styliser — branche
@@ -846,10 +846,10 @@ descendance classique (`ar-dropdown-item button`) depuis le light DOM peut le st
 
 **Périmètre initialement proposé par l'issue (hover seul) écarté** : la démo home page portait
 déjà une règle non-`@layer` (`ar-dropdown-item button { background: transparent; ... }`,
-issue #200) qui aurait neutralisé silencieusement tout hover ajouté dans `default.css`
+issue #200) qui aurait neutralisé silencieusement tout hover ajouté dans `ariane.css`
 (`@layer ariane.theme`) — une règle hors couche l'emporte toujours sur une règle dans un
 `@layer`, quel que soit l'état pseudo-classe. Se limiter au hover aurait donc laissé la démo de
-reproduction elle-même inchangée. **Décision du mainteneur** : `default.css` reprend tout le
+reproduction elle-même inchangée. **Décision du mainteneur** : `ariane.css` reprend tout le
 reset de base (`display: block`, `width: 100%`, `border: none`, `background: transparent`,
 `text-align: left`, curseur, padding) en plus de `:hover`/`:focus-visible` — la règle ad-hoc de
 la home page disparaît intégralement, pas seulement sa portion `:hover`.

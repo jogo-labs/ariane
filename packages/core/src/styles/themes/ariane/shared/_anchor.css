@@ -1,0 +1,9 @@
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Anchor
+             * Partagé — positionnement des composants ancrés / popovers)
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* anchor ( */
+    --ar-anchor-distance: 4px;
+    --ar-anchor-offset: 0px;
+}

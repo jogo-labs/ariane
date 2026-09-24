@@ -6,7 +6,7 @@ const panelBaseStyles = css`
     /* Cette règle est la source canonique pour toute propriété qui ne fait que
        consommer un token --ar-panel-* générique sans jamais diverger d'un
        composant à l'autre. Un composant consommateur (voir static override
-       styles) ne doit ajouter sa propre règle ::part(panel) dans default.css
+       styles) ne doit ajouter sa propre règle ::part(panel) dans ariane.css
        QUE pour une propriété dont la valeur diverge réellement du générique —
        jamais pour redéclarer la même valeur. */
     [part='panel'] {

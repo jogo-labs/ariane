@@ -199,7 +199,7 @@ describe('ar-dropdown — browser', () => {
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
 
     describe('fallback CSS sans thème chargé', () => {
-        it('le panel a un fond, un texte et une bordure visibles même sans default.css', async () => {
+        it('le panel a un fond, un texte et une bordure visibles même sans ariane.css', async () => {
             el = await fixture(html`
                 <ar-dropdown>
                     <button slot="trigger">Trigger</button>
@@ -210,7 +210,7 @@ describe('ar-dropdown — browser', () => {
             const panel = getPanel(el);
             const computed = getComputedStyle(panel);
 
-            // default.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
+            // ariane.css n'est jamais chargé dans les tests (Vitest ni WTR) : ces
             // valeurs viennent uniquement du fallback système CSS4 posé dans
             // panel.styles.ts, pas d'un thème.
             expect(computed.backgroundColor).to.not.equal('');

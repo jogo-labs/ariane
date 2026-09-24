@@ -1,0 +1,72 @@
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Alert
+             * Voir les règles complémentaires pour les variants ci-dessous
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-alert-color: var(--ar-color-text);
+    --ar-alert-close-size: 2rem;
+    --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
+    --ar-alert-hide-transition-duration: 0.33s;
+}
+
+/* Alert */
+ar-alert {
+    padding: 1rem;
+    border-radius: var(--ar-border-radius-lg);
+    border-width: 1px;
+    border-style: solid;
+    column-gap: 0.75rem;
+
+    /* Customisation */
+    &::part(close-button) {
+        border-radius: var(--ar-border-radius-sm);
+        color: currentColor;
+        background-color: color-mix(in srgb, currentColor 8%, transparent);
+        opacity: 0.75;
+        position: relative;
+        top: -0.2rem;
+        inset-inline-end: -0.2rem;
+    }
+
+    &::part(close-button):hover {
+        background-color: color-mix(in srgb, currentColor 20%, transparent);
+        opacity: 1;
+    }
+
+    &::part(close-button):focus-visible {
+        opacity: 1;
+    }
+
+    &::part(icon) {
+        font-size: 1.5em;
+    }
+    &:state(hiding) {
+        opacity: 0;
+        transform: scale(0.75);
+    }
+
+    /* presets par variant */
+    &[variant='info'] {
+        --ar-alert-bg: var(--ar-color-info-bg);
+        --ar-alert-border: var(--ar-color-info-border);
+        --ar-alert-icon: var(--ar-color-info-text);
+    }
+
+    &[variant='warning'] {
+        --ar-alert-bg: var(--ar-color-warning-bg);
+        --ar-alert-border: var(--ar-color-warning-border);
+        --ar-alert-icon: var(--ar-color-warning-text);
+    }
+
+    &[variant='error'] {
+        --ar-alert-bg: var(--ar-color-danger-bg);
+        --ar-alert-border: var(--ar-color-danger-border);
+        --ar-alert-icon: var(--ar-color-danger-text);
+    }
+
+    &[variant='success'] {
+        --ar-alert-bg: var(--ar-color-success-bg);
+        --ar-alert-border: var(--ar-color-success-border);
+        --ar-alert-icon: var(--ar-color-success-text);
+    }
+}

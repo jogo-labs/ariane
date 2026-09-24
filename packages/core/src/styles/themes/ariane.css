@@ -1,0 +1,36 @@
+/**
+ * ariane.css — thème de la doc/démo Ariane ("Le Fil").
+ * Utilise @layer pour éviter les conflits de spécificité avec les styles utilisateur.
+ * Source éclatée en fragments par concern (voir ./ariane/) pour la maintenabilité —
+ * dist/ reste un seul fichier bundlé (esbuild résout les @import, cf. build-css.js).
+ *
+ * Usage :
+ *   <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css">
+ *   ou
+ *   import '@ariane-ui/core/themes/ariane.css'; // via bundler
+ */
+
+/* Theme setup */
+@import url('./ariane/_palette.css') layer(ariane.theme);
+@import url('./ariane/_semantic-tokens.css') layer(ariane.theme);
+@import url('./ariane/_global-tokens.css') layer(ariane.theme);
+
+/* Shared by components */
+@import url('./ariane/shared/_panel.css') layer(ariane.theme);
+@import url('./ariane/shared/_anchor.css') layer(ariane.theme);
+
+/* Components */
+@import url('./ariane/components/_alert.css') layer(ariane.theme);
+@import url('./ariane/components/_breadcrumb.css') layer(ariane.theme);
+@import url('./ariane/components/_charcounter.css') layer(ariane.theme);
+@import url('./ariane/components/_collapse.css') layer(ariane.theme);
+@import url('./ariane/components/_datepicker.css') layer(ariane.theme);
+@import url('./ariane/components/_dialog.css') layer(ariane.theme);
+@import url('./ariane/components/_dropdown.css') layer(ariane.theme);
+@import url('./ariane/components/_pagination.css') layer(ariane.theme);
+@import url('./ariane/components/_progressbar.css') layer(ariane.theme);
+@import url('./ariane/components/_spinner.css') layer(ariane.theme);
+@import url('./ariane/components/_stepper.css') layer(ariane.theme);
+@import url('./ariane/components/_tab.css') layer(ariane.theme);
+@import url('./ariane/components/_table-sort.css') layer(ariane.theme);
+@import url('./ariane/components/_tooltip.css') layer(ariane.theme);

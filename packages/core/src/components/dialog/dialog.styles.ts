@@ -10,7 +10,7 @@ export default [
             display: block;
 
             /* Taille par défaut (repli fonctionnel sans thème) — les paliers sm/lg/xl sont
-               une taxonomie fournie par default.css, pas une exigence du composant. */
+               une taxonomie fournie par ariane.css, pas une exigence du composant. */
             /* functional-default: largeur modale non contrainte casserait le layout sans thème (ADR-005, amendement 2026-07-29) */
             --ar-dialog-width: 500px;
         }

@@ -1,6 +1,6 @@
 /**
  * Détecte un ::part(x) de base déclaré après son ::part(x--état) correspondant dans
- * default.css — les règles ::part() de même spécificité se départagent par ordre de
+ * ariane.css — les règles ::part() de même spécificité se départagent par ordre de
  * déclaration (la dernière l'emporte), donc une base après sa variante d'état ferait
  * perdre la base au profit de l'état, y compris hors contexte actif.
  *
@@ -33,7 +33,7 @@ function findMatchingBrace(source, openBraceIndex) {
             if (depth === 0) return i;
         }
     }
-    throw new Error('Accolade fermante introuvable dans default.css');
+    throw new Error('Accolade fermante introuvable dans ariane.css');
 }
 
 /**
@@ -78,7 +78,7 @@ function findPartOccurrences(body, bodyStartLine) {
 
 /**
  * @param {string} filePath chemin du fichier, utilisé uniquement pour le message d'erreur
- * @param {string} source contenu brut de default.css
+ * @param {string} source contenu brut de ariane.css
  * @returns {string[]}
  */
 export function findPartStateOrderErrors(filePath, source) {

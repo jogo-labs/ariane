@@ -1,7 +1,7 @@
 /**
  * Détecte les CSS custom properties `--ar-*` assignées avec une valeur littérale
  * dans un fichier `*.styles.ts`, plutôt qu'une référence `var()` vers un token
- * `default.css` — viole la philosophie headless du projet (aucune valeur de
+ * `ariane.css` — viole la philosophie headless du projet (aucune valeur de
  * design codée en dur dans un composant).
  *
  * Utilisé par `cem.config.js` (hook `packageLinkPhase`) pour faire échouer
@@ -53,7 +53,7 @@ const STRUCTURAL_LITERAL_KEYWORDS = new Set(['0px']);
 // (`500px` modal, `720px` drawer) directement dans `dialog.styles.ts`, la
 // largeur d'un dialog étant fonctionnelle (casse le layout sans contrainte)
 // et non purement cosmétique — contrairement aux paliers nommés sm/lg/xl,
-// qui restent une opinion du thème dans `default.css`.
+// qui restent une opinion du thème dans `ariane.css`.
 const FUNCTIONAL_DEFAULT_COMMENT_RE = /^\s*\/\* functional-default: .+ \*\/\s*$/;
 
 // Un fallback qui est lui-même une référence nue à une autre custom property (sans
@@ -111,7 +111,7 @@ export function findHardcodedTokenAssignments(filePath, source) {
         if (FUNCTIONAL_DEFAULT_COMMENT_RE.test(precedingLine)) continue;
 
         errors.push(
-            `${filePath}:${line} — ${match[1]} codé en dur, doit référencer un token default.css via var()`,
+            `${filePath}:${line} — ${match[1]} codé en dur, doit référencer un token ariane.css via var()`,
         );
     }
     return errors;

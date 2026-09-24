@@ -178,7 +178,10 @@ ar-alert {
 }
 ```
 
-Les valeurs globales (couleurs, espacements, typographie) vivent dans `packages/core/src/styles/themes/default.css` et se surchargent via `:root`.
+Les valeurs globales (couleurs, espacements, typographie) vivent dans les fragments sous
+`packages/core/src/styles/themes/ariane/` (`_palette.css`, `_semantic-tokens.css`,
+`_global-tokens.css`, `shared/`, `components/`) — `ariane.css` n'en est que la liste
+d'`@import` — et se surchargent via `:root`.
 
 ---
 

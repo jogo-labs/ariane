@@ -331,7 +331,7 @@ describe('ar-pagination — browser', () => {
             await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
-        // Reproduit les règles pertinentes de packages/core/src/styles/themes/default.css pour
+        // Reproduit les règles pertinentes de packages/core/src/styles/themes/ariane.css pour
         // ar-pagination (column-gap sur [part='list'], padding sur link/current/ellipsis) sans
         // charger le thème complet : ce sont précisément les règles non budgétées par
         // `_recalculateBudget` avant le fix (Finding Critical #1), à l'origine d'un débordement

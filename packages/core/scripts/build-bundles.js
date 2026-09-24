@@ -24,8 +24,17 @@
  */
 
 import esbuild from 'esbuild';
-import { readdirSync, mkdirSync, rmSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import {
+    readdirSync,
+    mkdirSync,
+    rmSync,
+    existsSync,
+    readFileSync,
+    writeFileSync,
+    cpSync,
+} from 'fs';
 import { readFile } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { minifyHTMLLiterals } from 'minify-literals';
@@ -153,6 +162,18 @@ if (!WATCH) {
         }
     }
 
+    // Préserver dist/styles/ (généré par build:css, qui tourne avant ce script dans la
+    // chaîne `build`) : build:css ne re-tourne pas après ce script, donc un rmSync sur
+    // dist/ entier effacerait ariane.css/ariane.js sans jamais les régénérer.
+    const stylesDir = join(ROOT, 'dist', 'styles');
+    const preservedStylesTmp = join(tmpdir(), 'ariane-build-bundles-styles-tmp');
+    let hasPreservedStyles = false;
+    if (existsSync(stylesDir)) {
+        rmSync(preservedStylesTmp, { recursive: true, force: true });
+        cpSync(stylesDir, preservedStylesTmp, { recursive: true });
+        hasPreservedStyles = true;
+    }
+
     for (const dir of ['dist', 'cdn']) {
         const target = join(ROOT, dir);
         if (existsSync(target)) {
@@ -163,6 +184,11 @@ if (!WATCH) {
 
     for (const [name, content] of preserved) {
         writeFileSync(join(ROOT, 'dist', name), content, 'utf-8');
+    }
+
+    if (hasPreservedStyles) {
+        cpSync(preservedStylesTmp, stylesDir, { recursive: true });
+        rmSync(preservedStylesTmp, { recursive: true, force: true });
     }
 }
 

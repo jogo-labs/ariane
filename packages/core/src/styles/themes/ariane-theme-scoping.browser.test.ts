@@ -1,7 +1,7 @@
 /// <reference types="mocha" />
 /**
  * Vérifie que `data-theme="dark"`/`data-theme="light"` scope les tokens `--ar-*`
- * de `default.css` au sous-arbre du conteneur qui le porte, pas seulement à `:root`
+ * de `ariane.css` au sous-arbre du conteneur qui le porte, pas seulement à `:root`
  * (issue #203).
  */
 import { expect } from '@open-wc/testing';
@@ -12,7 +12,7 @@ const VAULT_OKLCH = 'oklch(0.2354 0.0334 273.44)';
 async function loadDefaultTheme(): Promise<HTMLLinkElement> {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = new URL('./default.css', import.meta.url).href;
+    link.href = new URL('./ariane.css', import.meta.url).href;
     document.head.appendChild(link);
     await new Promise<void>((resolve) => {
         link.addEventListener('load', () => resolve(), { once: true });
@@ -27,7 +27,7 @@ function probeBackground(parent: HTMLElement): string {
     return getComputedStyle(probe).backgroundColor;
 }
 
-describe('default.css — scoping de data-theme par bloc', () => {
+describe('ariane.css — scoping de data-theme par bloc', () => {
     let link: HTMLLinkElement;
     let root: HTMLDivElement;
 

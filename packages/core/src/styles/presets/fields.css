@@ -1,9 +1,9 @@
 /**
  * Classes de champ de formulaire prêtes à l'emploi — à inclure séparément de
- * `themes/default.css` (fichier indépendant, même s'il consomme les mêmes
+ * `themes/ariane.css` (fichier indépendant, même s'il consomme les mêmes
  * tokens `--ar-*` génériques).
  *
- * Contrairement aux tokens/`::part()` de `themes/default.css`, qui stylisent
+ * Contrairement aux tokens/`::part()` de `themes/ariane.css`, qui stylisent
  * le contrat intrinsèque des composants `ar-*`, ces classes habillent du
  * HTML consommateur ordinaire (un `<textarea>`/`<input>` externe que vous
  * associez vous-même à un composant, par exemple via `for` à `ar-charcounter`).

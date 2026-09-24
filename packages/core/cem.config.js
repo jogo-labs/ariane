@@ -9,7 +9,7 @@
  * @type {import('@custom-elements-manifest/analyzer').UserConfig}
  */
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { customElementVsCodePlugin } from 'custom-element-vs-code-integration';
 import {
@@ -23,6 +23,10 @@ import {
 } from './scripts/validate-no-hardcoded-tokens.js';
 import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js';
 import { pruneDanglingCustomElementExports } from './scripts/prune-dangling-custom-element-exports.js';
+import {
+    buildDedupedTokenInventory,
+    findDuplicateTokens,
+} from './scripts/validate-no-duplicate-tokens.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -203,22 +207,72 @@ export default {
                     }
                 }
 
-                // Valide que chaque token --ar-* de default.css appartenant à un composant
+                // Valide que chaque token --ar-* de ariane.css appartenant à un composant
                 // a bien une entrée @cssprop dans son JSDoc (trou de documentation) —
                 // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
-                const themeCss = readFileSync(
-                    resolve(process.cwd(), 'src/styles/themes/default.css'),
-                    'utf-8',
-                );
+                //
+                // Ce `themeCss` (et lui seul — le garde-fou anti-doublon plus bas garde sa
+                // propre lecture) doit provenir des fragments SOURCE (non minifiés), pas de
+                // dist/styles/themes/ariane.css : ce dernier est le bundle esbuild sur une
+                // seule ligne, et les regex de `validate-cssprop-defaults.js`/
+                // `validate-part-state-order.js` supposent du CSS formaté multi-lignes avec
+                // guillemets préservés (`:root[data-theme='dark']`, `;` de fin de
+                // déclaration). Sur le bundle minifié ces regex ratent silencieusement
+                // presque tout (0 bloc de composant détecté, tokens de fin de bloc avalés
+                // par le `;` manquant, exclusion dark mode jamais déclenchée) — cf. revue
+                // finale #256. On reconstruit donc ici l'équivalent fonctionnel de l'ancien
+                // default.css unique en concaténant les fragments dans l'ordre des
+                // `@import` de l'entrée ariane.css (le seul ordre qui compte pour ces deux
+                // validateurs, qui ne dépendent ni de `@layer` ni du wrapper de l'entrée).
+                const themeEntryPath = resolve(process.cwd(), 'src/styles/themes/ariane.css');
+                const themeEntrySrc = readFileSync(themeEntryPath, 'utf-8');
+                const themeEntryDir = resolve(process.cwd(), 'src/styles/themes');
+                const importedFragmentPaths = [
+                    ...themeEntrySrc.matchAll(/@import url\('([^']+)'\)/g),
+                ].map((match) => resolve(themeEntryDir, match[1]));
+                // `_global-tokens.css` est le seul fragment contenant le marqueur dark mode
+                // (`:root[data-theme='dark']`, en toute fin de fichier — il ne fait que
+                // basculer `color-scheme`, aucune valeur de token n'y est redéclarée, tout le
+                // thème utilisant `light-dark()` en ligne). `extractThemeTokens` tronque le
+                // blob concaténé au premier marqueur rencontré : en position 3 (ordre des
+                // `@import`), il couperait tous les fragments shared/components qui suivent,
+                // alors qu'ils n'ont eux-mêmes aucun rapport avec le dark mode. On place donc
+                // ce fragment en dernier dans la concaténation, pour reconstruire fidèlement
+                // la structure de l'ancien fichier unique (tous les tokens d'abord, la
+                // bascule dark tout à la fin) — vérifié empiriquement (--ar-panel-bg, entre
+                // autres, disparaissait sinon).
+                const orderedFragmentPaths = [...importedFragmentPaths].sort((a, b) => {
+                    const aIsGlobalTokens = a.endsWith('_global-tokens.css');
+                    const bIsGlobalTokens = b.endsWith('_global-tokens.css');
+                    if (aIsGlobalTokens === bIsGlobalTokens) return 0;
+                    return aIsGlobalTokens ? 1 : -1;
+                });
+                const themeCss = orderedFragmentPaths
+                    .map((fragmentPath) => readFileSync(fragmentPath, 'utf-8'))
+                    .join('\n\n');
                 const themeTokens = extractThemeTokens(themeCss);
                 const cssPropCoverageErrors = validateCssPropertyCoverage(
                     customElementsManifest,
                     themeTokens,
                 );
+                // Le garde-fou anti-doublon lit les fragments SOURCE individuellement
+                // (pas le CSS bundlé) : une redéclaration légitime d'un même token sous
+                // plusieurs sélecteurs à l'intérieur d'un seul fragment (ex.
+                // --ar-alert-bg une fois par variant) ne doit pas être signalée — seul un
+                // token apparaissant dans PLUSIEURS fragments distincts est une erreur.
+                const fragmentsDir = resolve(process.cwd(), 'src/styles/themes/ariane');
+                const fragmentContents = readdirSync(fragmentsDir, { recursive: true })
+                    .filter((relativePath) => relativePath.endsWith('.css'))
+                    .map((relativePath) =>
+                        readFileSync(resolve(fragmentsDir, relativePath), 'utf-8'),
+                    );
+                const duplicateTokenErrors = findDuplicateTokens(
+                    buildDedupedTokenInventory(fragmentContents),
+                );
 
                 // Valide qu'aucun composant n'assigne une valeur littérale à une
                 // custom property --ar-* dans ses *.styles.ts au lieu de référencer
-                // un token default.css via var() — cf.
+                // un token ariane.css via var() — cf.
                 // docs/superpowers/specs/2026-07-16-dialog-width-headless-tokens-design.md
                 const stylesFiles = findStylesFiles(resolve(process.cwd(), 'src'));
                 const hardcodedErrors = stylesFiles.flatMap((filePath) =>
@@ -234,10 +288,10 @@ export default {
                 );
 
                 // Valide que toute règle ::part(x) de base précède ses parts d'état
-                // (::part(x-état)) dans default.css — cf.
+                // (::part(x-état)) dans ariane.css — cf.
                 // docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md
                 const partStateOrderErrors = findPartStateOrderErrors(
-                    'src/styles/themes/default.css',
+                    'src/styles/themes/ariane.css (fragments concaténés)',
                     themeCss,
                 );
 
@@ -246,6 +300,7 @@ export default {
                     ...hardcodedErrors,
                     ...unjustifiedFallbackErrors,
                     ...partStateOrderErrors,
+                    ...duplicateTokenErrors,
                 ];
                 if (allErrors.length > 0) {
                     const coverageErrorsMsg =
@@ -264,8 +319,12 @@ export default {
                         partStateOrderErrors.length > 0
                             ? `\n  ordre part d'état invalide :\n${partStateOrderErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
+                    const duplicateTokenErrorsMsg =
+                        duplicateTokenErrors.length > 0
+                            ? `\n  token(s) dupliqué(s) :\n${duplicateTokenErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}${partStateOrderErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec ariane.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}${partStateOrderErrorsMsg}${duplicateTokenErrorsMsg}`,
                     );
                 }
             },

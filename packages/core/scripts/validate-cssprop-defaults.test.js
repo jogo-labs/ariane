@@ -14,8 +14,8 @@ describe('extractThemeTokens', () => {
         expect(tokens.get('--ar-color-primary-05')).toBe('#010105');
     });
 
-    it("ignore une occurrence du marqueur dark mode a l'interieur d'un commentaire (faux-positif du header de default.css)", () => {
-        // Reproduit le header réel de default.css : le commentaire de tête mentionne
+    it("ignore une occurrence du marqueur dark mode a l'interieur d'un commentaire (faux-positif du header de ariane.css)", () => {
+        // Reproduit le header réel de ariane.css : le commentaire de tête mentionne
         // littéralement ":root[data-theme='dark']" à titre de documentation, avant le
         // vrai bloc :root de base. Sans filtrage des commentaires, DARK_OVERRIDE_RE
         // matche cette occurrence textuelle et tronque baseCss dès le commentaire,

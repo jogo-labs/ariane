@@ -22,6 +22,7 @@ import esbuild from 'esbuild';
 import { readdirSync, mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname, relative, extname } from 'path';
 import { fileURLToPath } from 'url';
+import { extractComponentRules } from './extract-component-rules.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -29,12 +30,6 @@ const CSS_SRC = join(ROOT, 'src', 'styles');
 const CSS_OUT = join(ROOT, 'dist', 'styles');
 const THEMES_SRC = join(CSS_SRC, 'themes');
 const WATCH = process.argv.includes('--watch');
-
-// Marqueur de split entre la partie tokens (:root) et la partie composants
-// (::part()) d'un fichier de thème. Distinct du titre de section décoratif
-// juste après (ex. "THÈME COMPOSANTS") : ce marqueur est le seul repère
-// fiable pour ce script, il ne doit pas être renommé.
-const SPLIT_ANCHOR = 'build-split-anchor: components';
 
 /**
  * Scan récursif pour trouver tous les fichiers CSS.
@@ -65,49 +60,22 @@ function toCamelCase(str) {
 }
 
 /**
- * Pour chaque fichier de thème sous src/styles/themes/, génère un module JS
- * jumeau exportant un CSSStyleSheet peuplé avec la partie "composants" du
- * thème (tout ce qui suit SPLIT_ANCHOR dans le fichier source).
+ * Pour chaque fichier de thème sous src/styles/themes/ (hors fragments
+ * préfixés `_`), génère un module JS jumeau exportant un CSSStyleSheet
+ * peuplé avec la partie "composants" du thème (règles ::part(), etc.),
+ * extraite du CSS déjà bundlé (résolution des @import faite par ctx.rebuild()
+ * — doit donc s'exécuter avant cette fonction) via extractComponentRules().
  * @returns {Promise<void>}
  */
 async function generateThemeJsExports() {
-    const themeFiles = findCssFiles(THEMES_SRC);
+    const themeFiles = findCssFiles(THEMES_SRC).filter((f) => !f.split('/').pop().startsWith('_'));
 
     for (const file of themeFiles) {
-        const source = readFileSync(file, 'utf8');
-        const anchorIndex = source.indexOf(SPLIT_ANCHOR);
+        const basename = relative(THEMES_SRC, file).replace(/\.css$/, '');
+        const bundledPath = join(CSS_OUT, 'themes', `${basename}.css`);
+        const bundledSource = readFileSync(bundledPath, 'utf8');
 
-        if (anchorIndex === -1) {
-            throw new Error(
-                `[build-css] Ancre "${SPLIT_ANCHOR}" introuvable dans ` +
-                    `${relative(ROOT, file)} — requise pour générer l'export ` +
-                    'CSSStyleSheet du thème (voir scripts/build-css.js).',
-            );
-        }
-
-        // L'ancre se trouve à l'intérieur d'un commentaire CSS.
-        // Trouver la fermeture */ pour extraire uniquement le CSS des composants.
-        const searchStart = anchorIndex + SPLIT_ANCHOR.length;
-        const commentEndIndex = source.indexOf('*/', searchStart);
-
-        if (commentEndIndex === -1) {
-            throw new Error(
-                `[build-css] Commentaire d'ancre non fermé dans ` +
-                    `${relative(ROOT, file)} — le commentaire contenant ` +
-                    `"${SPLIT_ANCHOR}" doit être fermé par */ (voir scripts/build-css.js).`,
-            );
-        }
-
-        // Extraire le CSS après la fermeture du commentaire. Dans le fichier
-        // source, ce CSS est enrobé dans une @layer ariane.theme { ... } dont
-        // l'ouverture précède l'ancre et dont la fermeture } se trouve en fin
-        // de fichier. On la ré-enrobe dans une @layer fraîche et complète
-        // (plutôt que de retirer la } de fermeture d'origine) pour préserver
-        // le layering : sans lui, les règles ::part() de default.js seraient
-        // non-layered alors qu'elles le sont dans default.css, cassant
-        // l'équivalence de cascade entre les deux méthodes de chargement
-        // documentées (<link> vs adoptedStyleSheets — cf. #170).
-        const componentsSource = `@layer ariane.theme {\n${source.slice(commentEndIndex + 2)}`;
+        const componentsSource = extractComponentRules(bundledSource);
 
         const { code: minified, warnings } = await esbuild.transform(componentsSource, {
             loader: 'css',
@@ -123,13 +91,11 @@ async function generateThemeJsExports() {
                 )
                 .join('\n');
             throw new Error(
-                `[build-css] Warnings de transformation CSS dans ` +
-                    `${relative(ROOT, file)}:\n${warningMessages}\n` +
+                `[build-css] Warnings de transformation CSS dans ${relative(ROOT, file)}:\n${warningMessages}\n` +
                     'Voir scripts/build-css.js pour les détails.',
             );
         }
 
-        const basename = relative(THEMES_SRC, file).replace(/\.css$/, '');
         const exportName = `${toCamelCase(basename)}Theme`;
         const jsContent =
             `export const ${exportName} = new CSSStyleSheet();\n` +
@@ -148,12 +114,16 @@ if (cssFiles.length === 0) {
     process.exit(0);
 }
 
-// Construire les entry points en préservant la structure de répertoires
+// Construire les entry points en préservant la structure de répertoires.
+// Les fragments préfixés `_` (cf. ariane/_*.css) ne sont pas des entry points
+// autonomes : ils sont résolus via @import par ariane.css (bundle: true).
 const entryPoints = Object.fromEntries(
-    cssFiles.map((file) => {
-        const key = relative(CSS_SRC, file).replace(/\.css$/, '');
-        return [key, file];
-    }),
+    cssFiles
+        .filter((file) => !file.split('/').pop().startsWith('_'))
+        .map((file) => {
+            const key = relative(CSS_SRC, file).replace(/\.css$/, '');
+            return [key, file];
+        }),
 );
 
 mkdirSync(CSS_OUT, { recursive: true });
@@ -161,7 +131,7 @@ mkdirSync(CSS_OUT, { recursive: true });
 const ctx = await esbuild.context({
     entryPoints,
     outdir: CSS_OUT,
-    bundle: false, // pas de résolution d'imports @import ici
+    bundle: true, // résout les @import (fragments de thème, cf. #256)
     minify: true,
     logLevel: 'info',
 });

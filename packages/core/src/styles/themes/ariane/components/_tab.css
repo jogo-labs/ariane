@@ -1,0 +1,71 @@
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Tab
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-tab-padding-x: 1.5rem;
+    --ar-tab-padding-y: 1rem;
+
+    --ar-tab-active-shadow: inset 0 -2px 0 var(--ar-color-primary-70);
+
+    --ar-tab-focus-ring-offset: -2px;
+    --ar-tab-focus-ring-color: var(--ar-focus-ring-color);
+
+    --ar-tab-group-border-color: var(--ar-color-border);
+    --ar-tab-group-border-top-width: 0;
+    --ar-tab-group-border-bottom-width: 1px;
+}
+
+ar-tab-group {
+    &::part(tab-group) {
+        gap: 0;
+    }
+
+    &.has-overflow-start:not(.has-overflow-end)::part(nav) {
+        mask-image: linear-gradient(to right, transparent, black 3rem);
+    }
+    &.has-overflow-end:not(.has-overflow-start)::part(nav) {
+        mask-image: linear-gradient(to left, transparent, black 3rem);
+    }
+    &.has-overflow-start.has-overflow-end::part(nav) {
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 3rem,
+            black calc(100% - 3rem),
+            transparent
+        );
+    }
+}
+
+ar-tab {
+    border-radius: 0;
+    font-weight: var(--ar-font-weight-normal);
+
+    &::part(tab) {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: color 0.35s;
+        color: var(--ar-color-text-muted);
+        background: transparent;
+    }
+
+    &::part(tab--selected) {
+        color: var(--ar-color-text);
+        font-weight: var(--ar-font-weight-bold);
+        background: transparent;
+    }
+
+    &:hover:not(:state(disabled)):not(:state(active))::part(tab) {
+        color: var(--ar-color-text);
+        background: transparent;
+        box-shadow: inset 0 -2px 0 var(--ar-color-text);
+    }
+}
+
+ar-tab:state(disabled)::part(tab) {
+    color: light-dark(
+        var(--ar-color-neutral-60),
+        color-mix(in oklab, var(--ar-color-vault), white 20%)
+    );
+}

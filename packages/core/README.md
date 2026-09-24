@@ -17,7 +17,7 @@ npm install @ariane-ui/core
 ```html
 <!-- CDN -->
 <script type="module" src="node_modules/@ariane-ui/core/cdn/index.js"></script>
-<link rel="stylesheet" href="node_modules/@ariane-ui/core/themes/default.css" />
+<link rel="stylesheet" href="node_modules/@ariane-ui/core/themes/ariane.css" />
 
 <ar-alert variant="success">Opération réussie.</ar-alert>
 ```
@@ -25,7 +25,7 @@ npm install @ariane-ui/core
 ```typescript
 // ESM avec bundler (tree-shakeable)
 import '@ariane-ui/core';
-import '@ariane-ui/core/themes/default.css';
+import '@ariane-ui/core/themes/ariane.css';
 ```
 
 ---
@@ -54,7 +54,7 @@ import '@ariane-ui/core';
 import '@ariane-ui/core/dist/components/alert/alert.js';
 
 // Thème CSS
-import '@ariane-ui/core/themes/default.css';
+import '@ariane-ui/core/themes/ariane.css';
 
 // CDN bundle (Lit inclus)
 import '@ariane-ui/core/cdn';
@@ -80,7 +80,9 @@ ar-alert {
 }
 ```
 
-Les valeurs par défaut sont définies dans `src/styles/themes/default.css`.
+Les valeurs par défaut sont définies dans `src/styles/themes/ariane.css` (liste d'`@import`)
+et ses fragments sous `src/styles/themes/ariane/` (`_palette.css`, `_semantic-tokens.css`,
+`_global-tokens.css`, `shared/`, `components/`).
 Créez votre propre thème en surchargeant ces variables dans votre CSS global.
 
 ### CSS Parts
@@ -111,7 +113,7 @@ src/
 ├── context/             # Providers @lit/context (communication parent-enfant)
 ├── state/               # Moteurs de calcul d'état purs
 ├── styles/              # CSS partagé
-│   ├── themes/          ← Fichiers de thème (default.css…)
+│   ├── themes/          ← Fichiers de thème (ariane.css…)
 │   └── components/      ← Styles utilitaires partagés
 ├── types/               # Interfaces TypeScript globales
 └── index.ts             # Export barrel
