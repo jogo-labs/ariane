@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDedupedTokenInventory, findDuplicateTokens } from './validate-no-duplicate-tokens.js';
+import {
+    buildDedupedTokenInventory,
+    extractRootTokens,
+    findDuplicateTokens,
+} from './validate-no-duplicate-tokens.js';
 
 test('détecte un token déclaré deux fois', () => {
     const css = `:root { --ar-color-text: red; } :root { --ar-color-text: blue; }`;
@@ -43,4 +47,22 @@ test('buildDedupedTokenInventory laisse détecter un doublon inter-fragments', (
     const errors = findDuplicateTokens(inventory);
     assert.equal(errors.length, 1);
     assert.match(errors[0], /--ar-alert-bg/);
+});
+
+test('extractRootTokens exclut les overrides imbriqués dans un sélecteur composant', () => {
+    const fragment = `
+        :root {
+            --ar-x: 1;
+        }
+
+        ar-foo {
+            &::part(bar) {
+                --ar-x: 2;
+            }
+        }
+    `;
+    const rootTokens = extractRootTokens(fragment);
+    const matches = [...rootTokens.matchAll(/--ar-x(?=\s*:)/g)];
+    assert.equal(matches.length, 1);
+    assert.ok(!rootTokens.includes('ar-foo'));
 });
