@@ -15,17 +15,40 @@ Les points 1 et 2 (renommer `default.css` → `ariane.css`, réorganiser en impo
 
 Un seul repo GitHub, marqué _template repository_, contenant :
 
-- `ariane-starter.css` — le thème neutre, écrit à la main (valeurs sobres pour les tokens `--ar-*` existants : gris/bleu, radius neutres). Pas de logique, pas de build.
+- `ariane-starter.css` — fichier d'entrée du thème neutre, **généré** (copie de la structure `@import` de `ariane.css`, cf. section dédiée ci-dessous) — jamais édité à la main.
+- `ariane-starter/` — arbre de fragments, **généré** : copie conforme de `packages/core/src/styles/themes/ariane/` (issue de #256), à l'exception de `_palette.css` (neutralisé) et de l'échelle de radius dans `_global-tokens.css` (neutralisée). Tout le reste (tokens sémantiques, tokens partagés, tokens+règles par composant) est repris **verbatim**.
 - `index.html` — la page de démo "Kitchen Sink" (générée, committée en l'état, jamais éditée à la main).
-- `README.md` — instructions de fork/copie pour un consommateur.
+- `README.md` — instructions de fork/copie pour un consommateur (seul fichier écrit à la main dans ce repo).
 
 Pas de second repo séparé pour la démo : elle n'a de sens qu'avec le CSS starter à côté, et dupliquer la configuration Pages/CI pour deux repos n'apporte rien à ce stade (YAGNI).
 
-**Déploiement** : GitHub Pages en "Deploy from a branch" (`main`, racine) — pas de workflow Pages dédié, `index.html` est un fichier statique déjà committé.
+**Déploiement** : GitHub Pages en "Deploy from a branch" (`main`, racine) — pas de workflow Pages dédié, tout le contenu est statique et déjà committé.
 
-### Génération de la démo : script dans le monorepo `ariane`
+### Thème neutre : dérivé de `ariane.css`, pas écrit à la main
 
-Le générateur (`scripts/generate-starter-demo.js`, nouveau, dans `ariane`) est la seule pièce de logique de tout le chantier. Il doit vivre dans `ariane` car il a besoin des deux sources suivantes, toutes deux privées au monorepo (jamais publiées sur npm) :
+Décision prise après #256 (restructuration de `default.css` → `ariane.css` en fragments) : plutôt qu'un fichier neutre maintenu indépendamment (risque de drift au fil de l'évolution de la lib), le starter-kit **copie l'arbre de fragments réel** et ne neutralise que ce qui porte l'identité visuelle "Ariane" — deux fragments précis, ciblés par transformation de texte plutôt que réécrits à la main :
+
+- **`_palette.css`** — seules les valeurs `--ar-color-primary-*` (11 déclarations) changent : la **luminosité (L)** de chaque palier est extraite du fichier source réel (regex sur `oklch(<L> <C> <H>)`) et **préservée telle quelle** — donc si la palette ambre est recalibrée plus tard (contraste AA, etc.), le starter neutre suit automatiquement, sans intervention. Seuls la teinte et le chroma sont fixés à des valeurs neutres (slate-blue, hue 250, chroma fortement réduit) :
+
+    ```
+    05: oklch(<L source> 0.02  250)     50: oklch(<L source> 0.045 250)
+    10: oklch(<L source> 0.025 250)     60: oklch(<L source> 0.05  250)
+    20: oklch(<L source> 0.03  250)     70: oklch(<L source> 0.045 250)
+    30: oklch(<L source> 0.035 250)     80: oklch(<L source> 0.035 250)
+    40: oklch(<L source> 0.04  250)     90: oklch(<L source> 0.025 250)
+                                        95: oklch(<L source> 0.015 250)
+    ```
+
+    `--ar-color-vault`/`-vault-deep` sont réécrits en alias vers la rampe neutre déjà présente dans le même fichier (`var(--ar-color-neutral-10)`/`var(--ar-color-neutral-05)`) plutôt qu'en valeurs propres — indépendant de toute évolution future de ces deux tokens. Le reste de `_palette.css` (Green/Yellow/Red/Blue/White/Neutral — hues sémantiques universelles success/warning/danger/info, pas une identité de marque) est copié **verbatim**, inchangé.
+
+- **`_global-tokens.css`** — seules les 4 valeurs `--ar-border-radius-{sm,md,lg,xl}` sont remplacées par une échelle plus discrète (`0.25rem`/`0.375rem`/`0.5rem`/`0.75rem` — `-full` inchangé, déjà générique). Tout le reste du fichier (typographie, espacement, tokens génériques mutualisés bouton/input/panel) est copié **verbatim** — ce ne sont pas des choix d'identité, ce sont des valeurs structurelles/fonctionnelles.
+- **Tous les autres fragments** (`_semantic-tokens.css`, `shared/_panel.css`, `shared/_anchor.css`, les 14 fragments `components/`) sont copiés **verbatim**, sans transformation — ils référencent déjà les primitives via `var()`, donc héritent automatiquement du rendu neutre.
+
+Deux petites fonctions pures (testables) portent cette logique : `deriveNeutralPalette(paletteCssText) => string` et `deriveNeutralGlobalTokens(globalTokensCssText) => string` — dans `ariane`, à côté du générateur de la démo.
+
+### Génération de la démo et du thème : scripts dans le monorepo `ariane`
+
+Le générateur (`scripts/starter-kit/generate-starter-demo.js`, nouveau, dans `ariane`) orchestre deux sorties vers le repo externe en une seule commande/un seul commit : la page `index.html` (Kitchen Sink) **et** le thème (`ariane-starter.css` + `ariane-starter/`, cf. section précédente). Il doit vivre dans `ariane` car il a besoin des sources suivantes, toutes privées au monorepo (jamais publiées sur npm) :
 
 - **`packages/core/dist/custom-elements.json`** (manifest CEM) → liste des 19 tagNames + `summary` de chaque composant.
 - **`apps/docs/src/content/components/ar-*.mdx`** → frontmatter `variants: [{ name, label, description, html }]`, déjà écrit à la main pour la doc réelle. Réutilisé tel quel, zéro duplication de contenu de démo.
@@ -51,8 +74,8 @@ Le script prend en charge la partie fastidieuse pour réduire les deux irritants
 npm run generate:starter-demo -- --repo ../ariane-starter-kit
 ```
 
-- Génère `index.html`, l'écrit directement dans le checkout du repo externe (chemin relatif, checkout frère supposé en local).
-- Fait `git add` + `git commit` dans ce checkout (message de commit généré, ex. `chore: régénère la démo (ariane vX.Y.Z)`).
+- Génère `index.html` **et** régénère `ariane-starter.css`/`ariane-starter/` (copie + neutralisation ciblée), les écrit directement dans le checkout du repo externe (chemin relatif, checkout frère supposé en local).
+- Fait `git add` + `git commit` dans ce checkout (message de commit généré, ex. `chore: régénère la démo et le thème (ariane vX.Y.Z)`).
 - **Ne pousse jamais automatiquement** — le `git push` reste un geste volontaire du dev, après relecture du diff généré.
 
 **Précondition documentée** (dans le `README` du script et celui d'`ariane-starter-kit`) : les deux repos doivent être clonés en checkouts frères en local (ex. `~/Code/.../ariane` et `~/Code/.../ariane-starter-kit`). `--repo` a pour défaut `../ariane-starter-kit`, overridable.
@@ -77,6 +100,4 @@ Le script est exécuté en CI (`ci-core.yml` ou `ci-docs.yml`) en mode dry-run :
 
 ## Points restant à trancher en implémentation (pas bloquants pour le plan)
 
-- Emplacement exact du script dans l'arborescence `ariane` (racine `scripts/` vs `packages/core/scripts/` vs nouveau `apps/docs/scripts/` — le script lit des données des deux packages, donc probablement à la racine du monorepo).
-- Contenu précis des valeurs du thème starter (palette grise/bleue exacte, échelle de radius) — décision de détail visuelle, pas structurelle.
-- Nom exact du fichier CSS starter (`ariane-starter.css` proposé, à confirmer).
+- Emplacement exact des scripts dans l'arborescence `ariane` — `scripts/starter-kit/` à la racine du monorepo (le script lit des données de `packages/core/` et `apps/docs/`, donc pas rattaché à un seul package).
