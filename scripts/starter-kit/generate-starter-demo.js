@@ -50,6 +50,11 @@ export function generate({
 
     mkdirSync(target, { recursive: true });
     writeFileSync(path.join(target, 'index.html'), html);
+    // GitHub Pages sert le repo via Jekyll par défaut, qui exclut tout
+    // fichier/dossier préfixé `_` — soit les 19 fragments de thème sous
+    // ariane-starter/. `.nojekyll` désactive ce traitement (cf. finding
+    // critique #230 point 3 : le site live était rendu sans styles).
+    writeFileSync(path.join(target, '.nojekyll'), '');
     syncStarterTheme({ srcThemesDir, repoPath: target });
 
     if (dryRun) {
@@ -57,9 +62,11 @@ export function generate({
         return { html, warnings, committed: false };
     }
 
-    execFileSync('git', ['add', 'index.html', 'ariane-starter.css', 'ariane-starter'], {
-        cwd: repoPath,
-    });
+    execFileSync(
+        'git',
+        ['add', 'index.html', '.nojekyll', 'ariane-starter.css', 'ariane-starter'],
+        { cwd: repoPath },
+    );
     try {
         execFileSync(
             'git',

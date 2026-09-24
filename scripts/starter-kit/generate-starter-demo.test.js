@@ -1,6 +1,6 @@
 // scripts/starter-kit/generate-starter-demo.test.js
 import { describe, expect, it } from 'vitest';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,6 +37,7 @@ describe('generate (dry-run)', () => {
             expect(written).toBe(result.html);
             const entry = readFileSync(path.join(outDir, 'ariane-starter.css'), 'utf8');
             expect(entry).toMatch(/@import url\('\.\/ariane-starter\//);
+            expect(existsSync(path.join(outDir, '.nojekyll'))).toBe(true);
         } finally {
             rmSync(outDir, { recursive: true, force: true });
         }
