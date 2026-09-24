@@ -39,6 +39,7 @@ npm run build:manifest     # Regénère custom-elements.json
 - `main` ← PR depuis `dev` uniquement, pour les releases
 - Release : tag `vX.Y.Z` → CI publie sur npm + crée la GitHub Release automatiquement
 - Tag npm : `-alpha.*` → `alpha`, `-beta.*` → `beta`, stable → `latest`
+- Si un composant a changé depuis la dernière release : régénérer la démo et le thème starter-kit (`npm run generate:starter-demo -- --repo <checkout ariane-starter-kit>`) et pousser dans ce repo après relecture du diff. Checkout frère attendu à côté de `ariane` en local.
 
 ## Notes
 
