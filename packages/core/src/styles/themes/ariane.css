@@ -9,11 +9,17 @@
  *   ou
  *   import '@ariane-ui/core/themes/ariane.css'; // via bundler
  */
+
+/* Theme setup */
 @import url('./ariane/_palette.css') layer(ariane.theme);
 @import url('./ariane/_semantic-tokens.css') layer(ariane.theme);
 @import url('./ariane/_global-tokens.css') layer(ariane.theme);
+
+/* Shared by components */
 @import url('./ariane/shared/_panel.css') layer(ariane.theme);
 @import url('./ariane/shared/_anchor.css') layer(ariane.theme);
+
+/* Components */
 @import url('./ariane/components/_alert.css') layer(ariane.theme);
 @import url('./ariane/components/_breadcrumb.css') layer(ariane.theme);
 @import url('./ariane/components/_charcounter.css') layer(ariane.theme);
