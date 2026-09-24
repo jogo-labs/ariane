@@ -1,8 +1,10 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Charcounter
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-charcounter-warning-weight: 600;
---ar-charcounter-error-weight: 700;
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Charcounter
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-charcounter-warning-weight: 600;
+    --ar-charcounter-error-weight: 700;
+}
 
 ar-charcounter {
     &::part(count) {

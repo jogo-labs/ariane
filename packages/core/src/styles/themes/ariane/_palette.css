@@ -1,104 +1,106 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * 1. PALETTE BRUTE
-         * Couleurs de base — ne pas utiliser directement dans les composants.
-         * Passer par les tokens sémantiques (sections 2 et 3).
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * 1. PALETTE BRUTE
+             * Couleurs de base — ne pas utiliser directement dans les composants.
+             * Passer par les tokens sémantiques (sections 2 et 3).
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* Primary (ambre — identité #110) — 05=sombre → 95=clair.
-           Ancré sur deux valeurs déjà vérifiées AA côté doc (charte-graphique.md) :
-           40 = #8f5f00 (--doc-accent clair), 70 = #ffaa00 (--doc-ember brut).
-           Contraste vérifié (OKLCH → sRGB, formule WCAG) :
-           primary-40 vs blanc (fond de bouton, texte blanc dessus) = 5.52:1 (>=4.5)
-           primary-70 vs vault #191d2e (texte interactif en sombre) = 8.76:1 (>=4.5) */
---ar-color-primary-05: oklch(16.5% 0.035 70);
---ar-color-primary-10: oklch(22.5% 0.05 71);
---ar-color-primary-20: oklch(31% 0.075 72);
---ar-color-primary-30: oklch(41.5% 0.095 73);
---ar-color-primary-40: oklch(52.43% 0.1108 74.71);
---ar-color-primary-50: oklch(60.5% 0.13 74.5);
---ar-color-primary-60: oklch(70.5% 0.155 74);
---ar-color-primary-70: oklch(80.16% 0.1705 73.27);
---ar-color-primary-80: oklch(86.5% 0.13 78);
---ar-color-primary-90: oklch(92.5% 0.075 83);
---ar-color-primary-95: oklch(96.5% 0.038 87);
+    /* Primary (ambre — identité #110) — 05=sombre → 95=clair.
+               Ancré sur deux valeurs déjà vérifiées AA côté doc (charte-graphique.md) :
+               40 = #8f5f00 (--doc-accent clair), 70 = #ffaa00 (--doc-ember brut).
+               Contraste vérifié (OKLCH → sRGB, formule WCAG) :
+               primary-40 vs blanc (fond de bouton, texte blanc dessus) = 5.52:1 (>=4.5)
+               primary-70 vs vault #191d2e (texte interactif en sombre) = 8.76:1 (>=4.5) */
+    --ar-color-primary-05: oklch(16.5% 0.035 70);
+    --ar-color-primary-10: oklch(22.5% 0.05 71);
+    --ar-color-primary-20: oklch(31% 0.075 72);
+    --ar-color-primary-30: oklch(41.5% 0.095 73);
+    --ar-color-primary-40: oklch(52.43% 0.1108 74.71);
+    --ar-color-primary-50: oklch(60.5% 0.13 74.5);
+    --ar-color-primary-60: oklch(70.5% 0.155 74);
+    --ar-color-primary-70: oklch(80.16% 0.1705 73.27);
+    --ar-color-primary-80: oklch(86.5% 0.13 78);
+    --ar-color-primary-90: oklch(92.5% 0.075 83);
+    --ar-color-primary-95: oklch(96.5% 0.038 87);
 
-/* Vault (surfaces sombres dédiées — identité "Voûte", #110) — utilisé
-           uniquement par --ar-color-bg/-bg-subtle côté sombre, jamais par un
-           composant directement. Valeurs alignées sur --doc-vault/-vault-deep
-           (apps/docs/src/styles/doc-tokens.css), converties en oklch natif. */
---ar-color-vault: oklch(23.54% 0.0334 273.44);
---ar-color-vault-deep: oklch(18.99% 0.0249 273.04);
+    /* Vault (surfaces sombres dédiées — identité "Voûte", #110) — utilisé
+               uniquement par --ar-color-bg/-bg-subtle côté sombre, jamais par un
+               composant directement. Valeurs alignées sur --doc-vault/-vault-deep
+               (apps/docs/src/styles/doc-tokens.css), converties en oklch natif. */
+    --ar-color-vault: oklch(23.54% 0.0334 273.44);
+    --ar-color-vault-deep: oklch(18.99% 0.0249 273.04);
 
-/* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
---ar-color-white: oklch(100% 0 0);
+    /* White — blanc pur, utilisé comme couleur de texte sur fond coloré */
+    --ar-color-white: oklch(100% 0 0);
 
-/* Neutral — 05=sombre → 95=clair (même convention que les autres hues).
-           Chroma quasi nulle (0.002, contre 0.000-0.021 dans l'ancienne rampe
-           teintée bleu froid) — aligné sur le gris pur des primitifs --doc-*
-           (--doc-paper/--doc-ink mesurés à chroma=0 exactement). Luminosité (L)
-           inchangée par rapport à l'ancienne rampe : le contraste de tout token
-           qui en dérive (bordures, texte muté, désactivé) n'est pas affecté,
-           seule la teinte perceptible change. */
---ar-color-neutral-05: oklch(15.79% 0.002 90);
---ar-color-neutral-10: oklch(20.46% 0.002 90);
---ar-color-neutral-20: oklch(29.82% 0.002 90);
---ar-color-neutral-30: oklch(39.17% 0.002 90);
---ar-color-neutral-40: oklch(47.94% 0.002 90);
---ar-color-neutral-50: oklch(63.89% 0.002 90);
---ar-color-neutral-60: oklch(71.11% 0.002 90);
---ar-color-neutral-70: oklch(78.34% 0.002 90);
---ar-color-neutral-80: oklch(85.56% 0.002 90);
---ar-color-neutral-90: oklch(92.86% 0.002 90);
---ar-color-neutral-95: oklch(97.1% 0.002 90);
+    /* Neutral — 05=sombre → 95=clair (même convention que les autres hues).
+               Chroma quasi nulle (0.002, contre 0.000-0.021 dans l'ancienne rampe
+               teintée bleu froid) — aligné sur le gris pur des primitifs --doc-*
+               (--doc-paper/--doc-ink mesurés à chroma=0 exactement). Luminosité (L)
+               inchangée par rapport à l'ancienne rampe : le contraste de tout token
+               qui en dérive (bordures, texte muté, désactivé) n'est pas affecté,
+               seule la teinte perceptible change. */
+    --ar-color-neutral-05: oklch(15.79% 0.002 90);
+    --ar-color-neutral-10: oklch(20.46% 0.002 90);
+    --ar-color-neutral-20: oklch(29.82% 0.002 90);
+    --ar-color-neutral-30: oklch(39.17% 0.002 90);
+    --ar-color-neutral-40: oklch(47.94% 0.002 90);
+    --ar-color-neutral-50: oklch(63.89% 0.002 90);
+    --ar-color-neutral-60: oklch(71.11% 0.002 90);
+    --ar-color-neutral-70: oklch(78.34% 0.002 90);
+    --ar-color-neutral-80: oklch(85.56% 0.002 90);
+    --ar-color-neutral-90: oklch(92.86% 0.002 90);
+    --ar-color-neutral-95: oklch(97.1% 0.002 90);
 
-/* Green — utilisé pour success */
---ar-color-green-05: oklch(17.74% 0.037 165.47);
---ar-color-green-10: oklch(22.71% 0.047 165.92);
---ar-color-green-20: oklch(30.89% 0.065 165.46);
---ar-color-green-30: oklch(38.23% 0.08 164.89);
---ar-color-green-40: oklch(45.24% 0.095 164.51);
---ar-color-green-50: oklch(54.74% 0.113 164.94);
---ar-color-green-60: oklch(65.11% 0.13 166.01);
---ar-color-green-70: oklch(73.49% 0.142 166.89);
---ar-color-green-80: oklch(81.85% 0.149 168.5);
---ar-color-green-90: oklch(91.42% 0.072 172.95);
---ar-color-green-95: oklch(96.01% 0.035 174.15);
+    /* Green — utilisé pour success */
+    --ar-color-green-05: oklch(17.74% 0.037 165.47);
+    --ar-color-green-10: oklch(22.71% 0.047 165.92);
+    --ar-color-green-20: oklch(30.89% 0.065 165.46);
+    --ar-color-green-30: oklch(38.23% 0.08 164.89);
+    --ar-color-green-40: oklch(45.24% 0.095 164.51);
+    --ar-color-green-50: oklch(54.74% 0.113 164.94);
+    --ar-color-green-60: oklch(65.11% 0.13 166.01);
+    --ar-color-green-70: oklch(73.49% 0.142 166.89);
+    --ar-color-green-80: oklch(81.85% 0.149 168.5);
+    --ar-color-green-90: oklch(91.42% 0.072 172.95);
+    --ar-color-green-95: oklch(96.01% 0.035 174.15);
 
-/* Yellow — utilisé pour warning */
---ar-color-yellow-05: oklch(18.39% 0.039 71.95);
---ar-color-yellow-10: oklch(23.51% 0.05 68.78);
---ar-color-yellow-20: oklch(32.32% 0.069 69.3);
---ar-color-yellow-30: oklch(39.73% 0.085 68.82);
---ar-color-yellow-40: oklch(46.87% 0.099 70.54);
---ar-color-yellow-50: oklch(57.03% 0.123 69.45);
---ar-color-yellow-60: oklch(67.67% 0.147 69.48);
---ar-color-yellow-70: oklch(76.13% 0.164 70.48);
---ar-color-yellow-80: oklch(84.07% 0.169 83.45);
---ar-color-yellow-90: oklch(92.18% 0.131 96.09);
---ar-color-yellow-95: oklch(96.32% 0.068 97.5);
+    /* Yellow — utilisé pour warning */
+    --ar-color-yellow-05: oklch(18.39% 0.039 71.95);
+    --ar-color-yellow-10: oklch(23.51% 0.05 68.78);
+    --ar-color-yellow-20: oklch(32.32% 0.069 69.3);
+    --ar-color-yellow-30: oklch(39.73% 0.085 68.82);
+    --ar-color-yellow-40: oklch(46.87% 0.099 70.54);
+    --ar-color-yellow-50: oklch(57.03% 0.123 69.45);
+    --ar-color-yellow-60: oklch(67.67% 0.147 69.48);
+    --ar-color-yellow-70: oklch(76.13% 0.164 70.48);
+    --ar-color-yellow-80: oklch(84.07% 0.169 83.45);
+    --ar-color-yellow-90: oklch(92.18% 0.131 96.09);
+    --ar-color-yellow-95: oklch(96.32% 0.068 97.5);
 
-/* Red — utilisé pour danger */
---ar-color-red-05: oklch(19.17% 0.079 29.23);
---ar-color-red-10: oklch(24.55% 0.1 27.41);
---ar-color-red-20: oklch(33.45% 0.124 26.78);
---ar-color-red-30: oklch(40.91% 0.141 26.45);
---ar-color-red-40: oklch(48.27% 0.158 25.74);
---ar-color-red-50: oklch(58.51% 0.177 25.15);
---ar-color-red-60: oklch(69.08% 0.18 23.79);
---ar-color-red-70: oklch(76.9% 0.137 19.63);
---ar-color-red-80: oklch(84.65% 0.084 18.96);
---ar-color-red-90: oklch(92.57% 0.038 17.86);
---ar-color-red-95: oklch(96.48% 0.017 17.46);
+    /* Red — utilisé pour danger */
+    --ar-color-red-05: oklch(19.17% 0.079 29.23);
+    --ar-color-red-10: oklch(24.55% 0.1 27.41);
+    --ar-color-red-20: oklch(33.45% 0.124 26.78);
+    --ar-color-red-30: oklch(40.91% 0.141 26.45);
+    --ar-color-red-40: oklch(48.27% 0.158 25.74);
+    --ar-color-red-50: oklch(58.51% 0.177 25.15);
+    --ar-color-red-60: oklch(69.08% 0.18 23.79);
+    --ar-color-red-70: oklch(76.9% 0.137 19.63);
+    --ar-color-red-80: oklch(84.65% 0.084 18.96);
+    --ar-color-red-90: oklch(92.57% 0.038 17.86);
+    --ar-color-red-95: oklch(96.48% 0.017 17.46);
 
-/* Blue — utilisé pour info */
---ar-color-blue-05: oklch(18.05% 0.045 253.25);
---ar-color-blue-10: oklch(23.25% 0.059 252.8);
---ar-color-blue-20: oklch(31.79% 0.079 253.15);
---ar-color-blue-30: oklch(39.27% 0.095 252.36);
---ar-color-blue-40: oklch(46.27% 0.113 253.15);
---ar-color-blue-50: oklch(56.35% 0.132 251.63);
---ar-color-blue-60: oklch(66.7% 0.136 249.55);
---ar-color-blue-70: oklch(74.85% 0.137 245.56);
---ar-color-blue-80: oklch(83.32% 0.091 242.3);
---ar-color-blue-90: oklch(92.32% 0.041 240.38);
---ar-color-blue-95: oklch(96.27% 0.02 238.66);
+    /* Blue — utilisé pour info */
+    --ar-color-blue-05: oklch(18.05% 0.045 253.25);
+    --ar-color-blue-10: oklch(23.25% 0.059 252.8);
+    --ar-color-blue-20: oklch(31.79% 0.079 253.15);
+    --ar-color-blue-30: oklch(39.27% 0.095 252.36);
+    --ar-color-blue-40: oklch(46.27% 0.113 253.15);
+    --ar-color-blue-50: oklch(56.35% 0.132 251.63);
+    --ar-color-blue-60: oklch(66.7% 0.136 249.55);
+    --ar-color-blue-70: oklch(74.85% 0.137 245.56);
+    --ar-color-blue-80: oklch(83.32% 0.091 242.3);
+    --ar-color-blue-90: oklch(92.32% 0.041 240.38);
+    --ar-color-blue-95: oklch(96.27% 0.02 238.66);
+}

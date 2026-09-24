@@ -1,8 +1,10 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Dropdown
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-dropdown-distance: var(--ar-anchor-distance);
---ar-dropdown-offset: var(--ar-anchor-offset);
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Dropdown
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-dropdown-distance: var(--ar-anchor-distance);
+    --ar-dropdown-offset: var(--ar-anchor-offset);
+}
 
 ar-dropdown {
     &::part(panel) {

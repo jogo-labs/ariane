@@ -1,9 +1,11 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Breadcrumb
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-breadcrumb-distance: var(--ar-anchor-distance);
---ar-breadcrumb-offset: var(--ar-anchor-offset);
---ar-breadcrumb-toggle-min-size: 2.5rem;
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Breadcrumb
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-breadcrumb-distance: var(--ar-anchor-distance);
+    --ar-breadcrumb-offset: var(--ar-anchor-offset);
+    --ar-breadcrumb-toggle-min-size: 2.5rem;
+}
 
 ar-breadcrumb {
     /* ── Partagé ──────────────────────────────────────────── */

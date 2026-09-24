@@ -1,8 +1,10 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Pagination
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-pagination-button-size: 2.5rem;
---ar-pagination-transition-duration: var(--ar-button-transition-duration);
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Pagination
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-pagination-button-size: 2.5rem;
+    --ar-pagination-transition-duration: var(--ar-button-transition-duration);
+}
 
 ar-pagination {
     &:not([compact])::part(list) {

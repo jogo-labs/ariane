@@ -1,11 +1,13 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Alert
-         * Voir les règles complémentaires pour les variants ci-dessous
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-alert-color: var(--ar-color-text);
---ar-alert-close-size: 2rem;
---ar-alert-close-transition-duration: var(--ar-button-transition-duration);
---ar-alert-hide-transition-duration: 0.33s;
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Alert
+             * Voir les règles complémentaires pour les variants ci-dessous
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-alert-color: var(--ar-color-text);
+    --ar-alert-close-size: 2rem;
+    --ar-alert-close-transition-duration: var(--ar-button-transition-duration);
+    --ar-alert-hide-transition-duration: 0.33s;
+}
 
 /* Alert */
 ar-alert {

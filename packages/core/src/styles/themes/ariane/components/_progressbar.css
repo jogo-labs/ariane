@@ -1,12 +1,14 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Progressbar
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-progressbar-track-color: light-dark(
-    var(--ar-color-neutral-90),
-    color-mix(in oklab, var(--ar-color-vault), white 20%)
-);
---ar-progressbar-fill-color: var(--ar-color-primary-70);
---ar-progressbar-max-width: 500px;
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Progressbar
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-progressbar-track-color: light-dark(
+        var(--ar-color-neutral-90),
+        color-mix(in oklab, var(--ar-color-vault), white 20%)
+    );
+    --ar-progressbar-fill-color: var(--ar-color-primary-70);
+    --ar-progressbar-max-width: 500px;
+}
 
 ar-progressbar {
     &::part(progressbar) {

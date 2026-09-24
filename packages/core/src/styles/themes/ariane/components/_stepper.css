@@ -1,17 +1,19 @@
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Stepper
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-stepper-distance: var(--ar-anchor-distance);
---ar-stepper-offset: var(--ar-anchor-offset);
---ar-stepper-toggle-min-size: 2.5rem;
+:root {
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Stepper
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-stepper-distance: var(--ar-anchor-distance);
+    --ar-stepper-offset: var(--ar-anchor-offset);
+    --ar-stepper-toggle-min-size: 2.5rem;
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         * Stepper-item
-         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
---ar-stepper-item-label-color: var(--ar-color-text-muted);
---ar-stepper-item-link-hover-label-color: var(--ar-color-text);
---ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
---ar-stepper-item-current-header-color: var(--ar-color-interactive);
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             * Stepper-item
+             * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    --ar-stepper-item-label-color: var(--ar-color-text-muted);
+    --ar-stepper-item-link-hover-label-color: var(--ar-color-text);
+    --ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
+    --ar-stepper-item-current-header-color: var(--ar-color-interactive);
+}
 
 /* Stepper */
 ar-stepper {
