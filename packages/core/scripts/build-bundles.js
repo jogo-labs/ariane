@@ -34,6 +34,7 @@ import {
     cpSync,
 } from 'fs';
 import { readFile } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { minifyHTMLLiterals } from 'minify-literals';
@@ -165,7 +166,7 @@ if (!WATCH) {
     // chaîne `build`) : build:css ne re-tourne pas après ce script, donc un rmSync sur
     // dist/ entier effacerait ariane.css/ariane.js sans jamais les régénérer.
     const stylesDir = join(ROOT, 'dist', 'styles');
-    const preservedStylesTmp = join(ROOT, '.build-bundles-styles-tmp');
+    const preservedStylesTmp = join(tmpdir(), 'ariane-build-bundles-styles-tmp');
     let hasPreservedStyles = false;
     if (existsSync(stylesDir)) {
         rmSync(preservedStylesTmp, { recursive: true, force: true });
