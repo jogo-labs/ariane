@@ -23,6 +23,7 @@ import {
 } from './scripts/validate-no-hardcoded-tokens.js';
 import { findPartStateOrderErrors } from './scripts/validate-part-state-order.js';
 import { pruneDanglingCustomElementExports } from './scripts/prune-dangling-custom-element-exports.js';
+import { findDuplicateTokens } from './scripts/validate-no-duplicate-tokens.js';
 
 export default {
     // Inclure tous les fichiers TS sauf les tests et les styles
@@ -203,11 +204,11 @@ export default {
                     }
                 }
 
-                // Valide que chaque token --ar-* de default.css appartenant à un composant
+                // Valide que chaque token --ar-* de ariane.css appartenant à un composant
                 // a bien une entrée @cssprop dans son JSDoc (trou de documentation) —
                 // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
                 const themeCss = readFileSync(
-                    resolve(process.cwd(), 'src/styles/themes/default.css'),
+                    resolve(process.cwd(), 'dist/styles/themes/ariane.css'),
                     'utf-8',
                 );
                 const themeTokens = extractThemeTokens(themeCss);
@@ -215,10 +216,11 @@ export default {
                     customElementsManifest,
                     themeTokens,
                 );
+                const duplicateTokenErrors = findDuplicateTokens(themeCss);
 
                 // Valide qu'aucun composant n'assigne une valeur littérale à une
                 // custom property --ar-* dans ses *.styles.ts au lieu de référencer
-                // un token default.css via var() — cf.
+                // un token ariane.css via var() — cf.
                 // docs/superpowers/specs/2026-07-16-dialog-width-headless-tokens-design.md
                 const stylesFiles = findStylesFiles(resolve(process.cwd(), 'src'));
                 const hardcodedErrors = stylesFiles.flatMap((filePath) =>
@@ -234,10 +236,10 @@ export default {
                 );
 
                 // Valide que toute règle ::part(x) de base précède ses parts d'état
-                // (::part(x-état)) dans default.css — cf.
+                // (::part(x-état)) dans ariane.css — cf.
                 // docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md
                 const partStateOrderErrors = findPartStateOrderErrors(
-                    'src/styles/themes/default.css',
+                    'dist/styles/themes/ariane.css',
                     themeCss,
                 );
 
@@ -246,6 +248,7 @@ export default {
                     ...hardcodedErrors,
                     ...unjustifiedFallbackErrors,
                     ...partStateOrderErrors,
+                    ...duplicateTokenErrors,
                 ];
                 if (allErrors.length > 0) {
                     const coverageErrorsMsg =
@@ -264,8 +267,12 @@ export default {
                         partStateOrderErrors.length > 0
                             ? `\n  ordre part d'état invalide :\n${partStateOrderErrors.map((e) => `    - ${e}`).join('\n')}`
                             : '';
+                    const duplicateTokenErrorsMsg =
+                        duplicateTokenErrors.length > 0
+                            ? `\n  token(s) dupliqué(s) :\n${duplicateTokenErrors.map((e) => `    - ${e}`).join('\n')}`
+                            : '';
                     throw new Error(
-                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec default.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}${partStateOrderErrorsMsg}`,
+                        `[CEM] ${allErrors.length} @cssprop erreur(s) avec ariane.css :${coverageErrorsMsg}${hardcodedErrorsMsg}${unjustifiedFallbackErrorsMsg}${partStateOrderErrorsMsg}${duplicateTokenErrorsMsg}`,
                     );
                 }
             },
