@@ -23,6 +23,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,css,astro,md}\" --ignore-path .gitignore",
     "create": "node packages/core/scripts/create-component.js",
+    "generate:starter-demo": "node scripts/starter-kit/generate-starter-demo.js",
+    "test:starter-kit": "vitest run scripts/starter-kit",
     "prepare": "node -e \"if (process.env.CI) process.exit(0)\" && husky"
   },
   "devDependencies": {
