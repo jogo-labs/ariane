@@ -20,4 +20,9 @@ describe('readManifestComponents', () => {
         const components = readManifestComponents(FIXTURE);
         expect(typeof components[0].summary).toBe('string');
     });
+
+    it('exclut les sous-composants marqués x-parent (déjà démontrés via leur parent)', () => {
+        const components = readManifestComponents(FIXTURE);
+        expect(components.find((c) => c.tagName === 'ar-breadcrumb-item')).toBeUndefined();
+    });
 });

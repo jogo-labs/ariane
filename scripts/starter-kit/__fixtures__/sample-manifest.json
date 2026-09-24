@@ -16,6 +16,19 @@
     {
       "path": "src/base/ariane-element.ts",
       "declarations": [{ "kind": "class", "name": "ArianeElement", "customElement": true }]
+    },
+    {
+      "path": "src/components/breadcrumb/breadcrumb-item.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ArBreadcrumbItem",
+          "customElement": true,
+          "tagName": "ar-breadcrumb-item",
+          "summary": "Élément d'un fil d'Ariane.",
+          "x-parent": "ar-breadcrumb"
+        }
+      ]
     }
   ]
 }
