@@ -753,13 +753,16 @@ git commit -m "docs: checklist release — régénération de la démo starter-k
 
 - [ ] **Step 1: Créer le repo (après confirmation explicite)**
 
+Se positionner dans le répertoire **parent** de `ariane` avant de lancer la commande — `--clone` clone dans le répertoire courant, et on veut un checkout frère (ex. `~/Code/Active_projects/`, pas à l'intérieur de `ariane`) :
+
 ```bash
+cd /Users/jon/Code/Active_projects
 gh repo create jogo-labs/ariane-starter-kit --public \
   --description "Thème CSS neutre + démo Kitchen Sink pour démarrer avec Ariane" \
   --clone
 ```
 
-Ceci clone le repo dans `./ariane-starter-kit` (checkout frère de `ariane` si la commande est lancée depuis le même répertoire parent, ex. `~/Code/Active_projects/`).
+`--clone` crée le repo sur GitHub **et** le clone en local en une seule commande — rien à cloner à la main ensuite. Résultat attendu : `~/Code/Active_projects/ariane-starter-kit/` créé, checkout frère de `~/Code/Active_projects/ariane/`.
 
 - [ ] **Step 2: Activer le flag "Template repository"**
 
