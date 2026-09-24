@@ -57,4 +57,68 @@ describe('buildKitchenSinkHtml', () => {
         expect(html).toMatch(/ariane-starter\.css/);
         expect(html).toMatch(/class="ks-nav"/);
     });
+
+    it('inclut une TOC latérale avec un lien par composant', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-alert',
+                summary: 'Affiche un message important.',
+                variants: [
+                    {
+                        name: 'default',
+                        label: 'Défaut',
+                        description: 'Rendu par défaut.',
+                        html: '<ar-alert>Texte</ar-alert>',
+                    },
+                ],
+            },
+            {
+                tagName: 'ar-dialog',
+                summary: 'Affiche une boîte de dialogue.',
+                variants: [
+                    {
+                        name: 'default',
+                        label: 'Défaut',
+                        description: 'Rendu par défaut.',
+                        html: '<ar-dialog></ar-dialog>',
+                    },
+                ],
+            },
+        ]);
+        expect(html).toMatch(/<nav class="ks-toc"/);
+        expect(html).toMatch(/<a href="#ar-alert">/);
+        expect(html).toMatch(/<a href="#ar-dialog">/);
+    });
+
+    it('inclut le bouton de switch de thème', () => {
+        const { html } = buildKitchenSinkHtml([]);
+        expect(html).toMatch(/<button type="button" class="ks-theme-toggle" id="ks-theme-toggle"/);
+    });
+
+    it('utilise le name du variant comme titre quand label est absent', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-sample',
+                summary: 'Résumé.',
+                variants: [
+                    {
+                        name: 'Nom du variant',
+                        description: 'desc',
+                        html: '<ar-sample></ar-sample>',
+                    },
+                ],
+            },
+        ]);
+        expect(html).toMatch(/<h3>Nom du variant<\/h3>/);
+        expect(html).not.toMatch(/<h3>undefined<\/h3>/);
+    });
+
+    it('inclut les liens vers les dépôts ariane et ariane-starter-kit dans la nav', () => {
+        const { html } = buildKitchenSinkHtml([]);
+        const navMatch = html.match(/<header class="ks-nav">[\s\S]*?<\/header>/);
+        expect(navMatch).not.toBeNull();
+        const nav = navMatch[0];
+        expect(nav).toMatch(/https:\/\/github\.com\/jogo-labs\/ariane"/);
+        expect(nav).toMatch(/https:\/\/github\.com\/jogo-labs\/ariane-starter-kit"/);
+    });
 });
