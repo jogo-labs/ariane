@@ -80,7 +80,9 @@ ar-alert {
 }
 ```
 
-Les valeurs par défaut sont définies dans `src/styles/themes/ariane.css`.
+Les valeurs par défaut sont définies dans `src/styles/themes/ariane.css` (liste d'`@import`)
+et ses fragments sous `src/styles/themes/ariane/` (`_palette.css`, `_semantic-tokens.css`,
+`_global-tokens.css`, `shared/`, `components/`).
 Créez votre propre thème en surchargeant ces variables dans votre CSS global.
 
 ### CSS Parts
