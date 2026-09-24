@@ -1,9 +1,9 @@
 /**
  * Classes de bouton prêtes à l'emploi — à inclure séparément de
- * `themes/default.css` (fichier indépendant, même s'il consomme les
+ * `themes/ariane.css` (fichier indépendant, même s'il consomme les
  * mêmes tokens `--ar-button-*`).
  *
- * Contrairement aux tokens/`::part()` de `themes/default.css`, qui
+ * Contrairement aux tokens/`::part()` de `themes/ariane.css`, qui
  * stylisent le contrat intrinsèque des composants `ar-*`, ces classes
  * habillent du HTML consommateur ordinaire (un `<button>` que vous
  * écrivez vous-même, par exemple en slot d'un `ar-dropdown-item`).
