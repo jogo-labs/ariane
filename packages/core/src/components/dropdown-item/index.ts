@@ -1,6 +1,8 @@
 import { ArDropdownItem } from './dropdown-item.js';
 
-customElements.define('ar-dropdown-item', ArDropdownItem);
+if (!customElements.get('ar-dropdown-item')) {
+    customElements.define('ar-dropdown-item', ArDropdownItem);
+}
 
 declare global {
     interface HTMLElementTagNameMap {

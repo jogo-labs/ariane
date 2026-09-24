@@ -1,6 +1,8 @@
 import { ArTabPanel } from './tab-panel.js';
 
-customElements.define('ar-tab-panel', ArTabPanel);
+if (!customElements.get('ar-tab-panel')) {
+    customElements.define('ar-tab-panel', ArTabPanel);
+}
 
 declare global {
     interface HTMLElementTagNameMap {
