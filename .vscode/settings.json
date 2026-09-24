@@ -13,7 +13,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "lit-plugin.rules.no-unknown-tag-name": "warning",
   "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.css-language-features"
   },
   // Générés par `npm run build:manifest` (packages/core/cem.config.js) — lancer un build
   // avant que l'autocomplétion des tags ar-* / --ar-* fonctionne sur un clone neuf.
