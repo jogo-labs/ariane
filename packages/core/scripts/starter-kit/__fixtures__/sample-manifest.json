@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "modules": [
+    {
+      "path": "src/components/alert/alert.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ArAlert",
+          "customElement": true,
+          "tagName": "ar-alert",
+          "summary": "Affiche un message important intégré au contenu environnant."
+        }
+      ]
+    },
+    {
+      "path": "src/base/ariane-element.ts",
+      "declarations": [{ "kind": "class", "name": "ArianeElement", "customElement": true }]
+    }
+  ]
+}
