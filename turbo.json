@@ -3,6 +3,7 @@
   "ui": "tui",
   "tasks": {
     "build:manifest": {
+      "dependsOn": ["build:css"],
       "inputs": ["src/**/*.ts", "cem.config.js"],
       "outputs": ["dist/custom-elements.json"]
     },
