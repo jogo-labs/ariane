@@ -1,0 +1,192 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Stepper
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+--ar-stepper-distance: var(--ar-anchor-distance);
+--ar-stepper-offset: var(--ar-anchor-offset);
+--ar-stepper-toggle-min-size: 2.5rem;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Stepper-item
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+--ar-stepper-item-label-color: var(--ar-color-text-muted);
+--ar-stepper-item-link-hover-label-color: var(--ar-color-text);
+--ar-stepper-item-link-focus-outline-color: var(--ar-color-interactive);
+--ar-stepper-item-current-header-color: var(--ar-color-interactive);
+
+/* Stepper */
+ar-stepper {
+    &::part(trigger) {
+        display: inline-flex;
+        background-color: var(--ar-button-secondary-bg);
+        color: var(--ar-color-text);
+        justify-content: center;
+        gap: 1.25rem;
+        padding: var(--ar-button-padding-x);
+        min-height: var(--ar-button-height);
+        border: 1px solid var(--ar-color-border);
+        border-radius: var(--ar-button-border-radius);
+        font-family: inherit;
+        font-size: var(--ar-font-size-sm);
+        font-weight: var(--ar-button-font-weight);
+        line-height: 1;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            background-color var(--ar-button-transition-duration),
+            color var(--ar-button-transition-duration),
+            border-color var(--ar-button-transition-duration);
+    }
+
+    &::part(trigger):disabled {
+        background-color: var(--ar-button-disabled-bg);
+        border-color: var(--ar-button-disabled-border);
+        color: var(--ar-button-disabled-color);
+        cursor: not-allowed;
+    }
+
+    &::part(trigger):not(:disabled):active,
+    &:state(open)::part(trigger):not(:disabled) {
+        border-color: var(--ar-button-secondary-border-hover);
+        background-color: var(--ar-button-secondary-bg-hover);
+        transform: scale(0.985);
+    }
+
+    &::part(trigger):focus-visible {
+        outline: 2px solid var(--ar-button-focus-ring-color);
+        outline-offset: 2px;
+    }
+
+    &::part(trigger):not(:disabled):hover {
+        border-color: var(--ar-button-secondary-border-hover);
+        background-color: var(--ar-button-secondary-bg-hover);
+    }
+
+    &::part(trigger-label) {
+        margin-top: 0.5rem;
+        font-weight: 700;
+        color: var(--ar-color-interactive);
+    }
+
+    &::part(trigger-icon) {
+        transition: transform 0.35s;
+    }
+
+    &:state(open)::part(trigger-icon) {
+        transform: rotate(180deg);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &::part(trigger-icon) {
+            transition: none;
+        }
+    }
+
+    &::part(panel) {
+        padding: 0.75rem;
+    }
+}
+
+/* Stepper-item */
+ar-stepper-item {
+    /* Variables de mutualisation propres au thème */
+    --ar-theme-stepper-indicator-color: var(--ar-color-text);
+    --ar-theme-stepper-indicator-bg: var(--ar-color-interactive-subtle);
+
+    /* Texte cliquable en couleur neutre : seule la puce porte l'accent. text-decoration:
+           none est explicite pour neutraliser le soulignement par défaut du user-agent sur <a>,
+           qui se peint comme une bande continue sur toute la largeur du conteneur flex. */
+    &::part(step-link) {
+        color: var(--ar-color-text);
+        text-decoration: none;
+    }
+
+    &::part(step-link):hover,
+    &::part(step-link):focus {
+        color: var(--ar-color-text-muted);
+
+        --ar-theme-stepper-indicator-bg: var(--ar-color-text-muted);
+        --ar-theme-stepper-indicator-color: var(--ar-color-text-inverse);
+    }
+
+    &::part(step-link):focus {
+        border-radius: 0.125rem;
+    }
+
+    /* Posé sur label--link (label d'une étape cliquable) plutôt que sur step-link :
+           text-decoration sur un conteneur display:flex se peint en bande continue sur toute sa
+           largeur, en ignorant le text-decoration:none des enfants. Le soulignement reste
+           permanent, y compris au survol/focus : ::part(step-link):hover ::part(label--link)
+           n'est pas un sélecteur valide. */
+    &::part(label--link) {
+        text-decoration: underline;
+    }
+
+    /*
+         * Indicateur à 2 niveaux :
+         * - par défaut (à venir et complétée) : aplat --ar-theme-stepper-indicator-bg ;
+         * - courante (indicator--current) : aplat --ar-color-interactive + texte inversé.
+         *
+         * Toutes les déclarations d'indicateur (fond, couleur, taille, y compris :hover/:focus)
+         * sont ici : un ::part() externe l'emporte toujours sur une règle interne du shadow tree
+         * pour la même propriété, quelle que soit la spécificité.
+         *
+         * ar-stepper-item > ar-stepper-item cible les sous-étapes par l'imbrication réelle.
+         */
+    &::part(indicator) {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: var(--ar-border-radius-full);
+        background-color: var(--ar-theme-stepper-indicator-bg);
+        color: var(--ar-theme-stepper-indicator-color);
+    }
+
+    &::part(indicator--current) {
+        background-color: var(--ar-color-interactive);
+        color: var(--ar-color-text-inverse);
+    }
+
+    & > ar-stepper-item::part(indicator) {
+        width: 0.75rem;
+        height: 0.75rem;
+        margin-inline-start: 0.75rem;
+        margin-inline-end: 1.25rem;
+    }
+}
+
+/* Sous reverse-align, l'indicateur de sous-étape passe après le label : ses marges sont
+       inversées en conséquence. */
+ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::part(indicator) {
+    margin-inline-start: 1.25rem;
+    margin-inline-end: 0.75rem;
+}
+
+/* Connecteur décoratif (ligne pointillée) : pseudo-élément du host ar-stepper-item, atteint
+       par un sélecteur direct sur le tag (::part() ne peut pas cibler un pseudo-élément).
+       Étape et sous-étape se distinguent par l'imbrication : ar-stepper > ar-stepper-item /
+       ar-stepper-item > ar-stepper-item. */
+ar-stepper > ar-stepper-item:not(:last-child)::after,
+ar-stepper-item > ar-stepper-item::before {
+    content: '';
+    display: block;
+    width: 2.25rem;
+    align-self: flex-start;
+    background-image: linear-gradient(var(--ar-color-neutral-80) 25%, transparent 0);
+    background-size: 2px 8px;
+    background-repeat: repeat-y;
+}
+
+ar-stepper > ar-stepper-item:not(:last-child)::after {
+    height: 1.5rem;
+    background-position: center 3px;
+}
+
+ar-stepper-item > ar-stepper-item::before {
+    height: 1rem;
+    background-position: center 4px;
+}
+
+/* Sous reverse-align, le connecteur passe du même côté que l'indicateur. */
+ar-stepper[reverse-align] > ar-stepper-item:not(:last-child)::after,
+ar-stepper[reverse-align] ar-stepper-item > ar-stepper-item::before {
+    align-self: flex-end;
+}

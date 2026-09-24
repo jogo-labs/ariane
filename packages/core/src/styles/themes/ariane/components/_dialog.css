@@ -1,0 +1,71 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         * Dialog
+         * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+--ar-dialog-spacing: 1.25rem;
+/* --ar-dialog-spacing-block / --ar-dialog-spacing-inline : points d'extension
+           optionnels, consommés avec fallback dans dialog.styles.ts (padding-block/-inline
+           de [part='body']). Volontairement non déclarés ici — --ar-dialog-spacing suffit
+           par défaut ; les définir permet de différencier le padding vertical/horizontal
+           sans surcharge globale de --ar-dialog-spacing. */
+--ar-dialog-backdrop: rgba(0, 0, 0, 0.5);
+--ar-dialog-bg: var(--ar-color-bg);
+--ar-dialog-color: var(--ar-color-text);
+--ar-dialog-close-size: 2.5rem;
+--ar-dialog-close-transition-duration: var(--ar-button-transition-duration);
+--ar-dialog-shake-outline-color: var(--ar-color-danger-text);
+
+ar-dialog {
+    &::part(dialog) {
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 20px 50px -8px rgba(0, 0, 0, 0.2);
+    }
+
+    &:not([mode='drawer'])::part(dialog) {
+        border-radius: var(--ar-border-radius-lg);
+    }
+
+    &::part(close-button) {
+        border-radius: var(--ar-border-radius-md);
+        color: currentColor;
+        background-color: color-mix(in srgb, currentColor 8%, transparent);
+    }
+
+    &::part(close-button):hover {
+        background-color: color-mix(in srgb, currentColor 20%, transparent);
+    }
+
+    &::part(title) {
+        font-size: var(--ar-font-size-md);
+    }
+
+    &::part(header) {
+        gap: 0.75rem;
+        padding: 1.25rem 1.25rem 0;
+    }
+
+    &::part(footer) {
+        gap: 0.75rem;
+        padding: 0 1.25rem 1.25rem;
+    }
+
+    &[size='sm'] {
+        --ar-dialog-width: 360px;
+    }
+    &[size='lg'] {
+        --ar-dialog-width: 800px;
+    }
+    &[size='xl'] {
+        --ar-dialog-width: 1140px;
+    }
+
+    &[mode='drawer'][size='sm'] {
+        --ar-dialog-width: 360px;
+    }
+    &[mode='drawer'][size='lg'] {
+        --ar-dialog-width: 960px;
+    }
+    &[mode='drawer'][size='xl'] {
+        --ar-dialog-width: 1440px;
+    }
+}
