@@ -1,6 +1,8 @@
 import { ArSpinner } from './spinner.js';
 
-customElements.define('ar-spinner', ArSpinner);
+if (!customElements.get('ar-spinner')) {
+    customElements.define('ar-spinner', ArSpinner);
+}
 
 declare global {
     interface HTMLElementTagNameMap {

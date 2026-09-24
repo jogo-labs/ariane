@@ -1,6 +1,8 @@
 import { ArStepper } from './stepper.js';
 
-customElements.define('ar-stepper', ArStepper);
+if (!customElements.get('ar-stepper')) {
+    customElements.define('ar-stepper', ArStepper);
+}
 
 declare global {
     interface HTMLElementTagNameMap {

@@ -1,6 +1,8 @@
 import { ArDatepicker } from './datepicker.js';
 
-customElements.define('ar-datepicker', ArDatepicker);
+if (!customElements.get('ar-datepicker')) {
+    customElements.define('ar-datepicker', ArDatepicker);
+}
 
 declare global {
     interface HTMLElementTagNameMap {
