@@ -210,10 +210,46 @@ export default {
                 // Valide que chaque token --ar-* de ariane.css appartenant à un composant
                 // a bien une entrée @cssprop dans son JSDoc (trou de documentation) —
                 // cf. docs/superpowers/specs/2026-07-16-cem-theme-default-sync-design.md
-                const themeCss = readFileSync(
-                    resolve(process.cwd(), 'dist/styles/themes/ariane.css'),
-                    'utf-8',
-                );
+                //
+                // Ce `themeCss` (et lui seul — le garde-fou anti-doublon plus bas garde sa
+                // propre lecture) doit provenir des fragments SOURCE (non minifiés), pas de
+                // dist/styles/themes/ariane.css : ce dernier est le bundle esbuild sur une
+                // seule ligne, et les regex de `validate-cssprop-defaults.js`/
+                // `validate-part-state-order.js` supposent du CSS formaté multi-lignes avec
+                // guillemets préservés (`:root[data-theme='dark']`, `;` de fin de
+                // déclaration). Sur le bundle minifié ces regex ratent silencieusement
+                // presque tout (0 bloc de composant détecté, tokens de fin de bloc avalés
+                // par le `;` manquant, exclusion dark mode jamais déclenchée) — cf. revue
+                // finale #256. On reconstruit donc ici l'équivalent fonctionnel de l'ancien
+                // default.css unique en concaténant les fragments dans l'ordre des
+                // `@import` de l'entrée ariane.css (le seul ordre qui compte pour ces deux
+                // validateurs, qui ne dépendent ni de `@layer` ni du wrapper de l'entrée).
+                const themeEntryPath = resolve(process.cwd(), 'src/styles/themes/ariane.css');
+                const themeEntrySrc = readFileSync(themeEntryPath, 'utf-8');
+                const themeEntryDir = resolve(process.cwd(), 'src/styles/themes');
+                const importedFragmentPaths = [
+                    ...themeEntrySrc.matchAll(/@import url\('([^']+)'\)/g),
+                ].map((match) => resolve(themeEntryDir, match[1]));
+                // `_global-tokens.css` est le seul fragment contenant le marqueur dark mode
+                // (`:root[data-theme='dark']`, en toute fin de fichier — il ne fait que
+                // basculer `color-scheme`, aucune valeur de token n'y est redéclarée, tout le
+                // thème utilisant `light-dark()` en ligne). `extractThemeTokens` tronque le
+                // blob concaténé au premier marqueur rencontré : en position 3 (ordre des
+                // `@import`), il couperait tous les fragments shared/components qui suivent,
+                // alors qu'ils n'ont eux-mêmes aucun rapport avec le dark mode. On place donc
+                // ce fragment en dernier dans la concaténation, pour reconstruire fidèlement
+                // la structure de l'ancien fichier unique (tous les tokens d'abord, la
+                // bascule dark tout à la fin) — vérifié empiriquement (--ar-panel-bg, entre
+                // autres, disparaissait sinon).
+                const orderedFragmentPaths = [...importedFragmentPaths].sort((a, b) => {
+                    const aIsGlobalTokens = a.endsWith('_global-tokens.css');
+                    const bIsGlobalTokens = b.endsWith('_global-tokens.css');
+                    if (aIsGlobalTokens === bIsGlobalTokens) return 0;
+                    return aIsGlobalTokens ? 1 : -1;
+                });
+                const themeCss = orderedFragmentPaths
+                    .map((fragmentPath) => readFileSync(fragmentPath, 'utf-8'))
+                    .join('\n\n');
                 const themeTokens = extractThemeTokens(themeCss);
                 const cssPropCoverageErrors = validateCssPropertyCoverage(
                     customElementsManifest,
@@ -255,7 +291,7 @@ export default {
                 // (::part(x-état)) dans ariane.css — cf.
                 // docs/superpowers/specs/2026-07-27-part-state-multiplication-design.md
                 const partStateOrderErrors = findPartStateOrderErrors(
-                    'dist/styles/themes/ariane.css',
+                    'src/styles/themes/ariane.css (fragments concaténés)',
                     themeCss,
                 );
 
