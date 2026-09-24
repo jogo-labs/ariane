@@ -16,7 +16,12 @@ describe('syncStarterTheme', () => {
 
             writeFileSync(
                 path.join(srcThemesDir, 'ariane.css'),
-                `@import url('./ariane/_palette.css') layer(ariane.theme);\n` +
+                `/**\n` +
+                    ` * ariane.css — thème de la doc/démo Ariane ("Le Fil").\n` +
+                    ` * Usage :\n` +
+                    ` *   <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css">\n` +
+                    ` */\n\n` +
+                    `@import url('./ariane/_palette.css') layer(ariane.theme);\n` +
                     `@import url('./ariane/components/_alert.css') layer(ariane.theme);\n`,
             );
             writeFileSync(
@@ -37,6 +42,8 @@ describe('syncStarterTheme', () => {
             const entry = readFileSync(path.join(repoPath, 'ariane-starter.css'), 'utf8');
             expect(entry).toMatch(/@import url\('\.\/ariane-starter\/_palette\.css'\)/);
             expect(entry).not.toMatch(/\.\/ariane\//);
+            expect(entry).not.toMatch(/thème de la doc\/démo Ariane/);
+            expect(entry).toMatch(/thème de démarrage neutre/);
 
             const palette = readFileSync(
                 path.join(repoPath, 'ariane-starter', '_palette.css'),

@@ -26,16 +26,26 @@ function copyTree(srcDir, destDir, transform) {
  * verbatim : ces fragments référencent déjà les primitives via `var()`,
  * donc héritent automatiquement du rendu neutre.
  */
+const NEW_HEADER = `/**
+ * ariane-starter.css — thème de démarrage neutre pour Ariane.
+ * Généré depuis ariane.css (packages/core, monorepo jogo-labs/ariane) —
+ * ne pas éditer directement, régénéré à chaque publication de la lib.
+ * Fragments sous ./ariane-starter/ : copiez/adaptez-les à votre identité
+ * visuelle, ou supprimez ceux dont vous n'avez pas besoin.
+ *
+ * Usage :
+ *   <link rel="stylesheet" href="./ariane-starter.css">
+ */`;
+
 export function syncStarterTheme({ srcThemesDir, repoPath }) {
     const entrySrc = path.join(srcThemesDir, 'ariane.css');
     const fragmentsSrc = path.join(srcThemesDir, 'ariane');
     const entryDest = path.join(repoPath, 'ariane-starter.css');
     const fragmentsDest = path.join(repoPath, 'ariane-starter');
 
-    const entryContent = readFileSync(entrySrc, 'utf8').replaceAll(
-        './ariane/',
-        './ariane-starter/',
-    );
+    const entryContent = readFileSync(entrySrc, 'utf8')
+        .replace(/\/\*\*[\s\S]*?\*\//, NEW_HEADER)
+        .replaceAll('./ariane/', './ariane-starter/');
     mkdirSync(repoPath, { recursive: true });
     writeFileSync(entryDest, entryContent);
 
