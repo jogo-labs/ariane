@@ -1,56 +1,56 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, expect, it } from 'vitest';
 import {
     buildDedupedTokenInventory,
     extractRootTokens,
     findDuplicateTokens,
 } from './validate-no-duplicate-tokens.js';
 
-test('détecte un token déclaré deux fois', () => {
-    const css = `:root { --ar-color-text: red; } :root { --ar-color-text: blue; }`;
-    const errors = findDuplicateTokens(css);
-    assert.equal(errors.length, 1);
-    assert.match(errors[0], /--ar-color-text/);
-});
+describe('validate-no-duplicate-tokens', () => {
+    it('détecte un token déclaré deux fois', () => {
+        const css = `:root { --ar-color-text: red; } :root { --ar-color-text: blue; }`;
+        const errors = findDuplicateTokens(css);
+        expect(errors.length).toBe(1);
+        expect(errors[0]).toMatch(/--ar-color-text/);
+    });
 
-test('aucune erreur si chaque token apparaît une seule fois', () => {
-    const css = `:root { --ar-color-text: red; --ar-color-bg: white; }`;
-    assert.deepEqual(findDuplicateTokens(css), []);
-});
+    it('aucune erreur si chaque token apparaît une seule fois', () => {
+        const css = `:root { --ar-color-text: red; --ar-color-bg: white; }`;
+        expect(findDuplicateTokens(css)).toEqual([]);
+    });
 
-test('buildDedupedTokenInventory neutralise les redéclarations légitimes intra-fragment', () => {
-    const fragment = `
+    it('buildDedupedTokenInventory neutralise les redéclarations légitimes intra-fragment', () => {
+        const fragment = `
         &[variant='info'] { --ar-alert-bg: var(--ar-color-info-bg); }
         &[variant='warning'] { --ar-alert-bg: var(--ar-color-warning-bg); }
         &[variant='error'] { --ar-alert-bg: var(--ar-color-danger-bg); }
     `;
-    const inventory = buildDedupedTokenInventory([fragment]);
-    assert.deepEqual(findDuplicateTokens(inventory), []);
-});
+        const inventory = buildDedupedTokenInventory([fragment]);
+        expect(findDuplicateTokens(inventory)).toEqual([]);
+    });
 
-test('buildDedupedTokenInventory ignore une mention de token dans un commentaire', () => {
-    const fragment = `
+    it('buildDedupedTokenInventory ignore une mention de token dans un commentaire', () => {
+        const fragment = `
         &::part(panel) {
             /* Valeur propre, volontairement non cascadée depuis --ar-panel-min-width :
                un menu dropdown reste lisible plus étroit. */
             min-width: 10rem;
         }
     `;
-    const inventory = buildDedupedTokenInventory([fragment]);
-    assert.deepEqual(findDuplicateTokens(inventory), []);
-});
+        const inventory = buildDedupedTokenInventory([fragment]);
+        expect(findDuplicateTokens(inventory)).toEqual([]);
+    });
 
-test('buildDedupedTokenInventory laisse détecter un doublon inter-fragments', () => {
-    const fragmentA = `:root { --ar-alert-bg: red; }`;
-    const fragmentB = `:root { --ar-alert-bg: blue; }`;
-    const inventory = buildDedupedTokenInventory([fragmentA, fragmentB]);
-    const errors = findDuplicateTokens(inventory);
-    assert.equal(errors.length, 1);
-    assert.match(errors[0], /--ar-alert-bg/);
-});
+    it('buildDedupedTokenInventory laisse détecter un doublon inter-fragments', () => {
+        const fragmentA = `:root { --ar-alert-bg: red; }`;
+        const fragmentB = `:root { --ar-alert-bg: blue; }`;
+        const inventory = buildDedupedTokenInventory([fragmentA, fragmentB]);
+        const errors = findDuplicateTokens(inventory);
+        expect(errors.length).toBe(1);
+        expect(errors[0]).toMatch(/--ar-alert-bg/);
+    });
 
-test('extractRootTokens exclut les overrides imbriqués dans un sélecteur composant', () => {
-    const fragment = `
+    it('extractRootTokens exclut les overrides imbriqués dans un sélecteur composant', () => {
+        const fragment = `
         :root {
             --ar-x: 1;
         }
@@ -61,8 +61,9 @@ test('extractRootTokens exclut les overrides imbriqués dans un sélecteur compo
             }
         }
     `;
-    const rootTokens = extractRootTokens(fragment);
-    const matches = [...rootTokens.matchAll(/--ar-x(?=\s*:)/g)];
-    assert.equal(matches.length, 1);
-    assert.ok(!rootTokens.includes('ar-foo'));
+        const rootTokens = extractRootTokens(fragment);
+        const matches = [...rootTokens.matchAll(/--ar-x(?=\s*:)/g)];
+        expect(matches.length).toBe(1);
+        expect(!rootTokens.includes('ar-foo')).toBe(true);
+    });
 });
