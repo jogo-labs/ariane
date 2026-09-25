@@ -17,7 +17,7 @@ describe('buildKitchenSinkHtml', () => {
                 ],
             },
         ]);
-        expect(html).toMatch(/<h2>ar-alert<\/h2>/);
+        expect(html).toMatch(/<h2>ar-alert <code>ar-alert<\/code><\/h2>/);
         expect(html).toMatch(/Affiche un message important\./);
         expect(html).toMatch(/<ar-alert>Texte<\/ar-alert>/);
         expect(warnings).toEqual([]);
@@ -86,8 +86,59 @@ describe('buildKitchenSinkHtml', () => {
             },
         ]);
         expect(html).toMatch(/<nav class="ks-toc"/);
-        expect(html).toMatch(/<a href="#ar-alert">/);
-        expect(html).toMatch(/<a href="#ar-dialog">/);
+        expect(html).toMatch(/<a href="#ar-alert">ar-alert<\/a>/);
+        expect(html).toMatch(/<a href="#ar-dialog">ar-dialog<\/a>/);
+    });
+
+    it('utilise le title du frontmatter (TOC + h2), tout en gardant le tagName visible', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-alert',
+                title: 'Alerte',
+                summary: 'Affiche un message important.',
+                variants: [
+                    {
+                        name: 'default',
+                        label: 'Défaut',
+                        description: 'Rendu par défaut.',
+                        html: '<ar-alert>Texte</ar-alert>',
+                    },
+                ],
+            },
+        ]);
+        expect(html).toMatch(/<a href="#ar-alert">Alerte<\/a>/);
+        expect(html).toMatch(/<h2>Alerte <code>ar-alert<\/code><\/h2>/);
+    });
+
+    it('sans title, retombe sur le tagName comme libellé visible (TOC + h2)', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-alert',
+                summary: 'Affiche un message important.',
+                variants: [
+                    {
+                        name: 'default',
+                        label: 'Défaut',
+                        description: 'Rendu par défaut.',
+                        html: '<ar-alert>Texte</ar-alert>',
+                    },
+                ],
+            },
+        ]);
+        expect(html).toMatch(/<a href="#ar-alert">ar-alert<\/a>/);
+        expect(html).toMatch(/<h2>ar-alert <code>ar-alert<\/code><\/h2>/);
+    });
+
+    it('inclut les liens vers les presets CSS (boutons, champs)', () => {
+        const { html } = buildKitchenSinkHtml([]);
+        expect(html).toMatch(/<link rel="stylesheet" href="\.\/presets\/buttons\.css" \/>/);
+        expect(html).toMatch(/<link rel="stylesheet" href="\.\/presets\/fields\.css" \/>/);
+    });
+
+    it('inclut le logo Ariane (SVG + libellé)', () => {
+        const { html } = buildKitchenSinkHtml([]);
+        expect(html).toMatch(/class="ks-logo-mark"/);
+        expect(html).toMatch(/<span class="ks-logo">Ariane<\/span>/);
     });
 
     it('inclut le bouton de switch de thème', () => {

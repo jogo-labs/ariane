@@ -5,8 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readManifestComponents } from './read-manifest-components.js';
 import { readVariantsFromMdx } from './read-mdx-variants.js';
+import { readComponentTitle } from './read-component-title.js';
 import { buildKitchenSinkHtml } from './build-kitchen-sink-html.js';
 import { syncStarterTheme } from './sync-starter-theme.js';
+import { syncPresets } from './sync-presets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -25,6 +27,7 @@ export function generate({
     manifestPath,
     mdxDir,
     srcThemesDir,
+    srcPresetsDir,
     dryRun,
     outDir,
     repoPath,
@@ -33,6 +36,7 @@ export function generate({
     const components = readManifestComponents(manifestPath).map((c) => ({
         ...c,
         variants: readVariantsFromMdx(path.join(mdxDir, `${c.tagName}.mdx`)),
+        title: readComponentTitle(path.join(mdxDir, `${c.tagName}.mdx`)),
     }));
 
     const { html, warnings } = buildKitchenSinkHtml(components);
@@ -56,6 +60,7 @@ export function generate({
     // critique #230 point 3 : le site live était rendu sans styles).
     writeFileSync(path.join(target, '.nojekyll'), '');
     syncStarterTheme({ srcThemesDir, repoPath: target });
+    syncPresets({ srcPresetsDir, repoPath: target });
 
     if (dryRun) {
         console.log(`Démo + thème générés (dry-run) dans ${target}/`);
@@ -64,7 +69,7 @@ export function generate({
 
     execFileSync(
         'git',
-        ['add', 'index.html', '.nojekyll', 'ariane-starter.css', 'ariane-starter'],
+        ['add', 'index.html', '.nojekyll', 'ariane-starter.css', 'ariane-starter', 'presets'],
         { cwd: repoPath },
     );
     try {
@@ -99,6 +104,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         manifestPath: path.join(ROOT, 'packages/core/dist/custom-elements.json'),
         mdxDir: path.join(ROOT, 'apps/docs/src/content/components'),
         srcThemesDir: path.join(ROOT, 'packages/core/src/styles/themes'),
+        srcPresetsDir: path.join(ROOT, 'packages/core/src/styles/presets'),
         dryRun,
         outDir: path.join(ROOT, 'dist-starter-demo'),
         repoPath: path.resolve(process.cwd(), repo),
