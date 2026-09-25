@@ -172,4 +172,33 @@ describe('buildKitchenSinkHtml', () => {
         expect(nav).toMatch(/https:\/\/github\.com\/jogo-labs\/ariane"/);
         expect(nav).toMatch(/https:\/\/github\.com\/jogo-labs\/ariane-starter-kit"/);
     });
+
+    it('inclut le pageScript une fois après la section du composant (rend la démo interactive)', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-pagination',
+                summary: 'Pagination.',
+                variants: [
+                    {
+                        name: 'default',
+                        label: 'Défaut',
+                        description: 'x',
+                        html: '<ar-pagination></ar-pagination>',
+                    },
+                ],
+                pageScript:
+                    "<script>document.addEventListener('ar-pagination-page-change', (e) => { e.target.current = e.detail.to; });</script>",
+            },
+        ]);
+        expect(html).toMatch(/ar-pagination-page-change/);
+        // une seule occurrence du script, pas dupliqué par variant
+        expect(html.match(/ar-pagination-page-change/g)).toHaveLength(1);
+    });
+
+    it('ne rend rien de plus quand pageScript est absent', () => {
+        const { html } = buildKitchenSinkHtml([
+            { tagName: 'ar-alert', summary: 'x', variants: [] },
+        ]);
+        expect(html).not.toMatch(/undefined/);
+    });
 });

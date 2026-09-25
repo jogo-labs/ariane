@@ -26,7 +26,8 @@ function renderComponent(component, warnings) {
         <section class="ks-component" id="${component.tagName}">
             <h2>${escapeHtml(label)} <code>&lt;${component.tagName}&gt;</code></h2>
             ${body}
-        </section>`;
+        </section>
+        ${component.pageScript ?? ''}`;
 }
 
 function renderTocEntry(component) {

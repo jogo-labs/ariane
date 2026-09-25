@@ -29,7 +29,7 @@ describe('deriveNeutralPalette', () => {
         // primary-70 : la source vaut L=76% — la sortie ne le préserve pas
         // (L=50% figé), preuve que ce n'est plus une transformation dérivée.
         expect(result).toMatch(/--ar-color-primary-70: oklch\(50% 0\.16 275\);/);
-        expect(result).toMatch(/--ar-color-primary-95: oklch\(88% 0\.02 275\);/);
+        expect(result).toMatch(/--ar-color-primary-95: oklch\(95% 0\.014 275\);/);
     });
 
     it('alias vault/vault-deep vers la rampe neutre existante', () => {

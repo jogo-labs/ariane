@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { readManifestComponents } from './read-manifest-components.js';
 import { readVariantsFromMdx } from './read-mdx-variants.js';
 import { readComponentTitle } from './read-component-title.js';
+import { readComponentPageScript } from './read-component-page-script.js';
 import { buildKitchenSinkHtml } from './build-kitchen-sink-html.js';
 import { syncStarterTheme } from './sync-starter-theme.js';
 import { syncPresets } from './sync-presets.js';
@@ -37,6 +38,7 @@ export function generate({
         ...c,
         variants: readVariantsFromMdx(path.join(mdxDir, `${c.tagName}.mdx`)),
         title: readComponentTitle(path.join(mdxDir, `${c.tagName}.mdx`)),
+        pageScript: readComponentPageScript(path.join(mdxDir, `${c.tagName}.mdx`)),
     }));
 
     const { html, warnings } = buildKitchenSinkHtml(components);
