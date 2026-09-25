@@ -6,7 +6,7 @@ import path from 'node:path';
 import { syncPresets } from './sync-presets.js';
 
 describe('syncPresets', () => {
-    it('copie les fichiers .css verbatim dans <repoPath>/presets/', () => {
+    it('copie fields.css verbatim, et transforme buttons.css (texte :active)', () => {
         const root = mkdtempSync(path.join(tmpdir(), 'sync-presets-'));
         try {
             const srcPresetsDir = path.join(root, 'presets-src');
@@ -14,13 +14,17 @@ describe('syncPresets', () => {
             mkdirSync(srcPresetsDir, { recursive: true });
             mkdirSync(repoPath, { recursive: true });
 
-            writeFileSync(path.join(srcPresetsDir, 'buttons.css'), '.ar-btn { color: red; }');
+            writeFileSync(
+                path.join(srcPresetsDir, 'buttons.css'),
+                '.ar-btn-primary { &:active { color: light-dark(var(--ar-color-text), var(--ar-color-text-inverse)); } }',
+            );
             writeFileSync(path.join(srcPresetsDir, 'fields.css'), '.ar-input { color: blue; }');
 
             syncPresets({ srcPresetsDir, repoPath });
 
             const buttons = readFileSync(path.join(repoPath, 'presets', 'buttons.css'), 'utf8');
-            expect(buttons).toBe('.ar-btn { color: red; }');
+            expect(buttons).toMatch(/color: var\(--ar-color-white\);/);
+            expect(buttons).not.toMatch(/light-dark\(var\(--ar-color-text\)/);
 
             const fields = readFileSync(path.join(repoPath, 'presets', 'fields.css'), 'utf8');
             expect(fields).toBe('.ar-input { color: blue; }');

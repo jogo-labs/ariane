@@ -47,11 +47,18 @@ describe('syncStarterTheme', () => {
                     `    --ar-border-radius-sm: 0.25rem;\n` +
                     `    --ar-border-radius-md: 0.5rem;\n` +
                     `    --ar-border-radius-lg: 0.875rem;\n` +
-                    `    --ar-border-radius-xl: 1.5rem;\n}`,
+                    `    --ar-border-radius-xl: 1.5rem;\n` +
+                    `    --ar-button-primary-color: var(--ar-color-neutral-10);\n}`,
             );
             writeFileSync(
                 path.join(srcThemesDir, 'ariane', 'components', '_alert.css'),
                 `ar-alert { color: red; }`,
+            );
+            writeFileSync(
+                path.join(srcThemesDir, 'ariane', 'components', '_datepicker.css'),
+                `:root {\n` +
+                    `    --ar-datepicker-day-selected-bg: var(--ar-color-primary-70);\n` +
+                    `    --ar-datepicker-day-selected-color: var(--ar-color-neutral-10);\n}`,
             );
 
             syncStarterTheme({ srcThemesDir, repoPath });
@@ -66,19 +73,28 @@ describe('syncStarterTheme', () => {
                 path.join(repoPath, 'ariane-starter', '_palette.css'),
                 'utf8',
             );
-            expect(palette).toMatch(/--ar-color-primary-40: oklch\(52\.43% 0\.04 250\);/);
+            expect(palette).toMatch(/--ar-color-primary-40: oklch\(37% 0\.13 275\);/);
 
             const globalTokens = readFileSync(
                 path.join(repoPath, 'ariane-starter', '_global-tokens.css'),
                 'utf8',
             );
             expect(globalTokens).toMatch(/--ar-border-radius-md: 0\.375rem;/);
+            expect(globalTokens).toMatch(/--ar-button-primary-color: var\(--ar-color-white\);/);
 
             const alert = readFileSync(
                 path.join(repoPath, 'ariane-starter', 'components', '_alert.css'),
                 'utf8',
             );
             expect(alert).toBe('ar-alert { color: red; }');
+
+            const datepicker = readFileSync(
+                path.join(repoPath, 'ariane-starter', 'components', '_datepicker.css'),
+                'utf8',
+            );
+            expect(datepicker).toMatch(
+                /--ar-datepicker-day-selected-color: var\(--ar-color-white\);/,
+            );
         } finally {
             rmSync(root, { recursive: true, force: true });
         }

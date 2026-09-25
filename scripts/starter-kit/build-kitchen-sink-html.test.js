@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildKitchenSinkHtml } from './build-kitchen-sink-html.js';
 
 describe('buildKitchenSinkHtml', () => {
-    it('rend le tagName, le summary et le html brut du variant', () => {
+    it('rend le tagName (h2) et le html brut du variant', () => {
         const { html, warnings } = buildKitchenSinkHtml([
             {
                 tagName: 'ar-alert',
@@ -17,28 +17,28 @@ describe('buildKitchenSinkHtml', () => {
                 ],
             },
         ]);
-        expect(html).toMatch(/<h2>ar-alert <code>ar-alert<\/code><\/h2>/);
-        expect(html).toMatch(/Affiche un message important\./);
+        expect(html).toMatch(/<h2>ar-alert <code>&lt;ar-alert&gt;<\/code><\/h2>/);
         expect(html).toMatch(/<ar-alert>Texte<\/ar-alert>/);
         expect(warnings).toEqual([]);
     });
 
-    it('échappe le texte (summary/label/description) mais pas le html du variant', () => {
+    it('échappe le texte (label/description) mais pas le html du variant', () => {
         const { html } = buildKitchenSinkHtml([
             {
                 tagName: 'ar-sample',
-                summary: 'Résumé avec <balise> non voulue',
+                summary: 'Résumé.',
                 variants: [
                     {
                         name: 'x',
-                        label: 'Label',
-                        description: 'desc',
+                        label: 'Label avec <balise> non voulue',
+                        description: 'desc avec <balise> non voulue',
                         html: '<ar-sample></ar-sample>',
                     },
                 ],
             },
         ]);
-        expect(html).toMatch(/Résumé avec &lt;balise&gt; non voulue/);
+        expect(html).toMatch(/Label avec &lt;balise&gt; non voulue/);
+        expect(html).toMatch(/desc avec &lt;balise&gt; non voulue/);
         expect(html).toMatch(/<ar-sample><\/ar-sample>/);
     });
 
@@ -86,8 +86,8 @@ describe('buildKitchenSinkHtml', () => {
             },
         ]);
         expect(html).toMatch(/<nav class="ks-toc"/);
-        expect(html).toMatch(/<a href="#ar-alert">ar-alert<\/a>/);
-        expect(html).toMatch(/<a href="#ar-dialog">ar-dialog<\/a>/);
+        expect(html).toMatch(/<li><a href="#ar-alert">ar-alert<\/a><\/li>/);
+        expect(html).toMatch(/<li><a href="#ar-dialog">ar-dialog<\/a><\/li>/);
     });
 
     it('utilise le title du frontmatter (TOC + h2), tout en gardant le tagName visible', () => {
@@ -107,7 +107,7 @@ describe('buildKitchenSinkHtml', () => {
             },
         ]);
         expect(html).toMatch(/<a href="#ar-alert">Alerte<\/a>/);
-        expect(html).toMatch(/<h2>Alerte <code>ar-alert<\/code><\/h2>/);
+        expect(html).toMatch(/<h2>Alerte <code>&lt;ar-alert&gt;<\/code><\/h2>/);
     });
 
     it('sans title, retombe sur le tagName comme libellé visible (TOC + h2)', () => {
@@ -126,7 +126,7 @@ describe('buildKitchenSinkHtml', () => {
             },
         ]);
         expect(html).toMatch(/<a href="#ar-alert">ar-alert<\/a>/);
-        expect(html).toMatch(/<h2>ar-alert <code>ar-alert<\/code><\/h2>/);
+        expect(html).toMatch(/<h2>ar-alert <code>&lt;ar-alert&gt;<\/code><\/h2>/);
     });
 
     it('inclut les liens vers les presets CSS (boutons, champs)', () => {

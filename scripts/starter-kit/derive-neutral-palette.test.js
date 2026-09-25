@@ -22,11 +22,14 @@ const SAMPLE = `:root {
 }`;
 
 describe('deriveNeutralPalette', () => {
-    it('préserve la luminosité (L) de chaque palier primary, change teinte/chroma', () => {
+    it('remplace chaque palier primary par la palette violette figée (PRIMARY_PALETTE)', () => {
         const result = deriveNeutralPalette(SAMPLE);
-        expect(result).toMatch(/--ar-color-primary-05: oklch\(16\.5% 0\.02 250\);/);
-        expect(result).toMatch(/--ar-color-primary-40: oklch\(52\.43% 0\.04 250\);/);
-        expect(result).toMatch(/--ar-color-primary-95: oklch\(96\.5% 0\.015 250\);/);
+        expect(result).toMatch(/--ar-color-primary-05: oklch\(14% 0\.05 275\);/);
+        expect(result).toMatch(/--ar-color-primary-40: oklch\(37% 0\.13 275\);/);
+        // primary-70 : la source vaut L=76% — la sortie ne le préserve pas
+        // (L=50% figé), preuve que ce n'est plus une transformation dérivée.
+        expect(result).toMatch(/--ar-color-primary-70: oklch\(50% 0\.16 275\);/);
+        expect(result).toMatch(/--ar-color-primary-95: oklch\(88% 0\.02 275\);/);
     });
 
     it('alias vault/vault-deep vers la rampe neutre existante', () => {

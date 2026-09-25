@@ -9,6 +9,7 @@ const SAMPLE = `:root {
     --ar-border-radius-xl: 1.5rem; /* 24px (était 12px) */
     --ar-border-radius-full: 9999px;
     --ar-button-height: 2.5rem;
+    --ar-button-primary-color: var(--ar-color-neutral-10);
 }`;
 
 describe('deriveNeutralGlobalTokens', () => {
@@ -25,6 +26,24 @@ describe('deriveNeutralGlobalTokens', () => {
         expect(result).toMatch(/--ar-border-radius-full: 9999px;/);
         expect(result).toMatch(/--ar-font-size-md: 1rem;/);
         expect(result).toMatch(/--ar-button-height: 2\.5rem;/);
+    });
+
+    it('remplace --ar-button-primary-color par du blanc', () => {
+        const result = deriveNeutralGlobalTokens(SAMPLE);
+        expect(result).toMatch(/--ar-button-primary-color: var\(--ar-color-white\);/);
+        expect(result).not.toMatch(/--ar-button-primary-color: var\(--ar-color-neutral-10\);/);
+    });
+
+    it('throw si --ar-button-primary-color ne matche pas (format inattendu)', () => {
+        const NO_BUTTON_COLOR = `:root {
+    --ar-border-radius-sm: 0.25rem;
+    --ar-border-radius-md: 0.5rem;
+    --ar-border-radius-lg: 0.875rem;
+    --ar-border-radius-xl: 1.5rem;
+}`;
+        expect(() => deriveNeutralGlobalTokens(NO_BUTTON_COLOR)).toThrow(
+            /--ar-button-primary-color non substitué/,
+        );
     });
 
     it('throw si moins de 4 tokens border-radius matchent (format inattendu)', () => {

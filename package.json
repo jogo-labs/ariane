@@ -24,6 +24,7 @@
     "format": "prettier --write \"**/*.{ts,js,mjs,json,css,astro,md}\" --ignore-path .gitignore",
     "create": "node packages/core/scripts/create-component.js",
     "generate:starter-demo": "node scripts/starter-kit/generate-starter-demo.js",
+    "demo:starter-kit": "npm run build --workspace=packages/core && npm run generate:starter-demo -- --dry-run && node scripts/starter-kit/serve-demo.js",
     "test:starter-kit": "vitest run scripts/starter-kit",
     "prepare": "node -e \"if (process.env.CI) process.exit(0)\" && husky"
   },

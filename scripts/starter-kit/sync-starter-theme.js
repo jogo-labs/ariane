@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'n
 import path from 'node:path';
 import { deriveNeutralPalette } from './derive-neutral-palette.js';
 import { deriveNeutralGlobalTokens } from './derive-neutral-global-tokens.js';
+import { deriveNeutralDatepickerTokens } from './derive-neutral-datepicker-tokens.js';
 
 function copyTree(srcDir, destDir, transform) {
     mkdirSync(destDir, { recursive: true });
@@ -20,11 +21,13 @@ function copyTree(srcDir, destDir, transform) {
 /**
  * Synchronise le thème starter-kit depuis le thème réel d'Ariane (#256) :
  * copie `ariane.css` + l'arbre de fragments `ariane/` dans le repo externe,
- * en neutralisant uniquement `_palette.css` (identité couleur) et
- * `_global-tokens.css` (échelle de radius) — tout le reste (tokens
- * sémantiques, tokens partagés, tokens+règles par composant) est copié
- * verbatim : ces fragments référencent déjà les primitives via `var()`,
- * donc héritent automatiquement du rendu neutre.
+ * en neutralisant `_palette.css` (identité couleur), `_global-tokens.css`
+ * (échelle de radius + texte du bouton primaire) et `_datepicker.css` (texte
+ * du jour sélectionné — même fond que le bouton primaire, même besoin de
+ * texte blanc). Tout le reste (tokens sémantiques, tokens partagés, tokens+
+ * règles des autres composants) est copié verbatim : ces fragments
+ * référencent déjà les primitives via `var()`, donc héritent automatiquement
+ * du rendu neutre.
  */
 const NEW_HEADER = `/**
  * ariane-starter.css — thème de démarrage neutre pour Ariane.
@@ -52,6 +55,7 @@ export function syncStarterTheme({ srcThemesDir, repoPath }) {
     copyTree(fragmentsSrc, fragmentsDest, (filename, content) => {
         if (filename === '_palette.css') return deriveNeutralPalette(content);
         if (filename === '_global-tokens.css') return deriveNeutralGlobalTokens(content);
+        if (filename === '_datepicker.css') return deriveNeutralDatepickerTokens(content);
         return content;
     });
 }
