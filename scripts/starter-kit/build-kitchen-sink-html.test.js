@@ -195,6 +195,25 @@ describe('buildKitchenSinkHtml', () => {
         expect(html.match(/ar-pagination-page-change/g)).toHaveLength(1);
     });
 
+    it('signale que le comportement est simulé quand pageScript est présent', () => {
+        const { html } = buildKitchenSinkHtml([
+            {
+                tagName: 'ar-pagination',
+                summary: 'Pagination.',
+                variants: [],
+                pageScript: '<script>/* ... */</script>',
+            },
+        ]);
+        expect(html).toMatch(/simulé par un script/);
+    });
+
+    it('ne signale rien quand pageScript est absent', () => {
+        const { html } = buildKitchenSinkHtml([
+            { tagName: 'ar-alert', summary: 'x', variants: [] },
+        ]);
+        expect(html).not.toMatch(/simulé par un script/);
+    });
+
     it('ne rend rien de plus quand pageScript est absent', () => {
         const { html } = buildKitchenSinkHtml([
             { tagName: 'ar-alert', summary: 'x', variants: [] },

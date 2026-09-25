@@ -22,9 +22,15 @@ function renderComponent(component, warnings) {
         body = component.variants.map(renderVariant).join('\n');
     }
     const label = component.title ?? component.tagName;
+    const pageScriptNote = component.pageScript
+        ? `<ar-alert variant="info" without-notification>
+            <p style="margin: 0">Le comportement observé ici (mise à jour automatique) est simulé par un script ajouté à cette page de démo — le composant ne le fait pas lui-même. À vous de câbler cette logique dans votre application.</p>
+        </ar-alert>`
+        : '';
     return `
         <section class="ks-component" id="${component.tagName}">
             <h2>${escapeHtml(label)} <code>&lt;${component.tagName}&gt;</code></h2>
+            ${pageScriptNote}
             ${body}
         </section>
         ${component.pageScript ?? ''}`;
