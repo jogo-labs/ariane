@@ -45,16 +45,20 @@
              * visuellement cohérents avec lui.
              * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    /* Button — Partagé (stepper) */
+    /* Button — Partagé (stepper). Survol/actif calculés relativement à
+               --ar-button-primary-bg (color-mix, pas des paliers de palette nommés) :
+               un thème dérivé peut assombrir primary-70 (ex. starter-kit, pour un
+               bouton plus riche avec texte blanc) sans que primary-60/-80 aient besoin
+               de suivre — ces deux paliers restent libres pour leurs autres usages
+               (--ar-color-interactive-subtle notamment, qui présume un texte sombre
+               dessus). Pourcentages calibrés pour reproduire quasi à l'identique
+               l'ancien rendu ambre (primary-60/-80 à assombrissement/éclaircissement
+               équivalent) : 12% ≈ écart primary-70→primary-60, 22% donne un actif net
+               sans dépendre du sens clair/sombre de la page (le fond du bouton est
+               volontairement identique dans les deux modes, cf. juste au-dessus). */
     --ar-button-primary-bg: var(--ar-color-primary-70);
-    --ar-button-primary-bg-hover: light-dark(
-        var(--ar-color-primary-60),
-        var(--ar-color-primary-80)
-    );
-    --ar-button-primary-bg-active: light-dark(
-        var(--ar-color-primary-80),
-        var(--ar-color-primary-60)
-    );
+    --ar-button-primary-bg-hover: color-mix(in oklab, var(--ar-button-primary-bg), black 12%);
+    --ar-button-primary-bg-active: color-mix(in oklab, var(--ar-button-primary-bg), black 22%);
     --ar-button-primary-color: var(--ar-color-neutral-10);
     --ar-button-primary-border-color: var(--ar-color-primary-70);
     --ar-button-danger-bg: var(--ar-color-danger-50);
