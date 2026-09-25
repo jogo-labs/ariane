@@ -134,15 +134,6 @@ ar-breadcrumb-item {
 
     &::part(current) {
         font-weight: 700;
-        /* Fond opaque qui masque le connecteur (cf. ar-breadcrumb::part(connector) plus haut)
-               sous le dernier item, sur toute sa hauteur réelle (1 ou plusieurs lignes) — sans
-               dépendre de sa propre hauteur. position: relative fait peindre ce fond au-dessus du
-               connecteur (positionné, lui) : sans elle, l'ordre de peinture standard placerait un
-               élément non positionné derrière un élément positionné, quel que soit son ordre dans
-               le DOM. Le contrat implicite : ce fond doit rester peint après le connecteur, donc
-               ar-breadcrumb-item doit rester après lui dans le DOM (déjà le cas, le connecteur
-               précède la liste dans le panel). */
-        background-color: var(--ar-panel-bg);
         position: relative;
     }
 
@@ -170,5 +161,19 @@ ar-breadcrumb-item {
 
     &::part(indicator--current) {
         background-color: var(--ar-color-interactive);
+    }
+}
+
+ar-breadcrumb:state(open) {
+    ar-breadcrumb-item::part(current) {
+        /* Fond opaque qui masque le connecteur (cf. ar-breadcrumb::part(connector) plus haut)
+               sous le dernier item, sur toute sa hauteur réelle (1 ou plusieurs lignes) — sans
+               dépendre de sa propre hauteur. position: relative fait peindre ce fond au-dessus du
+               connecteur (positionné, lui) : sans elle, l'ordre de peinture standard placerait un
+               élément non positionné derrière un élément positionné, quel que soit son ordre dans
+               le DOM. Le contrat implicite : ce fond doit rester peint après le connecteur, donc
+               ar-breadcrumb-item doit rester après lui dans le DOM (déjà le cas, le connecteur
+               précède la liste dans le panel). */
+        background-color: var(--ar-panel-bg);
     }
 }

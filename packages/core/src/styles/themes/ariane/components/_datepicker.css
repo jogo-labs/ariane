@@ -92,8 +92,8 @@ ar-datepicker {
 
     /* -- Panel flottant du calendrier -- */
     &::part(panel) {
-        width: 20.5rem;
-        padding: 0.5rem;
+        width: 21.5rem;
+        padding: 1rem;
     }
 
     &::part(grid) {

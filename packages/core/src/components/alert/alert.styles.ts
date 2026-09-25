@@ -12,14 +12,18 @@ export default css`
         border-color: var(--ar-alert-border);
     }
 
-    :host([hiding]) {
+    :host(:state(hiding)) {
         transition:
             opacity var(--ar-alert-hide-transition-duration),
             transform var(--ar-alert-hide-transition-duration);
     }
 
+    [part~='body'] {
+        flex-grow: 1;
+    }
+
     @media (prefers-reduced-motion: reduce) {
-        :host([hiding]),
+        :host(:state(hiding)),
         [part~='close-button'] {
             transition: none;
         }
