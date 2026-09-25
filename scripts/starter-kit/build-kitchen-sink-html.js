@@ -134,7 +134,7 @@ export function buildKitchenSinkHtml(components) {
         .ks-nav-left { display: flex; align-items: center; gap: 0.6rem; }
         .ks-logo-link { display: flex; align-items: center; gap: 0.4rem; }
         .ks-logo-mark { flex: none; display: block; }
-        .ks-logo { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+        .ks-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
         .ks-nav-title { font-weight: 400; opacity: 0.7; font-size: .9rem; }
         .ks-nav-right { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
         .ks-nav-right a { opacity: 0.85; }
@@ -210,10 +210,9 @@ export function buildKitchenSinkHtml(components) {
             font-size: 0.875rem;
         }
         details.ks-toc-mobile {
-            --rail-padding-inline-start: 0;
             border: 1px solid var(--ks-border);
             border-radius: .5rem;
-            margin: 0 0 2rem;
+            margin: 0 1.5rem 2rem;
             font-size: .875rem;
             display: block;
 
@@ -247,7 +246,8 @@ export function buildKitchenSinkHtml(components) {
         }
 
         nav.ks-toc a:hover, details.ks-toc-mobile a:hover { background: var(--ks-bg-subtle); color: var(--ks-text); }
-        .ks-content { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        .ks-content { max-width: 860px; margin: 0 auto; padding: 2rem 0 4rem; }
+        section.ks-component { padding-inline: 1.5rem; }
         section.ks-component + section.ks-component { border-top: 1px solid var(--ks-border); padding-block: 2.5rem 3rem; }
         section.ks-component h2 {
             display: flex;
@@ -329,12 +329,13 @@ export function buildKitchenSinkHtml(components) {
             <span class="ks-nav-title">Kitchen Sink</span>
         </div>
         <div class="ks-nav-right">
-            <button type="button" class="ks-theme-toggle" id="ks-theme-toggle" aria-label="Changer le mode"></button>
             <a class="github-link" href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener" aria-label="Visiter le projet Ariane Starter Kit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.57v-2.2c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"></path>
                 </svg>
-                <span class="desktop-only">&nbsp;Starter-kit&nbsp;</span><span aria-hidden="true">↗</span></a>
+                <span class="desktop-only">&nbsp;Starter-kit&nbsp;</span><span aria-hidden="true">↗</span>
+            </a>
+            <button type="button" class="ks-theme-toggle" id="ks-theme-toggle" aria-label="Changer le mode"></button>
         </div>
     </header>
     <div class="ks-layout">
