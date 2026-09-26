@@ -64,12 +64,10 @@ const showPlayground = displayMode === 'demo';
         </div>
         <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
             <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>ariane.css</code> fourni par Ariane.</p>
+            {hasPageScript && (
+                <p style="margin:0; margin-block-start: 1rem">Pour les besoins de la démo un script simule une réponse positive aux événements émis par le composant (voir <a href="#utilisation">Utilisation</a>).</p>
+            )}
         </ar-alert>
-        {hasPageScript && (
-            <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
-                <p style="margin: 0">Le comportement observé ici (mise à jour automatique) est simulé par un script ajouté à cette page de démo — le composant ne le fait pas lui-même. À vous de câbler cette logique dans votre application (voir <a href="#utilisation">Utilisation</a>).</p>
-            </ar-alert>
-        )}
         <div class="main-section examples-section">
             {variants.map((variant) => (
                 <article id={`exemple-${variant.name}`} class="example">

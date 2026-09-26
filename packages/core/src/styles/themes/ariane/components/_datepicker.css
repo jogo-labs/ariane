@@ -140,13 +140,11 @@ ar-datepicker {
 
     &::part(footer-button):hover {
         border-color: var(--ar-button-secondary-border-hover);
-        background-color: var(--ar-button-secondary-bg-hover);
     }
 
     &::part(footer-button):active {
         transform: scale(0.985);
         border-color: var(--ar-button-secondary-border-hover);
-        background-color: var(--ar-button-secondary-bg-hover);
     }
 
     &::part(footer-button):focus-visible {
