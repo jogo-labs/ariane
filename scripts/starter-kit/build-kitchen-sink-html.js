@@ -23,8 +23,8 @@ function renderComponent(component, warnings) {
     }
     const label = component.title ?? component.tagName;
     const pageScriptNote = component.pageScript
-        ? `<ar-alert variant="info" without-notification>
-            <p style="margin: 0">Le comportement observé ici (mise à jour automatique) est simulé par un script ajouté à cette page de démo — le composant ne le fait pas lui-même. À vous de câbler cette logique dans votre application.</p>
+        ? `<ar-alert variant="info" without-notification style="margin-bottom: 1.5rem">
+            <p style="margin: 0">Pour les besoins de la démo un script simule une réponse positive aux événements émis par le composant.</p>
         </ar-alert>`
         : '';
     return `
@@ -270,7 +270,6 @@ export function buildKitchenSinkHtml(components) {
             font-size: 0.75rem;
             font-weight: 400;
             font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            color: var(--ks-muted);
             background: var(--ks-bg-subtle);
             padding: 0.1rem 0.45rem;
             border-radius: 4px;
@@ -405,6 +404,25 @@ export function buildKitchenSinkHtml(components) {
                 }
                 apply(current);
             });
+        })();
+    </script>
+    <script>
+        (function () {
+            /* Un <input autofocus> dans une démo fermée (ex. ar-dialog "Focus initial")
+               reçoit le focus natif du navigateur, avant que le composant n'ait masqué son
+               panel fermé — sur cette page qui empile toutes les démos, ça scrolle loin
+               dans la page. L'effet survient à l'upgrade des custom elements (après le
+               script CDN, différé), donc après ce script lui-même exécuté au parsing :
+               on corrige une première fois immédiatement, puis à nouveau après l'événement
+               "load" (tout est chargé/upgradé) pour rattraper l'effet tardif. Jamais si l'URL
+               demande explicitement une ancre (lien direct vers une section). */
+            function resetScrollIfNoHash() {
+                if (!location.hash && window.scrollY > 0) {
+                    window.scrollTo(0, 0);
+                }
+            }
+            resetScrollIfNoHash();
+            window.addEventListener('load', resetScrollIfNoHash);
         })();
     </script>
 </body>
