@@ -3,6 +3,7 @@ tagName: ar-datepicker
 title: Datepicker
 variants:
     - name: Par défaut
+      label: Par défaut
       description: >
           Date unique avec format français. Le hint par défaut (non surchargé ici) affiche
           automatiquement un exemple de date formatée.
@@ -13,20 +14,24 @@ variants:
             lang="fr-FR"
           ></ar-datepicker>
     - name: Avec erreur
+      label: Avec erreur
       description: État d'erreur visible via le slot error.
       html: |
           <ar-datepicker label="Date de naissance">
             <span slot="error">Date invalide ou hors plage autorisée</span>
           </ar-datepicker>
     - name: Readonly
+      label: Readonly
       description: Valeur affichée non modifiable, soumise au formulaire.
       html: |
           <ar-datepicker value="2026-06-12" readonly label="Date"></ar-datepicker>
     - name: Disabled
+      label: Disabled
       description: Composant désactivé, valeur exclue du formulaire.
       html: |
           <ar-datepicker value="2026-06-12" disabled label="Date"></ar-datepicker>
     - name: Plage de dates
+      label: Plage de dates
       description: >
           `min` et `max` restreignent les jours sélectionnables (grisés, `aria-disabled`). Le
           hint par défaut annonce la plage aux technologies d'assistance sans configuration
@@ -39,6 +44,7 @@ variants:
             lang="fr-FR"
           ></ar-datepicker>
     - name: Langue et format
+      label: Langue et format
       description: >
           L'attribut `lang` pilote la totalité des textes et formats — y compris les textes par
           défaut des slots — à l'exception du label de l'input.

@@ -5,6 +5,7 @@ node_modules/
 dist/
 cdn/
 dist-astro/
+dist-starter-demo/
 
 # ── Cache ─────────────────────────────────────────────────────
 .turbo/
