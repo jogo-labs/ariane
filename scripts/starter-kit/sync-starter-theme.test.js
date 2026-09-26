@@ -58,7 +58,11 @@ describe('syncStarterTheme', () => {
                 path.join(srcThemesDir, 'ariane', 'components', '_datepicker.css'),
                 `:root {\n` +
                     `    --ar-datepicker-day-selected-bg: var(--ar-color-primary-70);\n` +
-                    `    --ar-datepicker-day-selected-color: var(--ar-color-neutral-10);\n}`,
+                    `    --ar-datepicker-day-selected-color: var(--ar-color-neutral-10);\n}\n` +
+                    `ar-datepicker {\n` +
+                    `    &::part(trigger):not(:disabled):active {\n` +
+                    `        color: light-dark(var(--ar-color-text), var(--ar-color-text-inverse));\n` +
+                    `    }\n}`,
             );
 
             syncStarterTheme({ srcThemesDir, repoPath });
