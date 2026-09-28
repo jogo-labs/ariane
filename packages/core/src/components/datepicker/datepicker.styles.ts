@@ -190,7 +190,7 @@ export default css`
 
     [part~='day'].selected:not([aria-disabled='true']):not(.disabled):hover {
         background-color: var(--ar-datepicker-day-selected-bg);
-        /* border-color: transparent; */
+        color: var(--ar-datepicker-day-selected-color);
     }
 
     [part~='day'].other-month {
