@@ -78,13 +78,11 @@
 
         &:not(:disabled):not([aria-disabled='true']):hover {
             border-color: var(--ar-button-secondary-border-hover);
-            background-color: var(--ar-button-secondary-bg-hover);
         }
 
         &:not(:disabled):not([aria-disabled='true']):active,
         &:not(:disabled):not([aria-disabled='true'])[aria-expanded='true'] {
             border-color: var(--ar-button-secondary-border-hover);
-            background-color: var(--ar-button-secondary-bg-hover);
         }
     }
 

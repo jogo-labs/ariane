@@ -51,6 +51,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Smoke test — générateur starter-kit demo
+        run: node scripts/starter-kit/generate-starter-demo.js --dry-run
+
+      - name: Tests unitaires — scripts starter-kit
+        run: npm run test:starter-kit
+
       - name: Test
         run: npm run test:coverage --workspace=packages/core
 
