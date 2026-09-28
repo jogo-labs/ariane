@@ -31,10 +31,9 @@ function copyTree(srcDir, destDir, transform) {
  */
 const NEW_HEADER = `/**
  * ariane-starter.css — thème de démarrage neutre pour Ariane.
- * Généré depuis ariane.css (packages/core, monorepo jogo-labs/ariane) —
- * ne pas éditer directement, régénéré à chaque publication de la lib.
- * Fragments sous ./ariane-starter/ : copiez/adaptez-les à votre identité
- * visuelle, ou supprimez ceux dont vous n'avez pas besoin.
+ * Fragments sous ./ariane-starter/, un par composant/rôle : personnalisez-les
+ * librement (couleurs, tailles, rayons...) pour votre identité visuelle, ou
+ * supprimez ceux dont vous n'avez pas besoin. C'est votre point de départ.
  *
  * Usage :
  *   <link rel="stylesheet" href="./ariane-starter.css">
