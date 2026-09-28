@@ -37,7 +37,7 @@ export function generate({
         ...readComponentMdx(path.join(mdxDir, `${c.tagName}.mdx`)),
     }));
 
-    const { html, warnings } = buildKitchenSinkHtml(components);
+    const { html, warnings } = buildKitchenSinkHtml(components, coreVersion);
     for (const warning of warnings) {
         console.warn(`[generate-starter-demo] ${warning}`);
     }

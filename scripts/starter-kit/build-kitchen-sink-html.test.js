@@ -22,6 +22,21 @@ describe('buildKitchenSinkHtml', () => {
         expect(warnings).toEqual([]);
     });
 
+    it('affiche le numéro de version quand coreVersion est fourni', () => {
+        const { html } = buildKitchenSinkHtml(
+            [{ tagName: 'ar-alert', summary: 'Résumé.', variants: [] }],
+            '0.1.0-alpha.8',
+        );
+        expect(html).toMatch(/<span class="ks-nav-version desktop-only">v0\.1\.0-alpha\.8<\/span>/);
+    });
+
+    it("n'affiche pas de numéro de version quand coreVersion est absent", () => {
+        const { html } = buildKitchenSinkHtml([
+            { tagName: 'ar-alert', summary: 'Résumé.', variants: [] },
+        ]);
+        expect(html).not.toMatch(/<span class="ks-nav-version/);
+    });
+
     it('échappe le texte (label/description) mais pas le html du variant', () => {
         const { html } = buildKitchenSinkHtml([
             {

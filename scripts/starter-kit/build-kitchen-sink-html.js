@@ -50,7 +50,7 @@ function renderTocEntry(component) {
  * externe (pile système uniquement) — palette sobre distincte de
  * l'identité Ariane, switch clair/sombre/auto propre au starter.
  */
-export function buildKitchenSinkHtml(components) {
+export function buildKitchenSinkHtml(components, coreVersion) {
     const warnings = [];
     const sections = components.map((c) => renderComponent(c, warnings)).join('\n');
     const tocEntries = components.map(renderTocEntry).join('\n                ');
@@ -143,6 +143,7 @@ export function buildKitchenSinkHtml(components) {
         .ks-logo-mark { flex: none; display: block; }
         .ks-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
         .ks-nav-title { font-weight: 400; opacity: 0.7; font-size: .9rem; }
+        .ks-nav-version { font-weight: 400; opacity: 0.5; font-size: .8rem; }
         .ks-nav-right { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
         .ks-nav-right a { opacity: 0.85; }
         .ks-nav-right a:hover { opacity: 1; }
@@ -333,6 +334,7 @@ export function buildKitchenSinkHtml(components) {
             </a>
             <span>|</span>
             <span class="ks-nav-title">Kitchen Sink</span>
+            ${coreVersion ? `<span class="ks-nav-version desktop-only">v${coreVersion}</span>` : ''}
         </div>
         <div class="ks-nav-right">
             <a class="github-link" href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener" aria-label="Visiter le projet Ariane Starter Kit">
