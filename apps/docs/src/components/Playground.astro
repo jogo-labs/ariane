@@ -37,6 +37,7 @@ interface Props {
     controls:       CemControl[];
     component:      CemDeclaration;
     relatedTokens?: RelatedTokens[];
+    hasPageScript?: boolean;
 }
 
 const {
@@ -48,6 +49,7 @@ const {
     controls,
     component,
     relatedTokens = [],
+    hasPageScript = false,
 } = Astro.props;
 
 const showPlayground = displayMode === 'demo';
@@ -62,6 +64,9 @@ const showPlayground = displayMode === 'demo';
         </div>
         <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
             <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>ariane.css</code> fourni par Ariane.</p>
+            {hasPageScript && (
+                <p style="margin:0; margin-block-start: 1rem">Pour les besoins de la démo un script simule une réponse positive aux événements émis par le composant (voir <a href="#utilisation">Utilisation</a>).</p>
+            )}
         </ar-alert>
         <div class="main-section examples-section">
             {variants.map((variant) => (

@@ -8,12 +8,19 @@
     --ar-datepicker-offset: var(--ar-anchor-offset);
 
     /* -- Champ texte + message d'erreur (au-dessus/en-dessous de l'input) -- */
-    /* --ar-color-danger-text (pas red-50 directement) : même convention que
-               ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core) */
-    --ar-datepicker-error-color: light-dark(var(--ar-color-danger-text), var(--ar-color-red-40));
+    /* --ar-color-danger-text (pas red-50/red-40 directement) : même convention que
+               ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core).
+               --ar-color-danger-text est déjà light-dark() en interne — un second
+               light-dark() ici pointait par erreur sur --ar-color-red-40 en sombre
+               (2,38:1 sur --ar-color-vault, échec AA) au lieu de --ar-color-danger-70
+               (7,58:1) que le token calibré aurait donné. */
+    --ar-datepicker-error-color: var(--ar-color-danger-text);
+    /* --ar-color-danger-40 (red-40) sur --ar-color-vault ne donne que 2,38:1 en sombre
+               (seuil non-texte 3:1) — même erreur que --ar-datepicker-error-color ci-dessus,
+               danger-70 (7,58:1) est le palier correct côté sombre. */
     --ar-datepicker-input-error-border-color: light-dark(
-        var(--ar-color-red-50),
-        var(--ar-color-red-40)
+        var(--ar-color-danger-50),
+        var(--ar-color-danger-70)
     );
 
     /* -- Panel calendrier (conteneur du header + grille + footer) -- */
@@ -92,8 +99,8 @@ ar-datepicker {
 
     /* -- Panel flottant du calendrier -- */
     &::part(panel) {
-        width: 20.5rem;
-        padding: 0.5rem;
+        width: 21.5rem;
+        padding: 1rem;
     }
 
     &::part(grid) {
@@ -140,13 +147,11 @@ ar-datepicker {
 
     &::part(footer-button):hover {
         border-color: var(--ar-button-secondary-border-hover);
-        background-color: var(--ar-button-secondary-bg-hover);
     }
 
     &::part(footer-button):active {
         transform: scale(0.985);
         border-color: var(--ar-button-secondary-border-hover);
-        background-color: var(--ar-button-secondary-bg-hover);
     }
 
     &::part(footer-button):focus-visible {

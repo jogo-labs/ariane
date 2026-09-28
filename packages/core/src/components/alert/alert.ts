@@ -200,7 +200,7 @@ export class ArAlert extends ArianeElement {
         return html` <div part="icon">
                 <slot name="icon"> ${this._defaultIcon()} </slot>
             </div>
-            <div part="body" class="alert-body">
+            <div part="body">
                 <slot></slot>
             </div>
             ${

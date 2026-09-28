@@ -230,6 +230,7 @@ const tocEntries = [
             controls={controls}
             component={component}
             relatedTokens={relatedTokens}
+            hasPageScript={!!pageScript}
         />
         {pageScript && <Fragment set:html={pageScript} />}
     </div>
