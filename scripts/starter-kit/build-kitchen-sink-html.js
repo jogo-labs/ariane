@@ -133,7 +133,7 @@ export function buildKitchenSinkHtml(components, coreVersion) {
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             background: var(--ks-bg);
             border: 1px solid var(--ks-border);
         }
@@ -144,7 +144,7 @@ export function buildKitchenSinkHtml(components, coreVersion) {
         .ks-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
         .ks-nav-title { font-weight: 400; opacity: 0.7; font-size: .9rem; }
         .ks-nav-version { font-weight: 400; opacity: 0.5; font-size: .8rem; }
-        .ks-nav-right { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
+        .ks-nav-right { display: flex; align-items: center; gap: .5rem; font-size: 0.875rem; }
         .ks-nav-right a { opacity: 0.85; }
         .ks-nav-right a:hover { opacity: 1; }
         .ks-theme-toggle {
@@ -205,7 +205,7 @@ export function buildKitchenSinkHtml(components, coreVersion) {
             list-style: none;
         }
         .ks-toc .ks-toc-inner {
-            padding-inline-start: 1.2rem;
+            padding-inline-start: .5rem;
             border-left: 1px solid var(--ks-border);
         }
         nav.ks-toc a,
@@ -301,6 +301,7 @@ export function buildKitchenSinkHtml(components, coreVersion) {
             }
         }
         @media (min-width: 1180px) {
+            header.ks-nav { padding-inline : 1.5rem; }
             .ks-layout {
                 grid-template-columns: 300px minmax(0px, 1fr);
             }
