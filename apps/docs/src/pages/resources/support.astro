@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+
+const tocEntries = [
+    { id: 'comprendre',            label: 'Comprendre Ariane',               level: 1 as const },
+    { id: 'quest-ce-quariane',     label: 'Qu\'est-ce qu\'Ariane ?',         level: 2 as const },
+    { id: 'accessibilite',         label: 'Accessibilité',                   level: 2 as const },
+    { id: 'aucun-style',           label: 'Pourquoi aucun style ?',          level: 2 as const },
+    { id: 'production',            label: 'En production ?',                 level: 2 as const },
+    { id: 'utiliser',              label: 'Utiliser Ariane',                 level: 1 as const },
+    { id: 'cdn-ou-npm',            label: 'CDN ou npm ?',                    level: 2 as const },
+    { id: 'frameworks',            label: 'Frameworks',                      level: 2 as const },
+    { id: 'composant-pas-pret',    label: 'Composant pas prêt',              level: 2 as const },
+    { id: 'personnaliser',         label: 'Personnaliser',                   level: 1 as const },
+    { id: 'mode-sombre',           label: 'Mode sombre',                     level: 2 as const },
+    { id: 'prefixe',               label: 'Changer le préfixe',              level: 2 as const },
+    { id: 'traductions',           label: 'Traductions',                     level: 2 as const },
+    { id: 'pas-de-reponse',        label: 'Pas de réponse ?',                level: 1 as const },
+];
+---
+
+<Layout title="Aide & Support" currentPath="/resources/support" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Aide &amp; Support</h2>
+            <p class="summary">
+                Les questions les plus courantes, avec un renvoi vers la page qui détaille chaque réponse.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="comprendre">Comprendre Ariane</NarrativeHeading>
+
+            <NarrativeSubheading id="quest-ce-quariane">Qu'est-ce qu'Ariane ?</NarrativeSubheading>
+            <p>Une librairie de composants web qui mise avant tout sur l'accessibilité. Elle prend en charge les patterns où l'accessibilité est difficile à réussir (stepper, datepicker, dialog…) et ne réécrit pas les éléments natifs qui fonctionnent bien. Vous pouvez l'utiliser directement dans vos projets, ou en faire l'une des fondations de votre design system.</p>
+
+            <NarrativeSubheading id="accessibilite">Que garantit Ariane en accessibilité, et que dois-je fournir ?</NarrativeSubheading>
+            <p>Ariane garantit l'accessibilité structurelle : rôles ARIA, attributs, gestion du focus, icônes masquées aux technologies d'assistance. Vous fournissez l'accessibilité éditoriale : messages compréhensibles hors contexte visuel, niveaux de sévérité cohérents, libellés significatifs. Chaque page de composant détaille les deux, dans les sections « Pris en charge automatiquement » et « À votre charge » (par exemple pour <a href="/components/alert">Alert</a>).</p>
+
+            <NarrativeSubheading id="aucun-style">Pourquoi mes composants n'ont-ils aucun style ?</NarrativeSubheading>
+            <p>Ariane est headless : les composants fonctionnent pleinement (accessibilité, interactions) mais n'ont aucun style visuel. Ajoutez une couche CSS. Le plus simple est de partir du thème de démo, téléchargeable sur <a href="/theming/appliquer-un-theme">Appliquer un thème</a>. La <a href="/theming/overview">vue d'ensemble</a> décrit les leviers disponibles.</p>
+
+            <NarrativeSubheading id="production">Puis-je l'utiliser en production ?</NarrativeSubheading>
+            <p>Pas encore. Ariane est en alpha : l'API peut changer sans préavis. Les changements de chaque version sont listés dans les <a href="https://github.com/jogo-labs/ariane/releases" rel="noopener" target="_blank">Releases GitHub</a>.</p>
+
+            <NarrativeHeading id="utiliser">Utiliser Ariane</NarrativeHeading>
+
+            <NarrativeSubheading id="cdn-ou-npm">CDN ou npm : que choisir ?</NarrativeSubheading>
+            <p>Le CDN est la voie recommandée pour démarrer : deux balises dans le <code>&lt;head&gt;</code>, sans outil. Passez à npm si vous avez un bundler et voulez n'importer que les composants utilisés, ou choisir vous-même leurs tags. Voir le <a href="/getting-started/quickstart">démarrage rapide</a>.</p>
+
+            <NarrativeSubheading id="frameworks">Avec quels frameworks fonctionne Ariane ?</NarrativeSubheading>
+            <p>Les composants sont des Custom Elements standards. La page <a href="/getting-started/frameworks">Frameworks</a> détaille l'intégration avec React, Vue, Angular et Svelte.</p>
+
+            <NarrativeSubheading id="composant-pas-pret">Pourquoi mon composant n'est-il pas prêt au chargement de la page ?</NarrativeSubheading>
+            <p>Les Custom Elements s'enregistrent de façon asynchrone. Avant d'agir sur un composant, attendez sa définition : <code>customElements.whenDefined('ar-alert')</code> pour un seul, ou <code>whenAllDefined()</code>, importé de <code>@ariane-ui/core/utils</code>, pour tous ceux de la page. Voir <a href="/getting-started/utilisation#chargement">Attendre le chargement</a>.</p>
+
+            <NarrativeHeading id="personnaliser">Personnaliser</NarrativeHeading>
+
+            <NarrativeSubheading id="mode-sombre">Comment gérer le mode sombre ?</NarrativeSubheading>
+            <p>Ariane n'impose aucun thème : le mode sombre fait partie du vôtre. Le thème de démo montre comment gérer les modes clair et sombre. Si vous avez déjà un design system, faites pointer les tokens Ariane vers les vôtres : leurs valeurs suivront votre mode sombre. Voir <a href="/theming/appliquer-un-theme">Appliquer un thème</a>.</p>
+
+            <NarrativeSubheading id="prefixe">Puis-je changer le préfixe <code>ar-</code> ?</NarrativeSubheading>
+            <p>Oui. Avec le CDN, définissez <code>window.ARIANE_CONFIG.prefix</code> avant le script. Avec npm, importez les classes depuis <code>@ariane-ui/core/headless</code> et appelez <code>customElements.define()</code> avec le tag de votre choix. Voir <a href="/theming/tag-customization">Personnaliser le préfixe des tags</a>.</p>
+
+            <NarrativeSubheading id="traductions">Comment traduire les libellés ?</NarrativeSubheading>
+            <p>Le français (par défaut) et l'anglais sont fournis. La langue vient de <code>&lt;html lang&gt;</code> ou de l'attribut <code>lang</code> du composant. Pour une autre langue, écrivez votre traduction : voir <a href="/getting-started/traductions">Traductions</a>.</p>
+
+            <NarrativeHeading id="pas-de-reponse">Vous n'avez pas trouvé votre réponse ?</NarrativeHeading>
+            <p>Posez votre question dans les <a href="https://github.com/jogo-labs/ariane/discussions/new?category=q-a" rel="noopener" target="_blank">Discussions</a>, catégorie Q&amp;A. Pour signaler un bug ou proposer une idée, voir <a href="/resources/contributing">Contribuer</a>.</p>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>

@@ -11,7 +11,7 @@ Ariane est une **bibliothèque de Web Components accessibles** construite avec [
 - **Web Awesome / Shoelace** — design system complet et opiniaté : tu adoptes le look de la librairie
 - **Radix UI / Headless UI** — composants sans style : tu apportes tout le CSS toi-même
 
-**Ariane** : comportement accessible + tokens CSS thémables, aucune opinion visuelle forte. C'est une **fondation** sur laquelle construire son propre design system — pas un design system en soi.
+**Ariane** : comportement accessible + tokens CSS thémables, aucune opinion visuelle forte. Tu peux l'utiliser telle quelle, ou en faire l'une des **fondations** de ton propre design system : les tokens, les `::part()` et le préfixe de tags personnalisable existent pour cette souplesse.
 
 Les composants sont des **Custom Elements natifs** : ils fonctionnent dans n'importe quel framework (React, Vue, Svelte, Angular) ou en HTML pur, sans configuration.
 

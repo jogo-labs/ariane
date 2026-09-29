@@ -1,6 +1,6 @@
 # Ariane
 
-Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorepo npm workspaces orchestré par Turborepo. Pas un design system — une fondation pour en construire un.
+Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorepo npm workspaces orchestré par Turborepo. Utilisable directement, ou comme l'une des fondations d'un design system : tokens, `::part()` et préfixe de tags personnalisable existent pour cette souplesse.
 
 ## Key Directories
 
