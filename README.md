@@ -11,9 +11,11 @@ Bibliothèque de composants web accessibles, construite avec **Lit 3** et **Type
 
 ## Ce que c'est
 
-Ariane est une **librairie de composants web accessibles** — une fondation sur laquelle construire un design system,
-pas un design system en soi. Les composants sont des **Custom Elements** natifs : ils fonctionnent dans n'importe
-quel framework (React, Vue, Angular, Svelte) ou sans framework du tout.
+Ariane est une **librairie de composants web accessibles** : l'accessibilité passe avant tout, et les composants
+n'imposent aucun style. Vous pouvez les utiliser directement, ou en faire l'une des fondations de votre design
+system : les tokens thémables, les `::part()` et le préfixe de tags personnalisable sont là pour cette souplesse.
+Les composants sont des **Custom Elements** natifs : ils fonctionnent dans n'importe quel framework (React, Vue,
+Angular, Svelte) ou sans framework du tout.
 
 Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-pagination`,
 `ar-progressbar`, `ar-spinner`, `ar-stepper` / `ar-stepper-item`.

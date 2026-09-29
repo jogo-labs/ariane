@@ -15,7 +15,8 @@ Ariane se positionne entre deux extrêmes du marché des composants web :
 - **Radix UI / Headless UI** — composants sans style : l'intégrateur apporte tout le CSS.
 
 **Ariane** : comportement accessible + tokens thémables, aucune opinion visuelle forte.
-C'est la **fondation** sur laquelle construire son propre design system — pas un design system en soi.
+Elle s'utilise telle quelle dans un projet, ou comme l'une des **fondations** d'un design system : c'est pour cette
+souplesse que les tokens, les `::part()` et le préfixe de tags sont personnalisables.
 
 ---
 
