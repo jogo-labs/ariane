@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "description": "Composants web accessibles pour tous les frameworks.",
+  "license": "MIT",
   "homepage": "https://ariane-ui.com",
   "workspaces": [
     "packages/*",
