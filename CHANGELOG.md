@@ -8,6 +8,10 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 > **Note** : Les versions `0.x.x-alpha.x` sont des pré-versions instables.
 > L'API publique peut changer sans préavis avant la version `1.0.0`.
 
+> **Historique** : les sections à partir de la prochaine release sont générées depuis les
+> Conventional Commits (`npm run changelog`). Les versions `0.1.0-alpha.4` à `0.1.0-alpha.11`
+> ne sont pas détaillées ici : voir les [GitHub Releases](https://github.com/jogo-labs/ariane/releases).
+
 ---
 
 ## [0.1.0-alpha.3] — 2026-03-26
