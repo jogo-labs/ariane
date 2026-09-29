@@ -100,4 +100,4 @@ Pour le setup et les commandes de développement, voir [DEVELOPMENT.md](DEVELOPM
 
 ## Licence
 
-MIT
+MIT, voir [LICENSE](LICENSE).

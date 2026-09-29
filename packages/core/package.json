@@ -3,6 +3,7 @@
   "version": "0.1.0-alpha.11",
   "type": "module",
   "description": "Accessible web components library",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
