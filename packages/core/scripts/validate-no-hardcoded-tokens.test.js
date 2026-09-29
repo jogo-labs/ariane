@@ -254,4 +254,86 @@ describe('findUnjustifiedFallbacks', () => {
         `;
         expect(findUnjustifiedFallbacks('datepicker.styles.ts', source)).toEqual([]);
     });
+
+    it('rejette un fallback à double imbrication de parenthèses sans commentaire de justification', () => {
+        const source = `
+            [part='panel'] {
+                max-width: var(--ar-panel-max-width, min(18rem, calc(100vw - 2rem)));
+            }
+        `;
+        const errors = findUnjustifiedFallbacks('panel.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('--ar-panel-max-width');
+        expect(errors[0]).toContain('min(18rem, calc(100vw - 2rem))');
+    });
+
+    it('accepte un fallback à double imbrication précédé du commentaire a11y-fallback', () => {
+        const source = [
+            "[part='panel'] {",
+            '    max-width: var(',
+            '        --ar-panel-max-width,',
+            '        /* a11y-fallback: borne la largeur sur mobile sans thème */',
+            '        min(18rem, calc(100vw - 2rem))',
+            '    );',
+            '}',
+        ].join('\n');
+        expect(findUnjustifiedFallbacks('panel.styles.ts', source)).toEqual([]);
+    });
+
+    it('rejette un fallback à triple imbrication de parenthèses', () => {
+        const source = `
+            [part='panel'] {
+                width: var(--ar-panel-width, max(1rem, min(2rem, calc(50% - 1rem))));
+            }
+        `;
+        const errors = findUnjustifiedFallbacks('panel.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('max(1rem, min(2rem, calc(50% - 1rem)))');
+    });
+
+    it('rapporte le bon numéro de ligne pour un fallback imbriqué multi-lignes', () => {
+        const source = [
+            "[part='panel'] {",
+            '    max-width: var(',
+            '        --ar-panel-max-width,',
+            '        min(18rem, calc(100vw - 2rem))',
+            '    );',
+            '}',
+        ].join('\n');
+        const errors = findUnjustifiedFallbacks('panel.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('panel.styles.ts:4 ');
+    });
+
+    it('détecte aussi le var() suivant sur la même déclaration après un fallback imbriqué', () => {
+        const source = `
+            [part='panel'] {
+                padding: var(--ar-a, min(1rem, calc(1vw))) var(--ar-b, 2rem);
+            }
+        `;
+        const errors = findUnjustifiedFallbacks('panel.styles.ts', source);
+        expect(errors).toHaveLength(2);
+        expect(errors[0]).toContain('--ar-a');
+        expect(errors[1]).toContain('--ar-b');
+    });
+
+    it('détecte un fallback imbriqué à l’intérieur d’un calc() englobant', () => {
+        const source = `
+            [part='panel'] {
+                margin: calc(-1 * var(--ar-panel-margin, min(1rem, calc(2vw))));
+            }
+        `;
+        const errors = findUnjustifiedFallbacks('panel.styles.ts', source);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toContain('--ar-panel-margin');
+    });
+
+    it('ne plante pas sur des parenthèses non fermées (erreur de syntaxe CSS, hors périmètre)', () => {
+        const source = `
+            [part='panel'] {
+                max-width: var(--ar-panel-max-width, min(18rem, 2rem);
+            }
+        `;
+        expect(() => findUnjustifiedFallbacks('panel.styles.ts', source)).not.toThrow();
+    });
 });
