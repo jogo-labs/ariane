@@ -22,7 +22,7 @@ export interface WhenAllDefinedOptions {
  * @returns Promise résolue quand plus aucun élément correspondant n'est en attente.
  *
  * @example
- * import { whenAllDefined } from '@ariane-ui/core';
+ * import { whenAllDefined } from '@ariane-ui/core/utils';
  * await whenAllDefined();
  * // Tous les ar-* (ou le préfixe configuré via ARIANE_CONFIG) présents dans la page sont prêts
  *

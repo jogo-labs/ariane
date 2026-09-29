@@ -12,6 +12,10 @@
       "types": "./dist/headless.d.ts",
       "default": "./dist/headless.js"
     },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    },
     "./cdn": "./cdn/index.js",
     "./cdn.prod": "./cdn/index.prod.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
