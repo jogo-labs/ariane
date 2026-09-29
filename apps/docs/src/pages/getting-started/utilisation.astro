@@ -27,7 +27,13 @@ alert.setAttribute('variant', 'success');`;
 
 const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
 await whenAllDefined();
-// Tous les composants ar-* sont prêts`;
+// Tous les composants ar-* sont prêts
+
+await whenAllDefined({ prefix: 'acme-' });
+// Préfixe personnalisé (import headless)
+
+await whenAllDefined({ root: monElement });
+// Limité à un sous-arbre (élément ou shadow root)`;
 
 const codeWhenAllDefinedCdn = `const tags = [...new Set(
     [...document.querySelectorAll('*')]
