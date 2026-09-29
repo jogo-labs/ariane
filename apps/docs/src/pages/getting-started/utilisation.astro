@@ -25,7 +25,8 @@ const codeWhenDefined = `await customElements.whenDefined('ar-alert');
 const alert = document.querySelector('ar-alert');
 alert.setAttribute('variant', 'success');`;
 
-const codeWhenAllDefinedNpm = `import { whenAllDefined } from '@ariane-ui/core';
+const codeWhenAllDefinedNpm = `// Sous-path sans effet de bord : n'enregistre aucun composant
+import { whenAllDefined } from '@ariane-ui/core/utils';
 await whenAllDefined();
 // Tous les composants ar-* sont prêts
 
