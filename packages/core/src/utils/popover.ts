@@ -21,6 +21,7 @@ export interface PopoverOptions {
 export class Popover {
     private _host: ReactiveControllerHost & HTMLElement;
     private _trigger: HTMLElement | null = null;
+    private _actuator: HTMLElement | null = null;
     private _panel: HTMLElement | null = null;
     private _isOpen = false;
     private _cleanupAutoUpdate: (() => void) | null = null;
@@ -64,6 +65,7 @@ export class Popover {
             this._panel.removeEventListener('toggle', this._onToggle);
         }
         this._trigger = anchor ?? trigger;
+        this._actuator = trigger;
         this._panel = panel;
         if (!panel.id) panel.id = `ar-popover-${crypto.randomUUID().slice(0, 8)}`;
         panel.setAttribute('popover', this._opts.popoverType);
@@ -83,6 +85,7 @@ export class Popover {
         this._panel.style.visibility = 'hidden';
         panel.showPopover();
         this._isOpen = true;
+        this._listenOutsidePointer();
         this._host.requestUpdate();
         this._cleanupAutoUpdate = autoUpdate(this._trigger, this._panel, async () => {
             await this._position();
@@ -94,6 +97,7 @@ export class Popover {
         if (!this._isOpen || !this._panel) return;
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
+        this._unlistenOutsidePointer();
         const panel = this._panel as PopoverPanel;
         if (typeof panel.hidePopover === 'function') panel.hidePopover();
         this._isOpen = false;
@@ -103,6 +107,7 @@ export class Popover {
     destroy(): void {
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
+        this._unlistenOutsidePointer();
         if (this._isOpen && this._panel) {
             const panel = this._panel as PopoverPanel;
             if (typeof panel.hidePopover === 'function') panel.hidePopover();
@@ -111,17 +116,53 @@ export class Popover {
         this._panel?.removeEventListener('toggle', this._onToggle);
         this._panel = null;
         this._trigger = null;
+        this._actuator = null;
     }
 
     private _onToggle = (e: Event): void => {
         const newState = (e as ToggleEvent).newState;
-        if (newState === 'closed' && this._isOpen) {
-            this._cleanupAutoUpdate?.();
-            this._cleanupAutoUpdate = null;
-            this._isOpen = false;
-            this._opts.onExternalClose?.();
-            this._host.requestUpdate();
-        }
+        if (newState === 'closed' && this._isOpen) this._dismiss();
+    };
+
+    /**
+     * Fermeture à l'initiative de l'utilisateur (light-dismiss natif ou tap extérieur).
+     * `hidePopover()` est sans effet si le navigateur a déjà fermé le panneau ; l'événement
+     * `toggle` qui suit trouve `_isOpen` faux, donc `onExternalClose` n'est appelé qu'une fois.
+     */
+    private _dismiss(): void {
+        this._cleanupAutoUpdate?.();
+        this._cleanupAutoUpdate = null;
+        this._unlistenOutsidePointer();
+        (this._panel as PopoverPanel | null)?.hidePopover?.();
+        this._isOpen = false;
+        this._opts.onExternalClose?.();
+        this._host.requestUpdate();
+    }
+
+    // Safari iOS 17.5–18.2 n'applique pas le light-dismiss natif au tap extérieur (complet dès
+    // 18.3) et la détection par fonctionnalité ne distingue pas ce support partiel : l'écouteur
+    // est donc toujours actif pour le type 'auto'.
+    private _listenOutsidePointer(): void {
+        if (this._opts.popoverType !== 'auto') return;
+        this._host.ownerDocument.addEventListener('pointerdown', this._onOutsidePointerDown, true);
+    }
+
+    private _unlistenOutsidePointer(): void {
+        this._host.ownerDocument.removeEventListener(
+            'pointerdown',
+            this._onOutsidePointerDown,
+            true,
+        );
+    }
+
+    private _onOutsidePointerDown = (e: PointerEvent): void => {
+        if (!this._isOpen || !this._panel) return;
+        const path = e.composedPath();
+        // Le trigger et l'ancre restent exclus : le composant bascule lui-même au clic.
+        if (path.includes(this._panel)) return;
+        if (this._trigger && path.includes(this._trigger)) return;
+        if (this._actuator && path.includes(this._actuator)) return;
+        this._dismiss();
     };
 
     private async _position(): Promise<void> {
