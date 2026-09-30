@@ -4,13 +4,12 @@
  * Pour importer un seul composant (tree-shaking) :
  *   import '@ariane-ui/core/components/alert/index.js';
  */
-export { whenAllDefined } from './utils/when-all-defined.js';
+export { whenAllDefined, registerTranslation } from './utils/index.js';
+export type { WhenAllDefinedOptions, Translation } from './utils/index.js';
 export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';
 export { announceA11y } from './a11y/announce-a11y.js';
 export { LocalizeController } from './controllers/localize.controller.js';
-export { registerTranslation } from '@shoelace-style/localize';
-export type { Translation } from './types/translation.js';
 import './components/alert/index.js';
 export { ArAlert } from './components/alert/alert.js';
 import './components/breadcrumb/index.js';

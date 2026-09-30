@@ -1,6 +1,7 @@
 {
   "name": "@ariane-ui/docs",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "predev": "node scripts/check-manifest.js",

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Proposer une idée ou une fonctionnalité
+    url: https://github.com/jogo-labs/ariane/discussions/new?category=ideas
+    about: Les idées se discutent dans les Discussions (catégorie Ideas).
+  - name: Poser une question d'usage
+    url: https://github.com/jogo-labs/ariane/discussions/new?category=q-a
+    about: Les questions se posent dans les Discussions (catégorie Q&A).

@@ -1,0 +1,113 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+
+const tocEntries = [
+    { id: 'ou-poser-quoi',        label: 'Où poser quoi',          level: 1 as const },
+    { id: 'signaler-un-bug',      label: 'Signaler un bug',        level: 1 as const },
+    { id: 'proposer-une-idee',    label: 'Proposer une idée',      level: 1 as const },
+    { id: 'proposer-un-correctif', label: 'Proposer un correctif', level: 1 as const },
+];
+
+const codeCommit = `fix(stepper): corrige la navigation au clavier
+
+BREAKING CHANGE: <seulement si le changement est incompatible>`;
+---
+
+<Layout title="Contribuer" currentPath="/resources/contributing" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Contribuer</h2>
+            <p class="summary">
+                Un bug, une idée, un correctif : voici comment contribuer. Pas besoin de savoir
+                coder pour signaler un problème.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="ou-poser-quoi">Où poser quoi</NarrativeHeading>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Vous voulez…</th>
+                            <th scope="col">Aller sur…</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Signaler un bug</td>
+                            <td><a href="https://github.com/jogo-labs/ariane/issues/new?template=bug_report.md" rel="noopener" target="_blank">Issues</a></td>
+                        </tr>
+                        <tr>
+                            <td>Proposer une idée</td>
+                            <td><a href="https://github.com/jogo-labs/ariane/discussions/new?category=ideas" rel="noopener" target="_blank">Discussions</a>, catégorie Ideas</td>
+                        </tr>
+                        <tr>
+                            <td>Poser une question</td>
+                            <td><a href="https://github.com/jogo-labs/ariane/discussions/new?category=q-a" rel="noopener" target="_blank">Discussions</a>, catégorie Q&amp;A</td>
+                        </tr>
+                        <tr>
+                            <td>Proposer un correctif</td>
+                            <td>Une Pull Request</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul class="narrative-list">
+                <li>Cherchez d'abord : le sujet existe peut-être déjà.</li>
+                <li>Pas de « +1 » : utilisez la réaction « pouce levé ».</li>
+                <li>Un sujet par fil.</li>
+            </ul>
+
+            <NarrativeHeading id="signaler-un-bug">Signaler un bug</NarrativeHeading>
+            <p>
+                Une reproduction minimale est essentielle : le plus petit extrait HTML qui montre
+                le problème, ou un lien CodePen ou StackBlitz. Précisez :
+            </p>
+            <ul class="narrative-list">
+                <li>la version de <code>@ariane-ui/core</code>, le navigateur et le système ;</li>
+                <li>le comportement attendu et le comportement observé ;</li>
+                <li>pour l'accessibilité, le lecteur d'écran utilisé (NVDA, VoiceOver…) et le zoom.</li>
+            </ul>
+
+            <NarrativeHeading id="proposer-une-idee">Proposer une idée</NarrativeHeading>
+            <p>
+                Ariane prend en charge les patterns dont l'implémentation accessible est difficile.
+                Elle ne réécrit pas les éléments natifs qui fonctionnent bien. Un composant est
+                envisagé si :
+            </p>
+            <ul class="narrative-list">
+                <li>sa complexité d'accessibilité est non triviale (stepper, datepicker, dialog) ;</li>
+                <li>ou il est rarement bien fait, par difficulté d'implémentation ;</li>
+                <li>ou il étend un natif insuffisant (<code>&lt;dialog&gt;</code>, <code>&lt;ar-dialog&gt;</code>).</li>
+            </ul>
+            <p>
+                Décrivez le besoin avant l'API. Nous visons la plus petite surface possible, un
+                comportement par défaut adapté au mobile, et des composants sans apparence
+                imposée. Inutile de relancer : les réactions mesurent l'intérêt.
+            </p>
+
+            <NarrativeHeading id="proposer-un-correctif">Proposer un correctif</NarrativeHeading>
+            <ul class="narrative-list">
+                <li>Ouvrez d'abord une issue, sauf pour un correctif évident.</li>
+                <li>Créez une branche <code>fix/&lt;description&gt;</code> depuis <code>dev</code>, et ouvrez la Pull Request vers <code>dev</code>.</li>
+                <li>Écrivez vos commits en Conventional Commits (vérifiés automatiquement).</li>
+                <li>Ajoutez un test qui échoue sans votre correctif, quand c'est possible.</li>
+                <li>Ne modifiez jamais <code>dist/</code> : il est généré par le build.</li>
+            </ul>
+            <pre><code class="language-text" set:text={codeCommit} /></pre>
+            <p>Installation, architecture, conventions de code : voir le <a href="https://github.com/jogo-labs/ariane/blob/main/DEVELOPMENT.md" rel="noopener" target="_blank">guide de développement</a>.</p>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
+</style>

@@ -15,7 +15,8 @@ Ariane se positionne entre deux extrêmes du marché des composants web :
 - **Radix UI / Headless UI** — composants sans style : l'intégrateur apporte tout le CSS.
 
 **Ariane** : comportement accessible + tokens thémables, aucune opinion visuelle forte.
-C'est la **fondation** sur laquelle construire son propre design system — pas un design system en soi.
+Elle s'utilise telle quelle dans un projet, ou comme l'une des **fondations** d'un design system : c'est pour cette
+souplesse que les tokens, les `::part()` et le préfixe de tags sont personnalisables.
 
 ---
 
@@ -67,38 +68,14 @@ peuvent étendre les classes Ariane dans leur propre design system — voir le p
 
 ---
 
-## Proposer un nouveau composant
+## Où poser quoi
 
-1. **Ouvrir une issue** en expliquant le besoin, les critères d'inclusion satisfaits, et une esquisse d'API.
-2. **Discussion** — attendre un retour avant de commencer l'implémentation.
-3. **PR sur `dev`** une fois l'issue validée.
+| Vous voulez…          | Aller sur…                                                                      |
+| --------------------- | ------------------------------------------------------------------------------- |
+| Signaler un bug       | [Issues](https://github.com/jogo-labs/ariane/issues/new/choose)                 |
+| Proposer une idée     | [Discussions](https://github.com/jogo-labs/ariane/discussions), catégorie Ideas |
+| Poser une question    | [Discussions](https://github.com/jogo-labs/ariane/discussions), catégorie Q&A   |
+| Proposer un correctif | Une Pull Request vers `dev`, après une issue (sauf correctif évident)           |
 
----
-
-## Workflow PR
-
-Toutes les contributions passent par une Pull Request sur la branche `dev`.
-
-```bash
-git clone https://github.com/jogo-labs/ariane
-cd ariane
-nvm use
-npm install
-git checkout -b feat/mon-composant
-```
-
----
-
-## Conventions de commit
-
-Les commits suivent **Conventional Commits**, vérifiés automatiquement par commitlint + Husky.
-
-```
-feat(button): ajoute la prop `loading`
-fix(stepper): corrige la navigation au clavier
-docs(alert): met à jour les exemples
-test(button): ajoute les cas disabled
-chore(deps): met à jour esbuild
-```
-
-Types autorisés : `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`.
+Le détail (reproduction minimale d'un bug, critères d'une idée, règles d'une Pull Request) est sur la
+page **Contribuer** du site de documentation, section « Ressources ».

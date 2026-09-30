@@ -14,12 +14,12 @@ import { join } from 'node:path';
 
 const HARDCODED_ASSIGNMENT_RE = /(--ar[\w-]+)\s*:(?!\s*var\()\s*[^;]+;/g;
 
-// Détecte var(--ar-xxx, fallback) en consommation. Capture group 2 = expression du
-// fallback, potentiellement multi-lignes (cf. format a11y-fallback ci-dessous).
-// `[^()]*(?:\([^()]*\)[^()]*)*` tolère un niveau d'imbrication de parenthèses dans
-// le fallback (ex. `var(--a, var(--b))`, déjà présent dans dialog.styles.ts) sans
-// tronquer la capture au premier `)` rencontré.
-const VAR_FALLBACK_RE = /var\(\s*(--ar[\w-]+)\s*,\s*([^()]*(?:\([^()]*\)[^()]*)*)\)/dg;
+// Début d'un var(--ar-xxx, fallback) en consommation, jusqu'au premier caractère du
+// fallback (espaces et retours à la ligne compris). Le fallback lui-même, potentiellement
+// multi-lignes (cf. format a11y-fallback ci-dessous) et imbriqué à profondeur arbitraire
+// (ex. `min(18rem, calc(100vw - 2rem))`), est extrait par `findVarFallbacks` : une regex ne
+// sait pas compter des parenthèses à profondeur non bornée (cf. #165).
+const VAR_FALLBACK_START_RE = /var\(\s*(--ar[\w-]+)\s*,\s*/g;
 
 // Mots-clés couleur système CSS4 autorisés comme fallback sans justification —
 // liste fermée, cf. section « Garde-fou CI » de la spec. Exact match (pas de
@@ -70,6 +70,37 @@ const BARE_TOKEN_FALLBACK_RE = /^var\(\s*--[\w-]+\s*\)$/;
 // au format exact (pas une simple tolérance de tout commentaire), sur la ligne
 // immédiatement précédente la valeur.
 const A11Y_FALLBACK_COMMENT_RE = /^\s*\/\* a11y-fallback: .+ \*\/\s*$/;
+
+/**
+ * Extrait chaque `var(--ar-*, <fallback>)` d'un source dont les commentaires ont déjà été
+ * neutralisés. La parenthèse fermante est celle qui équilibre l'ouvrante du `var(`, quelle
+ * que soit la profondeur d'imbrication. Un `var()` imbriqué dans un fallback n'est pas
+ * rescanné séparément : le fallback englobant est jugé en bloc. Un `var(` dont la
+ * parenthèse n'est jamais refermée (erreur de syntaxe CSS, détectée ailleurs) est ignoré.
+ *
+ * @param {string} source
+ * @returns {Generator<{ token: string, fallback: string, fallbackStart: number }>}
+ */
+function* findVarFallbacks(source) {
+    const startRe = new RegExp(VAR_FALLBACK_START_RE);
+    let start;
+    while ((start = startRe.exec(source)) !== null) {
+        const fallbackStart = startRe.lastIndex;
+        let depth = 1;
+        let end = -1;
+        for (let i = fallbackStart; i < source.length; i++) {
+            if (source[i] === '(') depth++;
+            else if (source[i] === ')' && --depth === 0) {
+                end = i;
+                break;
+            }
+        }
+        if (end === -1) continue;
+
+        yield { token: start[1], fallback: source.slice(fallbackStart, end), fallbackStart };
+        startRe.lastIndex = end + 1;
+    }
+}
 
 /**
  * Recense récursivement tous les fichiers `*.styles.ts` sous `dir`.
@@ -139,11 +170,10 @@ export function findUnjustifiedFallbacks(filePath, source) {
     const rawLines = source.split('\n');
 
     const errors = [];
-    VAR_FALLBACK_RE.lastIndex = 0;
-    let match;
-    while ((match = VAR_FALLBACK_RE.exec(withoutComments)) !== null) {
-        const token = match[1];
-        const fallback = match[2].trim();
+    for (const { token, fallback: rawFallback, fallbackStart } of findVarFallbacks(
+        withoutComments,
+    )) {
+        const fallback = rawFallback.trim();
 
         if (SYSTEM_COLOR_KEYWORDS.has(fallback)) continue;
         if (STRUCTURAL_LITERAL_KEYWORDS.has(fallback)) continue;
@@ -154,9 +184,7 @@ export function findUnjustifiedFallbacks(filePath, source) {
         // référence pour vérifier la ligne a11y-fallback précédente, pas la ligne
         // où commence l'appel var() (qui peut être plusieurs lignes plus haut dans
         // le format multi-lignes).
-        const [groupStart] = match.indices[2];
-        const trimmedStart = groupStart + (match[2].length - match[2].trimStart().length);
-        const valueLine = withoutComments.slice(0, trimmedStart).split('\n').length;
+        const valueLine = withoutComments.slice(0, fallbackStart).split('\n').length;
 
         const precedingLine = rawLines[valueLine - 2] ?? '';
         if (A11Y_FALLBACK_COMMENT_RE.test(precedingLine)) continue;

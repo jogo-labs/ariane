@@ -1,8 +1,9 @@
 {
   "name": "@ariane-ui/core",
-  "version": "0.1.0-alpha.11",
+  "version": "0.1.0-alpha.12",
   "type": "module",
   "description": "Accessible web components library",
+  "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -11,6 +12,10 @@
     "./headless": {
       "types": "./dist/headless.d.ts",
       "default": "./dist/headless.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
     },
     "./cdn": "./cdn/index.js",
     "./cdn.prod": "./cdn/index.prod.js",

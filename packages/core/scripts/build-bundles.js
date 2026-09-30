@@ -88,6 +88,8 @@ function toEntryKey(file) {
 const entryPoints = {
     index: join(SRC, 'index.ts'),
     headless: join(SRC, 'headless.ts'),
+    // Sous-path @ariane-ui/core/utils : code pur, sans customElements.define
+    'utils/index': join(SRC, 'utils', 'index.ts'),
     ...Object.fromEntries(componentFiles.map((f) => [toEntryKey(f), f])),
 };
 

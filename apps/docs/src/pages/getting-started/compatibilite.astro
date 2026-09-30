@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+
+const tocEntries = [
+    { id: 'navigateurs', label: 'Navigateurs',        level: 1 as const },
+    { id: 'ssr',         label: 'Rendu serveur (SSR)', level: 1 as const },
+];
+---
+
+<Layout title="Compatibilité" currentPath="/getting-started/compatibilite" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Compatibilité</h2>
+            <p class="summary">
+                Les navigateurs pris en charge et la position d'Ariane sur le rendu serveur.
+            </p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="navigateurs">Navigateurs</NarrativeHeading>
+            <p>Ariane cible les navigateurs récents, sans polyfills.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Navigateur</th>
+                            <th scope="col">Version minimale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Chrome et Edge</td>
+                            <td>125</td>
+                        </tr>
+                        <tr>
+                            <td>Firefox</td>
+                            <td>126</td>
+                        </tr>
+                        <tr>
+                            <td>Safari (macOS, iOS et iPadOS)</td>
+                            <td>17.5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>
+                Ces versions correspondent aux fonctionnalités de la plateforme que les composants et
+                le thème fourni utilisent :
+            </p>
+            <ul class="narrative-list">
+                <li>l'API Popover, pour les panneaux flottants (dropdown, tooltip, datepicker…) ;</li>
+                <li>les états personnalisés (<code>CustomStateSet</code> et <code>:state()</code>) ;</li>
+                <li><code>ElementInternals</code>, <code>&lt;dialog&gt;</code> et l'attribut <code>inert</code> ;</li>
+                <li>pour le thème fourni : <code>light-dark()</code>, <code>color-mix()</code>, <code>oklch()</code>, <code>@layer</code> et l'imbrication CSS.</li>
+            </ul>
+            <p>
+                Les tests automatisés tournent sur les dernières versions de Chromium, Firefox et
+                WebKit, les moteurs de Chrome et Edge, de Firefox et de Safari. Les versions minimales
+                sont déduites des données de compatibilité des fonctionnalités utilisées, pas d'un
+                test sur chaque version. En dessous, le comportement n'est pas garanti.
+            </p>
+            <p>
+                Sous Chrome et Edge 125, <code>:state()</code> n'existe pas : les états personnalisés
+                sont exposés avec le préfixe <code>--</code> (par exemple <code>:--open</code>). Les styles du
+                thème fourni n'en tiennent pas compte, mais la plupart des états ont aussi un attribut
+                équivalent (<code>[open]</code>, <code>[disabled]</code>…) utilisable dans vos propres styles.
+            </p>
+            <p>
+                Sur Safari iOS et iPadOS avant 18.3, le tap à l'extérieur d'un panneau ne le ferme
+                pas nativement. Ariane ajoute cette fermeture ; elle est testée en émulation, pas
+                encore sur appareil.
+            </p>
+
+            <NarrativeHeading id="ssr">Rendu serveur (SSR)</NarrativeHeading>
+            <p>
+                Pas de support officiel du rendu serveur pour l'instant : c'est une fonctionnalité à
+                venir. Le support actuel est partiel et n'est pas testé.
+            </p>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
+</style>

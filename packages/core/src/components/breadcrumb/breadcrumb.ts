@@ -67,9 +67,29 @@ export class ArBreadcrumb extends ArianeElement {
 
     private readonly localize = new LocalizeController(this);
 
-    static mobileQuery: MediaQueryList = window.matchMedia('(max-width: 767px)');
+    private static _mobileQuery: MediaQueryList | null = null;
 
-    @state() private isMobile: boolean = ArBreadcrumb.mobileQuery.matches;
+    /**
+     * Créée au premier accès, pas à la définition de la classe : `window` n'existe pas hors
+     * navigateur (Node, rendu serveur), et un accès direct ferait échouer l'import du module.
+     * `null` sans `window.matchMedia`. Assignable (les tests y injectent un mock).
+     */
+    static get mobileQuery(): MediaQueryList | null {
+        if (
+            !ArBreadcrumb._mobileQuery &&
+            typeof window !== 'undefined' &&
+            typeof window.matchMedia === 'function'
+        ) {
+            ArBreadcrumb._mobileQuery = window.matchMedia('(max-width: 767px)');
+        }
+        return ArBreadcrumb._mobileQuery;
+    }
+
+    static set mobileQuery(query: MediaQueryList | null) {
+        ArBreadcrumb._mobileQuery = query;
+    }
+
+    @state() private isMobile: boolean = ArBreadcrumb.mobileQuery?.matches ?? false;
 
     /**
      * Contrôle programmatique du panel mobile. Reflété comme attribut HTML.
@@ -128,7 +148,7 @@ export class ArBreadcrumb extends ArianeElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        ArBreadcrumb.mobileQuery.addEventListener('change', this._handleMediaChange);
+        ArBreadcrumb.mobileQuery?.addEventListener('change', this._handleMediaChange);
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
         // On attend la définition des tags réellement utilisés (pas un préfixe supposé) pour
         // fonctionner aussi bien avec des tags renommés indépendamment (import headless).
@@ -144,7 +164,7 @@ export class ArBreadcrumb extends ArianeElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
-        ArBreadcrumb.mobileQuery.removeEventListener('change', this._handleMediaChange);
+        ArBreadcrumb.mobileQuery?.removeEventListener('change', this._handleMediaChange);
     }
 
     override willUpdate(changed: PropertyValues<this>): void {
@@ -303,6 +323,6 @@ export class ArBreadcrumb extends ArianeElement {
     }
 
     private _handleMediaChange = (): void => {
-        this.isMobile = ArBreadcrumb.mobileQuery.matches;
+        this.isMobile = ArBreadcrumb.mobileQuery?.matches ?? false;
     };
 }

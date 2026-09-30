@@ -204,9 +204,10 @@ describe('AnchoredController', () => {
 
     describe('cssVarPrefix — lecture des custom properties CSS', () => {
         function parseTranslateY(transform: string): number {
-            const match = transform.match(/translate\([-\d.]+px,\s*([-\d.]+)px\)/);
+            // Firefox omet l'ordonnée nulle : `translate(4px)` pour `translate(4px, 0px)`.
+            const match = transform.match(/translate\([-\d.]+px(?:,\s*([-\d.]+)px)?\)/);
             if (!match) throw new Error(`transform inattendu: ${transform}`);
-            return Number(match[1]);
+            return Number(match[1] ?? 0);
         }
 
         it('lit --ar-<prefix>-distance sur le host et la répercute au positionnement', async () => {

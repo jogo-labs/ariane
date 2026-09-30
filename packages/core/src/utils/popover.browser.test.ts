@@ -99,6 +99,108 @@ describe('Popover', () => {
         });
     });
 
+    // Safari iOS 17.5–18.2 : le light-dismiss natif ne se déclenche pas au tap extérieur. Un
+    // événement synthétique (non fiable) ne déclenche jamais le light-dismiss natif : il isole
+    // donc l'écouteur de Popover, sur tous les moteurs.
+    describe('popoverType: auto — tap extérieur', () => {
+        function pointerDown(target: EventTarget): void {
+            target.dispatchEvent(
+                new PointerEvent('pointerdown', { bubbles: true, composed: true }),
+            );
+        }
+
+        it('un pointerdown hors du panel et du trigger ferme le panel et appelle onExternalClose', async () => {
+            let calls = 0;
+            const { panel, popover } = await setupPopover({
+                popoverType: 'auto',
+                onExternalClose: () => {
+                    calls++;
+                },
+            });
+            await popover.show();
+            pointerDown(document.body);
+            await aTimeout(50);
+            expect(calls).to.equal(1);
+            expect(popover.isOpen).to.equal(false);
+            expect(panel.matches(':popover-open')).to.equal(false);
+        });
+
+        it('un pointerdown dans le panel ne le ferme pas', async () => {
+            const { panel, popover } = await setupPopover({ popoverType: 'auto' });
+            await popover.show();
+            pointerDown(panel);
+            await aTimeout(50);
+            expect(popover.isOpen).to.equal(true);
+        });
+
+        it("un pointerdown sur le trigger ne le ferme pas (c'est le composant qui bascule)", async () => {
+            const { trigger, popover } = await setupPopover({ popoverType: 'auto' });
+            await popover.show();
+            pointerDown(trigger);
+            await aTimeout(50);
+            expect(popover.isOpen).to.equal(true);
+        });
+
+        it('un pointerdown dans un panel imbriqué ne ferme pas le panel parent', async () => {
+            const { panel, popover } = await setupPopover({ popoverType: 'auto' });
+            const child = document.createElement('div');
+            child.textContent = 'Enfant';
+            panel.appendChild(child);
+            await popover.show();
+            pointerDown(child);
+            await aTimeout(50);
+            expect(popover.isOpen).to.equal(true);
+        });
+
+        it("n'appelle plus onExternalClose après hide()", async () => {
+            let calls = 0;
+            const { popover } = await setupPopover({
+                popoverType: 'auto',
+                onExternalClose: () => {
+                    calls++;
+                },
+            });
+            await popover.show();
+            popover.hide();
+            pointerDown(document.body);
+            await aTimeout(50);
+            expect(calls).to.equal(0);
+        });
+
+        it("n'appelle plus onExternalClose après destroy()", async () => {
+            let calls = 0;
+            const { popover } = await setupPopover({
+                popoverType: 'auto',
+                onExternalClose: () => {
+                    calls++;
+                },
+            });
+            await popover.show();
+            popover.destroy();
+            pointerDown(document.body);
+            await aTimeout(50);
+            expect(calls).to.equal(0);
+        });
+
+        it('peut se rouvrir et se refermer au tap extérieur', async () => {
+            let calls = 0;
+            const { popover } = await setupPopover({
+                popoverType: 'auto',
+                onExternalClose: () => {
+                    calls++;
+                },
+            });
+            await popover.show();
+            pointerDown(document.body);
+            await aTimeout(50);
+            await popover.show();
+            pointerDown(document.body);
+            await aTimeout(50);
+            expect(calls).to.equal(2);
+            expect(popover.isOpen).to.equal(false);
+        });
+    });
+
     describe('popoverType: manual', () => {
         it("onExternalClose n'est pas appelé (pas de light-dismiss)", async () => {
             let called = false;
@@ -112,6 +214,16 @@ describe('Popover', () => {
             popover.hide();
             await aTimeout(50);
             expect(called).to.equal(false);
+        });
+
+        it("un pointerdown extérieur ne ferme pas le panel (pas d'écouteur)", async () => {
+            const { popover } = await setupPopover({ popoverType: 'manual' });
+            await popover.show();
+            document.body.dispatchEvent(
+                new PointerEvent('pointerdown', { bubbles: true, composed: true }),
+            );
+            await aTimeout(50);
+            expect(popover.isOpen).to.equal(true);
         });
     });
 
