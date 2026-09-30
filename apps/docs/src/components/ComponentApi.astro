@@ -292,7 +292,8 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                         <p class="hint">
                             Utilisez le sélecteur <code>:state(name)</code> sur le tag pour styler ce composant en fonction de son état. <br />
                             Composable avec <code>::part()</code> pour
-                            cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>).
+                            cibler un élément interne (<code>{component.tagName}:state(name)::part(x)</code>). <br />
+                            Sous Chrome et Edge 125, l'état est exposé avec le préfixe <code>--</code> (<code>:--name</code>) : voir <a href="/getting-started/compatibilite">Compatibilité</a>.
                         </p>
                         <div class="api-list" role="list">
                             {component.cssStates.map((state, i) => (
