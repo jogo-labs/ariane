@@ -7,6 +7,9 @@ const tooltipStyles = css`
     }
 
     [part='tooltip'] {
+        /* Masqué par défaut, affiché par :popover-open (voir panel.styles.ts). */
+        display: none;
+
         /* Popover positioning reset */
         position: absolute;
         inset: 0 auto auto 0;
@@ -36,11 +39,8 @@ const tooltipStyles = css`
         line-height: var(--ar-tooltip-line-height);
     }
 
-    [part='tooltip']:not(:popover-open) {
-        display: none;
-    }
-
     [part='tooltip']:popover-open {
+        display: block;
         animation: arPanelShow var(--ar-tooltip-show-duration) ease-out;
     }
 

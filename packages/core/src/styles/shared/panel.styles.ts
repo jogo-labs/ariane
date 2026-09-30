@@ -10,6 +10,11 @@ const panelBaseStyles = css`
        QUE pour une propriété dont la valeur diverge réellement du générique —
        jamais pour redéclarer la même valeur. */
     [part='panel'] {
+        /* Masqué par défaut, affiché par :popover-open. Sans API Popover, cette pseudo-classe
+           est inconnue et la règle qui la contient est ignorée : le panneau reste masqué.
+           L'inverse (:not(:popover-open) { display: none }) serait ignoré en entier. */
+        display: none;
+
         /* Popover positioning reset */
         position: absolute;
         inset: 0 auto auto 0;
@@ -31,11 +36,8 @@ const panelBaseStyles = css`
         max-width: var(--ar-panel-max-width, min(18rem, calc(100vw - 2rem)));
     }
 
-    [part='panel']:not(:popover-open) {
-        display: none;
-    }
-
     [part='panel']:popover-open {
+        display: block;
         animation: arPanelShow var(--ar-panel-show-duration) ease-out;
     }
 
