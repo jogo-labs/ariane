@@ -229,7 +229,7 @@ describe('ArAlert', () => {
 
 Fichiers nommés `*.browser.test.ts` ou `*.a11y.test.ts`.
 
-Les tests tournent sur Chromium et Firefox en CI, et sur WebKit en plus en local : installez les moteurs une fois avec `npx playwright install firefox webkit`. Un hook `pre-push` lance WebKit seul quand le push touche `packages/core/src` (`ARIANE_BROWSERS=webkit` pour le faire à la main, `git push --no-verify` pour passer outre).
+Les tests tournent sur Chromium et Firefox en CI. **WebKit n'est pas en CI** (ses dépendances système ne sont pas dans l'image du runner) : lancez `npm run test:browser` en local avant toute PR qui modifie `packages/core/src`. Il exécute les trois moteurs ; installez-les une fois avec `npx playwright install firefox webkit`. Pour WebKit seul : `ARIANE_BROWSERS=webkit npm run test:browser`.
 
 ```typescript
 import { expect, fixture, html } from '@open-wc/testing';

@@ -15,6 +15,7 @@
 
 - [ ] Le code suit les conventions du projet (ESLint, Prettier)
 - [ ] Les tests passent (`npm run test`)
+- [ ] Si `packages/core/src` est modifié : `npm run test:browser` passe en local sur Chromium, Firefox et WebKit (WebKit n'est pas en CI)
 - [ ] Le CEM a été régénéré si un composant a été modifié (`npm run build:manifest`)
 - [ ] Les changements ont été testés visuellement dans la doc si applicable
 

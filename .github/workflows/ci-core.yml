@@ -93,7 +93,7 @@ jobs:
 
       # Chromium utilise le Chrome préinstallé ; le Firefox préinstallé n'est pas pilotable
       # par Playwright (build patchée), d'où le téléchargement. WebKit tourne en local
-      # seulement (pre-push) : ses dépendances système ne sont pas dans l'image.
+      # seulement (à lancer avant une PR qui touche le core) : ses dépendances système ne sont pas dans l'image.
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         with:

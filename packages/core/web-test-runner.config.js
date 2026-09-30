@@ -26,7 +26,7 @@ export default {
 
     // Chromium et Firefox partout ; WebKit seulement hors CI (ses dépendances système ne
     // sont pas dans l'image du runner : `playwright install --with-deps` coûte plusieurs
-    // minutes d'apt-get). Le hook pre-push le lance seul via ARIANE_BROWSERS=webkit.
+    // minutes d'apt-get). ARIANE_BROWSERS=webkit le lance seul.
     // Prérequis local : `npx playwright install firefox webkit`.
     // En CI, Chromium utilise google-chrome-stable préinstallé sur le runner (évite le
     // téléchargement). --no-sandbox requis sur les runners Linux (pas de user namespace
