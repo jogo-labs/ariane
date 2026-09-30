@@ -141,7 +141,9 @@ export class Popover {
 
     // Safari iOS 17.5–18.2 n'applique pas le light-dismiss natif au tap extérieur (complet dès
     // 18.3) et la détection par fonctionnalité ne distingue pas ce support partiel : l'écouteur
-    // est donc toujours actif pour le type 'auto'.
+    // est donc toujours actif pour le type 'auto'. Un écouteur `pointerdown` est le contournement
+    // indiqué dans le rapport WebKit https://bugs.webkit.org/show_bug.cgi?id=267688 (corrigé dans
+    // Safari 18.3). À retirer quand le plancher Safari iOS passera à 18.3.
     private _listenOutsidePointer(): void {
         if (this._opts.popoverType !== 'auto') return;
         this._host.ownerDocument.addEventListener('pointerdown', this._onOutsidePointerDown, true);
