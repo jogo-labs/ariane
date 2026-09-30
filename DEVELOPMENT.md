@@ -47,7 +47,7 @@ npm install
 | `npm run test`               | Vitest, passe unique                             |
 | `npm run test:watch`         | Vitest interactif                                |
 | `npm run test:coverage`      | Vitest avec rapport de couverture                |
-| `npm run test:browser`       | @web/test-runner + Chromium                      |
+| `npm run test:browser`       | @web/test-runner + Chromium, Firefox, WebKit     |
 | `npm run lint`               | ESLint                                           |
 
 ---
@@ -228,6 +228,8 @@ describe('ArAlert', () => {
 ## Tests browser (web-test-runner + Playwright + axe-core)
 
 Fichiers nommés `*.browser.test.ts` ou `*.a11y.test.ts`.
+
+Les tests tournent sur Chromium et Firefox en CI. **WebKit n'est pas en CI** (ses dépendances système ne sont pas dans l'image du runner) : lancez `npm run test:browser` en local avant toute PR qui modifie `packages/core/src`. Il exécute les trois moteurs ; installez-les une fois avec `npx playwright install firefox webkit`. Pour WebKit seul : `ARIANE_BROWSERS=webkit npm run test:browser`.
 
 ```typescript
 import { expect, fixture, html } from '@open-wc/testing';

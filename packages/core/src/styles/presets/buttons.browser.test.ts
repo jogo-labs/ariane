@@ -4,6 +4,7 @@
  * bien les tokens `--ar-button-*` de `themes/ariane.css` (issue #200).
  */
 import { expect } from '@open-wc/testing';
+import { roundColor } from '../../browser-test-utils.js';
 
 async function loadStylesheet(relativePath: string): Promise<HTMLLinkElement> {
     const link = document.createElement('link');
@@ -55,17 +56,21 @@ describe('presets/buttons.css', () => {
 
     it('ar-btn-primary consomme --ar-button-primary-bg', () => {
         const btn = makeButton('ar-btn ar-btn-primary');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.8016 0.1705 73.27)');
+        expect(roundColor(getComputedStyle(btn).backgroundColor)).to.equal(
+            'oklch(0.8016 0.1705 73.27)',
+        );
     });
 
     it('ar-btn-secondary consomme --ar-button-secondary-bg', () => {
         const btn = makeButton('ar-btn ar-btn-secondary');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(1 0 0)');
+        expect(roundColor(getComputedStyle(btn).backgroundColor)).to.equal('oklch(1 0 0)');
     });
 
     it('ar-btn-danger consomme --ar-button-danger-bg', () => {
         const btn = makeButton('ar-btn ar-btn-danger');
-        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.5851 0.177 25.15)');
+        expect(roundColor(getComputedStyle(btn).backgroundColor)).to.equal(
+            'oklch(0.5851 0.177 25.15)',
+        );
     });
 
     it('ar-btn-tertiary consomme --ar-button-tertiary-bg', () => {
@@ -76,7 +81,9 @@ describe('presets/buttons.css', () => {
     it('un bouton disabled applique --ar-button-disabled-bg quelle que soit la variante', () => {
         const btn = makeButton('ar-btn ar-btn-primary');
         btn.disabled = true;
-        expect(getComputedStyle(btn).backgroundColor).to.equal('oklch(0.9286 0.002 90)');
+        expect(roundColor(getComputedStyle(btn).backgroundColor)).to.equal(
+            'oklch(0.9286 0.002 90)',
+        );
     });
 
     // :hover ne peut pas être forcé de façon fiable en JS pur (pas de vrai pointeur) —
