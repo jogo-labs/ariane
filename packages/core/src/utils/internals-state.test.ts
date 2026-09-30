@@ -23,16 +23,70 @@ describe('toggleState', () => {
         expect(() => toggleState(undefined, 'open', true)).not.toThrow();
     });
 
-    it("ne lève pas d'erreur si states.add lève (navigateur sans :state(), nom sans tirets)", () => {
-        // Chrome/Edge 90 à 124 : CustomStateSet n'accepte que les identifiants en `--nom`.
-        const add = vi.fn(() => {
-            throw new DOMException("The state must start with '--'", 'SyntaxError');
-        });
-        const internals = { states: { add, delete: add } } as unknown as ElementInternals;
+    describe('navigateur sans :state() (Chrome/Edge 90 à 124 : seuls les noms en `--` sont acceptés)', () => {
+        /** CustomStateSet de ces versions : `add` lève une SyntaxError pour un nom sans `--`. */
+        function dashedOnlyInternals(): { internals: ElementInternals; states: Set<string> } {
+            const states = new Set<string>();
+            const add = states.add.bind(states);
+            states.add = (name: string) => {
+                if (!name.startsWith('--')) {
+                    throw new DOMException("The state must start with '--'", 'SyntaxError');
+                }
+                return add(name);
+            };
+            return { internals: { states } as unknown as ElementInternals, states };
+        }
 
-        expect(() => toggleState(internals, 'open', true)).not.toThrow();
-        expect(() => toggleState(internals, 'open', false)).not.toThrow();
-        expect(add).toHaveBeenCalledTimes(2);
+        it('expose le state avec le préfixe -- quand le nom sans tirets est refusé', () => {
+            const { internals, states } = dashedOnlyInternals();
+
+            toggleState(internals, 'open', true);
+
+            expect(states.has('--open')).toBe(true);
+            expect(states.has('open')).toBe(false);
+        });
+
+        it('retire la variante préfixée quand active passe à false', () => {
+            const { internals, states } = dashedOnlyInternals();
+            toggleState(internals, 'open', true);
+
+            toggleState(internals, 'open', false);
+
+            expect(states.has('--open')).toBe(false);
+        });
+
+        it('retire la variante préfixée même si delete lève pour le nom sans tirets', () => {
+            const states = new Set<string>(['--open']);
+            const realDelete = states.delete.bind(states);
+            states.delete = (name: string) => {
+                if (!name.startsWith('--')) throw new DOMException('refusé', 'SyntaxError');
+                return realDelete(name);
+            };
+
+            toggleState({ states } as unknown as ElementInternals, 'open', false);
+
+            expect(states.has('--open')).toBe(false);
+        });
+
+        it("ne lève pas d'erreur si le nom préfixé est refusé lui aussi", () => {
+            const refuse = vi.fn(() => {
+                throw new DOMException('refusé', 'SyntaxError');
+            });
+            const internals = {
+                states: { add: refuse, delete: refuse },
+            } as unknown as ElementInternals;
+
+            expect(() => toggleState(internals, 'open', true)).not.toThrow();
+            expect(() => toggleState(internals, 'open', false)).not.toThrow();
+        });
+    });
+
+    it("n'ajoute que le nom sans tirets quand il est accepté (Chrome/Edge 125+, Firefox, Safari)", () => {
+        const internals = fakeInternals();
+
+        toggleState(internals, 'open', true);
+
+        expect([...internals.states]).toEqual(['open']);
     });
 
     it("ne lève pas d'erreur si internals.states est undefined (happy-dom)", () => {

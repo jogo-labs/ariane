@@ -5,21 +5,42 @@
  * `attachInternals()` du tout (vérifié : `typeof el.attachInternals === 'undefined'`),
  * contrairement à un vrai navigateur — cf. les tests `*.browser.test.ts` pour la couverture
  * réelle du mécanisme.
+ *
+ * Chrome/Edge 90 à 124 n'acceptent que les noms préfixés par `--` (sélecteur `:--nom`, retiré
+ * en 125 au profit de `:state(nom)`) et lèvent une erreur sinon. Dans ce cas le state est exposé
+ * sous `--nom` : le thème fourni ne le gère pas, c'est au consommateur de le cibler s'il veut
+ * supporter ces versions. La suppression retire les deux formes.
  */
 export function toggleState(
     internals: ElementInternals | undefined,
     name: string,
     active: boolean,
 ): void {
-    try {
-        if (active) {
-            internals?.states?.add(name);
-        } else {
-            internals?.states?.delete(name);
+    const states = internals?.states;
+    if (!states) return;
+
+    if (active) {
+        try {
+            states.add(name);
+            return;
+        } catch {
+            // Nom sans `--` refusé (Chrome/Edge 90 à 124) : repli sur la forme préfixée.
         }
-    } catch {
-        // Chrome/Edge 90 à 124 : CustomStateSet lève une erreur pour un nom sans `--` (le
-        // `:state()` sans tirets n'arrive qu'en 125). Le state n'est qu'un point d'accroche de
-        // style, cumulatif à l'attribut reflété : ne pas planter le composant pour autant.
+        try {
+            states.add(`--${name}`);
+        } catch {
+            // Refusé aussi : le state n'est qu'un point d'accroche de style, on ne plante pas.
+        }
+        return;
+    }
+
+    // Les deux formes peuvent exister selon le navigateur, et `delete` n'a pas forcément la même
+    // validation que `add` : on tente chacune indépendamment.
+    for (const candidate of [name, `--${name}`]) {
+        try {
+            states.delete(candidate);
+        } catch {
+            // Ignoré, même raison que ci-dessus.
+        }
     }
 }
