@@ -23,6 +23,18 @@ describe('toggleState', () => {
         expect(() => toggleState(undefined, 'open', true)).not.toThrow();
     });
 
+    it("ne lève pas d'erreur si states.add lève (navigateur sans :state(), nom sans tirets)", () => {
+        // Chrome/Edge 90 à 124 : CustomStateSet n'accepte que les identifiants en `--nom`.
+        const add = vi.fn(() => {
+            throw new DOMException("The state must start with '--'", 'SyntaxError');
+        });
+        const internals = { states: { add, delete: add } } as unknown as ElementInternals;
+
+        expect(() => toggleState(internals, 'open', true)).not.toThrow();
+        expect(() => toggleState(internals, 'open', false)).not.toThrow();
+        expect(add).toHaveBeenCalledTimes(2);
+    });
+
     it("ne lève pas d'erreur si internals.states est undefined (happy-dom)", () => {
         const internals = { states: undefined } as unknown as ElementInternals;
         expect(() => toggleState(internals, 'open', true)).not.toThrow();

@@ -11,9 +11,15 @@ export function toggleState(
     name: string,
     active: boolean,
 ): void {
-    if (active) {
-        internals?.states?.add(name);
-    } else {
-        internals?.states?.delete(name);
+    try {
+        if (active) {
+            internals?.states?.add(name);
+        } else {
+            internals?.states?.delete(name);
+        }
+    } catch {
+        // Chrome/Edge 90 à 124 : CustomStateSet lève une erreur pour un nom sans `--` (le
+        // `:state()` sans tirets n'arrive qu'en 125). Le state n'est qu'un point d'accroche de
+        // style, cumulatif à l'attribut reflété : ne pas planter le composant pour autant.
     }
 }
