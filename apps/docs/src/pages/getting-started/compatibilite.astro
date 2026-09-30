@@ -64,9 +64,10 @@ const tocEntries = [
                 test sur chaque version. En dessous, le comportement n'est pas garanti.
             </p>
             <p>
-                Sous Chrome et Edge 125, les états personnalisés (<code>:state()</code>) ne sont pas
-                disponibles : les styles qui en dépendent, comme celui d'un onglet désactivé ou de
-                l'icône d'un panneau ouvert, ne s'appliquent pas.
+                Sous Chrome et Edge 125, <code>:state()</code> n'existe pas : les états personnalisés
+                sont exposés avec le préfixe <code>--</code> (par exemple <code>:--open</code>). Les styles du
+                thème fourni n'en tiennent pas compte, mais la plupart des états ont aussi un attribut
+                équivalent (<code>[open]</code>, <code>[disabled]</code>…) utilisable dans vos propres styles.
             </p>
             <p>
                 Sur Safari iOS et iPadOS avant 18.3, la fermeture d'un panneau par un tap à
