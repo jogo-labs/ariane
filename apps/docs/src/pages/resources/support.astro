@@ -13,6 +13,8 @@ const tocEntries = [
     { id: 'utiliser',              label: 'Utiliser Ariane',                 level: 1 as const },
     { id: 'cdn-ou-npm',            label: 'CDN ou npm ?',                    level: 2 as const },
     { id: 'frameworks',            label: 'Frameworks',                      level: 2 as const },
+    { id: 'navigateurs',           label: 'Navigateurs',                     level: 2 as const },
+    { id: 'ssr',                   label: 'Rendu serveur (SSR)',             level: 2 as const },
     { id: 'composant-pas-pret',    label: 'Composant pas prêt',              level: 2 as const },
     { id: 'personnaliser',         label: 'Personnaliser',                   level: 1 as const },
     { id: 'mode-sombre',           label: 'Mode sombre',                     level: 2 as const },
@@ -53,6 +55,12 @@ const tocEntries = [
 
             <NarrativeSubheading id="frameworks">Avec quels frameworks fonctionne Ariane ?</NarrativeSubheading>
             <p>Les composants sont des Custom Elements standards. La page <a href="/getting-started/frameworks">Frameworks</a> détaille l'intégration avec React, Vue, Angular et Svelte.</p>
+
+            <NarrativeSubheading id="navigateurs">Quels navigateurs sont pris en charge ?</NarrativeSubheading>
+            <p>Chrome et Edge 125, Firefox 126, Safari 17.5 (macOS, iOS et iPadOS), sans polyfills. Voir <a href="/getting-started/compatibilite">Compatibilité</a>.</p>
+
+            <NarrativeSubheading id="ssr">Puis-je utiliser Ariane avec du rendu serveur (SSR) ?</NarrativeSubheading>
+            <p>Pas de support officiel pour l'instant : c'est une fonctionnalité à venir. Le support actuel est partiel et n'est pas testé. Voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>.</p>
 
             <NarrativeSubheading id="composant-pas-pret">Pourquoi mon composant n'est-il pas prêt au chargement de la page ?</NarrativeSubheading>
             <p>Les Custom Elements s'enregistrent de façon asynchrone. Avant d'agir sur un composant, attendez sa définition : <code>customElements.whenDefined('ar-alert')</code> pour un seul, ou <code>whenAllDefined()</code>, importé de <code>@ariane-ui/core/utils</code>, pour tous ceux de la page. Voir <a href="/getting-started/utilisation#chargement">Attendre le chargement</a>.</p>
