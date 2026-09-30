@@ -1,6 +1,9 @@
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 
+const ALL_BROWSERS = process.env.CI ? ['chromium', 'firefox'] : ['chromium', 'firefox', 'webkit'];
+const BROWSERS = process.env.ARIANE_BROWSERS?.split(',') ?? ALL_BROWSERS;
+
 export default {
     // Fichiers de test browser — séparés des tests Vitest (.test.ts)
     // *.browser.test.ts : tests d'intégration (shadow DOM, MutationObserver…)
@@ -15,18 +18,33 @@ export default {
     // reproduction locale, même répétée).
     browserStartTimeout: 60000,
 
-    // Chromium uniquement en CI ; WebKit peut être ajouté plus tard
-    // En CI : utilise google-chrome-stable préinstallé sur le runner (évite le téléchargement).
-    // --no-sandbox requis sur les runners Linux (pas de user namespace dans les conteneurs).
-    browsers: [
+    // Firefox : un fichier de test à la fois. En parallèle, les tests à attente fixe sur une
+    // transition (ar-collapse : transitionend) échouent de façon aléatoire (1 run sur 5 seul,
+    // 2 sur 3 avec les autres moteurs) ; en série, 8 runs sur 8 sont verts. Hypothèse :
+    // Firefox bride les transitions des pages en arrière-plan.
+    ...(BROWSERS.includes('firefox') && { concurrency: 1 }),
+
+    // Chromium et Firefox partout ; WebKit seulement hors CI (ses dépendances système ne
+    // sont pas dans l'image du runner : `playwright install --with-deps` coûte plusieurs
+    // minutes d'apt-get). Le hook pre-push le lance seul via ARIANE_BROWSERS=webkit.
+    // Prérequis local : `npx playwright install firefox webkit`.
+    // En CI, Chromium utilise google-chrome-stable préinstallé sur le runner (évite le
+    // téléchargement). --no-sandbox requis sur les runners Linux (pas de user namespace
+    // dans les conteneurs).
+    browsers: BROWSERS.map((product) =>
         playwrightLauncher({
-            product: 'chromium',
-            launchOptions: {
-                executablePath: process.env.CI ? '/usr/bin/google-chrome-stable' : undefined,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            },
+            product,
+            launchOptions:
+                product === 'chromium'
+                    ? {
+                          executablePath: process.env.CI
+                              ? '/usr/bin/google-chrome-stable'
+                              : undefined,
+                          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                      }
+                    : {},
         }),
-    ],
+    ),
 
     // Plugin esbuild pour transpiler TypeScript à la volée.
     // tsconfig.wtr.json est un fichier plat (sans "extends") qui transmet

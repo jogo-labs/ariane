@@ -1,0 +1,14 @@
+# Tests navigateur WebKit (le seul moteur absent de la CI) si le push touche le code du core.
+git diff --quiet origin/dev...HEAD -- packages/core/src 2>/dev/null && exit 0
+
+out=$(ARIANE_BROWSERS=webkit npm run test:browser --workspace=packages/core 2>&1)
+status=$?
+if [ $status -ne 0 ]; then
+    if echo "$out" | grep -q "Executable doesn't exist"; then
+        echo "pre-push : WebKit n'est pas installé, tests ignorés. Installez-le : npx playwright install webkit"
+        exit 0
+    fi
+    echo "$out"
+    echo "pre-push : tests WebKit en échec (git push --no-verify pour passer outre)."
+    exit $status
+fi

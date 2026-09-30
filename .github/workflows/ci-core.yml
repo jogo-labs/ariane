@@ -91,5 +91,17 @@ jobs:
       - name: Build core
         run: npm run build --workspace=packages/core
 
+      # Chromium utilise le Chrome préinstallé ; le Firefox préinstallé n'est pas pilotable
+      # par Playwright (build patchée), d'où le téléchargement. WebKit tourne en local
+      # seulement (pre-push) : ses dépendances système ne sont pas dans l'image.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-firefox-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Firefox (Playwright)
+        run: npx playwright install firefox
+
       - name: Browser tests
         run: npm run test:browser --workspace=packages/core

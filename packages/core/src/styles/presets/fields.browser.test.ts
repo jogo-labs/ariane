@@ -5,6 +5,7 @@
  * (issue #209).
  */
 import { expect } from '@open-wc/testing';
+import { roundColor } from '../../browser-test-utils.js';
 
 async function loadStylesheet(relativePath: string): Promise<HTMLLinkElement> {
     const link = document.createElement('link');
@@ -58,14 +59,14 @@ describe('presets/fields.css', () => {
 
     it('ar-input consomme --ar-color-border', () => {
         const input = makeInput('input');
-        expect(getComputedStyle(input).borderColor).to.equal('oklch(0.9286 0.002 90)');
+        expect(roundColor(getComputedStyle(input).borderColor)).to.equal('oklch(0.9286 0.002 90)');
     });
 
     it('ar-input consomme --ar-color-bg et --ar-color-text', () => {
         const input = makeInput('input');
         const style = getComputedStyle(input);
-        expect(style.backgroundColor).to.equal('oklch(1 0 0)');
-        expect(style.color).to.equal('oklch(0.2982 0.002 90)');
+        expect(roundColor(style.backgroundColor)).to.equal('oklch(1 0 0)');
+        expect(roundColor(style.color)).to.equal('oklch(0.2982 0.002 90)');
     });
 
     it('textarea.ar-input applique resize:vertical', () => {
@@ -76,24 +77,26 @@ describe('presets/fields.css', () => {
     it('ar-input avec aria-invalid consomme --ar-color-danger-text', () => {
         const input = makeInput('input');
         input.setAttribute('aria-invalid', 'true');
-        expect(getComputedStyle(input).borderColor).to.equal('oklch(0.4827 0.158 25.74)');
+        expect(roundColor(getComputedStyle(input).borderColor)).to.equal(
+            'oklch(0.4827 0.158 25.74)',
+        );
     });
 
     it('ar-label consomme --ar-color-text par défaut', () => {
         const label = makeLabel();
-        expect(getComputedStyle(label).color).to.equal('oklch(0.2982 0.002 90)');
+        expect(roundColor(getComputedStyle(label).color)).to.equal('oklch(0.2982 0.002 90)');
     });
 
     it("ar-label[data-ar-char-state='warning'] consomme --ar-color-warning-text", () => {
         const label = makeLabel();
         label.dataset.arCharState = 'warning';
-        expect(getComputedStyle(label).color).to.equal('oklch(0.4687 0.099 70.54)');
+        expect(roundColor(getComputedStyle(label).color)).to.equal('oklch(0.4687 0.099 70.54)');
     });
 
     it("ar-label[data-ar-char-state='error'] consomme --ar-color-danger-text", () => {
         const label = makeLabel();
         label.dataset.arCharState = 'error';
-        expect(getComputedStyle(label).color).to.equal('oklch(0.4827 0.158 25.74)');
+        expect(roundColor(getComputedStyle(label).color)).to.equal('oklch(0.4827 0.158 25.74)');
     });
 
     it('un input disabled reste lisible (cursor not-allowed, opacité réduite)', () => {

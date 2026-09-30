@@ -5,6 +5,7 @@
  * (issue #203).
  */
 import { expect } from '@open-wc/testing';
+import { roundColor } from '../../browser-test-utils.js';
 
 const WHITE_OKLCH = 'oklch(1 0 0)';
 const VAULT_OKLCH = 'oklch(0.2354 0.0334 273.44)';
@@ -24,7 +25,7 @@ function probeBackground(parent: HTMLElement): string {
     const probe = document.createElement('div');
     probe.style.background = 'var(--ar-color-bg)';
     parent.appendChild(probe);
-    return getComputedStyle(probe).backgroundColor;
+    return roundColor(getComputedStyle(probe).backgroundColor);
 }
 
 describe('ariane.css — scoping de data-theme par bloc', () => {
