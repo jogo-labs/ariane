@@ -40,6 +40,8 @@ function pluralize(count: number, label: string): string {
  *
  * @cssState warning - Le nombre de caractères restants approche la limite.
  * @cssState error   - La limite de caractères est dépassée.
+ *
+ * @tagname ar-charcounter
  */
 export class ArCharcounter extends ArianeElement {
     static override styles = [styles];

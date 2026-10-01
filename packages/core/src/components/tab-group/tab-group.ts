@@ -26,6 +26,8 @@ import styles from './tab-group.styles.js';
  * @cssprop --ar-tab-group-border-color - Couleur du trait séparateur sous la tablist.
  *
  * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
+ *
+ * @tagname ar-tab-group
  */
 export class ArTabGroup extends ArianeElement {
     static override styles = [styles];

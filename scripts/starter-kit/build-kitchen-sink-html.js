@@ -61,7 +61,7 @@ export function buildKitchenSinkHtml(components, coreVersion) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kitchen Sink — Ariane Starter Kit</title>
-    <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
+    <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
     <link rel="stylesheet" href="./ariane-starter.css" />
     <link rel="stylesheet" href="./presets/buttons.css" />
     <link rel="stylesheet" href="./presets/fields.css" />

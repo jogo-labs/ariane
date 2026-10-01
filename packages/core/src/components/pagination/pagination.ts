@@ -77,6 +77,8 @@ export interface ArPaginationPageChangeDetail {
  * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
  *   `current` a réellement changé (réassignation externe en réponse à `ar-pagination-page-change`,
  *   ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
+ *
+ * @tagname ar-pagination
  */
 export class ArPagination extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];

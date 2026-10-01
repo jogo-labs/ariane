@@ -85,6 +85,8 @@ if (typeof document !== 'undefined') {
  * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
  * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
  * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
+ *
+ * @tagname ar-dialog
  */
 export class ArDialog extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, styles];

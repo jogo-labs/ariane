@@ -1,8 +1,7 @@
 import { ArTooltip } from './tooltip.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-tooltip')) {
-    customElements.define('ar-tooltip', ArTooltip);
-}
+defineComponent('ar-tooltip', ArTooltip);
 
 declare global {
     interface HTMLElementTagNameMap {

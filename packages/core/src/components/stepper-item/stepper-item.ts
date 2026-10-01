@@ -49,6 +49,8 @@ function withIndicatorStatePart(state: IndicatorState): string {
  * @cssprop --ar-stepper-item-current-header-color - Couleur du texte de l'étape courante rendue comme élément non cliquable (sans lien).
  * @cssprop --ar-stepper-item-link-hover-label-color - Couleur du label de l'étape au survol/focus (cascade vers --ar-color-text).
  * @cssprop --ar-stepper-item-link-focus-outline-color - Couleur de l'anneau de focus du lien d'étape (cascade vers --ar-color-interactive).
+ *
+ * @tagname ar-stepper-item
  */
 export class ArStepperItem extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, styles];

@@ -36,19 +36,19 @@ npm install
 
 ### `packages/core`
 
-| Commande                     | Description                                      |
-| ---------------------------- | ------------------------------------------------ |
-| `npm run build:manifest`     | Génère `custom-elements.json`                    |
-| `npm run build:bundles`      | esbuild → `dist/` + `cdn/` dev + `cdn/*.prod.js` |
-| `npm run build:bundles:dev`  | npm + CDN dev uniquement (plus rapide en local)  |
-| `npm run build:bundles:prod` | npm + CDN prod uniquement                        |
-| `npm run build:css`          | Thèmes CSS                                       |
-| `npm run build:types`        | Déclarations TypeScript                          |
-| `npm run test`               | Vitest, passe unique                             |
-| `npm run test:watch`         | Vitest interactif                                |
-| `npm run test:coverage`      | Vitest avec rapport de couverture                |
-| `npm run test:browser`       | @web/test-runner + Chromium, Firefox, WebKit     |
-| `npm run lint`               | ESLint                                           |
+| Commande                     | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| `npm run build:manifest`     | Génère `custom-elements.json`                                |
+| `npm run build:bundles`      | esbuild → `dist/` + `cdn/*.js` (prod) + `cdn/*.dev.js`       |
+| `npm run build:bundles:dev`  | npm + CDN dev (`*.dev.js`) uniquement (plus rapide en local) |
+| `npm run build:bundles:prod` | npm + CDN prod uniquement                                    |
+| `npm run build:css`          | Thèmes CSS                                                   |
+| `npm run build:types`        | Déclarations TypeScript                                      |
+| `npm run test`               | Vitest, passe unique                                         |
+| `npm run test:watch`         | Vitest interactif                                            |
+| `npm run test:coverage`      | Vitest avec rapport de couverture                            |
+| `npm run test:browser`       | @web/test-runner + Chromium, Firefox, WebKit                 |
+| `npm run lint`               | ESLint                                                       |
 
 ---
 
@@ -70,7 +70,8 @@ apps/docs/      # Site de documentation Astro
 
 Chaque composant dans `components/<name>/` :
 
-- `<name>.ts` — classe LitElement, `@customElement('ar-<name>')`
+- `<name>.ts` — classe `ArianeElement` (qui étend `LitElement` ; `ArianeFormElement` pour un composant de formulaire), sans enregistrement ; le JSDoc de la classe porte `@tagname ar-<name>` (le manifeste en tire le `tagName`, donc la doc)
+- `index.ts` — enregistrement : `defineComponent('ar-<name>', Ar<Name>)` (`src/internal/define-component.ts`) et la clé de `HTMLElementTagNameMap`. Le tag est celui par défaut ; `defineComponent` le remplace par `window.ARIANE_CONFIG.prefix` s'il est défini. Un test (`registration-consistency.test.ts`) vérifie que ce tag, `@tagname`, `HTMLElementTagNameMap` et la clé de `COMPONENT_DEFS` dans l'autoloader concordent
 - `<name>.styles.ts` — styles Lit `css` tagged template
 - `<name>.test.ts` — tests Vitest
 
@@ -250,10 +251,10 @@ describe('ArAlert a11y', () => {
 | Répertoire                  | Usage                                                           |
 | --------------------------- | --------------------------------------------------------------- |
 | `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking |
-| `cdn/index.js`              | Bundle CDN dev — non minifié, avertissements actifs             |
-| `cdn/autoloader.js`         | Autoloader CDN dev                                              |
-| `cdn/index.prod.js`         | Bundle CDN prod — minifié, avertissements supprimés             |
-| `cdn/autoloader.prod.js`    | Autoloader CDN prod                                             |
+| `cdn/index.js`              | Bundle CDN prod — minifié, avertissements supprimés             |
+| `cdn/autoloader.js`         | Autoloader CDN prod                                             |
+| `cdn/index.dev.js`          | Bundle CDN dev — non minifié, avertissements actifs             |
+| `cdn/autoloader.dev.js`     | Autoloader CDN dev                                              |
 | `dist/custom-elements.json` | Manifest CEM — consommé par la doc                              |
 | `dist/styles/themes/`       | Fichiers CSS de thème                                           |
 
@@ -261,8 +262,8 @@ describe('ArAlert a11y', () => {
 
 Les avertissements dans les composants sont conditionnels à `__DEV__` :
 
-- **CDN dev** : `__DEV__ = true` (injecté par esbuild) — avertissements visibles
-- **CDN prod** : `__DEV__ = false` — le code mort est supprimé par esbuild, aucun impact à l'exécution
+- **CDN prod** (`*.js`, le nom court) : `__DEV__ = false` — le code mort est supprimé par esbuild, aucun impact à l'exécution
+- **CDN dev** (`*.dev.js`) : `__DEV__ = true` (injecté par esbuild) — avertissements visibles
 - **Bundle npm** : `__DEV__` est remplacé par `process.env.NODE_ENV !== "production"` via un banner — Vite et Webpack suppriment automatiquement le code mort lors du build de production du projet consommateur
 
 ---

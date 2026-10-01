@@ -53,6 +53,8 @@ export type ArDropdownPlacement =
  * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
  * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
  * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
+ *
+ * @tagname ar-dropdown
  */
 export class ArDropdown extends ArianeElement {
     static override styles = [panelStyles, styles];

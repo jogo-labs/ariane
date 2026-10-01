@@ -79,6 +79,8 @@ export interface ArStepperStepChangeDetail {
  * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
  *   `currentPath` a réellement changé (réassignation externe en réponse à
  *   `ar-stepper-step-change`, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
+ *
+ * @tagname ar-stepper
  */
 export class ArStepper extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, utilitiesStyles, panelStyles, styles];

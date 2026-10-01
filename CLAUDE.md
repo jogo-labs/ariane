@@ -40,7 +40,7 @@ npm run changelog          # Section de la prochaine release dans CHANGELOG.md (
 - commit et push depuis `dev` de manière exceptionnelle > demander confirmation
 - `main` ← PR depuis `dev` uniquement, pour les releases
 - Release : `npm run changelog` sur la branche de release (après le bump, relire la section), puis tag `vX.Y.Z` → CI publie sur npm + crée la GitHub Release automatiquement
-- Tag npm : `-alpha.*` → `alpha`, `-beta.*` → `beta`, stable → `latest`
+- Tag npm : `-alpha.*` → `alpha`, `-beta.*` → `beta`, stable → `latest` ; tant qu'aucune version stable n'existe (pré-v1), `release.yml` publie tout sous `latest`
 - Si un composant a changé depuis la dernière release : régénérer la démo et le thème starter-kit (`npm run generate:starter-demo -- --repo <checkout ariane-starter-kit>`) et pousser dans ce repo après relecture du diff. Checkout frère attendu à côté de `ariane` en local.
 
 ## Notes

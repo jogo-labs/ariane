@@ -124,8 +124,10 @@ describe('create-component.js', () => {
                 join(tmpDir, 'src/components/tooltip/index.ts'),
                 'utf-8',
             );
-            expect(indexContent).toContain("customElements.define('ar-tooltip', ArTooltip)");
+            expect(indexContent).toContain("defineComponent('ar-tooltip', ArTooltip)");
+            expect(indexContent).not.toContain('customElements.define');
             expect(indexContent).toContain("'ar-tooltip': ArTooltip");
+            expect(componentContent).toContain('@tagname ar-tooltip');
         });
 
         it('génère le bon import dans le fichier de test', () => {
@@ -156,7 +158,7 @@ describe('create-component.js', () => {
                 join(tmpDir, 'src/components/tooltip/index.ts'),
                 'utf-8',
             );
-            expect(indexContent).toContain("customElements.define('ar-tooltip'");
+            expect(indexContent).toContain("defineComponent('ar-tooltip'");
             expect(componentContent).not.toContain('ar-ar-tooltip');
             expect(indexContent).not.toContain('ar-ar-tooltip');
         });
@@ -177,9 +179,7 @@ describe('create-component.js', () => {
                 join(tmpDir, 'src/components/my-component/index.ts'),
                 'utf-8',
             );
-            expect(indexContent).toContain(
-                "customElements.define('ar-my-component', ArMyComponent)",
-            );
+            expect(indexContent).toContain("defineComponent('ar-my-component', ArMyComponent)");
         });
 
         it('lit le prefix depuis config.componentPrefix dans package.json', () => {
@@ -199,7 +199,8 @@ describe('create-component.js', () => {
                 join(tmpDir, 'src/components/tooltip/index.ts'),
                 'utf-8',
             );
-            expect(indexContent).toContain("customElements.define('ft-tooltip'");
+            expect(indexContent).toContain("defineComponent('ft-tooltip'");
+            expect(componentContent).toContain('@tagname ft-tooltip');
         });
     });
 

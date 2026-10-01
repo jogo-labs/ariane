@@ -36,6 +36,18 @@ const ASSET_MAPPINGS = [
 ];
 
 /**
+ * En développement, le serveur sert la version de DÉVELOPPEMENT du bundle CDN sous l'URL de
+ * production : `npm run dev` ne construit que `*.dev.js`, donc `/cdn/index.js` (la production)
+ * n'existe pas, et quand il existe (après un build complet) c'est la version sans avertissements
+ * qu'on ne veut pas ici. L'URL reste `/cdn/index.js`, ce qui conserve l'identité du module
+ * partagée entre Layout.astro et public/js/playground.js (qui importe announceA11y depuis cette
+ * URL). Au build, `generateBundle` copie tout `cdn/` : `/cdn/index.js` est alors la production.
+ */
+const DEV_SERVER_OVERRIDES = {
+    '/cdn/index.js': resolve(CORE_ROOT, 'cdn/index.dev.js'),
+};
+
+/**
  * Fichiers individuels à servir à une URL fixe.
  * Utilisé pour exposer custom-elements.json à api-viewer.
  */
@@ -93,6 +105,14 @@ export default defineConfig({
 
                             res.setHeader('Content-Type', getContentType(file));
                             createReadStream(file).pipe(res);
+                            return;
+                        }
+
+                        // Version de développement du bundle CDN sous l'URL de production
+                        const override = DEV_SERVER_OVERRIDES[url];
+                        if (override && existsSync(override)) {
+                            res.setHeader('Content-Type', getContentType(override));
+                            createReadStream(override).pipe(res);
                             return;
                         }
 

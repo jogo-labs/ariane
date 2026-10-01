@@ -1,8 +1,7 @@
 import { ArDropdown } from './dropdown.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-dropdown')) {
-    customElements.define('ar-dropdown', ArDropdown);
-}
+defineComponent('ar-dropdown', ArDropdown);
 
 declare global {
     interface HTMLElementTagNameMap {

@@ -56,11 +56,14 @@ import '@ariane-ui/core/dist/components/alert/alert.js';
 // Thème CSS
 import '@ariane-ui/core/themes/ariane.css';
 
-// CDN bundle (Lit inclus)
+// CDN bundle (Lit inclus), version de production
 import '@ariane-ui/core/cdn';
 
-// CDN autoloader (charge les composants à la demande)
+// CDN autoloader (charge les composants à la demande), version de production
 import '@ariane-ui/core/cdn/autoloader';
+
+// Versions de développement (avertissements dans la console) : '@ariane-ui/core/cdn.dev'
+// et '@ariane-ui/core/cdn/autoloader.dev'
 
 // Manifest CEM (outillage et intégrations)
 import manifest from '@ariane-ui/core/custom-elements.json';

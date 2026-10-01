@@ -10,16 +10,17 @@
  *                   Les bundlers consommateurs (Vite, webpack) remplacent process.env.NODE_ENV
  *                   → dead-code elimination en prod, warnings actifs en dev.
  *
- *  cdn/           → bundle CDN dev : tout inclus (lit bundlé), non minifié, __DEV__ = true.
- *                   Destiné au développement local via <script type="module">.
+ *  cdn/*.js       → bundle CDN prod : tout inclus (lit bundlé), minifié, __DEV__ = false
+ *                   (dead-code éliminé). Le nom court est la production : oublier de préciser
+ *                   la version donne le build sûr (#300).
  *
- *  cdn/*.prod.js  → bundle CDN prod : tout inclus, minifié, __DEV__ = false (dead-code
- *                   éliminé). Destiné à la production via un CDN.
+ *  cdn/*.dev.js   → bundle CDN dev : tout inclus, non minifié, __DEV__ = true. Destiné au
+ *                   développement local via <script type="module">.
  *
  * CLI flags :
- *   --dev   → npm + CDN dev seulement
- *   --prod  → npm + CDN prod seulement
- *   --watch → npm + CDN dev en watch (prod inutile en watch)
+ *   --dev   → npm + CDN dev (*.dev.js) seulement
+ *   --prod  → npm + CDN prod (*.js) seulement
+ *   --watch → npm + CDN dev (*.dev.js) en watch (prod inutile en watch)
  *   (aucun) → npm + CDN dev + CDN prod (mode CI)
  */
 
@@ -224,6 +225,7 @@ async function buildCdnDev() {
         ...commonOptions,
         entryPoints: cdnEntryPoints,
         outdir: join(ROOT, 'cdn'),
+        outExtension: { '.js': '.dev.js' },
         minify: false,
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
@@ -247,7 +249,6 @@ async function buildCdnProd() {
         ...commonOptions,
         entryPoints: cdnEntryPoints,
         outdir: join(ROOT, 'cdn'),
-        outExtension: { '.js': '.prod.js' },
         minify: true,
         splitting: true,
         chunkNames: 'chunks/[name]-[hash]',
@@ -260,7 +261,7 @@ async function buildCdnProd() {
 
     if (result.metafile) {
         const outputs = result.metafile.outputs;
-        const key = Object.keys(outputs).find((k) => k.endsWith('index.prod.js'));
+        const key = Object.keys(outputs).find((k) => k.endsWith('cdn/index.js'));
         const bytes = key ? outputs[key].bytes : 0;
         const kb = (bytes / 1024).toFixed(1);
         console.log(`\n✓ CDN prod bundle: ${kb} kB (minified)\n`);

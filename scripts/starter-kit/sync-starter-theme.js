@@ -1,5 +1,5 @@
 // scripts/starter-kit/sync-starter-theme.js
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { deriveNeutralPalette } from './derive-neutral-palette.js';
 import { deriveNeutralGlobalTokens } from './derive-neutral-global-tokens.js';
