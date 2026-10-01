@@ -29,18 +29,18 @@ Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-pagination`,
 Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil requis.
 
 ```html
-<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></script>
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
 
-> En développement local, remplacez `autoloader.prod.js` par `autoloader.js` pour obtenir des avertissements détaillés dans la console.
+> Chaque script CDN existe en deux versions : le nom sans suffixe (`autoloader.js`, `index.js`) est la **production** (minifiée, sans avertissements) ; en développement local, utilisez la version `.dev.js` (`autoloader.dev.js`, `index.dev.js`) pour obtenir des avertissements détaillés dans la console.
 
 ### Via CDN — Bundle complet
 
 Charge tous les composants en une seule requête.
 
 ```html
-<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></script>
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
 

@@ -16,7 +16,7 @@ import { expect } from '@open-wc/testing';
 
 // Le bundle CDN enregistre tous les composants ET démarre l'autoloader.
 // On l'importe une seule fois — l'autoloader attache son MutationObserver à document.body.
-await import('../cdn/index.js');
+await import('../cdn/index.dev.js');
 
 const tick = () => new Promise((r) => setTimeout(r, 50));
 
