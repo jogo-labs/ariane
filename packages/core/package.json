@@ -18,9 +18,9 @@
       "default": "./dist/utils/index.js"
     },
     "./cdn": "./cdn/index.js",
-    "./cdn.prod": "./cdn/index.prod.js",
+    "./cdn.dev": "./cdn/index.dev.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
-    "./cdn/autoloader.prod": "./cdn/autoloader.prod.js",
+    "./cdn/autoloader.dev": "./cdn/autoloader.dev.js",
     "./themes/*.css": "./dist/styles/themes/*.css",
     "./themes/*.js": "./dist/styles/themes/*.js",
     "./presets/*.css": "./dist/styles/presets/*.css",
@@ -34,10 +34,11 @@
     "cdn"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:manifest && npm run build:bundles && npm run build:types",
+    "build": "npm run build:css && npm run build:manifest && npm run build:bundles && npm run check:cdn && npm run build:types",
     "build:dev": "npm run build:css && npm run build:manifest && npm run build:bundles:dev && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
+    "check:cdn": "node scripts/check-cdn-bundles.js",
     "build:bundles:dev": "node scripts/build-bundles.js --dev",
     "build:bundles:prod": "node scripts/build-bundles.js --prod",
     "build:css": "node scripts/build-css.js",

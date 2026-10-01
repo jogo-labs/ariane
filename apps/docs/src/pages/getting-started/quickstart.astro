@@ -10,13 +10,14 @@ const tocEntries = [
     { id: 'cdn',            label: 'Via CDN',            level: 1 as const },
     { id: 'autoloader',     label: 'Autoloader',         level: 2 as const },
     { id: 'bundle',         label: 'Bundle complet',     level: 2 as const },
+    { id: 'dev-prod',       label: 'Développement et production', level: 2 as const },
     { id: 'npm',            label: 'Installation avec npm', level: 1 as const },
 ];
 
 const codeAutoloader = `<!-- Charge automatiquement les composants utilisés dans la page ou ses shadow DOM. -->
-<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.prod.js"></scr` + `ipt>`;
+<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></scr` + `ipt>`;
 
-const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.prod.js"></scr` + `ipt>`;
+const codeBundle = `<script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></scr` + `ipt>`;
 
 const codeUsage = `<ar-alert variant="success">
   Opération réussie.
@@ -58,8 +59,7 @@ const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.j
             <NarrativeSubheading id="autoloader">Autoloader (le plus simple)</NarrativeSubheading>
             <pre><code class="language-html" set:text={codeAutoloader} /></pre>
             <p class="hint">
-                En développement local, remplacez <code>autoloader.prod.js</code> par <code>autoloader.js</code> pour obtenir des avertissements détaillés dans la console.
-            </p>
+                En développement local, utilisez <code>autoloader.dev.js</code> à la place pour obtenir des avertissements détaillés dans la console.</p>
             <p>Les composants sont ensuite utilisables directement, par exemple un composant Alerte :</p>
             <pre><code class="language-html" set:text={codeUsage} /></pre>
 
@@ -67,6 +67,35 @@ const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.j
                 Si vous utilisez beaucoup de composants ou souhaitez éviter les imports dynamiques, vous pouvez également charger tous les composants en une seule requête.
             </p>
             <pre><code class="language-html" set:text={codeBundle} /></pre>
+
+            <NarrativeSubheading id="dev-prod">Développement et production</NarrativeSubheading>
+            <p>Chaque script CDN existe en deux versions :</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Version</th>
+                            <th scope="col">Fichiers</th>
+                            <th scope="col">Contenu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Production</td>
+                            <td><code>autoloader.js</code>, <code>index.js</code></td>
+                            <td>Minifiée, près de deux fois plus légère, sans avertissements.</td>
+                        </tr>
+                        <tr>
+                            <td>Développement</td>
+                            <td><code>autoloader.dev.js</code>, <code>index.dev.js</code></td>
+                            <td>Non minifiée, avec des avertissements dans la console.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Les avertissements de développement signalent les erreurs d'usage, notamment d'accessibilité (par exemple un dialog sans libellé accessible). Utilisez la version de développement en local, et la version de production sur votre site.</p>
+            <p class="hint">Le nom sans suffixe est la version de production : oublier de préciser la version donne le build sûr.</p>
+            <p>Avec npm, une seule version est publiée : c'est le bundler de votre projet qui choisit, selon <code>process.env.NODE_ENV</code> (la valeur <code>production</code> supprime les avertissements).</p>
 
             <NarrativeHeading id="npm">Installation avec npm</NarrativeHeading>
             <p>Installez d'abord le paquet d'Ariane</p>
@@ -93,4 +122,5 @@ const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.j
 
 <style>
     @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
 </style>
