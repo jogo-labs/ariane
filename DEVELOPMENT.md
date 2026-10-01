@@ -70,7 +70,8 @@ apps/docs/      # Site de documentation Astro
 
 Chaque composant dans `components/<name>/` :
 
-- `<name>.ts` — classe LitElement, `@customElement('ar-<name>')`
+- `<name>.ts` — classe `ArianeElement` (qui étend `LitElement` ; `ArianeFormElement` pour un composant de formulaire), sans enregistrement ; le JSDoc de la classe porte `@tagname ar-<name>` (le manifeste en tire le `tagName`, donc la doc)
+- `index.ts` — enregistrement : `defineComponent('ar-<name>', Ar<Name>)` (`src/internal/define-component.ts`) et la clé de `HTMLElementTagNameMap`. Le tag est celui par défaut ; `defineComponent` le remplace par `window.ARIANE_CONFIG.prefix` s'il est défini. Un test (`registration-consistency.test.ts`) vérifie que ce tag, `@tagname`, `HTMLElementTagNameMap` et la clé de `COMPONENT_DEFS` dans l'autoloader concordent
 - `<name>.styles.ts` — styles Lit `css` tagged template
 - `<name>.test.ts` — tests Vitest
 

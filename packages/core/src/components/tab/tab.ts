@@ -23,6 +23,8 @@ import styles from './tab.styles.js';
  *
  * @cssState disabled - L'onglet est désactivé.
  * @cssState active   - L'onglet est actif (sélectionné).
+ *
+ * @tagname ar-tab
  */
 export class ArTab extends ArianeElement {
     static override styles = [styles];

@@ -36,6 +36,8 @@ export interface BreadcrumbItemRenderState {
  *
  * @slot indicator - Remplace le contenu par défaut (aplat de couleur posé par le thème) de la
  *   puce mobile par une icône. Purement décoratif (`aria-hidden`).
+ *
+ * @tagname ar-breadcrumb-item
  */
 export class ArBreadcrumbItem extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, styles];

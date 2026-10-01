@@ -101,6 +101,8 @@ import styles from './${fileName}.styles.js';
  * @cssprop [--${tagName}-size=auto] - Taille du composant.
  *
  * @event {CustomEvent} ${tagName}-change - Émis lors d'un changement.
+ *
+ * @tagname ${tagName}
  */
 // Composant participant à un <form> natif : extends ArianeFormElement à la place
 // (packages/core/src/base/ariane-form-element.ts) — formAssociated = true est hérité
@@ -119,8 +121,9 @@ export class ${className} extends ArianeElement {
 `;
 
 const indexTemplate = `import { ${className} } from './${fileName}.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-customElements.define('${tagName}', ${className});
+defineComponent('${tagName}', ${className});
 
 declare global {
     interface HTMLElementTagNameMap {

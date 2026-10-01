@@ -1,8 +1,7 @@
 import { ArCollapse } from './collapse.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-collapse')) {
-    customElements.define('ar-collapse', ArCollapse);
-}
+defineComponent('ar-collapse', ArCollapse);
 
 declare global {
     interface HTMLElementTagNameMap {

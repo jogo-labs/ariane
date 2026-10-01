@@ -49,6 +49,8 @@ export type ArTooltipPlacement =
  * ar-dropdown/ar-dialog/ar-breadcrumb.
  * @event {CustomEvent} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
  * @event {CustomEvent} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
+ *
+ * @tagname ar-tooltip
  */
 export class ArTooltip extends ArianeElement {
     static override styles = [styles];

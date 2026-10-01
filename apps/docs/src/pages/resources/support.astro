@@ -71,7 +71,7 @@ const tocEntries = [
             <p>Ariane n'impose aucun thème : le mode sombre fait partie du vôtre. Le thème de démo montre comment gérer les modes clair et sombre. Si vous avez déjà un design system, faites pointer les tokens Ariane vers les vôtres : leurs valeurs suivront votre mode sombre. Voir <a href="/theming/appliquer-un-theme">Appliquer un thème</a>.</p>
 
             <NarrativeSubheading id="prefixe">Puis-je changer le préfixe <code>ar-</code> ?</NarrativeSubheading>
-            <p>Oui. Avec le CDN, définissez <code>window.ARIANE_CONFIG.prefix</code> avant le script. Avec npm, importez les classes depuis <code>@ariane-ui/core/headless</code> et appelez <code>customElements.define()</code> avec le tag de votre choix. Voir <a href="/theming/tag-customization">Personnaliser le préfixe des tags</a>.</p>
+            <p>Oui. Définissez <code>window.ARIANE_CONFIG.prefix</code> avant le script (CDN) ou avant l'import de la librairie (npm). Avec npm, vous pouvez aussi importer les classes depuis <code>@ariane-ui/core/headless</code> et appeler <code>customElements.define()</code> avec le tag de votre choix. Voir <a href="/theming/tag-customization">Personnaliser le préfixe des tags</a>.</p>
 
             <NarrativeSubheading id="traductions">Comment traduire les libellés ?</NarrativeSubheading>
             <p>Le français (par défaut) et l'anglais sont fournis. La langue vient de <code>&lt;html lang&gt;</code> ou de l'attribut <code>lang</code> du composant. Pour une autre langue, écrivez votre traduction : voir <a href="/getting-started/traductions">Traductions</a>.</p>

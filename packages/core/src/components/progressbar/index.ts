@@ -1,8 +1,7 @@
 import { ArProgressbar } from './progressbar.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-progressbar')) {
-    customElements.define('ar-progressbar', ArProgressbar);
-}
+defineComponent('ar-progressbar', ArProgressbar);
 
 declare global {
     interface HTMLElementTagNameMap {

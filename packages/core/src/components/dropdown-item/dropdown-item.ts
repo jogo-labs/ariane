@@ -9,6 +9,8 @@ const FOCUSABLE = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1
  * @display docs
  *
  * @slot - Un bouton ou un lien — reçoit automatiquement role="menuitem" et tabIndex=-1.
+ *
+ * @tagname ar-dropdown-item
  */
 export class ArDropdownItem extends ArianeElement {
     static override styles = [

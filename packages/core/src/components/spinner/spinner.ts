@@ -23,6 +23,8 @@ import '../../translations/en.js';
  * @csspart status    - Le `<div role="alert">` lu par les lecteurs d'écran.
  *
  * @cssprop --ar-spinner-stroke-color - Couleur du trait SVG. Hérite de `currentColor` par défaut.
+ *
+ * @tagname ar-spinner
  */
 export class ArSpinner extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, animationsStyles, styles];

@@ -1,8 +1,7 @@
 import { ArPagination } from './pagination.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-pagination')) {
-    customElements.define('ar-pagination', ArPagination);
-}
+defineComponent('ar-pagination', ArPagination);
 
 declare global {
     interface HTMLElementTagNameMap {

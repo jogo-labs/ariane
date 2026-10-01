@@ -1,8 +1,7 @@
 import { ArAlert } from './alert.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-alert')) {
-    customElements.define('ar-alert', ArAlert);
-}
+defineComponent('ar-alert', ArAlert);
 
 declare global {
     interface HTMLElementTagNameMap {
