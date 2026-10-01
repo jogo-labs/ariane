@@ -20,12 +20,13 @@ Mesuré :
 ## Décisions
 
 - **Garder la composition** : `ar-table-sort` reste composé de `ar-tooltip`. Écarté : extraire la logique du tooltip dans un contrôleur pour que `table-sort` rende sa propre bulle. Cela supprimerait la dépendance mais fermerait la porte aux compositions futures (par exemple un `ar-calendar` autonome intégré dans `ar-datepicker`).
-- **Tag interne privé** : `ar-table-sort` rend un élément interne, instance d'une **sous-classe** de `ArTooltip` enregistrée sous un nom privé. Une sous-classe est nécessaire : une même classe ne peut pas être enregistrée sous deux noms (`NotSupportedError`). Le tag n'est pas une surface de personnalisation : les règles CSS du consommateur n'atteignent pas ce tooltip (tableau ci-dessus), seuls les tokens `--ar-tooltip-*` (hérités, définis sur `:root` dans le thème) le stylent, comme la doc de `table-sort` le dit déjà (`relatedTokens`).
+- **Tag interne privé** : `ar-table-sort` rend un élément interne, instance d'une **sous-classe** de `ArTooltip` enregistrée sous un nom privé. Une sous-classe est nécessaire : une même classe ne peut pas être enregistrée sous deux noms (`NotSupportedError`). Le tag n'est pas une surface de personnalisation, il est **non contractuel** (il peut changer sans rupture) : les règles CSS du consommateur n'atteignent pas ce tooltip (tableau ci-dessus), seuls les tokens `--ar-tooltip-*` (hérités, définis sur `:root` dans le thème) le stylent, comme la doc de `table-sort` le dit déjà (`relatedTokens`). Un token posé sur l'hôte (`ar-table-sort { --ar-tooltip-bg: … }`) personnalise le tooltip interne d'une instance précise (mesuré).
 - **Nom fixe** : `ariane-internal-tooltip`, enregistré avec le garde `if (!customElements.get(tag))`. Le nom ne commence pas par `ar-`, donc il n'entre pas en collision avec une autre librairie qui utiliserait ce préfixe, et il n'est pas capté par `whenAllDefined` avec le préfixe par défaut. Écarté : un nom aléatoire par chargement de module (chaque copie d'Ariane resterait autonome si deux versions coexistent sur la page, mais le nom changerait à chaque fois, ce qui complique tests et débogage). Avec un nom fixe, deux copies sur une même page partagent la première classe enregistrée, comme c'est déjà le cas pour les `ar-*`.
 - **Enregistrement au premier usage, pas à l'import** : le composant enregistre son élément interne dans `connectedCallback`, via un utilitaire, avant le premier rendu. Cela préserve le contrat de `/headless` (importer ne définit rien) et l'enregistrement d'un nom privé ne peut pas entrer en conflit avec un tag que le consommateur choisit (pas de `NotSupportedError` dépendant de l'ordre des `define`).
 - **Aucune obligation pour le consommateur** : en headless, il n'a rien à enregistrer pour le tooltip interne ; en autoloader, le tag privé est ignoré (`loadComponent` sort quand le tag n'est pas dans sa table). Ariane ne définit plus `ar-tooltip` à son insu : le consommateur peut enregistrer `ArTooltip` sous le tag de son choix.
 - **Pas de déduction de préfixe ni de contrainte « un préfixe pour les composés »** : écartées, devenues inutiles. Le tag est une constante, le template n'a pas besoin de `lit/static-html`.
 - **`customElements.getName()` non utilisé** : l'API existe (Chrome et Edge 117, Firefox 116, Safari 17, toutes au-dessus de nos planchers ; testée dans Chromium, Firefox et WebKit), mais elle ne retrouve que la classe exacte, pas une sous-classe du consommateur, et faire dépendre le tag rendu de ce qui est défini à la première connexion introduirait une dépendance à l'ordre d'exécution. Utilisable plus tard pour un diagnostic en dev si un besoin apparaît (YAGNI).
+- **Parts du tooltip non exportées** : pas d'`exportparts` maintenant. Aucune régression (ces parts sont inatteignables aujourd'hui, mesuré), ajouter des parts exportées plus tard n'est pas une rupture alors que les retirer ou les renommer en est une, et une valeur se définit en token ou en part, jamais les deux (#171). La cohérence entre toutes les instances passe par des **tokens** : une seule déclaration sur `:root` atteint les instances directes et imbriquées, alors qu'une règle `::part()` en demande une par hôte. Le manque identifié (`max-width`, réglable uniquement par `::part(tooltip)`) est traité par un token dédié dans #297 (`--ar-tooltip-max-width`, sur le modèle de `--ar-panel-max-width`), hors de #295.
 - **Utilitaire non exporté publiquement** : `utils/index.ts` garde ses deux exports (`whenAllDefined`, `registerTranslation`). L'utilitaire servira de référence pour les compositions futures et pourra être exposé quand un second cas l'exigera.
 
 ## Changements
@@ -49,12 +50,26 @@ Mesuré :
 ## Documentation
 
 - `/theming/tag-customization` : une section courte, « Composants qui en embarquent un autre » : certains composants (aujourd'hui `ar-table-sort` avec un tooltip) utilisent un élément interne sous un nom privé ; il n'y a rien à enregistrer, Ariane ne définit pas de tag `ar-*` à votre insu, le préfixe n'est pas concerné, et la personnalisation passe par les tokens (`--ar-tooltip-*`). Pas de contrainte nouvelle sur les noms de tags en mode npm.
-- `ar-table-sort.mdx` : reformuler l'entrée `relatedTokens` (« utilise en interne un tooltip, personnalisable via ses tokens `--ar-tooltip-*` »).
+- `ar-table-sort.mdx` : reformuler l'entrée `relatedTokens` (« utilise en interne un tooltip, personnalisable via ses tokens `--ar-tooltip-*`, sur `:root` pour toutes les instances ou sur `ar-table-sort` pour une instance »). L'encart existant renvoie déjà vers les tokens de `ar-tooltip` ; ils ne sont pas des `@cssprop` de `table-sort`, dont le `.styles.ts` ne les consomme pas.
+- Le tag privé est présenté comme non contractuel dans la section de `/theming/tag-customization`.
 - La doc du préfixe sur le bundle complet et la FAQ (« Puis-je changer le préfixe `ar-` ? ») dépendent de #296 et ne sont pas touchées ici.
+
+## Conventions pour les compositions futures
+
+Un composant qui en embarque un autre (par exemple un `ar-calendar` autonome dans `ar-datepicker`) suit les mêmes règles, sans rupture :
+
+1. Les tokens de l'enfant sont valorisés sur `:root` dans le thème, jamais derrière un sélecteur de tag (un sélecteur de tag ne traverse pas la frontière shadow du parent). État du thème fourni : les 14 fichiers `themes/ariane/components/_*.css` ont chacun un bloc `:root`, et `_tooltip.css` n'a aucun sélecteur de tag.
+2. L'élément enfant est enregistré sous un nom privé via `defineInternalElement`, au premier usage.
+3. Avant d'instancier un enfant dans le shadow DOM du parent, regarder s'il peut être slotté (principe de #171).
+4. Si le consommateur doit pouvoir styler l'intérieur par règle CSS, exporter les parts **explicitement**, avec `exportparts` (par exemple `exportparts="day:calendar-day"`), des noms préfixés pour éviter les collisions avec les parts du parent, et un `@csspart` documenté. Vérifié dans Chromium, Firefox et WebKit : le relais par `exportparts` fonctionne, `::part(a)::part(b)` ne fonctionne pas, et `::part(b)` sans export n'atteint rien. Ces noms sont publics : ils sont décidés au cas par cas, à la demande, jamais par précaution.
+5. Documenter les tokens de l'enfant sur la page du parent (`relatedTokens`).
+
+Ce qui est public (donc une rupture si modifié) : tags `ar-*`, attributs, propriétés, événements, slots, tokens, noms de parts, y compris exportées. Ce qui ne l'est pas : le nom du tag privé, la structure interne, le fait qu'un composant en embarque un autre.
 
 ## Hors périmètre
 
 - #296 : le bundle complet ignore `ARIANE_CONFIG.prefix`.
+- #297 : token `--ar-tooltip-max-width` (parité de personnalisation de `max-width` sur toutes les instances du tooltip).
 - #262 (tag JSDoc `@dependency`) : à reconsidérer. L'élément interne n'est plus une dépendance que le consommateur doit connaître ni enregistrer ; la doc écrite à la main couvre le cas.
 
 ## Non vérifié
