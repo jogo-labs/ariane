@@ -14,6 +14,13 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.13](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.12...v0.1.0-alpha.13) (2026-10-01)
+
+### Corrigé
+
+- **core:** les points d'entrée qui enregistrent honorent ARIANE_CONFIG.prefix ([#296](https://github.com/jogo-labs/ariane/issues/296)) ([#299](https://github.com/jogo-labs/ariane/issues/299)) ([00aae44](https://github.com/jogo-labs/ariane/commit/00aae4431d10350f866478b3494c2e1908596b4a))
+- **table-sort:** tooltip interne sous un tag privé, plus d'ar-tooltip enregistré à l'import ([#295](https://github.com/jogo-labs/ariane/issues/295)) ([#298](https://github.com/jogo-labs/ariane/issues/298)) ([3765f3f](https://github.com/jogo-labs/ariane/commit/3765f3feafa1ef715f3a3afdf078dc8da4e6d345))
+
 ## [0.1.0-alpha.12](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.11...v0.1.0-alpha.12) (2026-09-30)
 
 ### Ajouté
