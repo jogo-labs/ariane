@@ -106,6 +106,8 @@ import '../../translations/en.js';
  * @event {CustomEvent} ar-datepicker-shown          - Après ouverture.
  * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture. @cancelable
  * @event {CustomEvent} ar-datepicker-hidden         - Après fermeture.
+ *
+ * @tagname ar-datepicker
  */
 export class ArDatepicker extends ArianeFormElement {
     static override styles = [panelStyles, styles];

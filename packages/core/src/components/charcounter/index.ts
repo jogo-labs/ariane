@@ -1,8 +1,7 @@
 import { ArCharcounter } from './charcounter.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-charcounter')) {
-    customElements.define('ar-charcounter', ArCharcounter);
-}
+defineComponent('ar-charcounter', ArCharcounter);
 
 declare global {
     interface HTMLElementTagNameMap {

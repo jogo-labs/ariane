@@ -1,8 +1,7 @@
 import { ArTab } from './tab.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-tab')) {
-    customElements.define('ar-tab', ArTab);
-}
+defineComponent('ar-tab', ArTab);
 
 declare global {
     interface HTMLElementTagNameMap {

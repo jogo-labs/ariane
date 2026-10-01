@@ -1,8 +1,7 @@
 import { ArDialog } from './dialog.js';
+import { defineComponent } from '../../internal/define-component.js';
 
-if (!customElements.get('ar-dialog')) {
-    customElements.define('ar-dialog', ArDialog);
-}
+defineComponent('ar-dialog', ArDialog);
 
 declare global {
     interface HTMLElementTagNameMap {

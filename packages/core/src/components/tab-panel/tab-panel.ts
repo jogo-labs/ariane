@@ -13,6 +13,8 @@ import styles from './tab-panel.styles.js';
  * @slot - Contenu du panel.
  *
  * @csspart tab-panel - Racine du composant.
+ *
+ * @tagname ar-tab-panel
  */
 export class ArTabPanel extends ArianeElement {
     static override styles = [styles];

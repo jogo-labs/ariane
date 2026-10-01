@@ -42,6 +42,8 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
  * @cssState pending - Un tri a été demandé et attend confirmation.
  *
  * @event {CustomEvent<{ type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
+ *
+ * @tagname ar-table-sort
  */
 export class ArTableSort extends ArianeElement {
     static override styles = [styles];

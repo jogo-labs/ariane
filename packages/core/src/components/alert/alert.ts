@@ -48,6 +48,8 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  * @cssState hiding - L'alerte est en cours de fermeture (animation de sortie).
  *
  * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
+ *
+ * @tagname ar-alert
  */
 export class ArAlert extends ArianeElement {
     static override styles = [styles];

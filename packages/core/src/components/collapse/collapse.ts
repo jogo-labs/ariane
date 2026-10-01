@@ -33,6 +33,8 @@ import styles from './collapse.styles.js';
  * @event {CustomEvent} ar-collapse-hide           - Avant la fermeture. @cancelable
  * @event {CustomEvent} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
  * @event {CustomEvent} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
+ *
+ * @tagname ar-collapse
  */
 export class ArCollapse extends ArianeElement {
     static override styles = [styles];

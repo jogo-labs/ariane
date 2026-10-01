@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const codePrefixConfig = `<script>
   window.ARIANE_CONFIG = { prefix: 'acme' };
@@ -11,9 +12,18 @@ const codePrefixUsage = `<acme-alert variant="success">
   Opération réussie.
 </acme-alert>`;
 
-const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
+const codeNpmConfig = `// ariane-config.ts
+window.ARIANE_CONFIG = { prefix: 'acme' };`;
 
-customElements.define('acme-alert', ArAlert);`;
+const codeNpmImport = `import './ariane-config'; // évalué en premier
+import '@ariane-ui/core';`;
+
+const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
+import { whenAllDefined } from '@ariane-ui/core/utils';
+
+customElements.define('acme-alert', ArAlert);
+
+await whenAllDefined({ prefix: 'acme-' });`;
 
 const codeEmbeddedTokens = `:root {
     --ar-tooltip-bg: #1f2937; /* toutes les instances */
@@ -44,28 +54,49 @@ ar-table-sort {
             <NarrativeHeading id="cdn-tag-customization">Vous utilisez le CDN</NarrativeHeading>
             <p>
                 Définissez <code>window.ARIANE_CONFIG.prefix</code>&nbsp;
-                <strong>avant</strong> le script Ariane (autoloader ou bundle complet) :
+                <strong>avant</strong> le script Ariane (autoloader, bundle complet, ou import d'un composant seul) :
             </p>
             <pre><code class="language-html" set:text={codePrefixConfig} /></pre>
 
             <p>Les composants s'utilisent alors sous le préfixe configuré :</p>
             <pre><code class="language-html" set:text={codePrefixUsage} /></pre>
             <p class="hint">
-                Le préfixe définit ainsi est global et s'applique à tous les composants.
+                Le préfixe défini ainsi est global et s'applique à tous les composants.
                 Le renommage libre par composant nécessite d'utiliser Ariane via le paquet npm.
             </p>
 
             <NarrativeHeading id="npm-tag-customization">Vous utilisez npm</NarrativeHeading>
-            <p>
-                Pour choisir vous-même le tag de chaque composant plutôt que d'utiliser les
-                tags <code>ar-*</code> par défaut, importez les classes depuis <code>@ariane-ui/core/headless</code>,
-                puis vous appelez <code>customElements.define()</code> vous-même :
-            </p>
+            <p>Deux possibilités, selon que vous voulez un préfixe commun ou choisir chaque tag.</p>
+
+            <NarrativeSubheading id="npm-prefixe">Un préfixe commun</NarrativeSubheading>
+            <p>Les imports qui enregistrent les composants (<code>@ariane-ui/core</code> ou l'import d'un composant seul) lisent <code>window.ARIANE_CONFIG.prefix</code> au moment où ils sont évalués. La variable doit donc être posée dans un module importé <strong>avant</strong> la librairie :</p>
+            <pre><code class="language-typescript" set:text={codeNpmConfig} /></pre>
+            <pre><code class="language-typescript" set:text={codeNpmImport} /></pre>
+            <p class="hint">Poser la variable dans le même module que l'import, après la ligne <code>import</code>, ne fonctionne pas : les imports d'un module sont évalués avant son propre code, et la librairie enregistre alors les tags <code>ar-*</code>.</p>
+
+            <NarrativeSubheading id="npm-headless">Le tag de chaque composant</NarrativeSubheading>
+            <p>Pour choisir vous-même le tag de chaque composant, importez les classes depuis <code>@ariane-ui/core/headless</code> : cette entrée n'enregistre rien, vous appelez <code>customElements.define()</code> vous-même. Contrairement au préfixe global, ce mode permet de renommer chaque composant individuellement. <code>whenAllDefined</code> prend alors le préfixe en option :</p>
             <pre><code class="language-typescript" set:text={codeNpmHeadless} /></pre>
-            <p class="hint">
-                Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
-                composant individuellement.
-            </p>
+            <p class="hint">Les types (<code>HTMLElementTagNameMap</code>) décrivent les tags par défaut <code>ar-*</code> : avec un préfixe personnalisé, les tags ne sont pas typés.</p>
+
+            <NarrativeHeading id="modes">Ce que chaque mode de chargement honore</NarrativeHeading>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Mode de chargement</th>
+                            <th scope="col"><code>ARIANE_CONFIG.prefix</code></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Autoloader (CDN)</td><td>honoré</td></tr>
+                        <tr><td>Bundle complet (CDN)</td><td>honoré</td></tr>
+                        <tr><td>Import d'un composant seul (CDN ou npm)</td><td>honoré</td></tr>
+                        <tr><td>Import de <code>@ariane-ui/core</code> (npm)</td><td>honoré, à poser avant l'import</td></tr>
+                        <tr><td><code>@ariane-ui/core/headless</code> (npm)</td><td>non utilisé : vous choisissez chaque tag</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
             <NarrativeHeading id="composants-composes">Composants qui en embarquent un autre</NarrativeHeading>
             <p>Certains composants en embarquent un autre dans leur shadow DOM (aujourd'hui <code>ar-table-sort</code>, qui affiche un tooltip). Ils l'enregistrent eux-mêmes, au premier usage, sous un nom interne privé : vous n'avez rien à enregistrer, Ariane ne définit aucun tag <code>ar-*</code> à votre insu et le préfixe que vous choisissez n'est pas concerné. Ce nom interne est un détail d'implémentation : ne vous appuyez pas dessus.</p>
@@ -78,4 +109,5 @@ ar-table-sort {
 
 <style>
     @import '../../styles/doc-prose.css';
+    @import '../../styles/doc-table.css';
 </style>

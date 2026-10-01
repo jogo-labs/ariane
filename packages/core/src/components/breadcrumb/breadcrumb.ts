@@ -61,6 +61,8 @@ import '../../translations/en.js';
  * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. @cancelable
  * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
  * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
+ *
+ * @tagname ar-breadcrumb
  */
 export class ArBreadcrumb extends ArianeElement {
     static override styles: CSSResultGroup = [utilitiesStyles, resetStyles, panelStyles, styles];
