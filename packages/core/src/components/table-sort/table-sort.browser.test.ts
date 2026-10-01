@@ -146,8 +146,8 @@ describe('ar-table-sort — browser', () => {
             const label = th.querySelector<HTMLElement>('#label')!;
             expect(getComputedStyle(label).fontWeight).to.equal('700');
 
-            const tooltip = el.shadowRoot?.querySelector('ar-tooltip');
-            if (!tooltip) throw new Error('ar-tooltip introuvable');
+            const tooltip = el.shadowRoot?.querySelector('ariane-internal-tooltip');
+            if (!tooltip) throw new Error('ariane-internal-tooltip introuvable');
             expect(getComputedStyle(tooltip).fontWeight).to.equal('400');
         });
     });

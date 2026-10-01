@@ -8,12 +8,20 @@ import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
-import '../tooltip/index.js';
+import { ArTooltip } from '../tooltip/tooltip.js';
+import { defineInternalElement } from '../../utils/internal-element.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';
 
 const CYCLE: TableSortOrder[] = ['none', 'asc', 'desc'];
+
+/**
+ * Tag privé du tooltip interne (sous-classe d'`ArTooltip`, enregistrée au premier usage).
+ * Non contractuel : n'est pas un `ar-*`, donc ni collision de préfixe ni enregistrement à
+ * l'import de `/headless`. Même nom dans le template de `render()` et dans `table-sort.styles.ts`.
+ */
+const INTERNAL_TOOLTIP_TAG = 'ariane-internal-tooltip';
 
 function nextOrder(current: TableSortOrder): TableSortOrder {
     return CYCLE[(CYCLE.indexOf(current) + 1) % CYCLE.length];
@@ -63,6 +71,7 @@ export class ArTableSort extends ArianeElement {
     private readonly localize = new LocalizeController(this);
 
     override connectedCallback(): void {
+        defineInternalElement(INTERNAL_TOOLTIP_TAG, ArTooltip);
         super.connectedCallback();
         this._syncParentTh();
     }
@@ -170,7 +179,7 @@ export class ArTableSort extends ArianeElement {
                 <slot></slot>
                 <span part="indicator" aria-hidden="true"></span>
             </button>
-            <ar-tooltip for=${this._buttonId}>${label}</ar-tooltip>
+            <ariane-internal-tooltip for=${this._buttonId}>${label}</ariane-internal-tooltip>
         `;
     }
 }

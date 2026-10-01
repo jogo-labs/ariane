@@ -63,7 +63,7 @@ describe('ArTableSort', () => {
     // ── Labels alpha ──────────────────────────────────────────────────────
 
     function tooltipLabel(el: ArTableSort): string {
-        return el.shadowRoot!.querySelector('ar-tooltip')!.textContent!.trim();
+        return el.shadowRoot!.querySelector('ariane-internal-tooltip')!.textContent!.trim();
     }
 
     describe('labels — alpha', () => {
@@ -365,8 +365,19 @@ describe('ArTableSort', () => {
     });
 });
 
-describe('dépendance ar-tooltip', () => {
-    it('ar-tooltip est défini après import isolé de ar-table-sort', () => {
-        expect(customElements.get('ar-tooltip')).toBeDefined();
+describe('tooltip interne (#295)', () => {
+    it("n'enregistre pas ar-tooltip à l'import de ar-table-sort", () => {
+        expect(customElements.get('ar-tooltip')).toBeUndefined();
+    });
+
+    it('le tooltip interne est défini après import isolé de ar-table-sort', async () => {
+        const el = await fixture<ArTableSort>('<ar-table-sort></ar-table-sort>');
+        expect(el.shadowRoot!.querySelector('ariane-internal-tooltip')).not.toBeNull();
+        expect(customElements.get('ariane-internal-tooltip')).toBeDefined();
+        el.remove();
+    });
+
+    it("le tag privé n'est pas préfixé ar-", () => {
+        expect('ariane-internal-tooltip'.startsWith('ar-')).toBe(false);
     });
 });
