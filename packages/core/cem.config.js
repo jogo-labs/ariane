@@ -29,11 +29,9 @@ import {
 } from './scripts/validate-no-duplicate-tokens.js';
 
 export default {
-    // Inclure tous les fichiers TS sauf les tests et les styles.
-    // `internal-element.ts` n'est pas un composant : son `customElements.define(tag, …)` générique
-    // serait pris par l'analyseur pour un composant nommé « tag » (la doc ne compilerait plus).
+    // Inclure tous les fichiers TS sauf les tests et les styles
     globs: ['src/**/*.ts'],
-    exclude: ['src/**/*.test.ts', 'src/**/*.styles.ts', 'src/utils/internal-element.ts'],
+    exclude: ['src/**/*.test.ts', 'src/**/*.styles.ts'],
 
     // Activer la détection automatique des patterns LitElement
     // (décorateurs @customElement, @property, @state, etc.)

@@ -9,7 +9,7 @@ export default css`
     /* Réinitialise le poids hérité du <th> (bold par défaut UA) pour le tooltip interne
        uniquement — un reset sur :host affecterait aussi le libellé de colonne slotté
        (même parent DOM réel que le tooltip pour l'héritage CSS, cf. #168). Tag privé du
-       tooltip interne : cf. INTERNAL_TOOLTIP_TAG dans table-sort.ts. */
+       tooltip interne : cf. internal/tooltip-internal.ts. */
     ariane-internal-tooltip {
         font-weight: normal;
     }
