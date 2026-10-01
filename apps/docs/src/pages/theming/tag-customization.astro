@@ -15,6 +15,14 @@ const codeNpmHeadless = `import { ArAlert } from '@ariane-ui/core/headless';
 
 customElements.define('acme-alert', ArAlert);`;
 
+const codeEmbeddedTokens = `:root {
+    --ar-tooltip-bg: #1f2937; /* toutes les instances */
+}
+
+ar-table-sort {
+    --ar-tooltip-bg: #7c2d12; /* le tooltip de ce composant seulement */
+}`;
+
 ---
 
 <Layout
@@ -58,6 +66,12 @@ customElements.define('acme-alert', ArAlert);`;
                 Contrairement au préfixe global du CDN, ce mode permet de renommer chaque
                 composant individuellement.
             </p>
+
+            <NarrativeHeading id="composants-composes">Composants qui en embarquent un autre</NarrativeHeading>
+            <p>Certains composants en embarquent un autre dans leur shadow DOM (aujourd'hui <code>ar-table-sort</code>, qui affiche un tooltip). Ils l'enregistrent eux-mêmes, au premier usage, sous un nom interne privé : vous n'avez rien à enregistrer, Ariane ne définit aucun tag <code>ar-*</code> à votre insu et le préfixe que vous choisissez n'est pas concerné. Ce nom interne est un détail d'implémentation : ne vous appuyez pas dessus.</p>
+            <p>L'élément embarqué se personnalise par ses tokens (<code>--ar-tooltip-*</code> pour le tooltip de <code>ar-table-sort</code>) : sur <code>:root</code> pour toutes les instances, ou sur le composant hôte pour une seule.</p>
+            <pre><code class="language-css" set:text={codeEmbeddedTokens} /></pre>
+            <p class="hint">Les règles CSS qui ciblent un tag ou ses <code>::part()</code> n'atteignent pas un élément situé dans le shadow DOM d'un autre composant : seuls les tokens, hérités par les éléments imbriqués, le font.</p>
         </div>
     </div>
 </Layout>
