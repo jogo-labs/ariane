@@ -68,7 +68,9 @@ describe('buildKitchenSinkHtml', () => {
 
     it('inclut la barre de nav sobre et le lien CDN autoloader', () => {
         const { html } = buildKitchenSinkHtml([]);
-        expect(html).toMatch(/cdn\/autoloader\.prod\.js/);
+        // Production : le nom court (#300). Ni `.dev.js` (développement), ni l'ancien `.prod.js`.
+        expect(html).toMatch(/cdn\/autoloader\.js/);
+        expect(html).not.toMatch(/cdn\/autoloader\.(dev|prod)\.js/);
         expect(html).toMatch(/ariane-starter\.css/);
         expect(html).toMatch(/class="ks-nav"/);
     });
