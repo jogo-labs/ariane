@@ -31,10 +31,12 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "cdn"
+    "cdn",
+    "skills",
+    "llms"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:manifest && npm run build:bundles && npm run check:cdn && npm run build:types",
+    "build": "npm run build:css && npm run build:manifest && npm run build:skill && npm run build:bundles && npm run check:cdn && npm run check:skill && npm run build:types",
     "build:dev": "npm run build:css && npm run build:manifest && npm run build:bundles:dev && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
