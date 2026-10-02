@@ -1,7 +1,7 @@
 # Agent Skill `ariane` + `llms.txt` pour consommer Ariane (#264)
 
 **Date :** 2026-10-02
-**Statut :** Design validé section par section (brainstorming), en attente de relecture de la spec
+**Statut :** Spec validée par le mainteneur (2026-10-02), prête pour le plan d'implémentation
 **Issue :** #264 (`scope:docs`, `type:feat`, `priority:après-beta`)
 **Analyse préliminaire :** `docs/superpowers/specs/2026-09-12-llms-txt-agent-skill-analyse-preliminaire.md`
 
@@ -124,6 +124,13 @@ Règles d'écriture :
 - Les `presets/` (`buttons.css`, `fields.css`, exportés via `./presets/*.css`) sont intégrés à `theming.md` après lecture ; leur couverture par la doc actuelle est à constater à l'écriture.
 - Pas de lien vers le site de doc (pas de domaine public, #276) : les références pointent vers des fichiers de la skill.
 - `description` du `SKILL.md` : situations concrètes en français (écrire ou modifier du HTML avec des balises `ar-*` ; installer ou charger Ariane en CDN, npm ou headless ; thémer des composants Ariane, personnaliser le préfixe) plus quelques termes anglais courants (`web components`, `design system`). Validé avec `skill-creator` sur des demandes en français et en anglais avant d'être figé. Le déclenchement de la skill repose sur le jugement du modèle à partir de la `description` ; aucune mesure de taux de déclenchement en français n'existe à ce jour.
+
+Règles de rédaction (le lecteur est un agent, pas un humain) :
+
+- **Compresser, ne pas recopier.** Les pages de doc sont pédagogiques et narratives, écrites pour un lecteur humain. Les fichiers de la skill en reprennent le contenu sous une forme dense : tables, listes, exemples HTML copiables, règles du type « si le besoin est X, utiliser Y », pièges énoncés directement. Pas de ton marketing, pas d'introduction ni de transition.
+- **Concis ne veut pas dire lacunaire.** Un agent ne peut pas poser de question : noms d'attribut, valeurs par défaut et contraintes sont exacts et complets, une phrase vague coûte plus cher qu'une phrase de plus.
+- **Un fichier, une tâche.** Chaque référence est chargée à la demande : elle peut être plus longue que `SKILL.md` mais traite un seul sujet. `SKILL.md` route vers les références et ne détaille rien.
+- **Longueur.** Aucune cible chiffrée n'est fixée ici (la documentation consultée recommande la concision sans donner de seuil) ; elle est arrêtée à l'écriture avec les conseils des skills `skill-creator` et `writing-skills`.
 
 ## Maintenance (trois filets)
 
