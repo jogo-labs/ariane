@@ -26,7 +26,7 @@ Permettre à un LLM (Claude Code en priorité, tout outil compatible Agent Skill
 | Nombre de skills        | Une seule, `ariane`                                                                                                                                                                                                                                                                                                                                  | Skill séparée de création de thème (`ariane-theme`) : voir « Hors périmètre »                                                                                                                                                                                                                                                                                                                     |
 | Emplacement des sources | `packages/core/scripts/skill/` (comme WebAwesome : le contenu écrit n'a de consommateur que le script qui le copie)                                                                                                                                                                                                                                  | Dossier racine `skills-src/`                                                                                                                                                                                                                                                                                                                                                                      |
 
-Note sur les événements : l'entrée d'événement `name`, sans description, que le CEM dérive de `_emit` dans `ar-tab-group` et `ar-tooltip`, est ignorée par le générateur. Les vrais événements, documentés par `@event`, figurent dans la skill.
+Note sur les événements : l'entrée d'événement `name`, sans description, que le CEM dérive de `_emit` dans `ar-tab-group` et `ar-tooltip`, est ignorée par le générateur. Les vrais événements, documentés par `@event`, figurent dans la skill. Le filtre porte sur le nom `name` (artefact de `new CustomEvent(name, …)`), pas sur l'absence de description : un vrai `@event` sans description reste listé.
 
 ## Architecture
 
@@ -67,7 +67,7 @@ Un fichier `references/components/<tag>.md` par composant racine (14), contenant
 
 1. Titre et description du CEM.
 2. Exemples : les `variants` du frontmatter MDX (libellé, description, HTML).
-3. API en tableaux : attributs (type, défaut), slots, événements (marque « annulable » issue de `@cancelable`), propriétés CSS, parts, états CSS, méthodes publiques.
+3. API en tableaux : attributs (type, défaut), slots, événements (marque « annulable » issue de `@cancelable`), propriétés CSS, parts, états CSS, méthodes publiques. Le tableau des événements a une colonne Type (`type.text` du CEM, qui porte le type de `detail` quand le composant l'annote). Les méthodes d'API interne sont écartées à la source par `@internal` (l'analyseur du CEM les omet), et le générateur exclut en plus par nom les callbacks form-associated (`formAssociatedCallback`, `formDisabledCallback`, `formResetCallback`, `formStateRestoreCallback`).
 4. Accessibilité et usage : le corps du MDX converti.
 
 Les sous-composants n'ont pas de fichier propre : ils sont des sections du fichier de leur parent (via `x-parent`).
@@ -76,6 +76,7 @@ Conversion du MDX (seul JSX présent aujourd'hui : `<WcagRef criterion summary /
 
 - `import` en tête de fichier retirés, hors blocs de code (le `import IMask` d'`ar-datepicker` est dans un bloc de code et reste).
 - `<WcagRef criterion="4.1.3" summary="…" />` remplacé par du texte, « WCAG 4.1.3 : … », sans lien.
+- Liens absolus du site (`[texte](/…)`) et liens vers une ancre seule (`[texte](#…)`, ancre de la page du site absente de la skill) remplacés par leur texte, hors blocs de code et code inline ; les liens relatifs (`fichier.md#ancre`) sont conservés.
 - Tout autre composant JSX : le générateur échoue en nommant le fichier.
 
 `components/index.md` liste les composants (sous-composants rattachés à leur parent) et porte une ligne « généré depuis @ariane-ui/core X ». Aucun champ de version n'est injecté dans le frontmatter de `SKILL.md` (champs reconnus par Claude Code : voir sa documentation, pas de champ `version` vu).
@@ -125,7 +126,7 @@ Règles d'écriture :
 - `theming.md` décrit la structure et le contrat (les `cssProperties` des composants), jamais les valeurs de la palette du thème par défaut (choix de design, cf. règle des `@cssprop`). `default-old.css` est ignoré.
 - Les `presets/` (`buttons.css`, `fields.css`, exportés via `./presets/*.css`) sont intégrés à `theming.md` après lecture ; leur couverture par la doc actuelle est à constater à l'écriture.
 - Pas de lien vers le site de doc (pas de domaine public, #276) : les références pointent vers des fichiers de la skill.
-- `description` du `SKILL.md` : situations concrètes en français (écrire ou modifier du HTML avec des balises `ar-*` ; installer ou charger Ariane en CDN, npm ou headless ; thémer des composants Ariane, personnaliser le préfixe) plus quelques termes anglais courants (`web components`, `design system`). Validé avec `skill-creator` sur des demandes en français et en anglais avant d'être figé. Le déclenchement de la skill repose sur le jugement du modèle à partir de la `description` ; aucune mesure de taux de déclenchement en français n'existe à ce jour.
+- `description` du `SKILL.md` : situations concrètes en français (écrire ou modifier du HTML avec des balises `ar-*` ; installer ou charger Ariane en CDN, npm ou headless ; thémer des composants Ariane, personnaliser le préfixe) sans terme anglais : `design system` a été retiré à la tâche 11 (le travail sur un design system est hors périmètre de cette skill) et `web components` ne figure pas dans le `description` final. Testé avec `skill-creator` sur des demandes en français et en anglais, non validé : le test ne départage rien (résultat et limites : voir « Non vérifié »). Le déclenchement de la skill repose sur le jugement du modèle à partir de la `description` ; aucune mesure fiable du taux de déclenchement n'existe à ce jour (une seule exécution par demande).
 
 Règles de rédaction (le lecteur est un agent, pas un humain) :
 
