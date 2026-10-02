@@ -38,7 +38,8 @@ Thumbs.db
 !.claude/skills/
 .claude/skills/speakeasy-context
 # Copie locale de la skill ariane installée par `npx skills add` (source : packages/core/skills/)
-/.claude/skills/ariane/
+/.claude/skills/ariane
+/.agents/skills/ariane/
 /skills-lock.json
 .superpowers/
 .github/hooks/

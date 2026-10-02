@@ -75,17 +75,18 @@ import manifest from '@ariane-ui/core/custom-elements.json';
 
 Le paquet livre une Agent Skill `ariane` (`skills/ariane/`) qui décrit l'installation, l'usage, le thème, les traductions et l'API de chaque composant de la version installée.
 
-Installation dans un projet pour Claude Code (observée avec l'outil `skills` 1.7.0) :
+Installation dans un projet (observée avec l'outil `skills` 1.7.0, sur un paquet `npm pack` installé dans un projet vierge) :
 
 ```bash
-npx skills add ./node_modules/@ariane-ui/core/skills/ariane -a claude-code -y
+npx skills experimental_sync -a claude-code -y
 ```
 
-- La commande copie la skill dans `.claude/skills/ariane` du projet et écrit un `skills-lock.json`.
-- La copie ne suit pas les mises à jour de `@ariane-ui/core` : relancer `npx skills add …` après une mise à jour du paquet (`skills` 1.7.0 propose aussi `skills update`, non vérifié sur une source locale).
+- La commande (expérimentale, d'après son nom) cherche les skills livrées par les paquets de `node_modules` et installe `ariane` : copie dans `.agents/skills/ariane`, lien `.claude/skills/ariane` vers cette copie. Elle installe aussi les skills livrées par d'autres paquets installés.
+- Après une mise à jour de `@ariane-ui/core`, relancer la même commande : elle rafraîchit la skill si son contenu a changé, et répond « already up to date » sinon. Aucune notification automatique à la mise à jour du paquet, et `npx skills update` ne gère pas ce cas (observé : « No project skills to update » pour une skill installée depuis un chemin local).
+- Alternative : `npx skills add ./node_modules/@ariane-ui/core/skills/ariane -a claude-code -y` copie la skill dans `.claude/skills/ariane` et écrit un `skills-lock.json` ; la copie ne suit pas les mises à jour du paquet.
 - Sans skill : `node_modules/@ariane-ui/core/llms/llms.txt` (et `llms-full.txt`, tout le contenu en un fichier).
 
-Le déclenchement d'une skill relève du jugement de l'agent, qui ne la consulte pas toujours. Pour le fiabiliser, ajouter au `CLAUDE.md` ou `AGENTS.md` du projet :
+Le déclenchement d'une skill relève du jugement de l'agent, qui peut ne pas la consulter. Facultatif : si vous constatez qu'elle n'est pas utilisée, vous pouvez ajouter au `CLAUDE.md` ou `AGENTS.md` de votre projet une ligne qui l'invoque explicitement, par exemple :
 
 > Pour tout code utilisant `@ariane-ui/core` ou des balises `ar-*`, utiliser la skill `ariane` (ou lire `node_modules/@ariane-ui/core/llms/llms.txt`).
 
