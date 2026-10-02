@@ -167,7 +167,7 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 | `fields.css`  | `ar-input` (`<input>`, `<textarea>`), `ar-label`, `ar-field-group` (empile label, champ, éléments liés) |
 
 - `ar-btn` seule ne pose aucune couleur de variante : toujours l'associer à une variante.
-- `ar-btn` prend en charge `:disabled` et `[aria-disabled='true']`. Pour ces états, `buttons.css` pose `background-color`, `border-color` et `color` en `!important` (valeurs `--ar-button-disabled-*`) : un `!important` en couche l'emporte sur le CSS hors couche, donc surcharger ces couleurs passe par les tokens `--ar-button-disabled-bg`, `--ar-button-disabled-border` et `--ar-button-disabled-color`, ou par un `!important` dans l'application. `ar-input` prend en charge `[aria-invalid='true']`, `:disabled`, `[aria-disabled]` et `:read-only`.
+- `ar-btn` prend en charge `:disabled` et `[aria-disabled='true']`. Pour ces états, `buttons.css` pose `background-color`, `border-color` et `color` en `!important` (valeurs `--ar-button-disabled-*`) : un `!important` en couche l'emporte sur le CSS hors couche, donc surcharger ces couleurs passe par les tokens `--ar-button-disabled-bg`, `--ar-button-disabled-border` et `--ar-button-disabled-color`. Un `!important` de l'application hors couche ne l'emporte pas sur celui du preset (en couche). `ar-input` prend en charge `[aria-invalid='true']`, `:disabled`, `[aria-disabled]` et `:read-only`.
 - `ar-label` réagit à `data-ar-char-state="warning"` et `data-ar-char-state="error"` : hook documenté par `ar-charcounter`, à poser sur le label lié au champ observé.
 
 ```html
