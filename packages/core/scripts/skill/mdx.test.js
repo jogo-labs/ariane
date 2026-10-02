@@ -105,6 +105,20 @@ describe('convertMdxBody : liens absolus du site', () => {
         const body = 'Écrire `[a](/b)` puis [c](/d).';
         expect(convert(body)).toBe('Écrire `[a](/b)` puis c.');
     });
+
+    it('retire le lien dont le texte est du code inline', () => {
+        expect(convert('[`ar-x`](/c)')).toBe('`ar-x`');
+    });
+
+    it('traite code inline dans le texte du lien et code inline voisin sur la même ligne', () => {
+        expect(convert('Voir [`ar-x`](/c) et `[a](/b)` puis [d](/e).')).toBe(
+            'Voir `ar-x` et `[a](/b)` puis d.',
+        );
+    });
+
+    it('laisse un lien à texte en code inline dont la cible n’est pas absolue', () => {
+        expect(convert('[`ar-x`](#a)')).toBe('[`ar-x`](#a)');
+    });
 });
 
 describe('shiftHeadings', () => {

@@ -12,8 +12,11 @@ const FENCE_RE = /^\s*```/;
 const IMPORT_RE = /^import\s.+$/gm;
 const WCAG_REF_RE = /<WcagRef\s+criterion="([^"]+)"\s+summary="([^"]*)"\s*\/>/g;
 const INLINE_CODE_RE = /`[^`\n]*`/g;
-// Lien Markdown dont la cible commence par `/` (hors image : `!` devant), titre optionnel.
-const ABSOLUTE_LINK_RE = /(?<!!)\[([^\]]*)\]\(\/[^)\s]*(?:\s+"[^"]*")?\)/g;
+// Un code inline (conservé tel quel) OU un lien Markdown dont la cible commence par `/` (hors
+// image : `!` devant), titre optionnel. Le texte du lien peut contenir du code inline. Le code
+// inline étant consommé en premier, un lien qui y figure n'est jamais touché.
+const ABSOLUTE_LINK_RE =
+    /(`[^`\n]*`)|(?<!!)\[((?:`[^`\n]*`|[^\]`])*)\]\(\/[^)\s]*(?:\s+"[^"]*")?\)/g;
 const JSX_RE = /<([A-Z][A-Za-z0-9]*)[\s/>]/;
 
 /**
@@ -58,10 +61,7 @@ function mapOutsideFences(markdown, transform) {
  * la skill ne doit pas pointer vers le site de doc (pas de domaine public).
  */
 function stripAbsoluteLinks(text) {
-    return text
-        .split(/(`[^`\n]*`)/)
-        .map((part, index) => (index % 2 === 1 ? part : part.replace(ABSOLUTE_LINK_RE, '$1')))
-        .join('');
+    return text.replace(ABSOLUTE_LINK_RE, (_match, code, linkText) => code ?? linkText);
 }
 
 /**
