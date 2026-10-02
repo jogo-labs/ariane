@@ -12,11 +12,10 @@ const FENCE_RE = /^\s*```/;
 const IMPORT_RE = /^import\s.+$/gm;
 const WCAG_REF_RE = /<WcagRef\s+criterion="([^"]+)"\s+summary="([^"]*)"\s*\/>/g;
 const INLINE_CODE_RE = /`[^`\n]*`/g;
-// Un code inline (conservé tel quel) OU un lien Markdown dont la cible commence par `/` (hors
-// image : `!` devant), titre optionnel. Le texte du lien peut contenir du code inline. Le code
-// inline étant consommé en premier, un lien qui y figure n'est jamais touché.
-const ABSOLUTE_LINK_RE =
-    /(`[^`\n]*`)|(?<!!)\[((?:`[^`\n]*`|[^\]`])*)\]\(\/[^)\s]*(?:\s+"[^"]*")?\)/g;
+// Un code inline (conservé tel quel) OU un lien Markdown dont la cible commence par `/` ou `#`
+// (hors image : `!` devant), titre optionnel. Le texte du lien peut contenir du code inline. Le
+// code inline étant consommé en premier, un lien qui y figure n'est jamais touché.
+const SITE_LINK_RE = /(`[^`\n]*`)|(?<!!)\[((?:`[^`\n]*`|[^\]`])*)\]\([/#][^)\s]*(?:\s+"[^"]*")?\)/g;
 const JSX_RE = /<([A-Z][A-Za-z0-9]*)[\s/>]/;
 
 /**
@@ -57,11 +56,13 @@ function mapOutsideFences(markdown, transform) {
 }
 
 /**
- * Remplace les liens absolus du site (`[texte](/chemin)`) par leur texte, hors code inline :
- * la skill ne doit pas pointer vers le site de doc (pas de domaine public).
+ * Remplace les liens absolus du site (`[texte](/chemin)`) et les liens vers une ancre seule
+ * (`[texte](#ancre)`) par leur texte, hors code inline : la skill ne doit pas pointer vers le site
+ * de doc (pas de domaine public), et les ancres de la page du site n'existent pas dans la skill.
+ * Les liens relatifs (`fichier.md#ancre`) sont laissés.
  */
-function stripAbsoluteLinks(text) {
-    return text.replace(ABSOLUTE_LINK_RE, (_match, code, linkText) => code ?? linkText);
+function stripSiteLinks(text) {
+    return text.replace(SITE_LINK_RE, (_match, code, linkText) => code ?? linkText);
 }
 
 /**
@@ -75,7 +76,8 @@ export function parseMdx(source) {
 
 /**
  * Convertit le corps d'un MDX en Markdown : retire les `import`, remplace `<WcagRef>` par du
- * texte, remplace les liens absolus du site par leur texte, échoue sur tout autre composant JSX.
+ * texte, remplace les liens absolus du site et les ancres seules par leur texte, échoue sur tout
+ * autre composant JSX.
  * Les blocs de code ne sont jamais modifiés.
  *
  * @param {string} body
@@ -88,7 +90,7 @@ export function convertMdxBody(body, file) {
             .replace(IMPORT_RE, '')
             .replace(WCAG_REF_RE, (_match, criterion, summary) => `WCAG ${criterion} : ${summary}`)
             .replace(/\n{3,}/g, '\n\n');
-        converted = stripAbsoluteLinks(converted);
+        converted = stripSiteLinks(converted);
         const jsx = converted.replace(INLINE_CODE_RE, '').match(JSX_RE);
         if (jsx) {
             throw new Error(

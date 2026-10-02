@@ -86,9 +86,9 @@ describe('convertMdxBody : liens absolus du site', () => {
         expect(convert('[a](/x) et [b](/y)')).toBe('a et b');
     });
 
-    it('laisse https, mailto, ancres et liens relatifs', () => {
+    it('laisse https, mailto et liens relatifs (ancre comprise)', () => {
         const md =
-            '[a](https://x.fr) [b](mailto:a@b.fr) [c](#ancre) [d](autre.md) [e](./x.md) [f](../x.md)';
+            '[a](https://x.fr) [b](mailto:a@b.fr) [d](autre.md) [e](./x.md) [f](../x.md) [g](x.md#y)';
         expect(convert(md)).toBe(md);
     });
 
@@ -117,7 +117,29 @@ describe('convertMdxBody : liens absolus du site', () => {
     });
 
     it('laisse un lien à texte en code inline dont la cible n’est pas absolue', () => {
-        expect(convert('[`ar-x`](#a)')).toBe('[`ar-x`](#a)');
+        expect(convert('[`ar-x`](autre.md#a)')).toBe('[`ar-x`](autre.md#a)');
+    });
+});
+
+describe('convertMdxBody : ancres de la page du site', () => {
+    const convert = (body) => convertMdxBody(body, 'x.mdx');
+
+    it('remplace un lien vers une ancre seule par son texte', () => {
+        expect(convert('Voir la [Référence API](#reference-api).')).toBe('Voir la Référence API.');
+    });
+
+    it('gère un titre et un texte en code inline', () => {
+        expect(convert('[a](#x "Titre") et [`ar-x`](#y)')).toBe('a et `ar-x`');
+    });
+
+    it('laisse une ancre dans un bloc de code ou du code inline', () => {
+        const fenced = '```md\n[a](#b)\n```';
+        expect(convert(fenced)).toBe(fenced);
+        expect(convert('Écrire `[a](#b)` puis [c](#d).')).toBe('Écrire `[a](#b)` puis c.');
+    });
+
+    it('laisse une image dont la cible est une ancre', () => {
+        expect(convert('![alt](#x)')).toBe('![alt](#x)');
     });
 });
 
