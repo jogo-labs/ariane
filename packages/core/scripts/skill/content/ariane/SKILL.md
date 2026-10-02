@@ -1,6 +1,6 @@
 ---
 name: ariane
-description: "À utiliser dès qu'il faut écrire ou modifier du HTML contenant des balises `ar-*` (web components Ariane, paquet `@ariane-ui/core`), installer ou charger Ariane (CDN, npm, headless), thémer ses composants (tokens `--ar-*`, `::part()`) ou personnaliser le préfixe des tags."
+description: "À utiliser dès qu'une demande concerne Ariane (`@ariane-ui/core`, balises `ar-*`) : écrire du HTML avec ses composants, choisir un composant, charger la lib (CDN, npm, Vue/React), la thémer (tokens `--ar-*`, `::part()`), traduire ses libellés (i18n) ou changer le préfixe des tags."
 ---
 
 # Ariane
