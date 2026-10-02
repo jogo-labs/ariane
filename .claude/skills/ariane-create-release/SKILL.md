@@ -16,11 +16,13 @@ Proposer la version suivante et demander confirmation :
 
 > Version actuelle : `X.Y.Z-alpha.N`. Nouvelle version ? (proposition : `X.Y.Z-alpha.N+1`)
 
-Le dist-tag npm est **inféré automatiquement** depuis la version :
+Le dist-tag npm est **inféré automatiquement** depuis la version par `release.yml` :
 
 - `-alpha.*` → `alpha`
 - `-beta.*` → `beta`
 - pas de suffixe → `latest`
+
+Cas particulier, tant qu'aucune version stable n'existe (pré-v1) : `release.yml` publie **tout sous `latest`**. Ce cas disparaît dès la première version stable.
 
 Ne pas demander le type séparément — il est dans le numéro de version.
 
@@ -76,12 +78,17 @@ Relire la section du changelog générée et `packages/core/scripts/skill/conten
 
 ### 4. Créer la PR vers `main`
 
-Via `mcp__github__create_pull_request` :
+Via la CLI `gh` (le MCP GitHub n'est pas configuré chez tous les contributeurs) :
+
+```bash
+gh pr create --base main --head release/X.Y.Z \
+  --title "release: @ariane-ui/core vX.Y.Z" --body-file <fichier>
+```
 
 - **title** : `release: @ariane-ui/core vX.Y.Z`
 - **head** : `release/X.Y.Z`
 - **base** : `main`
-- **body** : la section de `CHANGELOG.md` générée à l'étape 3 bis (relue)
+- **body** : la section de `CHANGELOG.md` générée à l'étape 3 bis (relue), dans `<fichier>`
 
 ### 5. Tag + nettoyage post-merge
 
