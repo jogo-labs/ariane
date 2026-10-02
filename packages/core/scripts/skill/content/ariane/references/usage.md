@@ -1,6 +1,6 @@
 # Utiliser les composants
 
-Les composants sont des Custom Elements natifs : ils s'utilisent directement en HTML, sans framework, quel que soit le mode de chargement (voir `installation.md`). Le détail par composant (attributs, propriétés, slots, événements, méthodes) est dans `components/index.md` et `components/<tag>.md`.
+Les composants sont des Custom Elements natifs : ils s'utilisent directement en HTML, sans framework, quel que soit le mode de chargement (voir `installation.md`). Le détail par composant (attributs, slots, événements, méthodes) est dans `components/index.md` et `components/<tag>.md`.
 
 ```html
 <ar-alert variant="success">Votre message a bien été envoyé.</ar-alert>
@@ -158,7 +158,7 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 - Ces événements remontent (`bubbles`) et traversent le shadow DOM (`composed`) ; leur `detail` est `{ id }` (l'`id` de l'hôte, ou `undefined`).
 - `ar-dialog-dismissed` et `ar-dialog-accepted` (clic sur un élément portant `data-ar-dismiss` ou `data-ar-accept`) sont aussi annulables.
 - Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ from, to }`.
-- Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé pour `ar-datepicker-show`).
+- Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé ni pour `-show` ni pour `-hide`).
 
 ## Méthodes
 
@@ -170,7 +170,8 @@ Certaines actions s'appellent directement sur l'élément, une fois le composant
     <p>Contenu qui se révèle à l'ouverture</p>
 </ar-collapse>
 
-<script>
+<script type="module">
+    await customElements.whenDefined('ar-collapse');
     const collapse = document.querySelector('ar-collapse');
     collapse.show();
 </script>

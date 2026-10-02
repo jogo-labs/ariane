@@ -19,7 +19,7 @@
 | Tri d'une colonne de tableau, confirmé de façon asynchrone (côté serveur)                        | `<ar-table-sort>` dans un `<th>`                                                | `type` (`alpha` par défaut, `numeric`, `date`), `order` (piloté par `confirm()`/`reject()`), `pending`                                                                   |
 | Information brève et non interactive au survol ou au focus d'un élément                          | `<ar-tooltip>`                                                                  | `for` (ID du déclencheur, requis), `placement` (`top` par défaut), `show-delay` (300), `hide-delay` (150), `without-arrow`, `disabled`                                   |
 
-API complète (attributs, propriétés, événements, slots, parts, tokens) : `components/<tag>.md`, sous-composants inclus dans le fichier du parent.
+API complète (attributs, événements, slots, parts, tokens) : `components/<tag>.md`, sous-composants inclus dans le fichier du parent.
 
 ## Confusions fréquentes
 

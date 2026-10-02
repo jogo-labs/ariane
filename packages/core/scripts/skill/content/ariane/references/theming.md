@@ -29,8 +29,13 @@ import '@ariane-ui/core/themes/ariane.css';
 Sans build, dans le `<head>` :
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/themes/ariane.css"
+/>
 ```
+
+`<version>` : la version épinglée (voir `installation.md`).
 
 Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 
@@ -171,8 +176,14 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 - `ar-label` réagit à `data-ar-char-state="warning"` et `data-ar-char-state="error"` : hook documenté par `ar-charcounter`, à poser sur le label lié au champ observé.
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/buttons.css" />
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/presets/fields.css" />
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/presets/buttons.css"
+/>
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/presets/fields.css"
+/>
 
 <button class="ar-btn ar-btn-primary">Valider</button>
 
@@ -210,7 +221,7 @@ export class MonApp extends HTMLElement {
 customElements.define('mon-app', MonApp);
 ```
 
-Via CDN : même code, avec `import { arianeTheme } from 'https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.js';` dans le fichier qui définit le composant.
+Via CDN : même code, avec `import { arianeTheme } from 'https://unpkg.com/@ariane-ui/core@<version>/dist/styles/themes/ariane.js';` dans le fichier qui définit le composant.
 
 Thème propre : créer une version `.js` de votre CSS, sans les tokens `:root` (inutiles dans un shadow root).
 
