@@ -88,7 +88,7 @@ export class ArStepper extends ArianeElement {
     private readonly localize = new LocalizeController(this);
 
     /**
-     * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
+     * Chemin de l'étape courante. Doit correspondre au `path` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
      */
     @property({ type: String, attribute: 'current-path', reflect: true })

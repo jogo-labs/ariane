@@ -58,8 +58,22 @@ export class ArStepperItem extends ArianeElement {
     private readonly _uid = Math.random().toString(36).slice(2, 9);
     private readonly _afterLabelId = `stepper-item-after-label-${this._uid}`;
 
+    /**
+     * Identifiant de l'étape : `current-path` d'`ar-stepper` le désigne pour en faire l'étape
+     * courante, et il est transmis dans `detail` (`from`, `to`) des événements de navigation.
+     */
     @property({ type: String }) path = '';
+
+    /**
+     * Libellé de l'étape, rendu dans la part `label` : le choisir descriptif (« Mes informations »
+     * plutôt que « Étape 1 »).
+     */
     @property({ type: String }) label = '';
+
+    /**
+     * Destination de l'étape cliquable : une URL réelle produit un lien `<a>` (navigation native),
+     * une valeur absente ou `#` produit un `<button>` (navigation par l'événement seulement).
+     */
     @property({ type: String }) href?: string;
 
     @state() private _indicatorState: IndicatorState = 'default';
