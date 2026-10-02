@@ -40,6 +40,7 @@
     "build:bundles": "node scripts/build-bundles.js",
     "check:cdn": "node scripts/check-cdn-bundles.js",
     "build:skill": "node scripts/skill/build-skill.js",
+    "check:skill": "node scripts/skill/check-skill.js",
     "build:bundles:dev": "node scripts/build-bundles.js --dev",
     "build:bundles:prod": "node scripts/build-bundles.js --prod",
     "build:css": "node scripts/build-css.js",
