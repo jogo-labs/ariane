@@ -38,7 +38,17 @@ export default translation;`;
 
 const codeCustomTranslationCdn = `<html lang="es">
   <head>
-    <script type="module" src="/path/to/es.js"></script>
+    <script type="module">
+      import { registerTranslation } from 'https://unpkg.com/@ariane-ui/core@<version>/cdn/index.js';
+
+      registerTranslation({
+        $code: 'es',
+        $name: 'Español',
+        $dir: 'ltr',
+
+        // ... tous les termes de fr.ts, traduits
+      });
+    </script>
   </head>
 
   <body>
@@ -119,7 +129,12 @@ const codeCustomTranslationCdn = `<html lang="es">
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslation} /></pre>
             <p>
-                Une fois votre fichier compilé en JS, importez la traduction ainsi :
+                Avec npm, importez ce fichier une fois, avant d'utiliser les composants. En CDN,
+                sans bundler, <code>@ariane-ui/core/utils</code> ne se résout pas dans le navigateur :
+                importez <code>registerTranslation</code> depuis la même URL, et la même variante
+                (<code>.dev.js</code> ou non), que les composants. Une copie de la fonction embarquée
+                dans votre propre bundle enregistrerait la traduction dans un registre que les
+                composants CDN ne lisent pas, sans erreur visible :
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
 

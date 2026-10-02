@@ -6,6 +6,8 @@ dist/
 cdn/
 dist-astro/
 dist-starter-demo/
+/packages/core/skills/
+/packages/core/llms/
 
 # ── Cache ─────────────────────────────────────────────────────
 .turbo/
@@ -32,7 +34,13 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
-.claude
+.claude/*
+!.claude/skills/
+.claude/skills/speakeasy-context
+# Copie locale de la skill ariane installée par `npx skills add` (source : packages/core/skills/)
+/.claude/skills/ariane
+/.agents/skills/ariane/
+/skills-lock.json
 .superpowers/
 .github/hooks/
 .codeium/windsurf/skills/speakeasy-context

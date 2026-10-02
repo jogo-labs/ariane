@@ -192,7 +192,10 @@ export class ArDatepicker extends ArianeFormElement {
         return this.disabled || this._formDisabled;
     }
 
-    /** Appelé par le navigateur quand un `<fieldset disabled>` ancêtre change d'état. */
+    /**
+     * Appelé par le navigateur quand un `<fieldset disabled>` ancêtre change d'état.
+     * @internal
+     */
     formDisabledCallback(disabled: boolean): void {
         this._formDisabled = disabled;
     }

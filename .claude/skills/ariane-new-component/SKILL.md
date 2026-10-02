@@ -52,24 +52,24 @@ besoin de l'exerciser l'injecte temporairement sur `HTMLElement.prototype` (cf.
 
 ## Naming
 
-| Élément | Convention | Exemple |
-|---|---|---|
-| Tag HTML | `ar-<name>` | `ar-stepper` |
-| Classe | `Ar<Name>` | `ArStepper` |
-| Événements | `ar-<event>` | `ar-step-change` |
-| CSS custom properties | `--ar-<component>-<prop>` | `--ar-stepper-gap` |
-| CSS parts | `part="base"`, `part="label"`, etc. | |
+| Élément               | Convention                          | Exemple            |
+| --------------------- | ----------------------------------- | ------------------ |
+| Tag HTML              | `ar-<name>`                         | `ar-stepper`       |
+| Classe                | `Ar<Name>`                          | `ArStepper`        |
+| Événements            | `ar-<event>`                        | `ar-step-change`   |
+| CSS custom properties | `--ar-<component>-<prop>`           | `--ar-stepper-gap` |
+| CSS parts             | `part="base"`, `part="label"`, etc. |                    |
 
 ## Annotations JSDoc CEM
 
 Les annotations standard (`@slot`, `@csspart`, `@cssprop`, `@event`, `@summary`) sont connues. Annotations spécifiques au projet :
 
-| Annotation | Effet |
-|---|---|
-| `@display demo` | Page doc : exemples + playground + API (défaut) |
-| `@display docs` | Page doc : API uniquement, pas de playground |
-| `@parent ar-<tag>` | Marque comme sous-composant — nav et home page le lisent via CEM `x-parent` |
-| `@ignore` | Exclut un membre des contrôles playground |
+| Annotation                         | Effet                                                                                                                                                                                         |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@display demo`                    | Page doc : exemples + playground + API (défaut)                                                                                                                                               |
+| `@display docs`                    | Page doc : API uniquement, pas de playground                                                                                                                                                  |
+| `@parent ar-<tag>`                 | Marque comme sous-composant — nav et home page le lisent via CEM `x-parent`                                                                                                                   |
+| `@ignore`                          | Exclut un membre des contrôles playground                                                                                                                                                     |
 | `@cssState <name> - <description>` | Documente un `:state()` posé via `this.toggleState()` (`ArianeElement`) — reconnu **nativement** par l'analyzer (comme `@cssprop`), génère l'onglet doc « CSS Custom States » automatiquement |
 
 `@internal` sur une classe (pas un membre) est une convention TSDoc reconnue **nativement** par `@custom-elements-manifest/analyzer` (pas un ajout maison) : sa déclaration et son export sont retirés automatiquement du manifest publié — utile pour un mini custom element purement interne, jamais utilisé seul par un consommateur (ex. exporté uniquement via `::part()`). Si son `customElements.define()` vit dans un fichier séparé (pattern `index.ts`, comme les composants publics), `pruneDanglingCustomElementExports` (`cem.config.js`) nettoie le résidu ; aucune action supplémentaire requise.
@@ -130,3 +130,7 @@ Critères courants par pattern :
 | Composant interactif avec état            | 4.1.2 name, role, value                       |
 
 La page "Understanding" correspondante est linkable via le composant `WcagRef` dans la doc (voir skill `ariane-write-docs`).
+
+## Skill consommateur (`ariane`)
+
+Si l'API publique, un comportement ou une règle d'usage change, ou si le composant est nouveau, mettre à jour `packages/core/scripts/skill/content/ariane/` (au minimum `references/choosing-components.md` pour un nouveau composant), puis `npm run build:skill && npm run check:skill` depuis `packages/core`. Voir `packages/core/scripts/skill/README.md`.

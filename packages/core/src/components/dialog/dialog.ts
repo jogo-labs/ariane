@@ -62,7 +62,7 @@ if (typeof document !== 'undefined') {
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
- * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur les tailles prédéfinies pour une règle au moins aussi spécifique que `[size='...']` (ex. `ar-dialog[size='sm']`) — un simple `ar-dialog { }` est moins spécifique et perd face au preset de thème quand `size` est défini.
+ * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur la largeur d'une taille prédéfinie (`size`) tant que la règle qui la pose l'emporte dans la cascade (spécificité, ordre, couches `@layer`) sur celle qui définit cette taille.
  * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
  * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
@@ -135,9 +135,9 @@ export class ArDialog extends ArianeElement {
     /**
      * Taille du dialog. Les paliers `sm`/`lg`/`xl` sont définis par le thème —
      * sans thème chargé, seule la taille par défaut du composant s'applique.
-     * Utilisez `--ar-dialog-width` pour une valeur personnalisée. Un `ar-dialog { }` non qualifié
-     * doit néanmoins être au moins aussi spécifique que `[size='...']` (ou utiliser `!important`,
-     * ou omettre `size`) pour l'emporter de façon fiable sur un palier de thème.
+     * Utilisez `--ar-dialog-width` pour une valeur personnalisée : elle prend le pas sur le palier
+     * tant que la règle qui la pose l'emporte dans la cascade (spécificité, ordre, couches
+     * `@layer`) sur celle qui définit le palier.
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';

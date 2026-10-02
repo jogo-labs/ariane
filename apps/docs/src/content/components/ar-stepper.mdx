@@ -118,9 +118,9 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### À votre charge
 
-- **Labels descriptifs sur chaque `ar-stepper-item`.** Le `label` est le seul texte vocalisé
-  pour chaque étape — évitez les labels génériques ("Étape 1") au profit de libellés métier
-  ("Mes informations", "Récapitulatif").
+- **Labels descriptifs sur chaque `ar-stepper-item`.** Le `label` identifie chaque étape
+  (un numéro d'étape localisé est ajouté en texte masqué) — évitez les labels génériques
+  ("Étape 1") au profit de libellés métier ("Mes informations", "Récapitulatif").
 - **`current-path` doit correspondre au `path` d'un item existant.** Une valeur incorrecte
   n'active aucun item — aucun feedback visuel ni vocal ne signale l'étape courante.
 - **`href` détermine l'élément rendu pour une étape cliquable.** Un `href` réel (ex. `/etape-2`)
@@ -176,7 +176,7 @@ variante _Mode édition_ pour le mode `edit`.
 Chaque `ar-stepper-item` expose un slot nommé `after-label` pour afficher un contenu additif à
 côté du label — un badge de statut, une icône, une pastille de compteur. Ce contenu s'ajoute au
 label sans jamais le remplacer : il reste toujours lu séparément par les lecteurs d'écran
-(annoncé via `aria-describedby`), le label demeure donc le seul texte vocalisé pour identifier
+(annoncé via `aria-describedby`), le label demeure donc le texte qui identifie
 l'étape.
 
 ```html
