@@ -34,7 +34,9 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
-.claude
+.claude/*
+!.claude/skills/
+.claude/skills/speakeasy-context
 .superpowers/
 .github/hooks/
 .codeium/windsurf/skills/speakeasy-context
