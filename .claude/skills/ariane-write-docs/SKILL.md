@@ -87,3 +87,7 @@ Le composant (`apps/docs/src/components/WcagRef.astro`) génère l'ID automatiqu
 ### Critères déjà mappés
 
 Voir la table `slugs` dans `WcagRef.astro` pour la liste des critères supportés : 1.3.1, 1.4.13, 2.1.1, 2.1.2, 2.4.8, 3.2.2, 4.1.2, 4.1.3.
+
+## Skill consommateur (`ariane`)
+
+Si l'API publique, un comportement ou une règle d'usage change, ou si le composant est nouveau, mettre à jour `packages/core/scripts/skill/content/ariane/` (au minimum `references/choosing-components.md` pour un nouveau composant), puis `npm run build:skill && npm run check:skill` depuis `packages/core`. Voir `packages/core/scripts/skill/README.md`.
