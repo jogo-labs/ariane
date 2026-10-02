@@ -12,6 +12,8 @@ const FENCE_RE = /^\s*```/;
 const IMPORT_RE = /^import\s.+$/gm;
 const WCAG_REF_RE = /<WcagRef\s+criterion="([^"]+)"\s+summary="([^"]*)"\s*\/>/g;
 const INLINE_CODE_RE = /`[^`\n]*`/g;
+// Lien Markdown dont la cible commence par `/` (hors image : `!` devant), titre optionnel.
+const ABSOLUTE_LINK_RE = /(?<!!)\[([^\]]*)\]\(\/[^)\s]*(?:\s+"[^"]*")?\)/g;
 const JSX_RE = /<([A-Z][A-Za-z0-9]*)[\s/>]/;
 
 /**
@@ -52,6 +54,17 @@ function mapOutsideFences(markdown, transform) {
 }
 
 /**
+ * Remplace les liens absolus du site (`[texte](/chemin)`) par leur texte, hors code inline :
+ * la skill ne doit pas pointer vers le site de doc (pas de domaine public).
+ */
+function stripAbsoluteLinks(text) {
+    return text
+        .split(/(`[^`\n]*`)/)
+        .map((part, index) => (index % 2 === 1 ? part : part.replace(ABSOLUTE_LINK_RE, '$1')))
+        .join('');
+}
+
+/**
  * @param {string} source contenu brut d'un `.mdx`
  * @returns {{ data: Record<string, any>, body: string }}
  */
@@ -62,7 +75,8 @@ export function parseMdx(source) {
 
 /**
  * Convertit le corps d'un MDX en Markdown : retire les `import`, remplace `<WcagRef>` par du
- * texte, échoue sur tout autre composant JSX. Les blocs de code ne sont jamais modifiés.
+ * texte, remplace les liens absolus du site par leur texte, échoue sur tout autre composant JSX.
+ * Les blocs de code ne sont jamais modifiés.
  *
  * @param {string} body
  * @param {string} file chemin du MDX, utilisé dans le message d'erreur
@@ -70,10 +84,11 @@ export function parseMdx(source) {
  */
 export function convertMdxBody(body, file) {
     return mapOutsideFences(body, (text) => {
-        const converted = text
+        let converted = text
             .replace(IMPORT_RE, '')
             .replace(WCAG_REF_RE, (_match, criterion, summary) => `WCAG ${criterion} : ${summary}`)
             .replace(/\n{3,}/g, '\n\n');
+        converted = stripAbsoluteLinks(converted);
         const jsx = converted.replace(INLINE_CODE_RE, '').match(JSX_RE);
         if (jsx) {
             throw new Error(

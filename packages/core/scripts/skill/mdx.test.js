@@ -69,6 +69,44 @@ describe('convertMdxBody', () => {
     });
 });
 
+describe('convertMdxBody : liens absolus du site', () => {
+    const convert = (body) => convertMdxBody(body, 'x.mdx');
+
+    it('remplace un lien absolu par son texte', () => {
+        expect(convert('Voir [les traductions](/getting-started/traductions).')).toBe(
+            'Voir les traductions.',
+        );
+    });
+
+    it('gère une ancre, un titre et un lien //hote', () => {
+        expect(convert('[a](/x#y) [b](/x "Titre") [c](//hote/x)')).toBe('a b c');
+    });
+
+    it('remplace deux liens absolus sur la même ligne', () => {
+        expect(convert('[a](/x) et [b](/y)')).toBe('a et b');
+    });
+
+    it('laisse https, mailto, ancres et liens relatifs', () => {
+        const md =
+            '[a](https://x.fr) [b](mailto:a@b.fr) [c](#ancre) [d](autre.md) [e](./x.md) [f](../x.md)';
+        expect(convert(md)).toBe(md);
+    });
+
+    it('laisse une image absolue', () => {
+        expect(convert('![alt](/img/x.png)')).toBe('![alt](/img/x.png)');
+    });
+
+    it('laisse un lien absolu dans un bloc de code', () => {
+        const body = '```md\n[a](/b)\n```';
+        expect(convert(body)).toBe(body);
+    });
+
+    it('laisse un lien absolu dans du code inline', () => {
+        const body = 'Écrire `[a](/b)` puis [c](/d).';
+        expect(convert(body)).toBe('Écrire `[a](/b)` puis c.');
+    });
+});
+
 describe('shiftHeadings', () => {
     it('descend les titres hors blocs de code', () => {
         const md = '## A\n\n```md\n## pas un titre\n```\n\n### B';
