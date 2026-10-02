@@ -26,6 +26,8 @@ Permettre à un LLM (Claude Code en priorité, tout outil compatible Agent Skill
 | Nombre de skills        | Une seule, `ariane`                                                                                                 | Skill séparée de création de thème (`ariane-theme`) : voir « Hors périmètre »                                                                                                                                                                                                                                                                                                                     |
 | Emplacement des sources | `packages/core/scripts/skill/` (comme WebAwesome : le contenu écrit n'a de consommateur que le script qui le copie) | Dossier racine `skills-src/`                                                                                                                                                                                                                                                                                                                                                                      |
 
+Note sur les événements : l'entrée d'événement `name`, sans description, que le CEM dérive de `_emit` dans `ar-tab-group` et `ar-tooltip`, est ignorée par le générateur. Les vrais événements, documentés par `@event`, figurent dans la skill.
+
 ## Architecture
 
 ### Dossiers
@@ -157,10 +159,12 @@ Règles de rédaction (le lecteur est un agent, pas un humain) :
 
 ## Non vérifié
 
-- Que `npx skills add` installe correctement une skill dont le `SKILL.md` renvoie à des fichiers relatifs, et en lien symbolique depuis `node_modules` (annoncé par WebAwesome, pas testé ici). À tester sur un projet vierge avant la release.
-- Le type MIME servi par unpkg pour les `.md` et que unpkg sert un dossier hors `dist` et `cdn` déclaré dans `files`.
-- Que Turbo restaure `skills/**` et `llms/**` depuis son cache (le cas existe avec `cdn/**`).
-- Quelle section de `package.json` porte `gray-matter` à la racine, et si `core` doit le déclarer.
-- Taille cible du `SKILL.md` : à fixer à l'écriture (la documentation consultée recommande la concision, sans seuil).
-- L'usage de `presets/` dans la doc actuelle.
-- Le comportement de Cursor et d'autres outils avec ces skills (annoncé par WebAwesome pour Cursor, non testé).
+Résultats des vérifications du 2026-10-02 (tâche 13).
+
+- `npx skills add` avec renvois relatifs et chemin dans `node_modules` : vérifié avec `skills` 1.7.0, sur un projet vierge où le paquet packé (`npm pack`) était installé. `npx skills add ./node_modules/@ariane-ui/core/skills/ariane -a claude-code -y` installe une copie (pas un lien symbolique) dans `./.claude/skills/ariane` du projet (portée projet, rien dans `~/.claude/skills`), écrit un `skills-lock.json` (source locale et hash) et n'affiche aucun avertissement. La copie est identique à la source (`diff -r`), `references/components/index.md` et `references/usage.md` existent à côté du `SKILL.md` installé, et tous les renvois `references/…` du `SKILL.md` se résolvent. Le comportement symlink du CLI (sans `--copy`, pour les agents universels) n'a pas été observé : avec `-a claude-code` le CLI a copié. `npx skills remove ariane -y` retire la skill.
+- Le type MIME servi par unpkg pour les `.md` et le service d'un dossier hors `dist` et `cdn` déclaré dans `files` : à constater à la première release (invérifiable avant la publication).
+- Restauration par Turbo de `skills/**` et `llms/**` : vérifié à la tâche 7. Le second `npm run build` est un cache hit complet, et après suppression de `packages/core/skills` et `packages/core/llms`, un build restaure les deux dossiers depuis le cache Turbo.
+- Section de `package.json` de `gray-matter` : `devDependencies` du `package.json` racine (`^4.0.3`). Il est aussi déclaré dans `devDependencies` de `packages/core/package.json` (`^4.0.3`, ajouté à la tâche 1), puisque `core` l'utilise dans `scripts/skill/`.
+- Taille du `SKILL.md` : le fichier final fait 27 lignes et 265 mots. La taille n'a pas été fixée par un seuil chiffré, elle résulte du contenu strictement nécessaire (routage, règles d'usage, renvois vers `references/`).
+- Usage de `presets/` dans la doc actuelle : la page `appliquer-un-theme` n'en couvre qu'une petite partie (lien unpkg, exemple avec `ar-btn ar-btn-primary` et `ar-input`). Les autres classes, la couche `ariane.presets`, la dépendance aux tokens et le hook `data-ar-char-state` n'y sont pas documentés ; `theming.md` de la skill les décrit donc sans équivalent dans la doc du site.
+- Comportement de Cursor et d'autres outils avec ces skills (annoncé par WebAwesome pour Cursor) : toujours non vérifié, non testé ici.
