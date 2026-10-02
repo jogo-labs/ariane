@@ -201,6 +201,26 @@ describe('checkSkill', () => {
         expect(errors).not.toMatch(/SKILL\.md \(description\).*<ar-dialog>/);
     });
 
+    it('règle 9 : le description accepte le nom sans préfixe, pas les README', () => {
+        write(
+            'SKILL.md',
+            '---\nname: ariane\ndescription: "Ariane : dialog (modale), tab-group (onglets)."\n---\n\n# Ariane\n',
+        );
+        expect(run()).toEqual([]);
+        const readmes = [{ path: 'README.md', text: 'dialog et tab-group, sans préfixe.' }];
+        const errors = run({ readmes }).join('\n');
+        expect(errors).toMatch(/README\.md.*<ar-dialog>/);
+        expect(errors).toMatch(/README\.md.*<ar-tab-group>/);
+    });
+
+    it('règle 9 : le nom sans préfixe ne vaut pas pour un nom plus long', () => {
+        write(
+            'SKILL.md',
+            '---\nname: ariane\ndescription: "Ariane : dialogs, ar-tab-group."\n---\n\n# Ariane\n',
+        );
+        expect(run().join('\n')).toMatch(/SKILL\.md \(description\).*<ar-dialog>/);
+    });
+
     it('règle 9 : accepte la forme balise et la forme code inline', () => {
         const readmes = [{ path: 'README.md', text: '| `<ar-dialog>` | x |\n`ar-tab-group`' }];
         expect(run({ readmes })).toEqual([]);

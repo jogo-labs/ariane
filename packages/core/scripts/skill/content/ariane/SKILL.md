@@ -1,6 +1,6 @@
 ---
 name: ariane
-description: "À utiliser dès qu'une demande concerne Ariane (`@ariane-ui/core`, balises `ar-*`) : écrire du HTML avec ses composants (ar-alert, ar-breadcrumb, ar-charcounter, ar-collapse, ar-datepicker, ar-dialog, ar-dropdown, ar-pagination, ar-progressbar, ar-spinner, ar-stepper, ar-tab-group, ar-table-sort, ar-tooltip), choisir un composant, charger la lib (CDN, npm, Vue/React), la thémer (tokens `--ar-*`, `::part()`), traduire ses libellés (i18n) ou changer le préfixe des tags."
+description: "Dans un projet qui utilise Ariane (`@ariane-ui/core`, balises `ar-*`), à utiliser dès qu'on ajoute, modifie ou thème un composant d'interface : alert, breadcrumb (fil d'ariane), charcounter (compteur de caractères), collapse (accordéon), datepicker (date), dialog (modale, drawer), dropdown (menu), pagination, progressbar, spinner, stepper (étapes), tabs (tab-group, onglets), table-sort (tri de colonne), tooltip (infobulle) ; ou pour installer et charger la lib (CDN, npm, Vue/React), la thémer (tokens `--ar-*`, `::part()`), traduire ses libellés ou changer le préfixe des tags."
 ---
 
 # Ariane

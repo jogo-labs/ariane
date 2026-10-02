@@ -14,9 +14,9 @@
  *   6. le frontmatter de `SKILL.md` a `name: ariane` et une `description` ;
  *   7. `package.json` publie `skills` et `llms` (`files`) ;
  *   8. chaque token `--ar-*` cité dans `references/theming.md` existe (CEM ou thème) ;
- *   9. chaque composant racine du CEM est cité dans les README fournis et dans le `description`
- *      de SKILL.md (listes de composants écrites à la main : sans ce contrôle elles se périment
- *      sans signal).
+ *   9. chaque composant racine du CEM est cité dans les README fournis (`ar-x`) et dans le
+ *      `description` de SKILL.md (`ar-x` ou le nom sans préfixe) : listes de composants écrites
+ *      à la main, qui sans ce contrôle se périment sans signal.
  *
  * Ce qu'il ne vérifie PAS : la vérité d'une phrase de conseil, les valeurs d'attribut, la qualité
  * de déclenchement de la `description`. Ceux-là relèvent de la relecture à la release.
@@ -219,11 +219,18 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
     // les sous-composants sont décrits avec leur parent, non exigés.
     const componentLists = [...readmes];
     if (skillDescription !== '') {
-        componentLists.push({ path: 'SKILL.md (description)', text: skillDescription });
+        // Le description est lu par un agent qui reçoit des demandes sans préfixe (« ajoute un
+        // datepicker ») : le nom sans `ar-` vaut aussi.
+        componentLists.push({
+            path: 'SKILL.md (description)',
+            text: skillDescription,
+            bare: true,
+        });
     }
-    for (const { path, text } of componentLists) {
+    for (const { path, text, bare } of componentLists) {
         for (const root of roots) {
-            const cited = new RegExp(`(?<![a-z0-9-])${root.tagName}(?![a-z0-9-])`).test(text);
+            const name = bare ? `(?:ar-)?${root.tagName.replace(/^ar-/, '')}` : root.tagName;
+            const cited = new RegExp(`(?<![a-z0-9-])${name}(?![a-z0-9-])`).test(text);
             if (!cited) {
                 errors.push(
                     `${path} — <${root.tagName}> n'est pas cité (liste des composants à mettre à jour).`,
