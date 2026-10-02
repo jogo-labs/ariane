@@ -176,6 +176,26 @@ describe('checkSkill', () => {
         expect(run()).toEqual([]);
     });
 
+    it('règle 9 : signale un composant racine absent d’un README', () => {
+        const readmes = [{ path: 'packages/core/README.md', text: 'Composants : `ar-dialog`.' }];
+        const errors = run({ readmes }).join('\n');
+        expect(errors).toMatch(/packages\/core\/README\.md.*<ar-tab-group>/);
+        expect(errors).not.toMatch(/README\.md.*<ar-dialog>/);
+    });
+
+    it('règle 9 : un sous-composant n’est pas exigé, et un tag plus long ne compte pas pour son préfixe', () => {
+        const only = [{ path: 'README.md', text: '`ar-dialog-extra` et `ar-tab-group`.' }];
+        const errors = run({ readmes: only }).join('\n');
+        expect(errors).toMatch(/README\.md.*<ar-dialog>/);
+        expect(errors).not.toMatch(/<ar-tab>/);
+        expect(errors).not.toMatch(/<ar-tab-group>/);
+    });
+
+    it('règle 9 : accepte la forme balise et la forme code inline', () => {
+        const readmes = [{ path: 'README.md', text: '| `<ar-dialog>` | x |\n`ar-tab-group`' }];
+        expect(run({ readmes })).toEqual([]);
+    });
+
     it('ne soumet pas les fichiers générés aux règles 1 à 3', () => {
         write(
             'references/components/ar-dialog.md',

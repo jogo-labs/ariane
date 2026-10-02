@@ -97,6 +97,7 @@ Propriétés : sortie déterministe (tri par tag), un composant du CEM sans MDX 
 6. Le frontmatter de `SKILL.md` a `name` et `description`, et `name` est égal au nom du dossier.
 7. `package.json` liste `skills` et `llms` dans `files`.
 8. Chaque token `--ar-*` cité dans `theming.md` existe dans les `cssProperties` du CEM ou dans les fragments du thème (`src/styles/themes/ariane/`).
+9. Chaque composant racine du CEM est cité dans `README.md` et `packages/core/README.md` (listes de composants écrites à la main, hors zone de la skill : constatées périmées le 2026-10-02, 7 composants sur 19 ; sans ce contrôle elles se périment sans signal). Un tag plus long ne vaut pas pour son préfixe ; les sous-composants ne sont pas exigés.
 
 Convention : les tags, attributs et tokens à contrôler figurent dans des tables ou du code inline.
 

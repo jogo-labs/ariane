@@ -15,11 +15,11 @@ Ne modifiez jamais `skills/` ni `llms/` : ils sont recréés à chaque build. Po
 
 1. Éditez le fichier concerné de `content/ariane/`.
 2. `npm run build:manifest && npm run build:skill` (depuis `packages/core`).
-3. `npm run check:skill` : échoue si un tag, un attribut ou un token cité n'existe plus, si un composant racine n'est pas dans `choosing-components.md`, si un lien relatif est cassé.
+3. `npm run check:skill` : échoue si un tag, un attribut ou un token cité n'existe plus, si un composant racine n'est pas dans `choosing-components.md`, ni cité dans les listes de composants de `README.md` et `packages/core/README.md`, si un lien relatif est cassé.
 
 ## Quand mettre à jour
 
-Mettez à jour `content/ariane/` quand l'API publique (attribut, slot, événement, méthode, propriété CSS, part), un comportement ou une règle d'usage change, ou quand un composant est ajouté, renommé ou supprimé (le contrôle échoue tant que `choosing-components.md` n'est pas à jour). Le tableau d'API par composant, lui, suit seul le CEM et les MDX.
+Mettez à jour `content/ariane/` quand l'API publique (attribut, slot, événement, méthode, propriété CSS, part), un comportement ou une règle d'usage change, ou quand un composant est ajouté, renommé ou supprimé (le contrôle échoue tant que `choosing-components.md` et les listes de composants des deux README ne sont pas à jour). Le tableau d'API par composant, lui, suit seul le CEM et les MDX.
 
 ## Règles de rédaction (lecteur : un agent)
 

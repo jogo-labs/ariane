@@ -13,7 +13,9 @@
  *   5. les liens Markdown relatifs se résolvent ;
  *   6. le frontmatter de `SKILL.md` a `name: ariane` et une `description` ;
  *   7. `package.json` publie `skills` et `llms` (`files`) ;
- *   8. chaque token `--ar-*` cité dans `references/theming.md` existe (CEM ou thème).
+ *   8. chaque token `--ar-*` cité dans `references/theming.md` existe (CEM ou thème) ;
+ *   9. chaque composant racine du CEM est cité dans les README fournis (liste des composants
+ *      écrite à la main : sans ce contrôle elle se périme sans signal).
  *
  * Ce qu'il ne vérifie PAS : la vérité d'une phrase de conseil, les valeurs d'attribut, la qualité
  * de déclenchement de la `description`. Ceux-là relèvent de la relecture à la release.
@@ -60,10 +62,13 @@ function listCss(dir) {
 }
 
 /**
- * @param {{ cem: any, skillDir: string, pkg: { files?: string[] }, themeDir: string }} input
+ * @param {{
+ *   cem: any, skillDir: string, pkg: { files?: string[] }, themeDir: string,
+ *   readmes?: { path: string, text: string }[],
+ * }} input
  * @returns {string[]} les erreurs, vide si tout concorde
  */
-export function checkSkill({ cem, skillDir, pkg, themeDir }) {
+export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
     const errors = [];
     const declarations = cem.modules
         .flatMap((module) => module.declarations ?? [])
@@ -205,6 +210,19 @@ export function checkSkill({ cem, skillDir, pkg, themeDir }) {
         }
     }
 
+    // 9 : liste des composants des README. Un tag plus long (`ar-tab-group`) ne vaut pas pour son
+    // préfixe (`ar-tab`) ; les sous-composants sont décrits avec leur parent, non exigés.
+    for (const { path, text } of readmes) {
+        for (const root of roots) {
+            const cited = new RegExp(`(?<![a-z0-9-])${root.tagName}(?![a-z0-9-])`).test(text);
+            if (!cited) {
+                errors.push(
+                    `${path} — <${root.tagName}> n'est pas cité (liste des composants à mettre à jour).`,
+                );
+            }
+        }
+    }
+
     return errors;
 }
 
@@ -223,6 +241,10 @@ if (isMain) {
         skillDir: join(root, 'skills/ariane'),
         pkg: JSON.parse(readFileSync(join(root, 'package.json'), 'utf-8')),
         themeDir: join(root, 'src/styles/themes/ariane'),
+        readmes: [
+            { path: 'packages/core/README.md', file: 'README.md' },
+            { path: 'README.md', file: '../../README.md' },
+        ].map(({ path, file }) => ({ path, text: readFileSync(join(root, file), 'utf-8') })),
     });
     if (errors.length > 0) {
         console.error('\n❌ Skill incohérente avec la bibliothèque :');
