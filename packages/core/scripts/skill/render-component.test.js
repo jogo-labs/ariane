@@ -162,4 +162,10 @@ describe('renderIndex', () => {
         expect(md).toContain('- [`<ar-tab-group>`](ar-tab-group.md) : Onglets.');
         expect(md).toContain('    - `<ar-tab>` : Un onglet. (voir ar-tab-group.md)');
     });
+
+    it('aplatit un résumé multi-paragraphes sur une seule ligne', () => {
+        const multi = { decl: { tagName: 'ar-tooltip', description: 'Info.\n\nSuite\ndu texte.' } };
+        const md = renderIndex({ roots: [multi], childrenOf: new Map(), version: '1.0.0' });
+        expect(md).toContain('- [`<ar-tooltip>`](ar-tooltip.md) : Info. Suite du texte.\n');
+    });
 });

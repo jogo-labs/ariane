@@ -177,6 +177,11 @@ export function renderComponentFile(root, children) {
  * @returns {string}
  */
 export function renderIndex({ roots, childrenOf, version }) {
+    // Un résumé multi-paragraphes casserait la liste : on l'aplatit sur une seule ligne.
+    const oneLine = (text) =>
+        String(text ?? '')
+            .replace(/\s+/g, ' ')
+            .trim();
     const lines = [
         HEADER,
         '',
@@ -187,12 +192,12 @@ export function renderIndex({ roots, childrenOf, version }) {
         '',
     ];
     for (const { decl } of roots) {
-        const summary = decl.summary || decl.description || '';
+        const summary = oneLine(decl.summary || decl.description);
         lines.push(
             `- [\`<${decl.tagName}>\`](${decl.tagName}.md)${summary ? ` : ${summary}` : ''}`,
         );
         for (const child of childrenOf.get(decl.tagName) ?? []) {
-            const childSummary = child.decl.summary || child.decl.description || '';
+            const childSummary = oneLine(child.decl.summary || child.decl.description);
             lines.push(
                 `    - \`<${child.decl.tagName}>\`${childSummary ? ` : ${childSummary}` : ''} (voir ${decl.tagName}.md)`,
             );

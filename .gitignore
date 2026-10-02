@@ -6,6 +6,8 @@ dist/
 cdn/
 dist-astro/
 dist-starter-demo/
+/packages/core/skills/
+/packages/core/llms/
 
 # ── Cache ─────────────────────────────────────────────────────
 .turbo/
