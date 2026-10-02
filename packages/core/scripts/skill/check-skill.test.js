@@ -24,7 +24,7 @@ const CEM = {
 const PKG = { files: ['dist', 'cdn', 'skills', 'llms'] };
 
 const SKILL_MD =
-    '---\nname: ariane\ndescription: Utiliser Ariane.\n---\n\n# Ariane\n\nVoir [index](references/components/index.md).\n';
+    '---\nname: ariane\ndescription: "Ariane : ar-dialog, ar-tab-group."\n---\n\n# Ariane\n\nVoir [index](references/components/index.md).\n';
 const CHOOSING =
     '# Choisir\n\n| Besoin | Composant |\n| --- | --- |\n| Modale | `<ar-dialog>` |\n| Onglets | `<ar-tab-group>` |\n';
 
@@ -189,6 +189,16 @@ describe('checkSkill', () => {
         expect(errors).toMatch(/README\.md.*<ar-dialog>/);
         expect(errors).not.toMatch(/<ar-tab>/);
         expect(errors).not.toMatch(/<ar-tab-group>/);
+    });
+
+    it('règle 9 : signale un composant racine absent de la description de SKILL.md', () => {
+        write(
+            'SKILL.md',
+            '---\nname: ariane\ndescription: "Ariane : ar-dialog uniquement."\n---\n\n# Ariane\n',
+        );
+        const errors = run().join('\n');
+        expect(errors).toMatch(/SKILL\.md \(description\).*<ar-tab-group>/);
+        expect(errors).not.toMatch(/SKILL\.md \(description\).*<ar-dialog>/);
     });
 
     it('règle 9 : accepte la forme balise et la forme code inline', () => {

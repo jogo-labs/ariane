@@ -14,8 +14,9 @@
  *   6. le frontmatter de `SKILL.md` a `name: ariane` et une `description` ;
  *   7. `package.json` publie `skills` et `llms` (`files`) ;
  *   8. chaque token `--ar-*` cité dans `references/theming.md` existe (CEM ou thème) ;
- *   9. chaque composant racine du CEM est cité dans les README fournis (liste des composants
- *      écrite à la main : sans ce contrôle elle se périme sans signal).
+ *   9. chaque composant racine du CEM est cité dans les README fournis et dans le `description`
+ *      de SKILL.md (listes de composants écrites à la main : sans ce contrôle elles se périment
+ *      sans signal).
  *
  * Ce qu'il ne vérifie PAS : la vérité d'une phrase de conseil, les valeurs d'attribut, la qualité
  * de déclenchement de la `description`. Ceux-là relèvent de la relecture à la release.
@@ -160,6 +161,7 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
     }
 
     // 6 : frontmatter de SKILL.md.
+    let skillDescription = '';
     const skillPath = join(skillDir, 'SKILL.md');
     if (!existsSync(skillPath)) {
         errors.push('SKILL.md — fichier absent.');
@@ -172,6 +174,8 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
         }
         if (!data.description || String(data.description).trim() === '') {
             errors.push('SKILL.md — description absente ou vide.');
+        } else {
+            skillDescription = String(data.description);
         }
     }
 
@@ -210,9 +214,14 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
         }
     }
 
-    // 9 : liste des composants des README. Un tag plus long (`ar-tab-group`) ne vaut pas pour son
-    // préfixe (`ar-tab`) ; les sous-composants sont décrits avec leur parent, non exigés.
-    for (const { path, text } of readmes) {
+    // 9 : liste des composants des README et du `description` de SKILL.md (mots-clés de
+    // déclenchement). Un tag plus long (`ar-tab-group`) ne vaut pas pour son préfixe (`ar-tab`) ;
+    // les sous-composants sont décrits avec leur parent, non exigés.
+    const componentLists = [...readmes];
+    if (skillDescription !== '') {
+        componentLists.push({ path: 'SKILL.md (description)', text: skillDescription });
+    }
+    for (const { path, text } of componentLists) {
         for (const root of roots) {
             const cited = new RegExp(`(?<![a-z0-9-])${root.tagName}(?![a-z0-9-])`).test(text);
             if (!cited) {

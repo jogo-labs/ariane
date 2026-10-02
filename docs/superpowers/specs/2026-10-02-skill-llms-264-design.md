@@ -51,7 +51,7 @@ Règles :
 
 - Le générateur lit `content/ariane/` pour le copier, sans jamais l'écrire. Il n'écrit que dans `skills/` et `llms/`, qu'il vide avant.
 - Aucun fichier n'a deux auteurs. Les fichiers générés portent un en-tête « généré, ne pas éditer ».
-- `SKILL.md` ne contient pas de liste de composants : elle vit dans `components/index.md` (générée), vers laquelle il pointe.
+- Le corps de `SKILL.md` ne contient pas de liste de composants : elle vit dans `components/index.md` (générée), vers laquelle il pointe. Seul son `description` cite les tags des composants racine, comme mots-clés de déclenchement (décision du 2026-10-02 : l'approche de WebAwesome, une liste de mots-clés concrets, est à comparer à notre description situationnelle) ; la règle 9 vérifie cette liste.
 - `skills` et `llms` sont ajoutés à `files` de `packages/core/package.json`. `skills/` et `llms/` sont ajoutés à `.gitignore`.
 - `scripts/skill/README.md` n'est pas publié ; il documente ces règles et la procédure de mise à jour (comme celui de WebAwesome).
 
@@ -97,7 +97,7 @@ Propriétés : sortie déterministe (tri par tag), un composant du CEM sans MDX 
 6. Le frontmatter de `SKILL.md` a `name` et `description`, et `name` est égal au nom du dossier.
 7. `package.json` liste `skills` et `llms` dans `files`.
 8. Chaque token `--ar-*` cité dans `theming.md` existe dans les `cssProperties` du CEM ou dans les fragments du thème (`src/styles/themes/ariane/`).
-9. Chaque composant racine du CEM est cité dans `README.md` et `packages/core/README.md` (listes de composants écrites à la main, hors zone de la skill : constatées périmées le 2026-10-02, 7 composants sur 19 ; sans ce contrôle elles se périment sans signal). Un tag plus long ne vaut pas pour son préfixe ; les sous-composants ne sont pas exigés.
+9. Chaque composant racine du CEM est cité dans `README.md`, `packages/core/README.md` et dans le `description` de `SKILL.md` (listes de composants écrites à la main, hors zone de la skill : constatées périmées le 2026-10-02, 7 composants sur 19 ; sans ce contrôle elles se périment sans signal). Un tag plus long ne vaut pas pour son préfixe ; les sous-composants ne sont pas exigés.
 
 Convention : les tags, attributs et tokens à contrôler figurent dans des tables ou du code inline.
 

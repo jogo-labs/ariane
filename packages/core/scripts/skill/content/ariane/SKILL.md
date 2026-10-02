@@ -1,6 +1,6 @@
 ---
 name: ariane
-description: "À utiliser dès qu'une demande concerne Ariane (`@ariane-ui/core`, balises `ar-*`) : écrire du HTML avec ses composants, choisir un composant, charger la lib (CDN, npm, Vue/React), la thémer (tokens `--ar-*`, `::part()`), traduire ses libellés (i18n) ou changer le préfixe des tags."
+description: "À utiliser dès qu'une demande concerne Ariane (`@ariane-ui/core`, balises `ar-*`) : écrire du HTML avec ses composants (ar-alert, ar-breadcrumb, ar-charcounter, ar-collapse, ar-datepicker, ar-dialog, ar-dropdown, ar-pagination, ar-progressbar, ar-spinner, ar-stepper, ar-tab-group, ar-table-sort, ar-tooltip), choisir un composant, charger la lib (CDN, npm, Vue/React), la thémer (tokens `--ar-*`, `::part()`), traduire ses libellés (i18n) ou changer le préfixe des tags."
 ---
 
 # Ariane
