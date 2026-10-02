@@ -116,7 +116,7 @@ Les slots disponibles sont listés par composant dans `components/<tag>.md`. Le 
 
 ## Événements
 
-Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; son type est dans `components/<tag>.md`.
+Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données. Pour les événements dont le composant annote le type de `detail`, la colonne Type de `components/<tag>.md` le donne (`CustomEvent<…>`) ; sinon elle indique `CustomEvent` seul et le contenu de `detail` est à lire dans la description de l'événement ou dans cette page.
 
 ```js
 const pagination = document.querySelector('ar-pagination');
