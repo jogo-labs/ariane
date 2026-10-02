@@ -37,8 +37,8 @@ const GLOBAL_ATTRIBUTES = new Set([
 ]);
 const TAG_MENTION_RE = /<(ar-[a-z0-9-]+)(?=[\s>/])/g;
 const TAG_WITH_ATTRIBUTES_RE =
-    /<(ar-[a-z0-9-]+)((?:\s+[^\s>=/]+(?:=(?:"[^"]*"|'[^']*'))?)*)\s*\/?>/g;
-const ATTRIBUTE_RE = /([^\s=]+)(?:=(?:"[^"]*"|'[^']*'))?/g;
+    /<(ar-[a-z0-9-]+)((?:\s+[^\s>=/]+(?:=(?:"[^"]*"|'[^']*'|[^\s>"']+))?)*)\s*\/?>/g;
+const ATTRIBUTE_RE = /([^\s=]+)(?:=(?:"[^"]*"|'[^']*'|[^\s>"']+))?/g;
 const LINK_RE = /\]\(([^)\s]+)\)/g;
 const TOKEN_RE = /(--ar-[a-z0-9]+(?:-[a-z0-9]+)*)(-\*)?/g;
 const THEME_TOKEN_RE = /(--ar[\w-]+)\s*:/g;
@@ -138,6 +138,12 @@ export function checkSkill({ cem, skillDir, pkg, themeDir }) {
         for (const match of text.matchAll(LINK_RE)) {
             const target = match[1];
             if (/^(https?:|mailto:|#)/.test(target)) continue;
+            if (target.startsWith('/')) {
+                errors.push(
+                    `${path}:${lineOf(text, match.index)} — lien absolu vers le site de doc (non portable dans la skill) : ${target}`,
+                );
+                continue;
+            }
             const file = target.split('#')[0];
             if (file === '') continue;
             if (!existsSync(resolve(dirname(join(skillDir, path)), file))) {

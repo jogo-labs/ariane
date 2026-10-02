@@ -83,6 +83,25 @@ describe('checkSkill', () => {
         expect(errors).not.toMatch(/without-header/);
     });
 
+    it('règle 2 : lit les valeurs sans guillemets', () => {
+        write('references/usage.md', '<ar-dialog open=true inconnu></ar-dialog>\n');
+        const errors = run().join('\n');
+        expect(errors).toMatch(/inconnu/);
+        expect(errors).not.toMatch(/« open »/);
+    });
+
+    it('règle 2 : lit une balise auto-fermante', () => {
+        write('references/usage.md', '<ar-dialog inconnu />\n');
+        expect(run().join('\n')).toMatch(/inconnu/);
+    });
+
+    it('règle 2 : une valeur entre guillemets contenant > ne coupe pas la balise', () => {
+        write('references/usage.md', '<ar-dialog title="a > b" inconnu></ar-dialog>\n');
+        const errors = run().join('\n');
+        expect(errors).toMatch(/inconnu/);
+        expect(errors).not.toMatch(/« title »/);
+    });
+
     it('règle 3 : signale un composant racine absent de choosing-components.md', () => {
         write('references/choosing-components.md', '# Choisir\n\n| Modale | `<ar-dialog>` |\n');
         expect(run().join('\n')).toMatch(/choosing-components\.md.*<ar-tab-group>/);
@@ -117,6 +136,17 @@ describe('checkSkill', () => {
     it('règle 5 : ignore les liens http et les ancres', () => {
         write('references/usage.md', '[a](https://exemple.org) [b](#ancre)\n');
         expect(run()).toEqual([]);
+    });
+
+    it('règle 5 : refuse les liens absolus, ignore http et ancres', () => {
+        write(
+            'references/usage.md',
+            '[x](/getting-started/traductions) [y](/tmp) [a](https://exemple.org) [b](#ancre)\n',
+        );
+        const errors = run();
+        expect(errors).toHaveLength(2);
+        expect(errors.join('\n')).toMatch(/lien absolu.*\/getting-started\/traductions/);
+        expect(errors.join('\n')).toMatch(/lien absolu.*\/tmp/);
     });
 
     it('règle 6 : exige name = ariane et une description', () => {
