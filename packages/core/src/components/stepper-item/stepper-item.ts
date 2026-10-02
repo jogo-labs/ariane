@@ -81,6 +81,7 @@ export class ArStepperItem extends ArianeElement {
     /* PUBLIC API                                       */
     /* ------------------------------------------------ */
 
+    /** @internal */
     setRegistry(registry: StepperRegistry) {
         if (this._registry) {
             this._registry.unregisterItem(this);
@@ -89,7 +90,10 @@ export class ArStepperItem extends ArianeElement {
         registry.registerItem(this);
     }
 
-    /** Poussé par `ar-stepper` à chaque recalcul d'état (currentPath, mode, structure de l'arbre). */
+    /**
+     * Poussé par `ar-stepper` à chaque recalcul d'état (currentPath, mode, structure de l'arbre).
+     * @internal
+     */
     setRenderState(state: ItemRenderState): void {
         this._indicatorState = state.indicatorState;
         this._isLink = state.isLink;
@@ -97,7 +101,10 @@ export class ArStepperItem extends ArianeElement {
         this._srLabel = state.srLabel;
     }
 
-    /** Déplace le focus sur le contrôle interne (lien ou conteneur non cliquable). */
+    /**
+     * Déplace le focus sur le contrôle interne (lien ou conteneur non cliquable).
+     * @internal
+     */
     focusControl(): void {
         this.shadowRoot?.querySelector<HTMLElement>('.item-header')?.focus();
     }
