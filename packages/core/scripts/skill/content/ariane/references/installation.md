@@ -33,7 +33,7 @@ Règles :
 
 - Le nom court (`autoloader.js`, `index.js`) est la production : minifié, avertissements supprimés. Le suffixe `.dev.js` est le développement : non minifié, avertissements actifs dans la console (erreurs d'usage, notamment d'accessibilité).
 - Utiliser `.dev.js` en local, le nom court sur le site publié.
-- Épingler une version dans l'URL en production (`https://unpkg.com/@ariane-ui/core@<version>/cdn/autoloader.js`) : sans version, unpkg sert la dernière publiée. Le paquet est pré-v1 (version actuelle `0.1.0-alpha.13`) et toutes les versions pré-v1 sont publiées sous le dist-tag npm `latest`, donc une URL sans version suit la dernière publiée, y compris une alpha.
+- Épingler une version dans l'URL en production (`https://unpkg.com/@ariane-ui/core@<version>/cdn/autoloader.js`) : sans version, unpkg sert la dernière publiée. Le paquet est pré-v1 et toutes les versions pré-v1 sont publiées sous le dist-tag npm `latest`, donc une URL sans version suit la dernière publiée, y compris une alpha.
 - Avec npm, un seul build est publié : c'est le bundler du projet qui choisit selon `process.env.NODE_ENV` (`production` supprime les avertissements).
 
 ## npm
@@ -100,8 +100,8 @@ await whenAllDefined({ prefix: 'acme-' });
 | Firefox                       | 126              |
 | Safari (macOS, iOS et iPadOS) | 17.5             |
 
-- Pas de polyfills. En dessous de ces versions, le comportement n'est pas garanti. Les versions sont déduites des données de compatibilité des fonctionnalités utilisées (API Popover, états personnalisés, `ElementInternals`, `<dialog>`, `inert` ; pour le thème fourni : `light-dark()`, `color-mix()`, `oklch()`, `@layer`, imbrication CSS), pas testées version par version. Les tests automatisés tournent sur Chromium, Firefox et WebKit.
-- Chrome et Edge 125 : `:state()` n'existe pas, les états personnalisés sont exposés avec le préfixe `--` (`:--open`). Le thème fourni n'en tient pas compte ; la plupart des états ont un attribut équivalent (`[open]`, `[disabled]`…) à utiliser dans le CSS applicatif.
+- Pas de polyfills. En dessous de ces versions, le comportement n'est pas garanti. Les versions sont déduites des données de compatibilité des fonctionnalités utilisées (API Popover, états personnalisés, `ElementInternals`, `<dialog>`, `inert` ; pour le thème fourni : `light-dark()`, `color-mix()`, `oklch()`, `@layer`, imbrication CSS), pas testées version par version. Les tests automatisés tournent sur les dernières versions de Chromium, Firefox et WebKit (WebKit en local seulement, pas en CI).
+- Chrome et Edge avant 125 (hors plancher) : `:state()` n'existe pas, les états personnalisés sont exposés avec le préfixe `--` (`:--open`). Le thème fourni n'en tient pas compte ; la plupart des états ont un attribut équivalent (`[open]`, `[disabled]`…) à utiliser dans le CSS applicatif.
 - Safari iOS et iPadOS avant 18.3 : le tap à l'extérieur d'un panneau ne le ferme pas nativement. Ariane ajoute cette fermeture ; elle est testée en émulation, pas sur appareil.
 - SSR : pas de support officiel (fonctionnalité à venir) ; le support actuel est partiel et non testé.
 
