@@ -25,6 +25,7 @@ const alert = {
                 description: 'Émis avant fermeture. @cancelable',
             },
             { name: 'ar-alert-closed', type: { text: 'CustomEvent' }, description: 'Fermée.' },
+            { name: 'ar-alert-change', type: { text: 'CustomEvent<{ active: string }>' } },
         ],
         cssProperties: [{ name: '--ar-alert-gap', description: 'Espace.' }],
         cssParts: [{ name: 'base', description: 'Conteneur.' }],
@@ -34,6 +35,10 @@ const alert = {
             { kind: 'method', name: 'close', description: 'Ferme.', parameters: [] },
             { kind: 'method', name: 'update', inheritedFrom: { name: 'LitElement' } },
             { kind: 'method', name: 'internal', privacy: 'protected' },
+            { kind: 'method', name: 'formAssociatedCallback', parameters: [{ name: 'form' }] },
+            { kind: 'method', name: 'formDisabledCallback', parameters: [{ name: 'disabled' }] },
+            { kind: 'method', name: 'formResetCallback', parameters: [] },
+            { kind: 'method', name: 'formStateRestoreCallback', parameters: [{ name: 'state' }] },
         ],
     },
     variants: [
@@ -95,10 +100,15 @@ describe('renderComponentFile', () => {
         expect(md).toContain('| (par défaut) | Contenu. |');
     });
 
-    it("ignore l'entrée sans description et marque les annulables", () => {
+    it("ignore l'artefact `name` de l'analyseur, rend le type et marque les annulables", () => {
+        expect(md).toContain('| Événement | Type | Annulable | Description |');
         expect(md).not.toContain('`name`');
-        expect(md).toContain('| `ar-alert-close` | oui | Émis avant fermeture. |');
-        expect(md).toContain('| `ar-alert-closed` | non | Fermée. |');
+        expect(md).toContain('| `ar-alert-close` | `CustomEvent` | oui | Émis avant fermeture. |');
+        expect(md).toContain('| `ar-alert-closed` | `CustomEvent` | non | Fermée. |');
+    });
+
+    it('garde un événement réel sans description, avec le type de son detail', () => {
+        expect(md).toContain('| `ar-alert-change` | `CustomEvent<{ active: string }>` | non | — |');
     });
 
     it('rend propriétés CSS, parts et états CSS', () => {
@@ -112,6 +122,13 @@ describe('renderComponentFile', () => {
         expect(md).not.toContain('update');
         expect(md).not.toContain('internal');
         expect(md).not.toContain('_secret');
+    });
+
+    it('exclut les callbacks du cycle de vie form-associated', () => {
+        expect(md).not.toContain('formAssociatedCallback');
+        expect(md).not.toContain('formDisabledCallback');
+        expect(md).not.toContain('formResetCallback');
+        expect(md).not.toContain('formStateRestoreCallback');
     });
 
     it('ajoute le corps MDX sous « Accessibilité et usage » sans doubler le titre', () => {

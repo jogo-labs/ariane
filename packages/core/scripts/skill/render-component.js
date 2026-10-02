@@ -5,13 +5,20 @@
  * MDX, le fichier de référence d'un composant racine (sous-composants inclus) et l'index.
  *
  * Particularités du CEM d'Ariane (constatées) : `description` de classe vide, le texte est dans
- * `summary` ; un événement sans description est un artefact de l'analyseur (`_emit(name, …)`),
- * il est ignoré ; l'annulabilité d'un événement est le marqueur final `@cancelable`.
+ * `summary` ; l'événement nommé `name` est un artefact de l'analyseur (`new CustomEvent(name, …)`
+ * dans `_emit`), il est ignoré ; l'annulabilité d'un événement est le marqueur final `@cancelable`.
  */
 import { shiftHeadings } from './mdx.js';
 
 const CANCELABLE_RE = /\s*@cancelable\s*$/;
 const HEADER = '<!-- Généré par scripts/skill/build-skill.js : ne pas éditer. -->';
+/** Callbacks du cycle de vie form-associated, appelés par le navigateur : pas une API publique. */
+const FORM_CALLBACKS = new Set([
+    'formAssociatedCallback',
+    'formDisabledCallback',
+    'formResetCallback',
+    'formStateRestoreCallback',
+]);
 
 /** @param {string | undefined} description */
 export function isCancelable(description) {
@@ -72,13 +79,14 @@ function apiSections(decl, level) {
     add(
         'Événements',
         table(
-            ['Événement', 'Annulable', 'Description'],
+            ['Événement', 'Type', 'Annulable', 'Description'],
             (decl.events ?? [])
-                .filter((e) => e.description)
+                .filter((e) => e.name !== 'name')
                 .map((e) => [
                     code(e.name),
+                    code(e.type?.text),
                     isCancelable(e.description) ? 'oui' : 'non',
-                    e.description.replace(CANCELABLE_RE, ''),
+                    (e.description ?? '').replace(CANCELABLE_RE, ''),
                 ]),
         ),
     );
@@ -108,7 +116,14 @@ function apiSections(decl, level) {
         table(
             ['Méthode', 'Description'],
             (decl.members ?? [])
-                .filter((m) => m.kind === 'method' && !m.privacy && !m.static && !m.inheritedFrom)
+                .filter(
+                    (m) =>
+                        m.kind === 'method' &&
+                        !m.privacy &&
+                        !m.static &&
+                        !m.inheritedFrom &&
+                        !FORM_CALLBACKS.has(m.name),
+                )
                 .map((m) => [
                     code(`${m.name}(${(m.parameters ?? []).map((p) => p.name).join(', ')})`),
                     m.description,
