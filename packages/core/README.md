@@ -32,15 +32,22 @@ import '@ariane-ui/core/themes/ariane.css';
 
 ## Composants
 
-| Composant    | Tag                 | Description                                          |
-| ------------ | ------------------- | ---------------------------------------------------- |
-| Alert        | `<ar-alert>`        | Message contextuel (info, success, warning, error)   |
-| Breadcrumb   | `<ar-breadcrumb>`   | Fil d'ariane de navigation                           |
-| Pagination   | `<ar-pagination>`   | Navigation entre pages                               |
-| Progress Bar | `<ar-progressbar>`  | Barre de progression                                 |
-| Spinner      | `<ar-spinner>`      | Indicateur de chargement                             |
-| Stepper      | `<ar-stepper>`      | Navigation multi-étapes (desktop + mobile adaptatif) |
-| Stepper Item | `<ar-stepper-item>` | Étape individuelle du Stepper                        |
+| Composant    | Tag                | Description                                                                                |
+| ------------ | ------------------ | ------------------------------------------------------------------------------------------ |
+| Alert        | `<ar-alert>`       | Message contextuel (info, success, warning, error)                                         |
+| Breadcrumb   | `<ar-breadcrumb>`  | Fil d'ariane de navigation, mobile et desktop (liens : `<ar-breadcrumb-item>`)             |
+| Charcounter  | `<ar-charcounter>` | Caractères restants d'un champ de texte, avec alerte avant la limite                       |
+| Collapse     | `<ar-collapse>`    | Résumé qui se déplie pour révéler du contenu additionnel                                   |
+| Datepicker   | `<ar-datepicker>`  | Champ de saisie de date synchronisé avec un calendrier popover                             |
+| Dialog       | `<ar-dialog>`      | Modale ou drawer qui capte l'attention                                                     |
+| Dropdown     | `<ar-dropdown>`    | Panneau contextuel déclenché par un bouton, menu d'actions (items : `<ar-dropdown-item>`)  |
+| Pagination   | `<ar-pagination>`  | Navigation entre pages                                                                     |
+| Progress Bar | `<ar-progressbar>` | Barre de progression                                                                       |
+| Spinner      | `<ar-spinner>`     | Indicateur de chargement                                                                   |
+| Stepper      | `<ar-stepper>`     | Navigation multi-étapes avec sous-étapes, desktop et mobile (étapes : `<ar-stepper-item>`) |
+| Tab Group    | `<ar-tab-group>`   | Onglets : un panneau affiché à la fois (`<ar-tab>`, `<ar-tab-panel>`)                      |
+| Table Sort   | `<ar-table-sort>`  | Indicateur de tri sur un entête de colonne, avec confirmation asynchrone                   |
+| Tooltip      | `<ar-tooltip>`     | Information contextuelle brève au survol ou au focus (WCAG 1.4.13)                         |
 
 ---
 
