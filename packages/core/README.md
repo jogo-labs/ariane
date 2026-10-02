@@ -71,6 +71,26 @@ import manifest from '@ariane-ui/core/custom-elements.json';
 
 ---
 
+## Pour les agents IA
+
+Le paquet livre une Agent Skill `ariane` (`skills/ariane/`) qui décrit l'installation, l'usage, le thème, les traductions et l'API de chaque composant de la version installée.
+
+Installation dans un projet pour Claude Code (observée avec l'outil `skills` 1.7.0) :
+
+```bash
+npx skills add ./node_modules/@ariane-ui/core/skills/ariane -a claude-code -y
+```
+
+- La commande copie la skill dans `.claude/skills/ariane` du projet et écrit un `skills-lock.json`.
+- La copie ne suit pas les mises à jour de `@ariane-ui/core` : relancer `npx skills add …` après une mise à jour du paquet (`skills` 1.7.0 propose aussi `skills update`, non vérifié sur une source locale).
+- Sans skill : `node_modules/@ariane-ui/core/llms/llms.txt` (et `llms-full.txt`, tout le contenu en un fichier).
+
+Le déclenchement d'une skill relève du jugement de l'agent, qui ne la consulte pas toujours. Pour le fiabiliser, ajouter au `CLAUDE.md` ou `AGENTS.md` du projet :
+
+> Pour tout code utilisant `@ariane-ui/core` ou des balises `ar-*`, utiliser la skill `ariane` (ou lire `node_modules/@ariane-ui/core/llms/llms.txt`).
+
+---
+
 ## Personnalisation CSS
 
 Chaque composant expose des **CSS Custom Properties** pour la personnalisation sans modifier les sources :
