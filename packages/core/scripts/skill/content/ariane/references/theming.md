@@ -114,7 +114,7 @@ Contrainte de cascade `::part()` :
 - Conséquence : une propriété modifiée par une règle d'état interne du composant (classe de survol, de sélection…) reste un token ; la forcer via `::part()` figerait tous les états. Le contrat de chaque composant tient compte de cela : utiliser les tokens listés avant de passer par `::part()`.
 - Ne pas utiliser `!important` pour une préférence de style. Ariane l'emploie seulement quand une surcharge casserait un contrat fonctionnel (positionnement, garantie d'accessibilité).
 - Un `ar-<tag> { --token: … }` n'atteint qu'un élément du même arbre : il ne traverse pas la frontière du shadow DOM d'un autre composant. Un composant Ariane instancié dans le shadow DOM d'un autre (cas du tooltip interne d'`ar-table-sort`) se paramètre par des tokens valorisés sur `:root`, qui traversent toutes les frontières par héritage.
-- Un `ar-dialog { … }` non qualifié perd face à `ar-dialog[size='…']` du thème (spécificité supérieure) : le rendre aussi spécifique, ou omettre `size`, ou utiliser `--ar-dialog-width`.
+- Pour une largeur d'`ar-dialog` personnalisée, utiliser `--ar-dialog-width`. Avec `ariane.css` (en couche), une règle de l'application hors couche l'emporte sur le palier `ar-dialog[size='…']` du thème quelle que soit la spécificité. La spécificité ne joue que si les deux règles sont dans la même couche ou toutes deux hors couche (thème propre sans couche) : alors un `ar-dialog { … }` non qualifié perd face à `ar-dialog[size='…']` ; le rendre aussi spécifique ou omettre `size`.
 
 ### Parts sémantiques transverses
 
@@ -167,7 +167,7 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 | `fields.css`  | `ar-input` (`<input>`, `<textarea>`), `ar-label`, `ar-field-group` (empile label, champ, éléments liés) |
 
 - `ar-btn` seule ne pose aucune couleur de variante : toujours l'associer à une variante.
-- `ar-btn` prend en charge `:disabled` et `[aria-disabled='true']`. `ar-input` prend en charge `[aria-invalid='true']`, `:disabled`, `[aria-disabled]` et `:read-only`.
+- `ar-btn` prend en charge `:disabled` et `[aria-disabled='true']`. Pour ces états, `buttons.css` pose `background-color`, `border-color` et `color` en `!important` (valeurs `--ar-button-disabled-*`) : un `!important` en couche l'emporte sur le CSS hors couche, donc surcharger ces couleurs passe par les tokens `--ar-button-disabled-bg`, `--ar-button-disabled-border` et `--ar-button-disabled-color`, ou par un `!important` dans l'application. `ar-input` prend en charge `[aria-invalid='true']`, `:disabled`, `[aria-disabled]` et `:read-only`.
 - `ar-label` réagit à `data-ar-char-state="warning"` et `data-ar-char-state="error"` : hook documenté par `ar-charcounter`, à poser sur le label lié au champ observé.
 
 ```html
