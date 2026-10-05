@@ -114,27 +114,6 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
         </ar-tab-group>
     </section>
 
-    {/* ── Traduction ── */}
-    {component['x-localized'] && (
-        <section>
-            <div class="subsection-title-row">
-                <h4 id="api-traduction" class="subsection-title">Traduction</h4>
-                <HeadingAnchor id="api-traduction" label="Traduction" />
-            </div>
-            <p>
-                La langue de ce composant suit l'attribut <code>lang</code> de la page
-                (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
-                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
-                page <a href="/getting-started/traductions">Traductions</a> pour le détail du
-                mécanisme et la liste des traductions disponibles.
-            </p>
-            <p>
-                <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
-                « Attributs &amp; Propriétés ».
-            </p>
-        </section>
-    )}
-
     {/* ── Utilisation : API de configuration/pilotage (#233) ── */}
     {usageCategories.length > 0 && (
         <section>
@@ -359,6 +338,27 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     </ar-tab-panel>
                 )}
             </ar-tab-group>
+        </section>
+    )}
+
+    {/* ── Traduction ── */}
+    {component['x-localized'] && (
+        <section>
+            <div class="subsection-title-row">
+                <h4 id="api-traduction" class="subsection-title">Traduction</h4>
+                <HeadingAnchor id="api-traduction" label="Traduction" />
+            </div>
+            <p>
+                La langue de ce composant suit l'attribut <code>lang</code> de la page
+                (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
+                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
+                page <a href="/getting-started/traductions">Traductions</a> pour le détail du
+                mécanisme et la liste des traductions disponibles.
+            </p>
+            <p>
+                <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
+                « Attributs &amp; Propriétés ».
+            </p>
         </section>
     )}
 </div>

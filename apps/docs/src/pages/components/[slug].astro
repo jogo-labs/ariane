@@ -90,9 +90,6 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 
 const apiTocEntries = [
     { id: 'api-import', label: 'Import', level: 2 as const },
-    component['x-localized']
-        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
-        : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
         : null,
@@ -113,6 +110,9 @@ const apiTocEntries = [
         : null,
     (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
+        : null,
+    component['x-localized']
+        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
         : null,
 ].filter((entry) => entry !== null);
 
