@@ -16,6 +16,7 @@ Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorep
 - Breaking change : footer `BREAKING CHANGE: <description>` dans le message du commit (ou `!` après le scope), y compris dans le message de squash. `npm run changelog` le reprend sous « Changements incompatibles » ; sans marqueur il n'apparaît pas dans le changelog.
 - CSS tokens `--doc-*` (`apps/docs/`) ne forcent jamais un ajout dans `packages/core`
 - Un `${expr}` seul contenu d'un élément texte (sr-only, label…) dans un template Lit : si la ligne dépasse 100 caractères, Prettier peut le wrapper d'une façon qui insère des nœuds de texte (espaces) dans le DOM rendu, corrompant `textContent`/le nom accessible. Extraire la valeur en `const` avant le template plutôt que d'inliner un appel long.
+- Skill consommateur : si l'API publique d'un composant (attribut, slot, événement, méthode, propriété CSS, part), un comportement ou une règle d'usage change, mettre à jour `packages/core/scripts/skill/content/` (voir son `README.md`). Le tableau d'API généré suit seul le CEM et les MDX ; `npm run check:skill` (inclus dans `build`) échoue sur un composant ajouté sans entrée dans `choosing-components.md` ou absent des listes de composants de `README.md`, `packages/core/README.md` et du `description` de `SKILL.md`.
 
 ## Philosophie de conception
 
@@ -30,6 +31,7 @@ npm run test               # Vitest passe unique (racine)
 npm run test:all           # Vitest + WTR browser
 npm run create ar-<nom>    # Scaffold nouveau composant
 npm run build:manifest     # Regénère custom-elements.json
+npm run build:skill        # Regénère skills/ariane et llms/ (depuis packages/core)
 npm run changelog          # Section de la prochaine release dans CHANGELOG.md (branche release, après bump)
 ```
 

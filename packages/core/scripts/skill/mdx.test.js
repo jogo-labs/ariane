@@ -1,0 +1,159 @@
+// @vitest-environment node
+import { describe, expect, it } from 'vitest';
+import { convertMdxBody, parseMdx, shiftHeadings } from './mdx.js';
+
+describe('parseMdx', () => {
+    it('sépare le frontmatter (variants) du corps', () => {
+        const source = [
+            '---',
+            'tagName: ar-x',
+            'variants:',
+            '    - name: a',
+            '      label: A',
+            '      html: |',
+            '          <ar-x></ar-x>',
+            '---',
+            '',
+            '## Accessibilité',
+            '',
+            'texte',
+            '',
+        ].join('\n');
+        const { data, body } = parseMdx(source);
+        expect(data.variants[0].name).toBe('a');
+        expect(data.variants[0].html.trim()).toBe('<ar-x></ar-x>');
+        expect(body).toBe('## Accessibilité\n\ntexte');
+    });
+});
+
+describe('convertMdxBody', () => {
+    it('retire les imports hors blocs de code et compacte les lignes vides', () => {
+        const body = "import WcagRef from '../../components/WcagRef.astro';\n\n## Titre\n\ntexte";
+        expect(convertMdxBody(body, 'x.mdx')).toBe('## Titre\n\ntexte');
+    });
+
+    it('conserve un import situé dans un bloc de code', () => {
+        const body = "```js\nimport IMask from 'imask';\n```";
+        expect(convertMdxBody(body, 'x.mdx')).toBe(body);
+    });
+
+    it('remplace <WcagRef> (multi-lignes) par du texte', () => {
+        const body = [
+            '- conforme',
+            '    <WcagRef',
+            '        criterion="4.1.3"',
+            '        summary="Status Messages : annoncés sans déplacer le focus."',
+            '    />',
+            '- suite',
+        ].join('\n');
+        const out = convertMdxBody(body, 'x.mdx');
+        expect(out).toContain('WCAG 4.1.3 : Status Messages : annoncés sans déplacer le focus.');
+        expect(out).not.toContain('<WcagRef');
+        expect(out).toContain('- suite');
+    });
+
+    it('échoue sur un composant JSX inconnu en nommant le fichier', () => {
+        expect(() => convertMdxBody('<Callout>x</Callout>', 'ar-x.mdx')).toThrow(
+            /ar-x\.mdx.*<Callout>/,
+        );
+    });
+
+    it('ne prend pas un générique en code inline pour du JSX', () => {
+        const body = 'Retourne une `Promise<Foo>` résolue.';
+        expect(convertMdxBody(body, 'x.mdx')).toBe(body);
+    });
+
+    it('ne touche pas au contenu des blocs de code (JSX apparent compris)', () => {
+        const body = '```html\n<Foo bar="1"></Foo>\n```';
+        expect(convertMdxBody(body, 'x.mdx')).toBe(body);
+    });
+});
+
+describe('convertMdxBody : liens absolus du site', () => {
+    const convert = (body) => convertMdxBody(body, 'x.mdx');
+
+    it('remplace un lien absolu par son texte', () => {
+        expect(convert('Voir [les traductions](/getting-started/traductions).')).toBe(
+            'Voir les traductions.',
+        );
+    });
+
+    it('gère une ancre, un titre et un lien //hote', () => {
+        expect(convert('[a](/x#y) [b](/x "Titre") [c](//hote/x)')).toBe('a b c');
+    });
+
+    it('remplace deux liens absolus sur la même ligne', () => {
+        expect(convert('[a](/x) et [b](/y)')).toBe('a et b');
+    });
+
+    it('laisse https, mailto et liens relatifs (ancre comprise)', () => {
+        const md =
+            '[a](https://x.fr) [b](mailto:a@b.fr) [d](autre.md) [e](./x.md) [f](../x.md) [g](x.md#y)';
+        expect(convert(md)).toBe(md);
+    });
+
+    it('laisse une image absolue', () => {
+        expect(convert('![alt](/img/x.png)')).toBe('![alt](/img/x.png)');
+    });
+
+    it('laisse un lien absolu dans un bloc de code', () => {
+        const body = '```md\n[a](/b)\n```';
+        expect(convert(body)).toBe(body);
+    });
+
+    it('laisse un lien absolu dans du code inline', () => {
+        const body = 'Écrire `[a](/b)` puis [c](/d).';
+        expect(convert(body)).toBe('Écrire `[a](/b)` puis c.');
+    });
+
+    it('retire le lien dont le texte est du code inline', () => {
+        expect(convert('[`ar-x`](/c)')).toBe('`ar-x`');
+    });
+
+    it('traite code inline dans le texte du lien et code inline voisin sur la même ligne', () => {
+        expect(convert('Voir [`ar-x`](/c) et `[a](/b)` puis [d](/e).')).toBe(
+            'Voir `ar-x` et `[a](/b)` puis d.',
+        );
+    });
+
+    it('laisse un lien à texte en code inline dont la cible n’est pas absolue', () => {
+        expect(convert('[`ar-x`](autre.md#a)')).toBe('[`ar-x`](autre.md#a)');
+    });
+});
+
+describe('convertMdxBody : ancres de la page du site', () => {
+    const convert = (body) => convertMdxBody(body, 'x.mdx');
+
+    it('remplace un lien vers une ancre seule par son texte', () => {
+        expect(convert('Voir la [Référence API](#reference-api).')).toBe('Voir la Référence API.');
+    });
+
+    it('gère un titre et un texte en code inline', () => {
+        expect(convert('[a](#x "Titre") et [`ar-x`](#y)')).toBe('a et `ar-x`');
+    });
+
+    it('laisse une ancre dans un bloc de code ou du code inline', () => {
+        const fenced = '```md\n[a](#b)\n```';
+        expect(convert(fenced)).toBe(fenced);
+        expect(convert('Écrire `[a](#b)` puis [c](#d).')).toBe('Écrire `[a](#b)` puis c.');
+    });
+
+    it('laisse une image dont la cible est une ancre', () => {
+        expect(convert('![alt](#x)')).toBe('![alt](#x)');
+    });
+});
+
+describe('shiftHeadings', () => {
+    it('descend les titres hors blocs de code', () => {
+        const md = '## A\n\n```md\n## pas un titre\n```\n\n### B';
+        expect(shiftHeadings(md, 1)).toBe('### A\n\n```md\n## pas un titre\n```\n\n#### B');
+    });
+
+    it('ne dépasse pas le niveau 6', () => {
+        expect(shiftHeadings('###### Z', 2)).toBe('###### Z');
+    });
+
+    it('ne change rien pour un décalage nul', () => {
+        expect(shiftHeadings('## A', 0)).toBe('## A');
+    });
+});

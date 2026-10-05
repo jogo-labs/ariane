@@ -17,8 +17,10 @@ system : les tokens thémables, les `::part()` et le préfixe de tags personnali
 Les composants sont des **Custom Elements** natifs : ils fonctionnent dans n'importe quel framework (React, Vue,
 Angular, Svelte) ou sans framework du tout.
 
-Composants disponibles : `ar-alert`, `ar-breadcrumb`, `ar-pagination`,
-`ar-progressbar`, `ar-spinner`, `ar-stepper` / `ar-stepper-item`.
+Composants disponibles : `ar-alert`, `ar-breadcrumb` (`ar-breadcrumb-item`), `ar-charcounter`,
+`ar-collapse`, `ar-datepicker`, `ar-dialog`, `ar-dropdown` (`ar-dropdown-item`), `ar-pagination`,
+`ar-progressbar`, `ar-spinner`, `ar-stepper` (`ar-stepper-item`), `ar-tab-group` (`ar-tab`,
+`ar-tab-panel`), `ar-table-sort`, `ar-tooltip`.
 
 ---
 

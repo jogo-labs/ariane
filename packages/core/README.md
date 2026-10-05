@@ -32,15 +32,22 @@ import '@ariane-ui/core/themes/ariane.css';
 
 ## Composants
 
-| Composant    | Tag                 | Description                                          |
-| ------------ | ------------------- | ---------------------------------------------------- |
-| Alert        | `<ar-alert>`        | Message contextuel (info, success, warning, error)   |
-| Breadcrumb   | `<ar-breadcrumb>`   | Fil d'ariane de navigation                           |
-| Pagination   | `<ar-pagination>`   | Navigation entre pages                               |
-| Progress Bar | `<ar-progressbar>`  | Barre de progression                                 |
-| Spinner      | `<ar-spinner>`      | Indicateur de chargement                             |
-| Stepper      | `<ar-stepper>`      | Navigation multi-étapes (desktop + mobile adaptatif) |
-| Stepper Item | `<ar-stepper-item>` | Étape individuelle du Stepper                        |
+| Composant    | Tag                | Description                                                                                |
+| ------------ | ------------------ | ------------------------------------------------------------------------------------------ |
+| Alert        | `<ar-alert>`       | Message contextuel (info, success, warning, error)                                         |
+| Breadcrumb   | `<ar-breadcrumb>`  | Fil d'ariane de navigation, mobile et desktop (liens : `<ar-breadcrumb-item>`)             |
+| Charcounter  | `<ar-charcounter>` | Caractères restants d'un champ de texte, avec alerte avant la limite                       |
+| Collapse     | `<ar-collapse>`    | Résumé qui se déplie pour révéler du contenu additionnel                                   |
+| Datepicker   | `<ar-datepicker>`  | Champ de saisie de date synchronisé avec un calendrier popover                             |
+| Dialog       | `<ar-dialog>`      | Modale ou drawer qui capte l'attention                                                     |
+| Dropdown     | `<ar-dropdown>`    | Panneau contextuel déclenché par un bouton, menu d'actions (items : `<ar-dropdown-item>`)  |
+| Pagination   | `<ar-pagination>`  | Navigation entre pages                                                                     |
+| Progress Bar | `<ar-progressbar>` | Barre de progression                                                                       |
+| Spinner      | `<ar-spinner>`     | Indicateur de chargement                                                                   |
+| Stepper      | `<ar-stepper>`     | Navigation multi-étapes avec sous-étapes, desktop et mobile (étapes : `<ar-stepper-item>`) |
+| Tab Group    | `<ar-tab-group>`   | Onglets : un panneau affiché à la fois (`<ar-tab>`, `<ar-tab-panel>`)                      |
+| Table Sort   | `<ar-table-sort>`  | Indicateur de tri sur un entête de colonne, avec confirmation asynchrone                   |
+| Tooltip      | `<ar-tooltip>`     | Information contextuelle brève au survol ou au focus (WCAG 1.4.13)                         |
 
 ---
 
@@ -68,6 +75,33 @@ import '@ariane-ui/core/cdn/autoloader';
 // Manifest CEM (outillage et intégrations)
 import manifest from '@ariane-ui/core/custom-elements.json';
 ```
+
+---
+
+## Pour les agents IA
+
+Le paquet livre une Agent Skill `ariane` (`skills/ariane/`) qui décrit l'installation, l'usage, le thème, les traductions et l'API de chaque composant de la version installée.
+
+Si votre agent IA prend en charge les skills, installez celle du paquet avec l'outil `skills` (observé avec la version 1.7.0, sur un paquet `npm pack` installé dans un projet vierge) :
+
+```bash
+npx skills experimental_sync -a <nom-de-votre-agent> -y
+```
+
+Exemple avec Claude Code (le seul agent testé) :
+
+```bash
+npx skills experimental_sync -a claude-code -y
+```
+
+- La commande (expérimentale, d'après son nom) cherche les skills livrées par les paquets de `node_modules` et installe `ariane` : copie dans `.agents/skills/ariane`, puis dossier de l'agent ciblé (observé pour Claude Code : lien `.claude/skills/ariane` vers cette copie). Elle installe aussi les skills livrées par d'autres paquets installés. L'option `-a` est décrite par `npx skills add --help`.
+- Après une mise à jour de `@ariane-ui/core`, relancer la même commande : elle rafraîchit la skill si son contenu a changé, et répond « already up to date » sinon. Aucune notification automatique à la mise à jour du paquet, et `npx skills update` ne gère pas ce cas (observé : « No project skills to update » pour une skill installée depuis un chemin local).
+- Alternative : `npx skills add ./node_modules/@ariane-ui/core/skills/ariane -a <nom-de-votre-agent> -y` copie la skill dans le dossier de l'agent et écrit un `skills-lock.json` ; la copie ne suit pas les mises à jour du paquet.
+- Sans prise en charge des skills : `node_modules/@ariane-ui/core/llms/llms.txt` (et `llms-full.txt`, tout le contenu en un fichier).
+
+Le déclenchement d'une skill relève du jugement de l'agent, qui peut ne pas la consulter. Facultatif : si vous constatez qu'elle n'est pas utilisée, vous pouvez ajouter au `CLAUDE.md` ou `AGENTS.md` de votre projet une ligne qui l'invoque explicitement, par exemple :
+
+> Pour tout code utilisant `@ariane-ui/core` ou des balises `ar-*`, utiliser la skill `ariane` (ou lire `node_modules/@ariane-ui/core/llms/llms.txt`).
 
 ---
 
