@@ -192,7 +192,8 @@ ar-datepicker {
         height: var(--ar-button-height);
         box-sizing: border-box;
         padding: 0 0.75rem;
-        border: 1px solid var(--ar-input-border-color);
+        border-width: 1px;
+        border-style: solid;
         border-inline-end: none;
         border-start-start-radius: var(--ar-input-radius);
         border-end-start-radius: var(--ar-input-radius);
@@ -204,34 +205,43 @@ ar-datepicker {
         transition: border-color 0.15s ease;
     }
 
-    &::part(input):read-only {
+    /* Les règles de bordure ci-dessous du `::part(input)` du thème (côté document)
+           l'emportent sur la règle d'erreur interne `:host([has-error]) [part~='input']`
+           du composant : elles excluent donc `:state(has-error)` au lieu de réénoncer la
+           couleur d'erreur. Un thème personnalisé qui fixe la couleur de bordure de
+           l'input doit faire de même. */
+    &:not(:state(has-error))::part(input) {
+        border-color: var(--ar-input-border-color);
+    }
+
+    &:not(:state(has-error))::part(input):read-only {
         border-color: var(--ar-input-inactive-border-color);
+    }
+
+    &::part(input):read-only {
         background: var(--ar-input-readonly-bg);
         cursor: default;
     }
 
-    &::part(input):disabled {
+    &:not(:state(has-error))::part(input):disabled {
         border-color: var(--ar-input-inactive-border-color);
+    }
+
+    &::part(input):disabled {
         color: var(--ar-input-disabled-color);
         background: var(--ar-input-disabled-bg);
         cursor: not-allowed;
     }
 
-    /* Après read-only/disabled (même spécificité) : le focus garde sa bordure. */
+    /* Après read-only/disabled (même spécificité) : le focus garde sa bordure, sauf en
+       erreur (l'anneau d'outline reste l'indicateur de focus). */
     &::part(input):focus-visible {
         outline: 2px solid var(--ar-input-focus-ring-color);
         outline-offset: var(--ar-focus-ring-offset);
-        border-color: var(--ar-color-interactive);
     }
 
-    /* Ordre de cascade, du plus faible au plus fort (spécificité égale, l'ordre source
-           tranche) : bordure de base < read-only/disabled < focus-visible < erreur.
-           Le `::part(input)` du thème, côté document, l'emporte sur la règle interne
-           `:host([has-error]) [part~='input']` du composant : le thème doit donc la
-           réénoncer. L'erreur reste visible au focus (l'anneau d'outline reste l'indicateur
-           de focus) et sur un champ read-only/disabled invalide. */
-    &[has-error]::part(input) {
-        border-color: var(--ar-datepicker-input-error-border-color);
+    &:not(:state(has-error))::part(input):focus-visible {
+        border-color: var(--ar-color-interactive);
     }
 
     /* -- Champ texte : bouton d'ouverture du calendrier (icône) -- */

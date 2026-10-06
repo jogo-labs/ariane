@@ -163,6 +163,8 @@ L'input accepte une saisie libre dans le format défini par la prop `format` (d�
 
 L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur via `ar-datepicker[has-error]::part(input)`.
 
+Le composant applique lui-même la couleur de bordure d'erreur de l'input ; un thème personnalisé qui fixe la couleur de bordure de `::part(input)` doit donc exclure l'état d'erreur (`ar-datepicker:not(:state(has-error))::part(input)`), sinon sa règle l'emporte sur celle du composant.
+
 La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
 
 ```js

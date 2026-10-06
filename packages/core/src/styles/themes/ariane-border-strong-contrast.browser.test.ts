@@ -154,12 +154,13 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
     // État final posé avant la connexion : pas de lecture pendant la transition de bordure.
     async function mountInvalid(
         theme: string,
-        opts: { readonly?: boolean } = {},
+        opts: { readonly?: boolean; disabled?: boolean } = {},
     ): Promise<{ el: ArDatepicker; input: HTMLInputElement; scope: HTMLDivElement }> {
         const scope = document.createElement('div');
         scope.setAttribute('data-theme', theme);
         const el = document.createElement('ar-datepicker') as ArDatepicker;
         if (opts.readonly) el.readonly = true;
+        if (opts.disabled) el.disabled = true;
         const error = document.createElement('span');
         error.slot = 'error';
         error.textContent = 'Date invalide';
@@ -203,6 +204,33 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             // Pas de transition en cours : la couleur d'erreur était déjà la valeur calculée.
             expect(getComputedStyle(input).borderTopColor).to.equal(
                 resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+            );
+        });
+
+        it(`l'erreur l'emporte sur la bordure d'un champ désactivé (${theme})`, async () => {
+            const { input, scope } = await mountInvalid(theme, { disabled: true });
+            expect(getComputedStyle(input).borderTopColor).to.equal(
+                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+            );
+        });
+
+        it(`hors erreur, le champ garde la bordure forte, puis celle de focus (${theme})`, async () => {
+            const scope = document.createElement('div');
+            scope.setAttribute('data-theme', theme);
+            const el = document.createElement('ar-datepicker') as ArDatepicker;
+            scope.appendChild(el);
+            root.appendChild(scope);
+            await el.updateComplete;
+            expect(el.hasAttribute('has-error')).to.equal(false);
+            const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
+            expect(getComputedStyle(input).borderTopColor).to.equal(
+                resolveToken(scope, '--ar-color-border-strong'),
+            );
+            input.focus();
+            expect(input.matches(':focus-visible')).to.equal(true);
+            await new Promise((r) => setTimeout(r, 250));
+            expect(getComputedStyle(input).borderTopColor).to.equal(
+                resolveToken(scope, '--ar-color-interactive'),
             );
         });
     }
