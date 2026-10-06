@@ -164,7 +164,7 @@ src/
 ├── internal/            # Utilitaires internes (defineComponent…)
 ├── state/               # Moteurs de calcul d'état purs
 ├── styles/              # CSS partagé
-│   ├── themes/          ← Thème de la documentation (ariane.css)
+│   ├── themes/          ← Fichiers de thème
 │   └── components/      ← Styles utilitaires partagés
 ├── types/               # Interfaces TypeScript globales
 ├── utils/               # Utilitaires publics (sous-chemin @ariane-ui/core/utils)
