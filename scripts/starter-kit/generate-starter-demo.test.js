@@ -50,6 +50,12 @@ describe('generate (dry-run)', () => {
             expect(entry).toMatch(/@import url\('\.\/ariane-starter\//);
             expect(existsSync(path.join(outDir, '.nojekyll'))).toBe(true);
             expect(existsSync(path.join(outDir, 'presets', 'buttons.css'))).toBe(true);
+            expect(existsSync(path.join(outDir, 'scripts', 'theme-to-js.js'))).toBe(true);
+            expect(
+                JSON.parse(readFileSync(path.join(outDir, 'package.json'), 'utf8')).scripts[
+                    'build:js'
+                ],
+            ).toContain('theme-to-js.js');
         } finally {
             rmSync(outDir, { recursive: true, force: true });
         }
