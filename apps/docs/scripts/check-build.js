@@ -7,9 +7,10 @@
  * Echec (exit 1) si une page est absente du dist/.
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unscopedSelectors } from '../../../scripts/starter-kit/scope-theme.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -38,6 +39,26 @@ for (const page of EXPECTED_PAGES) {
         hasError = true;
     } else {
         console.log(`✓ ${page}`);
+    }
+}
+
+const DOC_DEMO_THEME = join(DIST, 'themes', 'doc-demo.css');
+if (!existsSync(DOC_DEMO_THEME)) {
+    console.error('✗ Thème des démos manquant : themes/doc-demo.css');
+    hasError = true;
+} else {
+    const demoCss = readFileSync(DOC_DEMO_THEME, 'utf8');
+    if (!demoCss.includes('.doc-demo') || demoCss.includes(':root')) {
+        console.error('✗ themes/doc-demo.css doit être scopé sous .doc-demo (sans :root)');
+        hasError = true;
+    } else if (unscopedSelectors(demoCss, 'doc-demo').length > 0) {
+        console.error('✗ themes/doc-demo.css contient des sélecteurs hors .doc-demo :');
+        for (const selector of unscopedSelectors(demoCss, 'doc-demo')) {
+            console.error(`    ${selector}`);
+        }
+        hasError = true;
+    } else {
+        console.log('✓ themes/doc-demo.css');
     }
 }
 

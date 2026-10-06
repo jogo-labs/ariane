@@ -63,7 +63,7 @@ const showPlayground = displayMode === 'demo';
             <HeadingAnchor id="exemples" label="Exemples" />
         </div>
         <ar-alert variant="info" without-notification class="doc-callout-alert" style="margin-bottom: 1.5rem">
-            <p style="margin: 0">Les exemples de cette page sont affichés avec le thème de démo <code>ariane.css</code> fourni par Ariane.</p>
+            <p style="margin: 0">Les exemples de cette page sont affichés avec le thème neutre du <a href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">starter-kit</a>.</p>
             {hasPageScript && (
                 <p style="margin:0; margin-block-start: 1rem">Pour les besoins de la démo un script simule une réponse positive aux événements émis par le composant (voir <a href="#utilisation">Utilisation</a>).</p>
             )}
@@ -82,7 +82,7 @@ const showPlayground = displayMode === 'demo';
                     </div>
                     <div class="playground-card">
                         <div class="preview-wrap">
-                            <div class="preview">
+                            <div class="preview doc-demo">
                                 <Fragment set:html={variant.html} />
                             </div>
                         </div>
@@ -110,7 +110,7 @@ const showPlayground = displayMode === 'demo';
             <p class="variant-description">Manipulez les attributs pour voir le code et la preview se mettre à jour.</p>
         <div class="playground-card">
             <div class="preview-wrap">
-                <div class="preview" data-playground-preview>
+                <div class="preview doc-demo" data-playground-preview>
                     <Fragment set:html={playgroundHtml} />
                 </div>
             </div>
@@ -270,7 +270,7 @@ const showPlayground = displayMode === 'demo';
         border-radius: 0.5rem 0.5rem 0 0;
         /* Fond pointillé — reprend les points du rail (spec §6, différé au
            sous-chantier 3, cf. docs/superpowers/specs/2026-09-10-doc-layout-redesign-110-design.md). */
-        background-color: var(--doc-bg);
+        background-color: var(--doc-preview-bg);
         background-image: radial-gradient(circle at 1px 1px, var(--doc-rail) 1px, transparent 0);
         background-size: 16px 16px;
     }
@@ -386,8 +386,8 @@ const showPlayground = displayMode === 'demo';
        les redéfinir ici. */
 
     /* Les boutons/liens slottés dans ar-dropdown-item sont désormais stylisés
-       (reset + hover + focus-visible) directement par ariane.css (#199) —
-       plus rien à redéfinir ici. */
+       (reset + hover + focus-visible) par le thème (#199 ; dans les démos,
+       le thème du starter-kit scopé sous .doc-demo) — plus rien à redéfinir ici. */
 
     .preview :global(ar-dropdown hr) {
         border:     none;

@@ -17,16 +17,28 @@ npm install @ariane-ui/core
 ```html
 <!-- CDN -->
 <script type="module" src="node_modules/@ariane-ui/core/cdn/index.js"></script>
-<link rel="stylesheet" href="node_modules/@ariane-ui/core/themes/ariane.css" />
+<link rel="stylesheet" href="./ariane-starter.css" />
 
 <ar-alert variant="success">Opération réussie.</ar-alert>
 ```
 
+Le `<link>` du thème est indispensable : sans lui, les composants ne sont pas stylés (voir la section [Thème](#thème) ci-dessous).
+
 ```typescript
 // ESM avec bundler (tree-shakeable)
 import '@ariane-ui/core';
-import '@ariane-ui/core/themes/ariane.css';
+import './ariane-starter.css';
 ```
+
+### Thème
+
+Ariane est headless : sans thème, aucun composant n'est stylé. Partez du thème neutre du [starter-kit](https://github.com/jogo-labs/ariane-starter-kit) (démo : [Kitchen Sink](https://jogo-labs.github.io/ariane-starter-kit/)) : copiez `ariane-starter.css` et le dossier `ariane-starter/` dans votre projet, puis adaptez-les.
+
+```html
+<link rel="stylesheet" href="./ariane-starter.css" />
+```
+
+Pour un essai rapide sans rien copier, le même thème est servi à `https://jogo-labs.github.io/ariane-starter-kit/ariane-starter.css` (non versionné, il suit la dernière release).
 
 ---
 
@@ -58,10 +70,7 @@ import '@ariane-ui/core/themes/ariane.css';
 import '@ariane-ui/core';
 
 // Import individuel (tree-shaking)
-import '@ariane-ui/core/dist/components/alert/alert.js';
-
-// Thème CSS
-import '@ariane-ui/core/themes/ariane.css';
+import '@ariane-ui/core/dist/components/alert/index.js';
 
 // CDN bundle (Lit inclus), version de production
 import '@ariane-ui/core/cdn';
@@ -117,14 +126,14 @@ ar-alert {
 }
 ```
 
-Les valeurs par défaut sont définies dans `src/styles/themes/ariane.css` (liste d'`@import`)
-et ses fragments sous `src/styles/themes/ariane/` (`_palette.css`, `_semantic-tokens.css`,
-`_global-tokens.css`, `shared/`, `components/`).
-Créez votre propre thème en surchargeant ces variables dans votre CSS global.
+Les valeurs de design sont définies par le thème (voir le starter-kit) ; le composant n'en porte aucune.
+Créez votre propre thème en définissant ces variables dans votre CSS global.
+
+Trois leviers : les tokens `--ar-*`, les parts `::part()` (y compris les parts d'état), puis les états personnalisés `:state()`.
 
 ### CSS Parts
 
-Les éléments internes sont exposés via `::part()` pour un ciblage CSS précis :
+Les éléments internes (et des parts d'état) sont exposés via `::part()` pour un ciblage CSS précis :
 
 ```css
 ar-alert::part(icon) {
@@ -134,6 +143,10 @@ ar-alert::part(body) {
     /* le conteneur du contenu */
 }
 ```
+
+### États personnalisés
+
+Chaque composant expose ses états via `:state()` ; la liste figure dans la référence API de la page du composant.
 
 ---
 
@@ -148,12 +161,17 @@ src/
 │       └── alert.test.ts     ← Tests Vitest
 ├── controllers/         # ReactiveControllers réutilisables
 ├── context/             # Providers @lit/context (communication parent-enfant)
+├── internal/            # Utilitaires internes (defineComponent…)
 ├── state/               # Moteurs de calcul d'état purs
 ├── styles/              # CSS partagé
-│   ├── themes/          ← Fichiers de thème (ariane.css…)
+│   ├── themes/          ← Fichiers de thème
 │   └── components/      ← Styles utilitaires partagés
 ├── types/               # Interfaces TypeScript globales
+├── utils/               # Utilitaires publics (sous-chemin @ariane-ui/core/utils)
 └── index.ts             # Export barrel
+
+scripts/skill/           # Sources de la skill et de llms.txt
+skills/ et llms/         # Générés par build:skill, publiés avec le paquet
 ```
 
 ### Patterns clés

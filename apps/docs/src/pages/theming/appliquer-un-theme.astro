@@ -63,24 +63,32 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
             <NarrativeHeading id="personnalisation">Thème et personnalisation</NarrativeHeading>
             <p>
                 Ariane est une librairie <strong>headless</strong> et n'impose donc aucun style par défaut. <br />
-                Cela vous laisse donc le champs libre pour créer un thème adapté à votre besoin.
+                Cela vous laisse donc le champ libre pour créer un thème adapté à votre besoin.
             </p>
 
             <NarrativeSubheading id="charger-un-theme">Créer un thème</NarrativeSubheading>
             <p>
-                Chaque page de documentation d'un composant liste les différents points de personnalisation disponibles (Custom Properties CSS et CSS Parts). <br />
-                Pour mieux comprendre les mécanisme et faciliter la création de votre thème, vous pouvez utiliser comme base le thème créé pour les démos de cette documentation. <br />
-                Ce thème est commenté de manière exhaustive pour mieux comprendre les mécanismes en place, notamment aussi pour une gestion du modes clair et sombre :
+                Chaque page de documentation d'un composant liste les différents points de personnalisation disponibles (Custom Properties CSS, CSS Parts et CSS Custom States). <br />
+                Pour mieux comprendre les mécanismes et faciliter la création de votre thème, partez du <strong>thème neutre du starter-kit</strong> : il couvre tous les composants, il est commenté, et il gère les modes clair et sombre. <br />
+                Copiez-le dans votre projet et adaptez-le à votre identité visuelle. Une démo (Kitchen Sink) montre tous les composants avec ce thème :
             </p>
             <p>
-                <a class="download-theme" href="/themes/ariane.css" download>
-                    Télécharger le thème de démo
+                <a class="download-theme" href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">
+                    Récupérer le thème neutre (starter-kit)
                 </a>
+            </p>
+            <p>
+                <a class="download-theme" href="https://jogo-labs.github.io/ariane-starter-kit/" target="_blank" rel="noopener">
+                    Voir la démo (Kitchen Sink)
+                </a>
+            </p>
+            <p>
+                Les composants exposent aussi leurs états avec les <a href="/theming/personnalisation-avancee#state-parts">parts d'état</a> et les <strong>CSS Custom States</strong> (<code>:state(open)</code>, <code>:state(disabled)</code>…), listés dans la section <strong>Référence API</strong> de chaque composant.
             </p>
 
             <NarrativeSubheading id="tokens-globaux">Personnaliser toute la librairie</NarrativeSubheading>
             <p>
-                C'est la méthode principale que vous utiliserez pour créer votre thème, c'est celle illustrée dans le thème de démo.
+                C'est la méthode principale que vous utiliserez pour créer votre thème, c'est celle illustrée dans le thème du starter-kit.
             </p>
             <pre><code class="language-css" set:text={codeGlobalCustom} /></pre>
             <p>
@@ -107,8 +115,8 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
                 Ces mécanismes — tokens et <a href="/theming/personnalisation-avancee"><code>::part()</code></a> — couvrent l'apparence à l'intérieur des composants. <br />
                 Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
                 hors de leur portée. Pour ces cas là ce sera le CSS de votre page qui prendra le relais pour personnaliser ces éléments. <br />
-                En complément du thème de démo, Ariane met donc à disposition un exemple de classes CSS pré-définies pour personnaliser l'apparence de ces éléments non couverts.<br />
-                Chaque famille de classes vit dans son propre fichier et peut être chargé utilisée comme base de départ pour vos propre style ou utilisés directement en complément du thème de démo :
+                En complément du thème du starter-kit, Ariane met donc à disposition un exemple de classes CSS pré-définies pour personnaliser l'apparence de ces éléments non couverts.<br />
+                Chaque famille de classes vit dans son propre fichier et peut être chargée et utilisée comme base de départ pour vos propres styles, ou utilisée directement en complément du thème du starter-kit :
             </p>
             <pre><code class="language-html" set:text={codePresets} /></pre>
         </div>

@@ -1,5 +1,5 @@
 // scripts/starter-kit/generate-starter-demo.js
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,6 +59,15 @@ export function generate({
     writeFileSync(path.join(target, '.nojekyll'), '');
     syncStarterTheme({ srcThemesDir, repoPath: target });
     syncPresets({ srcPresetsDir, repoPath: target });
+    mkdirSync(path.join(target, 'scripts'), { recursive: true });
+    copyFileSync(
+        path.join(__dirname, 'theme-to-js.js'),
+        path.join(target, 'scripts', 'theme-to-js.js'),
+    );
+    copyFileSync(
+        path.join(__dirname, 'templates', 'package.json'),
+        path.join(target, 'package.json'),
+    );
 
     if (dryRun) {
         console.log(`Démo + thème générés (dry-run) dans ${target}/`);
@@ -67,7 +76,16 @@ export function generate({
 
     execFileSync(
         'git',
-        ['add', 'index.html', '.nojekyll', 'ariane-starter.css', 'ariane-starter', 'presets'],
+        [
+            'add',
+            'index.html',
+            '.nojekyll',
+            'ariane-starter.css',
+            'ariane-starter',
+            'presets',
+            'scripts',
+            'package.json',
+        ],
         { cwd: repoPath },
     );
     try {
