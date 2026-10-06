@@ -44,7 +44,7 @@ Pourquoi ça marche, vérifié par un spike jetable (Chromium, clair et sombre, 
 
 - Pages composant : `div.preview` de `Playground.astro` (deux occurrences).
 - Page d'accueil : `div.try-preview-stage` (trois occurrences). Les onglets `try-tabs` restent hors du conteneur, stylés individuellement. Les démos qu'ils contiennent (dropdown, dialog) passent au thème du starter : le rendu de la page d'accueil change, c'est voulu.
-- Démos vivantes dans la prose des pages getting-started (`utilisation`, `frameworks`, `traductions`) : un conteneur existant, ou un wrapper minimal si aucun n'existe. À inventorier au plan.
+- Pas d'autre démo vivante : les composants des pages getting-started (`utilisation`, `frameworks`, `traductions`, `quickstart`) sont des chaînes de code affichées, sauf des `ar-alert` de callout, qui sont du chrome et restent en `ariane.css`.
 
 ### 3. Tests et contrôles
 
@@ -67,7 +67,7 @@ Le thème JavaScript (`CSSStyleSheet` à adopter dans un shadow DOM applicatif) 
 - `DEVELOPMENT.md` : liste des commandes npm vérifiée contre les `package.json`. Ajouter la nouvelle commande.
 - Vérifications factuelles : l'import individuel `dist/components/alert/alert.js` (README) enregistre-t-il le tag, alors que la skill cite `index.js` ; la phrase « label seul : texte vocalisé » d'`ar-breadcrumb.mdx` ligne 58.
 - Site de doc :
-    - Page d'accueil : le commentaire d'import du snippet `codeInstall` dit d'où vient le thème (thème de la documentation) et renvoie au starter-kit pour le sien.
+    - Page d'accueil : le snippet `codeInstall` charge `https://jogo-labs.github.io/ariane-starter-kit/ariane-starter.css` (GitHub Pages ; l'URL et ses fragments répondent en `text/css` avec CORS ouvert, vérifié le 2026-10-06) au lieu d'`ariane.css`. Le commentaire dit : thème neutre du starter-kit, qui suit la dernière release, à copier dans son projet pour le personnaliser. L'URL n'est pas versionnée, comme l'URL unpkg sans version du snippet actuel.
     - `theming/appliquer-un-theme` : le Kitchen Sink est présenté comme point de départ ; `ariane.css` comme thème de la documentation ; le lien de téléchargement mène au dépôt du starter-kit, dans un nouvel onglet (`target="_blank"`, `rel="noopener"`) ; la section « Créer un thème » est mise à jour avec les états personnalisés (`:state()`, parts d'état).
     - `theming/shadow-dom` : réécrite autour du script du starter ; `arianeTheme` n'y apparaît plus comme recette.
     - `ar-alert.mdx` : reformuler « presets fournis par `ariane.css` ».
@@ -76,6 +76,7 @@ Le thème JavaScript (`CSSStyleSheet` à adopter dans un shadow DOM applicatif) 
 
 ## Hors périmètre
 
+- Taguer le dépôt du starter-kit à chaque release pour proposer des URL jsDelivr épinglées (`cdn.jsdelivr.net/gh/jogo-labs/ariane-starter-kit@<tag>/…`) : piste, à ajouter à la checklist de release si le besoin se confirme.
 - Déplacer `ariane.css` hors du paquet, ou retirer `ariane.js` : issues séparées si besoin.
 - Corriger le README du dépôt starter-kit (il cite encore `autoloader.prod.js`, URL d'avant #300) : autre dépôt, sur accord explicite avant de pousser.
 - Entrées CDN `utils` : #305.
