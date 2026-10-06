@@ -18,14 +18,14 @@ npm run build:js   # génère ariane-starter.js : export const starterTheme = ne
 const codeUseJs = `// mon-app.js — définition du composant, fichier séparé de la page
 import { starterTheme } from './ariane-starter.js';
 
-class MonApp extends HTMLElement {
+class MonComposant extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
         shadow.adoptedStyleSheets = [starterTheme];
         shadow.append(document.createElement('ar-datepicker'));
     }
 }
-customElements.define('mon-app', MonApp);`;
+customElements.define('mon-composant', MonComposant);`;
 
 const codeCustomTheme = `// mon-theme.js — dans l'idéal, généré au build à partir de votre thème CSS
 export const monTheme = new CSSStyleSheet();
@@ -42,14 +42,14 @@ monTheme.replaceSync(\`
 // mon-app.js — définition du composant, importe le fichier ainsi créé
 import { monTheme } from 'mon-theme.js';
 
-export class MonApp extends HTMLElement {
+export class MonComposant extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
         // Importez le thème dans le shadowRoot
         shadow.adoptedStyleSheets = [monTheme];
     }
 }
-customElements.define('mon-app', MonApp);`;
+customElements.define('mon-composant', MonComposant);`;
 ---
 
 <Layout
@@ -111,8 +111,7 @@ customElements.define('mon-app', MonApp);`;
             <p>
                 Le thème CSS reste chargé dans le document (ses tokens traversent le shadow DOM) :
                 la version JavaScript vient en complément, pour les règles <code>::part()</code>.<br />
-                Le <a href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">starter-kit</a>
-                fournit un script qui la génère à partir de son thème CSS :
+                Le <a href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">starter-kit</a> fournit un script qui la génère à partir de son thème CSS :
             </p>
             <pre><code class="language-bash" set:text={codeBuildJs} /></pre>
             <p>Il ne reste qu'à adopter la feuille obtenue dans votre shadow DOM :</p>
