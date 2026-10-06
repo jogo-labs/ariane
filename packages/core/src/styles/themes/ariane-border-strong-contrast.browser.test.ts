@@ -130,6 +130,84 @@ describe('ariane.css — bordures de survol et de champ inactif', () => {
     }
 });
 
+describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => {
+    let link: HTMLLinkElement;
+    let root: HTMLDivElement;
+
+    before(async () => {
+        link = await loadDefaultTheme();
+    });
+
+    after(() => {
+        link.remove();
+    });
+
+    beforeEach(() => {
+        root = document.createElement('div');
+        document.body.appendChild(root);
+    });
+
+    afterEach(() => {
+        root.remove();
+    });
+
+    // État final posé avant la connexion : pas de lecture pendant la transition de bordure.
+    async function mountInvalid(
+        theme: string,
+        opts: { readonly?: boolean } = {},
+    ): Promise<{ el: ArDatepicker; input: HTMLInputElement; scope: HTMLDivElement }> {
+        const scope = document.createElement('div');
+        scope.setAttribute('data-theme', theme);
+        const el = document.createElement('ar-datepicker') as ArDatepicker;
+        if (opts.readonly) el.readonly = true;
+        const error = document.createElement('span');
+        error.slot = 'error';
+        error.textContent = 'Date invalide';
+        el.appendChild(error);
+        scope.appendChild(el);
+        root.appendChild(scope);
+        await el.updateComplete;
+        await el.updateComplete;
+        expect(el.hasAttribute('has-error')).to.equal(true);
+        const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
+        return { el, input, scope };
+    }
+
+    for (const theme of ['light', 'dark']) {
+        it(`la bordure du champ en erreur est celle du token d'erreur (${theme})`, async () => {
+            const { input, scope } = await mountInvalid(theme);
+            const error = resolveToken(scope, '--ar-datepicker-input-error-border-color');
+            const border = getComputedStyle(input).borderTopColor;
+            expect(border).to.equal(error);
+            expect(border).not.to.equal(resolveToken(scope, '--ar-color-border-strong'));
+            expect(border).not.to.equal(resolveToken(scope, '--ar-input-inactive-border-color'));
+        });
+
+        it(`la bordure d'erreur atteint 3:1 contre le fond de page (${theme})`, async () => {
+            const { scope } = await mountInvalid(theme);
+            const error = resolveToken(scope, '--ar-datepicker-input-error-border-color');
+            expect(contrastRatio(error, resolveToken(scope, '--ar-color-bg'))).to.be.at.least(3);
+        });
+
+        it(`l'erreur l'emporte sur la bordure d'un champ read-only (${theme})`, async () => {
+            const { input, scope } = await mountInvalid(theme, { readonly: true });
+            expect(getComputedStyle(input).borderTopColor).to.equal(
+                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+            );
+        });
+
+        it(`la bordure d'erreur reste visible au focus (${theme})`, async () => {
+            const { input, scope } = await mountInvalid(theme);
+            input.focus();
+            expect(input.matches(':focus-visible')).to.equal(true);
+            // Pas de transition en cours : la couleur d'erreur était déjà la valeur calculée.
+            expect(getComputedStyle(input).borderTopColor).to.equal(
+                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+            );
+        });
+    }
+});
+
 describe('contrastRatio (helper)', () => {
     it('calcule les bornes et une paire connue', () => {
         expect(contrastRatio('#000000', '#ffffff')).to.be.closeTo(21, 0.001);

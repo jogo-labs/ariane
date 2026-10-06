@@ -224,6 +224,16 @@ ar-datepicker {
         border-color: var(--ar-color-interactive);
     }
 
+    /* Ordre de cascade, du plus faible au plus fort (spécificité égale, l'ordre source
+           tranche) : bordure de base < read-only/disabled < focus-visible < erreur.
+           Le `::part(input)` du thème, côté document, l'emporte sur la règle interne
+           `:host([has-error]) [part~='input']` du composant : le thème doit donc la
+           réénoncer. L'erreur reste visible au focus (l'anneau d'outline reste l'indicateur
+           de focus) et sur un champ read-only/disabled invalide. */
+    &[has-error]::part(input) {
+        border-color: var(--ar-datepicker-input-error-border-color);
+    }
+
     /* -- Champ texte : bouton d'ouverture du calendrier (icône) -- */
     &::part(trigger) {
         width: var(--ar-button-height);
