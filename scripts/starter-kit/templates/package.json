@@ -1,0 +1,12 @@
+{
+  "name": "ariane-starter-kit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:js": "node scripts/theme-to-js.js ariane-starter.css ariane-starter.js --name starterTheme"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "lightningcss": "^1.33.0"
+  }
+}

@@ -32,8 +32,9 @@ Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil 
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
+
+Sans thème, les composants ne sont pas stylés : voir la section [Thème](#thème) pour charger le thème neutre du starter-kit.
 
 > Chaque script CDN existe en deux versions : le nom sans suffixe (`autoloader.js`, `index.js`) est la **production** (minifiée, sans avertissements) ; en développement local, utilisez la version `.dev.js` (`autoloader.dev.js`, `index.dev.js`) pour obtenir des avertissements détaillés dans la console.
 
@@ -43,8 +44,9 @@ Charge tous les composants en une seule requête.
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@ariane-ui/core/dist/styles/themes/ariane.css" />
 ```
+
+Sans thème, les composants ne sont pas stylés : voir la section [Thème](#thème) pour charger le thème neutre du starter-kit.
 
 ### Via npm _(avec bundler)_
 
@@ -54,11 +56,21 @@ npm install @ariane-ui/core
 
 ```typescript
 import '@ariane-ui/core';
-import '@ariane-ui/core/themes/ariane.css';
+import './ariane-starter.css';
 
 // ou import individuel (tree-shaking)
-import '@ariane-ui/core/dist/components/button/button.js';
+import '@ariane-ui/core/dist/components/alert/index.js';
 ```
+
+### Thème
+
+Ariane est headless : sans thème, aucun composant n'est stylé. Partez du thème neutre du [starter-kit](https://github.com/jogo-labs/ariane-starter-kit) (démo : [Kitchen Sink](https://jogo-labs.github.io/ariane-starter-kit/)) : copiez `ariane-starter.css` et le dossier `ariane-starter/` dans votre projet, puis adaptez-les.
+
+```html
+<link rel="stylesheet" href="./ariane-starter.css" />
+```
+
+Pour un essai rapide sans rien copier, le même thème est servi à `https://jogo-labs.github.io/ariane-starter-kit/ariane-starter.css` (non versionné, il suit la dernière release).
 
 ---
 
@@ -73,7 +85,7 @@ ar-alert {
 }
 ```
 
-Les valeurs par défaut viennent du fichier de thème (`themes/ariane.css`).
+Les valeurs de design sont définies par le thème (voir le starter-kit) ; le composant n'en porte aucune.
 Consultez la page **Design Tokens** du site de documentation pour la liste complète.
 
 ---

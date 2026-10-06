@@ -18,39 +18,39 @@
 
 ## Appliquer un thème
 
-Le thème fourni est `ariane.css`. Il sert directement, ou de base pour un thème propre ; il est commenté et gère les modes clair et sombre.
+Le thème de départ est celui du starter-kit : https://github.com/jogo-labs/ariane-starter-kit (démo Kitchen Sink : https://jogo-labs.github.io/ariane-starter-kit/). Il gère les modes clair et sombre et sert directement, ou de base pour un thème propre. Copier ses fichiers CSS dans le projet, puis les charger.
 
-Avec un bundler :
+- Aucune feuille de thème de départ n'est versionnée (ni sur npm, ni sur le CDN `unpkg`) : les fichiers du starter-kit se copient depuis GitHub. Le paquet contient `themes/ariane.css` et `themes/ariane.js`, mais c'est le thème de la documentation d'Ariane : interne, sans garantie de stabilité ; ne jamais le charger, l'importer, le recommander ni s'en servir de base.
+- Le point d'entrée du starter est `ariane-starter.css`, une liste d'`@import` de ses fragments.
+
+Avec un bundler, depuis la copie locale :
 
 ```js
-import '@ariane-ui/core/themes/ariane.css';
+import './ariane-starter.css';
 ```
 
-Sans build, dans le `<head>` :
+Sans build, dans le `<head>`, avec la copie hébergée par le projet :
 
 ```html
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/themes/ariane.css"
-/>
+<link rel="stylesheet" href="/ariane-starter.css" />
 ```
-
-`<version>` : la version épinglée (voir `installation.md`).
 
 Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 
-| Fichier publié                                | Export npm                          |
-| --------------------------------------------- | ----------------------------------- |
-| `dist/styles/themes/<nom>.css`                | `@ariane-ui/core/themes/<nom>.css`  |
-| `dist/styles/themes/<nom>.js` (CSSStyleSheet) | `@ariane-ui/core/themes/<nom>.js`   |
-| `dist/styles/presets/<nom>.css`               | `@ariane-ui/core/presets/<nom>.css` |
+| Fichier publié                                       | Export npm                          |
+| ---------------------------------------------------- | ----------------------------------- |
+| `dist/styles/themes/<nom>.css` (interne : voir note) | `@ariane-ui/core/themes/<nom>.css`  |
+| `dist/styles/themes/<nom>.js` (interne : voir note)  | `@ariane-ui/core/themes/<nom>.js`   |
+| `dist/styles/presets/<nom>.css`                      | `@ariane-ui/core/presets/<nom>.css` |
 
-- Sans thème de la page ou de l'application, aucun composant n'est stylé : charger un thème (`ariane.css` ou le vôtre) est la première chose à vérifier quand un composant paraît « brut ».
-- Pour un thème propre : copier `ariane.css` comme point de départ, ou écrire une feuille qui valorise les tokens et les `::part()` des composants utilisés.
+Note : les lignes `themes/<nom>` ci-dessus sont le thème de la documentation d'Ariane, interne, sans garantie de stabilité : ne pas charger ni recommander ; partir du starter-kit.
 
-## Structure du thème fourni
+- Sans thème de la page ou de l'application, aucun composant n'est stylé : charger un thème (celui du starter-kit ou le vôtre) est la première chose à vérifier quand un composant paraît « brut ».
+- Pour un thème propre : partir de la copie du starter-kit, ou écrire une feuille qui valorise les tokens et les `::part()` des composants utilisés.
 
-`ariane.css` est une liste d'`@import`, chacun placé dans `layer(ariane.theme)` :
+## Structure du thème du starter-kit
+
+`ariane-starter.css` est une liste d'`@import`, chacun placé dans `layer(ariane.theme)` ; l'arbre de fragments ci-dessous est le sien (palette neutre) :
 
 | Fragment                                  | Contenu                                                                                                                                       |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -60,8 +60,8 @@ Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 | `shared/_panel.css`, `shared/_anchor.css` | Tokens partagés par les composants à panneau flottant (`--ar-panel-*`)                                                                        |
 | `components/_<nom>.css`                   | Un fichier par composant stylé : tokens `--ar-<nom>-*` et règles `::part()`                                                                   |
 
-- Le thème fourni stylise un sous-ensemble de composants (un fragment par composant dans `components/`) ; un composant sans fragment reste à styler avec ses tokens et parts.
-- Les valeurs de la palette fournie ne font pas partie du contrat : ne pas les recopier ni s'y fier. Les alias sémantiques et les tokens par composant sont le point d'accroche.
+- Le starter-kit stylise tous les composants racine (un fragment par composant dans `components/`) ; un sous-composant (item, panneau…) est stylé par le fragment de son parent.
+- Les valeurs de la palette du starter ne font pas partie du contrat : ne pas les recopier ni s'y fier. Les alias sémantiques et les tokens par composant sont le point d'accroche.
 - Deux tokens de bordure : `--ar-color-border` pour les séparateurs et panneaux décoratifs, `--ar-color-border-strong` pour la frontière d'un contrôle (champ, bouton à bordure), qui garde un contraste d'au moins 3:1 (WCAG 1.4.11). Un contrôle personnalisé dont la bordure l'identifie utilise le second.
 - Toutes les règles du thème sont dans `@layer ariane.theme`. Une règle hors de toute couche l'emporte sur une règle en couche, quelle que soit la spécificité : le CSS de l'application (non layered) surcharge le thème sans `!important` ni sélecteur renforcé.
 - Si l'application utilise elle-même des couches, c'est l'ordre de déclaration des couches qui décide : déclarer `ariane.theme` avant la couche de l'application.
@@ -120,7 +120,7 @@ Contrainte de cascade `::part()` :
 - Conséquence : une propriété modifiée par une règle d'état interne du composant (classe de survol, de sélection…) reste un token ; la forcer via `::part()` figerait tous les états. Le contrat de chaque composant tient compte de cela : utiliser les tokens listés avant de passer par `::part()`.
 - Ne pas utiliser `!important` pour une préférence de style. Ariane l'emploie seulement quand une surcharge casserait un contrat fonctionnel (positionnement, garantie d'accessibilité).
 - Un `ar-<tag> { --token: … }` n'atteint qu'un élément du même arbre : il ne traverse pas la frontière du shadow DOM d'un autre composant. Un composant Ariane instancié dans le shadow DOM d'un autre (cas du tooltip interne d'`ar-table-sort`) se paramètre par des tokens valorisés sur `:root`, qui traversent toutes les frontières par héritage.
-- Pour une largeur d'`ar-dialog` personnalisée, utiliser `--ar-dialog-width`. Avec `ariane.css` (en couche), une règle de l'application hors couche l'emporte sur le palier `ar-dialog[size='…']` du thème quelle que soit la spécificité. La spécificité ne joue que si les deux règles sont dans la même couche ou toutes deux hors couche (thème propre sans couche) : alors un `ar-dialog { … }` non qualifié perd face à `ar-dialog[size='…']` ; le rendre aussi spécifique ou omettre `size`.
+- Pour une largeur d'`ar-dialog` personnalisée, utiliser `--ar-dialog-width`. Avec le thème du starter-kit (en couche), une règle de l'application hors couche l'emporte sur le palier `ar-dialog[size='…']` du thème quelle que soit la spécificité. La spécificité ne joue que si les deux règles sont dans la même couche ou toutes deux hors couche (thème propre sans couche) : alors un `ar-dialog { … }` non qualifié perd face à `ar-dialog[size='…']` ; le rendre aussi spécifique ou omettre `size`.
 
 ### Parts sémantiques transverses
 
@@ -163,7 +163,7 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 `presets/buttons.css` et `presets/fields.css` habillent du HTML ordinaire écrit par l'application, hors du contrat des composants `ar-*` : un `<button>` placé en slot (par exemple d'un `ar-dropdown-item`), un `<input>` ou `<textarea>` associé à un composant (par exemple via `for` à `ar-charcounter`).
 
 - Opt-in : rien n'est appliqué sans poser la classe.
-- Fichiers indépendants de `ariane.css` (à charger séparément) mais ils consomment des tokens que le thème fourni valorise (`--ar-button-*`, `--ar-input-*`, `--ar-field-gap`, `--ar-color-*`, `--ar-font-size-sm`). Sans thème chargé (ou sans ces tokens dans un thème propre), les valeurs sont indéfinies : charger le thème, ou valoriser ces tokens.
+- Fichiers indépendants du thème (à charger séparément) mais ils consomment des tokens que le thème du starter-kit valorise (`--ar-button-*`, `--ar-input-*`, `--ar-field-gap`, `--ar-color-*`, `--ar-font-size-sm`). Sans thème chargé (ou sans ces tokens dans un thème propre), les valeurs sont indéfinies : charger le thème, ou valoriser ces tokens.
 - Leurs règles sont dans `@layer ariane.presets`.
 - Ce ne sont pas des composants : ni comportement ni accessibilité ajoutés, uniquement du style.
 
@@ -195,7 +195,7 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 </div>
 ```
 
-Avec un bundler : `import '@ariane-ui/core/presets/buttons.css';` et `import '@ariane-ui/core/presets/fields.css';`.
+Avec un bundler : `import '@ariane-ui/core/presets/buttons.css';` et `import '@ariane-ui/core/presets/fields.css';`. Les fichiers `presets/` du starter-kit et `@ariane-ui/core/presets/*.css` sont deux alternatives.
 
 ## Shadow DOM applicatif
 
@@ -205,45 +205,19 @@ Si l'application place ses pages ou une partie de son contenu dans un web compon
 - Les règles `::part()` du thème du document ne traversent pas : les composants Ariane dans ce shadow DOM n'ont que leurs tokens. Le thème doit rester chargé au niveau du document (sans lui, aucun token).
 - Pour les `::part()`, adopter une feuille de style dans chaque shadow root concerné (`adoptedStyleSheets`, chargement synchrone, instance partagée, pas de FOUC).
 
-Thème fourni : `arianeTheme`, un `CSSStyleSheet` déjà peuplé avec les règles composants (`::part()`, toujours dans `@layer ariane.theme`) ; les tokens `:root` en sont exclus (`:root` ne cible jamais un shadow root).
+Pour adopter un thème dans un shadow root, il faut une version JavaScript du CSS : un `CSSStyleSheet` peuplé avec les règles composants (`::part()`, dans `@layer ariane.theme`), sans les tokens `:root` (`:root` ne cible jamais un shadow root). Aucune feuille de thème de départ n'est versionnée (le `themes/ariane.js` du paquet est celui de la documentation d'Ariane : interne, à ne pas utiliser). Le starter-kit fournit le script qui la génère : `npm install` puis `npm run build:js` produit `ariane-starter.js`. Pour un autre thème : `node scripts/theme-to-js.js <entrée.css> <sortie.js> --name <identifiant>`, l'export nommé étant l'identifiant donné (`starterTheme` pour `build:js`).
 
-Via npm :
+Exemple, avec le fichier généré (export nommé `starterTheme`) :
 
 ```js
-import { arianeTheme } from '@ariane-ui/core/themes/ariane.js';
+import { starterTheme } from './ariane-starter.js';
 
 export class MonApp extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
-        shadow.adoptedStyleSheets = [arianeTheme];
+        shadow.adoptedStyleSheets = [starterTheme];
         shadow.append(document.createElement('ar-datepicker'));
     }
 }
 customElements.define('mon-app', MonApp);
-```
-
-Via CDN : même code, avec `import { arianeTheme } from 'https://unpkg.com/@ariane-ui/core@<version>/dist/styles/themes/ariane.js';` dans le fichier qui définit le composant.
-
-Thème propre : créer une version `.js` de votre CSS, sans les tokens `:root` (inutiles dans un shadow root).
-
-```js
-// mon-theme.js — idéalement généré au build à partir du thème CSS
-export const monTheme = new CSSStyleSheet();
-monTheme.replaceSync(`
-    ar-datepicker::part(panel) {
-        border-radius: 8px;
-    }
-`);
-```
-
-```js
-// mon-app.js
-import { monTheme } from './mon-theme.js';
-
-export class MonApp extends HTMLElement {
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
-        shadow.adoptedStyleSheets = [monTheme];
-    }
-}
 ```

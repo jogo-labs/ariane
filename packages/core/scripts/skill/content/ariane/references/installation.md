@@ -52,7 +52,7 @@ npm install @ariane-ui/core
 - Le sous-chemin `/dist/*` est exporté par le paquet : l'import par composant passe par lui.
 - Dans un contexte headless, importer `whenAllDefined` et `registerTranslation` depuis `@ariane-ui/core/utils` et non depuis le barrel : le barrel enregistre les `ar-*`. Ordre de grandeur mesuré (minifié) : environ 1 Ko via `/utils` contre environ 200 Ko via le barrel.
 - Le paquet n'a pas de champ `sideEffects` : `import '@ariane-ui/core'` n'est jamais supprimé par le tree-shaking.
-- Autres exports : `@ariane-ui/core/themes/*.css`, `@ariane-ui/core/presets/*.css`, `@ariane-ui/core/custom-elements.json`.
+- Autres exports : `@ariane-ui/core/themes/*.css` (thème de la documentation d'Ariane, interne, sans garantie de stabilité : ne pas charger ni recommander ; partir du starter-kit), `@ariane-ui/core/presets/*.css`, `@ariane-ui/core/custom-elements.json`.
 - `whenAllDefined({ prefix?, root? }): Promise<void>` : attend que les tags du préfixe présents sous `root` (défaut `document`) soient définis, shadow roots ouverts inclus ; les shadow roots `closed` ne sont pas atteignables.
 
 ## Préfixe des tags
@@ -90,7 +90,7 @@ await whenAllDefined({ prefix: 'acme-' });
 - `whenAllDefined` attend par défaut `<ARIANE_CONFIG.prefix ?? 'ar'>-` ; en headless passer `prefix` (avec le tiret final : `'acme-'`) correspondant aux tags définis.
 - Les types (`HTMLElementTagNameMap`) décrivent les tags par défaut `ar-*` : avec un préfixe personnalisé, les tags ne sont pas typés.
 - `ar-table-sort` embarque un tooltip qu'il enregistre lui-même sous un nom interne privé : rien à enregistrer, le préfixe choisi n'est pas concerné, ne pas s'appuyer sur ce nom. Le tooltip embarqué se personnalise par tokens posés sur `:root` (toutes les instances) ou sur l'hôte (une instance) ; les règles CSS ciblant un tag ou `::part()` n'atteignent pas un élément situé dans le shadow DOM d'un autre composant.
-- Le thème fourni cible les tags `ar-*`. Avec un préfixe personnalisé, ses tokens posés sur `:root` s'appliquent encore, mais ses règles dont le sélecteur nomme un tag `ar-*` ne correspondent plus : styles de l'hôte, `::part()` (`ar-alert::part(close-button)`…), variantes par attribut (`ar-dialog[size]`, qui pose `--ar-dialog-width`) et tokens posés sur un tag (`--ar-alert-bg` selon `variant`). Les réécrire avec le préfixe dans son propre thème.
+- Le thème du starter-kit cible les tags `ar-*`. Avec un préfixe personnalisé, ses tokens posés sur `:root` s'appliquent encore, mais ses règles dont le sélecteur nomme un tag `ar-*` ne correspondent plus : styles de l'hôte, `::part()` (`ar-alert::part(close-button)`…), variantes par attribut (`ar-dialog[size]`, qui pose `--ar-dialog-width`) et tokens posés sur un tag (`--ar-alert-bg` selon `variant`). Les réécrire avec le préfixe dans son propre thème.
 
 ## Compatibilité
 
@@ -100,8 +100,8 @@ await whenAllDefined({ prefix: 'acme-' });
 | Firefox                       | 126              |
 | Safari (macOS, iOS et iPadOS) | 17.5             |
 
-- Pas de polyfills. En dessous de ces versions, le comportement n'est pas garanti. Les versions sont déduites des données de compatibilité des fonctionnalités utilisées (API Popover, états personnalisés, `ElementInternals`, `<dialog>`, `inert` ; pour le thème fourni : `light-dark()`, `color-mix()`, `oklch()`, `@layer`, imbrication CSS), pas testées version par version. Les tests automatisés tournent sur les dernières versions de Chromium, Firefox et WebKit (WebKit en local seulement, pas en CI).
-- Chrome et Edge avant 125 (hors plancher) : `:state()` n'existe pas, les états personnalisés sont exposés avec le préfixe `--` (`:--open`). Le thème fourni n'en tient pas compte ; la plupart des états ont un attribut équivalent (`[open]`, `[disabled]`…) à utiliser dans le CSS applicatif.
+- Pas de polyfills. En dessous de ces versions, le comportement n'est pas garanti. Les versions sont déduites des données de compatibilité des fonctionnalités utilisées (API Popover, états personnalisés, `ElementInternals`, `<dialog>`, `inert` ; pour le thème du starter-kit : `light-dark()`, `color-mix()`, `oklch()`, `@layer`, imbrication CSS), pas testées version par version. Les tests automatisés tournent sur les dernières versions de Chromium, Firefox et WebKit (WebKit en local seulement, pas en CI).
+- Chrome et Edge avant 125 (hors plancher) : `:state()` n'existe pas, les états personnalisés sont exposés avec le préfixe `--` (`:--open`). Le thème du starter-kit n'en tient pas compte ; la plupart des états ont un attribut équivalent (`[open]`, `[disabled]`…) à utiliser dans le CSS applicatif.
 - Safari iOS et iPadOS avant 18.3 : le tap à l'extérieur d'un panneau ne le ferme pas nativement. Ariane ajoute cette fermeture ; elle est testée en émulation, pas sur appareil.
 - SSR : pas de support officiel (fonctionnalité à venir) ; le support actuel est partiel et non testé.
 

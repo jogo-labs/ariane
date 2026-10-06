@@ -9,7 +9,7 @@ Web components accessibles (Custom Elements natifs, Lit 3), tags préfixés `ar-
 
 ## Règles qui évitent les erreurs fréquentes
 
-- Aucun style sans thème : charger `ariane.css` ou un thème propre ; un composant d'apparence brute : vérifier d'abord que le thème est chargé.
+- Aucun style sans thème : charger un thème (copié du starter-kit, ou le vôtre) ; un composant d'apparence brute : vérifier d'abord que le thème est chargé.
 - Attendre la définition du composant (`customElements.whenDefined`, `whenAllDefined`) avant de lire une propriété, d'appeler une méthode ou de poser une propriété JavaScript.
 - `window.ARIANE_CONFIG.prefix` doit exister avant l'évaluation de la librairie : npm, le poser dans un module importé avant la librairie ; CDN, dans un `<script>` classique placé avant le script Ariane.
 - N'inventer aucun attribut, slot, événement, token ou part : lire `references/components/<tag>.md` avant d'écrire.

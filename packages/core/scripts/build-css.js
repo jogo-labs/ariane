@@ -31,8 +31,12 @@ const CSS_OUT = join(ROOT, 'dist', 'styles');
 const THEMES_SRC = join(CSS_SRC, 'themes');
 const WATCH = process.argv.includes('--watch');
 
+// Thèmes conservés dans le dépôt mais jamais construits ni publiés dans le package npm
+// (default-old.css sert de base de travail pour générer un autre thème).
+const EXCLUDED_FILES = new Set(['default-old.css']);
+
 /**
- * Scan récursif pour trouver tous les fichiers CSS.
+ * Scan récursif pour trouver tous les fichiers CSS (hors EXCLUDED_FILES).
  * @param {string} dir
  * @returns {string[]}
  */
@@ -43,7 +47,7 @@ function findCssFiles(dir) {
         const full = join(dir, entry.name);
         if (entry.isDirectory()) {
             results.push(...findCssFiles(full));
-        } else if (extname(entry.name) === '.css') {
+        } else if (extname(entry.name) === '.css' && !EXCLUDED_FILES.has(entry.name)) {
             results.push(full);
         }
     }
