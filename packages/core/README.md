@@ -22,6 +22,8 @@ npm install @ariane-ui/core
 <ar-alert variant="success">Opération réussie.</ar-alert>
 ```
 
+Le `<link>` du thème est indispensable : sans lui, les composants ne sont pas stylés (voir la section [Thème](#thème) ci-dessous).
+
 ```typescript
 // ESM avec bundler (tree-shakeable)
 import '@ariane-ui/core';

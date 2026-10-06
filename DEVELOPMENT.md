@@ -72,7 +72,7 @@ npm install
 
 ### Thème du starter-kit
 
-`npm run generate:starter-demo` régénère le Kitchen Sink du [starter-kit](https://github.com/jogo-labs/ariane-starter-kit) et copie dans le starter-kit `scripts/theme-to-js.js` et `package.json` ; le starter-kit y gagne `npm run build:js`, qui produit `ariane-starter.js` (un `CSSStyleSheet` à adopter dans un shadow DOM). Le thème des démos de la documentation est, lui, généré à chaque `npm run dev` ou `build` du site (`/themes/doc-demo.css`) depuis les sources du thème.
+`npm run generate:starter-demo` régénère le Kitchen Sink du [starter-kit](https://github.com/jogo-labs/ariane-starter-kit) et copie dans le starter-kit `scripts/theme-to-js.js` et `package.json` ; le starter-kit y gagne `npm run build:js`, qui produit `ariane-starter.js` (un `CSSStyleSheet` à adopter dans un shadow DOM). Avec `-- --repo <checkout>`, la commande écrit dans le checkout frère du starter-kit et y fait un commit git LOCAL (elle ne pousse jamais). Avec `--dry-run`, elle écrit dans un répertoire temporaire sans aucune opération git (utilisé par `demo:starter-kit` et la CI). Le thème des démos de la documentation est, lui, généré à chaque `npm run dev` ou `build` du site (`/themes/doc-demo.css`) depuis les sources du thème.
 
 ---
 

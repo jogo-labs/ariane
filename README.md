@@ -34,6 +34,8 @@ Ne charge chaque composant que lorsqu'il est utilisé dans la page. Aucun outil 
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
 ```
 
+Sans thème, les composants ne sont pas stylés : voir la section [Thème](#thème) pour charger le thème neutre du starter-kit.
+
 > Chaque script CDN existe en deux versions : le nom sans suffixe (`autoloader.js`, `index.js`) est la **production** (minifiée, sans avertissements) ; en développement local, utilisez la version `.dev.js` (`autoloader.dev.js`, `index.dev.js`) pour obtenir des avertissements détaillés dans la console.
 
 ### Via CDN — Bundle complet
@@ -43,6 +45,8 @@ Charge tous les composants en une seule requête.
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/index.js"></script>
 ```
+
+Sans thème, les composants ne sont pas stylés : voir la section [Thème](#thème) pour charger le thème neutre du starter-kit.
 
 ### Via npm _(avec bundler)_
 
