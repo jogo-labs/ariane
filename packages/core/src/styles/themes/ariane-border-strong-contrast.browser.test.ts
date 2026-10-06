@@ -62,3 +62,16 @@ describe('ariane.css — contraste de --ar-color-border-strong', () => {
         }
     }
 });
+
+describe('contrastRatio (helper)', () => {
+    it('calcule les bornes et une paire connue', () => {
+        expect(contrastRatio('#000000', '#ffffff')).to.be.closeTo(21, 0.001);
+        expect(contrastRatio('#ffffff', '#ffffff')).to.equal(1);
+        // #767676 sur blanc : 4,54:1 (seuil AA classique)
+        expect(contrastRatio('#767676', '#ffffff')).to.be.closeTo(4.54, 0.01);
+    });
+
+    it('refuse une couleur non opaque', () => {
+        expect(() => contrastRatio('rgba(0, 0, 0, 0.5)', '#ffffff')).to.throw();
+    });
+});

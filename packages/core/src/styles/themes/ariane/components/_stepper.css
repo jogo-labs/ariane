@@ -25,7 +25,7 @@ ar-stepper {
         gap: 1.25rem;
         padding: var(--ar-button-padding-x);
         min-height: var(--ar-button-height);
-        border: 1px solid var(--ar-color-border);
+        border: 1px solid var(--ar-color-border-strong);
         border-radius: var(--ar-button-border-radius);
         font-family: inherit;
         font-size: var(--ar-font-size-sm);
