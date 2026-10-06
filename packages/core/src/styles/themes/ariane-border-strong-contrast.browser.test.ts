@@ -6,6 +6,8 @@
  */
 import { expect } from '@open-wc/testing';
 import { contrastRatio } from '../../browser-test-utils.js';
+import '../../components/datepicker/index.js';
+import type { ArDatepicker } from '../../components/datepicker/datepicker.js';
 
 const SURFACES = ['--ar-color-bg', '--ar-input-bg', '--ar-button-secondary-bg'];
 
@@ -60,6 +62,71 @@ describe('ariane.css — contraste de --ar-color-border-strong', () => {
                 expect(contrastRatio(border, bg)).to.be.at.least(3);
             });
         }
+    }
+});
+
+describe('ariane.css — bordures de survol et de champ inactif', () => {
+    let link: HTMLLinkElement;
+    let root: HTMLDivElement;
+
+    before(async () => {
+        link = await loadDefaultTheme();
+    });
+
+    after(() => {
+        link.remove();
+    });
+
+    beforeEach(() => {
+        root = document.createElement('div');
+        document.body.appendChild(root);
+    });
+
+    afterEach(() => {
+        root.remove();
+    });
+
+    function scopeFor(theme: string): HTMLDivElement {
+        const scope = document.createElement('div');
+        scope.setAttribute('data-theme', theme);
+        root.appendChild(scope);
+        return scope;
+    }
+
+    for (const theme of ['light', 'dark']) {
+        it(`la bordure de survol secondaire est nettement plus contrastée que celle au repos (${theme})`, () => {
+            // Mesuré en clair : repos 3,4:1, survol 9,5:1 (écart 6,1) ; avec neutral-40, écart 3,2.
+            const scope = scopeFor(theme);
+            const bg = resolveToken(scope, '--ar-color-bg');
+            const rest = contrastRatio(resolveToken(scope, '--ar-color-border-strong'), bg);
+            const hover = contrastRatio(
+                resolveToken(scope, '--ar-button-secondary-border-hover'),
+                bg,
+            );
+            expect(hover).to.be.at.least(rest + 4);
+        });
+
+        it(`la bordure de champ inactif suit le bouton désactivé, pas la bordure forte (${theme})`, () => {
+            const scope = scopeFor(theme);
+            const inactive = resolveToken(scope, '--ar-input-inactive-border-color');
+            expect(inactive).to.equal(resolveToken(scope, '--ar-button-disabled-border'));
+            expect(inactive).not.to.equal(resolveToken(scope, '--ar-color-border-strong'));
+        });
+    }
+
+    for (const state of ['readonly', 'disabled'] as const) {
+        it(`ar-datepicker : la bordure du champ ${state} s'aligne sur celle du trigger désactivé`, async () => {
+            const el = document.createElement('ar-datepicker') as ArDatepicker;
+            el[state] = true;
+            root.appendChild(el);
+            await el.updateComplete;
+            const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
+            const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>('[part="trigger"]')!;
+            expect(trigger.disabled).to.equal(true);
+            const inputBorder = getComputedStyle(input).borderTopColor;
+            expect(inputBorder).to.equal(getComputedStyle(trigger).borderTopColor);
+            expect(inputBorder).not.to.equal(resolveToken(root, '--ar-color-border-strong'));
+        });
     }
 });
 

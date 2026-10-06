@@ -62,7 +62,7 @@ Note : les lignes `themes/<nom>` ci-dessus sont le thème de la documentation d'
 
 - Le starter-kit stylise tous les composants racine (un fragment par composant dans `components/`) ; un sous-composant (item, panneau…) est stylé par le fragment de son parent.
 - Les valeurs de la palette du starter ne font pas partie du contrat : ne pas les recopier ni s'y fier. Les alias sémantiques et les tokens par composant sont le point d'accroche.
-- Deux tokens de bordure : `--ar-color-border` pour les séparateurs et panneaux décoratifs, `--ar-color-border-strong` pour la frontière d'un contrôle (champ, bouton à bordure), qui garde un contraste d'au moins 3:1 (WCAG 1.4.11). Un contrôle personnalisé dont la bordure l'identifie utilise le second.
+- Deux tokens de bordure : `--ar-color-border` pour les séparateurs et panneaux décoratifs, `--ar-color-border-strong` pour la frontière d'un contrôle (champ, bouton à bordure), qui garde un contraste d'au moins 3:1 (WCAG 1.4.11). Un contrôle personnalisé dont la bordure l'identifie utilise le second. Les champs en lecture seule ou désactivés utilisent `--ar-input-inactive-border-color`.
 - Toutes les règles du thème sont dans `@layer ariane.theme`. Une règle hors de toute couche l'emporte sur une règle en couche, quelle que soit la spécificité : le CSS de l'application (non layered) surcharge le thème sans `!important` ni sélecteur renforcé.
 - Si l'application utilise elle-même des couches, c'est l'ordre de déclaration des couches qui décide : déclarer `ariane.theme` avant la couche de l'application.
 - Les tokens du thème sont posés sur `:root` : surcharger au même niveau.

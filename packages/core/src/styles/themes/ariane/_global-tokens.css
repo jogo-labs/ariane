@@ -65,7 +65,7 @@
     --ar-button-danger-color: var(--ar-color-white);
     --ar-button-secondary-bg: var(--ar-color-bg);
     --ar-button-secondary-border-hover: light-dark(
-        var(--ar-color-neutral-40),
+        var(--ar-color-neutral-30),
         var(--ar-color-neutral-90)
     );
     --ar-button-secondary-bg-hover: var(--ar-color-bg-subtle);
@@ -107,6 +107,12 @@
         color-mix(in oklab, var(--ar-color-vault), white 10%)
     );
     --ar-input-readonly-bg: var(--ar-color-bg-subtle);
+    /* Bordure d'un champ inactif (désactivé ou en lecture seule). Un contrôle
+       désactivé est exempté du contraste non textuel (WCAG 1.4.11) : la valeur est
+       celle du bouton désactivé, pour que deux contrôles accolés (champ + bouton
+       d'ar-datepicker) s'alignent. Appliquée aussi à la lecture seule, dont la
+       valeur reste lisible comme texte. */
+    --ar-input-inactive-border-color: var(--ar-button-disabled-border);
 
     /* Field gap — .ar-field-group (fields.css), réutilisé par le gap
                interne d'ar-datepicker::part(datepicker) */
