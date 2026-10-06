@@ -8,7 +8,7 @@ import { defineConfig } from '@playwright/test';
  * `npm run build` doit avoir tourné avant `npm run test:a11y`.
  */
 export default defineConfig({
-    testDir: './tests/a11y',
+    testDir: './tests',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,
