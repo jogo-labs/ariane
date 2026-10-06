@@ -1,6 +1,6 @@
 // scripts/starter-kit/theme-to-js.test.js
 import { describe, expect, it } from 'vitest';
-import { themeToJs } from './theme-to-js.js';
+import { parseArgs, themeToJs } from './theme-to-js.js';
 
 const THEME = `
 :root { --ar-color-text: black; }
@@ -65,5 +65,20 @@ describe('themeToJs', () => {
 
     it("refuse un nom qui n'est pas un identifiant JavaScript", () => {
         expect(() => themeToJs(THEME, { name: 'mon-theme' })).toThrow(/identifiant/);
+    });
+});
+
+describe('parseArgs', () => {
+    it('lit entrée, sortie et --name', () => {
+        expect(parseArgs(['a.css', 'b.js', '--name', 'monTheme'])).toEqual({
+            entry: 'a.css',
+            output: 'b.js',
+            name: 'monTheme',
+        });
+    });
+
+    it('échoue clairement si --name est sans valeur', () => {
+        expect(() => parseArgs(['a.css', 'b.js', '--name'])).toThrow(/--name attend/);
+        expect(() => parseArgs(['--name', '--autre', 'a.css'])).toThrow(/--name attend/);
     });
 });

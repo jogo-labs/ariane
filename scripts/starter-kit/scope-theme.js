@@ -43,8 +43,12 @@ export function collectSelectors(css) {
     return selectors;
 }
 
+// Lightning CSS rapporte une déclaration dont la valeur contient var() sous la propriété
+// 'unparsed' : le vrai nom est alors dans `value.propertyId.property`.
 function propertyName(declaration) {
-    return declaration.property === 'custom' ? declaration.value.name : declaration.property;
+    if (declaration.property === 'custom') return declaration.value.name;
+    if (declaration.property === 'unparsed') return declaration.value.propertyId.property;
+    return declaration.property;
 }
 
 /**

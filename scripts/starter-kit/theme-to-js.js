@@ -61,15 +61,35 @@ export function themeToJs(css, { name = 'theme' } = {}) {
     );
 }
 
-async function main(argv) {
+const USAGE = 'Usage : node scripts/theme-to-js.js <entrée.css> <sortie.js> [--name <identifiant>]';
+
+/** Analyse les arguments ; `--name` sans valeur est une erreur explicite. */
+export function parseArgs(argv) {
     const args = argv.slice();
     const nameIndex = args.indexOf('--name');
-    const name = nameIndex === -1 ? undefined : args.splice(nameIndex, 2)[1];
+    let name;
+    if (nameIndex !== -1) {
+        name = args[nameIndex + 1];
+        if (name === undefined || name.startsWith('--')) {
+            throw new Error('--name attend un identifiant JavaScript (ex. --name monTheme).');
+        }
+        args.splice(nameIndex, 2);
+    }
     const [entry, output] = args;
+    return { entry, output, name };
+}
+
+async function main(argv) {
+    let parsed;
+    try {
+        parsed = parseArgs(argv);
+    } catch (error) {
+        console.error(`${error.message}\n${USAGE}`);
+        process.exit(1);
+    }
+    const { entry, output, name } = parsed;
     if (!entry || !output) {
-        console.error(
-            'Usage : node scripts/theme-to-js.js <entrée.css> <sortie.js> [--name <identifiant>]',
-        );
+        console.error(USAGE);
         process.exit(1);
     }
     const bundled = await build({

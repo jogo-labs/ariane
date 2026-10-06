@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { scopeThemeUnder, collectSelectors, unscopedSelectors } from './scope-theme.js';
+import {
+    scopeThemeUnder,
+    collectSelectors,
+    collectDeclaredProperties,
+    unscopedSelectors,
+} from './scope-theme.js';
 
 const THEME = `
 @layer ariane.theme {
@@ -51,5 +56,27 @@ describe('collectSelectors', () => {
         const selectors = collectSelectors('ar-alert { &::part(close-button) { opacity: 1; } }');
         const flat = selectors.map((sel) => sel.map((c) => c.type).join(' '));
         expect(flat).toContain('type pseudo-element');
+    });
+});
+
+describe('collectDeclaredProperties', () => {
+    const namesOf = (css) => [...collectDeclaredProperties(css).values()].flatMap((n) => [...n]);
+
+    it('rapporte le vrai nom des déclarations à valeur var(), pas « unparsed »', () => {
+        const names = namesOf('ar-alert { color: var(--x); margin: var(--y) !important; --z: 1; }');
+        expect(names).toEqual(expect.arrayContaining(['color', 'margin', '--z']));
+        expect(names).not.toContain('unparsed');
+    });
+
+    it('permet de détecter un starter qui abandonne `color: var(--x)` pour un sélecteur', () => {
+        const reference = collectDeclaredProperties('ar-alert { color: var(--x); }');
+        const starter = collectDeclaredProperties('ar-alert { padding: 1px; }');
+        const missing = [];
+        for (const [selector, names] of reference) {
+            for (const name of names) {
+                if (!starter.get(selector)?.has(name)) missing.push(name);
+            }
+        }
+        expect(missing).toEqual(['color']);
     });
 });

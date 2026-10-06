@@ -127,7 +127,7 @@ ar-alert {
 Les valeurs de design sont définies par le thème (voir le starter-kit) ; le composant n'en porte aucune.
 Créez votre propre thème en définissant ces variables dans votre CSS global.
 
-Trois leviers, dans cet ordre : les tokens `--ar-*`, les parts `::part()` (y compris les parts d'état), puis les états personnalisés `:state()`.
+Trois leviers : les tokens `--ar-*`, les parts `::part()` (y compris les parts d'état), puis les états personnalisés `:state()`.
 
 ### CSS Parts
 
