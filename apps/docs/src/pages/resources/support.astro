@@ -43,7 +43,7 @@ const tocEntries = [
             <p>Ariane garantit l'accessibilité structurelle : rôles ARIA, attributs, gestion du focus, icônes masquées aux technologies d'assistance. Vous fournissez l'accessibilité éditoriale : messages compréhensibles hors contexte visuel, niveaux de sévérité cohérents, libellés significatifs. Chaque page de composant détaille les deux, dans les sections « Pris en charge automatiquement » et « À votre charge » (par exemple pour <a href="/components/alert">Alert</a>).</p>
 
             <NarrativeSubheading id="aucun-style">Pourquoi mes composants n'ont-ils aucun style ?</NarrativeSubheading>
-            <p>Ariane est headless : les composants fonctionnent pleinement (accessibilité, interactions) mais n'ont aucun style visuel. Ajoutez une couche CSS. Le plus simple est de partir du thème de démo, téléchargeable sur <a href="/theming/appliquer-un-theme">Appliquer un thème</a>. La <a href="/theming/overview">vue d'ensemble</a> décrit les leviers disponibles.</p>
+            <p>Ariane est headless : les composants fonctionnent pleinement (accessibilité, interactions) mais n'ont aucun style visuel. Ajoutez une couche CSS. Le plus simple est de partir du thème neutre du <a href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">starter-kit</a>, présenté sur <a href="/theming/appliquer-un-theme">Appliquer un thème</a>. La <a href="/theming/overview">vue d'ensemble</a> décrit les leviers disponibles.</p>
 
             <NarrativeSubheading id="production">Puis-je l'utiliser en production ?</NarrativeSubheading>
             <p>Pas encore. Ariane est en alpha : l'API peut changer sans préavis. Les changements de chaque version sont listés dans les <a href="https://github.com/jogo-labs/ariane/releases" rel="noopener" target="_blank">Releases GitHub</a>.</p>
@@ -68,7 +68,7 @@ const tocEntries = [
             <NarrativeHeading id="personnaliser">Personnaliser</NarrativeHeading>
 
             <NarrativeSubheading id="mode-sombre">Comment gérer le mode sombre ?</NarrativeSubheading>
-            <p>Ariane n'impose aucun thème : le mode sombre fait partie du vôtre. Le thème de démo montre comment gérer les modes clair et sombre. Si vous avez déjà un design system, faites pointer les tokens Ariane vers les vôtres : leurs valeurs suivront votre mode sombre. Voir <a href="/theming/appliquer-un-theme">Appliquer un thème</a>.</p>
+            <p>Ariane n'impose aucun thème : le mode sombre fait partie du vôtre. Le thème du starter-kit montre comment gérer les modes clair et sombre. Si vous avez déjà un design system, faites pointer les tokens Ariane vers les vôtres : leurs valeurs suivront votre mode sombre. Voir <a href="/theming/appliquer-un-theme">Appliquer un thème</a>.</p>
 
             <NarrativeSubheading id="prefixe">Puis-je changer le préfixe <code>ar-</code> ?</NarrativeSubheading>
             <p>Oui. Définissez <code>window.ARIANE_CONFIG.prefix</code> avant le script (CDN) ou avant l'import de la librairie (npm). Avec npm, vous pouvez aussi importer les classes depuis <code>@ariane-ui/core/headless</code> et appeler <code>customElements.define()</code> avec le tag de votre choix. Voir <a href="/theming/tag-customization">Personnaliser le préfixe des tags</a>.</p>

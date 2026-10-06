@@ -63,7 +63,7 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
             <NarrativeHeading id="personnalisation">Thème et personnalisation</NarrativeHeading>
             <p>
                 Ariane est une librairie <strong>headless</strong> et n'impose donc aucun style par défaut. <br />
-                Cela vous laisse donc le champs libre pour créer un thème adapté à votre besoin.
+                Cela vous laisse donc le champ libre pour créer un thème adapté à votre besoin.
             </p>
 
             <NarrativeSubheading id="charger-un-theme">Créer un thème</NarrativeSubheading>
@@ -76,7 +76,11 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
                 <a class="download-theme" href="https://github.com/jogo-labs/ariane-starter-kit" target="_blank" rel="noopener">
                     Récupérer le thème neutre (starter-kit)
                 </a>
-                <a href="https://jogo-labs.github.io/ariane-starter-kit/" target="_blank" rel="noopener">Voir la démo</a>
+            </p>
+            <p>
+                <a class="download-theme" href="https://jogo-labs.github.io/ariane-starter-kit/" target="_blank" rel="noopener">
+                    Voir la démo (Kitchen Sink)
+                </a>
             </p>
             <p>
                 Les composants exposent aussi leurs états avec les <a href="/theming/personnalisation-avancee#state-parts">parts d'état</a> et les <strong>CSS Custom States</strong> (<code>:state(open)</code>, <code>:state(disabled)</code>…), listés dans la section <strong>Référence API</strong> de chaque composant.
@@ -115,7 +119,7 @@ const codePresets = `<!-- Charger le CSS dans le <head> -->
                 Un bouton ou un champ que vous slottez dans un composant reste toutefois du HTML natif,
                 hors de leur portée. Pour ces cas là ce sera le CSS de votre page qui prendra le relais pour personnaliser ces éléments. <br />
                 En complément du thème du starter-kit, Ariane met donc à disposition un exemple de classes CSS pré-définies pour personnaliser l'apparence de ces éléments non couverts.<br />
-                Chaque famille de classes vit dans son propre fichier et peut être chargé utilisée comme base de départ pour vos propre style ou utilisés directement en complément du thème du starter-kit :
+                Chaque famille de classes vit dans son propre fichier et peut être chargée et utilisée comme base de départ pour vos propres styles, ou utilisée directement en complément du thème du starter-kit :
             </p>
             <pre><code class="language-html" set:text={codePresets} /></pre>
         </div>
