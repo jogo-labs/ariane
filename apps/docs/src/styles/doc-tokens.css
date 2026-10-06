@@ -45,6 +45,7 @@
 
     /* ─── Tokens sémantiques ────────────────────────────────────────── */
     --doc-bg: light-dark(var(--doc-paper), var(--doc-vault));
+    --doc-preview-bg: light-dark(var(--doc-paper), var(--doc-vault-deep));
     --doc-nav-bg: var(--doc-bg);
     --doc-text: light-dark(var(--doc-ink), var(--doc-chalk));
     --doc-text-muted: light-dark(var(--doc-ink-muted), var(--doc-chalk-muted));
