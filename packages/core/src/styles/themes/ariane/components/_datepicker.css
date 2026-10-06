@@ -35,7 +35,7 @@
     --ar-datepicker-nav-button-focus-ring-color: var(--ar-focus-ring-color);
 
     /* -- Footer du calendrier : boutons "Aujourd'hui" / "Fermer" -- */
-    --ar-datepicker-footer-button-border-color: var(--ar-color-border);
+    --ar-datepicker-footer-button-border-color: var(--ar-color-border-strong);
     --ar-datepicker-footer-button-focus-ring-color: var(--ar-focus-ring-color);
 
     /* -- Grille de jours : dimension de cellule + jours hors mois affiché -- */

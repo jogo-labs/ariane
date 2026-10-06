@@ -62,6 +62,7 @@ Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 
 - Le thème fourni stylise un sous-ensemble de composants (un fragment par composant dans `components/`) ; un composant sans fragment reste à styler avec ses tokens et parts.
 - Les valeurs de la palette fournie ne font pas partie du contrat : ne pas les recopier ni s'y fier. Les alias sémantiques et les tokens par composant sont le point d'accroche.
+- Deux tokens de bordure : `--ar-color-border` pour les séparateurs et panneaux décoratifs, `--ar-color-border-strong` pour la frontière d'un contrôle (champ, bouton à bordure), qui garde un contraste d'au moins 3:1 (WCAG 1.4.11). Un contrôle personnalisé dont la bordure l'identifie utilise le second.
 - Toutes les règles du thème sont dans `@layer ariane.theme`. Une règle hors de toute couche l'emporte sur une règle en couche, quelle que soit la spécificité : le CSS de l'application (non layered) surcharge le thème sans `!important` ni sélecteur renforcé.
 - Si l'application utilise elle-même des couches, c'est l'ordre de déclaration des couches qui décide : déclarer `ariane.theme` avant la couche de l'application.
 - Les tokens du thème sont posés sur `:root` : surcharger au même niveau.

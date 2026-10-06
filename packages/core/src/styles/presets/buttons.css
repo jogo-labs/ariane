@@ -73,7 +73,7 @@
 
     .ar-btn-secondary {
         background-color: var(--ar-button-secondary-bg);
-        border-color: var(--ar-color-border);
+        border-color: var(--ar-color-border-strong);
         color: var(--ar-color-text);
 
         &:not(:disabled):not([aria-disabled='true']):hover {

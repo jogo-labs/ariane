@@ -95,7 +95,7 @@
     --ar-button-transition-duration: 0.15s;
 
     /* Input — preset fields.css, réutilisé par ar-datepicker::part(input) */
-    --ar-input-border-color: var(--ar-color-border);
+    --ar-input-border-color: var(--ar-color-border-strong);
     --ar-input-radius: var(--ar-border-radius-md);
     --ar-input-bg: var(--ar-color-bg);
     --ar-input-color: var(--ar-color-text);

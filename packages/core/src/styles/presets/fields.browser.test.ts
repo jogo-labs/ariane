@@ -57,9 +57,9 @@ describe('presets/fields.css', () => {
         return el;
     }
 
-    it('ar-input consomme --ar-color-border', () => {
+    it('ar-input consomme --ar-color-border-strong', () => {
         const input = makeInput('input');
-        expect(roundColor(getComputedStyle(input).borderColor)).to.equal('oklch(0.9286 0.002 90)');
+        expect(roundColor(getComputedStyle(input).borderColor)).to.equal('oklch(0.6389 0.002 90)');
     });
 
     it('ar-input consomme --ar-color-bg et --ar-color-text', () => {
