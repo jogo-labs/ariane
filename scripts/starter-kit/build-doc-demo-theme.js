@@ -20,6 +20,17 @@ export async function bundleCss(entryPath) {
 }
 
 /**
+ * Le `:root { color-scheme: light dark }` du starter devient `.doc-demo { color-scheme: … }`
+ * après la réécriture `:root` -> `&` : le conteneur ne suivrait plus le `color-scheme` imposé
+ * par `html[data-theme]` (menu de thème du site) et les `light-dark()` des démos retomberaient
+ * sur la préférence de l'OS. Cette règle HORS couche (elle l'emporte sur `@layer`) force
+ * l'héritage depuis la page.
+ */
+function inheritColorScheme(className) {
+    return `\n.${className} {\n    color-scheme: inherit;\n}\n`;
+}
+
+/**
  * Thème neutre du starter-kit (dérivé d'`ariane.css` par `syncStarterTheme`, le même flux
  * que le Kitchen Sink), imbriqué sous `.doc-demo`. Aucune écriture dans le dépôt : le
  * starter est généré dans un répertoire temporaire.
@@ -29,7 +40,7 @@ export async function buildDocDemoTheme(srcThemesDir) {
     try {
         syncStarterTheme({ srcThemesDir, repoPath: tmp });
         const bundled = await bundleCss(path.join(tmp, 'ariane-starter.css'));
-        return scopeThemeUnder(bundled, DOC_DEMO_CLASS);
+        return scopeThemeUnder(bundled, DOC_DEMO_CLASS) + inheritColorScheme(DOC_DEMO_CLASS);
     } finally {
         rmSync(tmp, { recursive: true, force: true });
     }

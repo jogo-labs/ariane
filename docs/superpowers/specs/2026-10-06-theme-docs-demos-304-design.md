@@ -28,7 +28,7 @@ Pourquoi ça marche, vérifié par un spike jetable (Chromium, clair et sombre, 
 - Hors conteneur, ils sont identiques à `ariane.css` seul : 0 écart. Aucune fuite.
 - Une règle imbriquée `.doc-demo ar-x` a une priorité supérieure d'une classe à la règle globale `ar-x`, dans la même couche. Le thème ne contient aucun `!important`.
 - Les tokens du conteneur remplacent les tokens hérités. Les tokens posés sur un tag sont remplacés par les mêmes sélecteurs côté starter : le starter doit donc définir tout ce que définit `ariane.css` (vrai par construction, vérifié par un test, voir plus bas).
-- Le mode sombre ne pose pas de difficulté : les tokens utilisent `light-dark()` piloté par `color-scheme`, qui s'hérite.
+- Le mode sombre demande une précaution : les tokens utilisent `light-dark()` piloté par `color-scheme`, qui s'hérite. Mais le `:root { color-scheme: light dark }` du starter deviendrait `.doc-demo { color-scheme: light dark }` et couperait l'héritage du `color-scheme` imposé par `html[data-theme]` (menu de thème du site) : les démos suivraient alors l'OS au lieu du menu. La feuille scopée ne doit donc pas poser `color-scheme` elle-même ; une règle finale hors couche `.doc-demo { color-scheme: inherit }` garantit que les démos l'héritent de la page. Le spike n'émulait que la préférence de l'OS, il ne pouvait pas détecter ce cas.
 - Dropdown et dialog (couche supérieure) restent descendants du conteneur dans l'arbre DOM : ils sont couverts. Alert, tab-group, bouton avec preset `.ar-btn` aussi.
 
 ## Périmètre

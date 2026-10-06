@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { syncStarterTheme } from './sync-starter-theme.js';
-import { collectSelectors, unscopedSelectors } from './scope-theme.js';
+import { collectDeclaredProperties, collectSelectors, unscopedSelectors } from './scope-theme.js';
 import {
     DOC_DEMO_CLASS,
     bundleCss,
@@ -27,6 +27,19 @@ describe('buildDocDemoTheme (thème réel)', () => {
         expect(unscopedSelectors(css, DOC_DEMO_CLASS)).toEqual([]);
     });
 
+    it('force color-scheme: inherit hors de toute couche (suit le menu de thème du site)', () => {
+        // Règle non-couche : elle suit la dernière accolade fermante du bloc @layer.
+        const rule = /\.doc-demo\s*\{\s*color-scheme:\s*inherit;?\s*\}\s*$/;
+        expect(css).toMatch(rule);
+        const before = css.replace(rule, '');
+        const opens = (before.match(/\{/g) ?? []).length;
+        const closes = (before.match(/\}/g) ?? []).length;
+        expect(opens).toBe(closes);
+        // Aucune déclaration color-scheme du thème ne doit rester une valeur "light dark"
+        // non neutralisée par la règle finale : celle-ci est bien la dernière du fichier.
+        expect(css.lastIndexOf('color-scheme')).toBeGreaterThan(before.lastIndexOf('color-scheme'));
+    });
+
     it('le starter définit tout ce que définit ariane.css (aucune règle ne fuite)', async () => {
         const ariane = await bundleCss(path.join(THEMES, 'ariane.css'));
         const tmp = mkdtempSync(path.join(tmpdir(), 'starter-superset-'));
@@ -35,10 +48,25 @@ describe('buildDocDemoTheme (thème réel)', () => {
             const starter = await bundleCss(path.join(tmp, 'ariane-starter.css'));
             const key = (selector) => JSON.stringify(selector);
             const starterKeys = new Set(collectSelectors(starter).map(key));
-            const missing = collectSelectors(ariane)
+            const arianeSelectors = collectSelectors(ariane);
+            expect(arianeSelectors.length).toBeGreaterThan(0);
+            const missing = arianeSelectors
                 .filter((selector) => !starterKeys.has(key(selector)))
                 .map(key);
             expect(missing).toEqual([]);
+
+            // Chaque propriété déclarée par ariane.css pour un sélecteur doit l'être aussi par
+            // le starter (sinon la valeur d'ariane fuirait dans les démos).
+            const starterProps = collectDeclaredProperties(starter);
+            const missingProps = [];
+            for (const [selector, names] of collectDeclaredProperties(ariane)) {
+                for (const name of names) {
+                    if (!starterProps.get(selector)?.has(name)) {
+                        missingProps.push(`${selector} ${name}`);
+                    }
+                }
+            }
+            expect(missingProps).toEqual([]);
         } finally {
             rmSync(tmp, { recursive: true, force: true });
         }

@@ -60,7 +60,7 @@ Note : les lignes `themes/<nom>` ci-dessus sont le thème de la documentation d'
 | `shared/_panel.css`, `shared/_anchor.css` | Tokens partagés par les composants à panneau flottant (`--ar-panel-*`)                                                                        |
 | `components/_<nom>.css`                   | Un fichier par composant stylé : tokens `--ar-<nom>-*` et règles `::part()`                                                                   |
 
-- Le starter-kit stylise un sous-ensemble de composants (un fragment par composant dans `components/`) ; un composant sans fragment reste à styler avec ses tokens et parts.
+- Le starter-kit stylise tous les composants racine (un fragment par composant dans `components/`) ; un sous-composant (item, panneau…) est stylé par le fragment de son parent.
 - Les valeurs de la palette du starter ne font pas partie du contrat : ne pas les recopier ni s'y fier. Les alias sémantiques et les tokens par composant sont le point d'accroche.
 - Toutes les règles du thème sont dans `@layer ariane.theme`. Une règle hors de toute couche l'emporte sur une règle en couche, quelle que soit la spécificité : le CSS de l'application (non layered) surcharge le thème sans `!important` ni sélecteur renforcé.
 - Si l'application utilise elle-même des couches, c'est l'ordre de déclaration des couches qui décide : déclarer `ariane.theme` avant la couche de l'application.

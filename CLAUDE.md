@@ -35,7 +35,7 @@ npm run build:skill        # Regénère skills/ariane et llms/ (depuis packages/
 npm run changelog          # Section de la prochaine release dans CHANGELOG.md (branche release, après bump)
 ```
 
-Le thème des démos de la doc est généré au build du site (`/themes/doc-demo.css`) depuis les sources du thème ; le thème du starter-kit et celui des démos suivent `ariane.css`. Un composant ajouté au thème doit figurer dans les deux (test `scripts/starter-kit`).
+Le thème des démos de la doc est généré au build du site (`/themes/doc-demo.css`) depuis les sources du thème ; le thème du starter-kit et celui des démos suivent `ariane.css`. Un composant ajouté au thème apparaît automatiquement dans les deux (`syncStarterTheme` copie tout l'arbre) ; le test de `scripts/starter-kit` le vérifie.
 
 ## Git Workflow
 

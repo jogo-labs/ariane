@@ -43,6 +43,38 @@ export function collectSelectors(css) {
     return selectors;
 }
 
+function propertyName(declaration) {
+    return declaration.property === 'custom' ? declaration.value.name : declaration.property;
+}
+
+/**
+ * Noms de propriétés déclarées par sélecteur (clé = sélecteur sérialisé en JSON), imbrication
+ * aplatie, règles de même sélecteur fusionnées.
+ */
+export function collectDeclaredProperties(css) {
+    const byKey = new Map();
+    transform({
+        filename: 'properties.css',
+        code: lowerNesting(css),
+        visitor: {
+            Rule: {
+                style(rule) {
+                    const { declarations, importantDeclarations } = rule.value.declarations ?? {};
+                    const names = [...(declarations ?? []), ...(importantDeclarations ?? [])].map(
+                        propertyName,
+                    );
+                    for (const selector of rule.value.selectors) {
+                        const key = JSON.stringify(selector);
+                        if (!byKey.has(key)) byKey.set(key, new Set());
+                        for (const name of names) byKey.get(key).add(name);
+                    }
+                },
+            },
+        },
+    });
+    return byKey;
+}
+
 function startsWithClass(selector, className) {
     const first = selector[0];
     if (first?.type === 'class' && first.name === className) return true;
