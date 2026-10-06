@@ -10,6 +10,13 @@ const THEME = `
   ar-alert { color: var(--ar-color-text); &::part(close-button) { opacity: .75; } }
 }
 ar-dialog[size='sm'] { --ar-dialog-width: 20rem; }
+:root, ar-badge { color: red; }
+`;
+
+const SCOPED = `
+:root[data-theme='dark'] ar-tag { color: blue; }
+ar-chip[data-theme='dark'] { color: green; }
+[data-theme='dark'] ar-pill { color: pink; }
 `;
 
 function sheetText(js) {
@@ -41,6 +48,19 @@ describe('themeToJs', () => {
         expect(css).toContain('ar-alert');
         expect(css).toContain('::part(close-button)');
         expect(css).toContain('ar-dialog[size=sm]');
+    });
+
+    it('liste mixte : retire le membre document, garde le composant', () => {
+        const css = sheetText(themeToJs(THEME));
+        expect(css).toContain('ar-badge{color:red}');
+        expect(css).not.toMatch(/:root,ar-badge|ar-badge,:root/);
+    });
+
+    it('garde les sélecteurs de composants qui mentionnent :root ou [data-theme] hors sujet', () => {
+        const css = sheetText(themeToJs(SCOPED));
+        expect(css).toContain(':root[data-theme=dark] ar-tag');
+        expect(css).toContain('ar-chip[data-theme=dark]');
+        expect(css).toContain('[data-theme=dark] ar-pill');
     });
 
     it("refuse un nom qui n'est pas un identifiant JavaScript", () => {

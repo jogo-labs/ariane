@@ -3,8 +3,11 @@
  * Génère la version JavaScript d'un thème CSS : un module qui exporte un `CSSStyleSheet` à
  * adopter dans un shadow DOM applicatif (`shadowRoot.adoptedStyleSheets = [theme]`).
  *
- * Les règles `:root` et `[data-theme]` sont retirées : `:root` ne correspond à rien dans un
- * shadow root, et les tokens (propriétés personnalisées) traversent déjà la frontière par
+ * Les sélecteurs « document » sont retirés : ceux dont le sujet (le composé après le dernier
+ * combinateur) ne comporte que `:root` et/ou `[data-theme]` (`:root`, `[data-theme='dark']`,
+ * `:root[data-theme='dark']`). Un sélecteur qui cible un composant reste, même s'il mentionne
+ * `[data-theme]` en amont (`:root[data-theme='dark'] ar-alert`) ou sur le composant lui-même
+ * (`ar-alert[data-theme='dark']`). `:root` ne correspond à rien dans un shadow root, et les tokens (propriétés personnalisées) traversent déjà la frontière par
  * héritage depuis le document, qui doit donc charger le thème CSS. Les règles de composants
  * (`ar-x`, `::part()`) sont conservées avec leurs couches éventuelles.
  *
@@ -18,12 +21,20 @@ import { transform } from 'lightningcss';
 
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
-const isDocumentLevel = (selector) =>
-    selector.some(
-        (c) =>
-            (c.type === 'pseudo-class' && c.kind === 'root') ||
-            (c.type === 'attribute' && c.name === 'data-theme'),
+// Un sélecteur est « document » si son sujet (le composé après le dernier combinateur) ne
+// contient que `:root` et/ou `[data-theme]`, et n'est pas vide.
+const isDocumentLevel = (selector) => {
+    const lastCombinator = selector.map((c) => c.type).lastIndexOf('combinator');
+    const subject = selector.slice(lastCombinator + 1);
+    return (
+        subject.length > 0 &&
+        subject.every(
+            (c) =>
+                (c.type === 'pseudo-class' && c.kind === 'root') ||
+                (c.type === 'attribute' && c.name === 'data-theme'),
+        )
     );
+};
 
 export function themeToJs(css, { name = 'theme' } = {}) {
     if (!IDENTIFIER.test(name)) {
