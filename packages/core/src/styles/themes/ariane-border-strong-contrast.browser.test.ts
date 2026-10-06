@@ -95,7 +95,7 @@ describe('ariane.css — bordures de survol et de champ inactif', () => {
 
     for (const theme of ['light', 'dark']) {
         it(`la bordure de survol secondaire est nettement plus contrastée que celle au repos (${theme})`, () => {
-            // Mesuré en clair : repos 3,4:1, survol 9,5:1 (écart 6,1) ; avec neutral-40, écart 3,2.
+            // Mesuré en clair : repos 3,4:1, survol 13,7:1 (neutral-20) ; avec neutral-40, écart 3,2.
             const scope = scopeFor(theme);
             const bg = resolveToken(scope, '--ar-color-bg');
             const rest = contrastRatio(resolveToken(scope, '--ar-color-border-strong'), bg);
