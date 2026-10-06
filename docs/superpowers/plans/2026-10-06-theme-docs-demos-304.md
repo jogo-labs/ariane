@@ -909,10 +909,8 @@ Ariane est headless : sans thème, aucun composant n'est stylé. Partez du thèm
 ```html
 <link rel="stylesheet" href="./ariane-starter.css" />
 ```
-````
 
 Pour un essai rapide sans rien copier, le même thème est servi à `https://jogo-labs.github.io/ariane-starter-kit/ariane-starter.css` (non versionné, il suit la dernière release).
-
 ````
 
 Les imports npm `import '@ariane-ui/core/themes/ariane.css';` deviennent `import './ariane-starter.css';`. Ne pas laisser d'exemple qui charge `ariane.css`. Dans la ligne 120 de `packages/core/README.md` (« Les valeurs par défaut sont définies dans `src/styles/themes/ariane.css` … ») : reformuler « Les valeurs de design sont définies par le thème (voir le starter-kit) ; le composant n'en porte aucune ».
@@ -943,7 +941,7 @@ Expected: OK (le contrôle de la skill exige toujours les 14 composants racine d
 cd /Users/jon/Code/Active_projects/ariane
 git add README.md packages/core/README.md DEVELOPMENT.md
 git commit -m "docs: README et DEVELOPMENT.md alignés sur le starter-kit et les commandes réelles (#307)"
-````
+```
 
 ---
 
