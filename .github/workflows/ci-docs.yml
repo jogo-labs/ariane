@@ -8,6 +8,7 @@ on:
     paths:
       - 'apps/docs/**'
       - 'packages/core/**'
+      - 'scripts/starter-kit/**'
       - 'package.json'
       - 'package-lock.json'
       - 'turbo.json'

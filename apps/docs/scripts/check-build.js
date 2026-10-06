@@ -10,6 +10,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unscopedSelectors } from '../../../scripts/starter-kit/scope-theme.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -49,6 +50,12 @@ if (!existsSync(DOC_DEMO_THEME)) {
     const demoCss = readFileSync(DOC_DEMO_THEME, 'utf8');
     if (!demoCss.includes('.doc-demo') || demoCss.includes(':root')) {
         console.error('✗ themes/doc-demo.css doit être scopé sous .doc-demo (sans :root)');
+        hasError = true;
+    } else if (unscopedSelectors(demoCss, 'doc-demo').length > 0) {
+        console.error('✗ themes/doc-demo.css contient des sélecteurs hors .doc-demo :');
+        for (const selector of unscopedSelectors(demoCss, 'doc-demo')) {
+            console.error(`    ${selector}`);
+        }
         hasError = true;
     } else {
         console.log('✓ themes/doc-demo.css');

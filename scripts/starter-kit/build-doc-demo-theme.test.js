@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeAll } from 'vitest';
-import { cpSync, mkdtempSync, rmSync, utimesSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdtempSync, rmSync, utimesSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -93,6 +93,16 @@ describe('createDocDemoThemeProvider', () => {
             const second = await provider.get();
             expect(provider.builds).toBe(2);
             expect(second).toBe(first);
+
+            // Supprimer le fichier le plus récent (le mtime max redescend) invalide le cache.
+            const extra = path.join(dir, 'ariane', 'components', '_extra.css');
+            writeFileSync(extra, '/* inutilisé */\n');
+            utimesSync(extra, new Date(Date.now() + 120_000), new Date(Date.now() + 120_000));
+            await provider.get();
+            expect(provider.builds).toBe(3);
+            rmSync(extra);
+            await provider.get();
+            expect(provider.builds).toBe(4);
         } finally {
             rmSync(tmp, { recursive: true, force: true });
         }

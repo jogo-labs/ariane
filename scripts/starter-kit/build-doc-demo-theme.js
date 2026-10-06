@@ -46,16 +46,28 @@ export async function buildDocDemoTheme(srcThemesDir) {
     }
 }
 
-function latestMtimeMs(dir) {
+/** Nombre de fichiers et mtime le plus récent, pour détecter aussi une suppression. */
+function scanDir(dir) {
+    let count = 0;
     let latest = 0;
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);
-        latest = Math.max(
-            latest,
-            entry.isDirectory() ? latestMtimeMs(full) : statSync(full).mtimeMs,
-        );
+        if (entry.isDirectory()) {
+            const sub = scanDir(full);
+            count += sub.count;
+            latest = Math.max(latest, sub.latest);
+        } else {
+            count += 1;
+            latest = Math.max(latest, statSync(full).mtimeMs);
+        }
     }
-    return latest;
+    return { count, latest };
+}
+
+// Clé de cache : supprimer ou rétablir le fichier le plus récent change le compte ou le mtime max.
+function cacheKey(dir) {
+    const { count, latest } = scanDir(dir);
+    return `${count}:${latest}`;
 }
 
 /**
@@ -72,7 +84,7 @@ export function createDocDemoThemeProvider(srcThemesDir) {
             return builds;
         },
         async get() {
-            const stamp = latestMtimeMs(srcThemesDir);
+            const stamp = cacheKey(srcThemesDir);
             if (cached && cached.stamp === stamp) return cached.css;
             const css = await buildDocDemoTheme(srcThemesDir);
             builds += 1;
