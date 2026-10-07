@@ -274,15 +274,17 @@ describe('ArAlert a11y', () => {
 
 ## Build outputs
 
-| Répertoire                  | Usage                                                           |
-| --------------------------- | --------------------------------------------------------------- |
-| `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking |
-| `cdn/index.js`              | Bundle CDN prod — minifié, avertissements supprimés             |
-| `cdn/autoloader.js`         | Autoloader CDN prod                                             |
-| `cdn/index.dev.js`          | Bundle CDN dev — non minifié, avertissements actifs             |
-| `cdn/autoloader.dev.js`     | Autoloader CDN dev                                              |
-| `dist/custom-elements.json` | Manifest CEM — consommé par la doc                              |
-| `dist/styles/themes/`       | Fichiers CSS de thème                                           |
+| Répertoire                  | Usage                                                               |
+| --------------------------- | ------------------------------------------------------------------- |
+| `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking     |
+| `cdn/index.js`              | Bundle CDN prod — minifié, avertissements supprimés                 |
+| `cdn/autoloader.js`         | Autoloader CDN prod                                                 |
+| `cdn/index.dev.js`          | Bundle CDN dev — non minifié, avertissements actifs                 |
+| `cdn/autoloader.dev.js`     | Autoloader CDN dev                                                  |
+| `cdn/utils.js`              | Utilitaires purs CDN prod (`whenAllDefined`, `registerTranslation`) |
+| `cdn/utils.dev.js`          | Utilitaires purs CDN dev                                            |
+| `dist/custom-elements.json` | Manifest CEM — consommé par la doc                                  |
+| `dist/styles/themes/`       | Fichiers CSS de thème                                               |
 
 ### Constante `__DEV__`
 

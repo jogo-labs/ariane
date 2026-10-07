@@ -16,6 +16,8 @@ function makePackage(root, { prodWarn = false, devWarn = true, extraFiles = [] }
     writeFileSync(join(root, 'cdn/autoloader.js'), PROD);
     writeFileSync(join(root, 'cdn/index.dev.js'), devWarn ? DEV : PROD);
     writeFileSync(join(root, 'cdn/autoloader.dev.js'), PROD);
+    writeFileSync(join(root, 'cdn/utils.js'), PROD);
+    writeFileSync(join(root, 'cdn/utils.dev.js'), PROD);
     writeFileSync(join(root, 'cdn/chunks/alert-AAAA.js'), PROD);
     writeFileSync(join(root, 'cdn/chunks/alert-BBBB.dev.js'), PROD);
     for (const f of extraFiles) writeFileSync(join(root, f), PROD);
@@ -39,6 +41,30 @@ describe('checkCdnBundles', () => {
         delete exports['./cdn.dev'];
         const errors = checkCdnBundles({ exports, root });
         expect(errors.join('\n')).toContain('./cdn.dev');
+    });
+
+    it('signale un export CDN `utils` manquant ou une cible `utils` absente', () => {
+        makePackage(root);
+        const exports = { ...CDN_EXPORTS };
+        delete exports['./cdn/utils.dev'];
+        expect(checkCdnBundles({ exports, root }).join('\n')).toContain('./cdn/utils.dev');
+        rmSync(join(root, 'cdn/utils.js'));
+        expect(checkCdnBundles({ exports: CDN_EXPORTS, root }).join('\n')).toContain(
+            'cdn/utils.js',
+        );
+    });
+
+    it("accepte `utils.dev.js` sans avertissement tant qu'un autre fichier dev en a", () => {
+        makePackage(root);
+        expect(checkCdnBundles({ exports: CDN_EXPORTS, root })).toEqual([]);
+    });
+
+    it('signale une version de production `utils` qui contient console.warn', () => {
+        makePackage(root);
+        writeFileSync(join(root, 'cdn/utils.js'), DEV);
+        expect(checkCdnBundles({ exports: CDN_EXPORTS, root }).join('\n')).toContain(
+            'cdn/utils.js',
+        );
     });
 
     it('signale un ancien export `.prod` encore déclaré', () => {

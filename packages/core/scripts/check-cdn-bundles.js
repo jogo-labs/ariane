@@ -5,13 +5,15 @@
  * Vérifie, après `build:bundles`, la cohérence des bundles CDN avec `package.json` (#300) :
  * le nom court est la version de PRODUCTION, le suffixe `.dev.js` la version de DÉVELOPPEMENT.
  *
- *   cdn/index.js, cdn/autoloader.js          → production (minifiée, sans avertissements)
- *   cdn/index.dev.js, cdn/autoloader.dev.js  → développement (avec avertissements)
+ *   cdn/{index,autoloader,utils}.js      → production (minifiée, sans avertissements)
+ *   cdn/{index,autoloader,utils}.dev.js  → développement (avertissements actifs)
  *
- * Ce qu'on garantit : les quatre `exports` `./cdn*` existent et pointent vers ces fichiers
+ * Ce qu'on garantit : les six `exports` `./cdn*` existent et pointent vers ces fichiers
  * (aucun autre export `./cdn*`), les cibles existent, aucun reste de l'ancienne nomenclature
  * `*.prod.js`, aucun fichier de production ne contient `console.warn` (le code d'avertissement,
- * conditionné par `__DEV__`, doit y être éliminé), et la version de développement en contient.
+ * conditionné par `__DEV__`, doit y être éliminé), et au moins un fichier de développement en
+ * contient (la règle porte sur l'ensemble des `*.dev.js`, chunks compris : `utils` n'en a pas,
+ * c'est du code pur, et les avertissements vivent dans un chunk partagé).
  *
  * Un `exports` qui désigne un fichier absent ou la mauvaise version se verrait en production
  * (404, ou version de développement servie à la place de la production) : on le casse au build.
@@ -25,6 +27,8 @@ export const CDN_EXPORTS = {
     './cdn.dev': './cdn/index.dev.js',
     './cdn/autoloader': './cdn/autoloader.js',
     './cdn/autoloader.dev': './cdn/autoloader.dev.js',
+    './cdn/utils': './cdn/utils.js',
+    './cdn/utils.dev': './cdn/utils.dev.js',
 };
 
 function listJsFiles(dir) {

@@ -36,13 +36,12 @@ await whenAllDefined({ prefix: 'acme-' });
 await whenAllDefined({ root: monElement });
 // Limité à un sous-arbre (élément ou shadow root)`;
 
-const codeWhenAllDefinedCdn = `const tags = [...new Set(
-    [...document.querySelectorAll('*')]
-        .map(el => el.localName)
-        .filter(name => name.startsWith('ar-'))
-)];
-await Promise.all(tags.map(tag => customElements.whenDefined(tag)));
-// Tous les composants ar-* sont prêts`;
+const codeWhenAllDefinedCdn = `<script type="module">
+  import { whenAllDefined } from 'https://unpkg.com/@ariane-ui/core@<version>/cdn/utils.js';
+
+  await whenAllDefined();
+  // Tous les composants ar-* sont prêts
+</script>`;
 
 const codeAttribute = `<ar-pagination current="1" total="10"></ar-pagination>`;
 
@@ -125,7 +124,7 @@ const codeVsCodeSettings = `{
             <NarrativeSubheading>Tous les composants Ariane présents dans la page</NarrativeSubheading>
             <p>Via npm :</p>
             <pre><code class="language-js" set:text={codeWhenAllDefinedNpm} /></pre>
-            <p>Via CDN (sans import) :</p>
+            <p>Via CDN (<code>cdn/utils.js</code>, sans enregistrer de composant) :</p>
             <pre><code class="language-js" set:text={codeWhenAllDefinedCdn} /></pre>
 
             <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
