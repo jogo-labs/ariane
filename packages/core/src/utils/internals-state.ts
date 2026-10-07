@@ -8,8 +8,9 @@
  *
  * Chrome/Edge 90 à 124 n'acceptent que les noms préfixés par `--` (sélecteur `:--nom`, retiré
  * en 125 au profit de `:state(nom)`) et lèvent une erreur sinon. Dans ce cas le state est exposé
- * sous `--nom` : le thème fourni ne le gère pas, c'est au consommateur de le cibler s'il veut
- * supporter ces versions. La suppression retire les deux formes.
+ * sous `--nom` : les thèmes (celui du starter-kit compris) ne ciblent que `:state(nom)`, c'est
+ * au thème du consommateur de cibler aussi `:--nom` s'il veut supporter ces versions. La
+ * suppression retire les deux formes.
  */
 export function toggleState(
     internals: ElementInternals | undefined,
