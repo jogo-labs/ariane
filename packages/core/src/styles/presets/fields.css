@@ -36,7 +36,11 @@
             outline-offset: 1px;
         }
 
+        /* Lecture seule et désactivé : bordure inactive. Déclarées avant
+           [aria-invalid] (même spécificité) pour qu'un champ invalide garde sa
+           bordure d'erreur. */
         &:read-only {
+            border-color: var(--ar-input-inactive-border-color);
             background: var(--ar-input-readonly-bg);
             cursor: default;
         }
@@ -44,6 +48,7 @@
         &[aria-disabled],
         &:disabled {
             cursor: not-allowed;
+            border-color: var(--ar-input-inactive-border-color);
             color: var(--ar-input-disabled-color);
             background-color: var(--ar-input-disabled-bg);
         }
