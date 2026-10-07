@@ -89,6 +89,10 @@ const entryPoints = {
 const cdnEntryPoints = {
     index: join(SRC, 'index.ts'),
     autoloader: join(SRC, 'autoloader.ts'),
+    // Utilitaires purs pour les utilisateurs CDN (whenAllDefined, registerTranslation) : aucun
+    // enregistrement de composant. Partage les chunks, donc le registre des traductions, avec le
+    // barrel et l'autoloader de la MÊME variante (prod ou dev).
+    utils: join(SRC, 'utils', 'index.ts'),
 };
 
 // ─── Plugin : minification des templates `html`/`css` (Lit) ──────────────────

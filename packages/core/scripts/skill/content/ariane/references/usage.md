@@ -46,19 +46,19 @@ Signature : `whenAllDefined({ prefix?, root? }): Promise<void>`.
 - Les shadow roots ouverts sont parcourus, et le scan est répété tant que de nouveaux tags non définis apparaissent : un composant imbriqué n'existe dans le DOM qu'après la définition de son parent. Les shadow roots `closed` ne sont pas atteignables.
 - En import headless, passer le préfixe utilisé pour `customElements.define()`.
 
-Via CDN, sans import :
+Via CDN : importer `whenAllDefined` depuis `cdn/utils.js` (aucun composant enregistré) :
 
-```js
-const tags = [
-    ...new Set(
-        [...document.querySelectorAll('*')]
-            .map((el) => el.localName)
-            .filter((name) => name.startsWith('ar-')),
-    ),
-];
-await Promise.all(tags.map((tag) => customElements.whenDefined(tag)));
-// Tous les composants ar-* sont prêts
+```html
+<script type="module">
+    import { whenAllDefined } from 'https://unpkg.com/@ariane-ui/core@<version>/cdn/utils.js';
+
+    await whenAllDefined();
+    // Tous les composants ar-* sont prêts
+</script>
 ```
+
+- Même comportement que l'import npm : parcourt les shadow roots ouverts.
+- `whenAllDefined` n'attend que `customElements.whenDefined` : aucun registre partagé n'est en jeu, donc la variante (`utils.js` ou `utils.dev.js`) n'a pas à correspondre à celle des composants.
 
 ## Attributs et propriétés
 

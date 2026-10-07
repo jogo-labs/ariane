@@ -14,7 +14,7 @@ Règles :
 
 - Pas de build, ou prototype → CDN autoloader.
 - Tags personnalisés par composant, ou aucun enregistrement automatique → headless.
-- `@ariane-ui/core/utils` n'enregistre rien dans aucun mode.
+- `@ariane-ui/core/utils` (npm) et `cdn/utils.js` (CDN) n'enregistrent rien dans aucun mode.
 
 ## CDN
 
@@ -24,6 +24,8 @@ Règles :
 | `https://unpkg.com/@ariane-ui/core/cdn/index.js`          | Production, bundle complet (minifié) |
 | `https://unpkg.com/@ariane-ui/core/cdn/autoloader.dev.js` | Développement, autoloader            |
 | `https://unpkg.com/@ariane-ui/core/cdn/index.dev.js`      | Développement, bundle complet        |
+| `https://unpkg.com/@ariane-ui/core/cdn/utils.js`          | Production, utilitaires (minifié)    |
+| `https://unpkg.com/@ariane-ui/core/cdn/utils.dev.js`      | Développement, utilitaires           |
 
 ```html
 <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
@@ -52,6 +54,7 @@ npm install @ariane-ui/core
 - Le sous-chemin `/dist/*` est exporté par le paquet : l'import par composant passe par lui.
 - Dans un contexte headless, importer `whenAllDefined` et `registerTranslation` depuis `@ariane-ui/core/utils` et non depuis le barrel : le barrel enregistre les `ar-*`. Ordre de grandeur mesuré (minifié) : environ 1 Ko via `/utils` contre environ 200 Ko via le barrel.
 - Le paquet n'a pas de champ `sideEffects` : `import '@ariane-ui/core'` n'est jamais supprimé par le tree-shaking.
+- CDN : `cdn/utils.js` (production) et `cdn/utils.dev.js` (développement) exportent `whenAllDefined` et `registerTranslation` sans enregistrer de composant. Ils partagent le registre des traductions avec l'autoloader et le bundle complet de la même variante : associer `utils.js` à `autoloader.js`/`index.js`, `utils.dev.js` à `autoloader.dev.js`/`index.dev.js`.
 - Autres exports : `@ariane-ui/core/themes/*.css` (thème de la documentation d'Ariane, interne, sans garantie de stabilité : ne pas charger ni recommander ; partir du starter-kit), `@ariane-ui/core/presets/*.css`, `@ariane-ui/core/custom-elements.json`.
 - `whenAllDefined({ prefix?, root? }): Promise<void>` : attend que les tags du préfixe présents sous `root` (défaut `document`) soient définis, shadow roots ouverts inclus ; les shadow roots `closed` ne sont pas atteignables.
 
