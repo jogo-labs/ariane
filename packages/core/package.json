@@ -47,6 +47,7 @@
     "build:bundles:prod": "node scripts/build-bundles.js --prod",
     "build:css": "node scripts/build-css.js",
     "build:types": "tsc --emitDeclarationOnly --declarationMap",
+    "build:types:dev": "npm run build:types",
     "dev": "node scripts/build-bundles.js --watch & node scripts/build-css.js --watch",
     "test": "vitest run",
     "test:watch": "vitest",
