@@ -55,12 +55,12 @@ import '../../translations/en.js';
  *
  * @cssState open - Le panel mobile est ouvert.
  *
- * @event {CustomEvent} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
- * @event {CustomEvent} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
- * @event {CustomEvent} ar-breadcrumb-shown          - Émis après l'ouverture du dropdown mobile.
- * @event {CustomEvent} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. @cancelable
- * @event {CustomEvent} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
- * @event {CustomEvent} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-show           - Émis avant l'ouverture du dropdown mobile. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-show-prevented - Émis si ar-breadcrumb-show est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-shown          - Émis après l'ouverture du dropdown mobile.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-hide           - Émis avant la fermeture du dropdown mobile. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-hide-prevented - Émis si ar-breadcrumb-hide est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-breadcrumb-hidden         - Émis après la fermeture du dropdown mobile.
  *
  * @tagname ar-breadcrumb
  */

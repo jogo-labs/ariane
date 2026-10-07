@@ -109,7 +109,7 @@ describe('ar-stepper-item — browser', () => {
         const link = itemA.shadowRoot!.querySelector('a')!;
         link.click();
 
-        expect(detail).to.deep.equal({ from: 'b', to: 'a' });
+        expect(detail).to.deep.equal({ id: undefined, from: 'b', to: 'a' });
     });
 
     it('la numérotation des indicateurs (compteur CSS) reste correcte à travers le shadow DOM des items', async () => {

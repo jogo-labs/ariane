@@ -182,7 +182,10 @@ const codeVsCodeSettings = `{
             </p>
             <pre><code class="language-js" set:text={codeEventListener} /></pre>
             <p>
-                Les événements <strong>annulables</strong> sont indiqués dans la colonne « Annulable » de leur partie <strong>Référence API</strong>.
+                Les événements <strong>annulables</strong> sont indiqués dans la section « Événements » de la <strong>Référence API</strong>.
+            </p>
+            <p>
+                Le <code>detail</code> de chaque événement est un objet qui porte au minimum une clé <code>id</code> : la valeur de l'attribut <code>id</code> de l'élément au moment de l'émission, <code>undefined</code> s'il n'en a pas.
             </p>
             <p class="hint">
                 La liste complète des événements de chaque composant, avec le type de leur <code>detail</code>, est documentée dans la partie <strong>Référence API</strong>, section

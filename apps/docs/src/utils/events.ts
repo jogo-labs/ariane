@@ -24,3 +24,16 @@ export function stripCancelableMarker(description: string | undefined): string {
     if (description === undefined) return '';
     return description.replace(CANCELABLE_MARKER_RE, '');
 }
+
+const EVENT_DETAIL_RE = /^CustomEvent\s*<([\s\S]+)>$/;
+
+/**
+ * Extrait le type du `detail` du texte de type CEM d'un événement : `CustomEvent<X>` donne `X`,
+ * un `CustomEvent` nu ou un type absent donnent `null`.
+ */
+export function eventDetailType(type: string | undefined): string | null {
+    if (type === undefined) return null;
+    const match = EVENT_DETAIL_RE.exec(type.trim());
+    const detail = match?.[1]?.trim();
+    return detail ? detail : null;
+}

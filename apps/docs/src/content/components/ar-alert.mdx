@@ -85,7 +85,7 @@ import WcagRef from '../../components/WcagRef.astro';
 
 À la fermeture, `ar-alert` **se retire du DOM** (`this.remove()`) une fois la transition terminée — l'alerte n'est pas simplement masquée, elle disparaît définitivement de la page. Toute référence conservée à l'élément pointe alors vers un noeud détaché ; il n'existe pas de méthode pour la réafficher.
 
-`ar-alert-close` (sans `detail`) est émis à ce moment-là, après la fin de la transition et juste avant le retrait du DOM :
+`ar-alert-close` (`detail` : `{ id }`, l'attribut `id` de l'alerte, `undefined` s'il n'en a pas) est émis à ce moment-là, après la fin de la transition et juste avant le retrait du DOM :
 
 ```js
 document.querySelector('ar-alert').addEventListener('ar-alert-close', () => {

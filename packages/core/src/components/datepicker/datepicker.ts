@@ -10,9 +10,20 @@ import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import '../../translations/fr.js';
 import '../../translations/en.js';
+
+/** Détail des événements `ar-datepicker-input-change` et `ar-datepicker-input-complete` */
+export interface ArDatepickerInputDetail extends ArEventDetail {
+    /** Date saisie au format ISO `yyyy-MM-dd`, `null` si absente ou invalide */
+    value: string | null;
+    /** Date saisie, `null` si absente ou invalide */
+    valueAsDate: Date | null;
+    /** `false` si la saisie n'est pas une date valide */
+    valid: boolean;
+}
 
 /**
  * @summary Affiche un champ de saisie de date synchronisé avec un calendrier popover, pour combiner saisie libre au clavier et sélection visuelle.
@@ -100,12 +111,12 @@ import '../../translations/en.js';
  * @cssState readonly  - Le composant est en lecture seule.
  * @cssState has-error - Un message d'erreur est affiché (slot `error`).
  *
- * @event {CustomEvent} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
- * @event {CustomEvent} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
- * @event {CustomEvent} ar-datepicker-show           - Avant ouverture du popover. @cancelable
- * @event {CustomEvent} ar-datepicker-shown          - Après ouverture.
- * @event {CustomEvent} ar-datepicker-hide           - Avant fermeture. @cancelable
- * @event {CustomEvent} ar-datepicker-hidden         - Après fermeture.
+ * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
+ * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
+ * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-show           - Avant ouverture du popover. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-shown          - Après ouverture.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-hide           - Avant fermeture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-hidden         - Après fermeture.
  *
  * @tagname ar-datepicker
  */
@@ -564,17 +575,9 @@ export class ArDatepicker extends ArianeFormElement {
         const emitValid = valid ?? emitDate !== null;
         const emitValue = emitDate ? this._toIso(emitDate) : null;
 
-        this.dispatchEvent(
-            new CustomEvent('ar-datepicker-input-change', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    value: emitValue,
-                    valueAsDate: emitDate,
-                    valid: emitValid,
-                },
-            }),
-        );
+        emitEvent<Omit<ArDatepickerInputDetail, 'id'>>(this, 'ar-datepicker-input-change', {
+            detail: { value: emitValue, valueAsDate: emitDate, valid: emitValid },
+        });
     }
 
     private _toIso(date: Date): string {
@@ -637,13 +640,8 @@ export class ArDatepicker extends ArianeFormElement {
     private async _show(): Promise<void> {
         if (this._effectiveDisabled || this.readonly) return;
 
-        const allowed = this.dispatchEvent(
-            new CustomEvent('ar-datepicker-show', {
-                bubbles: true,
-                composed: true,
-                cancelable: true,
-            }),
-        );
+        const allowed = !emitEvent(this, 'ar-datepicker-show', { cancelable: true })
+            .defaultPrevented;
         if (!allowed) {
             this._skipNextOpenChange = true;
             this.open = false;
@@ -679,19 +677,12 @@ export class ArDatepicker extends ArianeFormElement {
         await this.updateComplete;
         this._focusFocusedDay();
 
-        this.dispatchEvent(
-            new CustomEvent('ar-datepicker-shown', { bubbles: true, composed: true }),
-        );
+        emitEvent(this, 'ar-datepicker-shown');
     }
 
     private _hide(): void {
-        const allowed = this.dispatchEvent(
-            new CustomEvent('ar-datepicker-hide', {
-                bubbles: true,
-                composed: true,
-                cancelable: true,
-            }),
-        );
+        const allowed = !emitEvent(this, 'ar-datepicker-hide', { cancelable: true })
+            .defaultPrevented;
         if (!allowed) {
             this._skipNextOpenChange = true;
             this.open = true;
@@ -703,9 +694,7 @@ export class ArDatepicker extends ArianeFormElement {
         this._focusTargetAfterHide?.focus();
         this._focusTargetAfterHide = null;
 
-        this.dispatchEvent(
-            new CustomEvent('ar-datepicker-hidden', { bubbles: true, composed: true }),
-        );
+        emitEvent(this, 'ar-datepicker-hidden');
     }
 
     private _handleTriggerClick(): void {
@@ -723,17 +712,13 @@ export class ArDatepicker extends ArianeFormElement {
         const result = parse(input.value, this.format);
 
         if (result.complete) {
-            this.dispatchEvent(
-                new CustomEvent('ar-datepicker-input-complete', {
-                    bubbles: true,
-                    composed: true,
-                    detail: {
-                        value: result.valid && result.date ? this._toIso(result.date) : null,
-                        valueAsDate: result.date,
-                        valid: result.valid,
-                    },
-                }),
-            );
+            emitEvent<Omit<ArDatepickerInputDetail, 'id'>>(this, 'ar-datepicker-input-complete', {
+                detail: {
+                    value: result.valid && result.date ? this._toIso(result.date) : null,
+                    valueAsDate: result.date,
+                    valid: result.valid,
+                },
+            });
 
             if (result.valid && result.date) {
                 this._calendar.selectedDate = result.date;

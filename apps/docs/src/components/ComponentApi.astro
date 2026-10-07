@@ -7,7 +7,7 @@
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
 import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
-import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
+import { eventDetailType, isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
 import { isStatePart } from '../utils/state-parts.ts';
@@ -174,16 +174,22 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     <ar-tab-panel name="evenements">
                         <h4 id="api-evenements" class="sr-only">Événements</h4>
                         <div class="api-list" role="list">
-                            {component.events.map((event, i) => (
-                                <div class="api-row" role="listitem">
-                                    <span class="sr-only">{i + 1} sur {component.events!.length}</span>
-                                    <span class="api-name">
-                                        {event.name}
-                                        {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
-                                    </span>
-                                    <p class="api-desc">{stripCancelableMarker(event.description)}</p>
-                                </div>
-                            ))}
+                            {component.events.map((event, i) => {
+                                const detailType = eventDetailType(event.type?.text);
+                                return (
+                                    <div class="api-row" role="listitem">
+                                        <span class="sr-only">{i + 1} sur {component.events!.length}</span>
+                                        <div>
+                                            <span class="api-name">
+                                                {event.name}
+                                                {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
+                                            </span>
+                                            {detailType && <code class="api-sig">detail&nbsp;: {detailType}</code>}
+                                        </div>
+                                        <p class="api-desc">{stripCancelableMarker(event.description)}</p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </ar-tab-panel>
                 )}

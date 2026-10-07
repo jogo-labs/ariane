@@ -380,4 +380,25 @@ describe('tooltip interne (#295)', () => {
     it("le tag privé n'est pas préfixé ar-", () => {
         expect('ariane-internal-tooltip'.startsWith('ar-')).toBe(false);
     });
+
+    describe('detail de ar-table-sort-change', () => {
+        it.each([
+            ['<ar-table-sort id="tri"></ar-table-sort>', 'tri'],
+            ['<ar-table-sort></ar-table-sort>', undefined],
+        ])('porte id en premier avec les champs propres (%s)', async (html, id) => {
+            const el = await fixture<ArTableSort>(html);
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-table-sort-change', (e) => events.push(e as CustomEvent));
+            (requirePart(el, 'sort-button') as HTMLElement).click();
+            await waitForUpdate(el);
+            el.remove();
+            expect(events[0].detail).toStrictEqual({
+                id,
+                type: 'alpha',
+                currentOrder: 'none',
+                requestedOrder: 'asc',
+                columnLabel: expect.any(String),
+            });
+        });
+    });
 });

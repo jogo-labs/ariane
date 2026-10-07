@@ -5,8 +5,7 @@
  * MDX, le fichier de référence d'un composant racine (sous-composants inclus) et l'index.
  *
  * Particularités du CEM d'Ariane (constatées) : `description` de classe vide, le texte est dans
- * `summary` ; l'événement nommé `name` est un artefact de l'analyseur (`new CustomEvent(name, …)`
- * dans `_emit`), il est ignoré ; l'annulabilité d'un événement est le marqueur final `@cancelable`.
+ * `summary` ; l'annulabilité d'un événement est le marqueur final `@cancelable`.
  */
 import { shiftHeadings } from './mdx.js';
 
@@ -80,14 +79,12 @@ function apiSections(decl, level) {
         'Événements',
         table(
             ['Événement', 'Type', 'Annulable', 'Description'],
-            (decl.events ?? [])
-                .filter((e) => e.name !== 'name')
-                .map((e) => [
-                    code(e.name),
-                    code(e.type?.text),
-                    isCancelable(e.description) ? 'oui' : 'non',
-                    (e.description ?? '').replace(CANCELABLE_RE, ''),
-                ]),
+            (decl.events ?? []).map((e) => [
+                code(e.name),
+                code(e.type?.text),
+                isCancelable(e.description) ? 'oui' : 'non',
+                (e.description ?? '').replace(CANCELABLE_RE, ''),
+            ]),
         ),
     );
     add(

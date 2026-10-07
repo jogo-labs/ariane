@@ -526,4 +526,28 @@ describe('ArAlert', () => {
             expect(requirePart(el, 'close-button').getAttribute('aria-label')).toBe('Close alert');
         });
     });
+
+    describe('detail des événements', () => {
+        const closeAndCapture = async (html: string): Promise<CustomEvent> => {
+            el = await fixture(html);
+            const handler = vi.fn();
+            el.addEventListener('ar-alert-close', handler);
+            (requirePart(el, 'close-button') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+            expect(handler).toHaveBeenCalledOnce();
+            return handler.mock.calls[0][0] as CustomEvent;
+        };
+
+        it("ar-alert-close porte { id } avec l'id posé par le consommateur", async () => {
+            const event = await closeAndCapture(
+                '<ar-alert id="mon-alerte" next-focus="x"></ar-alert>',
+            );
+            expect(event.detail).toStrictEqual({ id: 'mon-alerte' });
+        });
+
+        it("ar-alert-close porte { id: undefined } sans id (pas d'id généré)", async () => {
+            const event = await closeAndCapture('<ar-alert next-focus="x"></ar-alert>');
+            expect(event.detail).toStrictEqual({ id: undefined });
+        });
+    });
 });

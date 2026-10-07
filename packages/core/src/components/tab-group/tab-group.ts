@@ -6,6 +6,7 @@ import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.conte
 import type { ArTab } from '../tab/tab.js';
 import type { ArTabPanel } from '../tab-panel/tab-panel.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import styles from './tab-group.styles.js';
 
 /**
@@ -25,7 +26,7 @@ import styles from './tab-group.styles.js';
  * @cssprop --ar-tab-group-border-bottom-width - Épaisseur du trait séparateur sous la tablist. Mettre à 1px pour l'activer.
  * @cssprop --ar-tab-group-border-color - Couleur du trait séparateur sous la tablist.
  *
- * @event {CustomEvent<{ active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
+ * @event {CustomEvent<{ id: string | undefined, active: string }>} ar-tab-group-change - Émis quand l'onglet actif change.
  *
  * @tagname ar-tab-group
  */
@@ -68,7 +69,7 @@ export class ArTabGroup extends ArianeElement {
             if (wasActive) {
                 const newActive = this._effectiveActive;
                 this.active = newActive;
-                this._emit('ar-tab-group-change', { active: newActive });
+                emitEvent(this, 'ar-tab-group-change', { detail: { active: newActive } });
             }
         },
         notifyTabChanged: (tab: ArTab) => {
@@ -78,7 +79,7 @@ export class ArTabGroup extends ArianeElement {
                 const newActive = this._effectiveActive;
                 if (newActive !== this.active) {
                     this.active = newActive;
-                    this._emit('ar-tab-group-change', { active: newActive });
+                    emitEvent(this, 'ar-tab-group-change', { detail: { active: newActive } });
                 }
             }
         },
@@ -97,7 +98,7 @@ export class ArTabGroup extends ArianeElement {
             this.active = name;
             this._syncAll();
             this._scrollActiveTabIntoView();
-            this._emit('ar-tab-group-change', { active: name });
+            emitEvent(this, 'ar-tab-group-change', { detail: { active: name } });
         },
     };
 
@@ -203,10 +204,6 @@ export class ArTabGroup extends ArianeElement {
         const active = this._effectiveActive;
         const tab = this._tabs.find((t) => t.panel === active);
         tab?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-    }
-
-    private _emit(name: string, detail: unknown): void {
-        this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
     }
 
     private _handleKeyDown = (e: KeyboardEvent): void => {

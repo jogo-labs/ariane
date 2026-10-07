@@ -27,13 +27,13 @@ describe('emitToggleEvent', () => {
         const host = document.createElement('div');
         host.id = 'mon-id';
         const event = emitToggleEvent(host, 'my-event', { cancelable: false });
-        expect(event.detail).toEqual({ id: 'mon-id' });
+        expect(event.detail).toStrictEqual({ id: 'mon-id' });
     });
 
     it('detail.id vaut undefined quand host.id est vide', () => {
         const host = document.createElement('div');
         const event = emitToggleEvent(host, 'my-event', { cancelable: false });
-        expect(event.detail).toEqual({ id: undefined });
+        expect(event.detail).toStrictEqual({ id: undefined });
     });
 
     it('retourne le CustomEvent dispatché (pour vérifier defaultPrevented)', () => {

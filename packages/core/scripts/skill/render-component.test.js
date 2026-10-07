@@ -18,7 +18,6 @@ const alert = {
         ],
         slots: [{ name: '', description: 'Contenu.' }],
         events: [
-            { name: 'name', type: { text: 'CustomEvent' } },
             {
                 name: 'ar-alert-close',
                 type: { text: 'CustomEvent' },
@@ -26,6 +25,7 @@ const alert = {
             },
             { name: 'ar-alert-closed', type: { text: 'CustomEvent' }, description: 'Fermée.' },
             { name: 'ar-alert-change', type: { text: 'CustomEvent<{ active: string }>' } },
+            { name: 'ar-alert-id', type: { text: 'CustomEvent<{ id: string | undefined }>' } },
         ],
         cssProperties: [{ name: '--ar-alert-gap', description: 'Espace.' }],
         cssParts: [{ name: 'base', description: 'Conteneur.' }],
@@ -100,15 +100,20 @@ describe('renderComponentFile', () => {
         expect(md).toContain('| (par défaut) | Contenu. |');
     });
 
-    it("ignore l'artefact `name` de l'analyseur, rend le type et marque les annulables", () => {
+    it('rend le type et marque les annulables', () => {
         expect(md).toContain('| Événement | Type | Annulable | Description |');
-        expect(md).not.toContain('`name`');
         expect(md).toContain('| `ar-alert-close` | `CustomEvent` | oui | Émis avant fermeture. |');
         expect(md).toContain('| `ar-alert-closed` | `CustomEvent` | non | Fermée. |');
     });
 
     it('garde un événement réel sans description, avec le type de son detail', () => {
         expect(md).toContain('| `ar-alert-change` | `CustomEvent<{ active: string }>` | non | — |');
+    });
+
+    it('échappe le | du type du detail dans la cellule du tableau', () => {
+        expect(md).toContain(
+            '| `ar-alert-id` | `CustomEvent<{ id: string \\| undefined }>` | non | — |',
+        );
     });
 
     it('rend propriétés CSS, parts et états CSS', () => {
