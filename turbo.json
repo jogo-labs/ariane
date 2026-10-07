@@ -32,7 +32,12 @@
       "outputs": ["dist/styles/**"]
     },
     "build:types": {
-      "dependsOn": ["build:manifest"],
+      "dependsOn": ["build:manifest", "build:bundles"],
+      "inputs": ["src/**/*.ts", "tsconfig.json", "../../tsconfig.base.json"],
+      "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
+    },
+    "build:types:dev": {
+      "dependsOn": ["build:manifest", "build:bundles:dev"],
       "inputs": ["src/**/*.ts", "tsconfig.json", "../../tsconfig.base.json"],
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
@@ -59,7 +64,13 @@
       "outputs": ["dist/**", "cdn/**", "skills/**", "llms/**"]
     },
     "build:dev": {
-      "dependsOn": ["build:manifest", "build:bundles:dev", "build:css", "build:types", "^build"],
+      "dependsOn": [
+        "build:manifest",
+        "build:bundles:dev",
+        "build:css",
+        "build:types:dev",
+        "^build"
+      ],
       "inputs": [
         "src/**/*.ts",
         "src/styles/**/*.css",

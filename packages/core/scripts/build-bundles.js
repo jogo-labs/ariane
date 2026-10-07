@@ -25,20 +25,12 @@
  */
 
 import esbuild from 'esbuild';
-import {
-    readdirSync,
-    mkdirSync,
-    rmSync,
-    existsSync,
-    readFileSync,
-    writeFileSync,
-    cpSync,
-} from 'fs';
+import { readdirSync, mkdirSync, rmSync, existsSync } from 'fs';
 import { readFile } from 'fs/promises';
-import { tmpdir } from 'os';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { minifyHTMLLiterals } from 'minify-literals';
+import { cleanDist } from './clean-dist.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -147,52 +139,25 @@ const commonOptions = {
 // build-css.js --watch tourne en parallèle — un rmSync ici créerait une race
 // condition (dist/styles/ wipeé pendant que build-css.js y écrit).
 if (!WATCH) {
-    // Préserver les artefacts générés par build:manifest (qui tourne avant ce script
-    // dans la chaîne `build`) pendant le clean : la doc Astro peut avoir besoin de
-    // custom-elements.json pendant que ce build tourne (race condition Turbo avec les
-    // tâches persistent), et les fichiers vscode.*.json seraient sinon effacés sans
-    // jamais être régénérés (build:manifest ne re-tourne pas après ce script).
-    const preservedFiles = [
-        'custom-elements.json',
-        'vscode.html-custom-data.json',
-        'vscode.css-custom-data.json',
-    ];
-    const preserved = new Map();
-    for (const name of preservedFiles) {
-        const path = join(ROOT, 'dist', name);
-        if (existsSync(path)) {
-            preserved.set(name, readFileSync(path, 'utf-8'));
-        }
-    }
+    // INVARIANT : ne jamais retirer ni réécrire custom-elements.json pendant ce script :
+    // build:skill et la doc le lisent en parallèle (Turbo n'ordonne pas build:bundles avant
+    // eux, tous dépendent seulement de build:manifest). Un rmSync de dist/ suivi d'une
+    // réécriture ouvrait une fenêtre où le fichier n'existait pas (échec intermittent en CI).
+    // On vide donc dist/ sélectivement : les artefacts de build:manifest (jamais régénérés
+    // après ce script) et dist/styles/ (build:css, idem) restent en place, intacts.
+    cleanDist(join(ROOT, 'dist'), {
+        keep: [
+            'custom-elements.json',
+            'vscode.html-custom-data.json',
+            'vscode.css-custom-data.json',
+            'styles',
+        ],
+    });
 
-    // Préserver dist/styles/ (généré par build:css, qui tourne avant ce script dans la
-    // chaîne `build`) : build:css ne re-tourne pas après ce script, donc un rmSync sur
-    // dist/ entier effacerait ariane.css/ariane.js sans jamais les régénérer.
-    const stylesDir = join(ROOT, 'dist', 'styles');
-    const preservedStylesTmp = join(tmpdir(), 'ariane-build-bundles-styles-tmp');
-    let hasPreservedStyles = false;
-    if (existsSync(stylesDir)) {
-        rmSync(preservedStylesTmp, { recursive: true, force: true });
-        cpSync(stylesDir, preservedStylesTmp, { recursive: true });
-        hasPreservedStyles = true;
-    }
-
-    for (const dir of ['dist', 'cdn']) {
-        const target = join(ROOT, dir);
-        if (existsSync(target)) {
-            rmSync(target, { recursive: true });
-        }
-        mkdirSync(target, { recursive: true });
-    }
-
-    for (const [name, content] of preserved) {
-        writeFileSync(join(ROOT, 'dist', name), content, 'utf-8');
-    }
-
-    if (hasPreservedStyles) {
-        cpSync(preservedStylesTmp, stylesDir, { recursive: true });
-        rmSync(preservedStylesTmp, { recursive: true, force: true });
-    }
+    // cdn/ n'est lu par personne en parallèle : clean complet puis recréation.
+    const cdnDir = join(ROOT, 'cdn');
+    rmSync(cdnDir, { recursive: true, force: true });
+    mkdirSync(cdnDir, { recursive: true });
 }
 
 // ─── Build NPM ────────────────────────────────────────────────────────────────
