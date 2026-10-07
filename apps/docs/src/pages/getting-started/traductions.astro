@@ -71,9 +71,9 @@ registerTranslation(translation);
 
 export default translation;`;
 
-const codeCustomTranslationNpmImport = `// main.js — point d'entrée de l'application
-import './translations/es.js'; // enregistre votre traduction
-import '@ariane-ui/core'; // puis les composants`;
+const codeCustomTranslationNpmImport = `// main.js (ou layout racine)
+import '@ariane-ui/core'; // les composants
+import './translations/es.js'; // votre traduction (importée après, le français reste la langue de repli)`;
 ---
 
 <Layout title="Traductions" currentPath="/getting-started/traductions" showToc={true}>
@@ -173,8 +173,10 @@ import '@ariane-ui/core'; // puis les composants`;
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpm} /></pre>
             <p>
-                Importez votre traduction avant ou après les composants : pour une langue ajoutée,
-                l'ordre n'a pas d'incidence sur l'affichage.
+                Importez votre traduction une seule fois, dans le point d'entrée de l'application ou dans
+                le layout racine : le registre est partagé par tous les composants, il n'y a rien à
+                importer composant par composant. Pour une langue ajoutée, l'ordre d'import n'a pas
+                d'incidence sur l'affichage :
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpmImport} /></pre>
 
