@@ -205,11 +205,11 @@ ar-datepicker {
         transition: border-color 0.15s ease;
     }
 
-    /* Les règles de bordure ci-dessous du `::part(input)` du thème (côté document)
-           l'emportent sur la règle d'erreur interne `:host([has-error]) [part~='input']`
-           du composant : elles excluent donc `:state(has-error)` au lieu de réénoncer la
-           couleur d'erreur. Un thème personnalisé qui fixe la couleur de bordure de
-           l'input doit faire de même. */
+    /* Les règles de couleur de bordure du `::part(input)` ci-dessous (côté document)
+       l'emportent sur la règle d'erreur interne du composant, `:host([has-error])
+       [part~='input']` : elles excluent donc `:state(has-error)` au lieu de réénoncer la
+       couleur d'erreur. Un thème personnalisé qui fixe la couleur de bordure de l'input
+       doit faire de même. */
     &:not(:state(has-error))::part(input) {
         border-color: var(--ar-input-border-color);
     }
@@ -233,13 +233,14 @@ ar-datepicker {
         cursor: not-allowed;
     }
 
-    /* Après read-only/disabled (même spécificité) : le focus garde sa bordure, sauf en
-       erreur (l'anneau d'outline reste l'indicateur de focus). */
     &::part(input):focus-visible {
         outline: 2px solid var(--ar-input-focus-ring-color);
         outline-offset: var(--ar-focus-ring-offset);
     }
 
+    /* Même spécificité que les règles read-only/disabled ci-dessus : l'ordre décide, le
+       focus l'emporte. En erreur, aucune couleur n'est posée ici : la bordure reste celle
+       de l'erreur et l'outline ci-dessus reste l'indicateur de focus. */
     &:not(:state(has-error))::part(input):focus-visible {
         border-color: var(--ar-color-interactive);
     }
