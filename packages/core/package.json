@@ -21,6 +21,8 @@
     "./cdn.dev": "./cdn/index.dev.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
     "./cdn/autoloader.dev": "./cdn/autoloader.dev.js",
+    "./cdn/utils": "./cdn/utils.js",
+    "./cdn/utils.dev": "./cdn/utils.dev.js",
     "./themes/*.css": "./dist/styles/themes/*.css",
     "./themes/*.js": "./dist/styles/themes/*.js",
     "./presets/*.css": "./dist/styles/presets/*.css",
