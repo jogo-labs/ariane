@@ -15,7 +15,7 @@ Ne modifiez jamais `skills/` ni `llms/` : ils sont recréés à chaque build. Po
 
 1. Éditez le fichier concerné de `content/ariane/`.
 2. `npm run build:manifest && npm run build:skill` (depuis `packages/core`).
-3. `npm run check:skill` : échoue si un tag, un attribut ou un token cité n'existe plus, si un composant racine n'est pas dans `choosing-components.md`, ni cité dans les listes de composants de `README.md`, `packages/core/README.md` et du `description` de `SKILL.md` (nom avec ou sans préfixe), si un lien relatif est cassé.
+3. `npm run check:skill` : échoue si un tag, un attribut ou un token cité n'existe plus, si un composant racine n'est pas dans `choosing-components.md`, ni cité dans les listes de composants de `README.md`, `packages/core/README.md` et du `description` de `SKILL.md` (nom avec ou sans préfixe), si un lien relatif est cassé, si un événement du CEM n'est pas préfixé par le tag de son composant ou n'est pas typé `CustomEvent<{ id: …, … }>` (littéral inline avec `id`, cf. #308).
 
 ## Quand mettre à jour
 

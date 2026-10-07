@@ -116,7 +116,9 @@ Les slots disponibles sont listés par composant dans `components/<tag>.md`. Le 
 
 ## Événements
 
-Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données. Pour les événements dont le composant annote le type de `detail`, la colonne Type de `components/<tag>.md` le donne (`CustomEvent<…>`) ; sinon elle indique `CustomEvent` seul et le contenu de `detail` est à lire dans la description de l'événement ou dans cette page.
+Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; la colonne Type de `components/<tag>.md` en donne le type exact (`CustomEvent<{ id: string | undefined, … }>`).
+
+Tout événement `ar-*` a un `detail` objet portant `event.detail.id` : la valeur de l'attribut `id` de l'hôte au moment de l'émission, telle quelle, `undefined` si l'hôte n'en a pas. `ar-collapse`, `ar-tooltip` et `ar-charcounter` génèrent un `id` quand il est absent (liens ARIA) : cet `id` généré est exposé comme n'importe quel autre. Les champs propres à l'événement (`from`, `to`, `active`, `value`…) s'ajoutent à `id`. Poser son propre `id` sur l'hôte en fait un filtre fiable, surtout quand le shadow DOM d'un composant de l'application retargete l'événement composé et que `event.target` désigne l'hôte de l'application plutôt que le composant `ar-*` ; sinon `event.target` suffit.
 
 ```js
 const pagination = document.querySelector('ar-pagination');
@@ -157,7 +159,7 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 
 - Ces événements remontent (`bubbles`) et traversent le shadow DOM (`composed`) ; leur `detail` est `{ id }` (l'`id` de l'hôte, ou `undefined`).
 - `ar-dialog-dismissed` et `ar-dialog-accepted` (clic sur un élément portant `data-ar-dismiss` ou `data-ar-accept`) sont aussi annulables.
-- Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ from, to }`.
+- Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ id, from, to }`.
 - Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé ni pour `-show` ni pour `-hide`).
 
 ## Méthodes

@@ -16,7 +16,11 @@
  *   8. chaque token `--ar-*` cité dans `references/theming.md` existe (CEM ou thème) ;
  *   9. chaque composant racine du CEM est cité dans les README fournis (`ar-x`) et dans le
  *      `description` de SKILL.md (`ar-x` ou le nom sans préfixe) : listes de composants écrites
- *      à la main, qui sans ce contrôle se périment sans signal.
+ *      à la main, qui sans ce contrôle se périment sans signal ;
+ *  10. chaque événement du CEM est préfixé par le tag de son composant (`<tag>-…`) et typé
+ *      `CustomEvent<{ id: …, … }>` : un type nu, sans `id`, ou un événement fantôme (par
+ *      exemple `name`, issu d'une méthode privée `_emit(name)`) signale un `emitEvent` oublié
+ *      ou un `@event` mal annoté (#308).
  *
  * Ce qu'il ne vérifie PAS : la vérité d'une phrase de conseil, les valeurs d'attribut, la qualité
  * de déclenchement de la `description`. Ceux-là relèvent de la relecture à la release.
@@ -45,6 +49,10 @@ const ATTRIBUTE_RE = /([^\s=]+)(?:=(?:"[^"]*"|'[^']*'|[^\s>"']+))?/g;
 const LINK_RE = /\]\(([^)\s]+)\)/g;
 const TOKEN_RE = /(--ar-[a-z0-9]+(?:-[a-z0-9]+)*)(-\*)?/g;
 const THEME_TOKEN_RE = /(--ar[\w-]+)\s*:/g;
+
+// `CustomEvent<{ … }>` dont le littéral déclare une propriété `id`.
+const EVENT_TYPE_RE = /^CustomEvent<\s*\{([\s\S]*)\}\s*>$/;
+const EVENT_ID_RE = /(?<![\w$-])id\s*\??\s*:/;
 
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
 
@@ -234,6 +242,28 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
             if (!cited) {
                 errors.push(
                     `${path} — <${root.tagName}> n'est pas cité (liste des composants à mettre à jour).`,
+                );
+            }
+        }
+    }
+
+    // 10 : événements préfixés par le tag et typés avec `id`.
+    for (const declaration of declarations) {
+        for (const event of declaration.events ?? []) {
+            if (!event.name.startsWith(`${declaration.tagName}-`)) {
+                errors.push(
+                    `<${declaration.tagName}> — événement « ${event.name} » : le nom doit commencer par « ${declaration.tagName}- » (méthode privée émettant un nom variable ?).`,
+                );
+            }
+            const typeText = event.type?.text ?? '';
+            const literal = EVENT_TYPE_RE.exec(typeText.trim());
+            if (!literal) {
+                errors.push(
+                    `<${declaration.tagName}> — événement « ${event.name} » : type « ${typeText || 'absent'} », attendu CustomEvent<{ id: string | undefined, … }> (littéral inline dans le @event).`,
+                );
+            } else if (!EVENT_ID_RE.test(literal[1])) {
+                errors.push(
+                    `<${declaration.tagName}> — événement « ${event.name} » : le littéral du detail ne déclare pas \`id\` (« ${typeText} »).`,
                 );
             }
         }

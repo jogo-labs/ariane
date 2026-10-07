@@ -233,4 +233,67 @@ describe('checkSkill', () => {
         );
         expect(run()).toEqual([]);
     });
+
+    describe('événements (règle 10)', () => {
+        const withEvents = (events) => ({
+            modules: [
+                {
+                    declarations: [
+                        { ...CEM.modules[0].declarations[0], events },
+                        ...CEM.modules[0].declarations.slice(1),
+                    ],
+                },
+            ],
+        });
+
+        it('accepte un événement préfixé et typé avec id', () => {
+            const cem = withEvents([
+                {
+                    name: 'ar-dialog-shown',
+                    type: { text: 'CustomEvent<{ id: string | undefined }>' },
+                },
+                {
+                    name: 'ar-dialog-accepted',
+                    type: { text: 'CustomEvent<{ id: string | undefined, value: number }>' },
+                },
+            ]);
+            expect(run({ cem })).toEqual([]);
+        });
+
+        it('signale un événement fantôme sans préfixe de tag', () => {
+            const cem = withEvents([
+                { name: 'name', type: { text: 'CustomEvent<{ id: string | undefined }>' } },
+            ]);
+            expect(run({ cem }).join('\n')).toMatch(
+                /« name » : le nom doit commencer par « ar-dialog- »/,
+            );
+        });
+
+        it('signale un type nu', () => {
+            const cem = withEvents([{ name: 'ar-dialog-shown', type: { text: 'CustomEvent' } }]);
+            expect(run({ cem }).join('\n')).toMatch(/« ar-dialog-shown » : type « CustomEvent »/);
+        });
+
+        it('signale un type absent', () => {
+            const cem = withEvents([{ name: 'ar-dialog-shown' }]);
+            expect(run({ cem }).join('\n')).toMatch(/type « absent »/);
+        });
+
+        it('signale un littéral sans id', () => {
+            const cem = withEvents([
+                {
+                    name: 'ar-dialog-shown',
+                    type: { text: 'CustomEvent<{ from: number, to: number }>' },
+                },
+            ]);
+            expect(run({ cem }).join('\n')).toMatch(/ne déclare pas `id`/);
+        });
+
+        it('ne confond pas id avec une propriété qui le contient (valid, userId)', () => {
+            const cem = withEvents([
+                { name: 'ar-dialog-shown', type: { text: 'CustomEvent<{ userId: string }>' } },
+            ]);
+            expect(run({ cem }).join('\n')).toMatch(/ne déclare pas `id`/);
+        });
+    });
 });
