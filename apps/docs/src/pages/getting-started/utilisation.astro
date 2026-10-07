@@ -185,6 +185,9 @@ const codeVsCodeSettings = `{
             <p>
                 Les événements <strong>annulables</strong> sont indiqués dans la colonne « Annulable » de leur partie <strong>Référence API</strong>.
             </p>
+            <p>
+                Le <code>detail</code> de chaque événement est un objet qui porte <code>id</code> : la valeur de l'attribut <code>id</code> de l'élément au moment de l'émission, <code>undefined</code> s'il n'en a pas (<code>ar-collapse</code>, <code>ar-tooltip</code> et <code>ar-charcounter</code> en génèrent un quand il manque, il est exposé aussi). Posez votre propre <code>id</code> pour filtrer de façon fiable, notamment quand un événement composé traverse la limite du shadow DOM de votre composant : <code>event.target</code> y désigne alors votre hôte, pas le composant Ariane. Sinon, <code>event.target</code> suffit.
+            </p>
             <p class="hint">
                 La liste complète des événements de chaque composant, avec le type de leur <code>detail</code>, est documentée dans la partie <strong>Référence API</strong>, section
                 « Événements ».

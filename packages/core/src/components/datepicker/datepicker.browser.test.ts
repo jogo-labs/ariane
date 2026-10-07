@@ -177,6 +177,42 @@ describe('ar-datepicker — browser', () => {
             expect(changeDetail).to.not.equal(null);
             expect((changeDetail as Record<string, unknown>).value).to.equal('2026-06-12');
         });
+
+        it('input-change porte { id, value, valueAsDate, valid }', async () => {
+            el = await fixture(
+                html`<ar-datepicker id="mon-dp" value="2026-06-12"></ar-datepicker>`,
+            );
+            let changeDetail: unknown = null;
+            el.addEventListener('ar-datepicker-input-change', (e) => {
+                changeDetail = (e as CustomEvent).detail;
+            });
+            await openPicker(el);
+            const panel = el.shadowRoot?.querySelector('[part="panel"]') as HTMLElement;
+            panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            await el.updateComplete;
+            await aTimeout(20);
+            expect(changeDetail).to.deep.equal({
+                id: 'mon-dp',
+                value: '2026-06-12',
+                valueAsDate: new Date(2026, 5, 12),
+                valid: true,
+            });
+        });
+
+        it('shown et hidden portent { id }', async () => {
+            el = await fixture(html`<ar-datepicker id="mon-dp"></ar-datepicker>`);
+            const details: Record<string, unknown> = {};
+            for (const name of ['shown', 'hidden']) {
+                el.addEventListener(`ar-datepicker-${name}`, (e) => {
+                    details[name] = (e as CustomEvent).detail;
+                });
+            }
+            await openPicker(el);
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(50);
+            expect(details).to.deep.equal({ shown: { id: 'mon-dp' }, hidden: { id: 'mon-dp' } });
+        });
     });
 
     // ── Mémorisation de la position de navigation ─────────────────────────────

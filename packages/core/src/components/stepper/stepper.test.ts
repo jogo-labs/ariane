@@ -314,7 +314,7 @@ describe('ArStepper', () => {
 
             expect(handler).toHaveBeenCalledOnce();
             const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
-            expect(event.detail).toEqual({ from: '/b', to: '/a' });
+            expect(event.detail).toStrictEqual({ id: undefined, from: '/b', to: '/a' });
 
             el.removeEventListener('ar-stepper-step-change', handler);
         });
@@ -432,7 +432,7 @@ describe('ArStepper', () => {
             expect(handler).toHaveBeenCalledOnce();
             const event = handler.mock.calls[0][0] as CustomEvent<ArStepperStepChangeDetail>;
             expect(event.cancelable).toBe(false);
-            expect(event.detail).toEqual({ from: '/b', to: '/a' });
+            expect(event.detail).toStrictEqual({ id: undefined, from: '/b', to: '/a' });
         });
 
         it("n'est pas émis au premier rendu", async () => {
@@ -1279,7 +1279,7 @@ describe('ArStepper', () => {
 
             expect(stepChange).toHaveBeenCalledOnce();
             const detail = stepChange.mock.calls[0]![0].detail;
-            expect(detail).toEqual({ from: 'a', to: 'b' });
+            expect(detail).toStrictEqual({ id: undefined, from: 'a', to: 'b' });
         });
 
         it('preventDefault() sur ar-stepper-step-change annule la navigation et l’event natif', async () => {

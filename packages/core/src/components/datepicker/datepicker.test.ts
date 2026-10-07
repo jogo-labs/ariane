@@ -608,4 +608,60 @@ describe('ArDatepicker', () => {
             expect(themeCss).toMatch(/--ar-datepicker-day-bg:/);
         });
     });
+
+    describe('detail des événements', () => {
+        it('show et hide portent { id } posé par le consommateur', async () => {
+            el = await fixture('<ar-datepicker id="mon-dp"></ar-datepicker>');
+            const show = vi.fn();
+            const hide = vi.fn();
+            el.addEventListener('ar-datepicker-show', show);
+            el.addEventListener('ar-datepicker-hide', hide);
+            el.open = true;
+            await waitForUpdate(el);
+            el.open = false;
+            await waitForUpdate(el);
+            expect((show.mock.calls[0][0] as CustomEvent).detail).toStrictEqual({ id: 'mon-dp' });
+            expect((hide.mock.calls[0][0] as CustomEvent).detail).toStrictEqual({ id: 'mon-dp' });
+        });
+
+        it('show porte { id: undefined } sans id (pas d id généré)', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const show = vi.fn();
+            el.addEventListener('ar-datepicker-show', show);
+            el.open = true;
+            await waitForUpdate(el);
+            expect((show.mock.calls[0][0] as CustomEvent).detail).toStrictEqual({ id: undefined });
+        });
+
+        it('input-complete porte { id, value, valueAsDate, valid }', async () => {
+            el = await fixture('<ar-datepicker id="mon-dp"></ar-datepicker>');
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-input-complete', handler);
+            el.inputElement.value = '12/06/2026';
+            el.inputElement.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            const detail = (handler.mock.calls[0][0] as CustomEvent).detail;
+            expect(detail).toStrictEqual({
+                id: 'mon-dp',
+                value: '2026-06-12',
+                valueAsDate: new Date(2026, 5, 12),
+                valid: true,
+            });
+        });
+
+        it('input-complete invalide : value et valueAsDate à null', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-input-complete', handler);
+            el.inputElement.value = '30/02/2026';
+            el.inputElement.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect((handler.mock.calls[0][0] as CustomEvent).detail).toStrictEqual({
+                id: undefined,
+                value: null,
+                valueAsDate: null,
+                valid: false,
+            });
+        });
+    });
 });
