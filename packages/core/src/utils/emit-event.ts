@@ -15,13 +15,13 @@ export type ArEventDetail = { id: string | undefined };
 export function emitEvent<D extends object = object>(
     host: HTMLElement,
     name: string,
-    opts: { cancelable?: boolean; detail?: D } = {},
+    opts: { cancelable?: boolean; detail?: D & { id?: never } } = {},
 ): CustomEvent<ArEventDetail & D> {
     const e = new CustomEvent<ArEventDetail & D>(name, {
         bubbles: true,
         composed: true,
         cancelable: opts.cancelable === true,
-        detail: { id: host.id || undefined, ...opts.detail } as ArEventDetail & D,
+        detail: { ...opts.detail, id: host.id || undefined } as ArEventDetail & D,
     });
     host.dispatchEvent(e);
     return e;

@@ -33,12 +33,23 @@ describe('emitEvent', () => {
         expect(emitEvent(host, 'e').detail).toStrictEqual({ id: undefined });
     });
 
-    it('fusionne le detail propre à l événement après id', () => {
+    it('fusionne le detail propre à l événement avec id', () => {
         const host = document.createElement('div');
         host.id = 'x';
         const event = emitEvent(host, 'e', { detail: { from: 1, to: 2 } });
         expect(event.detail).toStrictEqual({ id: 'x', from: 1, to: 2 });
-        expect(Object.keys(event.detail)).toEqual(['id', 'from', 'to']);
+        expect(Object.keys(event.detail).sort()).toEqual(['from', 'id', 'to']);
+    });
+
+    it('un detail fourni ne peut pas remplacer l id de l hôte', () => {
+        const host = document.createElement('div');
+        host.id = 'hote';
+        // @ts-expect-error `id` est réservé à l'hôte : le passer est une erreur de compilation
+        const event = emitEvent(host, 'e', { detail: { id: 'autre', n: 1 } });
+        expect(event.detail.id).toBe('hote');
+        const bare = document.createElement('div');
+        // @ts-expect-error idem sans id sur l'hôte
+        expect(emitEvent(bare, 'e', { detail: { id: 'autre' } }).detail.id).toBeUndefined();
     });
 
     it('retourne l événement dispatché (defaultPrevented lisible)', () => {
