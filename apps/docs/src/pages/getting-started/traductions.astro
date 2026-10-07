@@ -150,9 +150,8 @@ import '@ariane-ui/core'; // puis les composants`;
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationCdnImportModule} /></pre>
             <p>
                 Dans votre HTML, importez ensuite l'utilitaire <code>registerTranslation</code> depuis
-                <code>cdn/utils.js</code> (aucun composant n'est enregistré par cet import), avec la même variante
-                que les composants : <code>utils.dev.js</code> si vous chargez <code>autoloader.dev.js</code> ou
-                <code>index.dev.js</code>. Dans le cas contraire, la traduction serait enregistrée dans un registre
+                <code>cdn/utils.js</code>. <br />
+                En environnement de développement, utilisez <code>utils.dev.js</code> et veillez dans ce cas à charger <code>autoloader.dev.js</code> ou <code>index.dev.js</code>. Sinon, la traduction serait enregistrée dans un registre
                 que les composants ne lisent pas, sans erreur visible.
             </p>
             <pre><code class="language-html" set:text={codeCustomTranslationCdnImport} /></pre>
