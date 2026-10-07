@@ -62,6 +62,45 @@ if (!existsSync(DOC_DEMO_THEME)) {
     }
 }
 
+// robots.txt et sitemap (#276) : le domaine principal est ariane-ui.com ; le sitemap ne doit
+// lister que des URL de ce domaine, et robots.txt doit le désigner.
+const SITE = 'https://ariane-ui.com';
+const ROBOTS = join(DIST, 'robots.txt');
+const SITEMAP_INDEX = join(DIST, 'sitemap-index.xml');
+const SITEMAP = join(DIST, 'sitemap-0.xml');
+if (!existsSync(ROBOTS) || !existsSync(SITEMAP_INDEX) || !existsSync(SITEMAP)) {
+    console.error('✗ robots.txt, sitemap-index.xml ou sitemap-0.xml manquant dans dist/');
+    hasError = true;
+} else {
+    const robots = readFileSync(ROBOTS, 'utf8');
+    const urls = [...readFileSync(SITEMAP, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+        (m) => m[1],
+    );
+    const problems = [];
+    if (!robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) {
+        problems.push(`robots.txt doit contenir « Sitemap: ${SITE}/sitemap-index.xml »`);
+    }
+    if (/^\s*Disallow:\s*\/\s*$/m.test(robots)) {
+        problems.push('robots.txt interdit tout le site (Disallow: /)');
+    }
+    const foreign = urls.filter((url) => !url.startsWith(`${SITE}/`));
+    if (foreign.length > 0) {
+        problems.push(`le sitemap liste des URL hors ${SITE} : ${foreign.slice(0, 3).join(', ')}`);
+    }
+    const missing = EXPECTED_PAGES.map(
+        (page) => `${SITE}/${page.replace(/index\.html$/, '')}`,
+    ).filter((url) => !urls.includes(url));
+    if (missing.length > 0) {
+        problems.push(`pages absentes du sitemap : ${missing.slice(0, 3).join(', ')}`);
+    }
+    if (problems.length > 0) {
+        for (const problem of problems) console.error(`✗ ${problem}`);
+        hasError = true;
+    } else {
+        console.log(`✓ robots.txt et sitemap (${urls.length} URL)`);
+    }
+}
+
 if (hasError) {
     console.error('\nBuild check echoue : des pages sont manquantes dans dist/.');
     process.exit(1);

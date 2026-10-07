@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync, createReadStream } from 'fs';
@@ -71,7 +72,12 @@ function getContentType(filePath) {
 }
 
 export default defineConfig({
-    integrations: [mdx()],
+    // Domaine principal (#276) : sert à l'URL absolue du sitemap et à `Astro.site`. L'aperçu
+    // `next.ariane-ui.com` et les déploiements de branche génèrent le même sitemap (URLs de la
+    // production) ; ils sont en `noindex`, voir vercel.json.
+    site: 'https://ariane-ui.com',
+
+    integrations: [mdx(), sitemap()],
 
     // Le contenu narratif MDX (src/content/components/*.mdx) est la seule source
     // Markdown du site — les autres pages passent par CodeBlock.astro (pipeline

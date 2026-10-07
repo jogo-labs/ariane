@@ -21,6 +21,7 @@
     "typescript": "^6.0.2"
   },
   "devDependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "vitest": "^4.1.8"
