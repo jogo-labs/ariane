@@ -3,6 +3,7 @@ import { ArianeElement } from '../../base/ariane-element.js';
 import { property, query } from 'lit/decorators.js';
 import { TooltipController } from '../../controllers/tooltip.controller.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import styles from './tooltip.styles.js';
 
 export type ArTooltipPlacement =
@@ -47,8 +48,8 @@ export type ArTooltipPlacement =
  * Pas d'events show/hide annulables : un tooltip n'a pas de raison métier de bloquer
  * son affichage (contrairement à un dialog ou un menu), contrairement à
  * ar-dropdown/ar-dialog/ar-breadcrumb.
- * @event {CustomEvent} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
- * @event {CustomEvent} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-tooltip-shown  - Émis après l'affichage effectif de la bulle.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-tooltip-hidden - Émis après le masquage effectif de la bulle.
  *
  * @tagname ar-tooltip
  */
@@ -178,24 +179,14 @@ export class ArTooltip extends ArianeElement {
     private _show(): void {
         if (this._tooltip.isOpen) return;
         void this._tooltip.show().then(() => {
-            this._emit('ar-tooltip-shown');
+            emitEvent(this, 'ar-tooltip-shown');
         });
     }
 
     private _hide(): void {
         if (!this._tooltip.isOpen) return;
         this._tooltip.hide();
-        this._emit('ar-tooltip-hidden');
-    }
-
-    private _emit(name: string): void {
-        this.dispatchEvent(
-            new CustomEvent(name, {
-                bubbles: true,
-                composed: true,
-                detail: { id: this.id || undefined },
-            }),
-        );
+        emitEvent(this, 'ar-tooltip-hidden');
     }
 
     private _scheduleShow(): void {

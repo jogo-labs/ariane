@@ -27,12 +27,12 @@ import styles from './collapse.styles.js';
  * @cssState disabled  - Le composant est désactivé.
  * @cssState animating - Le panel est en cours d'ouverture ou de fermeture (animation height).
  *
- * @event {CustomEvent} ar-collapse-show           - Avant l'ouverture. @cancelable
- * @event {CustomEvent} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
- * @event {CustomEvent} ar-collapse-shown          - Après la fin de l'animation d'ouverture.
- * @event {CustomEvent} ar-collapse-hide           - Avant la fermeture. @cancelable
- * @event {CustomEvent} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
- * @event {CustomEvent} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-show           - Avant l'ouverture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-show-prevented - Émis si ar-collapse-show est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-shown          - Après la fin de l'animation d'ouverture.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-hide           - Avant la fermeture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-hide-prevented - Émis si ar-collapse-hide est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-collapse-hidden         - Après la fin de l'animation de fermeture.
  *
  * @tagname ar-collapse
  */

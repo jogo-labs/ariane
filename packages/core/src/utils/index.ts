@@ -8,3 +8,4 @@ export { whenAllDefined } from './when-all-defined.js';
 export type { WhenAllDefinedOptions } from './when-all-defined.js';
 export { registerTranslation } from '@shoelace-style/localize';
 export type { Translation } from '../types/translation.js';
+export type { ArEventDetail } from './emit-event.js';

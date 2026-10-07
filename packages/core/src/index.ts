@@ -6,6 +6,7 @@
  */
 export { whenAllDefined, registerTranslation } from './utils/index.js';
 export type { WhenAllDefinedOptions, Translation } from './utils/index.js';
+export type { ArEventDetail } from './utils/index.js';
 export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';
 export { announceA11y } from './a11y/announce-a11y.js';
@@ -22,8 +23,10 @@ import './components/spinner/index.js';
 export { ArSpinner } from './components/spinner/spinner.js';
 import './components/pagination/index.js';
 export { ArPagination } from './components/pagination/pagination.js';
+export type { ArPaginationPageChangeDetail } from './components/pagination/pagination.js';
 import './components/stepper/index.js';
 export { ArStepper } from './components/stepper/stepper.js';
+export type { ArStepperStepChangeDetail } from './components/stepper/stepper.js';
 import './components/stepper-item/index.js';
 export { ArStepperItem } from './components/stepper-item/stepper-item.js';
 import './components/dialog/index.js';
@@ -44,7 +47,11 @@ import './components/tab-panel/index.js';
 export { ArTabPanel } from './components/tab-panel/tab-panel.js';
 import './components/table-sort/index.js';
 export { ArTableSort } from './components/table-sort/table-sort.js';
-export type { TableSortType, TableSortOrder } from './components/table-sort/table-sort.js';
+export type {
+    TableSortType,
+    TableSortOrder,
+    ArTableSortChangeDetail,
+} from './components/table-sort/table-sort.js';
 import './components/charcounter/index.js';
 export { ArCharcounter } from './components/charcounter/charcounter.js';
 export type { CharcounterState } from './components/charcounter/charcounter.js';
@@ -52,3 +59,4 @@ import './components/collapse/index.js';
 export { ArCollapse } from './components/collapse/collapse.js';
 import './components/datepicker/index.js';
 export { ArDatepicker } from './components/datepicker/datepicker.js';
+export type { ArDatepickerInputDetail } from './components/datepicker/datepicker.js';

@@ -3,6 +3,7 @@ import { property } from 'lit/decorators.js';
 import styles from './table-sort.styles.js';
 import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
@@ -12,6 +13,14 @@ import { defineInternalTooltip } from '../../internal/tooltip-internal.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
 export type TableSortOrder = 'none' | 'asc' | 'desc';
+
+/** Détail de l'événement `ar-table-sort-change` */
+export interface ArTableSortChangeDetail extends ArEventDetail {
+    type: TableSortType;
+    currentOrder: TableSortOrder;
+    requestedOrder: TableSortOrder;
+    columnLabel: string;
+}
 
 const CYCLE: TableSortOrder[] = ['none', 'asc', 'desc'];
 
@@ -41,7 +50,7 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
  *
  * @cssState pending - Un tri a été demandé et attend confirmation.
  *
- * @event {CustomEvent<{ type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
+ * @event {CustomEvent<{ id: string | undefined; type: TableSortType; currentOrder: TableSortOrder; requestedOrder: TableSortOrder; columnLabel: string }>} ar-table-sort-change - Émis au clic quand pending est false.
  *
  * @tagname ar-table-sort
  */
@@ -142,18 +151,14 @@ export class ArTableSort extends ArianeElement {
         const requestedOrder = nextOrder(this.order);
         this._pendingOrder = requestedOrder;
         this.pending = true;
-        this.dispatchEvent(
-            new CustomEvent('ar-table-sort-change', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    type: this.type,
-                    currentOrder: this.order,
-                    requestedOrder,
-                    columnLabel: this._getColumnLabel(),
-                },
-            }),
-        );
+        emitEvent<Omit<ArTableSortChangeDetail, 'id'>>(this, 'ar-table-sort-change', {
+            detail: {
+                type: this.type,
+                currentOrder: this.order,
+                requestedOrder,
+                columnLabel: this._getColumnLabel(),
+            },
+        });
     }
 
     private _getActionLabel(): string {
