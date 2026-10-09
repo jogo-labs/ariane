@@ -78,4 +78,4 @@ peuvent étendre les classes Ariane dans leur propre design system — voir le p
 | Proposer un correctif | Une Pull Request vers `dev`, après une issue (sauf correctif évident)           |
 
 Le détail (reproduction minimale d'un bug, critères d'une idée, règles d'une Pull Request) est sur la
-page **Contribuer** du site de documentation, section « Ressources ».
+page [Contribuer](https://ariane-ui.com/resources/contributing/) du site de documentation.
