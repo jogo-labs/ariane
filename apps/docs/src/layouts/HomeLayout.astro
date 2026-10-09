@@ -1,4 +1,5 @@
 ---
+import SpeedInsights from '@vercel/speed-insights/astro';
 import rootPkg from '../../../../package.json';
 
 interface Props {
@@ -8,12 +9,10 @@ interface Props {
 
 const { title, description = 'Accessible web components library' } = Astro.props;
 
-// URL canonique, uniquement sur le build de production : les déploiements preview (dont
-// next.ariane-ui.com) sont en noindex et ne doivent pas désigner une page de la production
-const canonicalUrl =
-    process.env.VERCEL_ENV === 'production'
-        ? new URL(Astro.url.pathname, Astro.site).href
-        : undefined;
+// Build de production Vercel : les déploiements preview (dont next.ariane-ui.com) sont en
+// noindex, ne désignent pas de page canonique et ne remontent pas de mesures de performance
+const isProduction = process.env.VERCEL_ENV === 'production';
+const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
@@ -238,5 +237,7 @@ const canonicalUrl =
                 <slot />
             </main>
         </div>
+
+        {isProduction && <SpeedInsights />}
     </body>
 </html>

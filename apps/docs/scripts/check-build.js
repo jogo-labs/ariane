@@ -93,13 +93,19 @@ if (!existsSync(ROBOTS) || !existsSync(SITEMAP_INDEX) || !existsSync(SITEMAP)) {
     if (missing.length > 0) {
         problems.push(`pages absentes du sitemap : ${missing.slice(0, 3).join(', ')}`);
     }
-    // Balise canonique : égale à l'URL du sitemap sur le build de production (VERCEL_ENV), absente
+    // Balise canonique et Speed Insights : égale à l'URL du sitemap sur le build de production (VERCEL_ENV), absente
     // ailleurs (preview noindex, build local)
     const isProduction = process.env.VERCEL_ENV === 'production';
     for (const url of urls) {
         const file = join(DIST, url.slice(SITE.length), 'index.html');
         const html = existsSync(file) ? readFileSync(file, 'utf8') : '';
         const canonical = html.match(/<link rel="canonical" href="([^"]*)">/)?.[1];
+        // Speed Insights : mesures de performance remontées uniquement en production
+        if (html.includes('<vercel-speed-insights') !== isProduction) {
+            problems.push(
+                `Speed Insights ${isProduction ? 'absent du build de production' : 'présent hors production'} : ${url}`,
+            );
+        }
         if (isProduction && canonical !== url) {
             problems.push(`balise canonique absente ou différente de ${url}`);
         } else if (!isProduction && canonical !== undefined) {
