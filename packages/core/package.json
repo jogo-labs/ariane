@@ -87,6 +87,10 @@
     "type": "git",
     "url": "https://github.com/jogo-labs/ariane"
   },
+  "homepage": "https://ariane-ui.com",
+  "bugs": {
+    "url": "https://github.com/jogo-labs/ariane/issues"
+  },
   "customElements": "dist/custom-elements.json",
   "config": {
     "componentPrefix": "ar"
