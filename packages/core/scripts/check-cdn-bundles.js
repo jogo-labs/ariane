@@ -11,15 +11,16 @@
  * Ce qu'on garantit : les six `exports` `./cdn*` existent et pointent vers ces fichiers
  * (aucun autre export `./cdn*`), les cibles existent, aucun reste de l'ancienne nomenclature
  * `*.prod.js`, aucun fichier de production ne contient `console.warn` (le code d'avertissement,
- * conditionné par `__DEV__`, doit y être éliminé), et au moins un fichier de développement en
- * contient (la règle porte sur l'ensemble des `*.dev.js`, chunks compris : `utils` n'en a pas,
- * c'est du code pur, et les avertissements vivent dans un chunk partagé).
+ * conditionné par `__DEV__`, doit y être éliminé), et chaque point d'entrée de développement qui
+ * charge des composants (`index.dev.js`, `autoloader.dev.js`) atteint un `console.warn` en
+ * suivant ses imports, chunks compris (les avertissements vivent dans un chunk partagé).
+ * `utils.dev.js` n'est pas concerné : c'est du code pur, sans avertissement.
  *
  * Un `exports` qui désigne un fichier absent ou la mauvaise version se verrait en production
  * (404, ou version de développement servie à la place de la production) : on le casse au build.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const CDN_EXPORTS = {
@@ -30,6 +31,24 @@ export const CDN_EXPORTS = {
     './cdn/utils': './cdn/utils.js',
     './cdn/utils.dev': './cdn/utils.dev.js',
 };
+
+// Points d'entrée de développement qui chargent des composants, donc des avertissements.
+const DEV_ENTRIES_WITH_WARNINGS = ['cdn/index.dev.js', 'cdn/autoloader.dev.js'];
+
+/** Fichiers atteints depuis `entry` en suivant les imports relatifs (statiques et dynamiques). */
+function importClosure(entry, root) {
+    const seen = new Set();
+    const visit = (file) => {
+        if (seen.has(file) || !existsSync(file)) return;
+        seen.add(file);
+        const source = readFileSync(file, 'utf-8');
+        for (const m of source.matchAll(/(?:from|import)\s*\(?\s*["'](\.[^"']+)["']/g)) {
+            visit(resolve(dirname(file), m[1]));
+        }
+    };
+    visit(resolve(root, entry));
+    return [...seen];
+}
 
 function listJsFiles(dir) {
     if (!existsSync(dir)) return [];
@@ -75,7 +94,6 @@ export function checkCdnBundles({ exports, root }) {
         errors.push(`Reste de l'ancienne nomenclature *.prod.js : ${examples}${more}.`);
     }
 
-    const dev = files.filter((f) => f.path.endsWith('.dev.js'));
     const prod = files.filter((f) => !f.path.endsWith('.dev.js') && !f.path.endsWith('.prod.js'));
 
     for (const { path, source } of prod) {
@@ -86,10 +104,16 @@ export function checkCdnBundles({ exports, root }) {
         }
     }
 
-    if (dev.length > 0 && !dev.some((f) => f.source.includes('console.warn'))) {
-        errors.push(
-            "Aucune version de développement (*.dev.js) ne contient d'avertissement (console.warn) : __DEV__ est-il bien à true ?",
+    for (const entry of DEV_ENTRIES_WITH_WARNINGS) {
+        if (!existsSync(join(root, entry))) continue; // déjà signalé comme fichier absent
+        const warns = importClosure(entry, root).some((f) =>
+            readFileSync(f, 'utf-8').includes('console.warn'),
         );
+        if (!warns) {
+            errors.push(
+                `${entry} n'atteint aucun avertissement (console.warn), même via ses chunks : __DEV__ est-il bien à true ?`,
+            );
+        }
     }
 
     return errors;
