@@ -6,6 +6,7 @@ import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import { emitEvent } from '../../utils/emit-event.js';
 import '../../translations/fr.js';
 import '../../translations/en.js';
 
@@ -47,7 +48,7 @@ export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
  *
  * @cssState hiding - L'alerte est en cours de fermeture (animation de sortie).
  *
- * @event {CustomEvent} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
+ * @event {CustomEvent<{ id: string | undefined }>} ar-alert-close - Émis après la fermeture de l'alerte (fin de transition).
  *
  * @tagname ar-alert
  */
@@ -250,7 +251,7 @@ export class ArAlert extends ArianeElement {
         // deux fois (une par propriété) — sans ce reset, le second appel repasserait la garde.
         this.hiding = false;
 
-        this.dispatchEvent(new CustomEvent('ar-alert-close', { bubbles: true, composed: true }));
+        emitEvent(this, 'ar-alert-close');
         this.remove();
 
         const $focusableElement = document.getElementById(

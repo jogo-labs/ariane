@@ -49,13 +49,13 @@ const tocEntries = [
 
             <p>
                 Ces versions correspondent aux fonctionnalités de la plateforme que les composants et
-                le thème fourni utilisent :
+                le thème du starter-kit utilisent :
             </p>
             <ul class="narrative-list">
                 <li>l'API Popover, pour les panneaux flottants (dropdown, tooltip, datepicker…) ;</li>
                 <li>les états personnalisés (<code>CustomStateSet</code> et <code>:state()</code>) ;</li>
                 <li><code>ElementInternals</code>, <code>&lt;dialog&gt;</code> et l'attribut <code>inert</code> ;</li>
-                <li>pour le thème fourni : <code>light-dark()</code>, <code>color-mix()</code>, <code>oklch()</code>, <code>@layer</code> et l'imbrication CSS.</li>
+                <li>pour le thème du starter-kit : <code>light-dark()</code>, <code>color-mix()</code>, <code>oklch()</code>, <code>@layer</code> et l'imbrication CSS.</li>
             </ul>
             <p>
                 Les tests automatisés tournent sur les dernières versions de Chromium, Firefox et
@@ -64,9 +64,9 @@ const tocEntries = [
                 test sur chaque version. En dessous, le comportement n'est pas garanti.
             </p>
             <p>
-                Sous Chrome et Edge 125, <code>:state()</code> n'existe pas : les états personnalisés
+                Sur Chrome et Edge avant la version 125, <code>:state()</code> n'existe pas : les états personnalisés
                 sont exposés avec le préfixe <code>--</code> (par exemple <code>:--open</code>). Les styles du
-                thème fourni n'en tiennent pas compte, mais la plupart des états ont aussi un attribut
+                thème du starter-kit n'en tiennent pas compte, mais la plupart des états ont aussi un attribut
                 équivalent (<code>[open]</code>, <code>[disabled]</code>…) utilisable dans vos propres styles.
             </p>
             <p>

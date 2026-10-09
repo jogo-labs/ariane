@@ -14,6 +14,20 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.14](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.13...v0.1.0-alpha.14) (2026-10-09)
+
+### Ajouté
+
+- **core:** detail typé avec id sur les 43 événements, affiché dans la doc ([#308](https://github.com/jogo-labs/ariane/issues/308)) ([#316](https://github.com/jogo-labs/ariane/issues/316)) ([0159224](https://github.com/jogo-labs/ariane/commit/01592248cb4a63ee3703b8ce8006d0322af48d02))
+- **core:** entrées CDN utils pour whenAllDefined et registerTranslation ([#305](https://github.com/jogo-labs/ariane/issues/305)) ([#315](https://github.com/jogo-labs/ariane/issues/315)) ([297633e](https://github.com/jogo-labs/ariane/commit/297633e8a09b0fe7c0216b0b37c4c7fad8a2c407))
+- **core:** skill ariane et llms.txt pour consommer Ariane ([#264](https://github.com/jogo-labs/ariane/issues/264)) ([#303](https://github.com/jogo-labs/ariane/issues/303)) ([558785c](https://github.com/jogo-labs/ariane/commit/558785c33607b0b0a04344ce292ad43e4795c7ce))
+- **core:** token --ar-color-border-strong pour les contours de contrôles (3:1), bordure d'erreur du datepicker ([#310](https://github.com/jogo-labs/ariane/issues/310), [#312](https://github.com/jogo-labs/ariane/issues/312)) ([#311](https://github.com/jogo-labs/ariane/issues/311)) ([707d851](https://github.com/jogo-labs/ariane/commit/707d851bb822d467e59ae8ad099e82095b01e66f))
+
+### Corrigé
+
+- **core:** build:bundles ne retire plus custom-elements.json, build:types après les bundles ([#313](https://github.com/jogo-labs/ariane/issues/313)) ([#314](https://github.com/jogo-labs/ariane/issues/314)) ([423142a](https://github.com/jogo-labs/ariane/commit/423142a9258254e7b214a2529a22fc36486a4809))
+- **core:** manifest déterministe, check:cdn plus strict ([#321](https://github.com/jogo-labs/ariane/issues/321)) ([d0ff0ef](https://github.com/jogo-labs/ariane/commit/d0ff0efe14d94e9975d5ab031618588b2613f0c3))
+
 ## [0.1.0-alpha.13](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.12...v0.1.0-alpha.13) (2026-10-01)
 
 ### Corrigé

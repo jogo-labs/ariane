@@ -47,12 +47,12 @@ export type ArDropdownPlacement =
  * @cssState open     - Le panel est ouvert.
  * @cssState disabled - Le composant est désactivé.
  *
- * @event {CustomEvent} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
- * @event {CustomEvent} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
- * @event {CustomEvent} ar-dropdown-shown          - Émis après l'ouverture.
- * @event {CustomEvent} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
- * @event {CustomEvent} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
- * @event {CustomEvent} ar-dropdown-hidden         - Émis après la fermeture.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-show           - Émis avant l'ouverture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-show-prevented - Émis si ar-dropdown-show est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-shown          - Émis après l'ouverture.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hidden         - Émis après la fermeture.
  *
  * @tagname ar-dropdown
  */

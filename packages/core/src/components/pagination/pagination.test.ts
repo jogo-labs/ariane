@@ -624,7 +624,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 1, to: 3 });
+            expect(detail).toStrictEqual({ id: undefined, from: 1, to: 3 });
         });
 
         it('réassigner current depuis un handler ar-pagination-page-change met à jour le rendu', async () => {
@@ -732,7 +732,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 3, to: 4 });
+            expect(detail).toStrictEqual({ id: undefined, from: 3, to: 4 });
         });
     });
 
@@ -760,7 +760,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 2, to: 3 });
+            expect(detail).toStrictEqual({ id: undefined, from: 2, to: 3 });
         });
 
         it('émis avec {from, to} au clic sur prev', async () => {
@@ -774,7 +774,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 3, to: 2 });
+            expect(detail).toStrictEqual({ id: undefined, from: 3, to: 2 });
         });
 
         it('émis avec {from, to} au clic sur un lien de page', async () => {
@@ -790,7 +790,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 1, to: 4 });
+            expect(detail).toStrictEqual({ id: undefined, from: 1, to: 4 });
         });
 
         it("n'est pas émis si prev est cliqué en page 1", async () => {
@@ -867,7 +867,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const detail = (handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>)
                 .detail;
-            expect(detail).toEqual({ from: 3, to: 15 });
+            expect(detail).toStrictEqual({ id: undefined, from: 3, to: 15 });
         });
 
         it('preventDefault() sur le select revert sa valeur DOM affichée', async () => {
@@ -1015,7 +1015,7 @@ describe('ArPagination', () => {
             expect(handler).toHaveBeenCalledOnce();
             const event = handler.mock.calls[0][0] as CustomEvent<ArPaginationPageChangeDetail>;
             expect(event.cancelable).toBe(false);
-            expect(event.detail).toEqual({ from: 1, to: 3 });
+            expect(event.detail).toStrictEqual({ id: undefined, from: 1, to: 3 });
         });
 
         it("n'est pas émis au premier rendu", async () => {

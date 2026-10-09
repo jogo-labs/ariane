@@ -9,6 +9,8 @@ const tocEntries = [
     { id: 'locale-resolution',  label: 'Résolution de la langue',       level: 2 as const },
     { id: 'default-imports',    label: 'Imports par défaut',            level: 2 as const },
     { id: 'traductions',        label: 'Créer votre propre traduction', level: 1 as const },
+    { id: 'traductions-cdn',    label: 'Avec le CDN',                   level: 2 as const },
+    { id: 'traductions-npm',    label: 'Avec le paquet NPM',            level: 2 as const },
     { id: 'traductions-disponibles', label: 'Traductions disponibles',  level: 1 as const },
 ];
 
@@ -18,7 +20,40 @@ const codeChangeLang = `<!-- Langue par défaut de la page -->
 <!-- Ou par composant, en surcharge -->
 <ar-table-sort lang="es">Prix</ar-table-sort>`;
 
-const codeCustomTranslation = `// es.ts — copie de fr.ts, traduite terme par terme
+const codeCustomTranslationCdnImportModule = `// es.js — copie de fr.ts, traduite terme par terme, sans import ni typage (usage CDN)
+
+const translation = {
+    $code: 'es',
+    $name: 'Español',
+    $dir: 'ltr',
+
+    // ... tous les termes de fr.ts, traduits
+    term1: '...',
+    term2: '...',
+};
+
+export default translation;`;
+
+const codeCustomTranslationCdnImport = `<html lang="es">
+  <head>
+    <!-- Enregistrez votre traduction -->
+    <script type="module">
+      import { registerTranslation } from 'https://unpkg.com/@ariane-ui/core@<version>/cdn/utils.js';
+      import translation from './translations/es.js';
+      registerTranslation(translation);
+    </script>
+
+    <!-- Puis chargez les composants -->
+    <script type="module" src="https://unpkg.com/@ariane-ui/core/cdn/autoloader.js"></script>
+  </head>
+
+  <body>
+    ...
+  </body>
+</html>
+`;
+
+const codeCustomTranslationNpm = `// es.ts — copie de fr.ts, traduite terme par terme
 import { registerTranslation } from '@ariane-ui/core/utils';
 import type { Translation } from '@ariane-ui/core/utils';
 
@@ -36,16 +71,9 @@ registerTranslation(translation);
 
 export default translation;`;
 
-const codeCustomTranslationCdn = `<html lang="es">
-  <head>
-    <script type="module" src="/path/to/es.js"></script>
-  </head>
-
-  <body>
-    ...
-  </body>
-</html>
-`;
+const codeCustomTranslationNpmImport = `// main.js (ou layout racine)
+import '@ariane-ui/core'; // les composants
+import './translations/es.js'; // votre traduction (importée après, le français reste la langue de repli)`;
 ---
 
 <Layout title="Traductions" currentPath="/getting-started/traductions" showToc={true}>
@@ -103,6 +131,10 @@ const codeCustomTranslationCdn = `<html lang="es">
                 Que vous souhaitiez surcharger une langue fournie, ou disposer sans attendre d'une
                 traduction non disponible pour votre propre langue, le mécanisme à utiliser est très
                 simple.<br />
+            </p>
+
+            <NarrativeSubheading id="traductions-cdn">Avec le CDN</NarrativeSubheading>
+            <p>
                 Commencez par copier{' '}
                 <a
                     href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
@@ -112,33 +144,59 @@ const codeCustomTranslationCdn = `<html lang="es">
                     <code>/core/src/translations/fr.ts</code>
                 </a>{' '}
                 (la traduction source du package, la plus à jour) dans votre projet et traduisez
-                chaque terme.<br />
-                Le type <code>Translation</code>, exporté par le package, vous
-                force à fournir tous les termes attendus. Cette fois l'import est à votre
-                charge — c'est votre fichier, pas un fichier livré par Ariane.
+                chaque terme. <br />
+                Modifiez-le pour ne garder que l'export de la traduction :
             </p>
-            <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslation} /></pre>
+            <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationCdnImportModule} /></pre>
             <p>
-                Une fois votre fichier compilé en JS, importez la traduction ainsi :
+                Dans votre HTML, importez ensuite l'utilitaire <code>registerTranslation</code> depuis
+                <code>cdn/utils.js</code>. <br />
+                En environnement de développement, utilisez <code>utils.dev.js</code> et veillez dans ce cas à charger <code>autoloader.dev.js</code> ou <code>index.dev.js</code>. Sinon, la traduction serait enregistrée dans un registre
+                que les composants ne lisent pas, sans erreur visible.
             </p>
-            <pre style="margin-top: 0.85rem"><code class="language-html" set:text={codeCustomTranslationCdn} /></pre>
+            <pre><code class="language-html" set:text={codeCustomTranslationCdnImport} /></pre>
 
-            <NarrativeHeading id="traductions-disponibles">Traductions disponibles</NarrativeHeading>
+            <NarrativeSubheading id="traductions-npm">Avec le paquet npm</NarrativeSubheading>
             <p>
-                Chaque composant concerné documente son propre support i18n dans sa page — pas
-                de liste centralisée ici, qui se désynchroniserait à chaque composant migré.
-                Le détail des termes (par composant, groupés par commentaire{' '}
-                <code>// ar-&lt;nom&gt;</code>) vit directement dans les fichiers de
-                traduction :
-            </p>
-            <p>
+                Commencez par copier{' '}
                 <a
-                    href="https://github.com/jogo-labs/ariane/tree/main/packages/core/src/translations"
+                    href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                     target="_blank"
                     rel="noopener"
                 >
-                    <code>packages/core/src/translations/</code>
-                </a>
+                    <code>/core/src/translations/fr.ts</code>
+                </a>{' '}
+                (la traduction source du package, la plus à jour) dans votre projet et traduisez
+                chaque terme. <br />
+                Le type <code>Translation</code>, exporté par le package, vous
+                force à fournir tous les termes attendus.
+            </p>
+            <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpm} /></pre>
+            <p>
+                Importez votre traduction une seule fois, dans le point d'entrée de l'application ou dans
+                le layout racine : le registre est partagé par tous les composants, il n'y a rien à
+                importer composant par composant. Pour une langue ajoutée, l'ordre d'import n'a pas
+                d'incidence sur l'affichage :
+            </p>
+            <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpmImport} /></pre>
+
+            <p class="hint">
+                Deux effets de l'ordre sont à connaître. La première traduction enregistrée devient la langue de
+                repli, utilisée quand la langue de la page n'a pas de traduction : enregistrer la vôtre avant
+                les composants en fait la langue de repli, après, le français le reste. Et pour <strong>remplacer</strong> une
+                langue fournie (<code>fr</code> ou <code>en</code>), enregistrez votre version
+                <em>après</em> le chargement des composants : leurs traductions par défaut se fusionnent par-dessus ce
+                qui est déjà enregistré.
+            </p>
+
+            <NarrativeHeading id="traductions-disponibles">Traductions disponibles</NarrativeHeading>
+            <p>
+                Chaque composant concerné documente son propre support i18n dans sa page. <br />
+                Pour le détail des termes, voir les <a
+                    href="https://github.com/jogo-labs/ariane/tree/main/packages/core/src/translations"
+                    target="_blank"
+                    rel="noopener"
+                >traductions existantes sur le repo Github</a>
             </p>
         </div>
     </div>

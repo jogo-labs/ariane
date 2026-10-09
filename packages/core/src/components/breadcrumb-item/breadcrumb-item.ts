@@ -63,13 +63,17 @@ export class ArBreadcrumbItem extends ArianeElement {
         callback: (registry) => this.setRegistry(registry),
     });
 
+    /** @internal */
     setRegistry(registry: BreadcrumbRegistry) {
         if (this._registry) this._registry.unregisterItem(this);
         this._registry = registry;
         registry.registerItem(this);
     }
 
-    /** Poussé par `ar-breadcrumb` à chaque recalcul (position, mode mobile). */
+    /**
+     * Poussé par `ar-breadcrumb` à chaque recalcul (position, mode mobile).
+     * @internal
+     */
     setRenderState(state: BreadcrumbItemRenderState): void {
         const previous = this._renderState;
         if (

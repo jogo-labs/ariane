@@ -1,4 +1,5 @@
 ---
+import SpeedInsights from '@vercel/speed-insights/astro';
 import rootPkg from '../../../../package.json';
 
 interface Props {
@@ -7,6 +8,11 @@ interface Props {
 }
 
 const { title, description = 'Accessible web components library' } = Astro.props;
+
+// Build de production Vercel : les déploiements preview (dont next.ariane-ui.com) sont en
+// noindex, ne désignent pas de page canonique et ne remontent pas de mesures de performance
+const isProduction = process.env.VERCEL_ENV === 'production';
+const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
@@ -16,6 +22,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
+        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
         <!-- Bunny Fonts (pas Google Fonts) — cf. Layout.astro pour le détail -->
         <link rel="preconnect" href="https://fonts.bunny.net" />
@@ -29,6 +36,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
 
         <!-- Thème par défaut de la librairie (nécessaire pour les démos live) -->
         <link rel="stylesheet" href="/themes/ariane.css" />
+        <link rel="stylesheet" href="/themes/doc-demo.css" />
 
         <!-- Classes de bouton prêtes à l'emploi (.ar-btn-*), pour le HTML consommateur -->
         <link rel="stylesheet" href="/presets/buttons.css" />
@@ -229,5 +237,7 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 <slot />
             </main>
         </div>
+
+        {isProduction && <SpeedInsights />}
     </body>
 </html>

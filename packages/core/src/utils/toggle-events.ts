@@ -1,3 +1,8 @@
+import { emitEvent, type ArEventDetail } from './emit-event.js';
+
+/** Détail des événements de cycle de vie disclosure (`show`/`shown`/`hide`/`hidden`…). */
+export type ArToggleEventDetail = ArEventDetail;
+
 /**
  * Construit et dispatch un `CustomEvent` selon la convention de cycle de vie disclosure
  * (`show`/`shown`/`hide`/`hidden`/`show-prevented`/`hide-prevented`) partagée par
@@ -7,13 +12,6 @@ export function emitToggleEvent(
     host: HTMLElement,
     name: string,
     opts: { cancelable: boolean },
-): CustomEvent {
-    const e = new CustomEvent(name, {
-        bubbles: true,
-        composed: true,
-        cancelable: opts.cancelable,
-        detail: { id: host.id || undefined },
-    });
-    host.dispatchEvent(e);
-    return e;
+): CustomEvent<ArToggleEventDetail> {
+    return emitEvent(host, name, opts);
 }

@@ -1,11 +1,16 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync, createReadStream } from 'fs';
+import { createDocDemoThemeProvider } from '../../scripts/starter-kit/build-doc-demo-theme.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const CORE_ROOT = resolve(__dirname, '../../packages/core');
+
+// Thème neutre des démos : feuille générée depuis les sources du thème, scopée sous .doc-demo
+const docDemoTheme = createDocDemoThemeProvider(resolve(CORE_ROOT, 'src/styles/themes'));
 
 /**
  * Map préfixe URL → liste de répertoires candidats, dans l'ordre de priorité.
@@ -67,7 +72,12 @@ function getContentType(filePath) {
 }
 
 export default defineConfig({
-    integrations: [mdx()],
+    // Domaine principal (#276) : sert à l'URL absolue du sitemap et à `Astro.site`. L'aperçu
+    // `next.ariane-ui.com` et les déploiements de branche génèrent le même sitemap (URLs de la
+    // production) ; ils sont en `noindex`, voir vercel.json.
+    site: 'https://ariane-ui.com',
+
+    integrations: [mdx(), sitemap()],
 
     // Le contenu narratif MDX (src/content/components/*.mdx) est la seule source
     // Markdown du site — les autres pages passent par CodeBlock.astro (pipeline
@@ -97,6 +107,18 @@ export default defineConfig({
                 configureServer(server) {
                     server.middlewares.use((req, res, next) => {
                         const url = req.url?.split('?')[0] ?? '';
+
+                        // Thème neutre des démos, généré à la volée depuis les sources du thème
+                        if (url === '/themes/doc-demo.css') {
+                            docDemoTheme
+                                .get()
+                                .then((css) => {
+                                    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+                                    res.end(css);
+                                })
+                                .catch(next);
+                            return;
+                        }
 
                         // Fichiers individuels (ex: custom-elements.json)
                         for (const { url: mappedUrl, file } of SINGLE_FILE_MAPPINGS) {
@@ -137,7 +159,7 @@ export default defineConfig({
 
                 // Au build Astro : copie les assets depuis le premier répertoire existant
                 async generateBundle() {
-                    const { cp, copyFile, mkdir } = await import('fs/promises');
+                    const { cp, copyFile, mkdir, writeFile } = await import('fs/promises');
                     const { join, dirname } = await import('path');
                     const outDir = resolve(__dirname, 'dist');
 
@@ -148,6 +170,12 @@ export default defineConfig({
                         const dest = join(outDir, prefix);
                         await cp(srcDir, dest, { recursive: true });
                     }
+
+                    await mkdir(join(outDir, 'themes'), { recursive: true });
+                    await writeFile(
+                        join(outDir, 'themes', 'doc-demo.css'),
+                        await docDemoTheme.get(),
+                    );
 
                     for (const { url: mappedUrl, file } of SINGLE_FILE_MAPPINGS) {
                         if (!existsSync(file)) continue;

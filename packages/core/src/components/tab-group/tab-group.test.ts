@@ -238,7 +238,7 @@ describe('ArTabGroup', () => {
             expect(el.active).not.toBe('a');
             expect(el.active).toBe('b');
             expect(events.length).toBe(1);
-            expect(events[0].detail).toEqual({ active: 'b' });
+            expect(events[0].detail).toStrictEqual({ id: undefined, active: 'b' });
         });
     });
 
@@ -254,7 +254,7 @@ describe('ArTabGroup', () => {
             tabB.click();
             await waitForUpdate(el);
             expect(events.length).toBe(1);
-            expect(events[0].detail).toEqual({ active: 'b' });
+            expect(events[0].detail).toStrictEqual({ id: undefined, active: 'b' });
         });
     });
 
@@ -283,6 +283,18 @@ describe('ArTabGroup', () => {
             el.querySelectorAll('ar-tab').forEach((tab) => {
                 expect(tab.getAttribute('slot')).toBe('tab');
             });
+        });
+    });
+
+    describe('detail avec id', () => {
+        it("ar-tab-group-change porte l'id posé par le consommateur", async () => {
+            el = await fixture(DEFAULT_HTML.replace('<ar-tab-group', '<ar-tab-group id="onglets"'));
+            await waitForUpdate(el);
+            const events: CustomEvent[] = [];
+            el.addEventListener('ar-tab-group-change', (e) => events.push(e as CustomEvent));
+            el.querySelector<HTMLElement>('ar-tab[panel="b"]')!.click();
+            await waitForUpdate(el);
+            expect(events[0].detail).toStrictEqual({ id: 'onglets', active: 'b' });
         });
     });
 });

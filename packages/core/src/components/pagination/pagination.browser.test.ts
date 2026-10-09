@@ -74,7 +74,7 @@ describe('ar-pagination — browser', () => {
             visibleNumber.click();
             await elementUpdated(el);
 
-            expect(detail).to.deep.equal({ from: 1, to: 3 });
+            expect(detail).to.deep.equal({ id: undefined, from: 1, to: 3 });
         });
     });
 

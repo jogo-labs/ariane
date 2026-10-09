@@ -7,9 +7,10 @@
  * Echec (exit 1) si une page est absente du dist/.
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unscopedSelectors } from '../../../scripts/starter-kit/scope-theme.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -38,6 +39,84 @@ for (const page of EXPECTED_PAGES) {
         hasError = true;
     } else {
         console.log(`✓ ${page}`);
+    }
+}
+
+const DOC_DEMO_THEME = join(DIST, 'themes', 'doc-demo.css');
+if (!existsSync(DOC_DEMO_THEME)) {
+    console.error('✗ Thème des démos manquant : themes/doc-demo.css');
+    hasError = true;
+} else {
+    const demoCss = readFileSync(DOC_DEMO_THEME, 'utf8');
+    if (!demoCss.includes('.doc-demo') || demoCss.includes(':root')) {
+        console.error('✗ themes/doc-demo.css doit être scopé sous .doc-demo (sans :root)');
+        hasError = true;
+    } else if (unscopedSelectors(demoCss, 'doc-demo').length > 0) {
+        console.error('✗ themes/doc-demo.css contient des sélecteurs hors .doc-demo :');
+        for (const selector of unscopedSelectors(demoCss, 'doc-demo')) {
+            console.error(`    ${selector}`);
+        }
+        hasError = true;
+    } else {
+        console.log('✓ themes/doc-demo.css');
+    }
+}
+
+// robots.txt et sitemap (#276) : le domaine principal est ariane-ui.com ; le sitemap ne doit
+// lister que des URL de ce domaine, et robots.txt doit le désigner.
+const SITE = 'https://ariane-ui.com';
+const ROBOTS = join(DIST, 'robots.txt');
+const SITEMAP_INDEX = join(DIST, 'sitemap-index.xml');
+const SITEMAP = join(DIST, 'sitemap-0.xml');
+if (!existsSync(ROBOTS) || !existsSync(SITEMAP_INDEX) || !existsSync(SITEMAP)) {
+    console.error('✗ robots.txt, sitemap-index.xml ou sitemap-0.xml manquant dans dist/');
+    hasError = true;
+} else {
+    const robots = readFileSync(ROBOTS, 'utf8');
+    const urls = [...readFileSync(SITEMAP, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+        (m) => m[1],
+    );
+    const problems = [];
+    if (!robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) {
+        problems.push(`robots.txt doit contenir « Sitemap: ${SITE}/sitemap-index.xml »`);
+    }
+    if (/^\s*Disallow:\s*\/\s*$/m.test(robots)) {
+        problems.push('robots.txt interdit tout le site (Disallow: /)');
+    }
+    const foreign = urls.filter((url) => !url.startsWith(`${SITE}/`));
+    if (foreign.length > 0) {
+        problems.push(`le sitemap liste des URL hors ${SITE} : ${foreign.slice(0, 3).join(', ')}`);
+    }
+    const missing = EXPECTED_PAGES.map(
+        (page) => `${SITE}/${page.replace(/index\.html$/, '')}`,
+    ).filter((url) => !urls.includes(url));
+    if (missing.length > 0) {
+        problems.push(`pages absentes du sitemap : ${missing.slice(0, 3).join(', ')}`);
+    }
+    // Balise canonique et Speed Insights : égale à l'URL du sitemap sur le build de production (VERCEL_ENV), absente
+    // ailleurs (preview noindex, build local)
+    const isProduction = process.env.VERCEL_ENV === 'production';
+    for (const url of urls) {
+        const file = join(DIST, url.slice(SITE.length), 'index.html');
+        const html = existsSync(file) ? readFileSync(file, 'utf8') : '';
+        const canonical = html.match(/<link rel="canonical" href="([^"]*)">/)?.[1];
+        // Speed Insights : mesures de performance remontées uniquement en production
+        if (html.includes('<vercel-speed-insights') !== isProduction) {
+            problems.push(
+                `Speed Insights ${isProduction ? 'absent du build de production' : 'présent hors production'} : ${url}`,
+            );
+        }
+        if (isProduction && canonical !== url) {
+            problems.push(`balise canonique absente ou différente de ${url}`);
+        } else if (!isProduction && canonical !== undefined) {
+            problems.push(`balise canonique hors build de production : ${url}`);
+        }
+    }
+    if (problems.length > 0) {
+        for (const problem of problems) console.error(`✗ ${problem}`);
+        hasError = true;
+    } else {
+        console.log(`✓ robots.txt et sitemap (${urls.length} URL)`);
     }
 }
 

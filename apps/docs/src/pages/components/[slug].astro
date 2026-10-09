@@ -90,9 +90,6 @@ const ownProps = (component.cssProperties ?? []).filter((p) => !p.name.startsWit
 
 const apiTocEntries = [
     { id: 'api-import', label: 'Import', level: 2 as const },
-    component['x-localized']
-        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
-        : null,
     component.attributes && component.attributes.length > 0
         ? { id: 'api-attributs', label: 'Attributs & Propriétés', level: 2 as const }
         : null,
@@ -113,6 +110,9 @@ const apiTocEntries = [
         : null,
     (ownProps.length > 0 || panelProps.length > 0 || relatedTokens.length > 0)
         ? { id: 'api-css-props', label: 'CSS Custom Properties', level: 2 as const }
+        : null,
+    component['x-localized']
+        ? { id: 'api-traduction', label: 'Traduction', level: 2 as const }
         : null,
 ].filter((entry) => entry !== null);
 
@@ -174,6 +174,14 @@ const tocEntries = [
 
             {pageDesc && <p class="summary">{pageDesc}</p>}
 
+            {/* ── Encart parent pour les sous-composants ── */}
+            {parentTag && (
+                <p class="parent-notice">
+                    Ce composant doit être utilisé en tant qu'enfant de <code>&lt;{parentTag}&gt;</code>.<br />
+                    Merci de voir la <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>documentation du composant {parentTag}</a> pour voir les exemples d'utilisation.
+                </p>
+            )}
+
             <ul class="meta">
                 <li>
                     <a href={sourceUrl} target="_blank" rel="noopener noreferrer">
@@ -190,14 +198,6 @@ const tocEntries = [
                     </a>
                 </li>
             </ul>
-
-            {/* ── Encart parent pour les sous-composants ── */}
-            {parentTag && (
-                <p class="parent-notice">
-                    Ce composant doit être utilisé en tant qu'enfant de <code>&lt;{parentTag}&gt;</code>.<br />
-                    Merci de voir la <a href={`/components/${parentTag.replace(/^ar-/, '')}`}>documentation du composant {parentTag}</a> pour voir les exemples d'utilisation.
-                </p>
-            )}
         </div>
 
         {/*

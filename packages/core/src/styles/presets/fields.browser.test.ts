@@ -49,6 +49,13 @@ describe('presets/fields.css', () => {
         return el;
     }
 
+    function inactiveBorder(): string {
+        const probe = document.createElement('div');
+        probe.style.borderTop = '1px solid var(--ar-input-inactive-border-color)';
+        container.appendChild(probe);
+        return getComputedStyle(probe).borderTopColor;
+    }
+
     function makeLabel(): HTMLLabelElement {
         const el = document.createElement('label');
         el.className = 'ar-label';
@@ -57,9 +64,42 @@ describe('presets/fields.css', () => {
         return el;
     }
 
-    it('ar-input consomme --ar-color-border', () => {
+    it('ar-input consomme --ar-color-border-strong', () => {
         const input = makeInput('input');
-        expect(roundColor(getComputedStyle(input).borderColor)).to.equal('oklch(0.9286 0.002 90)');
+        expect(roundColor(getComputedStyle(input).borderColor)).to.equal('oklch(0.6389 0.002 90)');
+    });
+
+    it('ar-input en lecture seule consomme --ar-input-inactive-border-color', () => {
+        const input = makeInput('input') as HTMLInputElement;
+        input.readOnly = true;
+        const border = getComputedStyle(input).borderColor;
+        expect(border).to.equal(inactiveBorder());
+        expect(roundColor(border)).not.to.equal('oklch(0.6389 0.002 90)');
+    });
+
+    it('ar-input désactivé consomme --ar-input-inactive-border-color', () => {
+        const input = makeInput('input') as HTMLInputElement;
+        input.disabled = true;
+        const border = getComputedStyle(input).borderColor;
+        expect(border).to.equal(inactiveBorder());
+        expect(roundColor(border)).not.to.equal('oklch(0.6389 0.002 90)');
+    });
+
+    it('ar-input[aria-disabled] consomme --ar-input-inactive-border-color', () => {
+        const input = makeInput('input');
+        input.setAttribute('aria-disabled', 'true');
+        const border = getComputedStyle(input).borderColor;
+        expect(border).to.equal(inactiveBorder());
+        expect(roundColor(border)).not.to.equal('oklch(0.6389 0.002 90)');
+    });
+
+    it("ar-input en lecture seule et invalide garde la bordure d'erreur", () => {
+        const input = makeInput('input') as HTMLInputElement;
+        input.readOnly = true;
+        input.setAttribute('aria-invalid', 'true');
+        expect(roundColor(getComputedStyle(input).borderColor)).to.equal(
+            'oklch(0.4827 0.158 25.74)',
+        );
     });
 
     it('ar-input consomme --ar-color-bg et --ar-color-text', () => {

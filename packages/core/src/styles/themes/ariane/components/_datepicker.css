@@ -35,7 +35,7 @@
     --ar-datepicker-nav-button-focus-ring-color: var(--ar-focus-ring-color);
 
     /* -- Footer du calendrier : boutons "Aujourd'hui" / "Fermer" -- */
-    --ar-datepicker-footer-button-border-color: var(--ar-color-border);
+    --ar-datepicker-footer-button-border-color: var(--ar-color-border-strong);
     --ar-datepicker-footer-button-focus-ring-color: var(--ar-focus-ring-color);
 
     /* -- Grille de jours : dimension de cellule + jours hors mois affiché -- */
@@ -192,7 +192,8 @@ ar-datepicker {
         height: var(--ar-button-height);
         box-sizing: border-box;
         padding: 0 0.75rem;
-        border: 1px solid var(--ar-input-border-color);
+        border-width: 1px;
+        border-style: solid;
         border-inline-end: none;
         border-start-start-radius: var(--ar-input-radius);
         border-end-start-radius: var(--ar-input-radius);
@@ -204,10 +205,17 @@ ar-datepicker {
         transition: border-color 0.15s ease;
     }
 
-    &::part(input):focus-visible {
-        outline: 2px solid var(--ar-input-focus-ring-color);
-        outline-offset: var(--ar-focus-ring-offset);
-        border-color: var(--ar-color-interactive);
+    /* Les règles de couleur de bordure du `::part(input)` ci-dessous (côté document)
+       l'emportent sur la règle d'erreur interne du composant, `:host([has-error])
+       [part~='input']` : elles excluent donc `:state(has-error)` au lieu de réénoncer la
+       couleur d'erreur. Un thème personnalisé qui fixe la couleur de bordure de l'input
+       doit faire de même. */
+    &:not(:state(has-error))::part(input) {
+        border-color: var(--ar-input-border-color);
+    }
+
+    &:not(:state(has-error))::part(input):read-only {
+        border-color: var(--ar-input-inactive-border-color);
     }
 
     &::part(input):read-only {
@@ -215,10 +223,26 @@ ar-datepicker {
         cursor: default;
     }
 
+    &:not(:state(has-error))::part(input):disabled {
+        border-color: var(--ar-input-inactive-border-color);
+    }
+
     &::part(input):disabled {
         color: var(--ar-input-disabled-color);
         background: var(--ar-input-disabled-bg);
         cursor: not-allowed;
+    }
+
+    &::part(input):focus-visible {
+        outline: 2px solid var(--ar-input-focus-ring-color);
+        outline-offset: var(--ar-focus-ring-offset);
+    }
+
+    /* Même spécificité que les règles read-only/disabled ci-dessus : l'ordre décide, le
+       focus l'emporte. En erreur, aucune couleur n'est posée ici : la bordure reste celle
+       de l'erreur et l'outline ci-dessus reste l'indicateur de focus. */
+    &:not(:state(has-error))::part(input):focus-visible {
+        border-color: var(--ar-color-interactive);
     }
 
     /* -- Champ texte : bouton d'ouverture du calendrier (icône) -- */

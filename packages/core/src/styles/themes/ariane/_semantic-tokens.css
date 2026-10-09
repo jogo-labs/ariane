@@ -99,6 +99,10 @@
 
     /* Bordure */
     --ar-color-border: light-dark(var(--ar-color-neutral-90), var(--ar-color-neutral-40));
+    /* Bordure de contrôle : la frontière d'un champ ou d'un bouton doit atteindre 3:1
+       (WCAG 1.4.11). Clair = neutral-50 (≈ 3,4:1 sur blanc) ; sombre = oklch(54% 0.002 90)
+       (≈ 3,3:1 sur vault, la surface de la page). */
+    --ar-color-border-strong: light-dark(var(--ar-color-neutral-50), oklch(54% 0.002 90));
 
     /* Focus */
     --ar-focus-ring-color: var(--ar-color-interactive);

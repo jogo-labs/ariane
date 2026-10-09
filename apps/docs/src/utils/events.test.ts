@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isCancelableEvent, stripCancelableMarker } from './events.js';
+import { eventDetailType, isCancelableEvent, stripCancelableMarker } from './events.js';
 
 describe('isCancelableEvent', () => {
     it('détecte le marqueur "@cancelable" en fin de description', () => {
@@ -42,5 +42,33 @@ describe('stripCancelableMarker', () => {
 
     it('retourne une chaîne vide pour une description undefined', () => {
         expect(stripCancelableMarker(undefined)).toBe('');
+    });
+});
+
+describe('eventDetailType', () => {
+    it('extrait le littéral du detail', () => {
+        expect(eventDetailType('CustomEvent<{ id: string | undefined, from: number }>')).toBe(
+            '{ id: string | undefined, from: number }',
+        );
+    });
+
+    it('conserve les génériques imbriqués', () => {
+        expect(eventDetailType('CustomEvent<{ ids: Array<string> }>')).toBe(
+            '{ ids: Array<string> }',
+        );
+    });
+
+    it('retourne null pour un CustomEvent nu', () => {
+        expect(eventDetailType('CustomEvent')).toBeNull();
+    });
+
+    it('retourne null pour un type absent, vide ou chevrons vides', () => {
+        expect(eventDetailType(undefined)).toBeNull();
+        expect(eventDetailType('')).toBeNull();
+        expect(eventDetailType('CustomEvent<>')).toBeNull();
+    });
+
+    it("retourne null pour un type qui n'est pas un CustomEvent", () => {
+        expect(eventDetailType('Event')).toBeNull();
     });
 });

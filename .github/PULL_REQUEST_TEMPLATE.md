@@ -17,6 +17,7 @@
 - [ ] Les tests passent (`npm run test`)
 - [ ] Si `packages/core/src` est modifié : `npm run test:browser` passe en local sur Chromium, Firefox et WebKit (WebKit n'est pas en CI)
 - [ ] Le CEM a été régénéré si un composant a été modifié (`npm run build:manifest`)
+- [ ] Si l'API publique, un comportement ou une règle d'usage change : `packages/core/scripts/skill/content/` est à jour (voir `CLAUDE.md`)
 - [ ] Les changements ont été testés visuellement dans la doc si applicable
 
 ## Issue liée

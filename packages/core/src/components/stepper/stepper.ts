@@ -18,11 +18,12 @@ import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import '../../translations/fr.js';
 import '../../translations/en.js';
 
 /** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
-export interface ArStepperStepChangeDetail {
+export interface ArStepperStepChangeDetail extends ArEventDetail {
     /**
      * Chemin de l'étape courante avant la transition. Peut être `''` si le stepper
      * est monté sans `current-path` initial et que `currentPath` est assigné pour la
@@ -73,10 +74,10 @@ export interface ArStepperStepChangeDetail {
  *
  * @cssState open - Le panel mobile est ouvert.
  *
- * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-change - Émis avant le
+ * @event {CustomEvent<{ id: string | undefined, from: string, to: string }>} ar-stepper-step-change - Émis avant le
  *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
  *   `currentPath` ne change pas. Contient `from` et `to`. @cancelable
- * @event {CustomEvent<{ from: string, to: string }>} ar-stepper-step-changed - Émis quand
+ * @event {CustomEvent<{ id: string | undefined, from: string, to: string }>} ar-stepper-step-changed - Émis quand
  *   `currentPath` a réellement changé (réassignation externe en réponse à
  *   `ar-stepper-step-change`, ou via `follow-scroll`). Non annulable. Contient `from` et `to`.
  *
@@ -88,7 +89,7 @@ export class ArStepper extends ArianeElement {
     private readonly localize = new LocalizeController(this);
 
     /**
-     * Chemin de l'étape courante. Doit correspondre au `href` d'un `<ar-stepper-item>`.
+     * Chemin de l'étape courante. Doit correspondre au `path` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
      */
     @property({ type: String, attribute: 'current-path', reflect: true })
@@ -479,14 +480,8 @@ export class ArStepper extends ArianeElement {
         return this.navigation.tree.flatMap((step) => step.children.map((sub) => sub.path));
     }
 
-    private _emitChanged(detail: ArStepperStepChangeDetail): void {
-        this.dispatchEvent(
-            new CustomEvent<ArStepperStepChangeDetail>('ar-stepper-step-changed', {
-                bubbles: true,
-                composed: true,
-                detail,
-            }),
-        );
+    private _emitChanged(detail: Omit<ArStepperStepChangeDetail, 'id'>): void {
+        emitEvent(this, 'ar-stepper-step-changed', { detail });
     }
 
     // ── Events ───────────────────────────────────────────────────────────────
@@ -494,16 +489,10 @@ export class ArStepper extends ArianeElement {
     private onItemActivated(item: ArStepperItem, event: MouseEvent): void {
         this._pendingFocusPath = item.path;
 
-        const detail: ArStepperStepChangeDetail = { from: this.currentPath, to: item.path };
-
-        const proceed = this.dispatchEvent(
-            new CustomEvent('ar-stepper-step-change', {
-                bubbles: true,
-                composed: true,
-                cancelable: true,
-                detail,
-            }),
-        );
+        const proceed = !emitEvent(this, 'ar-stepper-step-change', {
+            cancelable: true,
+            detail: { from: this.currentPath, to: item.path },
+        }).defaultPrevented;
         if (!proceed) {
             this._pendingFocusPath = undefined;
             event.preventDefault();

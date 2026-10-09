@@ -22,33 +22,57 @@ npm install
 
 ## Commandes racine
 
-| Commande                  | Description                                       |
-| ------------------------- | ------------------------------------------------- |
-| `npm run dev`             | Watch core + docs en parallèle (pré-build le CEM) |
-| `npm run build`           | Build complet (core + docs)                       |
-| `npm run test`            | Tests unitaires Vitest                            |
-| `npm run test:all`        | Tests unitaires + tests browser (Vitest + WTR)    |
-| `npm run lint`            | ESLint sur tous les packages                      |
-| `npm run format`          | Prettier sur tous les fichiers                    |
-| `npm run create ar-<nom>` | Scaffold un nouveau composant                     |
+| Commande                        | Description                                                                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run dev`                   | Watch core + docs en parallèle (pré-build le CEM)                                                                                                            |
+| `npm run build`                 | Build complet (core + docs)                                                                                                                                  |
+| `npm run test`                  | Tests unitaires Vitest                                                                                                                                       |
+| `npm run test:all`              | Tests unitaires + tests browser (Vitest + WTR)                                                                                                               |
+| `npm run lint`                  | ESLint sur tous les packages                                                                                                                                 |
+| `npm run format`                | Prettier sur tous les fichiers                                                                                                                               |
+| `npm run create ar-<nom>`       | Scaffold un nouveau composant                                                                                                                                |
+| `npm run generate:starter-demo` | Régénère le Kitchen Sink et le thème du starter-kit dans un checkout (`-- --repo <chemin>`), à lancer quand un composant a changé depuis la dernière release |
+| `npm run demo:starter-kit`      | Construit le core puis sert le Kitchen Sink en local (génération à blanc), pour le relire avant de le pousser                                                |
+| `npm run test:starter-kit`      | Vitest sur `scripts/starter-kit` (génération du thème et du Kitchen Sink)                                                                                    |
+| `npm run changelog`             | Écrit la section de la prochaine release dans `CHANGELOG.md`, sur la branche de release après le bump                                                        |
+| `npm run test:changelog`        | Vitest sur `scripts/changelog`                                                                                                                               |
 
 ## Commandes par workspace
 
 ### `packages/core`
 
-| Commande                     | Description                                                  |
-| ---------------------------- | ------------------------------------------------------------ |
-| `npm run build:manifest`     | Génère `custom-elements.json`                                |
-| `npm run build:bundles`      | esbuild → `dist/` + `cdn/*.js` (prod) + `cdn/*.dev.js`       |
-| `npm run build:bundles:dev`  | npm + CDN dev (`*.dev.js`) uniquement (plus rapide en local) |
-| `npm run build:bundles:prod` | npm + CDN prod uniquement                                    |
-| `npm run build:css`          | Thèmes CSS                                                   |
-| `npm run build:types`        | Déclarations TypeScript                                      |
-| `npm run test`               | Vitest, passe unique                                         |
-| `npm run test:watch`         | Vitest interactif                                            |
-| `npm run test:coverage`      | Vitest avec rapport de couverture                            |
-| `npm run test:browser`       | @web/test-runner + Chromium, Firefox, WebKit                 |
-| `npm run lint`               | ESLint                                                       |
+| Commande                     | Description                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `npm run build:dev`          | CSS, manifeste, bundles dev et types, sans la skill ni les contrôles (utilisé par `npm run dev`) |
+| `npm run build:manifest`     | Génère `custom-elements.json`                                                                    |
+| `npm run build:bundles`      | esbuild → `dist/` + `cdn/*.js` (prod) + `cdn/*.dev.js`                                           |
+| `npm run build:bundles:dev`  | npm + CDN dev (`*.dev.js`) uniquement (plus rapide en local)                                     |
+| `npm run build:bundles:prod` | npm + CDN prod uniquement                                                                        |
+| `npm run check:cdn`          | Vérifie les bundles CDN produits (à lancer après `build:bundles`)                                |
+| `npm run build:skill`        | Régénère `skills/ariane` et `llms/` depuis `scripts/skill/content` et le manifeste               |
+| `npm run check:skill`        | Échoue si un composant manque dans la skill ou les listes des README (inclus dans `build`)       |
+| `npm run build:css`          | Thèmes CSS                                                                                       |
+| `npm run build:types`        | Déclarations TypeScript                                                                          |
+| `npm run test`               | Vitest, passe unique                                                                             |
+| `npm run test:watch`         | Vitest interactif                                                                                |
+| `npm run test:coverage`      | Vitest avec rapport de couverture                                                                |
+| `npm run test:browser`       | @web/test-runner + Chromium, Firefox, WebKit                                                     |
+| `npm run lint`               | ESLint                                                                                           |
+
+### `apps/docs`
+
+| Commande             | Description                                                                |
+| -------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`        | Serveur de développement Astro (vérifie d'abord le manifeste via `predev`) |
+| `npm run build`      | Build du site statique                                                     |
+| `npm run lint`       | `astro check`                                                              |
+| `npm run test`       | Vitest, passe unique                                                       |
+| `npm run test:build` | Contrôle le site construit (à lancer après `npm run build`)                |
+| `npm run test:a11y`  | Tests Playwright d'accessibilité et de rendu du site                       |
+
+### Thème du starter-kit
+
+`npm run generate:starter-demo` régénère le Kitchen Sink du [starter-kit](https://github.com/jogo-labs/ariane-starter-kit) et copie dans le starter-kit `scripts/theme-to-js.js` et `package.json` ; le starter-kit y gagne `npm run build:js`, qui produit `ariane-starter.js` (un `CSSStyleSheet` à adopter dans un shadow DOM). Avec `-- --repo <checkout>`, la commande écrit dans le checkout frère du starter-kit et y fait un commit git LOCAL (elle ne pousse jamais). Avec `--dry-run`, elle écrit dans un répertoire temporaire sans aucune opération git (utilisé par `demo:starter-kit` et la CI). Le thème des démos de la documentation est, lui, généré à chaque `npm run dev` ou `build` du site (`/themes/doc-demo.css`) depuis les sources du thème.
 
 ---
 
@@ -56,12 +80,14 @@ npm install
 
 ```text
 packages/core/src/
-  components/   # Un répertoire par composant (ex: button/, stepper/)
+  components/   # Un répertoire par composant (ex: alert/, stepper/)
   controllers/  # Lit ReactiveControllers réutilisables
   context/      # @lit/context providers (communication parent-enfant)
+  internal/     # defineComponent et utilitaires internes
   state/        # Moteurs de calcul d'état purs
   styles/       # CSS partagé (reset, utilitaires, animations, thèmes)
   types/        # Interfaces TypeScript
+  utils/        # Utilitaires publics (@ariane-ui/core/utils)
   index.ts      # Export barrel
 apps/docs/      # Site de documentation Astro
 ```
@@ -248,15 +274,17 @@ describe('ArAlert a11y', () => {
 
 ## Build outputs
 
-| Répertoire                  | Usage                                                           |
-| --------------------------- | --------------------------------------------------------------- |
-| `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking |
-| `cdn/index.js`              | Bundle CDN prod — minifié, avertissements supprimés             |
-| `cdn/autoloader.js`         | Autoloader CDN prod                                             |
-| `cdn/index.dev.js`          | Bundle CDN dev — non minifié, avertissements actifs             |
-| `cdn/autoloader.dev.js`     | Autoloader CDN dev                                              |
-| `dist/custom-elements.json` | Manifest CEM — consommé par la doc                              |
-| `dist/styles/themes/`       | Fichiers CSS de thème                                           |
+| Répertoire                  | Usage                                                               |
+| --------------------------- | ------------------------------------------------------------------- |
+| `dist/`                     | Bundle npm — Lit en dépendance externe, compatible tree-shaking     |
+| `cdn/index.js`              | Bundle CDN prod — minifié, avertissements supprimés                 |
+| `cdn/autoloader.js`         | Autoloader CDN prod                                                 |
+| `cdn/index.dev.js`          | Bundle CDN dev — non minifié, avertissements actifs                 |
+| `cdn/autoloader.dev.js`     | Autoloader CDN dev                                                  |
+| `cdn/utils.js`              | Utilitaires purs CDN prod (`whenAllDefined`, `registerTranslation`) |
+| `cdn/utils.dev.js`          | Utilitaires purs CDN dev                                            |
+| `dist/custom-elements.json` | Manifest CEM — consommé par la doc                                  |
+| `dist/styles/themes/`       | Fichiers CSS de thème                                               |
 
 ### Constante `__DEV__`
 

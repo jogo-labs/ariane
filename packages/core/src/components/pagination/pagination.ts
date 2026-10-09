@@ -11,6 +11,7 @@ import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import '../../translations/fr.js';
 import '../../translations/en.js';
 
@@ -21,7 +22,7 @@ export class ArPaginationConfig {
 }
 
 /** Détail de l'événement émis lors d'un changement de page */
-export interface ArPaginationPageChangeDetail {
+export interface ArPaginationPageChangeDetail extends ArEventDetail {
     /** Numéro de la page précédente */
     from: number;
     /** Numéro de la nouvelle page */
@@ -70,11 +71,11 @@ export interface ArPaginationPageChangeDetail {
  * @cssprop --ar-pagination-button-size - Hauteur et largeur minimales des boutons/pages (repli interne `2.5rem`, WCAG 2.5.8).
  * @cssprop --ar-pagination-transition-duration - Durée de la transition (fond/couleur) au survol/pressé/focus de prev/next/page.
  *
- * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-change - Émis avant le
+ * @event {CustomEvent<{ id: string | undefined, from: number, to: number }>} ar-pagination-page-change - Émis avant le
  *   changement de page, à chaque interaction (clic page, précédent, suivant, sélection dans le
  *   `<select>` mobile). Annulable via `preventDefault()` : bloque l'interaction, `current` ne
  *   change pas. Contient `from` et `to`. @cancelable
- * @event {CustomEvent<{from: number, to: number}>} ar-pagination-page-changed - Émis quand
+ * @event {CustomEvent<{ id: string | undefined, from: number, to: number }>} ar-pagination-page-changed - Émis quand
  *   `current` a réellement changé (réassignation externe en réponse à `ar-pagination-page-change`,
  *   ou set programmatique indépendant). Non annulable. Contient `from` et `to`.
  *
@@ -542,24 +543,14 @@ export class ArPagination extends ArianeElement {
      */
     private _requestPageChange(to: number): boolean {
         const from = this.current;
-        return this.dispatchEvent(
-            new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-change', {
-                bubbles: true,
-                composed: true,
-                cancelable: true,
-                detail: { from, to },
-            }),
-        );
+        return !emitEvent(this, 'ar-pagination-page-change', {
+            cancelable: true,
+            detail: { from, to },
+        }).defaultPrevented;
     }
 
-    private _emitChanged(detail: ArPaginationPageChangeDetail): void {
-        this.dispatchEvent(
-            new CustomEvent<ArPaginationPageChangeDetail>('ar-pagination-page-changed', {
-                bubbles: true,
-                composed: true,
-                detail,
-            }),
-        );
+    private _emitChanged(detail: Omit<ArPaginationPageChangeDetail, 'id'>): void {
+        emitEvent(this, 'ar-pagination-page-changed', { detail });
     }
 
     private _announcePageChange(): void {

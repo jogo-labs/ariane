@@ -7,7 +7,7 @@
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
 import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
-import { isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
+import { eventDetailType, isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
 import { isStatePart } from '../utils/state-parts.ts';
@@ -114,27 +114,6 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
         </ar-tab-group>
     </section>
 
-    {/* ── Traduction ── */}
-    {component['x-localized'] && (
-        <section>
-            <div class="subsection-title-row">
-                <h4 id="api-traduction" class="subsection-title">Traduction</h4>
-                <HeadingAnchor id="api-traduction" label="Traduction" />
-            </div>
-            <p>
-                La langue de ce composant suit l'attribut <code>lang</code> de la page
-                (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
-                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
-                page <a href="/getting-started/traductions">Traductions</a> pour le détail du
-                mécanisme et la liste des traductions disponibles.
-            </p>
-            <p>
-                <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
-                « Attributs &amp; Propriétés ».
-            </p>
-        </section>
-    )}
-
     {/* ── Utilisation : API de configuration/pilotage (#233) ── */}
     {usageCategories.length > 0 && (
         <section>
@@ -195,16 +174,22 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     <ar-tab-panel name="evenements">
                         <h4 id="api-evenements" class="sr-only">Événements</h4>
                         <div class="api-list" role="list">
-                            {component.events.map((event, i) => (
-                                <div class="api-row" role="listitem">
-                                    <span class="sr-only">{i + 1} sur {component.events!.length}</span>
-                                    <span class="api-name">
-                                        {event.name}
-                                        {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
-                                    </span>
-                                    <p class="api-desc">{stripCancelableMarker(event.description)}</p>
-                                </div>
-                            ))}
+                            {component.events.map((event, i) => {
+                                const detailType = eventDetailType(event.type?.text);
+                                return (
+                                    <div class="api-row" role="listitem">
+                                        <span class="sr-only">{i + 1} sur {component.events!.length}</span>
+                                        <div>
+                                            <span class="api-name">
+                                                {event.name}
+                                                {isCancelableEvent(event.description) && <span class="flag">annulable</span>}
+                                            </span>
+                                            {detailType && <code class="api-sig">detail&nbsp;: {detailType}</code>}
+                                        </div>
+                                        <p class="api-desc">{stripCancelableMarker(event.description)}</p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </ar-tab-panel>
                 )}
@@ -359,6 +344,27 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     </ar-tab-panel>
                 )}
             </ar-tab-group>
+        </section>
+    )}
+
+    {/* ── Traduction ── */}
+    {component['x-localized'] && (
+        <section>
+            <div class="subsection-title-row">
+                <h4 id="api-traduction" class="subsection-title">Traduction</h4>
+                <HeadingAnchor id="api-traduction" label="Traduction" />
+            </div>
+            <p>
+                La langue de ce composant suit l'attribut <code>lang</code> de la page
+                (<code>&lt;html lang&gt;</code>).<br /> Vous pouvez appliquer une langue différente à une
+                instance donnée en posant l'attribut <code>lang</code> directement dessus.<br /> Voir la
+                page <a href="/getting-started/traductions">Traductions</a> pour le détail du
+                mécanisme et la liste des traductions disponibles.
+            </p>
+            <p>
+                <code>lang</code> étant un attribut HTML natif, il n'apparaît pas dans le tableau
+                « Attributs &amp; Propriétés ».
+            </p>
         </section>
     )}
 </div>

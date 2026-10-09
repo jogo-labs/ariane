@@ -8,6 +8,7 @@ import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 // fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
@@ -62,7 +63,7 @@ if (typeof document !== 'undefined') {
  * @csspart body - La zone de contenu principale.
  * @csspart footer - La zone d'actions (absente du DOM si slot non utilisé).
  *
- * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur les tailles prédéfinies pour une règle au moins aussi spécifique que `[size='...']` (ex. `ar-dialog[size='sm']`) — un simple `ar-dialog { }` est moins spécifique et perd face au preset de thème quand `size` est défini.
+ * @cssprop --ar-dialog-width - Largeur du dialog. Prend le pas sur la largeur d'une taille prédéfinie (`size`) tant que la règle qui la pose l'emporte dans la cascade (spécificité, ordre, couches `@layer`) sur celle qui définit cette taille.
  * @cssprop --ar-dialog-spacing - Padding interne (block et inline) de la zone de contenu.
  * @cssprop --ar-dialog-spacing-block - Padding haut/bas. Prend le pas sur `--ar-dialog-spacing` si défini.
  * @cssprop --ar-dialog-spacing-inline - Padding gauche/droite. Prend le pas sur `--ar-dialog-spacing` si défini.
@@ -75,16 +76,16 @@ if (typeof document !== 'undefined') {
  *
  * @cssState open - Le dialog est ouvert.
  *
- * @event {CustomEvent} ar-dialog-show - Émis avant l'ouverture. @cancelable
- * @event {CustomEvent} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
- * @event {CustomEvent} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
- * @event {CustomEvent} ar-dialog-hide - Émis avant la fermeture. @cancelable
- * @event {CustomEvent} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
- * @event {CustomEvent} ar-dialog-hidden - Émis après la fermeture (après animation).
- * @event {CustomEvent} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
- * @event {CustomEvent} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
- * @event {CustomEvent} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
- * @event {CustomEvent} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show - Émis avant l'ouverture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide - Émis avant la fermeture. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hidden - Émis après la fermeture (après animation).
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
  *
  * @tagname ar-dialog
  */
@@ -135,9 +136,9 @@ export class ArDialog extends ArianeElement {
     /**
      * Taille du dialog. Les paliers `sm`/`lg`/`xl` sont définis par le thème —
      * sans thème chargé, seule la taille par défaut du composant s'applique.
-     * Utilisez `--ar-dialog-width` pour une valeur personnalisée. Un `ar-dialog { }` non qualifié
-     * doit néanmoins être au moins aussi spécifique que `[size='...']` (ou utiliser `!important`,
-     * ou omettre `size`) pour l'emporter de façon fiable sur un palier de thème.
+     * Utilisez `--ar-dialog-width` pour une valeur personnalisée : elle prend le pas sur le palier
+     * tant que la règle qui la pose l'emporte dans la cascade (spécificité, ordre, couches
+     * `@layer`) sur celle qui définit le palier.
      */
     @property({ reflect: true, type: String })
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
@@ -355,15 +356,8 @@ export class ArDialog extends ArianeElement {
 
     // ── Events ─────────────────────────────────────────────────────────────────
 
-    private _emit(name: ArDialogEvents): CustomEvent {
-        const e = new CustomEvent(name, {
-            bubbles: true,
-            composed: true,
-            cancelable: true,
-            detail: { id: this.id || undefined },
-        });
-        this.dispatchEvent(e);
-        return e;
+    private _emit(name: ArDialogEvents): CustomEvent<ArEventDetail> {
+        return emitEvent(this, name, { cancelable: true });
     }
 
     private _announcePrevented(): void {
