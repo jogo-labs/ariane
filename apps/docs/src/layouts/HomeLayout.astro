@@ -229,5 +229,11 @@ const { title, description = 'Accessible web components library' } = Astro.props
                 <slot />
             </main>
         </div>
+
+        <!-- Vercel Speed Insights -->
+        <script is:inline>
+            window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+        </script>
+        <script is:inline defer src="/_vercel/speed-insights/script.js"></script>
     </body>
 </html>
