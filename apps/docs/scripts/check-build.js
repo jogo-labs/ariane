@@ -93,12 +93,17 @@ if (!existsSync(ROBOTS) || !existsSync(SITEMAP_INDEX) || !existsSync(SITEMAP)) {
     if (missing.length > 0) {
         problems.push(`pages absentes du sitemap : ${missing.slice(0, 3).join(', ')}`);
     }
-    // Chaque page a une balise canonique égale à son URL du sitemap (domaine unique indexé)
+    // Balise canonique : égale à l'URL du sitemap sur le build de production (VERCEL_ENV), absente
+    // ailleurs (preview noindex, build local)
+    const isProduction = process.env.VERCEL_ENV === 'production';
     for (const url of urls) {
         const file = join(DIST, url.slice(SITE.length), 'index.html');
         const html = existsSync(file) ? readFileSync(file, 'utf8') : '';
-        if (!html.includes(`<link rel="canonical" href="${url}">`)) {
+        const canonical = html.match(/<link rel="canonical" href="([^"]*)">/)?.[1];
+        if (isProduction && canonical !== url) {
             problems.push(`balise canonique absente ou différente de ${url}`);
+        } else if (!isProduction && canonical !== undefined) {
+            problems.push(`balise canonique hors build de production : ${url}`);
         }
     }
     if (problems.length > 0) {

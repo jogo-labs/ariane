@@ -19,8 +19,12 @@ const {
     showToc = false,
 } = Astro.props;
 
-// URL canonique : un seul domaine indexé, même si la page est servie ailleurs
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+// URL canonique, uniquement sur le build de production : les déploiements preview (dont
+// next.ariane-ui.com) sont en noindex et ne doivent pas désigner une page de la production
+const canonicalUrl =
+    process.env.VERCEL_ENV === 'production'
+        ? new URL(Astro.url.pathname, Astro.site).href
+        : undefined;
 ---
 
 <!doctype html>
@@ -30,7 +34,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
-        <link rel="canonical" href={canonicalUrl} />
+        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
         <!-- Bunny Fonts (pas Google Fonts) : même API css2, un seul host
              (pas de séparation css/statique type gstatic), sans tracking
