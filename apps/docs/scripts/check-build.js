@@ -93,6 +93,14 @@ if (!existsSync(ROBOTS) || !existsSync(SITEMAP_INDEX) || !existsSync(SITEMAP)) {
     if (missing.length > 0) {
         problems.push(`pages absentes du sitemap : ${missing.slice(0, 3).join(', ')}`);
     }
+    // Chaque page a une balise canonique égale à son URL du sitemap (domaine unique indexé)
+    for (const url of urls) {
+        const file = join(DIST, url.slice(SITE.length), 'index.html');
+        const html = existsSync(file) ? readFileSync(file, 'utf8') : '';
+        if (!html.includes(`<link rel="canonical" href="${url}">`)) {
+            problems.push(`balise canonique absente ou différente de ${url}`);
+        }
+    }
     if (problems.length > 0) {
         for (const problem of problems) console.error(`✗ ${problem}`);
         hasError = true;

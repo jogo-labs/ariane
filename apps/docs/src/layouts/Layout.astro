@@ -18,6 +18,9 @@ const {
     showNav = true,
     showToc = false,
 } = Astro.props;
+
+// URL canonique : un seul domaine indexé, même si la page est servie ailleurs
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
@@ -27,6 +30,7 @@ const {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content={description} />
         <title>{title} — {rootPkg.config.displayName}</title>
+        <link rel="canonical" href={canonicalUrl} />
 
         <!-- Bunny Fonts (pas Google Fonts) : même API css2, un seul host
              (pas de séparation css/statique type gstatic), sans tracking
