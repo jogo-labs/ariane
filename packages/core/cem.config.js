@@ -112,6 +112,12 @@ export default {
                 });
             },
             packageLinkPhase({ customElementsManifest }) {
+                // L'analyzer produit les modules dans un ordre qui varie d'un run à l'autre
+                // (analyse asynchrone des fichiers) : sans tri, `custom-elements.json` et les
+                // données VS Code qui en dérivent changent à chaque build, à contenu identique.
+                // Premier plugin déclaré, donc avant celui de VS Code.
+                customElementsManifest.modules?.sort((a, b) => (a.path < b.path ? -1 : 1));
+
                 // Un mini custom element interne marqué @internal (convention TSDoc déjà
                 // reconnue nativement par l'analyzer, cf. hasIgnoreJSDoc dans son propre code —
                 // rien à coder côté projet pour ça) voit sa déclaration et son export `js`
