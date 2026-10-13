@@ -6,9 +6,6 @@ import animationsStyles from '../../styles/animations.styles.js';
 import styles from './spinner.styles.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/en.js';
-import '../../translations/fr.js';
 
 /**
  * @summary Indique qu'une opération est en cours quand sa durée est inconnue. À utiliser pour un état de chargement là où une barre de progression déterminée n'est pas pertinente.

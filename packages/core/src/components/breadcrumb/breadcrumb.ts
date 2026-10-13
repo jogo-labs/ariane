@@ -13,9 +13,6 @@ import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/en.js';
-import '../../translations/fr.js';
 
 /**
  * @summary Affiche un fil de liens qui montre à l'utilisateur sa position dans la hiérarchie du site, avec un affichage adapté au mobile et au desktop.

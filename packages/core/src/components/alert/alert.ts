@@ -5,10 +5,7 @@ import { prefersReducedMotion } from '../../utils/media.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import { emitEvent } from '../../utils/emit-event.js';
-import '../../translations/en.js';
-import '../../translations/fr.js';
 
 /** Objet de configuration d'un webcomposant ArAlert */
 export class ArAlertConfig {

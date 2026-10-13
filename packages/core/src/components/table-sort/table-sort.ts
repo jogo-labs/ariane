@@ -6,9 +6,6 @@ import { warn } from '../../utils/warn.js';
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/en.js';
-import '../../translations/fr.js';
 import { defineInternalTooltip } from '../../internal/tooltip-internal.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';

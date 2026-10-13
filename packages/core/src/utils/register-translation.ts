@@ -1,5 +1,4 @@
-import '../translations/en.js';
-import '../translations/fr.js';
+import '../translations/built-in.js';
 import { registerTranslation as register } from '@shoelace-style/localize';
 import type { Translation } from '../types/translation.js';
 

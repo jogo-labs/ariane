@@ -11,9 +11,6 @@ import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
-// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/en.js';
-import '../../translations/fr.js';
 
 /** Détail des événements `ar-datepicker-input-change` et `ar-datepicker-input-complete` */
 export interface ArDatepickerInputDetail extends ArEventDetail {
