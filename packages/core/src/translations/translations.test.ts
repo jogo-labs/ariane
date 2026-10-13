@@ -202,4 +202,9 @@ describe('traductions', () => {
         expect(fr.closeAlert).toBe("Fermer l'alerte");
         expect(en.closeAlert).toBe('Close alert');
     });
+
+    it('fr et en fournissent validationValueMissing', () => {
+        expect(fr.validationValueMissing).toBe('Veuillez renseigner ce champ.');
+        expect(en.validationValueMissing).toBe('Please fill out this field.');
+    });
 });

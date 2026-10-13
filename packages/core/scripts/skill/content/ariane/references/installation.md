@@ -52,7 +52,7 @@ npm install @ariane-ui/core
 | `import { whenAllDefined, registerTranslation } from '@ariane-ui/core/utils';` | Code pur, sans enregistrer de composant ni embarquer les composants                                   |
 
 - Le sous-chemin `/dist/*` est exporté par le paquet : l'import par composant passe par lui.
-- Dans un contexte headless, importer `whenAllDefined` et `registerTranslation` depuis `@ariane-ui/core/utils` et non depuis le barrel : le barrel enregistre les `ar-*`. Ordre de grandeur mesuré (minifié) : environ 1 Ko via `/utils` contre environ 200 Ko via le barrel.
+- Dans un contexte headless, importer `whenAllDefined` et `registerTranslation` depuis `@ariane-ui/core/utils` et non depuis le barrel : le barrel enregistre les `ar-*`. Ordre de grandeur mesuré (minifié) : environ 5,4 Ko via `/utils` (il embarque les traductions `fr` et `en` intégrées) contre environ 200 Ko via le barrel.
 - Le paquet n'a pas de champ `sideEffects` : `import '@ariane-ui/core'` n'est jamais supprimé par le tree-shaking.
 - CDN : `cdn/utils.js` (production) et `cdn/utils.dev.js` (développement) exportent `whenAllDefined` et `registerTranslation` sans enregistrer de composant. Ils partagent le registre des traductions avec l'autoloader et le bundle complet de la même variante : associer `utils.js` à `autoloader.js`/`index.js`, `utils.dev.js` à `autoloader.dev.js`/`index.dev.js`.
 - Autres exports : `@ariane-ui/core/themes/*.css` (thème de la documentation d'Ariane, interne, sans garantie de stabilité : ne pas charger ni recommander ; partir du starter-kit), `@ariane-ui/core/presets/*.css`, `@ariane-ui/core/custom-elements.json`.

@@ -17,10 +17,7 @@ import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 /** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail extends ArEventDetail {
