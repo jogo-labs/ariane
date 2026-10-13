@@ -49,6 +49,29 @@ describe('cdn/utils.js (production)', () => {
         el.remove();
     });
 
+    it('une traduction partielle se replie, terme par terme, sur le français intégré', async () => {
+        utils.registerTranslation({
+            $code: 'zy',
+            $name: 'Test partiel',
+            $dir: 'ltr',
+            loading: 'Partiel',
+        });
+        await import('../cdn/autoloader.js');
+
+        const el = document.createElement('ar-spinner');
+        el.setAttribute('lang', 'zy');
+        el.setAttribute('done', '');
+        document.body.appendChild(el);
+        await customElements.whenDefined('ar-spinner');
+        await (el as unknown as { updateComplete: Promise<boolean> }).updateComplete;
+
+        // `loadingDone` est absent de la traduction `zy` : repli sur le français intégré.
+        expect(el.shadowRoot?.querySelector('[part="status"] p')?.textContent).to.equal(
+            'Chargement terminé',
+        );
+        el.remove();
+    });
+
     it('partage les fonctions (et le registre) avec cdn/index.js', async () => {
         const index = await import('../cdn/index.js');
         expect(utils.registerTranslation).to.equal(index.registerTranslation);
