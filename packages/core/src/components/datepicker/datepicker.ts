@@ -254,7 +254,10 @@ export class ArDatepicker extends ArianeFormElement {
             changed.has('value') ||
             changed.has('required') ||
             changed.has('disabled') ||
-            (changed as Map<PropertyKey, unknown>).has('_formDisabled')
+            (changed as Map<PropertyKey, unknown>).has('_formDisabled') ||
+            // Le message de validité est localisé : un changement de lang (mise à jour sans
+            // propriété modifiée) doit le recalculer tant que le champ est obligatoire et vide.
+            (this.required && !this.value)
         ) {
             this._syncFormValue();
         }
@@ -899,7 +902,7 @@ export class ArDatepicker extends ArianeFormElement {
             const anchor = this._input ?? undefined;
             this.internals?.setValidity(
                 { valueMissing: true },
-                'Veuillez sélectionner une date.',
+                this.localize.term('validationValueMissing'),
                 anchor,
             );
         } else {
