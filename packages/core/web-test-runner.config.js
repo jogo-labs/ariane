@@ -4,6 +4,38 @@ import { esbuildPlugin } from '@web/dev-server-esbuild';
 const ALL_BROWSERS = process.env.CI ? ['chromium', 'firefox'] : ['chromium', 'firefox', 'webkit'];
 const BROWSERS = process.env.ARIANE_BROWSERS?.split(',') ?? ALL_BROWSERS;
 
+/**
+ * Commande `ax-role` : rôle calculé de l'arbre d'accessibilité réel (CDP, Chromium seulement).
+ * `ariaSnapshot` de Playwright est calculé depuis le DOM et ne voit pas `ElementInternals.role` ;
+ * `page.accessibility` n'existe plus. Renvoie `null` hors Chromium.
+ */
+function axRolePlugin() {
+    return {
+        name: 'ax-role',
+        async executeCommand({ command, payload, session }) {
+            if (command !== 'ax-role') return undefined;
+            const page = session.browser.getPage(session.id);
+            if (page.context().browser()?.browserType().name() !== 'chromium') return null;
+            const cdp = await page.context().newCDPSession(page);
+            try {
+                const { root } = await cdp.send('DOM.getDocument');
+                const { nodeId } = await cdp.send('DOM.querySelector', {
+                    nodeId: root.nodeId,
+                    selector: payload.selector,
+                });
+                const { nodes } = await cdp.send('Accessibility.getPartialAXTree', {
+                    nodeId,
+                    fetchRelatives: false,
+                });
+                const node = nodes[0];
+                return { role: node?.role?.value ?? null, ignored: Boolean(node?.ignored) };
+            } finally {
+                await cdp.detach();
+            }
+        },
+    };
+}
+
 export default {
     // Fichiers de test browser — séparés des tests Vitest (.test.ts)
     // *.browser.test.ts : tests d'intégration (shadow DOM, MutationObserver…)
@@ -53,6 +85,7 @@ export default {
     // (qui étend tsconfig.base.json) ne suffit pas.
     plugins: [
         esbuildPlugin({ ts: true, tsconfig: './tsconfig.wtr.json', define: { __DEV__: 'true' } }),
+        axRolePlugin(),
     ],
 
     nodeResolve: true,
