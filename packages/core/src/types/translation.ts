@@ -11,7 +11,7 @@ import type { TableSortType, TableSortOrder } from '../components/table-sort/tab
  * Exigeant : tout terme ajouté dans une version ultérieure devient une erreur de compilation
  * pour qui type sa traduction avec `FullTranslation`. À choisir pour que le compilateur
  * garantisse une traduction complète ; sinon utiliser `Translation`, qui tolère les termes absents
- * (le terme manquant s'affiche alors en français).
+ * (le terme manquant se replie sur la langue de base, puis sur l'anglais intégré).
  */
 export interface FullTranslation extends BaseTranslation {
     // ar-table-sort
@@ -83,12 +83,12 @@ export interface FullTranslation extends BaseTranslation {
 
 /**
  * Traduction fournie à `registerTranslation` : `$code`, `$name` et `$dir` obligatoires, tous les
- * termes optionnels. Un terme absent se replie, terme par terme, sur la traduction française
- * intégrée. Enregistrer une traduction d'un code déjà connu (`fr`, `en`) fusionne ses termes
- * par-dessus ceux déjà enregistrés : une surcharge partielle suffit. Pour obtenir une vérification
- * d'exhaustivité du compilateur, typer avec `FullTranslation`. Lire un terme d'un objet
- * `Translation` donne `string | undefined` : utiliser `FullTranslation` pour des termes toujours
- * présents.
+ * termes optionnels. Un terme absent se replie sur la langue de base (`en` pour `en-GB`), puis sur
+ * la traduction anglaise intégrée. Enregistrer une traduction d'un code déjà connu (`fr`, `en`)
+ * fusionne ses termes par-dessus ceux déjà enregistrés : une surcharge partielle suffit. Pour
+ * obtenir une vérification d'exhaustivité du compilateur, typer avec `FullTranslation`. Lire un
+ * terme d'un objet `Translation` donne `string | undefined` : utiliser `FullTranslation` pour des
+ * termes toujours présents.
  */
 export type Translation = Pick<BaseTranslation, '$code' | '$name' | '$dir'> &
     Partial<Omit<FullTranslation, keyof BaseTranslation>>;

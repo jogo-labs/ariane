@@ -10,10 +10,10 @@ import { announceA11y } from '../../a11y/announce-a11y.js';
 import { focusAfterUpdate } from '../../a11y/focus-after-update.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
+// en avant fr : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
-import '../../translations/fr.js';
 import '../../translations/en.js';
+import '../../translations/fr.js';
 
 /** Objet de configuration d'un webcomposant ArPagination */
 export class ArPaginationConfig {

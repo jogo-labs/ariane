@@ -49,7 +49,7 @@ describe('cdn/utils.js (production)', () => {
         el.remove();
     });
 
-    it('une traduction partielle se replie, terme par terme, sur le français intégré', async () => {
+    it("une traduction partielle se replie, terme par terme, sur l'anglais intégré", async () => {
         utils.registerTranslation({
             $code: 'zy',
             $name: 'Test partiel',
@@ -65,9 +65,9 @@ describe('cdn/utils.js (production)', () => {
         await customElements.whenDefined('ar-spinner');
         await (el as unknown as { updateComplete: Promise<boolean> }).updateComplete;
 
-        // `loadingDone` est absent de la traduction `zy` : repli sur le français intégré.
+        // `loadingDone` est absent de la traduction `zy` : repli sur l'anglais intégré.
         expect(el.shadowRoot?.querySelector('[part="status"] p')?.textContent).to.equal(
-            'Chargement terminé',
+            'Loading complete',
         );
         el.remove();
     });

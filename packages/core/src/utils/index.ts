@@ -3,7 +3,7 @@
  * d'enregistrement (`customElements.define`). Importer depuis ici plutôt que depuis le
  * barrel principal évite d'embarquer les composants, et d'enregistrer les `ar-*` en mode
  * headless. Il enregistre toutefois les traductions françaises et anglaises intégrées (effet de bord
- * limité au registre de traductions) : le français sert de langue de repli complète.
+ * limité au registre de traductions) : l'anglais sert de langue de repli complète.
  */
 export { whenAllDefined } from './when-all-defined.js';
 export type { WhenAllDefinedOptions } from './when-all-defined.js';

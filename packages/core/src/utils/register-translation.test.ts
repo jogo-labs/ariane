@@ -22,12 +22,19 @@ describe('registerTranslation (enrobage de /utils)', () => {
         controllerModule = await import('../controllers/localize.controller.js');
     });
 
-    it('fr est le repli complet même si une autre langue est enregistrée en premier', () => {
+    it('en est le repli complet même si une autre langue est enregistrée en premier', () => {
         register({ $code: 'es', $name: 'Español', $dir: 'ltr', closeAlert: 'Cerrar' });
 
-        expect(termFor(controllerModule, 'de')('closeDialog')).toBe('Fermer la boîte de dialogue');
+        expect(termFor(controllerModule, 'de')('closeDialog')).toBe('Close dialog');
         expect(termFor(controllerModule, 'es')('closeAlert')).toBe('Cerrar');
-        expect(termFor(controllerModule, 'es')('closeDialog')).toBe('Fermer la boîte de dialogue');
+        expect(termFor(controllerModule, 'es')('closeDialog')).toBe('Close dialog');
+    });
+
+    it('une surcharge de fr ne change pas le repli (anglais intégré)', () => {
+        register({ $code: 'fr', $name: 'Français', $dir: 'ltr', closeDialog: 'Fermer la fenêtre' });
+
+        expect(termFor(controllerModule, 'fr')('closeDialog')).toBe('Fermer la fenêtre');
+        expect(termFor(controllerModule, 'de')('closeDialog')).toBe('Close dialog');
     });
 
     it('une surcharge partielle de fr enregistrée avant les composants est conservée', async () => {
