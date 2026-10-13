@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>ar-alert : rôle ARIA, test lecteurs d'écran</title>
+        <style>
+            /* Style de lisibilité de la page de test uniquement : les composants sont headless. */
+            body {
+                font: 16px/1.5 system-ui, sans-serif;
+                max-width: 52rem;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            h2 {
+                font-size: 1.1rem;
+                margin-top: 2rem;
+                border-bottom: 1px solid #888;
+            }
+            section > p,
+            li {
+                max-width: 46rem;
+            }
+            ar-alert,
+            .ref {
+                display: block;
+                border: 2px solid #444;
+                padding: 0.5rem 0.75rem;
+                margin: 0.5rem 0;
+            }
+            ar-alert[variant='error'] {
+                border-color: #b00020;
+            }
+            ar-alert[variant='warning'] {
+                border-color: #a15c00;
+            }
+            ar-alert[variant='success'] {
+                border-color: #1a7f37;
+            }
+            ar-alert[variant='info'] {
+                border-color: #0b57d0;
+            }
+            .ref {
+                border-style: dashed;
+            }
+            button {
+                font: inherit;
+                padding: 0.4rem 0.8rem;
+                margin: 0.2rem 0.2rem 0.2rem 0;
+            }
+            code {
+                background: #eee;
+                padding: 0 0.25rem;
+            }
+            #bundle-info {
+                background: #fff7d6;
+                padding: 0.5rem 0.75rem;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th,
+            td {
+                border: 1px solid #888;
+                padding: 0.3rem 0.5rem;
+                text-align: left;
+                vertical-align: top;
+            }
+            textarea {
+                width: 100%;
+                min-height: 5rem;
+                font: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>ar-alert : le rôle est-il pris en compte par le lecteur d'écran ?</h1>
+
+        <p id="bundle-info" role="note">Chargement du bundle…</p>
+
+        <details open>
+            <summary>Mode d'emploi</summary>
+            <ol>
+                <li>
+                    Construire le bundle depuis la racine du dépôt :
+                    <code>npm run build:bundles --workspace=packages/core</code>.
+                </li>
+                <li>
+                    Servir le dossier <code>packages/core</code> :
+                    <code>npx serve packages/core</code> (ou
+                    <code>python3 -m http.server -d packages/core</code>), puis ouvrir
+                    <code>/manual-tests/alert-role.html</code>.
+                </li>
+                <li>
+                    Pour comparer avec l'ancienne implémentation (rôle posé par attribut),
+                    ouvrir la page avec
+                    <code
+                        >?bundle=https://unpkg.com/@ariane-ui/core@0.1.0-alpha.14/cdn/index.js</code
+                    >.
+                </li>
+                <li>
+                    Lecteurs d'écran à essayer : VoiceOver (Safari, Chrome), NVDA (Firefox, Chrome),
+                    JAWS si disponible. Écouter pour chaque scénario et reporter le résultat en bas
+                    de page.
+                </li>
+                <li>
+                    Vérification dans l'outil de développement : onglet « Accessibilité » de Chrome,
+                    rôle calculé de chaque
+                    <code>ar-alert</code>. Une alerte <code>error</code> doit être
+                    <code>alert</code>, une <code>info</code> doit être <code>status</code>, sans
+                    attribut <code>role</code> dans le DOM.
+                </li>
+            </ol>
+            <p>
+                Les blocs en pointillés sont des <strong>témoins natifs</strong> (un
+                <code>&lt;div role="…"&gt;</code> ordinaire) : si le lecteur d'écran ne les annonce
+                pas non plus, le silence ne vient pas du composant.
+            </p>
+        </details>
+
+        <h2>A. Alertes présentes au chargement (relancer la page avec le lecteur d'écran actif)</h2>
+        <section id="A">
+            <p>
+                Rôle attendu sans attribut <code>role</code> : <code>error</code> et
+                <code>warning</code> donnent <code>alert</code>, <code>success</code> et
+                <code>info</code> donnent <code>status</code>.
+            </p>
+            <ar-alert variant="error" id="a-error">A1. Erreur : variante error (attendu : alert)</ar-alert>
+            <ar-alert variant="warning" id="a-warning">A2. Avertissement (attendu : alert)</ar-alert>
+            <ar-alert variant="success" id="a-success">A3. Succès (attendu : status)</ar-alert>
+            <ar-alert variant="info" id="a-info">A4. Information (attendu : status)</ar-alert>
+            <ar-alert variant="error" role="status" id="a-error-status"
+                >A5. Erreur avec <code>role="status"</code> écrit par l'auteur (attendu : status, il
+                remplace le défaut)</ar-alert
+            >
+            <ar-alert variant="info" role="alert" id="a-info-alert"
+                >A6. Information avec <code>role="alert"</code> écrit par l'auteur (attendu : alert)</ar-alert
+            >
+            <ar-alert variant="error" without-notification id="a-silent"
+                >A7. Erreur avec <code>without-notification</code> (attendu : aucun rôle, aucune
+                annonce)</ar-alert
+            >
+        </section>
+
+        <h2>B. Alertes insérées dynamiquement</h2>
+        <section id="B">
+            <p>Activer le bouton, écouter l'annonce.</p>
+            <button type="button" data-insert="error">B1. Insérer une alerte error</button>
+            <button type="button" data-insert="info">B2. Insérer une alerte info</button>
+            <button type="button" data-insert="error-status">
+                B3. Insérer une error avec role="status"
+            </button>
+            <button type="button" id="b-clear">Vider la zone</button>
+            <div id="b-zone" aria-label="Zone des alertes insérées" role="group"></div>
+            <h3>Témoins natifs</h3>
+            <button type="button" data-ref="alert">B4. Insérer un div role="alert"</button>
+            <button type="button" data-ref="status">B5. Insérer un div role="status"</button>
+            <div id="b-ref-zone"></div>
+        </section>
+
+        <h2>C. Modification d'une alerte déjà présente</h2>
+        <section id="C">
+            <ar-alert variant="info" id="c-alert">C1. Alerte modifiable (variante info)</ar-alert>
+            <button type="button" data-variant="error">Passer en variante error</button>
+            <button type="button" data-variant="info">Revenir en variante info</button>
+            <button type="button" id="c-role-status">Poser role="status"</button>
+            <button type="button" id="c-role-remove">Retirer l'attribut role</button>
+            <button type="button" id="c-silent">Basculer without-notification</button>
+            <p>Texte de l'alerte :</p>
+            <button type="button" id="c-text">Changer le texte</button>
+        </section>
+
+        <h2>Résultats</h2>
+        <p>
+            Cocher ce qui s'est produit, noter la combinaison testée (lecteur d'écran, navigateur),
+            puis copier le tableau Markdown.
+        </p>
+        <p>
+            <label
+                >Lecteur d'écran + navigateur :
+                <input id="env" type="text" size="40" placeholder="ex. NVDA 2025 + Firefox"
+            /></label>
+        </p>
+        <table id="results">
+            <thead>
+                <tr>
+                    <th>Scénario</th>
+                    <th>Annoncé</th>
+                    <th>Mode</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <p>
+            <button type="button" id="copy">Copier en Markdown</button>
+            <span id="copy-status" role="status"></span>
+        </p>
+        <textarea id="out" aria-label="Résultat en Markdown" readonly></textarea>
+
+        <script type="module">
+            const bundle = new URLSearchParams(location.search).get('bundle') || '../cdn/index.js';
+            const info = document.getElementById('bundle-info');
+            try {
+                await import(bundle);
+                info.textContent = `Bundle chargé : ${bundle}`;
+            } catch (e) {
+                info.textContent = `Échec du chargement du bundle ${bundle} : ${e}`;
+            }
+
+            // ── B. insertions ──
+            const zone = document.getElementById('b-zone');
+            const refZone = document.getElementById('b-ref-zone');
+            let n = 0;
+            for (const btn of document.querySelectorAll('[data-insert]')) {
+                btn.addEventListener('click', () => {
+                    const kind = btn.dataset.insert;
+                    const el = document.createElement('ar-alert');
+                    n += 1;
+                    if (kind === 'error-status') {
+                        el.setAttribute('variant', 'error');
+                        el.setAttribute('role', 'status');
+                        el.textContent = `Alerte insérée n°${n} : error avec role="status"`;
+                    } else {
+                        el.setAttribute('variant', kind);
+                        el.textContent = `Alerte insérée n°${n} : variante ${kind}`;
+                    }
+                    zone.append(el);
+                });
+            }
+            document.getElementById('b-clear').addEventListener('click', () => {
+                zone.replaceChildren();
+                refZone.replaceChildren();
+            });
+            for (const btn of document.querySelectorAll('[data-ref]')) {
+                btn.addEventListener('click', () => {
+                    const div = document.createElement('div');
+                    div.className = 'ref';
+                    div.setAttribute('role', btn.dataset.ref);
+                    n += 1;
+                    div.textContent = `Témoin natif n°${n} : role="${btn.dataset.ref}"`;
+                    refZone.append(div);
+                });
+            }
+
+            // ── C. modifications ──
+            const c = document.getElementById('c-alert');
+            for (const btn of document.querySelectorAll('[data-variant]')) {
+                btn.addEventListener('click', () => c.setAttribute('variant', btn.dataset.variant));
+            }
+            document.getElementById('c-role-status').addEventListener('click', () => c.setAttribute('role', 'status'));
+            document.getElementById('c-role-remove').addEventListener('click', () => c.removeAttribute('role'));
+            document.getElementById('c-silent').addEventListener('click', () => c.toggleAttribute('without-notification'));
+            let t = 0;
+            document.getElementById('c-text').addEventListener('click', () => {
+                t += 1;
+                c.textContent = `C1. Alerte modifiable : texte changé ${t} fois`;
+            });
+
+            // ── Tableau de résultats ──
+            const scenarios = [
+                'A1 error au chargement',
+                'A2 warning au chargement',
+                'A3 success au chargement',
+                'A4 info au chargement',
+                'A5 error + role="status"',
+                'A6 info + role="alert"',
+                'A7 without-notification (aucune annonce attendue)',
+                'B1 insérer error',
+                'B2 insérer info',
+                'B3 insérer error + role="status"',
+                'B4 témoin div role="alert"',
+                'B5 témoin div role="status"',
+                'C1 info → error',
+                'C1 texte changé',
+                'C1 role="status" posé',
+                'C1 attribut role retiré',
+            ];
+            const tbody = document.querySelector('#results tbody');
+            scenarios.forEach((s, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${s}</td>
+                    <td><select aria-label="Annoncé : ${s}"><option></option><option>oui</option><option>non</option><option>partiel</option></select></td>
+                    <td><select aria-label="Mode : ${s}"><option></option><option>assertif</option><option>poli</option><option>?</option></select></td>
+                    <td><input type="text" aria-label="Note : ${s}" size="24" /></td>`;
+                tbody.append(tr);
+            });
+            document.getElementById('copy').addEventListener('click', async () => {
+                const env = document.getElementById('env').value || '(non précisé)';
+                const rows = [...tbody.querySelectorAll('tr')].map((tr) => {
+                    const [label, ann, mode, note] = tr.children;
+                    return `| ${label.textContent} | ${ann.firstElementChild.value} | ${mode.firstElementChild.value} | ${note.firstElementChild.value} |`;
+                });
+                const md = [`Environnement : ${env}`, `Bundle : ${bundle}`, '', '| Scénario | Annoncé | Mode | Note |', '| --- | --- | --- | --- |', ...rows].join('\n');
+                const out = document.getElementById('out');
+                out.value = md;
+                try {
+                    await navigator.clipboard.writeText(md);
+                    document.getElementById('copy-status').textContent = 'Copié.';
+                } catch {
+                    document.getElementById('copy-status').textContent = 'Copie impossible : sélectionner le texte ci-dessous.';
+                }
+            });
+        </script>
+    </body>
+</html>
