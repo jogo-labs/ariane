@@ -156,7 +156,21 @@ describe('ArAlert', () => {
     describe('sans ElementInternals (happy-dom, anciens navigateurs)', () => {
         it('ne lève pas et ne pose aucun attribut role', async () => {
             el = await fixture('<ar-alert variant="error"></ar-alert>');
+            // Garde-fou : si happy-dom implémente attachInternals un jour, ce test ne couvrirait plus rien.
+            expect(typeof el.attachInternals).toBe('undefined');
             expect(el.hasAttribute('role')).toBe(false);
+        });
+
+        it("un role d'auteur n'est ni modifié ni signalé par un avertissement", async () => {
+            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            try {
+                el = await fixture('<ar-alert role="banner" variant="error"></ar-alert>');
+                expect(typeof el.attachInternals).toBe('undefined');
+                expect(el.getAttribute('role')).toBe('banner');
+                expect(spy).not.toHaveBeenCalled();
+            } finally {
+                spy.mockRestore();
+            }
         });
     });
 

@@ -50,7 +50,8 @@ import WcagRef from '../../components/WcagRef.astro';
   immédiatement. Retirer l'attribut rétablit le rôle de la variante.
 - `without-notification` supprime le rôle par défaut : aucune annonce, sauf si un attribut `role` est écrit sur l'élément.
 - Une alerte ajoutée dynamiquement à la page n'est annoncée de façon fiable que si son rôle est
-  `alert` ; pour un `status`, le conteneur doit exister avant son contenu.
+  `alert`. Pour un `status`, l'alerte doit exister dans la page avant son contenu : l'insérer vide,
+  puis la remplir.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
   est portée par le `role`, pas par l'icône.
 - Une icône par défaut est fournie pour les 4 variants connus (`error`, `warning`,

@@ -84,11 +84,22 @@ describe('ar-alert — rôle dans l’arbre d’accessibilité', () => {
         el = await fixture(html`<ar-alert variant="error" without-notification>Message</ar-alert>`);
         const silent = await axRole(el);
         if (silent === null) return this.skip();
-        expect(silent.role).to.not.equal('alert');
+        expect(silent.role).to.equal('generic');
 
         el.removeAttribute('without-notification');
         await el.updateComplete;
         expect((await axRole(el))?.role).to.equal('alert');
+    });
+
+    it('without-notification posé à chaud sur une alerte active retire son rôle', async function () {
+        el = await fixture(html`<ar-alert variant="error">Message</ar-alert>`);
+        const active = await axRole(el);
+        if (active === null) return this.skip();
+        expect(active.role).to.equal('alert');
+
+        el.setAttribute('without-notification', '');
+        await el.updateComplete;
+        expect((await axRole(el))?.role).to.equal('generic');
     });
 
     it("n'écrit jamais l'attribut role, même quand le rôle change", async () => {

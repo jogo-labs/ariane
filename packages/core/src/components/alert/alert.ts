@@ -24,10 +24,6 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
- * Rôle ARIA : `alert` pour `error` et `warning`, `status` pour les autres variants, posé par défaut
- * sans écrire l'attribut `role`. Un attribut `role` (`alert` ou `status`) écrit sur l'élément le
- * remplace ; `without-notification` supprime le rôle par défaut.
- *
  * @summary Affiche un message important intégré au contenu environnant. À utiliser pour des confirmations, avertissements, erreurs, ou toute information que l'utilisateur ne doit pas manquer.
  * @display demo
  * @localized
