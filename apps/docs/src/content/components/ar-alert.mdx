@@ -48,7 +48,7 @@ import WcagRef from '../../components/WcagRef.astro';
   rend une erreur annoncée poliment (par exemple une erreur déjà visible à l'écran, présente au
   chargement de la page), `<ar-alert variant="info" role="alert">` rend une information annoncée
   immédiatement. Retirer l'attribut rétablit le rôle de la variante.
-- `without-notification` supprime le rôle par défaut : aucune annonce.
+- `without-notification` supprime le rôle par défaut : aucune annonce, sauf si un attribut `role` est écrit sur l'élément.
 - Une alerte ajoutée dynamiquement à la page n'est annoncée de façon fiable que si son rôle est
   `alert` ; pour un `status`, le conteneur doit exister avant son contenu.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité

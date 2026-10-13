@@ -198,11 +198,19 @@
         <textarea id="out" aria-label="Résultat en Markdown" readonly></textarea>
 
         <script type="module">
-            const bundle = new URLSearchParams(location.search).get('bundle') || '/cdn/index.js';
+            // Seuls un chemin du site et le bundle publié sur unpkg sont acceptés : la page ne doit pas
+            // exécuter une URL arbitraire passée en paramètre.
+            const ALLOWED_BUNDLE =
+                /^(\/cdn\/[\w.-]+\.js|https:\/\/unpkg\.com\/@ariane-ui\/core@[\w.-]+\/cdn\/index(\.dev)?\.js)$/;
+            const requested = new URLSearchParams(location.search).get('bundle');
+            const bundle = requested && ALLOWED_BUNDLE.test(requested) ? requested : '/cdn/index.js';
             const info = document.getElementById('bundle-info');
             try {
                 await import(bundle);
-                info.textContent = `Bundle chargé : ${bundle}`;
+                info.textContent =
+                    requested && requested !== bundle
+                        ? `Paramètre bundle refusé (${requested}). Bundle chargé : ${bundle}`
+                        : `Bundle chargé : ${bundle}`;
             } catch (e) {
                 info.textContent = `Échec du chargement du bundle ${bundle} : ${e}`;
             }
