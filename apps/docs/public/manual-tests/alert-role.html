@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>ar-alert : rôle ARIA, test lecteurs d'écran</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <title>ar-alert : rôle ARIA, test lecteurs d'écran (page temporaire)</title>
         <style>
             /* Style de lisibilité de la page de test uniquement : les composants sont headless. */
             body {
@@ -86,18 +87,12 @@
             <summary>Mode d'emploi</summary>
             <ol>
                 <li>
-                    Construire le bundle depuis la racine du dépôt :
-                    <code>npm run build:bundles --workspace=packages/core</code>.
+                    Cette page charge le composant tel que construit pour ce déploiement (bundle
+                    indiqué ci-dessus).
                 </li>
                 <li>
-                    Servir le dossier <code>packages/core</code> :
-                    <code>npx serve packages/core</code> (ou
-                    <code>python3 -m http.server -d packages/core</code>), puis ouvrir
-                    <code>/manual-tests/alert-role.html</code>.
-                </li>
-                <li>
-                    Pour comparer avec l'ancienne implémentation (rôle posé par attribut),
-                    ouvrir la page avec
+                    Pour comparer avec l'ancienne implémentation (rôle posé par attribut), ouvrir la
+                    page avec
                     <code
                         >?bundle=https://unpkg.com/@ariane-ui/core@0.1.0-alpha.14/cdn/index.js</code
                     >.
@@ -203,7 +198,7 @@
         <textarea id="out" aria-label="Résultat en Markdown" readonly></textarea>
 
         <script type="module">
-            const bundle = new URLSearchParams(location.search).get('bundle') || '../cdn/index.js';
+            const bundle = new URLSearchParams(location.search).get('bundle') || '/cdn/index.js';
             const info = document.getElementById('bundle-info');
             try {
                 await import(bundle);
