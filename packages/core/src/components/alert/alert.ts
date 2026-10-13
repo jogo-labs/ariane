@@ -24,6 +24,10 @@ export class ArAlertConfig {
 export type ArAlertVariant = 'success' | 'warning' | 'error' | 'info';
 
 /**
+ * Rôle ARIA : `alert` pour `error` et `warning`, `status` pour les autres variants, posé par défaut
+ * sans écrire l'attribut `role`. Un attribut `role` (`alert` ou `status`) écrit sur l'élément le
+ * remplace ; `without-notification` supprime le rôle par défaut.
+ *
  * @summary Affiche un message important intégré au contenu environnant. À utiliser pour des confirmations, avertissements, erreurs, ou toute information que l'utilisateur ne doit pas manquer.
  * @display demo
  * @localized
@@ -77,19 +81,6 @@ export class ArAlert extends ArianeElement {
     withoutNotification = false;
 
     /**
-     * Force le niveau d'urgence ARIA indépendamment de `variant` : `role="alert"` si présent,
-     * sinon déduit de `variant` via une table de correspondance interne (`error`/`warning` →
-     * `alert`, `success`/`info` → `status`, tout autre variant → `status`).
-     */
-    @property({
-        converter: {
-            fromAttribute: (value: string | null): boolean | undefined =>
-                value === null ? undefined : true,
-        },
-    })
-    urgent?: boolean;
-
-    /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
      */
     @property({ reflect: true, type: String })
@@ -102,35 +93,24 @@ export class ArAlert extends ArianeElement {
      */
     @state() private hiding: boolean = false;
 
-    /**
-     * Indique si `role` a été posé manuellement dans le markup initial.
-     * Utilisé pour n'avertir qu'une seule fois que le composant va écraser cet attribut.
-     */
-    private _hadAuthoredRole: boolean | undefined = undefined;
-
     constructor() {
         super();
         // Lance la suppression du DOM à la fin de l'animation de fermeture
         this.addEventListener('transitionend', this._finishHide);
     }
 
-    override firstUpdated(): void {
-        // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
-        this._hadAuthoredRole = this.hasAttribute('role');
+    override connectedCallback(): void {
+        super.connectedCallback();
+        // Le rôle doit exister dès l'insertion : une alerte ajoutée dynamiquement est annoncée
+        // d'après le rôle présent à ce moment-là, pas après le premier rendu.
+        this._updateRole();
     }
 
     override updated(changed: Map<string, unknown>) {
         if (changed.has('hiding')) {
             this.toggleState('hiding', this.hiding);
         }
-        if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
-            if (this._hadAuthoredRole === true) {
-                warn(
-                    'ar-alert',
-                    `role="${this.getAttribute('role')}" posé manuellement sera écrasé par le composant — utilisez la prop 'urgent' pour contrôler le niveau ARIA.`,
-                );
-                this._hadAuthoredRole = false;
-            }
+        if (changed.has('variant') || changed.has('withoutNotification')) {
             this._updateRole();
         }
         if (
@@ -145,16 +125,16 @@ export class ArAlert extends ArianeElement {
         }
     }
 
+    /**
+     * Rôle ARIA par défaut, posé dans `ElementInternals` : l'attribut `role` n'est jamais écrit
+     * par le composant, un `role` écrit par l'auteur le remplace (règle de la plateforme).
+     * Tolère `internals` absent (happy-dom, anciens navigateurs).
+     */
     private _updateRole(): void {
-        if (this.withoutNotification) {
-            this.removeAttribute('role');
-            return;
-        }
-        if (this.urgent !== undefined) {
-            this.role = this.urgent ? 'alert' : 'status';
-            return;
-        }
-        this.role = ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status';
+        if (!this.internals) return;
+        this.internals.role = this.withoutNotification
+            ? null
+            : (ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status');
     }
 
     private static readonly _ROLE_BY_VARIANT: Record<string, 'alert' | 'status'> = {

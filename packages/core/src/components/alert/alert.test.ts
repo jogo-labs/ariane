@@ -69,144 +69,94 @@ describe('ArAlert', () => {
         });
     });
 
-    // ── Accessibilité ARIA ────────────────────────────────────────────────────
+    // ── Accessibilité ARIA : rôle par défaut via ElementInternals ──────────────
+    //
+    // happy-dom n'implémente pas attachInternals() : on injecte un faux ElementInternals sur le
+    // prototype pour observer `role`. L'arbre d'accessibilité réel est couvert par
+    // alert.role.browser.test.ts.
 
-    describe('accessibilité ARIA', () => {
-        it('variant="error" donne role="alert" au host', async () => {
+    describe('rôle par défaut (ElementInternals)', () => {
+        interface FakeInternals {
+            role: string | null;
+        }
+        let fake: FakeInternals;
+
+        beforeEach(() => {
+            fake = { role: null };
+            (HTMLElement.prototype as unknown as Record<string, unknown>).attachInternals = () =>
+                fake;
+        });
+        afterEach(() => {
+            delete (HTMLElement.prototype as unknown as Record<string, unknown>).attachInternals;
+        });
+
+        it.each([
+            ['error', 'alert'],
+            ['warning', 'alert'],
+            ['success', 'status'],
+            ['info', 'status'],
+            ['custom', 'status'],
+        ])('variant="%s" donne internals.role = %s', async (variant, expected) => {
+            el = await fixture(`<ar-alert variant="${variant}"></ar-alert>`);
+            expect(fake.role).toBe(expected);
+        });
+
+        it("le rôle existe dès l'insertion, avant le premier rendu", () => {
+            el = document.createElement('ar-alert') as ArAlert;
+            el.setAttribute('variant', 'error');
+            document.body.append(el);
+            expect(fake.role).toBe('alert');
+        });
+
+        it("n'écrit jamais l'attribut role", async () => {
             el = await fixture('<ar-alert variant="error"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
+            expect(el.hasAttribute('role')).toBe(false);
+            el.setAttribute('variant', 'info');
+            await waitForUpdate(el);
+            expect(el.hasAttribute('role')).toBe(false);
         });
 
-        it('variant="warning" donne role="alert" au host', async () => {
-            el = await fixture('<ar-alert variant="warning"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
-        });
-
-        it('variant="success" donne role="status" au host', async () => {
-            el = await fixture('<ar-alert variant="success"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('status');
-        });
-
-        it('variant="info" donne role="status" au host', async () => {
+        it('changer variant met à jour le rôle', async () => {
             el = await fixture('<ar-alert variant="info"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('status');
-        });
-
-        it('un variant custom inconnu donne role="status" (défaut sûr)', async () => {
-            el = await fixture('<ar-alert variant="promo"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('status');
-        });
-
-        it('without-notification supprime le role du host', async () => {
-            el = await fixture('<ar-alert without-notification></ar-alert>');
-            expect(el.hasAttribute('role')).toBe(false);
-        });
-    });
-
-    // ── Prop urgent (override du rôle) ──────────────────────────────────────
-
-    describe('prop urgent', () => {
-        it('urgent est undefined par défaut', async () => {
-            el = await fixture('<ar-alert></ar-alert>');
-            expect(el.urgent).toBeUndefined();
-        });
-
-        it('la seule présence de l\'attribut urgent force role="alert"', async () => {
-            el = await fixture('<ar-alert variant="success" urgent></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
-        });
-
-        it('urgent en absence ne force pas role="status" (retombe sur la table)', async () => {
-            el = await fixture('<ar-alert variant="error"></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
-        });
-
-        it('urgent=false (JS) force role="status" même sur un variant "error"', async () => {
-            el = await fixture('<ar-alert variant="error"></ar-alert>');
-            el.urgent = false;
+            expect(fake.role).toBe('status');
+            el.setAttribute('variant', 'error');
             await waitForUpdate(el);
-            expect(el.getAttribute('role')).toBe('status');
+            expect(fake.role).toBe('alert');
         });
 
-        it("urgent est prioritaire sur withoutNotification=false mais pas l'inverse", async () => {
-            el = await fixture(
-                '<ar-alert variant="success" urgent without-notification></ar-alert>',
-            );
-            expect(el.hasAttribute('role')).toBe(false);
-        });
-
-        it("removeAttribute('urgent') retombe sur undefined (pas sur false)", async () => {
-            el = await fixture('<ar-alert variant="error" urgent></ar-alert>');
-            expect(el.getAttribute('role')).toBe('alert');
-            el.removeAttribute('urgent');
+        it('without-notification retire le rôle par défaut, et le retirer le rétablit', async () => {
+            el = await fixture('<ar-alert variant="error" without-notification></ar-alert>');
+            expect(fake.role).toBeNull();
+            el.removeAttribute('without-notification');
             await waitForUpdate(el);
-            expect(el.urgent).toBeUndefined();
-            expect(el.getAttribute('role')).toBe('alert'); // retombe sur la table (error -> alert), pas force à status
+            expect(fake.role).toBe('alert');
+            el.setAttribute('without-notification', '');
+            await waitForUpdate(el);
+            expect(fake.role).toBeNull();
         });
-    });
 
-    // ── Avertissement role manuel ─────────────────────────────────────────────
-
-    describe('avertissement role manuel', () => {
-        it('avertit si role est posé manuellement dans le markup initial', async () => {
+        it("un role d'auteur n'est ni modifié ni signalé par un avertissement", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             try {
                 el = await fixture('<ar-alert role="banner" variant="error"></ar-alert>');
-                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
-                expect(spy.mock.calls[0][0]).toContain('role="banner"');
-            } finally {
-                spy.mockRestore();
-            }
-        });
-
-        it("n'avertit pas si role n'est pas posé dans le markup initial", async () => {
-            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            try {
-                el = await fixture('<ar-alert></ar-alert>');
-                // Le warning pour variant custom ne doit pas être appelé (pas de variant custom)
+                expect(el.getAttribute('role')).toBe('banner');
                 expect(spy).not.toHaveBeenCalled();
             } finally {
                 spy.mockRestore();
             }
         });
 
-        it('role posé manuellement est bien écrasé par la logique interne malgré le warning', async () => {
-            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            try {
-                el = await fixture('<ar-alert role="banner" variant="info"></ar-alert>');
-                expect(el.getAttribute('role')).toBe('status');
-                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
-                expect(spy.mock.calls[0][0]).toContain('role="banner"');
-            } finally {
-                spy.mockRestore();
-            }
+        it("urgent n'existe plus : ni propriété, ni effet de l'attribut", async () => {
+            el = await fixture('<ar-alert variant="info" urgent></ar-alert>');
+            expect('urgent' in el).toBe(false);
+            expect(fake.role).toBe('status');
         });
+    });
 
-        it("n'avertit qu'une seule fois, même si variant change ensuite", async () => {
-            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            try {
-                el = await fixture('<ar-alert role="banner"></ar-alert>');
-                expect(spy).toHaveBeenCalledOnce();
-                spy.mockClear();
-
-                el.variant = 'info';
-                await waitForUpdate(el);
-                expect(spy).not.toHaveBeenCalled();
-            } finally {
-                spy.mockRestore();
-            }
-        });
-
-        it("l'avertissement n'empêche pas la fermeture du role par withoutNotification", async () => {
-            const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            try {
-                el = await fixture('<ar-alert role="banner" without-notification></ar-alert>');
-                expect(el.hasAttribute('role')).toBe(false);
-                expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-alert]'));
-                expect(spy.mock.calls[0][0]).toContain('role="banner"');
-            } finally {
-                spy.mockRestore();
-            }
+    describe('sans ElementInternals (happy-dom, anciens navigateurs)', () => {
+        it('ne lève pas et ne pose aucun attribut role', async () => {
+            el = await fixture('<ar-alert variant="error"></ar-alert>');
+            expect(el.hasAttribute('role')).toBe(false);
         });
     });
 

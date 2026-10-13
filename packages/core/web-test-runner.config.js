@@ -7,7 +7,8 @@ const BROWSERS = process.env.ARIANE_BROWSERS?.split(',') ?? ALL_BROWSERS;
 /**
  * Commande `ax-role` : rôle calculé de l'arbre d'accessibilité réel (CDP, Chromium seulement).
  * `ariaSnapshot` de Playwright est calculé depuis le DOM et ne voit pas `ElementInternals.role` ;
- * `page.accessibility` n'existe plus. Renvoie `null` hors Chromium.
+ * `page.accessibility` n'existe plus. Renvoie `{ unsupported: true }` hors Chromium (WTR traite `null`
+ * comme « commande non gérée »).
  */
 function axRolePlugin() {
     return {
@@ -15,7 +16,9 @@ function axRolePlugin() {
         async executeCommand({ command, payload, session }) {
             if (command !== 'ax-role') return undefined;
             const page = session.browser.getPage(session.id);
-            if (page.context().browser()?.browserType().name() !== 'chromium') return null;
+            if (page.context().browser()?.browserType().name() !== 'chromium') {
+                return { unsupported: true };
+            }
             const cdp = await page.context().newCDPSession(page);
             try {
                 const { root } = await cdp.send('DOM.getDocument');

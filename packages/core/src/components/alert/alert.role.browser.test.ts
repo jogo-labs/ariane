@@ -21,7 +21,9 @@ let counter = 0;
 /** Rôle calculé de l'élément dans l'arbre d'accessibilité, `null` si le moteur ne le permet pas. */
 async function axRole(el: Element): Promise<AxNode | null> {
     el.id ||= `ax-target-${counter++}`;
-    return (await executeServerCommand('ax-role', { selector: `#${el.id}` })) as AxNode | null;
+    const result = (await executeServerCommand('ax-role', { selector: `#${el.id}` })) as
+        AxNode | { unsupported: true };
+    return 'unsupported' in result ? null : result;
 }
 
 describe('ar-alert — rôle dans l’arbre d’accessibilité', () => {
