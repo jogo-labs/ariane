@@ -37,21 +37,20 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) posé sur
-  l'hôte selon `variant` — `error`/`warning` → `alert`, `success`/`info` → `status`, tout
-  variant custom non reconnu → `status` (défaut sûr) — conforme
+- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) exposé par
+  l'élément selon `variant` — `error`/`warning` → `alert`, `success`/`info` → `status`, tout
+  variant custom non reconnu → `status` (défaut sûr) — sans écrire d'attribut `role` — conforme
     <WcagRef
         criterion="4.1.3"
         summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus."
     />
-- La prop `urgent` permet de forcer ce niveau indépendamment de `variant` : sa seule
-  présence (`<ar-alert urgent>`, pas besoin de `="true"`) force `role="alert"`. Elle
-  n'est jamais forcée par son absence — sans elle, le rôle retombe sur la déduction
-  depuis `variant`.
-- `role` est entièrement calculé par le composant. Toute tentative de le poser manuellement
-  en markup (`<ar-alert role="banner">`) sera écrasée : le composant émet un avertissement
-  en dev et applique sa propre logique. Pour contrôler le rôle ARIA, utilisez `urgent` ou
-  laissez le composant déduire de `variant`.
+- Pour remplacer ce rôle, écrire l'attribut `role` standard : `<ar-alert variant="error" role="status">`
+  rend une erreur annoncée poliment (par exemple une erreur déjà visible à l'écran, présente au
+  chargement de la page), `<ar-alert variant="info" role="alert">` rend une information annoncée
+  immédiatement. Retirer l'attribut rétablit le rôle de la variante.
+- `without-notification` supprime le rôle par défaut : aucune annonce.
+- Une alerte ajoutée dynamiquement à la page n'est annoncée de façon fiable que si son rôle est
+  `alert` ; pour un `status`, le conteneur doit exister avant son contenu.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
   est portée par le `role`, pas par l'icône.
 - Une icône par défaut est fournie pour les 4 variants connus (`error`, `warning`,
