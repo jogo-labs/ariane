@@ -143,9 +143,9 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
                 >
                     <code>/core/src/translations/fr.ts</code>
                 </a>{' '}
-                (la traduction source du package, la plus à jour) dans votre projet et traduisez
-                chaque terme. <br />
-                Modifiez-le pour ne garder que l'export de la traduction :
+                (la traduction source du package, la plus à jour) pour la liste des termes. <br />
+                Écrivez un module qui n'exporte que votre traduction, avec les termes à changer : les termes
+                absents s'affichent en français.
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationCdnImportModule} /></pre>
             <p>
@@ -158,7 +158,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
 
             <NarrativeSubheading id="traductions-npm">Avec le paquet npm</NarrativeSubheading>
             <p>
-                Commencez par copier{' '}
+                Consultez{' '}
                 <a
                     href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                     target="_blank"
@@ -169,8 +169,8 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
                 (la traduction source du package, la plus à jour) pour la liste des termes, et traduisez ceux
                 dont vous avez besoin. <br />
                 Le type <code>Translation</code>, exporté par le package, n'impose que
-                <code>$code</code>, <code>$name</code> et <code>$dir</code> : un terme absent s'affiche en
-                français. Pour que le compilateur garantisse une traduction complète, et signale les termes ajoutés
+                <code>$code</code>, <code>$name</code> et <code>$dir</code> : un terme absent se replie sur la
+                langue de base (<code>en</code> pour <code>en-GB</code>), puis sur le français intégré. Pour que le compilateur garantisse une traduction complète, et signale les termes ajoutés
                 dans une version ultérieure, typez avec <code>FullTranslation</code> (même export) : un
                 nouveau terme devient alors une erreur de compilation, par choix de votre part.
             </p>
@@ -185,7 +185,8 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
             <p class="hint">
                 Avec <code>registerTranslation</code> importé de <code>@ariane-ui/core/utils</code> (ou de
                 <code>cdn/utils.js</code>), la traduction française intégrée est enregistrée à l'import : c'est
-                toujours la langue de repli, complète. Pour <strong>surcharger</strong> une langue fournie
+                toujours la langue de repli, complète (c'est la version intégrée : une surcharge de <code>fr</code>
+                ne s'applique qu'aux pages en <code>fr</code>). Pour <strong>surcharger</strong> une langue fournie
                 (<code>fr</code> ou <code>en</code>), enregistrez un objet partiel avec le même
                 <code>$code</code> : seuls les termes que vous donnez changent, avant ou après le chargement des
                 composants. Une variante régionale s'ajoute avec son code (<code>fr-CA</code> ne s'applique qu'à

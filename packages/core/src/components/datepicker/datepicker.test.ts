@@ -547,6 +547,18 @@ describe('ArDatepicker', () => {
         );
 
         it(
+            'langue sans traduction : le message de validité se replie sur le français',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="de"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Veuillez renseigner ce champ.');
+            }),
+        );
+
+        it(
             '<ar-datepicker required disabled> → aucun message valueMissing',
             withFakeInternals(async (setValiditySpy) => {
                 el = await fixture('<ar-datepicker required disabled></ar-datepicker>');

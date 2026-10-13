@@ -86,7 +86,9 @@ export interface FullTranslation extends BaseTranslation {
  * termes optionnels. Un terme absent se replie, terme par terme, sur la traduction française
  * intégrée. Enregistrer une traduction d'un code déjà connu (`fr`, `en`) fusionne ses termes
  * par-dessus ceux déjà enregistrés : une surcharge partielle suffit. Pour obtenir une vérification
- * d'exhaustivité du compilateur, typer avec `FullTranslation`.
+ * d'exhaustivité du compilateur, typer avec `FullTranslation`. Lire un terme d'un objet
+ * `Translation` donne `string | undefined` : utiliser `FullTranslation` pour des termes toujours
+ * présents.
  */
 export type Translation = Pick<BaseTranslation, '$code' | '$name' | '$dir'> &
     Partial<Omit<FullTranslation, keyof BaseTranslation>>;

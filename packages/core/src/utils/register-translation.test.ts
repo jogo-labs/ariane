@@ -46,6 +46,16 @@ describe('registerTranslation (enrobage de /utils)', () => {
         expect(term('closeDialog')).toBe('Fermer la boîte de dialogue');
     });
 
+    it('une surcharge partielle de en enregistrée avant les composants est conservée', async () => {
+        register({ $code: 'en', $name: 'English', $dir: 'ltr', closeAlert: 'Dismiss this banner' });
+        await import('../translations/fr.js');
+        await import('../translations/en.js');
+
+        const term = termFor(controllerModule, 'en');
+        expect(term('closeAlert')).toBe('Dismiss this banner');
+        expect(term('closeDialog')).toBe('Close dialog');
+    });
+
     it('une variante régionale ne remplace que sa région', () => {
         register({
             $code: 'fr-CA',
