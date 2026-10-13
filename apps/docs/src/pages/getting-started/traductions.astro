@@ -20,14 +20,14 @@ const codeChangeLang = `<!-- Langue par défaut de la page -->
 <!-- Ou par composant, en surcharge -->
 <ar-table-sort lang="es">Prix</ar-table-sort>`;
 
-const codeCustomTranslationCdnImportModule = `// es.js — copie de fr.ts, traduite terme par terme, sans import ni typage (usage CDN)
+const codeCustomTranslationCdnImportModule = `// es.js — vos termes traduits, sans import ni typage (usage CDN). Les termes absents s'affichent en français.
 
 const translation = {
     $code: 'es',
     $name: 'Español',
     $dir: 'ltr',
 
-    // ... tous les termes de fr.ts, traduits
+    // ... les termes à traduire (voir fr.ts pour la liste)
     term1: '...',
     term2: '...',
 };
@@ -53,7 +53,7 @@ const codeCustomTranslationCdnImport = `<html lang="es">
 </html>
 `;
 
-const codeCustomTranslationNpm = `// es.ts — copie de fr.ts, traduite terme par terme
+const codeCustomTranslationNpm = `// es.ts — vos termes traduits ; les termes absents s'affichent en français
 import { registerTranslation } from '@ariane-ui/core/utils';
 import type { Translation } from '@ariane-ui/core/utils';
 
@@ -62,7 +62,7 @@ const translation: Translation = {
     $name: 'Español',
     $dir: 'ltr',
 
-    // ... tous les termes de fr.ts, traduits
+    // ... les termes à traduire (voir fr.ts pour la liste)
     term1: '...',
     term2: '...',
 };
@@ -73,7 +73,7 @@ export default translation;`;
 
 const codeCustomTranslationNpmImport = `// main.js (ou layout racine)
 import '@ariane-ui/core'; // les composants
-import './translations/es.js'; // votre traduction (importée après, le français reste la langue de repli)`;
+import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'importance)`;
 ---
 
 <Layout title="Traductions" currentPath="/getting-started/traductions" showToc={true}>
@@ -135,7 +135,7 @@ import './translations/es.js'; // votre traduction (importée après, le frança
 
             <NarrativeSubheading id="traductions-cdn">Avec le CDN</NarrativeSubheading>
             <p>
-                Commencez par copier{' '}
+                Consultez{' '}
                 <a
                     href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                     target="_blank"
@@ -166,27 +166,32 @@ import './translations/es.js'; // votre traduction (importée après, le frança
                 >
                     <code>/core/src/translations/fr.ts</code>
                 </a>{' '}
-                (la traduction source du package, la plus à jour) dans votre projet et traduisez
-                chaque terme. <br />
-                Le type <code>Translation</code>, exporté par le package, vous
-                force à fournir tous les termes attendus.
+                (la traduction source du package, la plus à jour) pour la liste des termes, et traduisez ceux
+                dont vous avez besoin. <br />
+                Le type <code>Translation</code>, exporté par le package, n'impose que
+                <code>$code</code>, <code>$name</code> et <code>$dir</code> : un terme absent s'affiche en
+                français. Pour que le compilateur garantisse une traduction complète, et signale les termes ajoutés
+                dans une version ultérieure, typez avec <code>FullTranslation</code> (même export) : un
+                nouveau terme devient alors une erreur de compilation, par choix de votre part.
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpm} /></pre>
             <p>
                 Importez votre traduction une seule fois, dans le point d'entrée de l'application ou dans
                 le layout racine : le registre est partagé par tous les composants, il n'y a rien à
-                importer composant par composant. Pour une langue ajoutée, l'ordre d'import n'a pas
-                d'incidence sur l'affichage :
+                importer composant par composant. L'ordre d'import n'a pas d'incidence sur l'affichage :
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpmImport} /></pre>
 
             <p class="hint">
-                Deux effets de l'ordre sont à connaître. La première traduction enregistrée devient la langue de
-                repli, utilisée quand la langue de la page n'a pas de traduction : enregistrer la vôtre avant
-                les composants en fait la langue de repli, après, le français le reste. Et pour <strong>remplacer</strong> une
-                langue fournie (<code>fr</code> ou <code>en</code>), enregistrez votre version
-                <em>après</em> le chargement des composants : leurs traductions par défaut se fusionnent par-dessus ce
-                qui est déjà enregistré.
+                Avec <code>registerTranslation</code> importé de <code>@ariane-ui/core/utils</code> (ou de
+                <code>cdn/utils.js</code>), la traduction française intégrée est enregistrée à l'import : c'est
+                toujours la langue de repli, complète. Pour <strong>surcharger</strong> une langue fournie
+                (<code>fr</code> ou <code>en</code>), enregistrez un objet partiel avec le même
+                <code>$code</code> : seuls les termes que vous donnez changent, avant ou après le chargement des
+                composants. Une variante régionale s'ajoute avec son code (<code>fr-CA</code> ne s'applique qu'à
+                <code>fr-CA</code>). Ces garanties ne valent pas pour un <code>registerTranslation</code>
+                importé directement de <code>@shoelace-style/localize</code>, où la première traduction enregistrée
+                devient la langue de repli.
             </p>
 
             <NarrativeHeading id="traductions-disponibles">Traductions disponibles</NarrativeHeading>
