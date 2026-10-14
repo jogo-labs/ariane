@@ -72,7 +72,9 @@ describe('cdn/utils.js (production)', () => {
         el.remove();
     });
 
-    it('partage les fonctions (et le registre) avec cdn/index.js', async () => {
+    it('partage les fonctions (et le registre) avec cdn/index.js', async function () {
+        // Importe le bundle complet : au-delà de 2 s (défaut mocha) quand les moteurs tournent en parallèle.
+        this.timeout(15000);
         const index = await import('../cdn/index.js');
         expect(utils.registerTranslation).to.equal(index.registerTranslation);
         expect(utils.whenAllDefined).to.equal(index.whenAllDefined);
