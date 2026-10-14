@@ -1,5 +1,7 @@
+import { configuredPrefix } from './ariane-config.js';
+
 /**
- * Enregistre un composant sous le tag que le consommateur a choisi : `window.ARIANE_CONFIG.prefix`
+ * Enregistre un composant sous le tag que le consommateur a choisi : `ARIANE_CONFIG.prefix`
  * s'il est défini, sinon le préfixe du tag par défaut. C'est le mécanisme commun à tous les
  * points d'entrée qui enregistrent (`index.ts` de chaque composant, donc le barrel, le bundle
  * CDN et les imports par composant) ; l'autoloader lit la même configuration de son côté.
@@ -16,6 +18,6 @@ export function defineComponent(defaultTag: string, component: CustomElementCons
     const dash = defaultTag.indexOf('-');
     const defaultPrefix = defaultTag.slice(0, dash);
     const name = defaultTag.slice(dash + 1);
-    const tag = `${window.ARIANE_CONFIG?.prefix ?? defaultPrefix}-${name}`;
+    const tag = `${configuredPrefix() ?? defaultPrefix}-${name}`;
     if (!customElements.get(tag)) customElements.define(tag, component);
 }
