@@ -66,6 +66,10 @@ export class ArCharcounter extends ArianeElement {
     private _errorAnnounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
+    private _form: HTMLFormElement | null = null;
+    private _fieldWatcher: MutationObserver | undefined;
+    private _resetTimer: ReturnType<typeof setTimeout> | undefined;
+    private _warnedMissingFor: string | undefined;
 
     /** État courant. Readonly — piloté par le composant. */
     get state(): CharcounterState {
@@ -114,29 +118,77 @@ export class ArCharcounter extends ArianeElement {
         this._detachField();
     }
 
-    private _attachField(): void {
+    /**
+     * Relit le champ observé et met à jour le décompte. À appeler après avoir posé la valeur du
+     * champ par programme (modèle d'un framework, valeur préremplie), qui n'émet pas d'événement
+     * `input`. Résout aussi `for` de nouveau : un champ remplacé par le framework est rattaché.
+     */
+    refresh(): void {
         if (!this.for) return;
-        const root = this.getRootNode();
-        const field = (root as Document | ShadowRoot).getElementById(this.for) as
-            HTMLInputElement | HTMLTextAreaElement | null;
-        if (!field) {
-            warn('ar-charcounter', `Aucun élément trouvé avec l'id "${this.for}".`);
+        const field = this._resolveField();
+        if (field !== this._field) {
+            this._detachField();
+            this._attachField();
             return;
         }
+        if (field) this._handleInput();
+    }
+
+    private _resolveField(): (HTMLInputElement | HTMLTextAreaElement) | null {
+        if (!this.for) return null;
+        const root = this.getRootNode() as Document | ShadowRoot;
+        return root.getElementById(this.for) as HTMLInputElement | HTMLTextAreaElement | null;
+    }
+
+    private _attachField(): void {
+        if (!this.for) return;
+        const field = this._resolveField();
+        if (!field) {
+            if (this._warnedMissingFor !== this.for) {
+                this._warnedMissingFor = this.for;
+                warn(
+                    'ar-charcounter',
+                    `Aucun élément avec l'id "${this.for}" pour l'instant : le compteur se rattachera quand il apparaîtra.`,
+                );
+            }
+            this._watchForField();
+            return;
+        }
+        this._stopWatchingForField();
         this._field = field;
         this._count = field.value.length;
         this._computeState();
         this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
+        this._form = field.form;
+        this._form?.addEventListener('reset', this._handleFormReset);
     }
 
     private _detachField(): void {
+        this._stopWatchingForField();
+        clearTimeout(this._resetTimer);
+        this._form?.removeEventListener('reset', this._handleFormReset);
+        this._form = null;
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
         this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;
+    }
+
+    /** Attend l'apparition du champ (rendu après le compteur, `v-if`, `@if`…). */
+    private _watchForField(): void {
+        if (this._fieldWatcher) return;
+        this._fieldWatcher = new MutationObserver(() => {
+            if (this._resolveField()) this._attachField();
+        });
+        this._fieldWatcher.observe(this.getRootNode(), { childList: true, subtree: true });
+    }
+
+    private _stopWatchingForField(): void {
+        this._fieldWatcher?.disconnect();
+        this._fieldWatcher = undefined;
     }
 
     private _ensureId(): string {
@@ -173,6 +225,12 @@ export class ArCharcounter extends ArianeElement {
         this._count = this._field.value.length;
         this._computeState();
         this.requestUpdate();
+    };
+
+    /** Le navigateur applique la remise à zéro après l'événement `reset` : relire à la tâche suivante. */
+    private readonly _handleFormReset = (): void => {
+        clearTimeout(this._resetTimer);
+        this._resetTimer = setTimeout(() => this.refresh(), 0);
     };
 
     private _computeState(): void {

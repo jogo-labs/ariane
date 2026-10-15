@@ -179,6 +179,134 @@ describe('ArCharcounter', () => {
         });
     });
 
+    // ── refresh() : valeur posée par programme ───────────────────────────
+
+    describe('refresh()', () => {
+        const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
+
+        it('relit la valeur posée par programme, sans événement input', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            (document.getElementById('f') as HTMLTextAreaElement).value = 'bonjour';
+            await waitForUpdate(el);
+            expect(remaining()).toBe('200');
+            el.refresh();
+            await waitForUpdate(el);
+            expect(remaining()).toBe('193');
+        });
+
+        it("recalcule l'état et l'annonce comme pour une saisie", async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
+            );
+            (document.getElementById('f') as HTMLTextAreaElement).value = '12345678';
+            el.refresh();
+            await waitForUpdate(el);
+            expect(el.state).toBe('warning');
+        });
+
+        it('se rattache au champ remplacé par le framework (même id)', async () => {
+            document.body.innerHTML = '<div><textarea id="f"></textarea></div>';
+            el = await fixture('<ar-charcounter id="cc" for="f" max="200"></ar-charcounter>');
+            const fresh = document.createElement('textarea');
+            fresh.id = 'f';
+            fresh.value = 'abc';
+            document.querySelector('div')!.replaceChildren(fresh);
+            el.refresh();
+            await waitForUpdate(el);
+            expect(remaining()).toBe('197');
+            expect(fresh.getAttribute('aria-describedby')).toBe('cc');
+            fresh.value = 'abcdef';
+            fresh.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(remaining()).toBe('194');
+        });
+
+        it('est sans effet sans attribut for', async () => {
+            vi.spyOn(console, 'warn').mockImplementation(() => {});
+            el = await fixture('<ar-charcounter max="100"></ar-charcounter>');
+            expect(() => el.refresh()).not.toThrow();
+            vi.restoreAllMocks();
+        });
+    });
+
+    // ── Champ rendu après le compteur ────────────────────────────────────
+
+    describe('champ rendu après le compteur', () => {
+        const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
+        const insertLate = async (id = 'late', value = 'abcde') => {
+            const field = document.createElement('textarea');
+            field.id = id;
+            field.value = value;
+            document.body.appendChild(field);
+            await Promise.resolve(); // livraison du MutationObserver
+            await waitForUpdate(el);
+            return field;
+        };
+
+        beforeEach(() => {
+            vi.spyOn(console, 'warn').mockImplementation(() => {});
+        });
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        it("se rattache quand le champ apparaît, avec sa valeur et l'aria-describedby", async () => {
+            el = await fixture('<ar-charcounter id="cc" for="late" max="100"></ar-charcounter>');
+            const field = await insertLate();
+            expect(remaining()).toBe('95');
+            expect(field.getAttribute('aria-describedby')).toBe('cc');
+        });
+
+        it('suit ensuite la saisie', async () => {
+            el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
+            const field = await insertLate();
+            field.value = 'abcdefgh';
+            field.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(remaining()).toBe('92');
+        });
+
+        it('ne se rattache pas si le compteur a été retiré avant', async () => {
+            el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
+            el.remove();
+            const field = await insertLate();
+            expect(field.hasAttribute('aria-describedby')).toBe(false);
+        });
+
+        it("n'attend plus l'ancien champ après un changement de for", async () => {
+            document.body.innerHTML = '<textarea id="other"></textarea>';
+            el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
+            el.for = 'other';
+            await waitForUpdate(el);
+            await Promise.resolve();
+            const field = await insertLate();
+            expect(field.hasAttribute('aria-describedby')).toBe(false);
+        });
+
+        it("n'avertit qu'une fois par valeur de for, puis pour une nouvelle valeur", async () => {
+            const spy = vi.spyOn(console, 'warn');
+            el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
+            el.refresh();
+            el.refresh();
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('"late"'))).toHaveLength(1);
+            el.for = 'autre';
+            await waitForUpdate(el);
+            await Promise.resolve();
+            await waitForUpdate(el);
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('"autre"'))).toHaveLength(1);
+        });
+
+        it("ne déclenche pas d'avertissement quand le champ existe déjà", async () => {
+            const spy = vi.spyOn(console, 'warn');
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="100"></ar-charcounter>');
+            el.refresh();
+            expect(spy.mock.calls.filter((c) => String(c[0]).includes('"f"'))).toHaveLength(0);
+        });
+    });
+
     // ── Pluralisation du label ────────────────────────────────────────────
 
     describe('pluralisation du label', () => {

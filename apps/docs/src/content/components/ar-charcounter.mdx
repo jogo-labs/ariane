@@ -77,6 +77,7 @@ Les critères WCAG suivants sont implémentés :
 
 ### À votre charge
 
+- **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
@@ -89,3 +90,21 @@ form.addEventListener('submit', (e) => {
 ```
 
 - L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="1.4.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
+
+## Utilisation
+
+### Valeur posée par programme
+
+Un champ dont la valeur est posée par code (modèle d'un framework, valeur préremplie) n'émet pas d'événement `input` : appelez `refresh()` pour que le compteur relise la valeur.
+
+```js
+textarea.value = 'Texte préchargé';
+counter.refresh();
+```
+
+`refresh()` résout aussi `for` de nouveau : un champ remplacé par le framework (même `id`, nouvel élément) est rattaché.
+
+### Réinitialisation et champ rendu plus tard
+
+- `form.reset()` sur le formulaire du champ est suivi automatiquement.
+- Si le champ n'existe pas encore (`v-if`, `@if`, rendu différé), le compteur se rattache dès qu'il apparaît. Un avertissement de développement le signale une fois.
