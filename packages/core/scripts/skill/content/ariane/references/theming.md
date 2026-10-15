@@ -177,14 +177,8 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 - `ar-label` réagit à `data-ar-char-state="warning"` et `data-ar-char-state="error"` : hook documenté par `ar-charcounter`, à poser sur le label lié au champ observé.
 
 ```html
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/presets/buttons.css"
-/>
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/@ariane-ui/core@<version>/dist/styles/presets/fields.css"
-/>
+<link rel="stylesheet" href="https://jogo-labs.github.io/ariane-starter-kit/presets/buttons.css" />
+<link rel="stylesheet" href="https://jogo-labs.github.io/ariane-starter-kit/presets/fields.css" />
 
 <button class="ar-btn ar-btn-primary">Valider</button>
 
