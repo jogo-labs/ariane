@@ -27,10 +27,15 @@ export class ArTabPanel extends ArianeElement {
     protected readonly _consumer = new ContextConsumer(this, {
         context: tabGroupContext,
         subscribe: true,
-        callback: (registry) => this._setRegistry(registry),
+        callback: (registry) => this.setRegistry(registry),
     });
 
-    private _setRegistry(registry: TabGroupRegistry): void {
+    /**
+     * Rattache le panneau à un registre de groupe. Appelé par `ar-tab-group` pour les panneaux
+     * déjà définis quand il se connecte.
+     * @internal
+     */
+    setRegistry(registry: TabGroupRegistry): void {
         if (this._registry) {
             this._registry.unregisterPanel(this);
         }

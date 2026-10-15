@@ -41,15 +41,20 @@ export class ArTab extends ArianeElement {
      */
     @property({ reflect: true, type: Boolean }) active = false;
 
-    _registry?: TabGroupRegistry | undefined;
+    private _registry?: TabGroupRegistry | undefined;
 
     protected readonly _consumer = new ContextConsumer(this, {
         context: tabGroupContext,
         subscribe: true,
-        callback: (registry) => this._setRegistry(registry),
+        callback: (registry) => this.setRegistry(registry),
     });
 
-    private _setRegistry(registry: TabGroupRegistry): void {
+    /**
+     * Rattache l'onglet à un registre de groupe. Appelé par `ar-tab-group` pour les onglets déjà
+     * définis quand il se connecte.
+     * @internal
+     */
+    setRegistry(registry: TabGroupRegistry): void {
         if (this._registry) {
             this._registry.unregisterTab(this);
         }

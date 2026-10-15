@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate } from '../../test-utils.js';
 import type { ArTabPanel } from './tab-panel.js';
 import './index.js';
@@ -12,6 +12,22 @@ describe('ArTabPanel', () => {
             el = await fixture('<ar-tab-panel name="a">Contenu</ar-tab-panel>');
             expect(el.shadowRoot).not.toBeNull();
             expect(el.shadowRoot?.querySelector('slot')).not.toBeNull();
+        });
+    });
+
+    describe('setRegistry (rattachement par le groupe)', () => {
+        it('enregistre le panneau auprès du registre fourni', async () => {
+            el = await fixture('<ar-tab-panel name="a">Contenu</ar-tab-panel>');
+            const registry = {
+                registerTab: vi.fn(),
+                unregisterTab: vi.fn(),
+                registerPanel: vi.fn(),
+                unregisterPanel: vi.fn(),
+                activate: vi.fn(),
+                notifyTabChanged: vi.fn(),
+            };
+            el.setRegistry(registry);
+            expect(registry.registerPanel).toHaveBeenCalledWith(el);
         });
     });
 
