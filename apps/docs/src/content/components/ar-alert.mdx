@@ -58,11 +58,14 @@ import WcagRef from '../../components/WcagRef.astro';
   `alert`. Pour un `status`, l'alerte doit exister dans la page avant son contenu : l'insérer vide,
   puis la remplir (avec VoiceOver, Safari comme Chrome, un `status` inséré avec son texte n'est
   signalé que par un son, alors que le même `status` inséré vide puis rempli est annoncé).
-- Avec VoiceOver (Safari, Chrome et Firefox), une alerte présente dès le chargement de la page n'est
-  pas annoncée de façon fiable, que le `role` soit écrit dans le HTML ou par le composant (Firefox
-  ne la vocalise pas du tout) : elle se lit comme le reste du contenu. Pour qu'un message soit
-  annoncé, l'insérer après le chargement, ou appeler `announceA11y(message)` (exporté par la
-  librairie). NVDA et JAWS n'ont pas encore été vérifiés.
+- Alertes présentes dès le chargement de la page (observé avec VoiceOver) : une `alert` seule est
+  en général annoncée (Safari et Chrome) ; quand plusieurs alertes sont présentes ensemble, une
+  partie seulement l'est, le navigateur ne transmettant pas tout à VoiceOver. Un `status` n'est
+  signalé que par un son, sans texte. Avec Firefox, VoiceOver ne vocalise aucune alerte au
+  chargement (combinaison très minoritaire, et le comportement est le même pour un `<div
+role="alert">`). Écrire `role` dans le HTML ou le laisser au composant ne change pas ce résultat.
+  Pour garantir une annonce, insérer l'alerte après le chargement ou appeler
+  `announceA11y(message)` (exporté par la librairie). NVDA et JAWS n'ont pas encore été vérifiés.
 - Changer `role` ou `variant` sur une alerte déjà affichée n'est pas annoncé en soi : seule la
   modification de son contenu l'est.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
