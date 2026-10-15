@@ -197,13 +197,18 @@
         <h2>C. Modification d'une alerte déjà présente</h2>
         <section id="C">
             <p>
-                Séquence suggérée : (1) <em>Recréer l'alerte</em> ; (2) <em>Passer en error</em> (le
-                composant passe <code>role</code> à <code>alert</code>) ; (3)
-                <em>Poser role="status"</em> comme le ferait une liaison de framework ; (4)
-                <em>Passer en info</em> puis <em>Passer en error</em> : le <code>role</code>
-                posé par l'application doit rester <code>status</code> ; (5)
-                <em>Retirer l'attribut role</em> puis <em>Passer en warning</em> : le composant
-                reprend la main (<code>alert</code>).
+                Un changement de <code>role</code> n'est <strong>pas</strong> annoncé en lui-même :
+                seule la modification du contenu d'une zone live l'est. Pour observer l'effet du
+                rôle, appliquer l'action, puis cliquer <em>Changer le texte</em> et noter si le
+                nouveau texte est annoncé, et avec quelle insistance. Séquence suggérée : (1)
+                <em>Recréer l'alerte</em> ; (2) <em>Passer en error</em> puis <em>Changer le
+                texte</em> (le composant écrit <code>role="alert"</code>) ; (3)
+                <em>Poser role="status"</em> comme le ferait une liaison de framework, puis
+                <em>Changer le texte</em> ; (4) <em>Passer en info</em>, <em>Passer en error</em>,
+                <em>Changer le texte</em> : le <code>role</code> posé par l'application doit rester
+                <code>status</code> ; (5) <em>Retirer l'attribut role</em>, <em>Passer en
+                warning</em>, <em>Changer le texte</em> (deux fois : un rôle ajouté à un élément
+                existant peut mettre un cycle à s'enregistrer comme zone live).
             </p>
             <div id="c-zone">
                 <ar-alert variant="info" id="c-alert">C1. Alerte modifiable (variante info)</ar-alert>
@@ -380,10 +385,10 @@
                 ['B5 témoin div role="status"', 'status'],
                 ['B6 insérer info + role="alert"', 'alert'],
                 ['B7 info vide puis remplie', 'status, annonce du texte ajouté'],
-                ['C1 passer en error (rôle du composant)', 'alert'],
-                ['C1 role="status" posé, variant changé (rôle de l’application conservé)', 'status'],
-                ['C1 attribut role retiré puis variant changé (le composant reprend)', 'alert/status selon variant'],
-                ['C1 texte changé', 'annonce du nouveau texte'],
+                ['C1 passer en error, puis changer le texte (rôle du composant)', 'texte annoncé (alert)'],
+                ['C1 role="status" posé, variant changé, puis texte changé (rôle de l’application conservé)', 'texte annoncé (status)'],
+                ['C1 attribut role retiré, variant changé, puis texte changé deux fois (le composant reprend)', 'texte annoncé (alert ou status selon variant)'],
+                ['C1 texte changé seul', 'texte annoncé'],
             ];
             const tbody = document.querySelector('#results tbody');
             scenarios.forEach(([s, expected]) => {
