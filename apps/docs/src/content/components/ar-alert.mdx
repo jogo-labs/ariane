@@ -56,7 +56,13 @@ import WcagRef from '../../components/WcagRef.astro';
   avertissement d'hydratation en développement. Écrire `role` dans le markup l'évite.
 - Une alerte ajoutée dynamiquement à la page n'est annoncée de façon fiable que si son rôle est
   `alert`. Pour un `status`, l'alerte doit exister dans la page avant son contenu : l'insérer vide,
-  puis la remplir.
+  puis la remplir (avec VoiceOver, Safari comme Chrome, un `status` inséré avec son texte n'est
+  signalé que par un son, alors que le même `status` inséré vide puis rempli est annoncé).
+- Une alerte présente dès le chargement de la page n'est pas annoncée de façon fiable par les
+  lecteurs d'écran, quel que soit le mécanisme (`role` écrit dans le HTML ou par le composant) : elle
+  se lit comme le reste du contenu. Pour qu'un message soit annoncé, l'insérer après le chargement.
+- Changer `role` ou `variant` sur une alerte déjà affichée n'est pas annoncé en soi : seule la
+  modification de son contenu l'est.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
   est portée par le `role`, pas par l'icône.
 - Une icône par défaut est fournie pour les 4 variants connus (`error`, `warning`,
