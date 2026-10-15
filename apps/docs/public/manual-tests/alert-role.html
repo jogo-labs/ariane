@@ -155,6 +155,17 @@
             <ar-alert variant="info" role="alert" id="a-info-alert"
                 >A6. Information avec <code>role="alert"</code> écrit par l'auteur (attendu : alert)</ar-alert
             >
+            <ar-alert variant="error" role="alert" id="a-error-alert"
+                >A8. Erreur avec <code>role="alert"</code> écrit par l'application, comme A1 mais
+                l'attribut est dans le HTML (attendu : alert)</ar-alert
+            >
+            <div class="ref" role="alert" id="a-ref-alert">
+                A9. Témoin natif <code>div role="alert"</code> présent au chargement (attendu : alert)
+            </div>
+            <div class="ref" role="status" id="a-ref-status">
+                A10. Témoin natif <code>div role="status"</code> présent au chargement (attendu :
+                status)
+            </div>
             <ar-alert variant="error" without-notification id="a-silent"
                 >A7. Erreur avec <code>without-notification</code> (attendu : aucun rôle, aucune
                 annonce)</ar-alert
@@ -359,6 +370,9 @@
                 ['A5 error + role="status" (application)', 'status'],
                 ['A6 info + role="alert" (application)', 'alert'],
                 ['A7 without-notification', 'aucun rôle, aucune annonce'],
+                ['A8 error + role="alert" écrit dans le HTML (comparer à A1)', 'alert'],
+                ['A9 témoin natif div role="alert" au chargement', 'alert'],
+                ['A10 témoin natif div role="status" au chargement', 'status'],
                 ['B1 insérer error', 'alert'],
                 ['B2 insérer info', 'status'],
                 ['B3 insérer error + role="status"', 'status'],
