@@ -217,7 +217,6 @@ Le build est orchestré par des scripts esbuild dans `scripts/`.
 | `dist/`                             | ESM tree-shakeable, Lit en peer dependency             |
 | `cdn/`                              | Bundle auto-contenu (Lit inclus), minifié              |
 | `dist/custom-elements.json`         | Manifest CEM — source de vérité pour la doc et les IDE |
-| `dist/styles/themes/`               | Fichiers CSS de thème prêts à l'emploi                 |
 | `dist/vscode.html-custom-data.json` | Autocomplétion HTML VS Code                            |
 | `dist/vscode.css-custom-data.json`  | Autocomplétion CSS VS Code                             |
 
