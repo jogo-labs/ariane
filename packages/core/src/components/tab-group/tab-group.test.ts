@@ -78,7 +78,7 @@ describe('ArTabGroup', () => {
             expect(el.hasAttribute('label')).toBe(false);
         });
 
-        it('reflète active et label quand ils ont une valeur, et les retire à vide', async () => {
+        it('reflète active et label quand ils ont une valeur ; revenus à vide, les attributs restent', async () => {
             el = await fixture(DEFAULT_HTML);
             el.active = 'b';
             el.label = 'Mon groupe';
@@ -88,8 +88,9 @@ describe('ArTabGroup', () => {
             el.active = '';
             el.label = '';
             await waitForUpdate(el);
-            expect(el.hasAttribute('active')).toBe(false);
-            expect(el.hasAttribute('label')).toBe(false);
+            // Comme un attribut natif (`id`) : une fois posé, l'attribut reste, même vide.
+            expect(el.getAttribute('active')).toBe('');
+            expect(el.getAttribute('label')).toBe('');
         });
 
         it('lit toujours les attributs posés dans le HTML', async () => {

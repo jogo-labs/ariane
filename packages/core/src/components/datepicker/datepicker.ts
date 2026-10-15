@@ -152,7 +152,7 @@ export class ArDatepicker extends ArianeFormElement {
     private readonly localize = new LocalizeController(this);
 
     /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
-    @property({ reflect: true }) value = '';
+    @property({ reflect: true, useDefault: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
     @property() format = 'dd/MM/yyyy';
     /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */

@@ -1,6 +1,5 @@
 import { property, state } from 'lit/decorators.js';
 import { ArianeElement } from './ariane-element.js';
-import { reflectWhenNotEmpty } from '../internal/reflect-when-not-empty.js';
 
 /** `validity` de repli quand `ElementInternals` n'existe pas (happy-dom, avant la connexion). */
 const VALID_STATE = Object.freeze({
@@ -33,8 +32,8 @@ const VALID_STATE = Object.freeze({
 export class ArianeFormElement extends ArianeElement {
     static formAssociated = true;
 
-    /** Identifie le champ dans `FormData`. Réfléchi en attribut seulement quand il est renseigné. */
-    @property({ reflect: true, converter: reflectWhenNotEmpty }) name = '';
+    /** Identifie le champ dans `FormData`. */
+    @property({ reflect: true, useDefault: true }) name = '';
 
     /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;

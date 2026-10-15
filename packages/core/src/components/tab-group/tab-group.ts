@@ -8,7 +8,6 @@ import { ArTabPanel } from '../tab-panel/tab-panel.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent } from '../../utils/emit-event.js';
 import styles from './tab-group.styles.js';
-import { reflectWhenNotEmpty } from '../../internal/reflect-when-not-empty.js';
 
 /**
  * @summary Organise du contenu associé dans un même conteneur qui affiche un panneau à la fois, avec des onglets pour naviguer entre eux.
@@ -35,10 +34,10 @@ export class ArTabGroup extends ArianeElement {
     static override styles = [styles];
 
     /** Nom de l'onglet actif. Si absent, le premier onglet non-disabled s'active. */
-    @property({ reflect: true, converter: reflectWhenNotEmpty }) active = '';
+    @property({ reflect: true, useDefault: true }) active = '';
 
     /** aria-label sur le tablist — recommandé si plusieurs ar-tab-group sur la page. */
-    @property({ reflect: true, converter: reflectWhenNotEmpty }) label = '';
+    @property({ reflect: true, useDefault: true }) label = '';
 
     /** Active le mode manuel : les flèches déplacent le focus sans activer l'onglet. */
     @property({ attribute: 'manual-activation', reflect: true, type: Boolean })
@@ -145,6 +144,10 @@ export class ArTabGroup extends ArianeElement {
 
     override firstUpdated(): void {
         this._initialized = true;
+        // Première synchronisation une fois initialisé (avertissements de panneau orphelin compris).
+        // Avec `useDefault`, la valeur initiale de `active` n'est plus dans `changed` : on ne peut
+        // plus compter sur `updated()` pour ce premier passage.
+        this._syncAll();
         this._setupScrollHints();
     }
 

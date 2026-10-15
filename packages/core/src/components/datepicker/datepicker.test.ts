@@ -489,6 +489,17 @@ describe('ArDatepicker', () => {
         });
     });
 
+    describe('réflexion de value (#325)', () => {
+        it('n\'écrit pas value="" au premier rendu, mais reflète une valeur posée', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            await waitForUpdate(el);
+            expect(el.hasAttribute('value')).toBe(false);
+            el.value = '2026-06-12';
+            await waitForUpdate(el);
+            expect(el.getAttribute('value')).toBe('2026-06-12');
+        });
+    });
+
     describe('formResetCallback (#325)', () => {
         it('restaure la valeur initiale, remet le texte de saisie et ferme le panneau', async () => {
             el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');

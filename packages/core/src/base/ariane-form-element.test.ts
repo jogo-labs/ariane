@@ -78,7 +78,7 @@ describe('ArianeFormElement', () => {
         expect(el.hasAttribute('required')).toBe(true);
     });
 
-    it('name n\'est réfléchi que quand il a une valeur (pas de name="" au premier rendu)', async () => {
+    it('name n\'est pas réfléchi au premier rendu (pas de name=""), puis l\'est comme un attribut natif', async () => {
         el = await fixture<TestArianeFormElement>(
             '<test-ariane-form-element></test-ariane-form-element>',
         );
@@ -88,7 +88,11 @@ describe('ArianeFormElement', () => {
         expect(el.getAttribute('name')).toBe('champ');
         el.name = '';
         await el.updateComplete;
-        expect(el.hasAttribute('name')).toBe(false);
+        // Comme `id` : une fois posé, l'attribut reste, même vide.
+        expect(el.getAttribute('name')).toBe('');
+        el.removeAttribute('name');
+        await el.updateComplete;
+        expect(el.name).toBe('');
     });
 
     it("lit l'attribut name posé dans le HTML", async () => {

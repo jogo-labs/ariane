@@ -43,7 +43,7 @@ chaque nouveau composant (cf. #253 pour le raisonnement complet).
 **Composant qui participe à un `<form>` natif** (ex. `ar-datepicker`) : `extends
 ArianeFormElement` à la place (`packages/core/src/base/ariane-form-element.ts`) —
 `formAssociated = true` est hérité automatiquement, pas besoin de le redéclarer. La base fournit
-déjà `name` (réfléchi seulement quand il est renseigné), `disabled`, `required`, la cascade
+déjà `name` (réfléchi, pas au premier rendu), `disabled`, `required`, la cascade
 `<fieldset disabled>` (`this.effectiveDisabled`, à utiliser à la place de `this.disabled`) et
 l'API de validation standard de l'hôte (`checkValidity()`, `validity`, `setCustomValidity()`…) :
 ne pas les redéclarer.
@@ -63,6 +63,13 @@ ne pas les redéclarer.
 `HTMLElement.prototype` (cf. `ariane-form-element.test.ts`), ou passe par un
 `*.browser.test.ts` (Playwright réel) pour `FormData`, `form.reset()` et la validité (cf.
 `datepicker.form.browser.test.ts`).
+
+**Propriété texte réfléchie en attribut** (`reflect: true`) : ajouter `useDefault: true`
+(`@property({ reflect: true, useDefault: true }) label = ''`, Lit ≥ 3.3.0). Sans lui, Lit écrit
+`label=""` au premier rendu, ce qui ne correspond pas au HTML serveur et déclenche l'avertissement
+d'hydratation de React et Next.js. Effet de bord : la valeur initiale n'est plus dans `changed` au
+premier `updated()`, donc ne pas compter sur `changed.has('prop')` pour un premier passage (le faire
+explicitement dans `firstUpdated()`).
 
 ## Naming
 
