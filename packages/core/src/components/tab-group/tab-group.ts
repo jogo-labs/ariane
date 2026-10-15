@@ -3,11 +3,20 @@ import { ArianeElement } from '../../base/ariane-element.js';
 import { property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { tabGroupContext, type TabGroupRegistry } from '../../context/tabs.context.js';
-import type { ArTab } from '../tab/tab.js';
-import type { ArTabPanel } from '../tab-panel/tab-panel.js';
+import { ArTab } from '../tab/tab.js';
+import { ArTabPanel } from '../tab-panel/tab-panel.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent } from '../../utils/emit-event.js';
 import styles from './tab-group.styles.js';
+
+/**
+ * Attribut réfléchi seulement quand il a une valeur : un `active=""` ou `label=""` écrit au premier
+ * rendu ne correspond pas au HTML serveur et fait échouer l'hydratation (React, Next.js).
+ */
+const reflectWhenNotEmpty = {
+    fromAttribute: (value: string | null): string => value ?? '',
+    toAttribute: (value: string): string | null => value || null,
+};
 
 /**
  * @summary Organise du contenu associé dans un même conteneur qui affiche un panneau à la fois, avec des onglets pour naviguer entre eux.
@@ -34,10 +43,10 @@ export class ArTabGroup extends ArianeElement {
     static override styles = [styles];
 
     /** Nom de l'onglet actif. Si absent, le premier onglet non-disabled s'active. */
-    @property({ reflect: true }) active = '';
+    @property({ reflect: true, converter: reflectWhenNotEmpty }) active = '';
 
     /** aria-label sur le tablist — recommandé si plusieurs ar-tab-group sur la page. */
-    @property({ reflect: true }) label = '';
+    @property({ reflect: true, converter: reflectWhenNotEmpty }) label = '';
 
     /** Active le mode manuel : les flèches déplacent le focus sans activer l'onglet. */
     @property({ attribute: 'manual-activation', reflect: true, type: Boolean })
@@ -122,7 +131,24 @@ export class ArTabGroup extends ArianeElement {
     override connectedCallback(): void {
         super.connectedCallback();
         this.addEventListener('keydown', this._handleKeyDown);
+        this._collectExistingItems();
         if (this._initialized) this._setupScrollHints();
+    }
+
+    /**
+     * Rattache les onglets et panneaux déjà définis avant le groupe (ordre de chargement d'un
+     * framework, de l'autoloader ou d'imports par composant) : ils ont demandé leur registre par
+     * contexte avant que le groupe existe et n'ont reçu aucune réponse. Un élément n'appartient à
+     * ce groupe que si son groupe le plus proche est celui-ci (groupes imbriqués).
+     */
+    private _collectExistingItems(): void {
+        for (const el of this.querySelectorAll('*')) {
+            if (el.parentElement?.closest(this.localName) !== this) continue;
+            if (el instanceof ArTab && !this._tabs.includes(el)) el.setRegistry(this._registry);
+            else if (el instanceof ArTabPanel && !this._panels.includes(el)) {
+                el.setRegistry(this._registry);
+            }
+        }
     }
 
     override firstUpdated(): void {
@@ -156,15 +182,29 @@ export class ArTabGroup extends ArianeElement {
         return this._tabs.find((t) => !t.disabled)?.panel ?? '';
     }
 
+    /** `id` générés par le composant : seuls ceux-là sont régénérés, jamais un `id` de l'application. */
+    private readonly _generatedIds = new WeakMap<Element, string>();
+
+    private _ensureId(el: HTMLElement, wanted: string): void {
+        if (!el.id || el.id === this._generatedIds.get(el)) {
+            el.id = wanted;
+            this._generatedIds.set(el, wanted);
+        }
+    }
+
     private _syncAll(): void {
         const active = this._effectiveActive;
         const pfx = this._prefix;
 
+        // Les `id` d'abord (panneaux et onglets) : l'ARIA se câble sur les `id` réels.
+        this._panels.forEach((panel) => this._ensureId(panel, `${pfx}-panel-${panel.name}`));
+        this._tabs.forEach((tab) => this._ensureId(tab, `${pfx}-tab-${tab.panel}`));
+
         this._tabs.forEach((tab) => {
             const isActive = tab.panel === active;
+            const panel = this._panels.find((p) => p.name === tab.panel);
             tab.setAttribute('role', 'tab');
-            tab.id = `${pfx}-tab-${tab.panel}`;
-            tab.setAttribute('aria-controls', `${pfx}-panel-${tab.panel}`);
+            tab.setAttribute('aria-controls', panel?.id ?? `${pfx}-panel-${tab.panel}`);
             tab.setAttribute('aria-selected', String(isActive));
             tab.active = isActive;
             tab.setAttribute('tabindex', isActive ? '0' : '-1');
@@ -173,7 +213,7 @@ export class ArTabGroup extends ArianeElement {
             } else {
                 tab.removeAttribute('aria-disabled');
             }
-            if (tab.panel && !this._panels.find((p) => p.name === tab.panel)) {
+            if (tab.panel && !panel) {
                 if (this._initialized) {
                     warn('ar-tab-group', `Aucun ar-tab-panel avec name="${tab.panel}" trouvé.`);
                 }
@@ -182,9 +222,9 @@ export class ArTabGroup extends ArianeElement {
 
         this._panels.forEach((panel) => {
             const isActive = panel.name === active;
+            const tab = this._tabs.find((t) => t.panel === panel.name);
             panel.setAttribute('role', 'tabpanel');
-            panel.id = `${pfx}-panel-${panel.name}`;
-            panel.setAttribute('aria-labelledby', `${pfx}-tab-${panel.name}`);
+            panel.setAttribute('aria-labelledby', tab?.id ?? `${pfx}-tab-${panel.name}`);
             panel.setAttribute('tabindex', '0');
             if (isActive) {
                 panel.removeAttribute('hidden');
