@@ -20,7 +20,7 @@
 
 Le thème de départ est celui du starter-kit : https://github.com/jogo-labs/ariane-starter-kit (démo Kitchen Sink : https://jogo-labs.github.io/ariane-starter-kit/). Il gère les modes clair et sombre et sert directement, ou de base pour un thème propre. Copier ses fichiers CSS dans le projet, puis les charger.
 
-- Aucune feuille de thème de départ n'est versionnée (ni sur npm, ni sur le CDN `unpkg`) : les fichiers du starter-kit se copient depuis GitHub. Le paquet contient `themes/ariane.css` et `themes/ariane.js`, mais c'est le thème de la documentation d'Ariane : interne, sans garantie de stabilité ; ne jamais le charger, l'importer, le recommander ni s'en servir de base.
+- Aucune feuille de thème de départ n'est versionnée (ni sur npm, ni sur le CDN `unpkg`) : les fichiers du starter-kit se copient depuis GitHub.
 - Le point d'entrée du starter est `ariane-starter.css`, une liste d'`@import` de ses fragments.
 
 Avec un bundler, depuis la copie locale :
@@ -201,7 +201,7 @@ Si l'application place ses pages ou une partie de son contenu dans un web compon
 - Les règles `::part()` du thème du document ne traversent pas : les composants Ariane dans ce shadow DOM n'ont que leurs tokens. Le thème doit rester chargé au niveau du document (sans lui, aucun token).
 - Pour les `::part()`, adopter une feuille de style dans chaque shadow root concerné (`adoptedStyleSheets`, chargement synchrone, instance partagée, pas de FOUC).
 
-Pour adopter un thème dans un shadow root, il faut une version JavaScript du CSS : un `CSSStyleSheet` peuplé avec les règles composants (`::part()`, dans `@layer ariane.theme`), sans les tokens `:root` (`:root` ne cible jamais un shadow root). Aucune feuille de thème de départ n'est versionnée (le `themes/ariane.js` du paquet est celui de la documentation d'Ariane : interne, à ne pas utiliser). Le starter-kit fournit le script qui la génère : `npm install` puis `npm run build:js` produit `ariane-starter.js`. Pour un autre thème : `node scripts/theme-to-js.js <entrée.css> <sortie.js> --name <identifiant>`, l'export nommé étant l'identifiant donné (`starterTheme` pour `build:js`).
+Pour adopter un thème dans un shadow root, il faut une version JavaScript du CSS : un `CSSStyleSheet` peuplé avec les règles composants (`::part()`, dans `@layer ariane.theme`), sans les tokens `:root` (`:root` ne cible jamais un shadow root). Aucune feuille de thème de départ n'est versionnée. Le starter-kit fournit le script qui la génère : `npm install` puis `npm run build:js` produit `ariane-starter.js`. Pour un autre thème : `node scripts/theme-to-js.js <entrée.css> <sortie.js> --name <identifiant>`, l'export nommé étant l'identifiant donné (`starterTheme` pour `build:js`).
 
 Exemple, avec le fichier généré (export nommé `starterTheme`) :
 
