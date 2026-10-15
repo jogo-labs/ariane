@@ -106,8 +106,9 @@
                     Vérification dans l'outil de développement : onglet « Accessibilité » de Chrome,
                     rôle calculé de chaque
                     <code>ar-alert</code>. Une alerte <code>error</code> doit être
-                    <code>alert</code>, une <code>info</code> doit être <code>status</code>, sans
-                    attribut <code>role</code> dans le DOM.
+                    <code>alert</code>, une <code>info</code> doit être <code>status</code>, et
+                    l'attribut <code>role</code> correspondant est écrit par le composant sur
+                    l'élément (visible dans l'inspecteur du DOM).
                 </li>
             </ol>
             <p>
@@ -120,7 +121,7 @@
         <h2>A. Alertes présentes au chargement (relancer la page avec le lecteur d'écran actif)</h2>
         <section id="A">
             <p>
-                Rôle attendu sans attribut <code>role</code> : <code>error</code> et
+                Rôle attendu, écrit par le composant : <code>error</code> et
                 <code>warning</code> donnent <code>alert</code>, <code>success</code> et
                 <code>info</code> donnent <code>status</code>.
             </p>

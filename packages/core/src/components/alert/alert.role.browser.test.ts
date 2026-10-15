@@ -1,8 +1,9 @@
 /// <reference types="mocha" />
 /**
- * Rôle d'ar-alert dans l'arbre d'accessibilité réel (Chromium, par CDP) : le défaut vient de
- * `ElementInternals.role`, l'attribut `role` de l'auteur le remplace, et le composant n'écrit
- * jamais l'attribut `role` lui-même. WebKit : seuls les tests sans arbre d'accessibilité tournent.
+ * Rôle d'ar-alert : le composant écrit l'attribut `role` de l'hôte (les lecteurs d'écran s'appuient
+ * sur l'attribut du DOM, pas sur `ElementInternals.role`, #334), sauf si l'auteur l'a posé. Les
+ * assertions sur l'arbre d'accessibilité réel (Chromium, par CDP) vérifient le rôle calculé ;
+ * WebKit : seuls les tests d'attribut tournent.
  */
 import { executeServerCommand } from '@web/test-runner-commands';
 import { expect, fixture, html } from '@open-wc/testing';
@@ -39,9 +40,9 @@ describe('ar-alert — rôle dans l’arbre d’accessibilité', () => {
     ];
 
     for (const [variant, expected] of cases) {
-        it(`variant="${variant}" expose le rôle ${expected} sans attribut role`, async function () {
+        it(`variant="${variant}" écrit role="${expected}" et l'expose`, async function () {
             el = await fixture(html`<ar-alert variant=${variant}>Message</ar-alert>`);
-            expect(el.hasAttribute('role')).to.equal(false);
+            expect(el.getAttribute('role')).to.equal(expected);
             const node = await axRole(el);
             if (node === null) return this.skip();
             expect(node.role).to.equal(expected);
@@ -62,13 +63,27 @@ describe('ar-alert — rôle dans l’arbre d’accessibilité', () => {
         expect(node.role).to.equal('alert');
     });
 
-    it("retirer l'attribut role restaure le défaut de la variante", async function () {
+    it("un role d'auteur retiré rend l'attribut au composant à la mise à jour suivante", async function () {
         el = await fixture(html`<ar-alert variant="error" role="status">Message</ar-alert>`);
         el.removeAttribute('role');
+        el.setAttribute('variant', 'warning');
         await el.updateComplete;
+        expect(el.getAttribute('role')).to.equal('alert');
         const node = await axRole(el);
         if (node === null) return this.skip();
         expect(node.role).to.equal('alert');
+    });
+
+    it("un role posé après la connexion (liaison de framework) l'emporte, aussi dans l'arbre", async function () {
+        el = await fixture(html`<ar-alert variant="error">Message</ar-alert>`);
+        expect(el.getAttribute('role')).to.equal('alert');
+        el.setAttribute('role', 'status');
+        el.setAttribute('variant', 'warning');
+        await el.updateComplete;
+        expect(el.getAttribute('role')).to.equal('status');
+        const node = await axRole(el);
+        if (node === null) return this.skip();
+        expect(node.role).to.equal('status');
     });
 
     it('changer variant à chaud met à jour le rôle', async function () {
@@ -102,24 +117,19 @@ describe('ar-alert — rôle dans l’arbre d’accessibilité', () => {
         expect((await axRole(el))?.role).to.equal('generic');
     });
 
-    it("n'écrit jamais l'attribut role, même quand le rôle change", async () => {
-        const seen: string[] = [];
+    it("écrit le role dès l'insertion, avant le premier rendu", () => {
         const host = document.createElement('div');
         document.body.append(host);
-        const observer = new MutationObserver((records) => {
-            for (const r of records) if (r.attributeName === 'role') seen.push('role');
-        });
         el = document.createElement('ar-alert') as ArAlert;
-        observer.observe(el, { attributes: true, attributeFilter: ['role'] });
         el.setAttribute('variant', 'error');
         host.append(el);
-        await el.updateComplete;
-        el.setAttribute('variant', 'info');
-        await el.updateComplete;
-        // Les enregistrements en attente sont livrés au prochain micro-tâche.
-        await Promise.resolve();
-        observer.disconnect();
+        expect(el.hasUpdated).to.equal(false);
+        expect(el.getAttribute('role')).to.equal('alert');
         host.remove();
-        expect(seen).to.deep.equal([]);
+    });
+
+    it('les sélecteurs sur l’attribut role trouvent les alertes (ar-alert[role])', async () => {
+        el = await fixture(html`<ar-alert variant="error">Message</ar-alert>`);
+        expect(document.querySelectorAll('ar-alert[role="alert"]').length).to.be.greaterThan(0);
     });
 });

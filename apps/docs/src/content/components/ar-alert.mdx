@@ -37,9 +37,9 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) exposé par
-  l'élément selon `variant` — `error`/`warning` → `alert`, `success`/`info` → `status`, tout
-  variant custom non reconnu → `status` (défaut sûr) — sans écrire d'attribut `role` — conforme
+- `role="alert"` (interruption immédiate) ou `role="status"` (annonce polie) écrit par le
+  composant sur l'élément selon `variant` — `error`/`warning` → `alert`, `success`/`info` →
+  `status`, tout variant custom non reconnu → `status` (défaut sûr) — conforme
     <WcagRef
         criterion="4.1.3"
         summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus."
@@ -47,8 +47,13 @@ import WcagRef from '../../components/WcagRef.astro';
 - Pour remplacer ce rôle, écrire l'attribut `role` standard : `<ar-alert variant="error" role="status">`
   rend une erreur annoncée poliment (par exemple une erreur déjà visible à l'écran, présente au
   chargement de la page), `<ar-alert variant="info" role="alert">` rend une information annoncée
-  immédiatement. Retirer l'attribut rétablit le rôle de la variante.
-- `without-notification` supprime le rôle par défaut : aucune annonce, sauf si un attribut `role` est écrit sur l'élément.
+  immédiatement. Le composant n'écrit `role` que s'il est absent ou s'il porte encore la valeur
+  qu'il a lui-même écrite : un `role` posé par l'application, avant ou après la connexion, n'est
+  jamais modifié, même quand `variant` change.
+- `without-notification` retire le rôle écrit par le composant : aucune annonce, sauf si un attribut
+  `role` a été écrit par l'application.
+- Rendu serveur (Next.js) : le composant écrit `role` à la connexion, ce qui peut déclencher un
+  avertissement d'hydratation en développement. Écrire `role` dans le markup l'évite.
 - Une alerte ajoutée dynamiquement à la page n'est annoncée de façon fiable que si son rôle est
   `alert`. Pour un `status`, l'alerte doit exister dans la page avant son contenu : l'insérer vide,
   puis la remplir.

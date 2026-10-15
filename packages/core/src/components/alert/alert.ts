@@ -119,15 +119,30 @@ export class ArAlert extends ArianeElement {
     }
 
     /**
-     * Rôle ARIA par défaut, posé dans `ElementInternals` : l'attribut `role` n'est jamais écrit
-     * par le composant, un `role` écrit par l'auteur le remplace (règle de la plateforme).
-     * Tolère `internals` absent (happy-dom, anciens navigateurs).
+     * Dernière valeur de `role` écrite par le composant (`null` s'il n'a rien écrit). Sert à
+     * reconnaître un `role` posé par l'auteur : s'il est présent et différent de cette valeur, il lui
+     * appartient et le composant n'y touche plus.
+     */
+    private _writtenRole: string | null = null;
+
+    /**
+     * Rôle ARIA par défaut, écrit en attribut sur l'hôte : les lecteurs d'écran s'appuient sur
+     * l'attribut `role` du DOM, pas sur `ElementInternals.role` (#334). Le composant n'écrit que si
+     * l'attribut est absent ou égal à la dernière valeur qu'il a lui-même écrite ; un `role` posé par
+     * l'auteur, avant ou après la connexion, n'est jamais modifié.
      */
     private _updateRole(): void {
-        if (!this.internals) return;
-        this.internals.role = this.withoutNotification
+        const current = this.getAttribute('role');
+        if (current !== null && current !== this._writtenRole) return;
+        const wanted = this.withoutNotification
             ? null
             : (ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status');
+        if (wanted === null) {
+            this.removeAttribute('role');
+        } else {
+            this.setAttribute('role', wanted);
+        }
+        this._writtenRole = wanted;
     }
 
     private static readonly _ROLE_BY_VARIANT: Record<string, 'alert' | 'status'> = {
