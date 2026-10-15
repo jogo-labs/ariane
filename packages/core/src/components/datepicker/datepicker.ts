@@ -188,6 +188,9 @@ export class ArDatepicker extends ArianeFormElement {
 
     /** Retour à la valeur initiale : valeur, texte de saisie, sélection du calendrier, panneau. */
     protected override formReset(): void {
+        // Avant le premier rendu, `_defaultValue` n'est pas encore capturé : la valeur courante EST
+        // la valeur initiale, et la restaurer à '' la perdrait.
+        if (!this.hasUpdated) return;
         const date = this._defaultValue ? parse(this._defaultValue, 'yyyy-MM-dd').date : null;
         this._calendar.selectedDate = date;
         if (date) {

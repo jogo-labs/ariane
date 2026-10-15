@@ -42,13 +42,27 @@ chaque nouveau composant (cf. #253 pour le raisonnement complet).
 
 **Composant qui participe à un `<form>` natif** (ex. `ar-datepicker`) : `extends
 ArianeFormElement` à la place (`packages/core/src/base/ariane-form-element.ts`) —
-`formAssociated = true` est hérité automatiquement, pas besoin de le redéclarer. Utiliser
-`this.internals?.setFormValue(...)`/`this.internals?.setValidity(...)` directement, sans
-wrapper : `this.internals` est déjà pleinement typé et découvrable. `happy-dom` (Vitest)
-n'implémente pas `attachInternals()` — `this.internals` y reste `undefined` ; un test qui a
-besoin de l'exerciser l'injecte temporairement sur `HTMLElement.prototype` (cf.
-`datepicker.test.ts`, `describe('setValidity / required')`), ou passe par un
-`*.browser.test.ts` (Playwright réel) pour `:state()`.
+`formAssociated = true` est hérité automatiquement, pas besoin de le redéclarer. La base fournit
+déjà `name` (réfléchi seulement quand il est renseigné), `disabled`, `required`, la cascade
+`<fieldset disabled>` (`this.effectiveDisabled`, à utiliser à la place de `this.disabled`) et
+l'API de validation standard de l'hôte (`checkValidity()`, `validity`, `setCustomValidity()`…) :
+ne pas les redéclarer.
+
+- Valeur soumise : `this.internals?.setFormValue(...)`.
+- Validité : **toujours `this.setComponentValidity(flags, message, ancre?)`**, jamais
+  `this.internals?.setValidity(...)` directement — un appel direct écraserait à chaque rendu
+  l'erreur posée par le consommateur avec `setCustomValidity()`. `{}` signifie valide ; un
+  drapeau vrai exige un message (localisé : `validation` + drapeau dans `Translation`).
+- Réinitialisation (`form.reset()`) : surcharger `protected formReset()` pour revenir à la valeur
+  initiale (mémorisée au premier rendu, pas l'attribut `value`, réfléchi). Ne pas émettre
+  d'événement de valeur. Ne rien faire tant que `!this.hasUpdated`.
+- Ne pas redéclarer `formDisabledCallback` ni `formResetCallback` (hérités).
+
+`happy-dom` (Vitest) n'implémente pas `attachInternals()` — `this.internals` y reste
+`undefined` ; un test qui a besoin de l'exercer l'injecte temporairement sur
+`HTMLElement.prototype` (cf. `ariane-form-element.test.ts`), ou passe par un
+`*.browser.test.ts` (Playwright réel) pour `FormData`, `form.reset()` et la validité (cf.
+`datepicker.form.browser.test.ts`).
 
 ## Naming
 

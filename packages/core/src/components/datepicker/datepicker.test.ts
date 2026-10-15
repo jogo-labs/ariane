@@ -514,6 +514,15 @@ describe('ArDatepicker', () => {
             expect(el.inputElement.value).toBe('');
         });
 
+        it('un reset avant le premier rendu conserve la valeur initiale', async () => {
+            el = document.createElement('ar-datepicker') as ArDatepicker;
+            el.setAttribute('value', '2026-05-01');
+            document.body.append(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+        });
+
         it('la valeur initiale reste celle du premier rendu', async () => {
             el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');
             await waitForUpdate(el);

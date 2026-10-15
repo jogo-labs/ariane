@@ -78,6 +78,26 @@ describe('ArianeFormElement', () => {
         expect(el.hasAttribute('required')).toBe(true);
     });
 
+    it('name n\'est réfléchi que quand il a une valeur (pas de name="" au premier rendu)', async () => {
+        el = await fixture<TestArianeFormElement>(
+            '<test-ariane-form-element></test-ariane-form-element>',
+        );
+        expect(el.hasAttribute('name')).toBe(false);
+        el.name = 'champ';
+        await el.updateComplete;
+        expect(el.getAttribute('name')).toBe('champ');
+        el.name = '';
+        await el.updateComplete;
+        expect(el.hasAttribute('name')).toBe(false);
+    });
+
+    it("lit l'attribut name posé dans le HTML", async () => {
+        el = await fixture<TestArianeFormElement>(
+            '<test-ariane-form-element name="date"></test-ariane-form-element>',
+        );
+        expect(el.name).toBe('date');
+    });
+
     it('effectiveDisabled combine disabled et la cascade fieldset (formDisabledCallback)', async () => {
         el = await fixture<TestArianeFormElement>(
             '<test-ariane-form-element></test-ariane-form-element>',

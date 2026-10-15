@@ -89,6 +89,35 @@ describe('ar-datepicker — formulaire', () => {
         });
     });
 
+    describe('form.reset() avec le panneau ouvert', () => {
+        it('ferme le panneau avec ses événements habituels, sans événement de valeur', async () => {
+            const { form, el } = await mount(
+                '<ar-datepicker name="d" value="2026-05-01"></ar-datepicker>',
+            );
+            el.value = '2026-06-02';
+            el.open = true;
+            await el.updateComplete;
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            const seen: string[] = [];
+            for (const name of [
+                'ar-datepicker-input-change',
+                'ar-datepicker-input-complete',
+                'ar-datepicker-hide',
+                'ar-datepicker-hidden',
+            ]) {
+                el.addEventListener(name, () => seen.push(name));
+            }
+            form.reset();
+            await el.updateComplete;
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            expect(el.open).to.equal(false);
+            expect(seen).to.not.include('ar-datepicker-input-change');
+            expect(seen).to.not.include('ar-datepicker-input-complete');
+            expect(seen).to.include('ar-datepicker-hide');
+            expect(seen).to.include('ar-datepicker-hidden');
+        });
+    });
+
     describe('API de validation', () => {
         it('un champ obligatoire vide est invalide, avec le message localisé', async () => {
             const { form, el } = await mount('<ar-datepicker required></ar-datepicker>');

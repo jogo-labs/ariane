@@ -22,18 +22,18 @@ Les trois décisions de conception ont été validées avec le mainteneur le 202
 
 ## Décisions
 
-| Sujet                      | Décision                                                                                                                                                                        |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Propriétés de la base      | `name` (réfléchi), `disabled` (booléen réfléchi), `required` (booléen réfléchi). `readonly` et `value` restent dans le datepicker.                                              |
-| Cascade fieldset           | `_formDisabled` (état), `formDisabledCallback(disabled)` et l'accesseur `effectiveDisabled` passent dans la base.                                                               |
-| Délégués de validation     | `validity`, `validationMessage`, `willValidate`, `form`, `labels`, `checkValidity()`, `reportValidity()`, `setCustomValidity(message)`, publics, vers `ElementInternals`.       |
-| Sans `ElementInternals`    | Valeurs de repli inoffensives (voir ci-dessous), aucune exception.                                                                                                              |
-| Fusion de la validité      | `setComponentValidity(flags, message?, anchor?)`, protégé, remplace les appels directs à `internals.setValidity` ; ajoute `customError` tant qu'un message personnalisé existe. |
-| Erreur personnalisée       | Persiste jusqu'à `setCustomValidity('')`, y compris après `form.reset()` et après une nouvelle saisie (comportement natif).                                                     |
-| Réinitialisation           | `formResetCallback()` de la base appelle le crochet protégé `formReset()` (sans effet par défaut). Aucun événement émis.                                                        |
-| Valeur initiale            | `value` au premier rendu (`firstUpdated`), mémorisée par le datepicker.                                                                                                         |
-| `formStateRestoreCallback` | Différé : aucun constat ne le demande, ajout non cassant plus tard.                                                                                                             |
-| Changement incompatible    | Aucun : ajouts seulement. Les noms (`name`, `disabled`, `required`) existent déjà sur le datepicker.                                                                            |
+| Sujet                      | Décision                                                                                                                                                                                                                                           |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Propriétés de la base      | `name` (réfléchi seulement quand renseigné, pour ne pas écrire `name=""` au premier rendu : défaut d'hydratation), `disabled` (booléen réfléchi), `required` (booléen réfléchi). `readonly` et `value` restent dans le datepicker.                 |
+| Cascade fieldset           | `_formDisabled` (état), `formDisabledCallback(disabled)` et l'accesseur `effectiveDisabled` passent dans la base.                                                                                                                                  |
+| Délégués de validation     | `validity`, `validationMessage`, `willValidate`, `form`, `labels`, `checkValidity()`, `reportValidity()`, `setCustomValidity(message)`, publics, vers `ElementInternals`.                                                                          |
+| Sans `ElementInternals`    | Valeurs de repli inoffensives (voir ci-dessous), aucune exception.                                                                                                                                                                                 |
+| Fusion de la validité      | `setComponentValidity(flags, message?, anchor?)`, protégé, remplace les appels directs à `internals.setValidity` ; ajoute `customError` tant qu'un message personnalisé existe.                                                                    |
+| Erreur personnalisée       | Persiste jusqu'à `setCustomValidity('')`, y compris après `form.reset()` et après une nouvelle saisie (comportement natif).                                                                                                                        |
+| Réinitialisation           | `formResetCallback()` de la base appelle le crochet protégé `formReset()` (sans effet par défaut). Aucun événement de valeur émis ; un panneau ouvert se ferme avec ses événements habituels `hide` / `hidden`. Sans effet avant le premier rendu. |
+| Valeur initiale            | `value` au premier rendu (`firstUpdated`), mémorisée par le datepicker.                                                                                                                                                                            |
+| `formStateRestoreCallback` | Différé : aucun constat ne le demande, ajout non cassant plus tard.                                                                                                                                                                                |
+| Changement incompatible    | Aucun : ajouts seulement. Les noms (`name`, `disabled`, `required`) existent déjà sur le datepicker.                                                                                                                                               |
 
 ## Conception
 
@@ -89,7 +89,7 @@ export class ArianeFormElement extends ArianeElement {
 - `_syncFormValue()` appelle `setComponentValidity` (au lieu de `internals.setValidity`) : `{}` quand valide ou désactivé, `{ valueMissing: true }` avec `validationValueMissing` sinon.
 - Mémorise `_defaultValue = this.value` dans `firstUpdated`.
 - Surcharge `formReset()` : `this.value = this._defaultValue`, texte de saisie remis en cohérence (`_syncInputFromValue()` ou vidé), sélection du calendrier alignée sur la valeur, panneau fermé. La valeur redevient « initiale » même si le texte saisi n'était pas encore validé.
-- Aucun événement émis par la réinitialisation (comme un `<input>`).
+- Aucun événement de valeur émis par la réinitialisation (comme un `<input>`) ; si le panneau est ouvert, il se ferme avec `hide` / `hidden` (ce qui peut être annulé par un écouteur). Avant le premier rendu, `formReset()` ne fait rien (la valeur courante est la valeur initiale).
 
 ### Documentation et skill
 

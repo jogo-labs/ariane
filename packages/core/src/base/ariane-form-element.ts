@@ -1,5 +1,6 @@
 import { property, state } from 'lit/decorators.js';
 import { ArianeElement } from './ariane-element.js';
+import { reflectWhenNotEmpty } from '../internal/reflect-when-not-empty.js';
 
 /** `validity` de repli quand `ElementInternals` n'existe pas (happy-dom, avant la connexion). */
 const VALID_STATE = Object.freeze({
@@ -32,8 +33,8 @@ const VALID_STATE = Object.freeze({
 export class ArianeFormElement extends ArianeElement {
     static formAssociated = true;
 
-    /** Identifie le champ dans `FormData`. */
-    @property({ reflect: true }) name = '';
+    /** Identifie le champ dans `FormData`. Réfléchi en attribut seulement quand il est renseigné. */
+    @property({ reflect: true, converter: reflectWhenNotEmpty }) name = '';
 
     /** Désactive le champ et exclut sa valeur du formulaire. */
     @property({ reflect: true, type: Boolean }) disabled = false;
@@ -131,9 +132,15 @@ export class ArianeFormElement extends ArianeElement {
     }
 
     /**
-     * Signale la validité propre au composant (par exemple `{ valueMissing: true }` avec son message).
-     * Fusionné avec l'erreur personnalisée éventuelle. `{}` signifie valide.
+     * Signale la validité propre au composant. Fusionné avec l'erreur personnalisée éventuelle.
+     * `{}` signifie valide ; un drapeau vrai exige un message non vide (sinon `setValidity` lève).
      */
+    protected setComponentValidity(flags: Record<never, never>): void;
+    protected setComponentValidity(
+        flags: ValidityStateFlags,
+        message: string,
+        anchor?: HTMLElement,
+    ): void;
     protected setComponentValidity(
         flags: ValidityStateFlags,
         message?: string,
