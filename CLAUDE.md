@@ -22,6 +22,7 @@ Web components library pour patterns UI accessibles, Lit 3 + TypeScript. Monorep
 
 - **Mobile-first** : toute décision d'API, de comportement ou de style part du cas mobile. Le desktop est une amélioration progressive, pas le point de départ. Avant d'ajouter une option, se demander si le comportement par défaut couvre déjà le cas mobile sans configuration.
 - **Headless** : aucun fallback cosmétique dans les composants (`var(--token)` sans valeur par défaut). Toutes les valeurs de design vont dans `themes/ariane.css` (liste d'`@import`) et ses fragments sous `themes/ariane/` (`_palette.css`, `_semantic-tokens.css`, `_global-tokens.css`, `shared/`, `components/`). Les fallbacks structurels (0px pour des compensations de layout) sont acceptables.
+- **Ne pas réinventer la roue** : avant de proposer ou d'écrire une solution maison (convertisseur, utilitaire, contrôleur, plugin de test), vérifier ce que Lit, la plateforme web ou une dépendance déjà présente offre pour ce besoin, dans la version réellement installée (changelog, sources, doc de la version). Exemple : `useDefault: true` de Lit remplace un convertisseur de réflexion maison. Une solution maison n'est retenue que si l'existant ne couvre pas le besoin, et le dit dans la PR.
 
 ## Common Commands
 

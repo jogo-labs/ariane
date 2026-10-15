@@ -1,5 +1,5 @@
 import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
-import { property, query, state } from 'lit/decorators.js';
+import { property, query } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { CalendarController, type CalendarControllerOptions } from './calendar.controller.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
@@ -123,12 +123,8 @@ export class ArDatepicker extends ArianeFormElement {
 
     private readonly _uid = Math.random().toString(36).slice(2, 9);
 
-    /**
-     * Désactivé par cascade d'un `<fieldset disabled>` ancêtre (formDisabledCallback), distinct
-     * de `disabled` (posé explicitement par le consommateur) pour ne pas refléter cet état sur
-     * l'attribut HTML `disabled` du host et pour ne pas perdre l'origine si les deux divergent.
-     */
-    @state() private _formDisabled = false;
+    /** Valeur au premier rendu : celle que `form.reset()` restaure. */
+    private _defaultValue = '';
 
     private readonly _calendar = new CalendarController(this);
     private readonly _hasSlot = new HasSlotController(
@@ -156,7 +152,7 @@ export class ArDatepicker extends ArianeFormElement {
     private readonly localize = new LocalizeController(this);
 
     /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
-    @property({ reflect: true }) value = '';
+    @property({ reflect: true, useDefault: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
     @property() format = 'dd/MM/yyyy';
     /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */
@@ -171,14 +167,8 @@ export class ArDatepicker extends ArianeFormElement {
     @property() autocomplete = '';
     /** Label du champ (alternative au slot `label`). */
     @property() label = '';
-    /** Désactive le champ et exclut sa valeur du formulaire. */
-    @property({ reflect: true, type: Boolean }) disabled = false;
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
     @property({ reflect: true, type: Boolean }) readonly = false;
-    /** Active la contrainte de validation native `required`. */
-    @property({ reflect: true, type: Boolean }) required = false;
-    /** Identifie le champ dans `FormData`. */
-    @property() name = '';
     /** Ouvre ou ferme le popover calendrier. */
     @property({ reflect: true, type: Boolean }) open = false;
 
@@ -196,20 +186,30 @@ export class ArDatepicker extends ArianeFormElement {
         return this._input;
     }
 
-    private get _effectiveDisabled(): boolean {
-        return this.disabled || this._formDisabled;
-    }
-
-    /**
-     * Appelé par le navigateur quand un `<fieldset disabled>` ancêtre change d'état.
-     * @internal
-     */
-    formDisabledCallback(disabled: boolean): void {
-        this._formDisabled = disabled;
+    /** Retour à la valeur initiale : valeur, texte de saisie, sélection du calendrier, panneau. */
+    protected override formReset(): void {
+        // Avant le premier rendu, `_defaultValue` n'est pas encore capturé : la valeur courante EST
+        // la valeur initiale, et la restaurer à '' la perdrait.
+        if (!this.hasUpdated) return;
+        const date = this._defaultValue ? parse(this._defaultValue, 'yyyy-MM-dd').date : null;
+        this._calendar.selectedDate = date;
+        if (date) {
+            this._calendar.currentViewMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+            this._calendar.focusedDate = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+            );
+        }
+        this.value = this._defaultValue;
+        this._syncInputFromValue();
+        this.open = false;
+        this.requestUpdate();
     }
 
     override firstUpdated(): void {
         this._anchored.attach(this._trigger, this._panel, this._inputWrapper);
+        this._defaultValue = this.value;
         this._syncFormValue();
     }
 
@@ -268,7 +268,7 @@ export class ArDatepicker extends ArianeFormElement {
             changed.has('disabled') ||
             (changed as Map<PropertyKey, unknown>).has('_formDisabled')
         ) {
-            this.toggleState('disabled', this._effectiveDisabled);
+            this.toggleState('disabled', this.effectiveDisabled);
         }
         if (changed.has('readonly')) {
             this.toggleState('readonly', this.readonly);
@@ -318,7 +318,7 @@ export class ArDatepicker extends ArianeFormElement {
                         id="dp-input-${this._uid}"
                         type="text"
                         style=${styleMap({ '--input-computed-width': inputComputedMaxWidth })}
-                        ?disabled=${this._effectiveDisabled}
+                        ?disabled=${this.effectiveDisabled}
                         ?readonly=${this.readonly}
                         aria-required=${this.required ? 'true' : nothing}
                         autocomplete=${this.autocomplete || nothing}
@@ -331,7 +331,7 @@ export class ArDatepicker extends ArianeFormElement {
                     <button
                         part="trigger"
                         type="button"
-                        ?disabled=${this._effectiveDisabled || this.readonly}
+                        ?disabled=${this.effectiveDisabled || this.readonly}
                         aria-label=${this.localize.term('openCalendar')}
                         aria-haspopup="dialog"
                         aria-expanded=${this.open}
@@ -638,7 +638,7 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     private async _show(): Promise<void> {
-        if (this._effectiveDisabled || this.readonly) return;
+        if (this.effectiveDisabled || this.readonly) return;
 
         const allowed = !emitEvent(this, 'ar-datepicker-show', { cancelable: true })
             .defaultPrevented;
@@ -698,7 +698,7 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     private _handleTriggerClick(): void {
-        if (this._effectiveDisabled || this.readonly) return;
+        if (this.effectiveDisabled || this.readonly) return;
         this.open = !this.open;
     }
 
@@ -889,21 +889,20 @@ export class ArDatepicker extends ArianeFormElement {
         }
     }
     private _syncFormValue(): void {
-        if (this._effectiveDisabled) {
+        if (this.effectiveDisabled) {
             this.internals?.setFormValue(null);
-            this.internals?.setValidity({});
+            this.setComponentValidity({});
             return;
         }
         this.internals?.setFormValue(this.value || null, this.value || null);
         if (this.required && !this.value) {
-            const anchor = this._input ?? undefined;
-            this.internals?.setValidity(
+            this.setComponentValidity(
                 { valueMissing: true },
                 this.localize.term('validationValueMissing'),
-                anchor,
+                this._input ?? undefined,
             );
         } else {
-            this.internals?.setValidity({});
+            this.setComponentValidity({});
         }
     }
 }

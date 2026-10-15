@@ -105,8 +105,9 @@ import styles from './${fileName}.styles.js';
  * @tagname ${tagName}
  */
 // Composant participant à un <form> natif : extends ArianeFormElement à la place
-// (packages/core/src/base/ariane-form-element.ts) — formAssociated = true est hérité
-// automatiquement, voir ar-datepicker pour un exemple complet.
+// (packages/core/src/base/ariane-form-element.ts) — formAssociated, name, disabled, required, la
+// validité (setComponentValidity, jamais internals.setValidity) et formReset() sont fournis ;
+// voir ar-datepicker pour un exemple complet.
 export class ${className} extends ArianeElement {
     static override styles = [styles];
 
