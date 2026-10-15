@@ -56,6 +56,13 @@
                 background: #eee;
                 padding: 0 0.25rem;
             }
+            #A .case {
+                display: none;
+            }
+            #A .case:target,
+            #A:target .case {
+                display: block;
+            }
             tr.current td {
                 background: #fff7d6;
             }
@@ -150,60 +157,59 @@
             </p>
             <p>
                 Chaque cas se teste seul : activer le lecteur d'écran, choisir un cas ci-dessous (la
-                page se recharge avec ce seul cas dans le HTML d'origine), écouter à l'arrivée, puis
-                noter le résultat dans le tableau en bas de page. Les saisies du tableau sont
-                conservées d'un rechargement à l'autre. Rôle attendu : <code>error</code> et
-                <code>warning</code> donnent <code>alert</code>, <code>success</code> et
-                <code>info</code> donnent <code>status</code>, écrit par le composant ; un
-                <code>role</code> posé par l'application (A5, A6, A8) est conservé.
+                page se recharge), écouter à l'arrivée, puis noter le résultat dans le tableau en bas
+                de page. Les cas sont écrits <strong>en dur dans le HTML</strong> de la page ; seule
+                une règle CSS (<code>:target</code>) n'affiche que celui qui est choisi, sans
+                JavaScript, pour que l'alerte soit du contenu présent dès le premier affichage. Les
+                saisies du tableau sont conservées d'un rechargement à l'autre. Rôle attendu :
+                <code>error</code> et <code>warning</code> donnent <code>alert</code>,
+                <code>success</code> et <code>info</code> donnent <code>status</code>, écrit par le
+                composant ; un <code>role</code> posé par l'application (A5, A6, A8) est conservé.
             </p>
-            <ul id="a-cases"></ul>
-            <p id="a-current" role="note"></p>
-            <div id="a-stage"></div>
-            <!-- Script classique : exécuté à l'analyse du HTML, pour que le cas choisi soit dans le
-                 document d'origine, comme du contenu statique, avant le chargement du composant. -->
-            <script>
-                (function () {
-                    var CASES = {
-                        A1: ['A1. Erreur, rôle écrit par le composant', '<ar-alert variant="error" id="a-error">A1. Erreur : variante error (attendu : alert)</ar-alert>'],
-                        A2: ['A2. Avertissement', '<ar-alert variant="warning" id="a-warning">A2. Avertissement (attendu : alert)</ar-alert>'],
-                        A3: ['A3. Succès', '<ar-alert variant="success" id="a-success">A3. Succès (attendu : status)</ar-alert>'],
-                        A4: ['A4. Information', '<ar-alert variant="info" id="a-info">A4. Information (attendu : status)</ar-alert>'],
-                        A5: ['A5. Erreur avec role="status" de l\'application', '<ar-alert variant="error" role="status" id="a-error-status">A5. Erreur avec <code>role="status"</code> écrit par l\'application (attendu : status, il remplace le défaut)</ar-alert>'],
-                        A6: ['A6. Information avec role="alert" de l\'application', '<ar-alert variant="info" role="alert" id="a-info-alert">A6. Information avec <code>role="alert"</code> écrit par l\'application (attendu : alert)</ar-alert>'],
-                        A7: ['A7. Erreur sans notification', '<ar-alert variant="error" without-notification id="a-silent">A7. Erreur avec <code>without-notification</code> (attendu : aucun rôle, aucune annonce)</ar-alert>'],
-                        A8: ['A8. Erreur avec role="alert" écrit dans le HTML (comparer à A1)', '<ar-alert variant="error" role="alert" id="a-error-alert">A8. Erreur avec <code>role="alert"</code> écrit dans le HTML, comme A1 mais l\'attribut est dans le HTML d\'origine (attendu : alert)</ar-alert>'],
-                        A9: ['A9. Témoin natif div role="alert"', '<div class="ref" role="alert" id="a-ref-alert">A9. Témoin natif <code>div role="alert"</code> présent au chargement (attendu : alert)</div>'],
-                        A10: ['A10. Témoin natif div role="status"', '<div class="ref" role="status" id="a-ref-status">A10. Témoin natif <code>div role="status"</code> présent au chargement (attendu : status)</div>']
-                    };
-                    var params = new URLSearchParams(location.search);
-                    var selected = params.get('case');
-                    var bundleParam = params.get('bundle');
-                    function href(value) {
-                        var q = '?case=' + encodeURIComponent(value);
-                        return q + (bundleParam ? '&bundle=' + encodeURIComponent(bundleParam) : '');
-                    }
-                    var list = document.getElementById('a-cases');
-                    Object.keys(CASES).concat(['all']).forEach(function (key) {
-                        var li = document.createElement('li');
-                        var link = document.createElement('a');
-                        link.href = href(key);
-                        link.textContent = key === 'all' ? 'Tous les cas ensemble' : CASES[key][0];
-                        if (key === selected) link.setAttribute('aria-current', 'true');
-                        li.appendChild(link);
-                        list.appendChild(li);
-                    });
-                    var keys = selected === 'all' ? Object.keys(CASES) : CASES[selected] ? [selected] : [];
-                    document.getElementById('a-current').textContent = keys.length
-                        ? selected === 'all'
-                            ? 'Cas chargés : tous.'
-                            : 'Cas chargé : ' + CASES[selected][0] + '.'
-                        : 'Aucun cas chargé : choisir un cas dans la liste.';
-                    document
-                        .getElementById('a-stage')
-                        .insertAdjacentHTML('beforeend', keys.map(function (k) { return CASES[k][1]; }).join(''));
-                })();
-            </script>
+            <ul id="a-cases">
+                <li><a href="?case=A1#A1">A1. Erreur, rôle écrit par le composant</a></li>
+                <li><a href="?case=A2#A2">A2. Avertissement</a></li>
+                <li><a href="?case=A3#A3">A3. Succès</a></li>
+                <li><a href="?case=A4#A4">A4. Information</a></li>
+                <li><a href="?case=A5#A5">A5. Erreur avec role="status" de l'application</a></li>
+                <li><a href="?case=A6#A6">A6. Information avec role="alert" de l'application</a></li>
+                <li><a href="?case=A7#A7">A7. Erreur sans notification</a></li>
+                <li><a href="?case=A8#A8">A8. Erreur avec role="alert" écrit dans le HTML (comparer à A1)</a></li>
+                <li><a href="?case=A9#A9">A9. Témoin natif div role="alert"</a></li>
+                <li><a href="?case=A10#A10">A10. Témoin natif div role="status"</a></li>
+                <li><a href="?case=all#A">Tous les cas ensemble</a></li>
+            </ul>
+            <p id="a-current" role="note">Aucun cas affiché : choisir un cas dans la liste.</p>
+            <div class="case" id="A1">
+                <ar-alert variant="error" id="a-error">A1. Erreur : variante error (attendu : alert)</ar-alert>
+            </div>
+            <div class="case" id="A2">
+                <ar-alert variant="warning" id="a-warning">A2. Avertissement (attendu : alert)</ar-alert>
+            </div>
+            <div class="case" id="A3">
+                <ar-alert variant="success" id="a-success">A3. Succès (attendu : status)</ar-alert>
+            </div>
+            <div class="case" id="A4">
+                <ar-alert variant="info" id="a-info">A4. Information (attendu : status)</ar-alert>
+            </div>
+            <div class="case" id="A5">
+                <ar-alert variant="error" role="status" id="a-error-status">A5. Erreur avec <code>role="status"</code> écrit par l'application (attendu : status, il remplace le défaut)</ar-alert>
+            </div>
+            <div class="case" id="A6">
+                <ar-alert variant="info" role="alert" id="a-info-alert">A6. Information avec <code>role="alert"</code> écrit par l'application (attendu : alert)</ar-alert>
+            </div>
+            <div class="case" id="A7">
+                <ar-alert variant="error" without-notification id="a-silent">A7. Erreur avec <code>without-notification</code> (attendu : aucun rôle, aucune annonce)</ar-alert>
+            </div>
+            <div class="case" id="A8">
+                <ar-alert variant="error" role="alert" id="a-error-alert">A8. Erreur avec <code>role="alert"</code> écrit dans le HTML, comme A1 mais l'attribut est dans le HTML d'origine (attendu : alert)</ar-alert>
+            </div>
+            <div class="case" id="A9">
+                <div class="ref" role="alert" id="a-ref-alert">A9. Témoin natif <code>div role="alert"</code> présent au chargement (attendu : alert)</div>
+            </div>
+            <div class="case" id="A10">
+                <div class="ref" role="status" id="a-ref-status">A10. Témoin natif <code>div role="status"</code> présent au chargement (attendu : status)</div>
+            </div>
         </section>
 
         <h2>B. Alertes insérées dynamiquement</h2>
@@ -479,11 +485,26 @@
                 }
                 location.reload();
             });
-            // Ligne du cas A chargé, mise en évidence dans le tableau.
-            const currentCase = new URLSearchParams(location.search).get('case');
-            if (currentCase && currentCase !== 'all') {
+            // Cas A affiché (choisi par le fragment d'URL, par CSS), ligne du tableau surlignée, et
+            // paramètre ?bundle= conservé dans les liens. Rien de tout cela n'est sous test.
+            const caseId = location.hash.slice(1);
+            const caseLinks = [...document.querySelectorAll('#a-cases a')];
+            for (const link of caseLinks) {
+                if (requested && requested === bundle) {
+                    const url = new URL(link.href);
+                    url.searchParams.set('bundle', requested);
+                    link.href = url.toString();
+                }
+                if (link.hash.slice(1) === caseId) link.setAttribute('aria-current', 'true');
+            }
+            const currentLink = caseLinks.find((link) => link.hash.slice(1) === caseId);
+            if (currentLink) {
+                document.getElementById('a-current').textContent =
+                    caseId === 'A' ? 'Tous les cas affichés.' : `Cas affiché : ${currentLink.textContent}.`;
+            }
+            if (/^A\d+$/.test(caseId)) {
                 rowsOf()
-                    .find((tr) => tr.children[0].textContent.startsWith(currentCase + ' '))
+                    .find((tr) => tr.children[0].textContent.startsWith(caseId + ' '))
                     ?.classList.add('current');
             }
 
