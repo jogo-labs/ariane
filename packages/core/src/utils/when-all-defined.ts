@@ -1,7 +1,9 @@
+import { configuredPrefix } from '../internal/ariane-config.js';
+
 export interface WhenAllDefinedOptions {
     /**
      * Préfixe des tags à attendre. Par défaut, celui configuré via
-     * `window.ARIANE_CONFIG.prefix` (CDN) ou `'ar-'` si absent. En import headless,
+     * `ARIANE_CONFIG.prefix` (CDN) ou `'ar-'` si absent. En import headless,
      * passer le préfixe utilisé pour `customElements.define()`.
      */
     prefix?: string;
@@ -35,7 +37,7 @@ export interface WhenAllDefinedOptions {
  * // Attend uniquement les éléments de ce sous-arbre
  */
 export async function whenAllDefined({
-    prefix = `${window.ARIANE_CONFIG?.prefix ?? 'ar'}-`,
+    prefix = `${configuredPrefix() ?? 'ar'}-`,
     root = document,
 }: WhenAllDefinedOptions = {}): Promise<void> {
     for (;;) {

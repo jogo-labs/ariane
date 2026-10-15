@@ -11,9 +11,6 @@ import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 /** Détail des événements `ar-datepicker-input-change` et `ar-datepicker-input-complete` */
 export interface ArDatepickerInputDetail extends ArEventDetail {
@@ -254,7 +251,10 @@ export class ArDatepicker extends ArianeFormElement {
             changed.has('value') ||
             changed.has('required') ||
             changed.has('disabled') ||
-            (changed as Map<PropertyKey, unknown>).has('_formDisabled')
+            (changed as Map<PropertyKey, unknown>).has('_formDisabled') ||
+            // Le message de validité est localisé : un changement de lang (mise à jour sans
+            // propriété modifiée) doit le recalculer tant que le champ est obligatoire et vide.
+            (this.required && !this.value)
         ) {
             this._syncFormValue();
         }
@@ -899,7 +899,7 @@ export class ArDatepicker extends ArianeFormElement {
             const anchor = this._input ?? undefined;
             this.internals?.setValidity(
                 { valueMissing: true },
-                'Veuillez sélectionner une date.',
+                this.localize.term('validationValueMissing'),
                 anchor,
             );
         } else {

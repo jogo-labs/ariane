@@ -15,6 +15,40 @@ describe('ArTab', () => {
         });
     });
 
+    describe('setRegistry (rattachement par le groupe)', () => {
+        it('enregistre le tab auprès du registre fourni', async () => {
+            el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
+            const registry = {
+                registerTab: vi.fn(),
+                unregisterTab: vi.fn(),
+                registerPanel: vi.fn(),
+                unregisterPanel: vi.fn(),
+                activate: vi.fn(),
+                notifyTabChanged: vi.fn(),
+            };
+            el.setRegistry(registry);
+            expect(registry.registerTab).toHaveBeenCalledWith(el);
+        });
+
+        it("se désinscrit de l'ancien registre avant de s'inscrire au nouveau", async () => {
+            el = await fixture('<ar-tab panel="a">Tab A</ar-tab>');
+            const make = () => ({
+                registerTab: vi.fn(),
+                unregisterTab: vi.fn(),
+                registerPanel: vi.fn(),
+                unregisterPanel: vi.fn(),
+                activate: vi.fn(),
+                notifyTabChanged: vi.fn(),
+            });
+            const first = make();
+            const second = make();
+            el.setRegistry(first);
+            el.setRegistry(second);
+            expect(first.unregisterTab).toHaveBeenCalledWith(el);
+            expect(second.registerTab).toHaveBeenCalledWith(el);
+        });
+    });
+
     describe('valeurs par défaut', () => {
         it('panel vaut chaîne vide', async () => {
             el = await fixture('<ar-tab>Tab</ar-tab>');

@@ -42,6 +42,14 @@ describe('@ariane-ui/core/utils', () => {
         expect(exports).toEqual(['registerTranslation', 'whenAllDefined']);
     });
 
+    it('embarque la traduction fr (repli) mais ni composant ni customElements.define', async () => {
+        const { inputs, code } = await bundle('./index.ts');
+
+        expect(inputs.some((path) => path.endsWith('translations/fr.ts'))).toBe(true);
+        expect(inputs.filter((path) => path.includes('/components/'))).toEqual([]);
+        expect(code).not.toMatch(/customElements\s*\.\s*define/);
+    });
+
     it('reste accessible depuis le barrel principal (pas de breaking change)', async () => {
         const { exports } = await bundle('../index.ts');
 

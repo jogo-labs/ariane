@@ -1,7 +1,7 @@
 import { registerTranslation } from '@shoelace-style/localize';
-import type { Translation } from '../types/translation.js';
+import type { FullTranslation } from '../types/translation.js';
 
-const translation: Translation = {
+const translation: FullTranslation = {
     $code: 'fr',
     $name: 'Français',
     $dir: 'ltr',
@@ -90,6 +90,9 @@ const translation: Translation = {
 
     // ── ar-alert ─────────────────────────────────────────────────────────
     closeAlert: "Fermer l'alerte",
+
+    // ── Validation des formulaires ───────────────────────────────────────
+    validationValueMissing: 'Veuillez renseigner ce champ.',
 };
 
 registerTranslation(translation);

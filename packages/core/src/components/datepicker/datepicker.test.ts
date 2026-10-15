@@ -523,6 +523,54 @@ describe('ArDatepicker', () => {
         );
 
         it(
+            'le message de validité obligatoire suit lang="en"',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="en"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Please fill out this field.');
+            }),
+        );
+
+        it(
+            'le message de validité obligatoire suit lang="fr"',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="fr"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Veuillez renseigner ce champ.');
+            }),
+        );
+
+        it(
+            "langue sans traduction : le message de validité se replie sur l'anglais",
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="de"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Please fill out this field.');
+            }),
+        );
+
+        it(
+            '<ar-datepicker required disabled> → aucun message valueMissing',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required disabled></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call).toBeUndefined();
+            }),
+        );
+
+        it(
             '<ar-datepicker required> avec valeur → setValidity({}) appelé',
             withFakeInternals(async (setValiditySpy) => {
                 el = await fixture('<ar-datepicker required value="2026-06-12"></ar-datepicker>');

@@ -5,7 +5,7 @@
  *   import '@ariane-ui/core/components/alert/index.js';
  */
 export { whenAllDefined, registerTranslation } from './utils/index.js';
-export type { WhenAllDefinedOptions, Translation } from './utils/index.js';
+export type { WhenAllDefinedOptions, Translation, FullTranslation } from './utils/index.js';
 export type { ArEventDetail } from './utils/index.js';
 export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';

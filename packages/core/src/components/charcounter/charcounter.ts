@@ -5,9 +5,6 @@ import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
 

@@ -49,7 +49,32 @@ describe('cdn/utils.dev.js (développement)', () => {
         el.remove();
     });
 
-    it('partage les fonctions (et le registre) avec cdn/index.dev.js', async () => {
+    it("une traduction partielle se replie, terme par terme, sur l'anglais intégré", async () => {
+        utils.registerTranslation({
+            $code: 'zy',
+            $name: 'Test partiel',
+            $dir: 'ltr',
+            loading: 'Partiel',
+        });
+        await import('../cdn/autoloader.dev.js');
+
+        const el = document.createElement('ar-spinner');
+        el.setAttribute('lang', 'zy');
+        el.setAttribute('done', '');
+        document.body.appendChild(el);
+        await customElements.whenDefined('ar-spinner');
+        await (el as unknown as { updateComplete: Promise<boolean> }).updateComplete;
+
+        // `loadingDone` est absent de la traduction `zy` : repli sur l'anglais intégré.
+        expect(el.shadowRoot?.querySelector('[part="status"] p')?.textContent).to.equal(
+            'Loading complete',
+        );
+        el.remove();
+    });
+
+    it('partage les fonctions (et le registre) avec cdn/index.dev.js', async function () {
+        // Importe le bundle complet : au-delà de 2 s (défaut mocha) quand les moteurs tournent en parallèle.
+        this.timeout(15000);
         const index = await import('../cdn/index.dev.js');
         expect(utils.registerTranslation).to.equal(index.registerTranslation);
         expect(utils.whenAllDefined).to.equal(index.whenAllDefined);
