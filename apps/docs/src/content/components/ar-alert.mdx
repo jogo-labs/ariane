@@ -45,11 +45,8 @@ import WcagRef from '../../components/WcagRef.astro';
         summary="Status Messages : les messages de statut doivent être annoncés aux technologies d'assistance sans déplacer le focus."
     />
 - Pour remplacer ce rôle, écrire l'attribut `role` : `<ar-alert variant="error" role="status">`
-  rend une erreur annoncée poliment. Un `role` posé par l'application n'est jamais modifié par le
-  composant, même quand `variant` change.
+  rend une erreur annoncée poliment.
 - `without-notification` retire le rôle écrit par le composant : aucune annonce.
-- Pour qu'un message soit annoncé, ajouter l'alerte à la page après son chargement, ou appeler
-  `announceA11y(message)`. Pour un `status`, l'insérer vide puis la remplir.
 - L'icône est masquée aux lecteurs d'écran (`aria-hidden`). L'information de sévérité
   est portée par le `role`, pas par l'icône.
 - Une icône par défaut est fournie pour les 4 variants connus (`error`, `warning`,

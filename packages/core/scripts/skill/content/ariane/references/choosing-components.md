@@ -36,7 +36,7 @@ API complète (attributs, événements, slots, parts, tokens) : `components/<tag
 
 ### Retours à l'utilisateur : alert, tooltip, dialog
 
-- Message à lire sans interrompre la tâche → `<ar-alert>` ; le rôle ARIA découle de `variant` (`error`/`warning` → `role="alert"`, `success`/`info` → `role="status"`), le composant écrit cet attribut `role`, sauf si l'application en a déjà posé un (`role="alert"` ou `role="status"`), qui n'est jamais modifié.
+- Message à lire sans interrompre la tâche → `<ar-alert>` ; le rôle ARIA découle de `variant` (`error`/`warning` → `role="alert"`, `success`/`info` → `role="status"`), le composant écrit cet attribut `role`, remplaçable par un `role="alert"` ou `role="status"` écrit sur l'élément.
 - Description brève d'un élément, sans lien ni bouton → `<ar-tooltip>` ; c'est un complément du nom accessible du déclencheur, jamais son seul libellé (un bouton icône garde son `aria-label`).
 - Contenu riche ou cliquable lié à un déclencheur → `<ar-dropdown>`, pas `<ar-tooltip>` (contenu `role="tooltip"` non interactif).
 - Tâche qui exige l'attention et interrompt le flux (confirmer, remplir, choisir) → `<ar-dialog>` ; `data-ar-accept` et `data-ar-dismiss` sur les boutons distinguent confirmation et annulation.
