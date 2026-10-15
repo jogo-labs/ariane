@@ -10,7 +10,7 @@
  * Opt-in : rien n'est appliqué sans poser explicitement la classe.
  *
  * Usage :
- *   <link rel="stylesheet" href="@ariane-ui/core/presets/buttons.css">
+ *   <link rel="stylesheet" href="presets/buttons.css">
  *
  *   <button class="ar-btn ar-btn-primary">Valider</button>
  */

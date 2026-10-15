@@ -869,3 +869,18 @@ redéclaration identique sur `:hover` était une déclaration morte, retirée à
 à `.ar-btn-tertiary`) ; `:focus-visible` pose l'anneau complet (`outline` + `outline-offset`),
 pas seulement l'offset comme pour d'autres composants — ceux-ci ont une base interne au shadow
 DOM qui pose déjà la couleur/largeur, `ar-dropdown-item` n'en a aucune.
+
+## Amendement (2026-10-15) : les presets ne sont plus publiés sur npm (issue #355)
+
+L'amendement du 2026-09-08 exposait chaque preset par un export npm `./presets/*.css`, au motif
+qu'un consommateur n'avait « rien de plus à charger que `themes/ariane.css` ». Cette prémisse est
+tombée : l'issue #337 retire le thème du paquet (c'est celui de la documentation, interne), et le
+thème de départ est celui du starter-kit.
+
+**Décision** : `presets/buttons.css` et `presets/fields.css` consomment des tokens (`--ar-button-*`,
+`--ar-input-*`…) que seul le thème du starter-kit valorise, et ils sont du visuel, donc à la charge
+de l'utilisateur dans une librairie headless. Ils sont distribués par le starter-kit, avec le thème,
+et plus par npm : l'export `./presets/*.css` est retiré et `dist/styles/presets` exclu du paquet. Les
+sources restent sous `src/styles/presets/` (le starter-kit les génère, leurs tests navigateur
+subsistent). Le reste de l'amendement du 2026-09-08 (couche `@layer ariane.presets`, nommage
+`.ar-btn-*`, un fichier par famille) est inchangé.
