@@ -98,6 +98,29 @@ describe('ar-charcounter — browser', () => {
             expect(remaining(el)).to.equal('4');
         });
 
+        it('suit le reset du nouveau formulaire quand le champ change de formulaire', async () => {
+            wrapper = await fixture(html`
+                <div>
+                    <form id="a"><input id="field" value="ab" /></form>
+                    <form id="b"></form>
+                    <ar-charcounter for="field" max="10"></ar-charcounter>
+                </div>
+            `);
+            const el = wrapper.querySelector<ArCharcounter>('ar-charcounter')!;
+            const input = wrapper.querySelector<HTMLInputElement>('#field')!;
+            const formB = wrapper.querySelector<HTMLFormElement>('#b')!;
+            await el.updateComplete;
+            formB.appendChild(input);
+            input.defaultValue = 'abcd';
+            el.refresh();
+            setValue(input, 'abcdefgh');
+            await el.updateComplete;
+            formB.reset();
+            await nextTask();
+            await el.updateComplete;
+            expect(remaining(el)).to.equal('6');
+        });
+
         it('se rattache à un champ inséré après le compteur', async () => {
             wrapper = await fixture(html`
                 <div>

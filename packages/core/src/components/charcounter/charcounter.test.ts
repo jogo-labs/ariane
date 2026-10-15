@@ -148,6 +148,19 @@ describe('ArCharcounter', () => {
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('193');
         });
 
+        it('pose data-ar-char-state sur un champ prérempli en warning, après le premier rendu', async () => {
+            document.body.innerHTML = '<textarea id="f">abcdefghi</textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
+            );
+            await waitForUpdate(el);
+            await Promise.resolve();
+            await waitForUpdate(el);
+            expect(document.getElementById('f')!.getAttribute('data-ar-char-state')).toBe(
+                'warning',
+            );
+        });
+
         it('met à jour le décompte à chaque event input', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
@@ -209,6 +222,7 @@ describe('ArCharcounter', () => {
         it('se rattache au champ remplacé par le framework (même id)', async () => {
             document.body.innerHTML = '<div><textarea id="f"></textarea></div>';
             el = await fixture('<ar-charcounter id="cc" for="f" max="200"></ar-charcounter>');
+            const old = document.getElementById('f') as HTMLTextAreaElement;
             const fresh = document.createElement('textarea');
             fresh.id = 'f';
             fresh.value = 'abc';
@@ -221,6 +235,56 @@ describe('ArCharcounter', () => {
             fresh.dispatchEvent(new Event('input'));
             await waitForUpdate(el);
             expect(remaining()).toBe('194');
+            old.value = 'x';
+            old.dispatchEvent(new Event('input'));
+            await waitForUpdate(el);
+            expect(remaining()).toBe('194');
+        });
+
+        it("pose data-ar-char-state sur le champ remplacé quand l'état ne change pas", async () => {
+            document.body.innerHTML = '<div><textarea id="f">abcdefghi</textarea></div>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
+            );
+            await waitForUpdate(el);
+            await Promise.resolve();
+            const fresh = document.createElement('textarea');
+            fresh.id = 'f';
+            fresh.value = 'abcdefghi';
+            document.querySelector('div')!.replaceChildren(fresh);
+            el.refresh();
+            await waitForUpdate(el);
+            expect(el.state).toBe('warning');
+            expect(fresh.getAttribute('data-ar-char-state')).toBe('warning');
+        });
+
+        it('ne ré-annonce pas le dépassement quand le champ est rattaché sans changement', async () => {
+            document.body.innerHTML = '<div><textarea id="f">abcdefghij</textarea></div>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="5" warn-threshold="1"></ar-charcounter>',
+            );
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            const region = document.getElementById('ar-live-region-assertive')!;
+            region.textContent = '';
+            const fresh = document.createElement('textarea');
+            fresh.id = 'f';
+            fresh.value = 'abcdefghij';
+            document.querySelector('div')!.replaceChildren(fresh);
+            el.refresh();
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            expect(region.textContent).toBe('');
+        });
+
+        it('est sans effet (sans erreur) sur un compteur déconnecté', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="100"></ar-charcounter>');
+            el.remove();
+            expect(() => el.refresh()).not.toThrow();
+            const detached = document.createElement('ar-charcounter') as ArCharcounter;
+            detached.for = 'f';
+            expect(() => detached.refresh()).not.toThrow();
+            expect(document.getElementById('f')!.hasAttribute('aria-describedby')).toBe(false);
         });
 
         it('est sans effet sans attribut for', async () => {
@@ -276,9 +340,8 @@ describe('ArCharcounter', () => {
         });
 
         it("n'attend plus l'ancien champ après un changement de for", async () => {
-            document.body.innerHTML = '<textarea id="other"></textarea>';
             el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
-            el.for = 'other';
+            el.for = 'autre';
             await waitForUpdate(el);
             await Promise.resolve();
             const field = await insertLate();

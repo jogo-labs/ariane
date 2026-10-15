@@ -70,6 +70,7 @@ export class ArCharcounter extends ArianeElement {
     private _fieldWatcher: MutationObserver | undefined;
     private _resetTimer: ReturnType<typeof setTimeout> | undefined;
     private _warnedMissingFor: string | undefined;
+    private _errorCount: number | undefined;
 
     /** État courant. Readonly — piloté par le composant. */
     get state(): CharcounterState {
@@ -93,7 +94,8 @@ export class ArCharcounter extends ArianeElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        if (changed.has('for')) {
+        // Déjà rattaché au bon champ (connectedCallback, avant le premier rendu) : rien à refaire.
+        if (changed.has('for') && !(this._field && this._field === this._resolveField())) {
             this._detachField();
             // Defer to next microtask so that requestUpdate() (called in _attachField)
             // runs after _$didUpdate() finishes its change-in-update check.
@@ -124,19 +126,23 @@ export class ArCharcounter extends ArianeElement {
      * `input`. Résout aussi `for` de nouveau : un champ remplacé par le framework est rattaché.
      */
     refresh(): void {
-        if (!this.for) return;
+        if (!this.isConnected || !this.for) return;
         const field = this._resolveField();
         if (field !== this._field) {
             this._detachField();
             this._attachField();
             return;
         }
-        if (field) this._handleInput();
+        if (field) {
+            this._bindForm(field);
+            this._handleInput();
+        }
     }
 
     private _resolveField(): (HTMLInputElement | HTMLTextAreaElement) | null {
         if (!this.for) return null;
         const root = this.getRootNode() as Document | ShadowRoot;
+        if (typeof root.getElementById !== 'function') return null;
         return root.getElementById(this.for) as HTMLInputElement | HTMLTextAreaElement | null;
     }
 
@@ -158,9 +164,18 @@ export class ArCharcounter extends ArianeElement {
         this._field = field;
         this._count = field.value.length;
         this._computeState();
+        // Un nouveau champ n'a pas encore les attributs : l'état peut être inchangé (champ remplacé).
+        if (this._state !== 'normal') this._setLinkedAttributes(this._state);
         this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
+        this._bindForm(field);
+    }
+
+    /** Suit `reset` sur le formulaire courant du champ (il peut changer sans changer de champ). */
+    private _bindForm(field: HTMLInputElement | HTMLTextAreaElement): void {
+        if (field.form === this._form) return;
+        this._form?.removeEventListener('reset', this._handleFormReset);
         this._form = field.form;
         this._form?.addEventListener('reset', this._handleFormReset);
     }
@@ -248,15 +263,18 @@ export class ArCharcounter extends ArianeElement {
             nextState = 'normal';
         }
 
+        if (nextState !== 'error') this._errorCount = undefined;
         if (nextState !== prevState) {
             this._state = nextState;
+            if (nextState === 'error') this._errorCount = this._count;
             this._announceTransition(nextState, remaining);
             if (nextState === 'normal') {
                 this._clearLinkedAttributes();
             } else {
                 this._setLinkedAttributes(nextState);
             }
-        } else if (nextState === 'error') {
+        } else if (nextState === 'error' && this._count !== this._errorCount) {
+            this._errorCount = this._count;
             clearTimeout(this._errorAnnounceTimer);
             this._errorAnnounceTimer = setTimeout(() => {
                 this._announceTransition(nextState, remaining);
