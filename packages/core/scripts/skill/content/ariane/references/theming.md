@@ -37,10 +37,6 @@ Sans build, dans le `<head>`, avec la copie hébergée par le projet :
 
 Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 
-| Fichier publié                  | Export npm                          |
-| ------------------------------- | ----------------------------------- |
-| `dist/styles/presets/<nom>.css` | `@ariane-ui/core/presets/<nom>.css` |
-
 - Sans thème de la page ou de l'application, aucun composant n'est stylé : charger un thème (celui du starter-kit ou le vôtre) est la première chose à vérifier quand un composant paraît « brut ».
 - Pour un thème propre : partir de la copie du starter-kit, ou écrire une feuille qui valorise les tokens et les `::part()` des composants utilisés.
 
@@ -185,7 +181,7 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 </div>
 ```
 
-Avec un bundler : `import '@ariane-ui/core/presets/buttons.css';` et `import '@ariane-ui/core/presets/fields.css';`. Les fichiers `presets/` du starter-kit et `@ariane-ui/core/presets/*.css` sont deux alternatives.
+Avec un bundler, copier `presets/buttons.css` et `presets/fields.css` du starter-kit dans le projet, puis les importer comme le thème.
 
 ## Shadow DOM applicatif
 
