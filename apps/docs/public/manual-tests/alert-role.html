@@ -91,24 +91,28 @@
                     indiqué ci-dessus).
                 </li>
                 <li>
-                    Pour comparer avec l'ancienne implémentation (rôle posé par attribut), ouvrir la
-                    page avec
+                    Le composant écrit lui-même l'attribut <code>role</code> selon
+                    <code>variant</code>, sauf si l'application en a déjà posé un (avant ou après
+                    l'insertion) : dans ce cas il n'y touche plus. Pour comparer avec la version
+                    publiée <code>alpha.14</code> (qui écrase un <code>role</code> posé par
+                    l'application), ouvrir la page avec
                     <code
                         >?bundle=https://unpkg.com/@ariane-ui/core@0.1.0-alpha.14/cdn/index.js</code
                     >.
                 </li>
                 <li>
                     Lecteurs d'écran à essayer : VoiceOver (Safari, Chrome), NVDA (Firefox, Chrome),
-                    JAWS si disponible. Écouter pour chaque scénario et reporter le résultat en bas
-                    de page.
+                    JAWS si disponible. Un écart est connu entre Safari et Chrome avec VoiceOver :
+                    tester les deux. Écouter pour chaque scénario et reporter le résultat en bas de
+                    page. Les scénarios A demandent de recharger la page avec le lecteur d'écran
+                    actif.
                 </li>
                 <li>
-                    Vérification dans l'outil de développement : onglet « Accessibilité » de Chrome,
-                    rôle calculé de chaque
-                    <code>ar-alert</code>. Une alerte <code>error</code> doit être
-                    <code>alert</code>, une <code>info</code> doit être <code>status</code>, et
-                    l'attribut <code>role</code> correspondant est écrit par le composant sur
-                    l'élément (visible dans l'inspecteur du DOM).
+                    Vérification dans l'outil de développement : l'attribut <code>role</code> de chaque
+                    <code>ar-alert</code> est visible dans l'inspecteur du DOM (et dans le tableau
+                    ci-dessous, mis à jour en direct) ; l'onglet « Accessibilité » de Chrome donne le
+                    rôle calculé. Une alerte <code>error</code> doit être <code>alert</code>, une
+                    <code>info</code> doit être <code>status</code>.
                 </li>
             </ol>
             <p>
@@ -118,12 +122,27 @@
             </p>
         </details>
 
+        <details>
+            <summary>Attribut role de chaque alerte (lecture seule, mis à jour en direct)</summary>
+            <table id="roles">
+                <thead>
+                    <tr>
+                        <th>Alerte</th>
+                        <th>variant</th>
+                        <th>role (DOM)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </details>
+
         <h2>A. Alertes présentes au chargement (relancer la page avec le lecteur d'écran actif)</h2>
         <section id="A">
             <p>
-                Rôle attendu, écrit par le composant : <code>error</code> et
+                Rôle attendu : <code>error</code> et
                 <code>warning</code> donnent <code>alert</code>, <code>success</code> et
-                <code>info</code> donnent <code>status</code>.
+                <code>info</code> donnent <code>status</code>, écrit par le composant. Un <code>role</code>
+                posé par l'application (A5 et A6) est conservé.
             </p>
             <ar-alert variant="error" id="a-error">A1. Erreur : variante error (attendu : alert)</ar-alert>
             <ar-alert variant="warning" id="a-warning">A2. Avertissement (attendu : alert)</ar-alert>
@@ -150,6 +169,12 @@
             <button type="button" data-insert="error-status">
                 B3. Insérer une error avec role="status"
             </button>
+            <button type="button" data-insert="info-alert">
+                B6. Insérer une info avec role="alert"
+            </button>
+            <button type="button" data-insert="info-empty">
+                B7. Insérer une info vide, puis la remplir 2 s plus tard
+            </button>
             <button type="button" id="b-clear">Vider la zone</button>
             <div id="b-zone" aria-label="Zone des alertes insérées" role="group"></div>
             <h3>Témoins natifs</h3>
@@ -160,13 +185,25 @@
 
         <h2>C. Modification d'une alerte déjà présente</h2>
         <section id="C">
-            <ar-alert variant="info" id="c-alert">C1. Alerte modifiable (variante info)</ar-alert>
-            <button type="button" data-variant="error">Passer en variante error</button>
-            <button type="button" data-variant="info">Revenir en variante info</button>
-            <button type="button" id="c-role-status">Poser role="status"</button>
+            <p>
+                Séquence suggérée : (1) <em>Recréer l'alerte</em> ; (2) <em>Passer en error</em> (le
+                composant passe <code>role</code> à <code>alert</code>) ; (3)
+                <em>Poser role="status"</em> comme le ferait une liaison de framework ; (4)
+                <em>Passer en info</em> puis <em>Passer en error</em> : le <code>role</code>
+                posé par l'application doit rester <code>status</code> ; (5)
+                <em>Retirer l'attribut role</em> puis <em>Passer en warning</em> : le composant
+                reprend la main (<code>alert</code>).
+            </p>
+            <div id="c-zone">
+                <ar-alert variant="info" id="c-alert">C1. Alerte modifiable (variante info)</ar-alert>
+            </div>
+            <button type="button" id="c-reset">Recréer l'alerte</button>
+            <button type="button" data-variant="error">Passer en error</button>
+            <button type="button" data-variant="warning">Passer en warning</button>
+            <button type="button" data-variant="info">Passer en info</button>
+            <button type="button" id="c-role-status">Poser role="status" (application)</button>
             <button type="button" id="c-role-remove">Retirer l'attribut role</button>
             <button type="button" id="c-silent">Basculer without-notification</button>
-            <p>Texte de l'alerte :</p>
             <button type="button" id="c-text">Changer le texte</button>
         </section>
 
@@ -185,6 +222,7 @@
             <thead>
                 <tr>
                     <th>Scénario</th>
+                    <th>Attendu</th>
                     <th>Annoncé</th>
                     <th>Mode</th>
                     <th>Note</th>
@@ -229,6 +267,17 @@
                         el.setAttribute('variant', 'error');
                         el.setAttribute('role', 'status');
                         el.textContent = `Alerte insérée n°${n} : error avec role="status"`;
+                    } else if (kind === 'info-alert') {
+                        el.setAttribute('variant', 'info');
+                        el.setAttribute('role', 'alert');
+                        el.textContent = `Alerte insérée n°${n} : info avec role="alert"`;
+                    } else if (kind === 'info-empty') {
+                        el.setAttribute('variant', 'info');
+                        zone.append(el);
+                        setTimeout(() => {
+                            el.textContent = `Alerte insérée n°${n} : info remplie après 2 s`;
+                        }, 2000);
+                        return;
                     } else {
                         el.setAttribute('variant', kind);
                         el.textContent = `Alerte insérée n°${n} : variante ${kind}`;
@@ -252,42 +301,81 @@
             }
 
             // ── C. modifications ──
-            const c = document.getElementById('c-alert');
-            for (const btn of document.querySelectorAll('[data-variant]')) {
-                btn.addEventListener('click', () => c.setAttribute('variant', btn.dataset.variant));
-            }
-            document.getElementById('c-role-status').addEventListener('click', () => c.setAttribute('role', 'status'));
-            document.getElementById('c-role-remove').addEventListener('click', () => c.removeAttribute('role'));
-            document.getElementById('c-silent').addEventListener('click', () => c.toggleAttribute('without-notification'));
+            const cZone = document.getElementById('c-zone');
+            const c = () => document.getElementById('c-alert');
             let t = 0;
+            document.getElementById('c-reset').addEventListener('click', () => {
+                const fresh = document.createElement('ar-alert');
+                fresh.id = 'c-alert';
+                fresh.setAttribute('variant', 'info');
+                fresh.textContent = 'C1. Alerte modifiable (variante info)';
+                cZone.replaceChildren(fresh);
+                t = 0;
+            });
+            for (const btn of document.querySelectorAll('[data-variant]')) {
+                btn.addEventListener('click', () => c().setAttribute('variant', btn.dataset.variant));
+            }
+            document.getElementById('c-role-status').addEventListener('click', () => c().setAttribute('role', 'status'));
+            document.getElementById('c-role-remove').addEventListener('click', () => c().removeAttribute('role'));
+            document.getElementById('c-silent').addEventListener('click', () => c().toggleAttribute('without-notification'));
             document.getElementById('c-text').addEventListener('click', () => {
                 t += 1;
-                c.textContent = `C1. Alerte modifiable : texte changé ${t} fois`;
+                c().textContent = `C1. Alerte modifiable : texte changé ${t} fois`;
             });
+
+            // ── Attribut role de chaque alerte, en direct ──
+            const rolesBody = document.querySelector('#roles tbody');
+            function renderRoles() {
+                const rows = [...document.querySelectorAll('ar-alert')].map((el) => {
+                    const tr = document.createElement('tr');
+                    const label = el.id || (el.textContent || '').trim().slice(0, 40) || '(sans texte)';
+                    for (const text of [label, el.getAttribute('variant') ?? '', el.getAttribute('role') ?? '(aucun)']) {
+                        const td = document.createElement('td');
+                        td.textContent = text;
+                        tr.append(td);
+                    }
+                    return tr;
+                });
+                rolesBody.replaceChildren(...rows);
+            }
+            // Observer les sections de scénarios, pas le tableau lui-même (sinon boucle).
+            const observer = new MutationObserver(renderRoles);
+            for (const id of ['A', 'B', 'C']) {
+                observer.observe(document.getElementById(id), {
+                    subtree: true,
+                    childList: true,
+                    attributes: true,
+                    attributeFilter: ['role', 'variant'],
+                });
+            }
+            renderRoles();
 
             // ── Tableau de résultats ──
             const scenarios = [
-                'A1 error au chargement',
-                'A2 warning au chargement',
-                'A3 success au chargement',
-                'A4 info au chargement',
-                'A5 error + role="status"',
-                'A6 info + role="alert"',
-                'A7 without-notification (aucune annonce attendue)',
-                'B1 insérer error',
-                'B2 insérer info',
-                'B3 insérer error + role="status"',
-                'B4 témoin div role="alert"',
-                'B5 témoin div role="status"',
-                'C1 info → error',
-                'C1 texte changé',
-                'C1 role="status" posé',
-                'C1 attribut role retiré',
+                ['A1 error au chargement', 'alert'],
+                ['A2 warning au chargement', 'alert'],
+                ['A3 success au chargement', 'status'],
+                ['A4 info au chargement', 'status'],
+                ['A5 error + role="status" (application)', 'status'],
+                ['A6 info + role="alert" (application)', 'alert'],
+                ['A7 without-notification', 'aucun rôle, aucune annonce'],
+                ['B1 insérer error', 'alert'],
+                ['B2 insérer info', 'status'],
+                ['B3 insérer error + role="status"', 'status'],
+                ['B4 témoin div role="alert"', 'alert'],
+                ['B5 témoin div role="status"', 'status'],
+                ['B6 insérer info + role="alert"', 'alert'],
+                ['B7 info vide puis remplie', 'status, annonce du texte ajouté'],
+                ['C1 passer en error (rôle du composant)', 'alert'],
+                ['C1 role="status" posé, variant changé (rôle de l’application conservé)', 'status'],
+                ['C1 attribut role retiré puis variant changé (le composant reprend)', 'alert/status selon variant'],
+                ['C1 texte changé', 'annonce du nouveau texte'],
             ];
             const tbody = document.querySelector('#results tbody');
-            scenarios.forEach((s, i) => {
+            scenarios.forEach(([s, expected]) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${s}</td>
+                    <td>${expected}</td>
                     <td><select aria-label="Annoncé : ${s}"><option></option><option>oui</option><option>non</option><option>partiel</option></select></td>
                     <td><select aria-label="Mode : ${s}"><option></option><option>assertif</option><option>poli</option><option>?</option></select></td>
                     <td><input type="text" aria-label="Note : ${s}" size="24" /></td>`;
@@ -296,10 +384,10 @@
             document.getElementById('copy').addEventListener('click', async () => {
                 const env = document.getElementById('env').value || '(non précisé)';
                 const rows = [...tbody.querySelectorAll('tr')].map((tr) => {
-                    const [label, ann, mode, note] = tr.children;
-                    return `| ${label.textContent} | ${ann.firstElementChild.value} | ${mode.firstElementChild.value} | ${note.firstElementChild.value} |`;
+                    const [label, expected, ann, mode, note] = tr.children;
+                    return `| ${label.textContent} | ${expected.textContent} | ${ann.firstElementChild.value} | ${mode.firstElementChild.value} | ${note.firstElementChild.value} |`;
                 });
-                const md = [`Environnement : ${env}`, `Bundle : ${bundle}`, '', '| Scénario | Annoncé | Mode | Note |', '| --- | --- | --- | --- |', ...rows].join('\n');
+                const md = [`Environnement : ${env}`, `Bundle : ${bundle}`, '', '| Scénario | Attendu | Annoncé | Mode | Note |', '| --- | --- | --- | --- | --- |', ...rows].join('\n');
                 const out = document.getElementById('out');
                 out.value = md;
                 try {
