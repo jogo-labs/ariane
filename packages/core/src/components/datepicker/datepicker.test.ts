@@ -489,6 +489,42 @@ describe('ArDatepicker', () => {
         });
     });
 
+    describe('formResetCallback (#325)', () => {
+        it('restaure la valeur initiale, remet le texte de saisie et ferme le panneau', async () => {
+            el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-06-02';
+            el.open = true;
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+            expect(el.inputElement.value).toBe('01/05/2026');
+            expect(el.open).toBe(false);
+        });
+
+        it("revient à vide quand il n'y avait pas de valeur initiale", async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-06-02';
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('');
+            expect(el.inputElement.value).toBe('');
+        });
+
+        it('la valeur initiale reste celle du premier rendu', async () => {
+            el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-07-07';
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+        });
+    });
+
     describe('setValidity / required', () => {
         // happy-dom ne supporte pas attachInternals() ni form.checkValidity() pour les FACE.
         // On injecte un faux ElementInternals via attachInternals pour espionner setValidity.
