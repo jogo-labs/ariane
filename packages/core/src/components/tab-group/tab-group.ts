@@ -8,15 +8,7 @@ import { ArTabPanel } from '../tab-panel/tab-panel.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent } from '../../utils/emit-event.js';
 import styles from './tab-group.styles.js';
-
-/**
- * Attribut réfléchi seulement quand il a une valeur : un `active=""` ou `label=""` écrit au premier
- * rendu ne correspond pas au HTML serveur et fait échouer l'hydratation (React, Next.js).
- */
-const reflectWhenNotEmpty = {
-    fromAttribute: (value: string | null): string => value ?? '',
-    toAttribute: (value: string): string | null => value || null,
-};
+import { reflectWhenNotEmpty } from '../../internal/reflect-when-not-empty.js';
 
 /**
  * @summary Organise du contenu associé dans un même conteneur qui affiche un panneau à la fois, avec des onglets pour naviguer entre eux.
