@@ -233,6 +233,12 @@ documenter via le slot `hint` si nécessaire.
     </tbody>
 </table>
 
+`name` est réfléchi en attribut : `<ar-datepicker name="date">` soumet sa valeur aussi quand un framework le pose comme propriété (React 19). Les autres comportements sont ceux d'un champ natif :
+
+- `form.reset()` ramène le champ à sa valeur initiale, celle du premier rendu, texte de saisie compris. Aucun événement n'est émis.
+- L'API de validation standard est disponible sur l'élément : `checkValidity()`, `reportValidity()`, `validity`, `validationMessage`, `willValidate`, `form` et `labels`.
+- `setCustomValidity(message)` signale une erreur, par exemple une erreur de serveur. Comme sur un `<input>`, elle persiste jusqu'à `setCustomValidity('')` : à l'application de l'effacer, par exemple à la prochaine saisie. Le slot `error` reste l'affichage du message dans la page ; la validité native sert à la validation du formulaire et à la bulle du navigateur.
+
 ### Intégration masque de saisie
 
 Le getter `inputElement` expose l'`<input>` interne pour y brancher une bibliothèque de masque comme IMask :
