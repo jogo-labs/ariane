@@ -37,13 +37,9 @@ Sans build, dans le `<head>`, avec la copie hébergée par le projet :
 
 Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 
-| Fichier publié                                       | Export npm                          |
-| ---------------------------------------------------- | ----------------------------------- |
-| `dist/styles/themes/<nom>.css` (interne : voir note) | `@ariane-ui/core/themes/<nom>.css`  |
-| `dist/styles/themes/<nom>.js` (interne : voir note)  | `@ariane-ui/core/themes/<nom>.js`   |
-| `dist/styles/presets/<nom>.css`                      | `@ariane-ui/core/presets/<nom>.css` |
-
-Note : les lignes `themes/<nom>` ci-dessus sont le thème de la documentation d'Ariane, interne, sans garantie de stabilité : ne pas charger ni recommander ; partir du starter-kit.
+| Fichier publié                  | Export npm                          |
+| ------------------------------- | ----------------------------------- |
+| `dist/styles/presets/<nom>.css` | `@ariane-ui/core/presets/<nom>.css` |
 
 - Sans thème de la page ou de l'application, aucun composant n'est stylé : charger un thème (celui du starter-kit ou le vôtre) est la première chose à vérifier quand un composant paraît « brut ».
 - Pour un thème propre : partir de la copie du starter-kit, ou écrire une feuille qui valorise les tokens et les `::part()` des composants utilisés.
