@@ -74,19 +74,6 @@ export class ArAlert extends ArianeElement {
     withoutNotification = false;
 
     /**
-     * Force le niveau d'urgence ARIA indépendamment de `variant` : `role="alert"` si présent,
-     * sinon déduit de `variant` via une table de correspondance interne (`error`/`warning` →
-     * `alert`, `success`/`info` → `status`, tout autre variant → `status`).
-     */
-    @property({
-        converter: {
-            fromAttribute: (value: string | null): boolean | undefined =>
-                value === null ? undefined : true,
-        },
-    })
-    urgent?: boolean;
-
-    /**
      * Type d'alerte. Détermine la couleur et l'icône affichées.
      */
     @property({ reflect: true, type: String })
@@ -99,35 +86,24 @@ export class ArAlert extends ArianeElement {
      */
     @state() private hiding: boolean = false;
 
-    /**
-     * Indique si `role` a été posé manuellement dans le markup initial.
-     * Utilisé pour n'avertir qu'une seule fois que le composant va écraser cet attribut.
-     */
-    private _hadAuthoredRole: boolean | undefined = undefined;
-
     constructor() {
         super();
         // Lance la suppression du DOM à la fin de l'animation de fermeture
         this.addEventListener('transitionend', this._finishHide);
     }
 
-    override firstUpdated(): void {
-        // Capture si `role` a été posé en markup initial (avant que le composant ne le contrôle)
-        this._hadAuthoredRole = this.hasAttribute('role');
+    override connectedCallback(): void {
+        super.connectedCallback();
+        // Le rôle doit exister dès l'insertion : une alerte ajoutée dynamiquement est annoncée
+        // d'après le rôle présent à ce moment-là, pas après le premier rendu.
+        this._updateRole();
     }
 
     override updated(changed: Map<string, unknown>) {
         if (changed.has('hiding')) {
             this.toggleState('hiding', this.hiding);
         }
-        if (changed.has('variant') || changed.has('withoutNotification') || changed.has('urgent')) {
-            if (this._hadAuthoredRole === true) {
-                warn(
-                    'ar-alert',
-                    `role="${this.getAttribute('role')}" posé manuellement sera écrasé par le composant — utilisez la prop 'urgent' pour contrôler le niveau ARIA.`,
-                );
-                this._hadAuthoredRole = false;
-            }
+        if (changed.has('variant') || changed.has('withoutNotification')) {
             this._updateRole();
         }
         if (
@@ -142,16 +118,31 @@ export class ArAlert extends ArianeElement {
         }
     }
 
+    /**
+     * Dernière valeur de `role` écrite par le composant (`null` s'il n'a rien écrit). Sert à
+     * reconnaître un `role` posé par l'auteur : s'il est présent et différent de cette valeur, il lui
+     * appartient et le composant n'y touche plus.
+     */
+    private _writtenRole: string | null = null;
+
+    /**
+     * Rôle ARIA par défaut, écrit en attribut sur l'hôte : les lecteurs d'écran s'appuient sur
+     * l'attribut `role` du DOM, pas sur `ElementInternals.role` (#334). Le composant n'écrit que si
+     * l'attribut est absent ou égal à la dernière valeur qu'il a lui-même écrite ; un `role` posé par
+     * l'auteur, avant ou après la connexion, n'est jamais modifié.
+     */
     private _updateRole(): void {
-        if (this.withoutNotification) {
+        const current = this.getAttribute('role');
+        if (current !== null && current !== this._writtenRole) return;
+        const wanted = this.withoutNotification
+            ? null
+            : (ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status');
+        if (wanted === null) {
             this.removeAttribute('role');
-            return;
+        } else {
+            this.setAttribute('role', wanted);
         }
-        if (this.urgent !== undefined) {
-            this.role = this.urgent ? 'alert' : 'status';
-            return;
-        }
-        this.role = ArAlert._ROLE_BY_VARIANT[this.variant] ?? 'status';
+        this._writtenRole = wanted;
     }
 
     private static readonly _ROLE_BY_VARIANT: Record<string, 'alert' | 'status'> = {
