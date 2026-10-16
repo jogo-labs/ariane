@@ -138,14 +138,6 @@ Le calendrier **mémorise la position de navigation** entre les ouvertures : moi
 
 La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
 
-### Saisie texte
-
-L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
-
-- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
-- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
-- `input` puis `change` — événements natifs, émis sur l'hôte une fois `value` à jour (sélection via le calendrier ou validation de la saisie au `blur`).
-
 ### Largeur du champ de saisie
 
 `--ar-datepicker-input-max-width` vaut par défaut une valeur calculée à partir de la longueur de `format`, indépendante de la largeur du hint (qui peut rester plus large). Si vous la surchargez, gardez-la cohérente avec le contenu attendu dans le champ, notamment évitez d'agrandir le champ de manière exagérée.
