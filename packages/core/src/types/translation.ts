@@ -49,6 +49,7 @@ export interface FullTranslation extends BaseTranslation {
     pageStatus: (page: number, total: number) => string;
     compactPageStatus: (current: number, total: number) => string;
     goToPage: string;
+    paginationPending: string;
     paginationLandmark: (page: number, total: number) => string;
 
     // ar-stepper

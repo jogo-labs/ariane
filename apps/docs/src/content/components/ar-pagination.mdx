@@ -67,6 +67,21 @@ import WcagRef from '../../components/WcagRef.astro';
   cette réassignation — mettez-la à jour de façon synchrone (voir la section Utilisation) pour
   qu'ils restent cohérents avec l'action de l'utilisateur.
 
+### Attente d'une réponse (`pending`)
+
+Quand le changement de page demande une requête, posez `pending` dès `ar-pagination-page-change` et retirez-le à la réponse. Le composant pose `aria-busy="true"` sur la navigation, annonce l'attente une fois (région live polie, au passage à `true` seulement, jamais au montage) et expose le part d'état `pagination--pending` et l'état CSS `:state(pending)`. Il ne bloque rien : les clics suivants émettent toujours `ar-pagination-page-change`, à vous d'ignorer une réponse périmée.
+
+À la différence d'`ar-table-sort`, où le composant pose lui-même `pending` pendant que vous confirmez ou rejetez le tri, ici `pending` est entièrement piloté par l'application.
+
+```js
+pagination.addEventListener('ar-pagination-page-change', async (e) => {
+    pagination.pending = true;
+    await loadPage(e.detail.to);
+    pagination.current = e.detail.to;
+    pagination.pending = false;
+});
+```
+
 ## Comportement responsive
 
 Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
