@@ -79,6 +79,8 @@ export interface FullTranslation extends BaseTranslation {
     // navigateur), pas le contenu du slot `error`. Nom = `validation` + drapeau de ValidityState
     // avec majuscule initiale (`validationValueMissing`, `validationRangeUnderflow`…).
     validationValueMissing: string;
+    validationRangeUnderflow: (min: string) => string;
+    validationRangeOverflow: (max: string) => string;
 }
 
 /**

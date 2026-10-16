@@ -51,6 +51,7 @@ const TOKEN_RE = /(--ar-[a-z0-9]+(?:-[a-z0-9]+)*)(-\*)?/g;
 const THEME_TOKEN_RE = /(--ar[\w-]+)\s*:/g;
 
 // `CustomEvent<{ … }>` dont le littéral déclare une propriété `id`.
+const NATIVE_EVENTS = new Set(['input', 'change']);
 const EVENT_TYPE_RE = /^CustomEvent<\s*\{([\s\S]*)\}\s*>$/;
 const EVENT_ID_RE = /(?<![\w$-])id\s*\??\s*:/;
 
@@ -247,9 +248,11 @@ export function checkSkill({ cem, skillDir, pkg, themeDir, readmes = [] }) {
         }
     }
 
-    // 10 : événements préfixés par le tag et typés avec `id`.
+    // 10 : événements préfixés par le tag et typés avec `id`. Les événements natifs de formulaire
+    // (`input`, `change`) émis sur l'hôte sont exemptés : leur nom et leur type sont ceux de la plateforme.
     for (const declaration of declarations) {
         for (const event of declaration.events ?? []) {
+            if (NATIVE_EVENTS.has(event.name)) continue;
             if (!event.name.startsWith(`${declaration.tagName}-`)) {
                 errors.push(
                     `<${declaration.tagName}> — événement « ${event.name} » : le nom doit commencer par « ${declaration.tagName}- » (méthode privée émettant un nom variable ?).`,
