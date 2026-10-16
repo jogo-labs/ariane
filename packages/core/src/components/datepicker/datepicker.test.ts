@@ -768,4 +768,155 @@ describe('ArDatepicker', () => {
             });
         });
     });
+    describe('intégration framework (#326)', () => {
+        const selectDay = (day: Date): void =>
+            (el as unknown as { _selectDay(d: Date): void })._selectDay(day);
+        const dayButtons = (): HTMLButtonElement[] =>
+            Array.from(el.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part~="day"]') ?? []);
+
+        describe('événements natifs input/change (S-010)', () => {
+            it("sélection calendrier : input puis change sur l'hôte, value déjà à jour", async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const seen: string[] = [];
+                for (const type of ['input', 'change']) {
+                    el.addEventListener(type, (e) => seen.push(`${type}:${el.value}:${e.bubbles}`));
+                }
+                selectDay(new Date(2026, 5, 12));
+                expect(seen).toStrictEqual(['input:2026-06-12:true', 'change:2026-06-12:true']);
+            });
+
+            it('non annulables', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const events: Event[] = [];
+                el.addEventListener('change', (e) => events.push(e));
+                selectDay(new Date(2026, 5, 12));
+                expect(events[0]?.cancelable).toBe(false);
+            });
+
+            it('validation de saisie au blur : input puis change', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const seen: string[] = [];
+                el.addEventListener('input', () => seen.push('input'));
+                el.addEventListener('change', () => seen.push('change'));
+                el.inputElement.value = '12/06/2026';
+                el.inputElement.dispatchEvent(new Event('blur'));
+                expect(seen).toStrictEqual(['input', 'change']);
+            });
+
+            it("rien au montage ni pour une valeur posée par l'application", async () => {
+                el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+                const handler = vi.fn();
+                el.addEventListener('input', handler);
+                el.addEventListener('change', handler);
+                el.value = '2026-07-01';
+                await waitForUpdate(el);
+                expect(handler).not.toHaveBeenCalled();
+            });
+        });
+
+        it('S-019 : réassigner isDateDisabled rafraîchit la grille sans rouvrir', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            const target = (): HTMLButtonElement | undefined =>
+                dayButtons().find(
+                    (b) => b.textContent?.trim() === '17' && !b.classList.contains('other-month'),
+                );
+            expect(target()?.getAttribute('aria-disabled')).toBeNull();
+            el.isDateDisabled = (d) => d.getDate() === 17;
+            await waitForUpdate(el);
+            expect(target()?.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('S-019 : réassigner max rafraîchit la grille', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            el.max = '2026-06-10';
+            await waitForUpdate(el);
+            const day = dayButtons().find(
+                (b) => b.textContent?.trim() === '20' && !b.classList.contains('other-month'),
+            );
+            expect(day?.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('S-020 : ni hide ni hidden au montage', async () => {
+            const template = document.createElement('template');
+            template.innerHTML = '<ar-datepicker></ar-datepicker>';
+            el = template.content.firstElementChild as ArDatepicker;
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-hide', handler);
+            el.addEventListener('ar-datepicker-hidden', handler);
+            document.body.appendChild(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(handler).not.toHaveBeenCalled();
+        });
+
+        it('S-021 : un seul input-change pour une sélection calendrier suivie du blur', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-input-change', handler);
+            selectDay(new Date(2026, 5, 12));
+            await waitForUpdate(el);
+            el.inputElement.dispatchEvent(new Event('blur'));
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        describe('S-024 : min/max pour une saisie clavier', () => {
+            // happy-dom n'a pas ElementInternals : faux attachInternals pour espionner setValidity.
+            const setValidity = vi.fn();
+            const proto = HTMLElement.prototype as unknown as Record<string, unknown>;
+            beforeEach(() => {
+                setValidity.mockClear();
+                proto.attachInternals = () => ({ setFormValue: vi.fn(), setValidity });
+            });
+            afterEach(() => {
+                delete proto.attachInternals;
+            });
+
+            const type = async (text: string): Promise<CustomEvent> => {
+                const handler = vi.fn();
+                el.addEventListener('ar-datepicker-input-change', handler);
+                el.inputElement.value = text;
+                el.inputElement.dispatchEvent(new Event('blur'));
+                await waitForUpdate(el);
+                return handler.mock.calls[0]?.[0] as CustomEvent;
+            };
+            const lastFlags = (): ValidityStateFlags => setValidity.mock.lastCall?.[0];
+
+            it('au-dessus de max : valid false et rangeOverflow', async () => {
+                el = await fixture('<ar-datepicker max="2026-12-31" lang="en"></ar-datepicker>');
+                const event = await type('20/04/2027');
+                expect(event.detail.valid).toBe(false);
+                expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
+                expect(setValidity.mock.lastCall?.[1]).toBe(
+                    'Date must be December 31, 2026 or earlier.',
+                );
+            });
+
+            it('en dessous de min : valid false et rangeUnderflow', async () => {
+                el = await fixture('<ar-datepicker min="2026-06-01"></ar-datepicker>');
+                const event = await type('20/04/2026');
+                expect(event.detail.valid).toBe(false);
+                expect(lastFlags()).toStrictEqual({ rangeUnderflow: true });
+            });
+
+            it('dans la plage : valide', async () => {
+                el = await fixture(
+                    '<ar-datepicker min="2026-06-01" max="2026-12-31"></ar-datepicker>',
+                );
+                const event = await type('20/09/2026');
+                expect(event.detail.valid).toBe(true);
+                expect(lastFlags()).toStrictEqual({});
+            });
+
+            it('changer max après coup réévalue la validité', async () => {
+                el = await fixture('<ar-datepicker value="2026-09-20"></ar-datepicker>');
+                el.max = '2026-06-30';
+                await waitForUpdate(el);
+                expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
+            });
+        });
+    });
 });

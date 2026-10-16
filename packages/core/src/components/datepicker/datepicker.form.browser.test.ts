@@ -170,4 +170,34 @@ describe('ar-datepicker — formulaire', () => {
             expect(el.validationMessage).to.equal('Veuillez renseigner ce champ.');
         });
     });
+
+    describe('intégration framework (#326)', () => {
+        it('saisie hors max : rangeOverflow, checkValidity() faux, value conservée', async () => {
+            const { form, el } = await mount(
+                '<ar-datepicker name="d" max="2026-12-31"></ar-datepicker>',
+            );
+            el.inputElement.value = '20/04/2027';
+            el.inputElement.dispatchEvent(new Event('blur'));
+            await el.updateComplete;
+            expect(el.validity.rangeOverflow).to.equal(true);
+            expect(form.checkValidity()).to.equal(false);
+            expect(el.value).to.equal('2027-04-20');
+            el.max = '2027-12-31';
+            await el.updateComplete;
+            expect(el.validity.valid).to.equal(true);
+        });
+
+        it('change natif : value déjà à jour à la réception, un seul événement', async () => {
+            const { el } = await mount('<ar-datepicker></ar-datepicker>');
+            const seen: string[] = [];
+            el.addEventListener('input', () => seen.push(`input:${el.value}`));
+            el.addEventListener('change', () => seen.push(`change:${el.value}`));
+            el.inputElement.value = '12/06/2026';
+            el.inputElement.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+            el.inputElement.dispatchEvent(new Event('blur'));
+            await el.updateComplete;
+            el.inputElement.dispatchEvent(new Event('blur'));
+            expect(seen).to.deep.equal(['input:2026-06-12', 'change:2026-06-12']);
+        });
+    });
 });

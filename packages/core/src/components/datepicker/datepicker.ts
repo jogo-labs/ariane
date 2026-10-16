@@ -110,6 +110,8 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  *
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
+ * @event {Event} input  - Natif, sur l'hôte, une fois `value` mise à jour par l'utilisateur (sélection calendrier ou validation de la saisie).
+ * @event {Event} change - Natif, juste après `input`.
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-show           - Avant ouverture du popover. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-shown          - Après ouverture.
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-hide           - Avant fermeture. @cancelable
@@ -213,18 +215,23 @@ export class ArDatepicker extends ArianeFormElement {
         this._syncFormValue();
     }
 
-    override updated(changed: PropertyValues<this>): void {
+    // Avant le rendu : les options du calendrier doivent être à jour pour ce rendu-ci, sinon la
+    // grille ouverte garde les anciens jours désactivés jusqu'à la prochaine ouverture.
+    override willUpdate(changed: PropertyValues<this>): void {
         if (changed.has('min') || changed.has('max') || changed.has('isDateDisabled')) {
             const opts: CalendarControllerOptions = { min: this.min, max: this.max };
             if (this.isDateDisabled !== undefined) opts.isDateDisabled = this.isDateDisabled;
             this._calendar.update(opts);
         }
+    }
 
+    override updated(changed: PropertyValues<this>): void {
         const hasError = this._hasSlot.test('error');
         this.toggleAttribute('has-error', hasError);
         this.toggleState('has-error', hasError);
 
-        if (changed.has('open')) {
+        // `open` initial à false : pas de transition, donc ni hide ni hidden au montage.
+        if (changed.has('open') && (this.open || changed.get('open') !== undefined)) {
             if (this._skipNextOpenChange) {
                 this._skipNextOpenChange = false;
             } else {
@@ -249,6 +256,8 @@ export class ArDatepicker extends ArianeFormElement {
 
         if (
             changed.has('value') ||
+            changed.has('min') ||
+            changed.has('max') ||
             changed.has('required') ||
             changed.has('disabled') ||
             (changed as Map<PropertyKey, unknown>).has('_formDisabled') ||
@@ -548,12 +557,14 @@ export class ArDatepicker extends ArianeFormElement {
         this._calendar.selectedDate = day;
         this._calendar.focusedDate = day;
 
+        const previous = this.value;
         this.value = this._toIso(day);
 
         const formatted = format(day, this.format);
         if (this._input) this._input.value = formatted;
 
         this._emitChange();
+        this._emitNative(previous);
         this._focusTargetAfterHide = this._input ?? null;
         this.open = false;
     }
@@ -578,6 +589,27 @@ export class ArDatepicker extends ArianeFormElement {
         emitEvent<Omit<ArDatepickerInputDetail, 'id'>>(this, 'ar-datepicker-input-change', {
             detail: { value: emitValue, valueAsDate: emitDate, valid: emitValid },
         });
+    }
+
+    /**
+     * `input` puis `change` natifs sur l'hôte, une fois `value` à jour : c'est ce que `ngModel`,
+     * `v-model` ou `onChange` écoutent. Émis seulement si la valeur a changé, jamais pour une
+     * valeur posée par l'application.
+     */
+    private _emitNative(previous: string): void {
+        if (this.value === previous) return;
+        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    /** Vrai si la date sort de `min`/`max` ; faux sans bornes. */
+    private _rangeFlag(date: Date | null): 'rangeUnderflow' | 'rangeOverflow' | null {
+        if (!date) return null;
+        const minDate = this.min ? parse(this.min, 'yyyy-MM-dd').date : null;
+        const maxDate = this.max ? parse(this.max, 'yyyy-MM-dd').date : null;
+        if (minDate && this._toIso(date) < this._toIso(minDate)) return 'rangeUnderflow';
+        if (maxDate && this._toIso(date) > this._toIso(maxDate)) return 'rangeOverflow';
+        return null;
     }
 
     private _toIso(date: Date): string {
@@ -708,6 +740,9 @@ export class ArDatepicker extends ArianeFormElement {
         btn?.focus();
     }
     private _handleInput(e: Event): void {
+        // L'`input` natif de l'<input> interne est composé : il atteindrait l'hôte avec `value`
+        // pas encore à jour. L'hôte émet le sien à la validation (_emitNative).
+        e.stopPropagation();
         const input = e.target as HTMLInputElement;
         const result = parse(input.value, this.format);
 
@@ -716,7 +751,7 @@ export class ArDatepicker extends ArianeFormElement {
                 detail: {
                     value: result.valid && result.date ? this._toIso(result.date) : null,
                     valueAsDate: result.date,
-                    valid: result.valid,
+                    valid: result.valid && this._rangeFlag(result.date) === null,
                 },
             });
 
@@ -742,9 +777,14 @@ export class ArDatepicker extends ArianeFormElement {
         const result = parse(raw, this.format);
 
         const isoValue = result.valid && result.date ? this._toIso(result.date) : null;
+        const previous = this.value;
+        // Valeur inchangée (typiquement après une sélection calendrier déjà notifiée) : rien à
+        // émettre, sauf un texte non vide invalide, dont le consommateur doit être informé.
+        if ((isoValue ?? '') === previous && (isoValue !== null || raw === '')) return;
         this.value = isoValue ?? '';
 
-        this._emitChange(result.date, result.valid);
+        this._emitChange(result.date, result.valid && this._rangeFlag(result.date) === null);
+        this._emitNative(previous);
     }
     private _handlePanelKeyDown(e: KeyboardEvent): void {
         if (e.key === 'Escape') {
@@ -902,7 +942,23 @@ export class ArDatepicker extends ArianeFormElement {
                 this._input ?? undefined,
             );
         } else {
-            this.setComponentValidity({});
+            const date = this.value ? parse(this.value, 'yyyy-MM-dd').date : null;
+            const flag = this._rangeFlag(date);
+            if (date && flag) {
+                const locale = this.localize.lang();
+                const bound = this._formatOrdinalDate(
+                    parse(flag === 'rangeUnderflow' ? this.min : this.max, 'yyyy-MM-dd')
+                        .date as Date,
+                    locale,
+                );
+                const term =
+                    flag === 'rangeUnderflow'
+                        ? this.localize.term('validationRangeUnderflow', bound)
+                        : this.localize.term('validationRangeOverflow', bound);
+                this.setComponentValidity({ [flag]: true }, term, this._input ?? undefined);
+            } else {
+                this.setComponentValidity({});
+            }
         }
     }
 }
