@@ -110,7 +110,7 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  *
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
- * @event {Event} input  - Natif, sur l'hôte, une fois `value` mise à jour par l'utilisateur (sélection calendrier ou validation de la saisie). Pas au montage ni pour une valeur posée par l'application.
+ * @event {Event} input  - Natif, sur l'hôte, une fois `value` mise à jour par l'utilisateur (sélection calendrier ou validation de la saisie).
  * @event {Event} change - Natif, juste après `input`.
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-show           - Avant ouverture du popover. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-shown          - Après ouverture.
