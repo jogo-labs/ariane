@@ -269,6 +269,14 @@ describe('checkSkill', () => {
             );
         });
 
+        it("accepte les événements natifs input et change émis sur l'hôte", () => {
+            const cem = withEvents([
+                { name: 'input', type: { text: 'Event' } },
+                { name: 'change', type: { text: 'Event' } },
+            ]);
+            expect(run({ cem })).toEqual([]);
+        });
+
         it('signale un type nu', () => {
             const cem = withEvents([{ name: 'ar-dialog-shown', type: { text: 'CustomEvent' } }]);
             expect(run({ cem }).join('\n')).toMatch(/« ar-dialog-shown » : type « CustomEvent »/);
