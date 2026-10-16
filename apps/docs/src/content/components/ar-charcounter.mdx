@@ -78,8 +78,6 @@ Les critères WCAG suivants sont implémentés :
 ### À votre charge
 
 - **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
-- **Valeur changée hors de `value`.** Le compteur suit la saisie, `value` et `form.reset()`. `setRangeText()`, `defaultValue`, l'attribut `value` et le contenu d'un `<textarea>` ne passent pas par `value` : appelez `refresh()` après.
-- **React avec hydratation.** Si `<ar-charcounter>` est défini avant `hydrateRoot`, il rattache le champ le premier et React n'y installe pas son suivi de valeur : l'événement natif `change` à la perte de focus déclenche un `onChange` en plus.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js

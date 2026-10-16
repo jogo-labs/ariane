@@ -183,10 +183,9 @@ export class ArCharcounter extends ArianeElement {
     }
 
     /**
-     * Relit le champ observé et met à jour le décompte. À n'utiliser que si la valeur change sans
-     * passer par la propriété `value` du champ (`setRangeText()`, `defaultValue`, attribut `value`,
-     * contenu d'un `textarea`), ou si un framework remplace l'élément du champ (même `id`, nouvel
-     * élément) : `for` est alors résolu de nouveau et le compteur se rattache au nouvel élément.
+     * Relit le champ observé et met à jour le décompte. Rarement utile : le compteur suit déjà la
+     * saisie, `value` et `form.reset()`. À appeler après un texte inséré par `setRangeText()`, ou si
+     * un framework remplace l'élément du champ (même `id`, nouvel élément).
      */
     refresh(): void {
         if (!this.isConnected || !this.for) return;
