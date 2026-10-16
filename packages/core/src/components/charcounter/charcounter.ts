@@ -67,6 +67,8 @@ export class ArCharcounter extends ArianeElement {
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
     private _form: HTMLFormElement | null = null;
+    private _ownValueBefore: PropertyDescriptor | undefined;
+    private _ownValueMine: PropertyDescriptor | undefined;
     private _fieldWatcher: MutationObserver | undefined;
     private _resetTimer: ReturnType<typeof setTimeout> | undefined;
     private _warnedMissingFor: string | undefined;
@@ -121,9 +123,10 @@ export class ArCharcounter extends ArianeElement {
     }
 
     /**
-     * Relit le champ observé et met à jour le décompte. À appeler après avoir posé la valeur du
-     * champ par programme (modèle d'un framework, valeur préremplie), qui n'émet pas d'événement
-     * `input`. Résout aussi `for` de nouveau : un champ remplacé par le framework est rattaché.
+     * Relit le champ observé et met à jour le décompte. Le compteur suit déjà la saisie, `value`
+     * posé par code et `form.reset()` : cette méthode ne sert que si le framework remplace
+     * l'élément du champ (même `id`, nouvel élément). Résout `for` de nouveau et rattache le
+     * compteur au nouvel élément.
      */
     refresh(): void {
         if (!this.isConnected || !this.for) return;
@@ -169,7 +172,49 @@ export class ArCharcounter extends ArianeElement {
         this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
+        this._interceptValue(field);
         this._bindForm(field);
+    }
+
+    /**
+     * Un `value` posé par programme (modèle d'un framework, donnée chargée) n'émet aucun événement
+     * `input`, et la plateforme n'offre ni observateur ni événement pour ce cas. Le compteur
+     * enveloppe donc le `value` du champ rattaché, sur l'instance seulement, et le rend au
+     * détachement. Un `value` propre au champ (suivi de valeur de React) est conservé et appelé.
+     */
+    private _interceptValue(field: HTMLInputElement | HTMLTextAreaElement): void {
+        let owner: object | null = field;
+        let inherited: PropertyDescriptor | undefined;
+        while (owner && !(inherited = Object.getOwnPropertyDescriptor(owner, 'value'))) {
+            owner = Object.getPrototypeOf(owner);
+        }
+        if (!inherited?.get || !inherited.set || !inherited.configurable) return;
+        const { get, set } = inherited;
+        this._ownValueBefore = Object.getOwnPropertyDescriptor(field, 'value');
+        const mine: PropertyDescriptor = {
+            configurable: true,
+            enumerable: inherited.enumerable ?? false,
+            get() {
+                return get.call(this);
+            },
+            set: (value: string) => {
+                set.call(field, value);
+                this._handleInput();
+            },
+        };
+        this._ownValueMine = mine;
+        Object.defineProperty(field, 'value', mine);
+    }
+
+    private _restoreValue(field: HTMLInputElement | HTMLTextAreaElement): void {
+        if (!this._ownValueMine) return;
+        // Si le framework a redéfini `value` depuis, son descripteur reste en place.
+        if (Object.getOwnPropertyDescriptor(field, 'value')?.set === this._ownValueMine.set) {
+            if (this._ownValueBefore) Object.defineProperty(field, 'value', this._ownValueBefore);
+            else delete (field as { value?: string }).value;
+        }
+        this._ownValueBefore = undefined;
+        this._ownValueMine = undefined;
     }
 
     /** Suit `reset` sur le formulaire courant du champ (il peut changer sans changer de champ). */
@@ -187,6 +232,7 @@ export class ArCharcounter extends ArianeElement {
         this._form = null;
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
+        this._restoreValue(this._field);
         this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;

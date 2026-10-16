@@ -196,11 +196,17 @@ describe('ArCharcounter', () => {
 
     describe('refresh()', () => {
         const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
+        // Pose la valeur sans passer par le `value` de l'instance (invisible pour le compteur).
+        const setSilently = (field: HTMLTextAreaElement, value: string) =>
+            Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(
+                field,
+                value,
+            );
 
-        it('relit la valeur posée par programme, sans événement input', async () => {
+        it('relit une valeur posée sans passer par le value du champ', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
-            (document.getElementById('f') as HTMLTextAreaElement).value = 'bonjour';
+            setSilently(document.getElementById('f') as HTMLTextAreaElement, 'bonjour');
             await waitForUpdate(el);
             expect(remaining()).toBe('200');
             el.refresh();
@@ -213,7 +219,7 @@ describe('ArCharcounter', () => {
             el = await fixture(
                 '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
             );
-            (document.getElementById('f') as HTMLTextAreaElement).value = '12345678';
+            setSilently(document.getElementById('f') as HTMLTextAreaElement, '12345678');
             el.refresh();
             await waitForUpdate(el);
             expect(el.state).toBe('warning');
@@ -296,6 +302,114 @@ describe('ArCharcounter', () => {
     });
 
     // ── Champ rendu après le compteur ────────────────────────────────────
+
+    describe('valeur posée par programme', () => {
+        const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
+        const protoSet = (proto: object) => Object.getOwnPropertyDescriptor(proto, 'value')!.set!;
+
+        it('suit field.value = … sans événement input ni refresh()', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            (document.getElementById('f') as HTMLTextAreaElement).value = 'bonjour';
+            await waitForUpdate(el);
+            expect(remaining()).toBe('193');
+        });
+
+        it('suit aussi un <input>', async () => {
+            document.body.innerHTML = '<input id="f" type="text" />';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            (document.getElementById('f') as HTMLInputElement).value = 'bonjour';
+            await waitForUpdate(el);
+            expect(remaining()).toBe('193');
+        });
+
+        it("recalcule l'état", async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter for="f" max="10" warn-threshold="3"></ar-charcounter>',
+            );
+            (document.getElementById('f') as HTMLTextAreaElement).value = '12345678901';
+            await waitForUpdate(el);
+            expect(el.state).toBe('error');
+        });
+
+        it('laisse le champ lire et écrire sa valeur normalement', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'abc';
+            expect(field.value).toBe('abc');
+            field.value = '';
+            expect(field.value).toBe('');
+        });
+
+        it("rend le champ intact quand le compteur est retiré, sans plus d'effet", async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            el.remove();
+            expect(Object.getOwnPropertyDescriptor(field, 'value')).toBeUndefined();
+            field.value = 'abc';
+            expect(field.value).toBe('abc');
+        });
+
+        it('garde et rend le value propre au champ posé par le framework (suivi de React)', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            const writes: string[] = [];
+            const frameworkOwn: PropertyDescriptor = {
+                configurable: true,
+                get() {
+                    return Object.getOwnPropertyDescriptor(
+                        HTMLTextAreaElement.prototype,
+                        'value',
+                    )!.get!.call(this);
+                },
+                set(v: string) {
+                    writes.push(v);
+                    protoSet(HTMLTextAreaElement.prototype).call(this, v);
+                },
+            };
+            Object.defineProperty(field, 'value', frameworkOwn);
+
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            field.value = 'bonjour';
+            await waitForUpdate(el);
+            expect(writes).toEqual(['bonjour']);
+            expect(remaining()).toBe('193');
+
+            el.remove();
+            const restored = Object.getOwnPropertyDescriptor(field, 'value');
+            expect(restored?.get).toBe(frameworkOwn.get);
+            expect(restored?.set).toBe(frameworkOwn.set);
+        });
+
+        it('suit le nouveau champ après un changement de for, et rend le précédent', async () => {
+            document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b"></textarea>';
+            el = await fixture('<ar-charcounter for="a" max="200"></ar-charcounter>');
+            el.setAttribute('for', 'b');
+            await waitForUpdate(el);
+            await new Promise((r) => setTimeout(r, 0));
+            expect(
+                Object.getOwnPropertyDescriptor(document.getElementById('a'), 'value'),
+            ).toBeUndefined();
+            (document.getElementById('b') as HTMLTextAreaElement).value = 'bonjour';
+            await waitForUpdate(el);
+            expect(remaining()).toBe('193');
+        });
+
+        it('suit un champ rendu après le compteur', async () => {
+            document.body.innerHTML = '';
+            el = await fixture('<ar-charcounter for="late" max="200"></ar-charcounter>');
+            const field = document.createElement('textarea');
+            field.id = 'late';
+            document.body.appendChild(field);
+            await new Promise((r) => setTimeout(r, 0));
+            field.value = 'bonjour';
+            await waitForUpdate(el);
+            expect(remaining()).toBe('193');
+        });
+    });
 
     describe('champ rendu après le compteur', () => {
         const remaining = () => getPart(el, 'remaining')?.textContent?.trim();

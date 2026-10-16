@@ -93,18 +93,8 @@ form.addEventListener('submit', (e) => {
 
 ## Utilisation
 
-### Valeur posée par programme
+### Suivi automatique du champ
 
-Un champ dont la valeur est posée par code (modèle d'un framework, valeur préremplie) n'émet pas d'événement `input` : appelez `refresh()` pour que le compteur relise la valeur.
-
-```js
-textarea.value = 'Texte préchargé';
-counter.refresh();
-```
-
-`refresh()` résout aussi `for` de nouveau : un champ remplacé par le framework (même `id`, nouvel élément) est rattaché.
-
-### Réinitialisation et champ rendu plus tard
-
+- Une valeur posée par code (`champ.value = …`, modèle d'un framework, donnée chargée après le rendu) est suivie sans action de votre part, comme la saisie.
 - `form.reset()` sur le formulaire du champ est suivi automatiquement.
 - Si le champ n'existe pas encore (`v-if`, `@if`, rendu différé), le compteur se rattache dès qu'il apparaît. Un avertissement de développement le signale une fois.

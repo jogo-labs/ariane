@@ -138,4 +138,70 @@ describe('ar-charcounter — browser', () => {
             expect(input.getAttribute('aria-describedby')).to.equal('cc');
         });
     });
+    // ── Valeur posée par programme (#332) ─────────────────────────────────────
+
+    describe('valeur posée par programme', () => {
+        const remaining = (el: ArCharcounter) =>
+            el.shadowRoot!.querySelector('[part="remaining"]')!.textContent!.trim();
+
+        it('suit textarea.value = … et input.value = … sans événement', async () => {
+            wrapper = await fixture(html`
+                <div>
+                    <textarea id="area"></textarea>
+                    <input id="line" type="text" />
+                    <ar-charcounter id="a" for="area" max="10"></ar-charcounter>
+                    <ar-charcounter id="b" for="line" max="10"></ar-charcounter>
+                </div>
+            `);
+            const a = wrapper.querySelector<ArCharcounter>('#a')!;
+            const b = wrapper.querySelector<ArCharcounter>('#b')!;
+            await Promise.all([a.updateComplete, b.updateComplete]);
+            wrapper.querySelector<HTMLTextAreaElement>('#area')!.value = '12345';
+            wrapper.querySelector<HTMLInputElement>('#line')!.value = '123';
+            await Promise.all([a.updateComplete, b.updateComplete]);
+            expect(remaining(a)).to.equal('5');
+            expect(remaining(b)).to.equal('7');
+        });
+
+        it('compose avec un value propre au champ, et le rend au retrait du compteur', async () => {
+            wrapper = await fixture(html`
+                <div>
+                    <textarea id="area"></textarea>
+                    <ar-charcounter for="area" max="10"></ar-charcounter>
+                </div>
+            `);
+            const area = wrapper.querySelector<HTMLTextAreaElement>('#area')!;
+            const el = wrapper.querySelector<ArCharcounter>('ar-charcounter')!;
+            const proto = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!;
+            const writes: string[] = [];
+            // Comme le suivi de valeur de React : un value sur l'instance qui délègue au prototype.
+            // Posé après le compteur ici ; l'ordre inverse est couvert par les tests unitaires.
+            el.remove();
+            const own: PropertyDescriptor = {
+                configurable: true,
+                get() {
+                    return proto.get!.call(this);
+                },
+                set(v: string) {
+                    writes.push(v);
+                    proto.set!.call(this, v);
+                },
+            };
+            Object.defineProperty(area, 'value', own);
+            wrapper.appendChild(el);
+            await el.updateComplete;
+            await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+            area.value = '1234';
+            await el.updateComplete;
+            expect(writes).to.deep.equal(['1234']);
+            expect(remaining(el)).to.equal('6');
+
+            el.remove();
+            const restored = Object.getOwnPropertyDescriptor(area, 'value');
+            expect(restored?.set).to.equal(own.set);
+            area.value = 'x';
+            expect(writes).to.deep.equal(['1234', 'x']);
+        });
+    });
 });
