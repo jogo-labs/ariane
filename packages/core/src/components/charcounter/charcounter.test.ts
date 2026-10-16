@@ -192,7 +192,7 @@ describe('ArCharcounter', () => {
         });
     });
 
-    // ── refresh() : valeur posée par programme ───────────────────────────
+    // ── refresh() : valeur posée hors du value du champ, champ remplacé ──
 
     describe('refresh()', () => {
         const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
@@ -301,7 +301,7 @@ describe('ArCharcounter', () => {
         });
     });
 
-    // ── Champ rendu après le compteur ────────────────────────────────────
+    // ── Valeur posée par programme ───────────────────────────────────────
 
     describe('valeur posée par programme', () => {
         const remaining = () => getPart(el, 'remaining')?.textContent?.trim();
@@ -398,6 +398,40 @@ describe('ArCharcounter', () => {
             expect(remaining()).toBe('193');
         });
 
+        it('rend le champ intact quand deux compteurs le suivent, quel que soit l’ordre de retrait', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const other: ArCharcounter = await fixture(
+                '<ar-charcounter for="f" max="100"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.value = 'bonjour';
+            await Promise.all([waitForUpdate(el), waitForUpdate(other)]);
+            expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('193');
+            expect(getPart(other, 'remaining')?.textContent?.trim()).toBe('93');
+
+            el.remove();
+            field.value = 'abc';
+            await waitForUpdate(other);
+            expect(getPart(other, 'remaining')?.textContent?.trim()).toBe('97');
+
+            other.remove();
+            expect(Object.getOwnPropertyDescriptor(field, 'value')).toBeUndefined();
+        });
+
+        it('ne double pas les mises à jour après retrait puis rattachement au même champ', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            const parent = el.parentElement!;
+            el.remove();
+            parent.appendChild(el);
+            await waitForUpdate(el);
+            const spy = vi.spyOn(el, 'requestUpdate');
+            field.value = 'bonjour';
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
         it('suit un champ rendu après le compteur', async () => {
             document.body.innerHTML = '';
             el = await fixture('<ar-charcounter for="late" max="200"></ar-charcounter>');
@@ -410,6 +444,8 @@ describe('ArCharcounter', () => {
             expect(remaining()).toBe('193');
         });
     });
+
+    // ── Champ rendu après le compteur ────────────────────────────────────
 
     describe('champ rendu après le compteur', () => {
         const remaining = () => getPart(el, 'remaining')?.textContent?.trim();

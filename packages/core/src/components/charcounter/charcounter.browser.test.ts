@@ -175,7 +175,7 @@ describe('ar-charcounter — browser', () => {
             const proto = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!;
             const writes: string[] = [];
             // Comme le suivi de valeur de React : un value sur l'instance qui délègue au prototype.
-            // Posé après le compteur ici ; l'ordre inverse est couvert par les tests unitaires.
+            // Posé avant le rattachement du compteur, comme React à la création du nœud.
             el.remove();
             const own: PropertyDescriptor = {
                 configurable: true,
@@ -202,6 +202,24 @@ describe('ar-charcounter — browser', () => {
             expect(restored?.set).to.equal(own.set);
             area.value = 'x';
             expect(writes).to.deep.equal(['1234', 'x']);
+        });
+        it('ne voit pas setRangeText() : refresh() relit la valeur', async () => {
+            wrapper = await fixture(html`
+                <div>
+                    <input id="line" type="text" />
+                    <ar-charcounter for="line" max="10"></ar-charcounter>
+                </div>
+            `);
+            const input = wrapper.querySelector<HTMLInputElement>('#line')!;
+            const el = wrapper.querySelector<ArCharcounter>('ar-charcounter')!;
+            await el.updateComplete;
+            input.setRangeText('abc');
+            await el.updateComplete;
+            expect(remaining(el)).to.equal('10');
+
+            el.refresh();
+            await el.updateComplete;
+            expect(remaining(el)).to.equal('7');
         });
     });
 });

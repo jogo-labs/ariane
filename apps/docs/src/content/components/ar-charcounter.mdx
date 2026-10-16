@@ -78,6 +78,8 @@ Les critères WCAG suivants sont implémentés :
 ### À votre charge
 
 - **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
+- **Valeur changée hors de `value`.** Le compteur suit la saisie, `value` et `form.reset()`. `setRangeText()`, `defaultValue`, l'attribut `value` et le contenu d'un `<textarea>` ne passent pas par `value` : appelez `refresh()` après.
+- **React avec hydratation.** Si `<ar-charcounter>` est défini avant `hydrateRoot`, il rattache le champ le premier et React n'y installe pas son suivi de valeur : l'événement natif `change` à la perte de focus déclenche un `onChange` en plus.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
@@ -90,11 +92,3 @@ form.addEventListener('submit', (e) => {
 ```
 
 - L'état `warning` et `error` ne doivent pas être communiqués uniquement par la couleur (<WcagRef criterion="1.4.1" summary="Use of Color : la couleur n'est pas utilisée comme le seul moyen de transmettre de l'information." />) : les slots `warning-icon` et `error-icon` permettent d'insérer un signal visuel supplémentaire. Les icônes doivent porter `aria-hidden="true"` pour éviter un doublon d'annonce — l'information est déjà transmise par `aria-live`.
-
-## Utilisation
-
-### Suivi automatique du champ
-
-- Une valeur posée par code (`champ.value = …`, modèle d'un framework, donnée chargée après le rendu) est suivie sans action de votre part, comme la saisie.
-- `form.reset()` sur le formulaire du champ est suivi automatiquement.
-- Si le champ n'existe pas encore (`v-if`, `@if`, rendu différé), le compteur se rattache dès qu'il apparaît. Un avertissement de développement le signale une fois.

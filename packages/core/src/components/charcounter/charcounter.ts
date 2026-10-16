@@ -8,6 +8,68 @@ import { ArianeElement } from '../../base/ariane-element.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
 
+type CounterField = HTMLInputElement | HTMLTextAreaElement;
+
+interface ValueWatch {
+    before: PropertyDescriptor | undefined;
+    mine: PropertyDescriptor;
+    listeners: Set<() => void>;
+}
+
+/** Un seul `value` enveloppé par champ, partagé par tous les compteurs qui le suivent. */
+const valueWatches = new WeakMap<CounterField, ValueWatch>();
+
+/**
+ * Un `value` posé par programme (modèle d'un framework, donnée chargée) n'émet aucun événement
+ * `input`, et la plateforme n'offre ni observateur ni événement pour ce cas. Le champ voit donc son
+ * `value` enveloppé, sur l'instance seulement, jusqu'au départ du dernier compteur. Un `value`
+ * propre au champ (suivi de valeur de React) est conservé et appelé.
+ */
+function watchValue(field: CounterField, listener: () => void): void {
+    const existing = valueWatches.get(field);
+    if (existing) {
+        existing.listeners.add(listener);
+        return;
+    }
+    let owner: object | null = field;
+    let inherited: PropertyDescriptor | undefined;
+    while (owner && !(inherited = Object.getOwnPropertyDescriptor(owner, 'value'))) {
+        owner = Object.getPrototypeOf(owner);
+    }
+    if (!inherited?.get || !inherited.set || !inherited.configurable) return;
+    const { get, set } = inherited;
+    const listeners = new Set([listener]);
+    const mine: PropertyDescriptor = {
+        configurable: true,
+        enumerable: inherited.enumerable ?? false,
+        get() {
+            return get.call(this);
+        },
+        set(value: string) {
+            set.call(field, value);
+            listeners.forEach((notify) => notify());
+        },
+    };
+    valueWatches.set(field, {
+        before: Object.getOwnPropertyDescriptor(field, 'value'),
+        mine,
+        listeners,
+    });
+    Object.defineProperty(field, 'value', mine);
+}
+
+function unwatchValue(field: CounterField, listener: () => void): void {
+    const watch = valueWatches.get(field);
+    if (!watch) return;
+    watch.listeners.delete(listener);
+    if (watch.listeners.size > 0) return;
+    valueWatches.delete(field);
+    // Si le framework a redéfini `value` depuis, son descripteur reste en place.
+    if (Object.getOwnPropertyDescriptor(field, 'value')?.set !== watch.mine.set) return;
+    if (watch.before) Object.defineProperty(field, 'value', watch.before);
+    else delete (field as { value?: string }).value;
+}
+
 function pluralize(count: number, label: string): string {
     if (!label.includes('|')) return label;
     const [singular, plural] = label.split('|');
@@ -67,8 +129,6 @@ export class ArCharcounter extends ArianeElement {
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
     private _form: HTMLFormElement | null = null;
-    private _ownValueBefore: PropertyDescriptor | undefined;
-    private _ownValueMine: PropertyDescriptor | undefined;
     private _fieldWatcher: MutationObserver | undefined;
     private _resetTimer: ReturnType<typeof setTimeout> | undefined;
     private _warnedMissingFor: string | undefined;
@@ -123,10 +183,10 @@ export class ArCharcounter extends ArianeElement {
     }
 
     /**
-     * Relit le champ observé et met à jour le décompte. Le compteur suit déjà la saisie, `value`
-     * posé par code et `form.reset()` : cette méthode ne sert que si le framework remplace
-     * l'élément du champ (même `id`, nouvel élément). Résout `for` de nouveau et rattache le
-     * compteur au nouvel élément.
+     * Relit le champ observé et met à jour le décompte. À n'utiliser que si la valeur change sans
+     * passer par la propriété `value` du champ (`setRangeText()`, `defaultValue`, attribut `value`,
+     * contenu d'un `textarea`), ou si un framework remplace l'élément du champ (même `id`, nouvel
+     * élément) : `for` est alors résolu de nouveau et le compteur se rattache au nouvel élément.
      */
     refresh(): void {
         if (!this.isConnected || !this.for) return;
@@ -172,49 +232,8 @@ export class ArCharcounter extends ArianeElement {
         this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
-        this._interceptValue(field);
+        watchValue(field, this._handleInput);
         this._bindForm(field);
-    }
-
-    /**
-     * Un `value` posé par programme (modèle d'un framework, donnée chargée) n'émet aucun événement
-     * `input`, et la plateforme n'offre ni observateur ni événement pour ce cas. Le compteur
-     * enveloppe donc le `value` du champ rattaché, sur l'instance seulement, et le rend au
-     * détachement. Un `value` propre au champ (suivi de valeur de React) est conservé et appelé.
-     */
-    private _interceptValue(field: HTMLInputElement | HTMLTextAreaElement): void {
-        let owner: object | null = field;
-        let inherited: PropertyDescriptor | undefined;
-        while (owner && !(inherited = Object.getOwnPropertyDescriptor(owner, 'value'))) {
-            owner = Object.getPrototypeOf(owner);
-        }
-        if (!inherited?.get || !inherited.set || !inherited.configurable) return;
-        const { get, set } = inherited;
-        this._ownValueBefore = Object.getOwnPropertyDescriptor(field, 'value');
-        const mine: PropertyDescriptor = {
-            configurable: true,
-            enumerable: inherited.enumerable ?? false,
-            get() {
-                return get.call(this);
-            },
-            set: (value: string) => {
-                set.call(field, value);
-                this._handleInput();
-            },
-        };
-        this._ownValueMine = mine;
-        Object.defineProperty(field, 'value', mine);
-    }
-
-    private _restoreValue(field: HTMLInputElement | HTMLTextAreaElement): void {
-        if (!this._ownValueMine) return;
-        // Si le framework a redéfini `value` depuis, son descripteur reste en place.
-        if (Object.getOwnPropertyDescriptor(field, 'value')?.set === this._ownValueMine.set) {
-            if (this._ownValueBefore) Object.defineProperty(field, 'value', this._ownValueBefore);
-            else delete (field as { value?: string }).value;
-        }
-        this._ownValueBefore = undefined;
-        this._ownValueMine = undefined;
     }
 
     /** Suit `reset` sur le formulaire courant du champ (il peut changer sans changer de champ). */
@@ -232,7 +251,7 @@ export class ArCharcounter extends ArianeElement {
         this._form = null;
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
-        this._restoreValue(this._field);
+        unwatchValue(this._field, this._handleInput);
         this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;
