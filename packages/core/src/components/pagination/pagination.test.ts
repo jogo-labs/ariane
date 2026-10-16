@@ -941,13 +941,16 @@ describe('ArPagination', () => {
             document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
         });
 
-        it("n'annonce rien tant que current n'est pas confirmé par le consommateur", async () => {
+        it("n'annonce pas la page tant que current n'est pas confirmé par le consommateur", async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             (requirePart(el, 'prev') as HTMLElement).click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
 
-            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+            // Seule l'attente est annoncée, pas la page.
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
         });
 
         it('un clic sur prev confirmé annonce "Page N-1 sur M"', async () => {
@@ -1228,6 +1231,88 @@ describe('ArPagination', () => {
             await waitForUpdate(el);
             const current = shadow.querySelector('span[part~="current"]') as HTMLElement;
             expect(shadow.activeElement).toBe(current);
+        });
+    });
+
+    describe('attente automatique (#327)', () => {
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        const nav = (): HTMLElement => requirePart(el, 'pagination') as HTMLElement;
+        const click = async (part: string): Promise<void> => {
+            (requirePart(el, part) as HTMLElement).click();
+            await waitForUpdate(el);
+        };
+
+        it("un page-change non annulé met le composant en attente, sans toucher à l'attribut", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            expect(nav().getAttribute('aria-busy')).toBe('true');
+            expect(partContains(nav(), 'pagination--pending')).toBe(true);
+            expect(el.pending).toBe(false);
+            expect(el.hasAttribute('pending')).toBe(false);
+        });
+
+        it("réassigner current vers une autre page met fin à l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            el.current = 3;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+            expect(partContains(nav(), 'pagination--pending')).toBe(false);
+        });
+
+        it("réassigner current à la même valeur (échec côté application) met fin à l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            el.current = 2;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it('un page-change annulé ne met pas en attente', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
+            await click('next');
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it("une réponse synchrone dans le handler n'allume ni attente ni annonce", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            await click('next');
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Page 3 sur 5',
+            );
+        });
+
+        it("l'attribut pending reste à la charge de l'application et prolonge l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5" pending></ar-pagination>');
+            await click('next');
+            el.current = 3;
+            await waitForUpdate(el);
+            expect(nav().getAttribute('aria-busy')).toBe('true');
+            el.pending = false;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it("l'attente automatique est annoncée une seule fois", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            await click('next');
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
         });
     });
 

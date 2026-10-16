@@ -91,8 +91,12 @@ export class ArPagination extends ArianeElement {
 
     /**
      * Numéro de la page courante (commence à 1).
+     *
+     * Toute affectation compte, même vers la même valeur (`hasChanged` toujours vrai) : réassigner
+     * `current` est la réponse de l'application à `ar-pagination-page-change`, y compris pour
+     * signaler un échec (même page), et met fin à l'attente automatique.
      */
-    @property({ reflect: true, type: Number, useDefault: true })
+    @property({ reflect: true, type: Number, useDefault: true, hasChanged: () => true })
     current: number = ArPagination.DEFAULT_CURRENT;
 
     /**
@@ -110,15 +114,22 @@ export class ArPagination extends ArianeElement {
     compact: boolean = false;
 
     /**
-     * Une réponse est attendue après `ar-pagination-page-change` (chargement de la page). Posé et
-     * retiré par l'application, jamais par le composant (à la différence d'`ar-table-sort`). Non
-     * bloquant : les interactions restent possibles. Pose `aria-busy="true"` sur la navigation,
-     * annonce l'attente au passage `false → true` et ajoute le part d'état `pagination--pending`.
+     * Attente d'une réponse, pilotée par l'application. Le composant attend déjà seul la réponse
+     * à chaque `ar-pagination-page-change` non annulé, jusqu'à la prochaine affectation de
+     * `current` : cet attribut sert à exprimer une attente qui ne passe pas par l'événement
+     * (chargement initial, rafraîchissement) et reste à la charge de l'application. Le composant
+     * ne le pose ni ne le retire jamais. Non bloquant : les interactions restent possibles. L'attente,
+     * manuelle ou automatique, pose `aria-busy="true"` sur la navigation, l'état `:state(pending)`
+     * et le part `pagination--pending`, et annonce l'attente au passage `false → true`.
      */
     @property({ reflect: true, type: Boolean })
     pending: boolean = false;
 
     @state() private _budget?: number;
+    // Attente automatique d'une réponse : posée à chaque demande de changement de page, levée à
+    // la prochaine affectation de `current` ou si la demande est annulée.
+    @state() private _awaiting = false;
+    private _wasPending = false;
     private _resizeObserver?: ResizeObserver | undefined;
     private _itemWidth = 0;
     private _initialized = false;
@@ -239,6 +250,14 @@ export class ArPagination extends ArianeElement {
         this._budget = Math.max(budget - 1, 0);
     }
 
+    private get _isPending(): boolean {
+        return this.pending || this._awaiting;
+    }
+
+    override willUpdate(changed: Map<string, unknown>): void {
+        if (changed.has('current')) this._awaiting = false;
+    }
+
     override updated(changed: Map<string, unknown>): void {
         // `_hasRenderedOnce` (posé false→true seulement en fin de cycle, cf. plus bas) exclut le
         // tout premier `updated()` : `compact` n'a pas de `useDefault`, donc `changed.has('compact')`
@@ -291,9 +310,10 @@ export class ArPagination extends ArianeElement {
             const value = String(_clamp(this.current, 1, Math.max(this.total, 1)));
             if (select.value !== value) select.value = value;
         }
-        if (changed.has('pending')) {
-            this.toggleState('pending', this.pending);
-            if (this._hasRenderedOnce && this.pending) {
+        if (this._isPending !== this._wasPending) {
+            this._wasPending = this._isPending;
+            this.toggleState('pending', this._isPending);
+            if (this._hasRenderedOnce && this._isPending) {
                 announceA11y(this.localize.term('paginationPending'), 'polite');
             }
         }
@@ -318,7 +338,7 @@ export class ArPagination extends ArianeElement {
         this._hasRenderedOnce = true;
         // Tant qu'une réponse est attendue (`pending`), l'intention de focus survit aux rendus
         // intermédiaires jusqu'à la confirmation de `current`.
-        if (!this.pending) this._pendingFocusPage = undefined;
+        if (!this._isPending) this._pendingFocusPage = undefined;
     }
 
     private _defaultPrevIcon(): TemplateResult {
@@ -362,10 +382,10 @@ export class ArPagination extends ArianeElement {
         const nextPageSrOnly = this.localize.term('nextPage', nextPageNumber, total);
 
         return html` <nav
-            part="pagination${this.pending ? ' pagination--pending' : ''}"
+            part="pagination${this._isPending ? ' pagination--pending' : ''}"
             role="navigation"
             aria-labelledby="ar-pagination"
-            aria-busy=${this.pending ? 'true' : nothing}
+            aria-busy=${this._isPending ? 'true' : nothing}
         >
             <p id="ar-pagination" class="sr-only">${landmarkLabel}</p>
             <ul part="list" @click=${this._onPageChange}>
@@ -576,12 +596,16 @@ export class ArPagination extends ArianeElement {
     private _requestPageChange(to: number): boolean {
         const from = this.current;
         this._currentSettled = true;
+        this._awaiting = true;
         const allowed = !emitEvent(this, 'ar-pagination-page-change', {
             cancelable: true,
             detail: { from, to },
         }).defaultPrevented;
         // Refus : l'intention de focus ne doit pas survivre à une demande qui n'aboutira pas.
-        if (!allowed) this._pendingFocusPage = undefined;
+        if (!allowed) {
+            this._pendingFocusPage = undefined;
+            this._awaiting = false;
+        }
         return allowed;
     }
 
