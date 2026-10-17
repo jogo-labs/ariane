@@ -184,8 +184,7 @@ documenter via le slot `hint` si nécessaire.
 
 ### Jours chargés à la demande
 
-`ar-datepicker-view-change` est émis à l'ouverture et à chaque changement de mois affiché. Posez
-`pending` le temps de charger les jours indisponibles du mois, puis réassignez `isDateDisabled` :
+Si les jours indisponibles dépendent du mois affiché et viennent d'un chargement, écoutez `ar-datepicker-view-change` : il est émis à l'ouverture et à chaque changement de mois. Posez `pending` le temps du chargement, puis réassignez `isDateDisabled` :
 
 ```js
 datepicker.addEventListener('ar-datepicker-view-change', async ({ detail }) => {
