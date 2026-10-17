@@ -9,8 +9,17 @@ import { ArianeFormElement } from '../../base/ariane-form-element.js';
 import { parse, format } from './date-parser.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './datepicker.styles.js';
+import { announceA11y } from '../../a11y/announce-a11y.js';
 import { warn } from '../../utils/warn.js';
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
+
+/** Détail de l'événement `ar-datepicker-view-change` */
+export interface ArDatepickerViewChangeDetail extends ArEventDetail {
+    /** Année du mois affiché */
+    year: number;
+    /** Mois affiché, de 1 (janvier) à 12 (décembre) */
+    month: number;
+}
 
 /** Détail des événements `ar-datepicker-input-change` et `ar-datepicker-input-complete` */
 export interface ArDatepickerInputDetail extends ArEventDetail {
@@ -107,6 +116,7 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @cssState disabled  - Le composant est désactivé.
  * @cssState readonly  - Le composant est en lecture seule.
  * @cssState has-error - Un message d'erreur est affiché (slot `error`).
+ * @cssState pending   - L'application a posé l'attribut `pending` : une réponse est attendue.
  *
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
@@ -116,6 +126,7 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-shown          - Après ouverture.
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-hide           - Avant fermeture. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-datepicker-hidden         - Après fermeture.
+ * @event {CustomEvent<{ id: string | undefined, year: number, month: number }>} ar-datepicker-view-change - Le mois affiché change (navigation) ou le calendrier s'ouvre ; `month` va de 1 à 12.
  *
  * @tagname ar-datepicker
  */
@@ -173,11 +184,20 @@ export class ArDatepicker extends ArianeFormElement {
     @property({ reflect: true, type: Boolean }) readonly = false;
     /** Ouvre ou ferme le popover calendrier. */
     @property({ reflect: true, type: Boolean }) open = false;
+    /**
+     * Attente d'une réponse, pilotée par l'application (par exemple les jours désactivés du mois
+     * affiché, à charger après `ar-datepicker-view-change`). Le composant ne le pose ni ne le
+     * retire jamais. Non bloquant : le calendrier reste utilisable. Pose `aria-busy="true"` sur le
+     * panneau, l'état `:state(pending)` et annonce l'attente au passage `false → true`.
+     */
+    @property({ reflect: true, type: Boolean }) pending = false;
 
     /** Ignore le prochain `updated()` open/close quand un event annulé re-set `open`. */
     private _skipNextOpenChange = false;
     /** Élément à focus une fois la fermeture confirmée (non annulée par ar-datepicker-hide). */
     private _focusTargetAfterHide: HTMLElement | null = null;
+    /** Dernier mois annoncé par `ar-datepicker-view-change` (année × 12 + mois), pendant l'ouverture. */
+    private _emittedViewKey = -1;
 
     @query('[part~="input"]') private _input!: HTMLInputElement;
     @query('[part="panel"]') private _panel!: HTMLElement;
@@ -249,6 +269,16 @@ export class ArDatepicker extends ArianeFormElement {
                 });
             }
         }
+
+        if (changed.has('pending')) {
+            this.toggleState('pending', this.pending);
+            // `get` indéfini au montage : pas d'annonce pour un `pending` posé dès le départ.
+            if (this.pending && changed.get('pending') !== undefined) {
+                announceA11y(this.localize.term('datepickerPending'), 'polite');
+            }
+        }
+
+        this._emitViewChangeOnNavigation();
 
         if (changed.has('value') || changed.has('format')) {
             this._syncInputFromValue();
@@ -381,6 +411,7 @@ export class ArDatepicker extends ArianeFormElement {
                     aria-modal="true"
                     aria-label=${this.localize.term('selectDate')}
                     aria-labelledby=${this.open ? `dp-month-${this._uid}` : nothing}
+                    aria-busy=${this.pending ? 'true' : nothing}
                     id="ar-dp-panel-${this._uid}"
                     @keydown=${this._handlePanelKeyDown}
                 >
@@ -581,6 +612,31 @@ export class ArDatepicker extends ArianeFormElement {
         this.open = false;
     }
 
+    /** Pendant l'ouverture, un mois affiché qui diffère du dernier annoncé est une navigation. */
+    private _emitViewChangeOnNavigation(): void {
+        if (!this.open) {
+            this._emittedViewKey = -1;
+            return;
+        }
+        // -1 : `_show()` n'a pas encore calé le mois d'ouverture, c'est lui qui l'annonce.
+        if (this._emittedViewKey !== -1 && this._viewKey() !== this._emittedViewKey) {
+            this._emitViewChange();
+        }
+    }
+
+    private _viewKey(): number {
+        const view = this._calendar.currentViewMonth;
+        return view.getFullYear() * 12 + view.getMonth();
+    }
+
+    private _emitViewChange(): void {
+        const view = this._calendar.currentViewMonth;
+        this._emittedViewKey = this._viewKey();
+        emitEvent<Omit<ArDatepickerViewChangeDetail, 'id'>>(this, 'ar-datepicker-view-change', {
+            detail: { year: view.getFullYear(), month: view.getMonth() + 1 },
+        });
+    }
+
     private _emitChange(date?: Date | null, valid?: boolean): void {
         const emitDate = date ?? (this.value ? parse(this.value, 'yyyy-MM-dd').date : null);
         const emitValid = valid ?? emitDate !== null;
@@ -704,6 +760,9 @@ export class ArDatepicker extends ArianeFormElement {
             this._calendar.selectedDate = null;
             // currentViewMonth et focusedDate conservés — mémorisent la navigation entre les ouvertures
         }
+
+        // Après le calage du mois sur la valeur : c'est le mois réellement affiché à l'ouverture.
+        this._emitViewChange();
 
         await this._anchored.show();
         await this.updateComplete;

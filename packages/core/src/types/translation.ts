@@ -24,6 +24,7 @@ export interface FullTranslation extends BaseTranslation {
     sortFailed: (columnLabel: string) => string;
 
     // ar-datepicker
+    datepickerPending: string;
     today: string;
     close: string;
     closeCalendar: string;
