@@ -67,21 +67,6 @@ import WcagRef from '../../components/WcagRef.astro';
   cette réassignation — mettez-la à jour de façon synchrone (voir la section Utilisation) pour
   qu'ils restent cohérents avec l'action de l'utilisateur.
 
-### Attente d'une réponse
-
-À chaque `ar-pagination-page-change` non annulé, le composant se met en attente jusqu'à ce que vous réassigniez `current` : `aria-busy="true"` sur la navigation, une annonce polie et `:state(pending)`. Rien n'est bloqué.
-
-En cas d'échec, réassignez la page actuelle pour lever l'attente.
-
-```js
-pagination.addEventListener('ar-pagination-page-change', async (e) => {
-    const ok = await loadPage(e.detail.to);
-    pagination.current = ok ? e.detail.to : pagination.current;
-});
-```
-
-Pour une attente qui ne passe pas par l'événement (chargement initial, rafraîchissement), posez l'attribut `pending` vous-même et retirez-le à la réponse. Il n'est jamais posé par le composant : pour cibler les deux cas en CSS, utilisez `:state(pending)`, pas `[pending]`.
-
 ## Comportement responsive
 
 Le composant adapte son contenu automatiquement à la largeur du conteneur dans lequel il est positionné (pas celle du viewport) :
@@ -93,12 +78,11 @@ adaptatif par défaut) : à vous de vérifier que le label et les boutons prev/n
 
 ## Utilisation
 
-Lorsque l'utilisateur souhaite changer de page, un événement `ar-pagination-page-change` est émis avec `{ from, to }` dans `event.detail`.
-Mettez à jour la propriété `current` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'état du composant de pagination.
+Écoutez `ar-pagination-page-change`, chargez la page, puis réassignez `current`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez la page actuelle.
 
 ```js
-document.addEventListener('ar-pagination-page-change', (e) => {
-    /* Mettez à jour le contenu de la page, puis la page active du composant */
-    e.target.current = e.detail.to;
+pagination.addEventListener('ar-pagination-page-change', async (e) => {
+    const ok = await loadPage(e.detail.to);
+    pagination.current = ok ? e.detail.to : pagination.current;
 });
 ```

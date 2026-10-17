@@ -62,7 +62,7 @@ export interface ArPaginationPageChangeDetail extends ArEventDetail {
  *   portée par le landmark et le texte accessible (sr-only) de prev/next). Personnalisable via
  *   `::part(label)`.
  *
- * @cssState pending - Une réponse est attendue : l'application a posé `pending`.
+ * @cssState pending - Une réponse est attendue : un utilisateur a demandé à changer de page ou l'application a posé manuellement l'attribut `pending`.
  *
  * @slot prev-icon - Icône du bouton "Page précédente". Remplace le chevron SVG par défaut.
  * @slot next-icon - Icône du bouton "Page suivante". Remplace le chevron SVG par défaut.
