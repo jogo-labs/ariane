@@ -41,6 +41,64 @@ async function mobileStepper(): Promise<ArStepper> {
 // ──────────────────────────────────────────────────────────────────────────────
 
 describe('ar-stepper — browser', () => {
+    describe('attente et focus asynchrone (#328)', () => {
+        const mount = async (desktopFrom: number): Promise<ArStepper> => {
+            const el = await fixture<ArStepper>(html`
+                <ar-stepper current-path="a" mode="edit" desktop-from=${desktopFrom}>
+                    <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
+                    <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+                </ar-stepper>
+            `);
+            await aTimeout(50);
+            return el;
+        };
+        const clickB = async (el: ArStepper): Promise<Element> => {
+            const itemB = el.querySelector('ar-stepper-item[path="b"]')!;
+            itemB.shadowRoot!.querySelector<HTMLElement>('[part~="step-link"]')!.click();
+            await elementUpdated(el);
+            return itemB;
+        };
+
+        it(":state(pending) suit l'attente automatique puis l'attribut", async () => {
+            const el = await mount(1);
+            expect(el.matches(':state(pending)')).to.equal(false);
+            await clickB(el);
+            expect(el.matches(':state(pending)')).to.equal(true);
+            el.currentPath = 'b';
+            await elementUpdated(el);
+            expect(el.matches(':state(pending)')).to.equal(false);
+            el.pending = true;
+            await elementUpdated(el);
+            expect(el.matches(':state(pending)')).to.equal(true);
+        });
+
+        // Les comparaisons passent par un booléen : un échec chai sur un nœud DOM tente d'en
+        // sérialiser l'arbre et peut figer la page.
+        it("desktop : le focus suit une confirmation tardive sur l'étape courante", async () => {
+            const el = await mount(1);
+            const itemB = await clickB(el);
+            await aTimeout(300);
+            el.currentPath = 'b';
+            await elementUpdated(el);
+            await aTimeout(50);
+            expect(document.activeElement === itemB, 'item B focalisé').to.equal(true);
+            expect(itemB.shadowRoot!.activeElement?.classList.contains('item-header')).to.equal(
+                true,
+            );
+        });
+
+        it('mobile : le focus suit une confirmation tardive sur le trigger', async () => {
+            const el = await mount(9999);
+            await clickB(el);
+            await aTimeout(300);
+            el.currentPath = 'b';
+            await elementUpdated(el);
+            await aTimeout(50);
+            const trigger = el.shadowRoot!.querySelector('[part~="trigger"]');
+            expect(el.shadowRoot!.activeElement === trigger, 'trigger focalisé').to.equal(true);
+        });
+    });
+
     let el: ArStepper;
 
     afterEach(() => el?.remove());

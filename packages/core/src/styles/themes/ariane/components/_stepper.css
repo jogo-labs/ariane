@@ -17,6 +17,10 @@
 
 /* Stepper */
 ar-stepper {
+    &:state(pending)::part(stepper) {
+        cursor: progress;
+    }
+
     &::part(trigger) {
         display: inline-flex;
         background-color: var(--ar-button-secondary-bg);

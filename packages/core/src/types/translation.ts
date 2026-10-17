@@ -54,6 +54,7 @@ export interface FullTranslation extends BaseTranslation {
 
     // ar-stepper
     stepperNavLabel: string;
+    stepperPending: string;
     stepLabel: (order: number, isSubstep: boolean) => string;
     currentStepStatus: (current: number, total: number) => string;
 
