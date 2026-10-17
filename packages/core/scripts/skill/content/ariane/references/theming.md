@@ -141,7 +141,6 @@ Convention `<élément>--<état>` : l'élément de base reste présent, l'état 
 | `--current`  | Position atteinte par navigation                         | `ar-pagination::part(item--current)`        |
 | `--selected` | Choix actif de l'utilisateur                             | `ar-tab::part(tab--selected)`               |
 | `--disabled` | Désactivé                                                | `ar-pagination::part(nav-button--disabled)` |
-| `--pending`  | Traitement en cours                                      | `ar-table-sort::part(sort-button--pending)` |
 | `--warning`  | Avertissement                                            | `ar-charcounter::part(count--warning)`      |
 | `--error`    | Erreur                                                   | `ar-charcounter::part(count--error)`        |
 | `--desktop`  | Affichage desktop d'un élément ayant une variante mobile | `ar-breadcrumb::part(list--desktop)`        |

@@ -36,7 +36,6 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
  * @slot - Libellé de la colonne.
  *
  * @csspart sort-button    - Le bouton déclencheur.
- * @csspart sort-button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `sort-button`).
  * @csspart action-button - Porté par `sort-button` : bouton qui déclenche une action ponctuelle.
  * @csspart indicator - L'icône de direction de tri.
  *
@@ -59,14 +58,17 @@ export class ArTableSort extends ArianeElement {
 
     /**
      * Ordre actuel. Pilotable par l'application (`el.order = …`) ou via `confirm()` / `reject()`.
+     * L'affecter, même à la même valeur, répond à la demande de tri en attente : `pending` est
+     * levé et le résultat annoncé (`sortApplied` si `order` est l'ordre demandé, sinon `sortFailed`).
      */
-    @property({ reflect: true }) order: TableSortOrder = 'none';
+    @property({ reflect: true, hasChanged: () => true }) order: TableSortOrder = 'none';
 
     /**
      * Vrai quand un tri a été demandé et attend confirmation. Le composant le pose au clic ; il
-     * se lève par `confirm()`, `reject()`, `reset()` ou en le remettant à `false`. Remis à `false`
-     * par l'application, le résultat est annoncé : `sortApplied` si `order` est devenu l'ordre
-     * demandé, sinon `sortFailed`. Posé par l'application sans clic, il ne déclenche aucune annonce.
+     * se lève par `confirm()`, `reject()`, `reset()`, en affectant `order` ou en le remettant à
+     * `false`. L'attente est annoncée (`sortPending`) au passage à `true`. Levé par l'application,
+     * le résultat est annoncé : `sortApplied` si `order` est devenu l'ordre demandé, sinon
+     * `sortFailed`. Posé sans clic, aucun résultat n'est annoncé.
      */
     @property({ reflect: true, type: Boolean }) pending = false;
 
@@ -83,21 +85,30 @@ export class ArTableSort extends ArianeElement {
         this._syncParentTh();
     }
 
+    override willUpdate(changed: Map<string, unknown>): void {
+        // Affecter `order` (même à la même valeur) répond à la demande en attente.
+        if (changed.has('order') && this._pendingOrder) this.pending = false;
+    }
+
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('order')) this._syncParentTh();
         if (changed.has('pending')) {
             this.toggleState('pending', this.pending);
-            // Demande encore en cours alors que pending est levé : ni confirm() ni reject() ne sont
-            // passés, c'est l'application qui a répondu par les propriétés.
-            if (changed.get('pending') === true && !this.pending && this._pendingOrder) {
-                const requested = this._pendingOrder;
-                this._pendingOrder = null;
-                announceA11y(
-                    this.order === requested
-                        ? this.localize.term('sortApplied', this._getColumnLabel(), requested)
-                        : this.localize.term('sortFailed', this._getColumnLabel()),
-                );
+            // `false` explicite : pas d'annonce pour un `pending` posé dès le montage.
+            if (this.pending && changed.get('pending') === false) {
+                announceA11y(this.localize.term('sortPending'));
             }
+        }
+        // Demande encore en cours alors que pending est levé : ni confirm() ni reject() ne sont
+        // passés, c'est l'application qui a répondu par les propriétés.
+        if (this._pendingOrder && !this.pending) {
+            const requested = this._pendingOrder;
+            this._pendingOrder = null;
+            announceA11y(
+                this.order === requested
+                    ? this.localize.term('sortApplied', this._getColumnLabel(), requested)
+                    : this.localize.term('sortFailed', this._getColumnLabel()),
+            );
         }
     }
 
@@ -192,7 +203,7 @@ export class ArTableSort extends ArianeElement {
         const label = this._getActionLabel();
         return html`
             <button
-                part="sort-button action-button${this.pending ? ' sort-button--pending' : ''}"
+                part="sort-button action-button"
                 type="button"
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}

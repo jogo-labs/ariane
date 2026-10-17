@@ -199,18 +199,6 @@ describe('ArTableSort', () => {
             await waitForUpdate(el);
             expect(requirePart(el, 'sort-button').getAttribute('aria-disabled')).toBe('true');
         });
-
-        it('émet part="sort-button sort-button--pending" pendant pending', async () => {
-            el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'sort-button') as HTMLElement).click();
-            await waitForUpdate(el);
-            expect(requirePart(el, 'sort-button--pending')).not.toBeNull();
-        });
-
-        it("n'émet pas sort-button--pending avant le clic", async () => {
-            el = await fixture('<ar-table-sort></ar-table-sort>');
-            expect(getPart(el, 'sort-button--pending')).toBeNull();
-        });
     });
 
     // ── confirm() ─────────────────────────────────────────────────────────
@@ -332,16 +320,55 @@ describe('ArTableSort', () => {
             el.pending = false;
             await waitForUpdate(el);
             await settle();
-            expect(live()).toBeFalsy();
+            expect(live()).toBe('Tri en cours…');
         });
 
-        it('pending posé sans clic puis levé : aucune annonce', async () => {
+        it("pending posé sans clic : l'attente est annoncée, pas l'issue", async () => {
             el.pending = true;
             await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Tri en cours…');
             el.pending = false;
             await waitForUpdate(el);
             await settle();
+            expect(live()).toBe('Tri en cours…');
+        });
+
+        it("annonce l'attente au clic, pas au montage", async () => {
+            el = await fixture('<ar-table-sort pending>Nom</ar-table-sort>');
+            await settle();
             expect(live()).toBeFalsy();
+            el.pending = false;
+            await waitForUpdate(el);
+            await click();
+            await settle();
+            expect(live()).toBe('Tri en cours…');
+        });
+
+        it("affecter order à l'ordre demandé lève pending et annonce le tri appliqué", async () => {
+            await click();
+            el.order = 'asc';
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it("réaffecter l'ordre actuel lève pending et annonce l'échec", async () => {
+            await click();
+            el.order = 'none';
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(live()).toBe('Nom : échec du tri.');
+        });
+
+        it('affecter order sans demande en cours ne touche pas à pending', async () => {
+            el.pending = true;
+            await waitForUpdate(el);
+            el.order = 'desc';
+            await waitForUpdate(el);
+            expect(el.pending).toBe(true);
         });
 
         it("confirm() n'annonce qu'une fois", async () => {
@@ -367,7 +394,7 @@ describe('ArTableSort', () => {
             await settle();
             expect(el.pending).toBe(false);
             expect(el.order).toBe('none');
-            expect(live()).toBeFalsy();
+            expect(live()).toBe('Tri en cours…');
             el.confirm();
             expect(el.order).toBe('none');
         });
