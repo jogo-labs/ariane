@@ -640,7 +640,7 @@ describe('ArStepper', () => {
             expect(shadow(itemOf(el, '/b')).activeElement).not.toBe(itemHeader(el, '/b'));
         });
 
-        it("n'affecte plus le focus au cycle de rendu suivant un clic (fenêtre bornée à un seul cycle)", async () => {
+        it("n'affecte plus le focus une fois que le focus a quitté le stepper (consommateur qui n'a pas répondu)", async () => {
             const el = await fixtureWithItems(`
                     <ar-stepper current-path="/c">
                         <ar-stepper-item path="/a" label="Étape A"></ar-stepper-item>
@@ -651,10 +651,12 @@ describe('ArStepper', () => {
 
             const linkA = itemPart<HTMLElement>(el, '/a', '[part~="step-link"]');
             linkA.click();
-
-            // Le consommateur ignore l'event (currentPath ne change pas tout de suite) puis,
-            // un cycle plus tard, une cause sans rapport (scroll-follow) amène sur /a.
             await waitForUpdate(el);
+
+            // L'utilisateur va ailleurs, puis une cause sans rapport (scroll-follow) amène sur /a.
+            const outside = document.createElement('button');
+            document.body.append(outside);
+            el.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: outside }));
             el.currentPath = '/a';
             await waitForUpdate(el);
 
@@ -1027,7 +1029,7 @@ describe('ArStepper', () => {
             document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
         });
 
-        it("n'annonce rien tant que currentPath n'est pas confirmé par le consommateur", async () => {
+        it("n'annonce pas l'étape tant que currentPath n'est pas confirmé par le consommateur", async () => {
             vi.spyOn(window, 'matchMedia').mockReturnValue({
                 matches: true,
                 addEventListener: vi.fn(),
@@ -1045,7 +1047,10 @@ describe('ArStepper', () => {
             link.click();
             await new Promise((resolve) => setTimeout(resolve, 60));
 
-            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+            // Seule l'attente est annoncée, pas l'étape.
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
         });
 
         it('un clic confirmé sur une étape de premier niveau annonce son label', async () => {
@@ -1299,6 +1304,218 @@ describe('ArStepper', () => {
             );
 
             expect(event.defaultPrevented).toBe(true);
+        });
+    });
+    describe('attente et intégration framework (#328)', () => {
+        const mockViewport = (desktop: boolean): void => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: desktop,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+        };
+        const tpl = (extra = ''): string => `
+            <ar-stepper current-path="a" mode="edit" ${extra}>
+                <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
+                <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+                <ar-stepper-item path="c" label="Étape C"></ar-stepper-item>
+            </ar-stepper>`;
+        const nav = (el: ArStepper): HTMLElement => requireQuery(shadow(el), 'nav');
+        const clickStep = (el: ArStepper, path: string): void =>
+            itemPart<HTMLElement>(el, path, '[part~="step-link"]').click();
+        const liveRegion = (): string | undefined =>
+            document.getElementById('ar-live-region-polite')?.textContent ?? undefined;
+
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        describe('pending', () => {
+            it('absent par défaut', async () => {
+                const el = await fixtureWithItems(tpl());
+                expect(el.pending).toBe(false);
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it("l'attribut pending pose aria-busy et reste réfléchi", async () => {
+                const el = await fixtureWithItems(tpl('pending'));
+                expect(nav(el).getAttribute('aria-busy')).toBe('true');
+                el.pending = false;
+                await waitForUpdate(el);
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it("un step-change non annulé met en attente, sans toucher à l'attribut", async () => {
+                const el = await fixtureWithItems(tpl());
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                expect(nav(el).getAttribute('aria-busy')).toBe('true');
+                expect(el.hasAttribute('pending')).toBe(false);
+            });
+
+            it("réassigner currentPath (autre étape ou même valeur) met fin à l'attente", async () => {
+                const el = await fixtureWithItems(tpl());
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                el.currentPath = 'a';
+                await waitForUpdate(el);
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it('un step-change annulé ne met pas en attente', async () => {
+                const el = await fixtureWithItems(tpl());
+                el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it("une réponse synchrone n'allume ni attente ni annonce d'attente", async () => {
+                const el = await fixtureWithItems(tpl());
+                el.addEventListener('ar-stepper-step-change', (e) => {
+                    el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
+                });
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(nav(el).hasAttribute('aria-busy')).toBe(false);
+                expect(liveRegion()).toBe('Étape B');
+            });
+
+            it("l'attente est annoncée une fois, au passage à true, et suit lang", async () => {
+                const el = await fixtureWithItems(tpl('lang="en"'));
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                clickStep(el, 'c');
+                await waitForUpdate(el);
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(liveRegion()).toBe('Loading…');
+            });
+
+            it('aucune annonce au montage avec pending', async () => {
+                await fixtureWithItems(tpl('pending'));
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(liveRegion()).toBeUndefined();
+            });
+        });
+
+        describe('S-022 : pas de step-changed pour la valeur initiale du framework', () => {
+            it('currentPath posé après le premier rendu : ni step-changed ni annonce', async () => {
+                const el = await fixtureWithItems(`
+                    <ar-stepper mode="edit">
+                        <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>`);
+                const handler = vi.fn();
+                el.addEventListener('ar-stepper-step-changed', handler);
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(handler).not.toHaveBeenCalled();
+                expect(liveRegion()).toBeUndefined();
+            });
+
+            it('les changements suivants émettent', async () => {
+                const el = await fixtureWithItems(`
+                    <ar-stepper mode="edit">
+                        <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>`);
+                el.currentPath = 'a';
+                await waitForUpdate(el);
+                const handler = vi.fn();
+                el.addEventListener('ar-stepper-step-changed', handler);
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                expect(handler).toHaveBeenCalledOnce();
+            });
+
+            it('une réponse à step-change émet même depuis la valeur par défaut', async () => {
+                const el = await fixtureWithItems(`
+                    <ar-stepper mode="edit">
+                        <ar-stepper-item path="a" label="Étape A"></ar-stepper-item>
+                        <ar-stepper-item path="b" label="Étape B"></ar-stepper-item>
+                    </ar-stepper>`);
+                el.addEventListener('ar-stepper-step-change', (e) => {
+                    el.currentPath = (e as CustomEvent<ArStepperStepChangeDetail>).detail.to;
+                });
+                const handler = vi.fn();
+                el.addEventListener('ar-stepper-step-changed', handler);
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                expect(handler).toHaveBeenCalledOnce();
+            });
+        });
+
+        it('S-033 : le trigger mobile reflète currentPath dans le même rendu', async () => {
+            mockViewport(false);
+            const el = await fixtureWithItems(tpl());
+            el.currentPath = 'b';
+            await waitForUpdate(el);
+            const status = requireQuery<HTMLElement>(shadow(el), '[part~="trigger-status"]');
+            expect(status.textContent).toContain('2');
+            expect(
+                requireQuery<HTMLElement>(shadow(el), '[part~="trigger-label"]').textContent,
+            ).toContain('Étape B');
+        });
+
+        describe('S-008 : le focus survit à une confirmation asynchrone', () => {
+            for (const desktop of [true, false]) {
+                it(`${desktop ? 'desktop' : 'mobile'} : focus sur l'étape courante 300 ms après le clic`, async () => {
+                    mockViewport(desktop);
+                    const el = await fixtureWithItems(tpl());
+                    clickStep(el, 'b');
+                    await waitForUpdate(el);
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+                    el.currentPath = 'b';
+                    await waitForUpdate(el);
+                    await waitForUpdate(itemOf(el, 'b'));
+                    expect(shadow(itemOf(el, 'b')).activeElement).toBe(itemHeader(el, 'b'));
+                });
+            }
+
+            it("un step-change annulé efface l'intention de focus", async () => {
+                const el = await fixtureWithItems(tpl());
+                el.addEventListener('ar-stepper-step-change', (e) => e.preventDefault());
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                await waitForUpdate(itemOf(el, 'b'));
+                expect(shadow(itemOf(el, 'b')).activeElement).not.toBe(itemHeader(el, 'b'));
+            });
+
+            it("un nouveau clic remplace l'intention précédente", async () => {
+                const el = await fixtureWithItems(tpl());
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                clickStep(el, 'c');
+                await waitForUpdate(el);
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                await waitForUpdate(itemOf(el, 'b'));
+                expect(shadow(itemOf(el, 'b')).activeElement).not.toBe(itemHeader(el, 'b'));
+            });
+
+            it("le focus qui quitte le stepper efface l'intention", async () => {
+                const el = await fixtureWithItems(tpl());
+                const outside = document.createElement('button');
+                document.body.append(outside);
+                clickStep(el, 'b');
+                await waitForUpdate(el);
+                el.dispatchEvent(
+                    new FocusEvent('focusout', { bubbles: true, relatedTarget: outside }),
+                );
+                el.currentPath = 'b';
+                await waitForUpdate(el);
+                await waitForUpdate(itemOf(el, 'b'));
+                expect(shadow(itemOf(el, 'b')).activeElement).not.toBe(itemHeader(el, 'b'));
+            });
         });
     });
 });

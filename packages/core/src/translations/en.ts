@@ -67,6 +67,7 @@ const translation: FullTranslation = {
 
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Form steps',
+    stepperPending: 'Loading…',
     stepLabel: (order, isSubstep) => `${isSubstep ? 'sub-' : ''}step ${order}:`,
     currentStepStatus: (current, total) => `Step ${current} / ${total} (in progress)`,
 

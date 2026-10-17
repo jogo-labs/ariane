@@ -128,11 +128,6 @@ import WcagRef from '../../components/WcagRef.astro';
   annulé. Un `href` absent ou égal à `#` produit un `<button>` : aucune navigation native, tout
   passe par l'événement (routeur de framework, navigation asynchrone). Un Ctrl/Cmd/Maj/Alt + clic
   sur un lien réel ouvre un nouvel onglet sans émettre `ar-stepper-step-change`.
-- **Mettre à jour `current-path` de façon synchrone (ou quasi-synchrone) dans le handler de
-  `ar-stepper-step-change`.** Le focus n'est restauré sur la nouvelle étape courante que si
-  cette mise à jour arrive dans le même tick microtask que l'event (cas des frameworks
-  synchrones ou quasi-synchrones, ex. `nextTick` de Vue) — sinon le focus n'est pas restauré,
-  silencieusement.
 
 ## Comportement responsive
 
@@ -154,13 +149,12 @@ se déplace dans l'élément ciblé sur desktop, et revient à sa position d'ori
 
 ### Écouter le changement d'étape
 
-Lorsque l'utilisateur souhaite changer d'étape, un événement `ar-stepper-step-change` est émis avec `{ from, to }` dans `event.detail`.
-Mettez à jour la propriété `currentPath` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'étape active du stepper.
+Écoutez `ar-stepper-step-change`, chargez l'étape, puis réassignez `currentPath`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez l'étape actuelle.
 
 ```js
-document.addEventListener('ar-stepper-step-change', (e) => {
-    /* Mettez à jour le contenu de l'étape, puis l'étape active du composant */
-    e.target.currentPath = e.detail.to;
+stepper.addEventListener('ar-stepper-step-change', async (e) => {
+    const ok = await loadStep(e.detail.to);
+    stepper.currentPath = ok ? e.detail.to : stepper.currentPath;
 });
 ```
 
