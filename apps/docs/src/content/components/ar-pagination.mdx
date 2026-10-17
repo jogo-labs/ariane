@@ -69,7 +69,7 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Attente d'une réponse
 
-À chaque `ar-pagination-page-change` non annulé, le composant se met en attente jusqu'à ce que vous réassigniez `current` : `aria-busy="true"` sur la navigation, une annonce polie, `:state(pending)` et le part `pagination--pending`. Rien n'est bloqué.
+À chaque `ar-pagination-page-change` non annulé, le composant se met en attente jusqu'à ce que vous réassigniez `current` : `aria-busy="true"` sur la navigation, une annonce polie et `:state(pending)`. Rien n'est bloqué.
 
 En cas d'échec, réassignez la page actuelle pour lever l'attente.
 
@@ -80,7 +80,7 @@ pagination.addEventListener('ar-pagination-page-change', async (e) => {
 });
 ```
 
-Pour une attente qui ne passe pas par l'événement (chargement initial, rafraîchissement), posez l'attribut `pending` vous-même et retirez-le à la réponse. Il n'est jamais posé par le composant : pour cibler les deux cas en CSS, utilisez `:state(pending)` ou le part, pas `[pending]`.
+Pour une attente qui ne passe pas par l'événement (chargement initial, rafraîchissement), posez l'attribut `pending` vous-même et retirez-le à la réponse. Il n'est jamais posé par le composant : pour cibler les deux cas en CSS, utilisez `:state(pending)`, pas `[pending]`.
 
 ## Comportement responsive
 

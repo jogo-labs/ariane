@@ -34,8 +34,7 @@ export interface ArPaginationPageChangeDetail extends ArEventDetail {
  * Les pages intermédiaires sont calculées automatiquement selon le nombre total.
  * Des ellipses (`...`) sont insérées quand le nombre de pages dépasse le seuil d'affichage.
  *
- * @csspart pagination - Racine du composant (`<nav>`). Porte aussi le part d'état `pagination--pending`.
- * @csspart pagination--pending - La racine pendant `pending` (variante d'état de `pagination`).
+ * @csspart pagination - Racine du composant.
  * @csspart list     - L'élément `<ul>` de la liste des pages.
  * @csspart item     - Chaque `<li>` de la liste. Porte aussi le part d'état `item--current` sur le `<li>` de la page active.
  * @csspart item--current - Le `<li>` de la page courante (variante d'état de `item`).
@@ -120,7 +119,7 @@ export class ArPagination extends ArianeElement {
      * (chargement initial, rafraîchissement) et reste à la charge de l'application. Le composant
      * ne le pose ni ne le retire jamais. Non bloquant : les interactions restent possibles. L'attente,
      * manuelle ou automatique, pose `aria-busy="true"` sur la navigation, l'état `:state(pending)`
-     * et le part `pagination--pending`, et annonce l'attente au passage `false → true`.
+     * et annonce l'attente au passage `false → true`.
      */
     @property({ reflect: true, type: Boolean })
     pending: boolean = false;
@@ -382,7 +381,7 @@ export class ArPagination extends ArianeElement {
         const nextPageSrOnly = this.localize.term('nextPage', nextPageNumber, total);
 
         return html` <nav
-            part="pagination${this._isPending ? ' pagination--pending' : ''}"
+            part="pagination"
             role="navigation"
             aria-labelledby="ar-pagination"
             aria-busy=${this._isPending ? 'true' : nothing}

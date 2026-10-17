@@ -15,7 +15,7 @@ ar-pagination {
         padding-right: 0.5rem;
     }
 
-    &::part(pagination--pending) {
+    &:state(pending)::part(pagination) {
         cursor: progress;
     }
 

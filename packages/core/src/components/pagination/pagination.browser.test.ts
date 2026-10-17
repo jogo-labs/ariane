@@ -17,6 +17,24 @@ import './index.js';
 document.documentElement.lang = 'fr';
 
 describe('ar-pagination — browser', () => {
+    describe('pending (#327)', () => {
+        it(":state(pending) suit l'attente automatique et l'attribut pending", async () => {
+            const el = await fixture<HTMLElement & { current: number; pending: boolean }>(
+                html`<ar-pagination current="2" total="5"></ar-pagination>`,
+            );
+            expect(el.matches(':state(pending)')).to.equal(false);
+            el.shadowRoot!.querySelector<HTMLElement>('[part~="next"]')!.click();
+            await elementUpdated(el);
+            expect(el.matches(':state(pending)')).to.equal(true);
+            el.current = 3;
+            await elementUpdated(el);
+            expect(el.matches(':state(pending)')).to.equal(false);
+            el.pending = true;
+            await elementUpdated(el);
+            expect(el.matches(':state(pending)')).to.equal(true);
+        });
+    });
+
     describe('focus après activation, confirmée par le consommateur (#154, #161)', () => {
         // Vérifie que le focus atterrit sur le nouvel élément part="current" et que
         // :focus-visible matche après un focus() + click() programmatiques, une fois que le

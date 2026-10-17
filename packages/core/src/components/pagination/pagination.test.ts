@@ -1153,11 +1153,10 @@ describe('ArPagination', () => {
 
         const nav = (): HTMLElement => requirePart(el, 'pagination') as HTMLElement;
 
-        it('absent par défaut : pas de aria-busy, pas de part pagination--pending', async () => {
+        it('absent par défaut : pas de aria-busy', async () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             expect(el.pending).toBe(false);
             expect(nav().hasAttribute('aria-busy')).toBe(false);
-            expect(partContains(nav(), 'pagination--pending')).toBe(false);
         });
 
         it('est réfléchi comme attribut booléen', async () => {
@@ -1167,11 +1166,10 @@ describe('ArPagination', () => {
             expect(el.hasAttribute('pending')).toBe(true);
         });
 
-        it('pending : aria-busy="true" sur le landmark et part pagination--pending sur la racine', async () => {
+        it('pending : aria-busy="true" sur le landmark', async () => {
             el = await fixture('<ar-pagination current="2" total="5" pending></ar-pagination>');
             expect(nav().getAttribute('aria-busy')).toBe('true');
             expect(partContains(nav(), 'pagination')).toBe(true);
-            expect(partContains(nav(), 'pagination--pending')).toBe(true);
         });
 
         it('non bloquant : un clic émet toujours ar-pagination-page-change', async () => {
@@ -1187,7 +1185,6 @@ describe('ArPagination', () => {
             el.pending = false;
             await waitForUpdate(el);
             expect(nav().hasAttribute('aria-busy')).toBe(false);
-            expect(partContains(nav(), 'pagination--pending')).toBe(false);
         });
 
         it('annonce polie au passage false → true', async () => {
@@ -1252,7 +1249,6 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
             await click('next');
             expect(nav().getAttribute('aria-busy')).toBe('true');
-            expect(partContains(nav(), 'pagination--pending')).toBe(true);
             expect(el.pending).toBe(false);
             expect(el.hasAttribute('pending')).toBe(false);
         });
@@ -1263,7 +1259,6 @@ describe('ArPagination', () => {
             el.current = 3;
             await waitForUpdate(el);
             expect(nav().hasAttribute('aria-busy')).toBe(false);
-            expect(partContains(nav(), 'pagination--pending')).toBe(false);
         });
 
         it("réassigner current à la même valeur (échec côté application) met fin à l'attente", async () => {
