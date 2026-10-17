@@ -98,6 +98,10 @@ ar-datepicker {
     }
 
     /* -- Panel flottant du calendrier -- */
+    &:state(pending)::part(panel) {
+        cursor: progress;
+    }
+
     &::part(panel) {
         width: 21.5rem;
         padding: 1rem;

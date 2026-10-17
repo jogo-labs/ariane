@@ -919,4 +919,121 @@ describe('ArDatepicker', () => {
             });
         });
     });
+    describe('pending et view-change (#330)', () => {
+        const nav = (part: string): void =>
+            (el.shadowRoot?.querySelector(`[part~="${part}"]`) as HTMLElement).click();
+        const live = (): string | null | undefined =>
+            document.getElementById('ar-live-region-polite')?.textContent;
+        const views = (): Array<{ year: number; month: number }> => {
+            const seen: Array<{ year: number; month: number }> = [];
+            el.addEventListener('ar-datepicker-view-change', (e) =>
+                seen.push((e as CustomEvent<{ year: number; month: number }>).detail),
+            );
+            return seen;
+        };
+
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+        });
+
+        describe('view-change', () => {
+            it("est émis à l'ouverture avec le mois affiché (1-12)", async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                const seen = views();
+                el.open = true;
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([{ year: 2026, month: 3 }]);
+            });
+
+            it('est émis à chaque navigation (mois, année)', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                const seen = views();
+                nav('next-month');
+                await waitForUpdate(el);
+                nav('prev-year');
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([
+                    { year: 2026, month: 4 },
+                    { year: 2025, month: 4 },
+                ]);
+            });
+
+            it('est émis à la réouverture, même mois', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                el.open = false;
+                await waitForUpdate(el);
+                const seen = views();
+                el.open = true;
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([{ year: 2026, month: 3 }]);
+            });
+
+            it('ne part pas au montage tant que le calendrier est fermé', async () => {
+                const seen: unknown[] = [];
+                document.addEventListener('ar-datepicker-view-change', (e) => seen.push(e), {
+                    once: true,
+                });
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                await waitForUpdate(el);
+                expect(seen).toHaveLength(0);
+            });
+
+            it('ne part pas pour un clic qui laisse le mois inchangé', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                const seen = views();
+                el.requestUpdate();
+                await waitForUpdate(el);
+                expect(seen).toHaveLength(0);
+            });
+        });
+
+        describe('pending', () => {
+            it('vaut false par défaut et se reflète', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                expect(el.pending).toBe(false);
+                el.pending = true;
+                await waitForUpdate(el);
+                expect(el.hasAttribute('pending')).toBe(true);
+            });
+
+            it('pose aria-busy sur le panneau', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const panel = getPart(el, 'panel');
+                expect(panel?.hasAttribute('aria-busy')).toBe(false);
+                el.pending = true;
+                await waitForUpdate(el);
+                expect(panel?.getAttribute('aria-busy')).toBe('true');
+                el.pending = false;
+                await waitForUpdate(el);
+                expect(panel?.hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it("annonce l'attente au passage false → true, pas au montage", async () => {
+                el = await fixture('<ar-datepicker pending></ar-datepicker>');
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(live()).toBeFalsy();
+                el.pending = false;
+                await waitForUpdate(el);
+                el.pending = true;
+                await waitForUpdate(el);
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(live()).toBe('Chargement en cours…');
+            });
+
+            it('le composant ne le pose ni ne le retire seul', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15" pending></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                nav('next-month');
+                await waitForUpdate(el);
+                expect(el.pending).toBe(true);
+            });
+        });
+    });
 });

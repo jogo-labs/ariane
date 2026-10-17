@@ -59,4 +59,7 @@ import './components/collapse/index.js';
 export { ArCollapse } from './components/collapse/collapse.js';
 import './components/datepicker/index.js';
 export { ArDatepicker } from './components/datepicker/datepicker.js';
-export type { ArDatepickerInputDetail } from './components/datepicker/datepicker.js';
+export type {
+    ArDatepickerInputDetail,
+    ArDatepickerViewChangeDetail,
+} from './components/datepicker/datepicker.js';
