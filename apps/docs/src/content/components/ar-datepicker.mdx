@@ -182,6 +182,23 @@ rester dans la grille de navigation). Contrairement à `min`/`max`, `isDateDisab
 dans le hint par défaut : ses règles étant arbitraires, il n'existe pas de formulation générique — à
 documenter via le slot `hint` si nécessaire.
 
+### Jours chargés à la demande
+
+`ar-datepicker-view-change` est émis à l'ouverture et à chaque changement de mois affiché. Posez
+`pending` le temps de charger les jours indisponibles du mois, puis réassignez `isDateDisabled` :
+
+```js
+datepicker.addEventListener('ar-datepicker-view-change', async ({ detail }) => {
+    datepicker.pending = true;
+    try {
+        const unavailable = await loadUnavailableDays(detail.year, detail.month);
+        datepicker.isDateDisabled = (d) => unavailable.has(d.toISOString().slice(0, 10));
+    } finally {
+        datepicker.pending = false;
+    }
+});
+```
+
 ### Formulaires
 
 `ar-datepicker` implémente `ElementInternals` et participe aux formulaires natifs via les attributs `name` et `required`.

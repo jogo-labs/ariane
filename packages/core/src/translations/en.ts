@@ -39,6 +39,7 @@ const translation: FullTranslation = {
     sortFailed: (columnLabel) => `${columnLabel}: sort failed.`,
 
     // ── ar-datepicker ────────────────────────────────────────────────────
+    datepickerPending: 'Loading…',
     today: 'Today',
     close: 'Close',
     closeCalendar: 'Close calendar',
