@@ -145,7 +145,7 @@ import WcagRef from '../../components/WcagRef.astro';
 - `scope="col"` est posé sur le `<th>` ancêtre s'il est absent — ne remplace jamais un `scope` existant.
 - Le bouton reçoit `aria-disabled="true"` (pas `disabled`) pendant `pending` — reste focusable ; un nouveau clic pendant cet état annonce _"Tri en cours, veuillez patienter."_.
 - Un tooltip (`ar-tooltip`) expose l'action suivante au survol et au focus : _"Trier de A à Z"_, _"Supprimer le tri alphabétique"_, etc.
-- Une région `aria-live="polite"` annonce le résultat des méthodes : `confirm()` → _"Prix : tri croissant appliqué"_ ; `reject()` → _"Nom : échec du tri."_ ; `reset()` → _"Nom : tri supprimé"_ (silencieux si déjà à `none`).
+- Une région `aria-live="polite"` annonce l'attente (_"Tri en cours…"_) puis le résultat, y compris pour les méthodes : `confirm()` → _"Prix : tri croissant appliqué"_ ; `reject()` → _"Nom : échec du tri."_ ; `reset()` → _"Nom : tri supprimé"_ (silencieux si déjà à `none`).
 
 Les critères WCAG suivants sont implémentés :
 
@@ -162,14 +162,16 @@ Les critères WCAG suivants sont implémentés :
 
 `ar-table-sort` ne coordonne pas les colonnes entre elles. Deux chemins de réinitialisation sont disponibles :
 
-- **`reset()`** — à utiliser en réponse à une action utilisateur. Remet `order` à `none`, annonce _"tri supprimé"_ aux lecteurs d'écran si la colonne était triée, et est sans effet si elle était déjà à `none`. C'est le chemin à privilégier dans un handler `ar-table-sort-change` pour éviter les tris cumulatifs.
+- **`reset()`** — à utiliser en réponse à une action utilisateur. Annule la demande en attente (sans annonce), remet `order` à `none`, annonce _"tri supprimé"_ aux lecteurs d'écran si la colonne était triée, et ne change rien à `order` si elle était déjà à `none`. C'est le chemin à privilégier dans un handler `ar-table-sort-change` pour éviter les tris cumulatifs.
 - **`element.order = 'none'`** — silencieux, pour les réinitialisations programmatiques (rafraîchissement de données, changement de contexte) où une annonce AT ne serait pas pertinente.
 
 Voir la variante **Multi-colonnes** pour un exemple complet. Pour permettre un tri sur plusieurs axes simultanément, ne pas appeler `reset()` sur les autres colonnes — chaque `aria-sort` reflètera alors son état réel, et l'utilisateur peut naviguer entre les en-têtes pour connaître l'état de chaque colonne.
 
-### Localisation
+### Piloté par l'application
 
-Les libellés suivent la langue de la page (`lang`) ou, à défaut, celle du navigateur. Le français et l'anglais sont fournis ; l'anglais sert de repli pour une langue sans traduction. Voir la page « Traductions » pour fournir ou surcharger une langue.
+`order` et `pending` peuvent aussi être pilotés par l'application, par exemple liés à un état de framework. Le composant pose lui-même `pending` au clic et annonce l'attente. Il se lève dès que l'application affecte `order` (même à la même valeur) ou remet `pending` à `false` : _"tri appliqué"_ est annoncé si `order` est devenu l'ordre demandé, _"échec du tri"_ sinon. En cas d'échec, réaffectez l'ordre actuel. `confirm()` et `reject()` restent disponibles et équivalent à ces affectations.
+
+`reject(reason)` annonce `reason` tel quel : le texte n'est pas traduit par le composant, à vous de le localiser. Un `pending` posé sans clic (chargement initial par exemple) annonce l'attente mais pas d'issue.
 
 ## Utilisation
 

@@ -11,7 +11,7 @@ describe('isStatePart', () => {
     it("reconnaît un part d'état sur un élément dont le nom contient un tiret simple", () => {
         expect(isStatePart('step-link--current')).toBe(true);
         expect(isStatePart('nav-button--disabled')).toBe(true);
-        expect(isStatePart('sort-button--pending')).toBe(true);
+        expect(isStatePart('count--warning')).toBe(true);
     });
 
     it('rejette un part sans séparateur --', () => {
