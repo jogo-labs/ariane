@@ -63,6 +63,7 @@ const translation: FullTranslation = {
     pageStatus: (page, total) => `Page ${page} sur ${total}`,
     compactPageStatus: (current, total) => `Page ${current} / ${total}`,
     goToPage: 'Aller à la page',
+    paginationPending: 'Chargement en cours…',
     paginationLandmark: (page, total) => `Pagination, page ${page} sur ${total}`,
 
     // ── ar-stepper ───────────────────────────────────────────────────────
