@@ -290,6 +290,96 @@ describe('ArTableSort', () => {
         });
     });
 
+    describe('modèle contrôlé (#331)', () => {
+        const live = (): string | null | undefined =>
+            document.getElementById('ar-live-region-polite')?.textContent;
+        const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 60));
+        const click = async (): Promise<void> => {
+            (el.shadowRoot?.querySelector('button') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+        };
+
+        beforeEach(async () => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+            el = await fixture('<ar-table-sort>Nom</ar-table-sort>');
+        });
+
+        it("pending levé par l'application avec order = ordre demandé : annonce le tri appliqué", async () => {
+            await click();
+            el.order = 'asc';
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it("pending levé par l'application sans changer order : annonce l'échec", async () => {
+            await click();
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : échec du tri.');
+        });
+
+        it("la demande est soldée : un second pending false n'annonce plus rien", async () => {
+            await click();
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+            el.pending = true;
+            await waitForUpdate(el);
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBeFalsy();
+        });
+
+        it('pending posé sans clic puis levé : aucune annonce', async () => {
+            el.pending = true;
+            await waitForUpdate(el);
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBeFalsy();
+        });
+
+        it("confirm() n'annonce qu'une fois", async () => {
+            await click();
+            el.confirm();
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it('reject(reason) annonce reason tel quel', async () => {
+            await click();
+            el.reject('Serveur indisponible');
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Serveur indisponible');
+        });
+
+        it('reset() annule la demande en attente, même si order est déjà none', async () => {
+            await click();
+            el.reset();
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(el.order).toBe('none');
+            expect(live()).toBeFalsy();
+            el.confirm();
+            expect(el.order).toBe('none');
+        });
+
+        it("reset() ne touche pas à un pending posé par l'application", async () => {
+            el.pending = true;
+            el.reset();
+            await waitForUpdate(el);
+            expect(el.pending).toBe(true);
+        });
+    });
+
     // ── Effets de bord sur <th> ───────────────────────────────────────────
 
     describe('effets de bord sur le <th> parent', () => {

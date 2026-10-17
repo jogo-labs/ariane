@@ -162,10 +162,16 @@ Les critères WCAG suivants sont implémentés :
 
 `ar-table-sort` ne coordonne pas les colonnes entre elles. Deux chemins de réinitialisation sont disponibles :
 
-- **`reset()`** — à utiliser en réponse à une action utilisateur. Remet `order` à `none`, annonce _"tri supprimé"_ aux lecteurs d'écran si la colonne était triée, et est sans effet si elle était déjà à `none`. C'est le chemin à privilégier dans un handler `ar-table-sort-change` pour éviter les tris cumulatifs.
+- **`reset()`** — à utiliser en réponse à une action utilisateur. Annule la demande en attente (sans annonce), remet `order` à `none`, annonce _"tri supprimé"_ aux lecteurs d'écran si la colonne était triée, et ne change rien à `order` si elle était déjà à `none`. C'est le chemin à privilégier dans un handler `ar-table-sort-change` pour éviter les tris cumulatifs.
 - **`element.order = 'none'`** — silencieux, pour les réinitialisations programmatiques (rafraîchissement de données, changement de contexte) où une annonce AT ne serait pas pertinente.
 
 Voir la variante **Multi-colonnes** pour un exemple complet. Pour permettre un tri sur plusieurs axes simultanément, ne pas appeler `reset()` sur les autres colonnes — chaque `aria-sort` reflètera alors son état réel, et l'utilisateur peut naviguer entre les en-têtes pour connaître l'état de chaque colonne.
+
+### Piloté par l'application
+
+`order` et `pending` peuvent aussi être pilotés par l'application, par exemple liés à un état de framework. Le composant pose lui-même `pending` au clic, puis le résultat est annoncé quand `pending` repasse à `false` : _"tri appliqué"_ si `order` est devenu l'ordre demandé, _"échec du tri"_ sinon. `confirm()` et `reject()` restent disponibles et équivalent à poser `order` puis `pending = false`.
+
+`reject(reason)` annonce `reason` tel quel : le texte n'est pas traduit par le composant, à vous de le localiser. Un `pending` posé sans clic (chargement initial par exemple) n'annonce rien.
 
 ### Localisation
 

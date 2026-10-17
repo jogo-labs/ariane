@@ -57,12 +57,16 @@ export class ArTableSort extends ArianeElement {
     /** Type de tri — influe sur les labels accessibles. */
     @property({ reflect: true }) type: TableSortType = 'alpha';
 
-    /** Ordre actuel. Ne pas modifier directement — utiliser confirm() ou reject(). */
+    /**
+     * Ordre actuel. Pilotable par l'application (`el.order = …`) ou via `confirm()` / `reject()`.
+     */
     @property({ reflect: true }) order: TableSortOrder = 'none';
 
     /**
-     * Vrai quand un tri a été demandé et attend confirmation.
-     * @readonly Piloté par le composant — ne pas modifier directement.
+     * Vrai quand un tri a été demandé et attend confirmation. Le composant le pose au clic ; il
+     * se lève par `confirm()`, `reject()`, `reset()` ou en le remettant à `false`. Remis à `false`
+     * par l'application, le résultat est annoncé : `sortApplied` si `order` est devenu l'ordre
+     * demandé, sinon `sortFailed`. Posé par l'application sans clic, il ne déclenche aucune annonce.
      */
     @property({ reflect: true, type: Boolean }) pending = false;
 
@@ -83,6 +87,17 @@ export class ArTableSort extends ArianeElement {
         if (changed.has('order')) this._syncParentTh();
         if (changed.has('pending')) {
             this.toggleState('pending', this.pending);
+            // Demande encore en cours alors que pending est levé : ni confirm() ni reject() ne sont
+            // passés, c'est l'application qui a répondu par les propriétés.
+            if (changed.get('pending') === true && !this.pending && this._pendingOrder) {
+                const requested = this._pendingOrder;
+                this._pendingOrder = null;
+                announceA11y(
+                    this.order === requested
+                        ? this.localize.term('sortApplied', this._getColumnLabel(), requested)
+                        : this.localize.term('sortFailed', this._getColumnLabel()),
+                );
+            }
         }
     }
 
@@ -96,8 +111,15 @@ export class ArTableSort extends ArianeElement {
         announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), newOrder));
     }
 
-    /** Remet le tri à "none" et annonce le reset aux lecteurs d'écran. Sans effet si déjà "none". */
+    /**
+     * Annule la demande en attente, sans annonce, puis remet le tri à "none" et annonce le reset
+     * aux lecteurs d'écran. Sans effet sur l'ordre si déjà "none".
+     */
     reset(): void {
+        if (this._pendingOrder) {
+            this._pendingOrder = null;
+            this.pending = false;
+        }
         if (this.order === 'none') return;
         this.order = 'none';
         announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), 'none'));
@@ -105,7 +127,8 @@ export class ArTableSort extends ArianeElement {
 
     /**
      * Annule le pending order. Sans effet si pending est false.
-     * @param reason Message annoncé aux lecteurs d'écran. Par défaut : "échec du tri".
+     * @param reason Message annoncé tel quel aux lecteurs d'écran (non traduit : à localiser par
+     * l'application). Par défaut : le terme `sortFailed`.
      */
     reject(reason?: string): void {
         if (!this._pendingOrder) return;
