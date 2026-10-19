@@ -205,7 +205,7 @@ Avec `follow-scroll`, la prop `current-path` se met à jour automatiquement pend
 Mettre à jour `current-path` depuis l'extérieur pilote le stepper comme un clic utilisateur :
 
 ```js
-document.querySelector('ar-stepper').currentPath = '#etape-2';
+document.querySelector('ar-stepper').currentPath = 'etape-2';
 ```
 
 En mode `create`, cette mise à jour ne rend pas les étapes suivantes cliquables pour autant — seul `mode="edit"` lève cette restriction.

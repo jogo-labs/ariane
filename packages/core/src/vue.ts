@@ -5,7 +5,7 @@
  *
  * Les types portent sur les balises par défaut (`ar-*`). Source : `types/elements.generated.ts`.
  */
-import type { DefineComponent } from 'vue';
+import type { DefineComponent, HTMLAttributes } from 'vue';
 import type {
     ArianeElementEventNames,
     ArianeElementProps,
@@ -23,8 +23,14 @@ type VueEvents<Tag extends keyof ArianeElements> = {
     ) => void;
 };
 
+// Les attributs HTML globaux (`id`, `role`, `aria-*`…) restent permis, comme sur un élément natif :
+// sans eux, `strictTemplates` les refuse sur un composant déclaré par `GlobalComponents`.
 type ArianeVueComponents = {
-    [Tag in keyof ArianeElements]: DefineComponent<ArianeElementProps[Tag] & VueEvents<Tag>>;
+    [Tag in keyof ArianeElements]: DefineComponent<
+        Omit<HTMLAttributes, keyof ArianeElementProps[Tag]> &
+            ArianeElementProps[Tag] &
+            VueEvents<Tag>
+    >;
 };
 
 declare module 'vue' {

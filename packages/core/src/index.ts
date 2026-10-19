@@ -2,7 +2,7 @@
  * Point d'entrée principal du package.
  * Ce fichier est généré/mis à jour par scripts/create-component.js.
  * Pour importer un seul composant (tree-shaking) :
- *   import '@ariane-ui/core/components/alert/index.js';
+ *   import '@ariane-ui/core/dist/components/alert/index.js';
  */
 // Types seulement : augmentation de `HTMLElementEventMap` (événements typés) et de `Window`.
 import './types/elements.generated.js';
