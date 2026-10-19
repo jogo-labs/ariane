@@ -2,9 +2,14 @@
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const tocEntries = [
     { id: 'react',   label: 'React',   level: 1 as const },
+    { id: 'react-evenements',   label: 'Événements',             level: 2 as const },
+    { id: 'react-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
+    { id: 'react-typage',       label: 'Typage TypeScript',      level: 2 as const },
+    { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
     { id: 'angular', label: 'Angular', level: 1 as const },
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
@@ -30,11 +35,52 @@ useEffect(() => {
     return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
 }, []);`;
 
-const codeReactProperty = `// Propriété JS complexe : passe toujours par une ref, quelle que soit la version.
+const codeReactProperty = `// Propriété JS complexe : passe par une ref (toujours sur React 18 et antérieur ; avec React 19,
+// seulement si le composant n'est pas encore défini au moment du rendu).
 useEffect(() => {
     if (datepickerRef.current) {
         datepickerRef.current.isDateDisabled = (date) => date.getDay() === 0;
     }
+}, []);`;
+
+const codeReactProps = `import '@ariane-ui/core';
+
+const isSunday = (date) => date.getDay() === 0;
+
+function Booking() {
+    return (
+        <>
+            {/* Noms camelCase : React 19 affecte la propriété */}
+            <ar-datepicker label="Date de départ" isDateDisabled={isSunday} />
+            <ar-dialog closeOnBackdrop />
+
+            {/* Noms kebab-case : React 19 pose l'attribut */}
+            <ar-dialog close-on-backdrop />
+        </>
+    );
+}`;
+
+const codeReactTypes = `// src/ariane.d.ts (ou n'importe quel module du projet)
+import '@ariane-ui/core/react';`;
+
+const codeReactTypesUsage = `<ar-pagination
+    current={page}
+    total={10}
+    onar-pagination-page-changed={(event) => setPage(event.detail.to)} // detail typé
+/>`;
+
+const codeReactHydration = `// Rendu serveur puis hydratation : écoutez par ref plutôt que par onar-…
+useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onChanged = (event) => setPage(event.detail.to);
+    el.addEventListener('ar-pagination-page-changed', onChanged);
+    return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
+}, []);`;
+
+const codeReactDefineAfterHydration = `// Définir les composants après l'hydratation
+useEffect(() => {
+    import('@ariane-ui/core');
 }, []);`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
@@ -117,7 +163,9 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Custom Elements utilisables sans que leur classe soit enregistrée.
             </p>
             <pre><code class="language-js" set:text={codeReactUsage} /></pre>
-            <p class="hint">
+
+            <NarrativeSubheading id="react-evenements">Événements</NarrativeSubheading>
+            <p>
                 Depuis React 19, les Custom Elements sont supportés nativement : un événement
                 personnalisé s'écoute via un préfixe <code>on</code> sensible à la casse
                 (<code>onar-pagination-page-changed</code> écoute l'événement <code>ar-pagination-page-changed</code>).
@@ -125,11 +173,66 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 n'existe pas — passez par une ref et <code>addEventListener</code> :
             </p>
             <pre><code class="language-js" set:text={codeReactEventFallback} /></pre>
+
+            <NarrativeSubheading id="react-proprietes">Propriétés et attributs</NarrativeSubheading>
             <p>
-                Une propriété JS complexe (objet, fonction) passe toujours par une ref, quelle que
-                soit la version :
+                React 19 décide pour chaque prop : si le nom existe sur l'élément, il affecte la <strong>propriété</strong> ; sinon il pose un <strong>attribut</strong> (<code>true</code> donne un attribut vide ; <code>false</code>, <code>undefined</code> ou une fonction retirent l'attribut). Un nom en camelCase
+                (<code>isDateDisabled</code>, <code>closeOnBackdrop</code>) est donc une propriété,
+                et un nom en kebab-case (<code>close-on-backdrop</code>) un attribut.
+            </p>
+            <pre><code class="language-js" set:text={codeReactProps} /></pre>
+            <p>
+                Pour une valeur simple, les deux formes donnent le même résultat : chaque attribut
+                d'Ariane est réfléchi, donc un sélecteur CSS comme <code>[path="e1"]</code> ou un <code>querySelector</code> fonctionne quelle que soit la forme employée.
+            </p>
+            <p>
+                Une fonction ou un objet se passe directement dans une prop camelCase, à condition
+                que le composant soit défini avant le rendu — ce que garantit l'import ci-dessus.
+                Si la classe est enregistrée plus tard (autoloader CDN, import dynamique), le nom
+                n'existe pas encore sur l'élément : React n'écrit alors qu'un attribut, ignore une
+                fonction et convertit un objet en texte. Dans ce cas, et sur React 18 et antérieur
+                (où toute prop est un attribut), passez par une ref :
             </p>
             <pre><code class="language-js" set:text={codeReactProperty} /></pre>
+
+            <NarrativeSubheading id="react-typage">Typage TypeScript</NarrativeSubheading>
+            <p>
+                Importez une fois, n'importe où dans le projet, le sous-chemin qui ne contient que
+                des types. Il déclare le JSX des balises <code>ar-*</code> : propriétés,
+                attributs en kebab-case et props d'événement <code>onar-…</code>, avec le type de <code>detail</code>.
+            </p>
+            <pre><code class="language-ts" set:text={codeReactTypes} /></pre>
+            <pre><code class="language-js" set:text={codeReactTypesUsage} /></pre>
+            <p class="hint">
+                Les types portent sur les balises par défaut (<code>ar-*</code>) : avec un préfixe
+                personnalisé, ils ne s'appliquent pas. <code>addEventListener('ar-…')</code> est typé
+                dès que le paquet est importé, sans ce sous-chemin.
+            </p>
+
+            <NarrativeSubheading id="react-hydratation">Rendu serveur et hydratation</NarrativeSubheading>
+            <p>
+                Avec un rendu serveur suivi de <code>hydrateRoot</code>, deux limites ont été
+                mesurées avec React 19.3. Elles ne concernent pas un rendu uniquement côté client.
+            </p>
+            <ul class="narrative-list">
+                <li>
+                    <strong>Props posées tardivement.</strong> Sur un élément rendu par le serveur, <code>onar-…</code> et les propriétés JS ne sont posés qu'au premier rendu qui
+                    modifie la prop (relevé avec Next.js 16.4). Écoutez alors par ref, et posez les
+                    propriétés dans un <code>useEffect</code> :
+                </li>
+            </ul>
+            <pre><code class="language-js" set:text={codeReactHydration} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    <strong><code>ar-charcounter</code> défini avant l'hydratation.</strong> Le
+                    composant rattache le champ le premier, et l'événement natif <code>change</code>, à la perte de focus, déclenche un <code>onChange</code> de
+                    React en plus (même valeur que le précédent, une fois par saisie). Sans
+                    conséquence pour un gestionnaire qui ne fait que mettre à jour un état ; à
+                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Parade
+                    vérifiée : définir les composants après l'hydratation.
+                </li>
+            </ul>
+            <pre><code class="language-js" set:text={codeReactDefineAfterHydration} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://react.dev/reference/react-dom/components#custom-html-elements"
                 target="_blank" rel="noopener">documentation officielle de React sur les Custom Elements</a>.
