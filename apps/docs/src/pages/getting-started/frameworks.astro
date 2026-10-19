@@ -11,6 +11,10 @@ const tocEntries = [
     { id: 'react-typage',       label: 'Typage TypeScript',      level: 2 as const },
     { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
+    { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
+    { id: 'vue-v-model',      label: 'v-model',                level: 2 as const },
+    { id: 'vue-typage',       label: 'Typage TypeScript',      level: 2 as const },
+    { id: 'vue-theme-sombre', label: 'Thème sombre',           level: 2 as const },
     { id: 'angular', label: 'Angular', level: 1 as const },
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
 ];
@@ -92,6 +96,35 @@ const codeVueScript = `function onChanged(event) {
 
 function isSunday(date) {
     return date.getDay() === 0;
+}`;
+
+const codeVueKebab = `<!-- Attribut texte : la propriété reste undefined, sans erreur -->
+<ar-datepicker :is-date-disabled="isSunday" />
+
+<!-- Propriété -->
+<ar-datepicker :isDateDisabled.prop="isSunday" />
+<ar-datepicker :is-date-disabled.camel.prop="isSunday" />`;
+
+const codeVueNumbers = `<!-- Nombre lié : la propriété vaut 10 -->
+<ar-pagination :current="page" :total="10" />
+
+<!-- Texte : la propriété vaut la chaîne "10" -->
+<ar-pagination current="1" total="10" />`;
+
+const codeVueModel = `<ar-datepicker v-model="birthDate" name="birth" label="Date de naissance" />
+
+<!-- Sans v-model -->
+<ar-datepicker
+    :value="birthDate"
+    @ar-datepicker-input-change="(event) => (birthDate = event.detail.value ?? '')"
+/>`;
+
+const codeVueTypes = `// src/env.d.ts (ou n'importe quel module du projet)
+import '@ariane-ui/core/vue';`;
+
+const codeVueDark = `/* Le template Vite pose :root { color-scheme: light dark; } hors couche : */
+:root:not([data-theme]) {
+    color-scheme: light dark;
 }`;
 
 const codeViteConfig = `// vite.config.ts — indique à Vue de ne pas traiter les tags ar-* comme des
@@ -249,14 +282,85 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
             <pre><code class="language-html" set:text={codeVueTemplate} /></pre>
             <p>Et le script associé :</p>
             <pre><code class="language-js" set:text={codeVueScript} /></pre>
-            <p class="hint">
-                Vue affecte un binding en propriété JS (plutôt qu'en attribut) uniquement si sa clé
-                correspond exactement à un nom déjà présent sur l'élément — un souci si le composant
-                n'est pas encore chargé au moment du rendu (chargement asynchrone, cas courant avec
-                l'autoloader CDN d'Ariane). Le modificateur <code>.prop</code> force ce comportement de
-                façon fiable, quel que soit le moment du rendu — c'est l'approche recommandée par Vue
-                lui-même pour ce cas.
+
+            <NarrativeSubheading id="vue-proprietes">Propriétés et attributs</NarrativeSubheading>
+            <p>
+                Vue décide pour chaque liaison : si la clé existe sur l'élément, il affecte la <strong>propriété</strong> ; sinon il pose un <strong>attribut</strong>. Un attribut
+                statique (<code>path="e1"</code>) suit la même règle. Le modificateur <code>.prop</code> force la propriété, <code>.attr</code> (ou le préfixe <code>^</code>) force l'attribut.
             </p>
+            <p>
+                Un nom en kebab-case n'existe pas sur l'élément : <code>:is-date-disabled="fn"</code> devient un attribut texte, et la propriété reste <code>undefined</code>, sans erreur
+                ni avertissement. Écrivez le nom en camelCase. <code>.prop</code> ne convertit pas
+                le nom : <code>:is-date-disabled.prop</code> viserait une clé qui n'existe pas, il
+                faut <code>:isDateDisabled.prop</code> ou ajouter <code>.camel</code>.
+            </p>
+            <pre><code class="language-html" set:text={codeVueKebab} /></pre>
+            <p>
+                Pour une fonction ou un objet, préférez <code>.prop</code> : il reste fiable même
+                si le composant n'est pas encore défini au moment du rendu (chargement asynchrone,
+                cas courant avec l'autoloader CDN), alors que la liaison sans modificateur ne
+                devient une propriété que si la classe est déjà enregistrée. C'est aussi
+                l'approche recommandée par Vue pour ce cas.
+            </p>
+            <p>
+                Un nombre se lie plutôt qu'il ne s'écrit : un attribut statique
+                (<code>total="10"</code>) est affecté à la propriété comme une chaîne, alors que <code>:total="10"</code> donne un nombre.
+            </p>
+            <pre><code class="language-html" set:text={codeVueNumbers} /></pre>
+            <p class="hint">
+                Chaque attribut d'Ariane est réfléchi : un sélecteur CSS comme <code>[path="e1"]</code> ou un <code>querySelector</code> fonctionne quelle que soit
+                la forme employée. Les attributs ARIA se posent tels quels : par exemple <code>role="alert"</code> sur une <code>ar-alert</code> pour une annonce immédiate.
+            </p>
+
+            <NarrativeSubheading id="vue-v-model">v-model</NarrativeSubheading>
+            <p>
+                <code>v-model</code> fonctionne sur <code>ar-datepicker</code> : il lit et écrit <code>value</code> (une date au format <code>yyyy-MM-dd</code>). Le composant émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour.
+                Sur un champ suivi par <code>ar-charcounter</code>, le <code>v-model</code> du
+                champ lui-même met à jour le compteur, y compris pour un préremplissage ou un
+                vidage fait par le code.
+            </p>
+            <pre><code class="language-html" set:text={codeVueModel} /></pre>
+            <p class="hint">
+                L'événement <code>ar-datepicker-input-change</code> porte aussi <code>valid</code> (la date respecte-t-elle <code>min</code> et <code>max</code>)
+                et <code>valueAsDate</code>, que <code>v-model</code> ne donne pas.
+            </p>
+
+            <NarrativeSubheading id="vue-typage">Typage TypeScript</NarrativeSubheading>
+            <p>
+                Importez une fois, n'importe où dans le projet, le sous-chemin qui ne contient que
+                des types. Il déclare les balises <code>ar-*</code> (<code>GlobalComponents</code>)
+                avec leurs propriétés et leurs événements, dont le <code>detail</code> est typé.
+                Dans un gabarit, <code>@ar-dialog-hide</code> est typé par <code>onArDialogHide</code>.
+            </p>
+            <pre><code class="language-ts" set:text={codeVueTypes} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    Par défaut, <code>vue-tsc</code> signale une valeur du mauvais type ou hors de
+                    l'union (<code>variant="danger"</code>) et type l'événement reçu par un
+                    gestionnaire.
+                </li>
+                <li>
+                    Avec <code>strictTemplates</code>, un nom d'événement mal orthographié est aussi
+                    signalé. Une propriété au nom mal orthographié ne l'est pas, dans les deux modes.
+                </li>
+                <li>
+                    Avec <code>strictTemplates</code>, <code>v-model</code> sur une balise Ariane est
+                    signalé (<code>vue-tsc</code> le traite comme celui d'un composant Vue) : utilisez <code>:value</code> et l'événement.
+                </li>
+            </ul>
+            <p class="hint">
+                Les types portent sur les balises par défaut (<code>ar-*</code>) : avec un préfixe
+                personnalisé, ils ne s'appliquent pas.
+            </p>
+
+            <NarrativeSubheading id="vue-theme-sombre">Thème sombre</NarrativeSubheading>
+            <p>
+                Le thème sombre manuel passe par <code>data-theme="dark"</code> sur <code>:root</code>. Les règles du thème sont dans une couche CSS
+                (<code>ariane.theme</code>) : un <code>color-scheme</code> posé sur <code>:root</code> sans couche, comme celui du <code>style.css</code> d'un
+                projet Vite, l'emporte et neutralise <code>data-theme</code>. Ne l'appliquez que
+                lorsque <code>data-theme</code> est absent :
+            </p>
+            <pre><code class="language-css" set:text={codeVueDark} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://vuejs.org/guide/extras/web-components.html"
                 target="_blank" rel="noopener">documentation officielle de Vue sur les Custom Elements</a>.

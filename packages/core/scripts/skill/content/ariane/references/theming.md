@@ -57,6 +57,7 @@ Dans un shadow DOM applicatif : voir `## Shadow DOM applicatif`.
 - Deux tokens de bordure : `--ar-color-border` pour les séparateurs et panneaux décoratifs, `--ar-color-border-strong` pour la frontière d'un contrôle (champ, bouton à bordure), qui garde un contraste d'au moins 3:1 (WCAG 1.4.11). Un contrôle personnalisé dont la bordure l'identifie utilise le second. Les champs en lecture seule ou désactivés utilisent `--ar-input-inactive-border-color`.
 - Toutes les règles du thème sont dans `@layer ariane.theme`. Une règle hors de toute couche l'emporte sur une règle en couche, quelle que soit la spécificité : le CSS de l'application (non layered) surcharge le thème sans `!important` ni sélecteur renforcé.
 - Si l'application utilise elle-même des couches, c'est l'ordre de déclaration des couches qui décide : déclarer `ariane.theme` avant la couche de l'application.
+- Thème sombre manuel : `data-theme="dark"` sur `:root` (ou sur un conteneur pour en limiter la portée). Les règles du thème sont dans la couche `ariane.theme` : un `color-scheme` posé sur `:root` sans couche (le `style.css` du template Vite, `:root { color-scheme: light dark }`) l'emporte et neutralise `data-theme`. Le restreindre à `:root:not([data-theme])`.
 - Les tokens du thème sont posés sur `:root` : surcharger au même niveau.
 
 ```css
