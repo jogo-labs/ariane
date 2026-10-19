@@ -244,6 +244,23 @@ document.getElementById('confirm-dialog').addEventListener('ar-dialog-accepted',
 });
 ```
 
+### Fermeture différée
+
+Pour enregistrer avant de fermer, annulez `ar-dialog-accepted` et posez `pending` dans le même gestionnaire. Le dialog reste ouvert, annonce l'attente au lieu d'un blocage et ignore les nouvelles tentatives de fermeture. Une fois la réponse reçue, levez `pending` puis fermez, ou laissez le dialog ouvert en cas d'échec :
+
+```js
+dialog.addEventListener('ar-dialog-accepted', async (e) => {
+    e.preventDefault();
+    dialog.pending = true;
+    try {
+        await save();
+        dialog.open = false;
+    } finally {
+        dialog.pending = false;
+    }
+});
+```
+
 ### Dialogs empilés
 
 Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme. Voir la variante « Dialogs empilés » pour le comportement de `Escape` et la coordination du focus.

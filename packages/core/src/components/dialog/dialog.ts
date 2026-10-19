@@ -25,6 +25,14 @@ export type ArDialogEvents =
     | 'ar-dialog-accepted'
     | 'ar-dialog-accepted-prevented';
 
+/** Les seuls événements annulables, `@cancelable` dans le JSDoc de `ArDialog`. */
+const CANCELABLE_EVENTS = new Set<ArDialogEvents>([
+    'ar-dialog-show',
+    'ar-dialog-hide',
+    'ar-dialog-dismissed',
+    'ar-dialog-accepted',
+]);
+
 const _dialogStack: ArDialog[] = [];
 
 if (typeof document !== 'undefined') {
@@ -72,12 +80,13 @@ if (typeof document !== 'undefined') {
  * @cssprop --ar-dialog-shake-outline-color - Couleur de l'anneau de mise en évidence (`outline`) affiché à la place du shake en `prefers-reduced-motion: reduce` (cascade vers --ar-color-danger-text).
  *
  * @cssState open - Le dialog est ouvert.
+ * @cssState pending - L'application a posé l'attribut `pending` : une réponse est attendue avant de fermer.
  *
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show - Émis avant l'ouverture. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide - Émis avant la fermeture. @cancelable
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé. Le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
+ * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé, ou si `open` repasse à `true` pendant l'animation de fermeture (la fermeture est alors abandonnée). Sauf report par `pending`, le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hidden - Émis après la fermeture (après animation).
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
@@ -141,6 +150,17 @@ export class ArDialog extends ArianeElement {
     size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
     /**
+     * Attente d'une réponse, pilotée par l'application : posé dans le gestionnaire d'un
+     * `ar-dialog-accepted` (ou `-dismissed`, `-hide`) annulé, il reporte la fermeture au lieu de la
+     * bloquer. Le composant n'agit alors ni par secousse ni par annonce de blocage, ignore en silence
+     * les nouvelles tentatives de fermeture (clic, Échap, backdrop) et pose `aria-busy="true"` sur le
+     * dialogue, l'état `:state(pending)` et une annonce polie de l'attente. L'application le lève
+     * (`pending = false`) puis ferme (`open = false`) ou laisse le dialog ouvert. Le composant ne le
+     * pose ni ne le retire jamais. Non bloquant pour le contenu : seules les fermetures sont ignorées.
+     */
+    @property({ reflect: true, type: Boolean }) pending = false;
+
+    /**
      * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
      * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
      * Traduit automatiquement selon `lang` si non personnalisé.
@@ -158,7 +178,7 @@ export class ArDialog extends ArianeElement {
     // ── Private state ──────────────────────────────────────────────────────────
 
     @query('dialog', true)
-    dialog!: HTMLDialogElement;
+    private dialog!: HTMLDialogElement;
 
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
@@ -168,6 +188,9 @@ export class ArDialog extends ArianeElement {
 
     /** Vrai pendant l'animation de fermeture — bloque les interactions et les double-appels. */
     @state() private _isClosing = false;
+
+    /** Interrompt l'animation de fermeture en cours (timer de repli et écouteur `animationend`). */
+    private _cancelCloseAnimation: (() => void) | null = null;
 
     /** Élément qui avait le focus avant l'ouverture — pour le restaurer à la fermeture. */
     private _triggerElement: Element | null = null;
@@ -237,6 +260,21 @@ export class ArDialog extends ArianeElement {
         }
     }
 
+    override willUpdate(changedProperties: PropertyValues<this>): void {
+        // `open` repassé à vrai pendant l'animation de fermeture : la fermeture est abandonnée,
+        // sans rejouer d'animation. Le `hide` déjà émis reste donc sans `hidden` : `hide-prevented`.
+        if (changedProperties.has('open') && this.open && this._isClosing) {
+            this._cancelCloseAnimation?.();
+            this._cancelCloseAnimation = null;
+            this.dialog.classList.remove('closing');
+            this._isClosing = false;
+            void this.updateComplete.then(() => {
+                this._emit('ar-dialog-hide-prevented');
+                this._focusInitial();
+            });
+        }
+    }
+
     override updated(changedProperties: PropertyValues<this>): void {
         this._warnIfMissingLabel();
         this._warnIfSlotLabelIgnored();
@@ -255,6 +293,13 @@ export class ArDialog extends ArianeElement {
             }
             this.toggleState('open', this.open);
         }
+        if (changedProperties.has('pending')) {
+            this.toggleState('pending', this.pending);
+            // `get` indéfini au montage : pas d'annonce pour un `pending` posé dès le départ.
+            if (this.pending && changedProperties.get('pending') !== undefined) {
+                announceA11y(this.localize.term('dialogPending'), 'polite');
+            }
+        }
     }
 
     // ── Render ─────────────────────────────────────────────────────────────────
@@ -271,6 +316,7 @@ export class ArDialog extends ArianeElement {
                 aria-label=${this.withoutHeader ? headingLabel : nothing}
                 aria-describedby="dialog-body"
                 aria-modal="true"
+                aria-busy=${this.pending ? 'true' : nothing}
                 ?inert=${!this.open || this._isClosing}
                 @cancel=${this._handleDialogCancel}
                 @click=${this._handleDialogClick}
@@ -354,7 +400,7 @@ export class ArDialog extends ArianeElement {
     // ── Events ─────────────────────────────────────────────────────────────────
 
     private _emit(name: ArDialogEvents): CustomEvent<ArEventDetail> {
-        return emitEvent(this, name, { cancelable: true });
+        return emitEvent(this, name, { cancelable: CANCELABLE_EVENTS.has(name) });
     }
 
     private _announcePrevented(): void {
@@ -388,7 +434,7 @@ export class ArDialog extends ArianeElement {
         // Fallback backdrop close for Safari iOS (WebKit #267688 — pointerdown absent sur backdrop).
         // Sur desktop, _handleDialogPointerUp déjà traité ; _close() est idempotent via _isClosing.
         if (this.closeOnBackdrop && event.target === this.dialog) {
-            this._close();
+            this._requestClose();
             return;
         }
 
@@ -403,15 +449,16 @@ export class ArDialog extends ArianeElement {
         );
 
         if (dismissed || accepted) {
+            event.stopPropagation();
+            // Une réponse est déjà attendue : la nouvelle tentative est ignorée en silence.
+            if (this.pending) return;
             const e = this._emit(dismissed ? 'ar-dialog-dismissed' : 'ar-dialog-accepted');
             if (e.defaultPrevented) {
-                event.stopPropagation();
                 const prevented = dismissed
                     ? 'ar-dialog-dismissed-prevented'
                     : 'ar-dialog-accepted-prevented';
                 this._emit(prevented);
-                this._shake();
-                this._announcePrevented();
+                this._signalBlocked();
                 return;
             }
 
@@ -426,7 +473,7 @@ export class ArDialog extends ArianeElement {
             if (_dialogStack[_dialogStack.length - 1] !== this) return;
             event.preventDefault();
             event.stopPropagation();
-            this._close();
+            this._requestClose();
         }
     };
 
@@ -443,7 +490,7 @@ export class ArDialog extends ArianeElement {
     private _handleDialogPointerUp = (event: PointerEvent) => {
         if (!this.closeOnBackdrop) return;
         if (this._pointerDownTarget === this.dialog && event.target === this.dialog) {
-            this._close();
+            this._requestClose();
         }
         this._pointerDownTarget = null;
     };
@@ -481,21 +528,42 @@ export class ArDialog extends ArianeElement {
         }
 
         this.updateComplete.then(() => {
-            const autoFocused = this.querySelector<HTMLElement>('[autofocus]');
-            const firstFocusable =
-                autoFocused ??
-                this.querySelector<HTMLElement>(
-                    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-                );
-            if (firstFocusable) {
-                firstFocusable.focus();
-            } else {
-                (
-                    this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this.dialog
-                )?.focus();
-            }
+            this._focusInitial();
             this._emit('ar-dialog-shown');
         });
+    }
+
+    /** Focus initial : `[autofocus]`, sinon le premier élément focusable, sinon le bouton de fermeture. */
+    private _focusInitial(): void {
+        const autoFocused = this.querySelector<HTMLElement>('[autofocus]');
+        const firstFocusable =
+            autoFocused ??
+            this.querySelector<HTMLElement>(
+                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
+        if (firstFocusable) {
+            firstFocusable.focus();
+        } else {
+            (
+                this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this.dialog
+            )?.focus();
+        }
+    }
+
+    /** Fermeture demandée par l'utilisateur (Échap, backdrop) : ignorée en silence si `pending`. */
+    private _requestClose(): void {
+        if (this.pending) return;
+        this._close();
+    }
+
+    /**
+     * Fermeture annulée : blocage (secousse et annonce) ou, si l'application a posé `pending`
+     * dans son gestionnaire, simple report.
+     */
+    private _signalBlocked(): void {
+        if (this.pending) return;
+        this._shake();
+        this._announcePrevented();
     }
 
     /** Déclenche l'animation de fermeture et attend animationend avant de clore. */
@@ -505,8 +573,7 @@ export class ArDialog extends ArianeElement {
         if (hideEvent.defaultPrevented) {
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
-            this._shake();
-            this._announcePrevented();
+            this._signalBlocked();
             return;
         }
 
@@ -531,6 +598,10 @@ export class ArDialog extends ArianeElement {
             this._finishClose();
         };
         this.dialog.addEventListener('animationend', onEnd);
+        this._cancelCloseAnimation = () => {
+            clearTimeout(fallback);
+            this.dialog.removeEventListener('animationend', onEnd);
+        };
     }
 
     /** Animation de rejet — déclenche un shake (ou outline si prefers-reduced-motion) pour signaler que la fermeture est bloquée. */
@@ -559,6 +630,7 @@ export class ArDialog extends ArianeElement {
         this._unfreezeScroll();
         this._removeOpenListeners();
         this._isClosing = false;
+        this._cancelCloseAnimation = null;
         this.open = false;
         const trigger = this._triggerElement;
         this._triggerElement = null;
