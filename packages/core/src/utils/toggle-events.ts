@@ -6,7 +6,7 @@ export type ArToggleEventDetail = ArEventDetail;
 /**
  * Construit et dispatch un `CustomEvent` selon la convention de cycle de vie disclosure
  * (`show`/`shown`/`hide`/`hidden`/`show-prevented`/`hide-prevented`) partagée par
- * ar-dropdown, ar-breadcrumb, ar-collapse (via ToggleController) et ar-dialog.
+ * ar-dropdown, ar-breadcrumb et ar-collapse (via ToggleController).
  */
 export function emitToggleEvent(
     host: HTMLElement,
