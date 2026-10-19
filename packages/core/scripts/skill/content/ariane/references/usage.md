@@ -193,3 +193,22 @@ Le paquet npm publie des fichiers de données VS Code générés depuis le Custo
 ```
 
 Le manifeste lui-même est exporté sous `@ariane-ui/core/custom-elements.json`.
+
+## Types TypeScript
+
+Importer `@ariane-ui/core` (ou `/headless`) type `addEventListener` : chaque événement `ar-*` reçoit son `CustomEvent<…>`, `detail` compris, sans cast. `window.ARIANE_CONFIG` est aussi déclaré (`import '@ariane-ui/core/utils'` suffit).
+
+```ts
+el.addEventListener('ar-dropdown-select', (event) => {
+    event.detail.item; // ArDropdownItem
+});
+```
+
+Le JSX React et les gabarits Vue se typent en important, une fois dans le projet, un sous-chemin qui ne contient que des types :
+
+```ts
+import '@ariane-ui/core/react'; // JSX : propriétés, attributs et props d'événement `onar-…` (React 19)
+import '@ariane-ui/core/vue'; // GlobalComponents : propriétés et événements (onArDialogHide)
+```
+
+Les types portent sur les balises par défaut (`ar-*`) : avec un préfixe personnalisé, ils ne s'appliquent pas. Sous Angular, `$event` est typé par la carte d'événements ; les propriétés ne sont pas vérifiées sous `CUSTOM_ELEMENTS_SCHEMA`.

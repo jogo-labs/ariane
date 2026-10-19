@@ -83,6 +83,9 @@ const entryPoints = {
     headless: join(SRC, 'headless.ts'),
     // Sous-path @ariane-ui/core/utils : code pur, sans customElements.define
     'utils/index': join(SRC, 'utils', 'index.ts'),
+    // Sous-paths @ariane-ui/core/react et /vue : types seulement, le JS émis est un module vide
+    react: join(SRC, 'react.ts'),
+    vue: join(SRC, 'vue.ts'),
     ...Object.fromEntries(componentFiles.map((f) => [toEntryKey(f), f])),
 };
 

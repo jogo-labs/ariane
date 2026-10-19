@@ -17,6 +17,14 @@
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
     },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./vue": {
+      "types": "./dist/vue.d.ts",
+      "default": "./dist/vue.js"
+    },
     "./cdn": "./cdn/index.js",
     "./cdn.dev": "./cdn/index.dev.js",
     "./cdn/autoloader": "./cdn/autoloader.js",
@@ -39,7 +47,7 @@
     "!dist/browser-test-utils.*"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:manifest && npm run build:skill && npm run build:bundles && npm run check:cdn && npm run check:skill && npm run build:types",
+    "build": "npm run build:css && npm run build:manifest && npm run check:types && npm run build:skill && npm run build:bundles && npm run check:cdn && npm run check:skill && npm run build:types && npm run test:types",
     "build:dev": "npm run build:css && npm run build:manifest && npm run build:bundles:dev && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
@@ -58,7 +66,10 @@
     "test:browser": "web-test-runner",
     "test:browser:watch": "web-test-runner --watch",
     "lint": "eslint src",
-    "create": "node scripts/create-component.js"
+    "create": "node scripts/create-component.js",
+    "generate:types": "node scripts/generate-types.js",
+    "check:types": "node scripts/generate-types.js --check",
+    "test:types": "tsc -p types-tests/tsconfig.json"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.0",
@@ -70,6 +81,7 @@
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@open-wc/testing": "^5.0.0",
     "@types/mocha": "^10.0.10",
+    "@types/react": "^19.3.0",
     "@types/sinon": "^22.0.0",
     "@vitest/coverage-v8": "^4.1.8",
     "@web/dev-server-esbuild": "^2.0.0",
@@ -82,7 +94,8 @@
     "minify-literals": "^2.1.0",
     "sinon": "^22.0.0",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.8",
+    "vue": "^3.5.44"
   },
   "repository": {
     "type": "git",

@@ -5,6 +5,8 @@
  * headless. Il enregistre toutefois les traductions françaises et anglaises intégrées (effet de bord
  * limité au registre de traductions) : l'anglais sert de langue de repli complète.
  */
+// Types seulement : `Window.ARIANE_CONFIG`.
+import '../types/ariane-config.js';
 export { whenAllDefined } from './when-all-defined.js';
 export type { WhenAllDefinedOptions } from './when-all-defined.js';
 export { registerTranslation } from './register-translation.js';

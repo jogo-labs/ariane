@@ -4,6 +4,9 @@
  * Pour importer un seul composant (tree-shaking) :
  *   import '@ariane-ui/core/components/alert/index.js';
  */
+// Types seulement : augmentation de `HTMLElementEventMap` (événements typés) et de `Window`.
+import './types/elements.generated.js';
+import './types/ariane-config.js';
 export { whenAllDefined, registerTranslation } from './utils/index.js';
 export type { WhenAllDefinedOptions, Translation, FullTranslation } from './utils/index.js';
 export type { ArEventDetail } from './utils/index.js';
