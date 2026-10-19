@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "paths": {
+      "@ariane-ui/core": ["../dist/index.d.ts"],
+      "@ariane-ui/core/headless": ["../dist/headless.d.ts"],
+      "@ariane-ui/core/utils": ["../dist/utils/index.d.ts"],
+      "@ariane-ui/core/react": ["../dist/react.d.ts"],
+      "@ariane-ui/core/vue": ["../dist/vue.d.ts"]
+    }
+  },
+  "include": ["*.ts", "*.tsx"]
+}

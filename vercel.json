@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:manifest --workspace=packages/core && npm run build:bundles --workspace=packages/core && npm run build:css --workspace=packages/core && npm run build --workspace=apps/docs",
+  "buildCommand": "npm run build:manifest --workspace=packages/core && npm run generate:types --workspace=packages/core && npm run build:bundles --workspace=packages/core && npm run build:css --workspace=packages/core && npm run build --workspace=apps/docs",
   "outputDirectory": "apps/docs/dist",
   "installCommand": "npm install",
   "framework": null,
