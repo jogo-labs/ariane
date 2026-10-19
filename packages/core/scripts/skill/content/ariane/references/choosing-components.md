@@ -30,7 +30,7 @@ API complète (attributs, événements, slots, parts, tokens) : `components/<tag
 - Afficher un panneau parmi plusieurs dans une même zone, au choix de l'utilisateur → `<ar-tab-group>` ; chaque `<ar-tab panel="x">` s'associe au `<ar-tab-panel name="x">` de même nom.
 - Contenu de panneau coûteux à charger → `<ar-tab-group manual-activation>` : les flèches déplacent le focus sans activer l'onglet.
 - Parcourir une liste découpée en pages → `<ar-pagination>` ; le composant ne charge ni n'annonce le nouveau contenu, c'est à l'intégrateur de le faire.
-- Proposer des actions ou un contenu ancré à un bouton, sans changer de page → `<ar-dropdown>` ; avec des `<ar-dropdown-item>`, panel en `role="menu"` et navigation clavier, sans eux, conteneur libre sans rôle ni navigation clavier.
+- Proposer des actions ou un contenu ancré à un bouton, sans changer de page → `<ar-dropdown>` ; avec des `<ar-dropdown-item>`, panel en `role="menu"`, navigation clavier et événement annulable `ar-dropdown-select` à l'activation d'un item (le menu se ferme sauf annulation), sans eux, conteneur libre sans rôle ni navigation clavier.
 - `<ar-pagination>` et `<ar-stepper>` ne changent pas d'état seuls : réassigner la propriété `current` (sur `ar-pagination-page-change`) ou `currentPath` (sur `ar-stepper-step-change`) avec `event.detail.to`, de façon synchrone pour que le focus suive.
 - Erreur typique : un `current-path` qui ne correspond au `path` d'aucun `<ar-stepper-item>` n'active aucune étape, sans aucun signal visuel ni vocal.
 
