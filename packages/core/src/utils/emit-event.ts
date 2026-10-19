@@ -26,19 +26,3 @@ export function emitEvent<D extends object = object>(
     host.dispatchEvent(e);
     return e;
 }
-
-/** Détail des événements de cycle de vie disclosure (`show`/`shown`/`hide`/`hidden`…). */
-export type ArToggleEventDetail = ArEventDetail;
-
-/**
- * Construit et dispatch un `CustomEvent` selon la convention de cycle de vie disclosure
- * (`show`/`shown`/`hide`/`hidden`/`show-prevented`/`hide-prevented`) partagée par
- * ar-dropdown, ar-breadcrumb et ar-collapse (via ToggleController).
- */
-export function emitToggleEvent(
-    host: HTMLElement,
-    name: string,
-    opts: { cancelable: boolean },
-): CustomEvent<ArToggleEventDetail> {
-    return emitEvent(host, name, opts);
-}

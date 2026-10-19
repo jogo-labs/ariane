@@ -4,7 +4,7 @@ import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
-import { emitEvent, emitToggleEvent } from '../../utils/emit-event.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
@@ -231,7 +231,7 @@ export class ArDropdown extends ArianeElement {
         if (this._menuMode) this._activateMenuListeners();
         void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
-            emitToggleEvent(this, 'ar-dropdown-shown', { cancelable: false });
+            emitEvent(this, 'ar-dropdown-shown');
         });
     }
 
@@ -241,7 +241,7 @@ export class ArDropdown extends ArianeElement {
         this._activeIndex = -1;
         this._popover.hide();
         this._resolvedTrigger?.focus();
-        emitToggleEvent(this, 'ar-dropdown-hidden', { cancelable: false });
+        emitEvent(this, 'ar-dropdown-hidden');
     }
 
     private _activateMenuListeners(): void {

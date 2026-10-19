@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
-import { emitToggleEvent } from '../utils/emit-event.js';
+import { emitEvent } from '../utils/emit-event.js';
 
 export interface ToggleControllerOptions {
     /** Préfixe des events, ex. 'ar-dropdown' → ar-dropdown-show, ar-dropdown-show-prevented, etc. */
@@ -71,11 +71,11 @@ export class ToggleController implements ReactiveController {
             return;
         }
         const prefix = this._opts.eventPrefix;
-        const ev = emitToggleEvent(this._host, `${prefix}-show`, { cancelable: true });
+        const ev = emitEvent(this._host, `${prefix}-show`, { cancelable: true });
         if (ev.defaultPrevented) {
             this._suppressNext = true;
             this._host.open = false;
-            emitToggleEvent(this._host, `${prefix}-show-prevented`, { cancelable: false });
+            emitEvent(this._host, `${prefix}-show-prevented`);
             return;
         }
         this._opts.onShow();
@@ -87,11 +87,11 @@ export class ToggleController implements ReactiveController {
             return;
         }
         const prefix = this._opts.eventPrefix;
-        const ev = emitToggleEvent(this._host, `${prefix}-hide`, { cancelable: true });
+        const ev = emitEvent(this._host, `${prefix}-hide`, { cancelable: true });
         if (ev.defaultPrevented) {
             this._suppressNext = true;
             this._host.open = true;
-            emitToggleEvent(this._host, `${prefix}-hide-prevented`, { cancelable: false });
+            emitEvent(this._host, `${prefix}-hide-prevented`);
             return;
         }
         this._opts.onHide();
