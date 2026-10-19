@@ -178,7 +178,7 @@ export class ArDialog extends ArianeElement {
     // ── Private state ──────────────────────────────────────────────────────────
 
     @query('dialog', true)
-    private dialog!: HTMLDialogElement;
+    private _dialog!: HTMLDialogElement;
 
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
@@ -255,7 +255,7 @@ export class ArDialog extends ArianeElement {
     }
 
     override firstUpdated(): void {
-        if (this.open && !this.dialog?.open) {
+        if (this.open && !this._dialog?.open) {
             this._show();
         }
     }
@@ -266,7 +266,7 @@ export class ArDialog extends ArianeElement {
         if (changedProperties.has('open') && this.open && this._isClosing) {
             this._cancelCloseAnimation?.();
             this._cancelCloseAnimation = null;
-            this.dialog.classList.remove('closing');
+            this._dialog.classList.remove('closing');
             this._isClosing = false;
             void this.updateComplete.then(() => {
                 this._emit('ar-dialog-hide-prevented');
@@ -286,9 +286,9 @@ export class ArDialog extends ArianeElement {
             warn('ar-dialog', 'placement n\'a aucun effet en mode "modal".');
         }
         if (changedProperties.has('open')) {
-            if (this.open && !this.dialog?.open) {
+            if (this.open && !this._dialog?.open) {
                 this._show();
-            } else if (!this.open && this.dialog?.open) {
+            } else if (!this.open && this._dialog?.open) {
                 this._scheduleClose();
             }
             this.toggleState('open', this.open);
@@ -414,7 +414,7 @@ export class ArDialog extends ArianeElement {
 
         void this.updateComplete.then(() => {
             this._closePending = false;
-            if (this.isConnected && !this.open && this.dialog?.open) {
+            if (this.isConnected && !this.open && this._dialog?.open) {
                 this._close();
             }
         });
@@ -433,13 +433,13 @@ export class ArDialog extends ArianeElement {
     private _handleDialogClick = (event: MouseEvent) => {
         // Fallback backdrop close for Safari iOS (WebKit #267688 — pointerdown absent sur backdrop).
         // Sur desktop, _handleDialogPointerUp déjà traité ; _close() est idempotent via _isClosing.
-        if (this.closeOnBackdrop && event.target === this.dialog) {
+        if (this.closeOnBackdrop && event.target === this._dialog) {
             this._requestClose();
             return;
         }
 
         const path = event.composedPath() as Element[];
-        const stopAt = path.indexOf(this.dialog);
+        const stopAt = path.indexOf(this._dialog);
         const inner = stopAt >= 0 ? path.slice(0, stopAt) : path;
         const dismissed = inner.find(
             (n): n is HTMLElement => n instanceof HTMLElement && n.hasAttribute('data-ar-dismiss'),
@@ -489,7 +489,7 @@ export class ArDialog extends ArianeElement {
 
     private _handleDialogPointerUp = (event: PointerEvent) => {
         if (!this.closeOnBackdrop) return;
-        if (this._pointerDownTarget === this.dialog && event.target === this.dialog) {
+        if (this._pointerDownTarget === this._dialog && event.target === this._dialog) {
             this._requestClose();
         }
         this._pointerDownTarget = null;
@@ -506,7 +506,7 @@ export class ArDialog extends ArianeElement {
             this._triggerElement = null;
             this._emit('ar-dialog-show-prevented');
             void this.updateComplete.then(() => {
-                if (this.isConnected && this.open && !this.dialog?.open) {
+                if (this.isConnected && this.open && !this._dialog?.open) {
                     this.open = false;
                 }
             });
@@ -514,17 +514,17 @@ export class ArDialog extends ArianeElement {
         }
 
         this._addOpenListeners();
-        this.dialog?.showModal();
+        this._dialog?.showModal();
         this._freezeScroll();
 
         if (!prefersReducedMotion()) {
-            this.dialog.classList.add('opening');
+            this._dialog.classList.add('opening');
             const onOpenEnd = (e: AnimationEvent) => {
-                if (e.target !== this.dialog) return;
-                this.dialog.classList.remove('opening');
-                this.dialog.removeEventListener('animationend', onOpenEnd);
+                if (e.target !== this._dialog) return;
+                this._dialog.classList.remove('opening');
+                this._dialog.removeEventListener('animationend', onOpenEnd);
             };
-            this.dialog.addEventListener('animationend', onOpenEnd);
+            this._dialog.addEventListener('animationend', onOpenEnd);
         }
 
         this.updateComplete.then(() => {
@@ -545,7 +545,7 @@ export class ArDialog extends ArianeElement {
             firstFocusable.focus();
         } else {
             (
-                this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this.dialog
+                this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this._dialog
             )?.focus();
         }
     }
@@ -578,8 +578,8 @@ export class ArDialog extends ArianeElement {
         }
 
         this._isClosing = true;
-        this.dialog.classList.remove('opening', 'shake');
-        this.dialog.classList.add('closing');
+        this._dialog.classList.remove('opening', 'shake');
+        this._dialog.classList.add('closing');
 
         if (prefersReducedMotion()) {
             this._finishClose();
@@ -587,26 +587,26 @@ export class ArDialog extends ArianeElement {
         }
 
         const fallback = setTimeout(() => {
-            this.dialog.removeEventListener('animationend', onEnd);
+            this._dialog.removeEventListener('animationend', onEnd);
             this._finishClose();
         }, 500);
 
         const onEnd = (e: AnimationEvent) => {
-            if (e.target !== this.dialog) return;
+            if (e.target !== this._dialog) return;
             clearTimeout(fallback);
-            this.dialog.removeEventListener('animationend', onEnd);
+            this._dialog.removeEventListener('animationend', onEnd);
             this._finishClose();
         };
-        this.dialog.addEventListener('animationend', onEnd);
+        this._dialog.addEventListener('animationend', onEnd);
         this._cancelCloseAnimation = () => {
             clearTimeout(fallback);
-            this.dialog.removeEventListener('animationend', onEnd);
+            this._dialog.removeEventListener('animationend', onEnd);
         };
     }
 
     /** Animation de rejet — déclenche un shake (ou outline si prefers-reduced-motion) pour signaler que la fermeture est bloquée. */
     private _shake(): void {
-        const dialog = this.dialog;
+        const dialog = this._dialog;
         dialog.classList.remove('shake');
         void dialog.offsetWidth; // force reflow pour redémarrer l'animation si déjà en cours
         dialog.classList.add('shake');
@@ -625,8 +625,8 @@ export class ArDialog extends ArianeElement {
 
     /** Finalise la fermeture : ferme le dialog natif, restaure l'état et émet ar-dialog-hidden. */
     private _finishClose(): void {
-        this.dialog.classList.remove('closing', 'opening', 'shake');
-        this.dialog.close();
+        this._dialog.classList.remove('closing', 'opening', 'shake');
+        this._dialog.close();
         this._unfreezeScroll();
         this._removeOpenListeners();
         this._isClosing = false;
