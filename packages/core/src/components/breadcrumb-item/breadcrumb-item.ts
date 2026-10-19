@@ -42,12 +42,12 @@ export interface BreadcrumbItemRenderState {
 export class ArBreadcrumbItem extends ArianeElement {
     static override styles: CSSResultGroup = [resetStyles, styles];
 
-    @property({ type: String }) label = '';
+    @property({ type: String, reflect: true, useDefault: true }) label = '';
     /**
      * Destination du lien. Un item intermédiaire sans `href` est rendu comme un `<a>` inerte :
      * pas de rôle link, non focusable.
      */
-    @property({ type: String }) href?: string;
+    @property({ type: String, reflect: true }) href?: string;
 
     @state() private _renderState: BreadcrumbItemRenderState | undefined = undefined;
 

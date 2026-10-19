@@ -112,14 +112,14 @@ export class ArStepper extends ArianeElement {
      * Mode de navigation : `create` (formulaire de création) ou `edit` (modification).
      * Détermine quelles étapes sont accessibles au clic.
      */
-    @property({ type: String, attribute: 'mode', useDefault: true })
+    @property({ type: String, attribute: 'mode', reflect: true, useDefault: true })
     mode: 'create' | 'edit' = 'create';
 
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
      * automatiquement quand l'utilisateur scrolle vers une section de la page.
      */
-    @property({ type: Boolean, attribute: 'follow-scroll' })
+    @property({ type: Boolean, attribute: 'follow-scroll', reflect: true })
     followScroll = false;
 
     /**
