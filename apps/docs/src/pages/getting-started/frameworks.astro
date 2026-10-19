@@ -423,8 +423,7 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
             <NarrativeSubheading id="angular-proprietes">for et readonly</NarrativeSubheading>
             <p>
-                Le compilateur d'Angular renomme certaines liaisons : <code>[for]</code> devient <code>htmlFor</code> et <code>[readonly]</code> devient <code>readOnly</code>, deux propriétés qui n'existent pas sur les composants Ariane. La liaison est ignorée, sans erreur de compilation :
-                <code>ar-charcounter</code> et <code>ar-tooltip</code> n'ont pas de <code>for</code>, <code>ar-datepicker</code> n'est pas en lecture seule. Passez par l'attribut.
+                Angular emploie les noms de propriétés du DOM natif : <code>[for]</code> devient <code>htmlFor</code> (celle de <code>label</code>) et <code>[readonly]</code> devient <code>readOnly</code> (celle de <code>input</code>). Les composants Ariane nomment leurs propriétés comme l'attribut (<code>for</code>, <code>readonly</code>) : la liaison vise une propriété qui n'existe pas et elle est ignorée, sans erreur de compilation. <code>ar-charcounter</code> et <code>ar-tooltip</code> ne reçoivent pas leur cible, <code>ar-datepicker</code> n'est pas en lecture seule. Passez par l'attribut.
             </p>
             <pre><code class="language-html" set:text={codeAngularAttr} /></pre>
             <p class="hint">
