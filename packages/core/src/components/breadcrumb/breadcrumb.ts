@@ -1,7 +1,7 @@
 import { type TemplateResult, html, nothing, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { emitToggleEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';

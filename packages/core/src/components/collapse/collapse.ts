@@ -3,7 +3,7 @@ import { property, query, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { emitToggleEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './collapse.styles.js';
 

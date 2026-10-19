@@ -1,11 +1,10 @@
 import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
-import { emitEvent } from '../../utils/emit-event.js';
+import { emitEvent, emitToggleEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';

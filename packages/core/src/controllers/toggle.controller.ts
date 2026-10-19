@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
-import { emitToggleEvent } from '../utils/toggle-events.js';
+import { emitToggleEvent } from '../utils/emit-event.js';
 
 export interface ToggleControllerOptions {
     /** Préfixe des events, ex. 'ar-dropdown' → ar-dropdown-show, ar-dropdown-show-prevented, etc. */

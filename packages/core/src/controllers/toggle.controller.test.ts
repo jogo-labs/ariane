@@ -3,7 +3,7 @@ import { property } from 'lit/decorators.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate } from '../test-utils.js';
 import { ToggleController } from './toggle.controller.js';
-import { emitToggleEvent } from '../utils/toggle-events.js';
+import { emitToggleEvent } from '../utils/emit-event.js';
 
 class TestToggleHost extends LitElement {
     @property({ type: Boolean }) open = false;
