@@ -217,6 +217,46 @@ describe('ar-dialog — browser', () => {
 
     // ── :state() cumulé (généralisation #251) ─────────────────────────────────
 
+    // ── Réouverture pendant la fermeture et pending (#329) ────────────────────
+
+    describe('réouverture et pending', () => {
+        it("open repassé à vrai pendant l'animation de fermeture : fermeture abandonnée", async () => {
+            el = await fixture(html`<ar-dialog label="Titre" open></ar-dialog>`);
+            await aTimeout(ANIM_OPEN);
+            const events: string[] = [];
+            for (const name of [
+                'ar-dialog-hide-prevented',
+                'ar-dialog-hidden',
+                'ar-dialog-shown',
+            ]) {
+                el.addEventListener(name, () => events.push(name));
+            }
+            el.open = false;
+            await el.updateComplete;
+            await aTimeout(50);
+            el.open = true;
+            await aTimeout(ANIM_CLOSE + ANIM_OPEN);
+            expect(el.open).to.equal(true);
+            expect(getDialogEl(el).open).to.equal(true);
+            expect(getDialogEl(el).classList.contains('closing')).to.equal(false);
+            expect(events).to.deep.equal(['ar-dialog-hide-prevented']);
+        });
+
+        it('fermeture annulée avec pending posé : pas de secousse, :state(pending)', async () => {
+            el = await fixture(html`<ar-dialog label="Titre" open></ar-dialog>`);
+            await aTimeout(ANIM_OPEN);
+            el.addEventListener('ar-dialog-hide', (e) => {
+                e.preventDefault();
+                el.pending = true;
+            });
+            el.open = false;
+            await aTimeout(ANIM_SHAKE);
+            expect(getDialogEl(el).classList.contains('shake')).to.equal(false);
+            expect(el.matches(':state(pending)')).to.equal(true);
+            expect(el.open).to.equal(true);
+        });
+    });
+
     describe(':state(open)', () => {
         it('synchronisé avec open', async () => {
             el = await fixture(html`<ar-dialog label="Titre"></ar-dialog>`);

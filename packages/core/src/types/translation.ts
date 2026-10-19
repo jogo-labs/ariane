@@ -74,6 +74,7 @@ export interface FullTranslation extends BaseTranslation {
     // ar-dialog
     closeDialog: string;
     closingBlocked: string;
+    dialogPending: string;
     dialogDefaultLabel: string;
 
     // ar-alert

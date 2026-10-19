@@ -89,6 +89,7 @@ const translation: FullTranslation = {
     // ── ar-dialog ────────────────────────────────────────────────────────
     closeDialog: 'Fermer la boîte de dialogue',
     closingBlocked: 'Fermeture bloquée.',
+    dialogPending: 'Traitement en cours…',
     dialogDefaultLabel: 'Dialogue',
 
     // ── ar-alert ─────────────────────────────────────────────────────────
