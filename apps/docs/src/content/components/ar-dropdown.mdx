@@ -112,7 +112,7 @@ import WcagRef from '../../components/WcagRef.astro';
         criterion="2.1.1"
         summary="Keyboard : toutes les fonctionnalités doivent être accessibles au clavier sans temporisation spécifique."
     />
-- Retour du focus sur le trigger à la fermeture.
+- Retour du focus sur le trigger à la fermeture, y compris après l'activation d'un item.
 - Light-dismiss natif (`popover="auto"`) : un clic hors du panel ferme automatiquement.
 - Les animations sont désactivées si `prefers-reduced-motion: reduce` est actif.
 
@@ -121,3 +121,15 @@ import WcagRef from '../../components/WcagRef.astro';
 - **Le bouton du trigger doit être accessible.** Fournir un libellé textuel clair ou un `aria-label` si le trigger ne contient que de l'iconographie.
 - **En mode menu, envelopper chaque action dans `ar-dropdown-item`.** Les éléments sans `ar-dropdown-item` dans un panel menu ne reçoivent pas `role="menuitem"` et sortent de la navigation clavier.
 - **Pour l'état désactivé, coupler `ar-dropdown[disabled]` et `aria-disabled="true"` sur le trigger.** L'attribut `disabled` du composant bloque la logique JS ; `aria-disabled="true"` (à la place du `disabled` natif) maintient le bouton dans l'ordre de tabulation pour que les technologies d'assistance puissent annoncer l'état et lire une éventuelle raison via `aria-describedby`.
+
+## Utilisation
+
+### Réagir à un choix
+
+En mode menu, activer un item (clic, Entrée ou Espace) émet `ar-dropdown-select`, puis ferme le menu. `detail.item` est l'`ar-dropdown-item` activé. Annulez l'événement pour garder le menu ouvert :
+
+```js
+dropdown.addEventListener('ar-dropdown-select', (e) => {
+    if (e.detail.item.hasAttribute('data-keep-open')) e.preventDefault();
+});
+```

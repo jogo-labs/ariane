@@ -5,9 +5,12 @@ import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
+
+const DISABLED = ':disabled, [aria-disabled="true"]';
 
 export type ArDropdownPlacement =
     | 'top'
@@ -53,6 +56,7 @@ export type ArDropdownPlacement =
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hidden         - Émis après la fermeture.
+ * @event {CustomEvent<{ id: string | undefined, item: ArDropdownItem }>} ar-dropdown-select - En mode menu, à l'activation d'un item (clic, Entrée, Espace) ; `item` est l'`ar-dropdown-item` activé. Sans annulation, le menu se ferme. @cancelable
  *
  * @tagname ar-dropdown
  */
@@ -243,11 +247,31 @@ export class ArDropdown extends ArianeElement {
 
     private _activateMenuListeners(): void {
         this._panel?.addEventListener('keydown', this._handleMenuKeyDown);
+        this._panel?.addEventListener('click', this._handleMenuClick);
     }
 
     private _removeMenuListeners(): void {
         this._panel?.removeEventListener('keydown', this._handleMenuKeyDown);
+        this._panel?.removeEventListener('click', this._handleMenuClick);
     }
+
+    /**
+     * Clic, Entrée et Espace aboutissent tous à un `click` natif sur l'élément slotté : un seul
+     * écouteur couvre les trois. L'événement `ar-dropdown-select` est indépendant du clic, qu'il
+     * n'annule jamais.
+     */
+    private _handleMenuClick = (e: MouseEvent): void => {
+        const path = e.composedPath();
+        const item = path.find((n): n is ArDropdownItem => n instanceof ArDropdownItem);
+        if (!item) return;
+        const inside = path.slice(0, path.indexOf(item));
+        if (inside.some((n) => n instanceof Element && n.matches(DISABLED))) return;
+        const selected = emitEvent<{ item: ArDropdownItem }>(this, 'ar-dropdown-select', {
+            cancelable: true,
+            detail: { item },
+        });
+        if (!selected.defaultPrevented) this.open = false;
+    };
 
     private _handlePanelKeyDown = (e: KeyboardEvent): void => {
         if (e.key === 'Escape' || e.key === 'Tab') this.open = false;
@@ -272,6 +296,13 @@ export class ArDropdown extends ArianeElement {
             case 'End':
                 e.preventDefault();
                 this._focusMenuItem(items.length - 1);
+                break;
+            case ' ':
+                // Un lien ne s'active pas à l'Espace nativement, contrairement à un bouton.
+                if (e.target instanceof HTMLAnchorElement) {
+                    e.preventDefault();
+                    e.target.click();
+                }
                 break;
         }
     };
