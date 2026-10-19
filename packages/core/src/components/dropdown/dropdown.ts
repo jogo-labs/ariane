@@ -1,6 +1,5 @@
 import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
@@ -232,7 +231,7 @@ export class ArDropdown extends ArianeElement {
         if (this._menuMode) this._activateMenuListeners();
         void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
-            emitToggleEvent(this, 'ar-dropdown-shown', { cancelable: false });
+            emitEvent(this, 'ar-dropdown-shown');
         });
     }
 
@@ -242,7 +241,7 @@ export class ArDropdown extends ArianeElement {
         this._activeIndex = -1;
         this._popover.hide();
         this._resolvedTrigger?.focus();
-        emitToggleEvent(this, 'ar-dropdown-hidden', { cancelable: false });
+        emitEvent(this, 'ar-dropdown-hidden');
     }
 
     private _activateMenuListeners(): void {

@@ -3,7 +3,7 @@ import { property } from 'lit/decorators.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixture, waitForUpdate } from '../test-utils.js';
 import { ToggleController } from './toggle.controller.js';
-import { emitToggleEvent } from '../utils/toggle-events.js';
+import { emitEvent } from '../utils/emit-event.js';
 
 class TestToggleHost extends LitElement {
     @property({ type: Boolean }) open = false;
@@ -15,11 +15,11 @@ class TestToggleHost extends LitElement {
         eventPrefix: 'ar-test',
         onShow: () => {
             this.onShowSpy();
-            emitToggleEvent(this, 'ar-test-shown', { cancelable: false });
+            emitEvent(this, 'ar-test-shown');
         },
         onHide: () => {
             this.onHideSpy();
-            emitToggleEvent(this, 'ar-test-hidden', { cancelable: false });
+            emitEvent(this, 'ar-test-hidden');
         },
     });
 }

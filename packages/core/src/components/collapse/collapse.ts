@@ -3,7 +3,7 @@ import { property, query, state } from 'lit/decorators.js';
 import { warn } from '../../utils/warn.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import styles from './collapse.styles.js';
 
@@ -313,7 +313,7 @@ export class ArCollapse extends ArianeElement {
         if (!this._shouldAnimate()) {
             panel.style.height = 'auto';
             this._animating = false;
-            emitToggleEvent(this, 'ar-collapse-shown', { cancelable: false });
+            emitEvent(this, 'ar-collapse-shown');
             return;
         }
         panel.style.height = `${targetH}px`;
@@ -321,7 +321,7 @@ export class ArCollapse extends ArianeElement {
             this._onTransitionEnd = null;
             this._animating = false;
             panel.style.height = 'auto';
-            emitToggleEvent(this, 'ar-collapse-shown', { cancelable: false });
+            emitEvent(this, 'ar-collapse-shown');
         };
         this._onTransitionEnd = onShow;
         panel.addEventListener('transitionend', onShow, { once: true });
@@ -335,7 +335,7 @@ export class ArCollapse extends ArianeElement {
             // finding 5 : snap immédiat — frère accordéon ou interruption externe
             this._panel.setAttribute('hidden', '');
             this._panel.style.height = '';
-            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
+            emitEvent(this, 'ar-collapse-hidden');
             return;
         }
         this._animating = true;
@@ -346,7 +346,7 @@ export class ArCollapse extends ArianeElement {
             this._animating = false;
             panel.setAttribute('hidden', '');
             panel.style.height = '';
-            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
+            emitEvent(this, 'ar-collapse-hidden');
             return;
         }
         panel.style.height = '0px';
@@ -355,7 +355,7 @@ export class ArCollapse extends ArianeElement {
             this._animating = false;
             panel.setAttribute('hidden', '');
             panel.style.height = '';
-            emitToggleEvent(this, 'ar-collapse-hidden', { cancelable: false });
+            emitEvent(this, 'ar-collapse-hidden');
         };
         this._onTransitionEnd = onHide;
         panel.addEventListener('transitionend', onHide, { once: true });
