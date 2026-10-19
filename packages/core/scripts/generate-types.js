@@ -11,9 +11,8 @@
  *   - `src/react.ts` (`@ariane-ui/core/react`) : `JSX.IntrinsicElements` ;
  *   - `src/vue.ts` (`@ariane-ui/core/vue`) : `GlobalComponents`.
  *
- * Le fichier est versionné (le lint tourne avant le build et en a besoin) :
- *   npm run generate:types   # régénère, après npm run build:manifest
- *   npm run check:types      # échoue si le fichier versionné est périmé (CI)
+ * Le fichier est un artefact de build (ignoré par git), régénéré par `npm run build` :
+ *   npm run build:manifest && npm run generate:types
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -224,19 +223,7 @@ async function main() {
         );
         process.exit(1);
     }
-    const next = await generate();
-    if (process.argv.includes('--check')) {
-        const current = existsSync(OUT_PATH) ? readFileSync(OUT_PATH, 'utf8') : '';
-        if (current !== next) {
-            console.error(
-                '[generate-types] src/types/elements.generated.ts est périmé : npm run generate:types, puis commiter le fichier.',
-            );
-            process.exit(1);
-        }
-        console.log('✓ Types générés à jour avec le CEM');
-        return;
-    }
-    writeFileSync(OUT_PATH, next);
+    writeFileSync(OUT_PATH, await generate());
     console.log(`✓ ${relative(ROOT, OUT_PATH)}`);
 }
 

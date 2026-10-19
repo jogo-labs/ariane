@@ -8,6 +8,7 @@ dist-astro/
 dist-starter-demo/
 /packages/core/skills/
 /packages/core/llms/
+/packages/core/src/types/elements.generated.ts
 
 # ── Cache ─────────────────────────────────────────────────────
 .turbo/
