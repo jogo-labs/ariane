@@ -51,6 +51,7 @@
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
     "build": {
+      "env": ["VERCEL_ENV"],
       "dependsOn": [
         "build:manifest",
         "build:skill",
