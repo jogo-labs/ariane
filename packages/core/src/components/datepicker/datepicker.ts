@@ -167,19 +167,19 @@ export class ArDatepicker extends ArianeFormElement {
     /** Valeur ISO `yyyy-MM-dd` de la date sélectionnée. */
     @property({ reflect: true, useDefault: true }) value = '';
     /** Format de saisie/affichage (tokens `dd`, `MM`, `yyyy`). Défaut : `dd/MM/yyyy`. */
-    @property() format = 'dd/MM/yyyy';
+    @property({ reflect: true, useDefault: true }) format = 'dd/MM/yyyy';
     /** Date minimale sélectionnable (ISO `yyyy-MM-dd`). */
-    @property() min = '';
+    @property({ reflect: true, useDefault: true }) min = '';
     /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
-    @property() max = '';
+    @property({ reflect: true, useDefault: true }) max = '';
     /** Callback de désactivation arbitraire — retourne `true` pour désactiver un jour. */
     @property({ attribute: false }) isDateDisabled?: (date: Date) => boolean;
     /** Texte placeholder de l'input. */
-    @property() placeholder = '';
+    @property({ reflect: true, useDefault: true }) placeholder = '';
     /** Valeur `autocomplete` de l'input natif. */
-    @property() autocomplete = '';
+    @property({ reflect: true, useDefault: true }) autocomplete = '';
     /** Label du champ (alternative au slot `label`). */
-    @property() label = '';
+    @property({ reflect: true, useDefault: true }) label = '';
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
     @property({ reflect: true, type: Boolean }) readonly = false;
     /** Ouvre ou ferme le popover calendrier. */

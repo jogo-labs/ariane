@@ -111,7 +111,7 @@ export class ArCharcounter extends ArianeElement {
     @property({ reflect: true }) for: string | undefined;
 
     /** Limite de caractères. Requis. */
-    @property({ type: Number }) max: number | undefined;
+    @property({ type: Number, reflect: true }) max: number | undefined;
 
     /** Nombre de caractères restants déclenchant l'état warning. */
     @property({ attribute: 'warn-threshold', reflect: true, type: Number }) warnThreshold = 20;
