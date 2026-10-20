@@ -19,7 +19,6 @@ const tocEntries = [
     { id: 'vue-theme-sombre', label: 'Thème sombre',           level: 2 as const },
     { id: 'angular', label: 'Angular', level: 1 as const },
     { id: 'angular-evenements', label: 'Événements et typage',  level: 2 as const },
-    { id: 'angular-proprietes', label: 'for et readonly',        level: 2 as const },
     { id: 'angular-formulaires', label: 'Formulaires',           level: 2 as const },
     { id: 'angular-open',       label: 'État ouvert/fermé',      level: 2 as const },
     { id: 'angular-theme',      label: 'Shadow DOM et budget',   level: 2 as const },
@@ -200,10 +199,6 @@ const codeAngularEvents = `<ar-pagination
     [total]="10"
     (ar-pagination-page-changed)="last = $event.detail.to"
 ></ar-pagination>`;
-
-const codeAngularAttr = `<ar-charcounter [attr.for]="fieldId" max="200"></ar-charcounter>
-<ar-tooltip [attr.for]="targetId">Aide</ar-tooltip>
-<ar-datepicker [attr.readonly]="locked ? '' : null"></ar-datepicker>`;
 
 const codeAngularForms = `<form #f="ngForm">
     <ar-datepicker label="Date" name="date" ngDefaultControl [(ngModel)]="date" required>
@@ -468,15 +463,6 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Sous <code>CUSTOM_ELEMENTS_SCHEMA</code>, Angular ne vérifie pas les liaisons de propriétés :
                 <code>[curent]="3"</code> (faute de frappe) ou <code>[total]="'dix'"</code> compilent sans erreur. C'est
                 une limite d'Angular, qu'aucun fichier de types ne lève.
-            </p>
-
-            <NarrativeSubheading id="angular-proprietes">for et readonly</NarrativeSubheading>
-            <p>
-                Angular emploie les noms de propriétés du DOM natif : <code>[for]</code> devient <code>htmlFor</code> (celle de <code>label</code>) et <code>[readonly]</code> devient <code>readOnly</code> (celle de <code>input</code>). Les composants Ariane nomment leurs propriétés comme l'attribut (<code>for</code>, <code>readonly</code>) : la liaison vise une propriété qui n'existe pas et elle est ignorée, sans erreur de compilation. <code>ar-charcounter</code> et <code>ar-tooltip</code> ne reçoivent pas leur cible, <code>ar-datepicker</code> n'est pas en lecture seule. Passez par l'attribut.
-            </p>
-            <pre><code class="language-html" set:text={codeAngularAttr} /></pre>
-            <p class="hint">
-                <code>for</code> attend une chaîne (l'<code>id</code> de la cible). <code>readonly</code> est un attribut booléen, comme <code>disabled</code> : il est vrai dès qu'il est présent, quelle que soit sa valeur. Or Angular ne retire un attribut que pour <code>null</code> ou <code>undefined</code> : <code>[attr.readonly]="false"</code> écrit <code>readonly="false"</code>, ce qui est invalide et laisse le champ en lecture seule. Écrivez <code>'' : null</code>, comme ci-dessus.
             </p>
 
             <NarrativeSubheading id="angular-formulaires">Formulaires</NarrativeSubheading>

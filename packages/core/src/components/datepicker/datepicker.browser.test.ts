@@ -612,11 +612,11 @@ describe('ar-datepicker — browser', () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             expect(el.matches(':state(readonly)')).to.equal(false);
 
-            el.readonly = true;
+            el.readOnly = true;
             await el.updateComplete;
             expect(el.matches(':state(readonly)')).to.equal(true);
 
-            el.readonly = false;
+            el.readOnly = false;
             await el.updateComplete;
             expect(el.matches(':state(readonly)')).to.equal(false);
         });

@@ -559,7 +559,7 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
                         </svg>
                     </button>
                     <!-- Dropdown thème (display:contents — sans impact sur le layout) -->
-                    <ar-dropdown id="theme-dropdown" for="theme-trigger" placement="bottom-end">
+                    <ar-dropdown id="theme-dropdown" trigger-id="theme-trigger" placement="bottom-end">
                         <ar-dropdown-item data-theme-mode="light">
                             <button class="theme-menu-item">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>

@@ -212,7 +212,7 @@ export class ArTableSort extends ArianeElement {
                 <slot></slot>
                 <span part="indicator" aria-hidden="true"></span>
             </button>
-            <ariane-internal-tooltip for=${this._buttonId}>${label}</ariane-internal-tooltip>
+            <ariane-internal-tooltip trigger-id=${this._buttonId}>${label}</ariane-internal-tooltip>
         `;
     }
 }

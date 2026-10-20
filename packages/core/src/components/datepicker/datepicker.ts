@@ -182,7 +182,7 @@ export class ArDatepicker extends ArianeFormElement {
     /** Label du champ (alternative au slot `label`). */
     @property({ reflect: true, useDefault: true }) label = '';
     /** Bloque la saisie tout en soumettant la valeur au formulaire. */
-    @property({ reflect: true, type: Boolean }) readonly = false;
+    @property({ attribute: 'readonly', reflect: true, type: Boolean }) readOnly = false;
     /** Ouvre ou ferme le popover calendrier. */
     @property({ reflect: true, type: Boolean }) open = false;
     /**
@@ -310,8 +310,8 @@ export class ArDatepicker extends ArianeFormElement {
         ) {
             this.toggleState('disabled', this.effectiveDisabled);
         }
-        if (changed.has('readonly')) {
-            this.toggleState('readonly', this.readonly);
+        if (changed.has('readOnly')) {
+            this.toggleState('readonly', this.readOnly);
         }
         if (changed.has('open')) {
             this.toggleState('open', this.open);
@@ -359,7 +359,7 @@ export class ArDatepicker extends ArianeFormElement {
                         type="text"
                         style=${styleMap({ '--input-computed-width': inputComputedMaxWidth })}
                         ?disabled=${this.effectiveDisabled}
-                        ?readonly=${this.readonly}
+                        ?readonly=${this.readOnly}
                         aria-required=${this.required ? 'true' : nothing}
                         autocomplete=${this.autocomplete || nothing}
                         placeholder=${this.placeholder || nothing}
@@ -371,7 +371,7 @@ export class ArDatepicker extends ArianeFormElement {
                     <button
                         part="trigger"
                         type="button"
-                        ?disabled=${this.effectiveDisabled || this.readonly}
+                        ?disabled=${this.effectiveDisabled || this.readOnly}
                         aria-label=${this.localize.term('openCalendar')}
                         aria-haspopup="dialog"
                         aria-expanded=${this.open}
@@ -727,7 +727,7 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     private async _show(): Promise<void> {
-        if (this.effectiveDisabled || this.readonly) return;
+        if (this.effectiveDisabled || this.readOnly) return;
 
         const allowed = !emitEvent(this, 'ar-datepicker-show', { cancelable: true })
             .defaultPrevented;
@@ -790,7 +790,7 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     private _handleTriggerClick(): void {
-        if (this.effectiveDisabled || this.readonly) return;
+        if (this.effectiveDisabled || this.readOnly) return;
         this.open = !this.open;
     }
 

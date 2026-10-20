@@ -29,7 +29,7 @@ export type ArDropdownPlacement =
  * @summary Affiche un panneau contextuel déclenché par un bouton, positionné automatiquement autour de lui. À utiliser pour des menus d'actions, des filtres, ou tout contenu additionnel qui ne justifie pas un dialog.
  * @display demo
  *
- * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).
+ * @slot trigger  - Le bouton déclencheur (ignoré si `trigger-id` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
  * @csspart panel - Le panel flottant.
@@ -82,7 +82,7 @@ export class ArDropdown extends ArianeElement {
      * ID d'un élément déclencheur externe (light DOM). Quand défini, le slot
      * `trigger` est ignoré.
      */
-    @property({ reflect: true }) for = '';
+    @property({ attribute: 'trigger-id', reflect: true }) triggerId = '';
 
     @query('[part="panel"]') private _panel!: HTMLElement;
 
@@ -110,19 +110,19 @@ export class ArDropdown extends ArianeElement {
     }
 
     override firstUpdated(): void {
-        if (this.for) {
+        if (this.triggerId) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
             if (slot?.assignedElements({ flatten: true }).length) {
                 warn(
                     'ar-dropdown',
-                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                    'trigger-id et slot="trigger" sont tous les deux définis — trigger-id prend la priorité.',
                 );
             }
         }
         const trigger = this._resolvedTrigger;
         if (trigger && this._panel) {
             this._popover.attach(trigger, this._panel);
-            if (this.for) {
+            if (this.triggerId) {
                 trigger.addEventListener('click', this._handleTriggerClick);
                 this._externalTrigger = trigger;
             }
@@ -142,16 +142,16 @@ export class ArDropdown extends ArianeElement {
         if (changed.has('noScrollLock')) {
             this._popover.setLockScroll(!this.noScrollLock);
         }
-        if (changed.has('for')) {
+        if (changed.has('triggerId')) {
             this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);
             this._externalTrigger = null;
             const newTrigger = this._resolvedTrigger;
-            if (this.for && !newTrigger) {
-                warn('ar-dropdown', `Aucun élément trouvé avec l'id "${this.for}".`);
+            if (this.triggerId && !newTrigger) {
+                warn('ar-dropdown', `Aucun élément trouvé avec l'id "${this.triggerId}".`);
             }
             if (newTrigger && this._panel) {
                 this._popover.attach(newTrigger, this._panel);
-                if (this.for) {
+                if (this.triggerId) {
                     newTrigger.addEventListener('click', this._handleTriggerClick);
                     this._externalTrigger = newTrigger;
                 }
@@ -176,21 +176,21 @@ export class ArDropdown extends ArianeElement {
     }
 
     private get _resolvedTrigger(): HTMLElement | null {
-        if (this.for) {
+        if (this.triggerId) {
             const root = this.getRootNode() as Document | ShadowRoot;
-            return root.getElementById(this.for);
+            return root.getElementById(this.triggerId);
         }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
     }
 
     private _handleTriggerSlotChange(): void {
-        if (this.for) {
+        if (this.triggerId) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
             if (slot?.assignedElements({ flatten: true }).length) {
                 warn(
                     'ar-dropdown',
-                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                    'trigger-id et slot="trigger" sont tous les deux définis — trigger-id prend la priorité.',
                 );
             }
             return;

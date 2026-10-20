@@ -138,7 +138,7 @@ describe('ar-charcounter — accessibilité', () => {
             `);
             const counter = el.querySelector<ArCharcounter>('ar-charcounter')!;
 
-            counter.for = 'fd2'; // planifie queueMicrotask dans updated()
+            counter.htmlFor = 'fd2'; // planifie queueMicrotask dans updated()
             counter.remove(); // disconnectedCallback synchrone avant le microtask
             await new Promise((r) => setTimeout(r, 0)); // vide tous les microtasks
         });

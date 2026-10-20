@@ -81,7 +81,7 @@ describe('panneaux flottants — masqués par défaut', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div style="padding-top: 80px">
                     <button id="pv-btn">x</button>
-                    <ar-tooltip for="pv-btn" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="pv-btn" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const tip = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
