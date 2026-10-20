@@ -340,22 +340,16 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
             <NarrativeHeading id="nextjs">Next.js</NarrativeHeading>
             <p>
-                Ariane ne prend pas officiellement en charge le rendu serveur (voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>) : le HTML produit par Next.js contient les balises <code>ar-*</code> et leur contenu, mais pas leur shadow DOM. Les composants se définissent dans le navigateur, une fois le JavaScript chargé. Cette section décrit ce que cela implique avec l'App Router, vérifié avec Next.js 16.4 et React 19.3.
-            </p>
-            <p>
-                Next.js étant un framework React, tout ce qui concerne les événements, les propriétés, le typage et l'hydratation se trouve dans la <a href="#react">section React</a>, en particulier <a href="#react-hydratation">Rendu serveur et hydratation</a>. Ne sont reprises ici que les particularités de Next.js.
+                Ariane ne prend pas officiellement en charge le rendu serveur (voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>) : le HTML produit par Next.js contient les balises <code>ar-*</code> et leur contenu, mais pas leur shadow DOM. Les composants se définissent dans le navigateur, une fois le JavaScript chargé. Next.js étant un framework React, les événements, les propriétés, le typage et l'hydratation sont décrits dans la <a href="#react">section React</a>. Ne sont reprises ici que les particularités de l'App Router.
             </p>
 
             <NarrativeSubheading id="nextjs-chargement">Charger la librairie</NarrativeSubheading>
             <p>
-                Un import statique de <code>@ariane-ui/core</code> s'évalue désormais sans erreur côté serveur. Il ne sert pourtant à rien dans un Server Component : l'import n'a lieu que sur le serveur, les balises restent non définies dans le navigateur. Dans un Client Component, les composants sont bien définis, mais avant l'hydratation (voir <a href="#nextjs-hydratation">Avertissements d'hydratation</a>).
-            </p>
-            <p>
-                Le plus simple est de charger la librairie après l'hydratation, par un <code>import()</code> dans un <code>useEffect</code> d'un Client Component monté dans le layout :
+                Chargez la librairie dans un Client Component monté dans le layout, par un <code>import()</code> dans un <code>useEffect</code>. Un import dans un Server Component ne définit rien dans le navigateur.
             </p>
             <pre><code class="language-tsx" set:text={codeNextLoader} /></pre>
             <p>
-                Avec <code>@ariane-ui/core/headless</code>, également importable côté serveur, enregistrez les classes dans le même effet. Gardez le <code>customElements.get</code> : en développement, StrictMode exécute l'effet deux fois.
+                Avec <code>@ariane-ui/core/headless</code>, enregistrez les classes dans le même effet. Gardez le <code>customElements.get</code> : en développement, StrictMode exécute l'effet deux fois.
             </p>
             <pre><code class="language-tsx" set:text={codeNextHeadless} /></pre>
             <p class="hint">
@@ -365,23 +359,23 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
             <NarrativeSubheading id="nextjs-avant-definition">Contenu avant la définition</NarrativeSubheading>
             <p>
-                Tant que les composants ne sont pas définis, le contenu qu'ils devaient masquer ou mettre en forme est visible tel quel : les panneaux d'<code>ar-tab-group</code>, le contenu replié d'<code>ar-collapse</code>, et une pagination qui occupe 0 pixel de large. Le chargement les met ensuite en forme d'un coup, d'où un saut de mise en page. Masquer les éléments non définis, en conservant leur place, l'évite :
+                Tant que les composants ne sont pas définis, leur contenu s'affiche tel quel (panneaux d'onglets, contenu replié d'<code>ar-collapse</code>), puis la mise en forme survient d'un coup. Pour l'éviter, masquez les éléments non définis tout en conservant leur place :
             </p>
             <pre><code class="language-css" set:text={codeNextDefined} /></pre>
             <p class="hint">
-                Vérifié : les éléments sont masqués avant la définition et visibles après. Sans JavaScript, ils restent masqués. Limitez le sélecteur aux composants concernés (<code>ar-tab-panel:not(:defined)</code>, <code>ar-collapse:not(:defined)</code>) si le contenu doit rester lisible dans ce cas.
+                Sans JavaScript, ces éléments restent masqués. Limitez le sélecteur aux composants concernés (<code>ar-tab-panel:not(:defined)</code>) si le contenu doit alors rester lisible.
             </p>
 
             <NarrativeSubheading id="nextjs-hydratation">Avertissements d'hydratation</NarrativeSubheading>
             <p>
-                À leur définition, certains composants écrivent des attributs sur leur hôte (<code>ar-alert</code> écrit <code>role</code>) ou sur leurs enfants (<code>ar-tab-group</code>, <code>ar-tab</code> et <code>ar-tab-panel</code> écrivent <code>slot</code>, <code>id</code>, <code>role</code>, <code>aria-*</code>, <code>tabindex</code>, <code>hidden</code>). S'ils sont définis avant l'hydratation, React en développement signale que le HTML du serveur ne correspond pas : « A tree hydrated but some attributes of the server rendered HTML didn't match… ». L'avertissement est absent en production, et aucun dysfonctionnement n'a été mesuré.
+                À leur définition, certains composants écrivent des attributs : <code>role</code> sur <code>ar-alert</code>, <code>slot</code>, <code>id</code>, <code>role</code> et <code>aria-*</code> sur les onglets. Si cette définition précède l'hydratation, React signale en développement que le HTML du serveur ne correspond pas (« A tree hydrated but some attributes of the server rendered HTML didn't match »). L'avertissement n'apparaît pas en production.
             </p>
             <ul class="narrative-list">
                 <li>
-                    <strong>Chargement après l'hydratation.</strong> C'est la parade générale (voir <a href="#nextjs-chargement">Charger la librairie</a>). Mesure sur des pages mêlant onglets et alertes : 2 chargements sur 20 affichent encore l'avertissement. Le cas est suivi dans <a href="https://github.com/jogo-labs/ariane/issues/345" target="_blank" rel="noopener">#345</a>.
+                    Chargez la librairie après l'hydratation, comme ci-dessus.
                 </li>
                 <li>
-                    <strong><code>ar-alert</code> : écrivez le <code>role</code>.</strong> Le composant n'écrase jamais un <code>role</code> posé par l'application. Avec un import statique dans un Client Component, l'avertissement apparaît sur 10 chargements sur 10 sans <code>role</code> dans le markup, sur 0 sur 10 avec. Utilisez <code>alert</code> pour une interruption immédiate, <code>status</code> pour une annonce polie.
+                    Pour <code>ar-alert</code>, écrivez le <code>role</code> dans le markup : le composant ne remplace jamais un <code>role</code> posé par l'application. Utilisez <code>alert</code> pour une interruption immédiate, <code>status</code> pour une annonce polie.
                 </li>
             </ul>
             <pre><code class="language-html" set:text={codeNextAlertRole} /></pre>
