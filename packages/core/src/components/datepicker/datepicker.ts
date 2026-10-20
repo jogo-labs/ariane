@@ -173,7 +173,8 @@ export class ArDatepicker extends ArianeFormElement {
     /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
     @property({ reflect: true, useDefault: true }) max = '';
     /** Callback de désactivation arbitraire — retourne `true` pour désactiver un jour. */
-    @property({ attribute: false }) isDateDisabled?: (date: Date) => boolean;
+    @property({ attribute: false }) isDateDisabled: ((date: Date) => boolean) | undefined =
+        undefined;
     /** Texte placeholder de l'input. */
     @property({ reflect: true, useDefault: true }) placeholder = '';
     /** Valeur `autocomplete` de l'input natif. */

@@ -116,7 +116,7 @@ Les slots disponibles sont listés par composant dans `components/<tag>.md`. Le 
 
 ## Événements
 
-Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; la colonne Type de `components/<tag>.md` en donne le type exact (`CustomEvent<{ id: string | undefined, … }>`).
+Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Avec un préfixe personnalisé, seul le tag change : les noms d'événements restent en `ar-*` (`<acme-pagination>` émet `ar-pagination-page-changed`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; la colonne Type de `components/<tag>.md` en donne le type exact (`CustomEvent<{ id: string | undefined, … }>`).
 
 Tout événement `ar-*` a un `detail` objet portant `event.detail.id` : la valeur de l'attribut `id` de l'hôte au moment de l'émission, telle quelle, `undefined` si l'hôte n'en a pas. `ar-collapse` et `ar-tooltip` génèrent un `id` quand il est absent (liens ARIA) : cet `id` généré est exposé comme n'importe quel autre. Les champs propres à l'événement (`from`, `to`, `active`, `value`…) s'ajoutent à `id`. Poser son propre `id` sur l'hôte en fait un filtre fiable, surtout quand le shadow DOM d'un composant de l'application ramène la cible de l'événement composé à l'hôte de l'application : `event.target` désigne alors l'hôte de l'application plutôt que le composant `ar-*`. Sinon `event.target` suffit.
 
@@ -161,6 +161,14 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 - `ar-dialog-dismissed` et `ar-dialog-accepted` (clic sur un élément portant `data-ar-dismiss` ou `data-ar-accept`) sont aussi annulables.
 - Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ id, from, to }`.
 - Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé ni pour `-show` ni pour `-hide`).
+
+### Attente d'une réponse (`pending`)
+
+Les composants qui attendent une réponse de l'application partagent l'attribut booléen `pending` : réfléchi, exposé par `:state(pending)`, avec une annonce de l'attente aux lecteurs d'écran au passage `false → true`. `aria-busy` est posé par `ar-pagination`, `ar-stepper`, `ar-datepicker` et `ar-dialog`. Qui le pose varie :
+
+- `ar-table-sort` : le composant le pose au clic. L'application le lève avec `confirm()`, `reject(raison?)`, `reset()` ou en affectant `order`.
+- `ar-pagination` et `ar-stepper` : le composant attend déjà seul la réponse après un événement non annulé, jusqu'à la prochaine affectation de `current` ou `currentPath`. `pending` exprime une attente qui ne passe pas par l'événement (chargement initial) ; le composant ne le pose ni ne le retire jamais.
+- `ar-datepicker` et `ar-dialog` : l'application le pose et le lève. Sur `ar-dialog`, il suspend les fermetures demandées par l'utilisateur.
 
 ## Méthodes
 

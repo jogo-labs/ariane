@@ -77,6 +77,8 @@ import '@ariane-ui/core';
 ```
 
 - Poser la variable dans le même module que l'import de la librairie, après la ligne `import`, ne marche pas : les imports d'un module sont évalués avant son propre code, et les tags `ar-*` sont déjà enregistrés. Cet ordre d'évaluation a été mesuré en Node. Ne rien supposer du comportement de Vite ou webpack : cet ordre n'a pas été vérifié avec eux ; passer par un module de configuration importé en premier.
+- Le préfixe ne s'applique qu'aux tags : les noms d'événements restent en `ar-*`.
+- Avec un bundler ou du code évalué en différé (chunk partagé en build de production, pré-bundling du serveur de développement), l'ordre d'évaluation des modules n'est pas garanti : `ARIANE_CONFIG` peut être lu trop tard et le préfixe est alors ignoré, sans erreur. Préférer `@ariane-ui/core/headless` ; réserver `ARIANE_CONFIG` aux scripts classiques et au CDN.
 - Le préfixe s'applique à tous les composants ; en CDN il est global. Renommer chaque composant individuellement impose npm avec `/headless`.
 - Chaque `components/<x>/index.js` enregistre son tag via `defineComponent('ar-<x>', Classe)` : `<préfixe>-<nom>` avec `ARIANE_CONFIG.prefix`, sinon `ar-<nom>`.
 

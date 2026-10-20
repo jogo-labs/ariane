@@ -11,6 +11,7 @@ const tocEntries = [
     { id: 'attributs',   label: 'Attributs & propriétés',   level: 1 as const },
     { id: 'slots',       label: 'Slots',                    level: 1 as const },
     { id: 'evenements',  label: 'Événements',                level: 1 as const },
+    { id: 'pending',     label: 'Attente d\'une réponse',    level: 2 as const },
     { id: 'methodes',    label: 'Méthodes',                  level: 1 as const },
     { id: 'ide-autocomplete', label: 'Autocomplétion IDE',   level: 1 as const },
 ];
@@ -182,6 +183,9 @@ const codeVsCodeSettings = `{
             </p>
             <pre><code class="language-js" set:text={codeEventListener} /></pre>
             <p>
+                Avec un <a href="/theming/tag-customization">préfixe personnalisé</a>, seul le tag change : les noms d'événements restent en <code>ar-*</code> (<code>&lt;acme-pagination&gt;</code> émet <code>ar-pagination-page-changed</code>).
+            </p>
+            <p>
                 Les événements <strong>annulables</strong> sont indiqués dans la section « Événements » de la <strong>Référence API</strong>.
             </p>
             <p>
@@ -195,6 +199,22 @@ const codeVsCodeSettings = `{
                 Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/fr/docs/Web/API/CustomEvent"
                 target="_blank" rel="noopener">documentation complète sur MDN</a>.
             </p>
+
+            <NarrativeSubheading id="pending">Attente d'une réponse</NarrativeSubheading>
+            <p>
+                Les composants qui attendent une réponse de l'application partagent l'attribut booléen <code>pending</code> : réfléchi, exposé par <code>:state(pending)</code>, avec une annonce de l'attente aux lecteurs d'écran au passage de <code>false</code> à <code>true</code>. <code>aria-busy</code> est posé par <code>ar-pagination</code>, <code>ar-stepper</code>, <code>ar-datepicker</code> et <code>ar-dialog</code>. Qui le pose varie :
+            </p>
+            <ul class="narrative-list">
+                <li>
+                    <code>ar-table-sort</code> : le composant le pose au clic. L'application le lève avec <code>confirm()</code>, <code>reject(raison?)</code>, <code>reset()</code> ou en affectant <code>order</code>.
+                </li>
+                <li>
+                    <code>ar-pagination</code> et <code>ar-stepper</code> : le composant attend déjà seul la réponse après un événement non annulé, jusqu'à la prochaine affectation de <code>current</code> ou <code>currentPath</code>. <code>pending</code> exprime une attente qui ne passe pas par l'événement (chargement initial) ; le composant ne le pose ni ne le retire jamais.
+                </li>
+                <li>
+                    <code>ar-datepicker</code> et <code>ar-dialog</code> : l'application le pose et le lève. Sur <code>ar-dialog</code>, il suspend les fermetures demandées par l'utilisateur.
+                </li>
+            </ul>
 
             <NarrativeHeading id="methodes">Méthodes</NarrativeHeading>
             <p>
