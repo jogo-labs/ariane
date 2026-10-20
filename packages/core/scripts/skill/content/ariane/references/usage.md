@@ -164,11 +164,7 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 
 ### Attente d'une réponse (`pending`)
 
-Les composants qui attendent une réponse de l'application partagent l'attribut booléen `pending` : réfléchi, exposé par `:state(pending)`, avec une annonce de l'attente aux lecteurs d'écran au passage `false → true`. `aria-busy` est posé par `ar-pagination`, `ar-stepper`, `ar-datepicker` et `ar-dialog`. Qui le pose varie :
-
-- `ar-table-sort` : le composant le pose au clic. L'application le lève avec `confirm()`, `reject(raison?)`, `reset()` ou en affectant `order`.
-- `ar-pagination` et `ar-stepper` : le composant attend déjà seul la réponse après un événement non annulé, jusqu'à la prochaine affectation de `current` ou `currentPath`. `pending` exprime une attente qui ne passe pas par l'événement (chargement initial) ; le composant ne le pose ni ne le retire jamais.
-- `ar-datepicker` et `ar-dialog` : l'application le pose et le lève. Sur `ar-dialog`, il suspend les fermetures demandées par l'utilisateur.
+Les composants qui attendent une réponse de l'application utilisent un attribut booléen `pending` (réfléchi, `:state(pending)`, annonce de l'attente) ; son fonctionnement exact est décrit dans la référence de chaque composant.
 
 ## Méthodes
 

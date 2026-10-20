@@ -149,7 +149,7 @@ se déplace dans l'élément ciblé sur desktop, et revient à sa position d'ori
 
 ### Écouter le changement d'étape
 
-Écoutez `ar-stepper-step-change`, chargez l'étape, puis réassignez `currentPath`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez l'étape actuelle.
+Écoutez `ar-stepper-step-change`, chargez l'étape, puis réassignez `currentPath`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez l'étape actuelle. L'attribut `pending` sert à exprimer une attente qui ne passe pas par l'événement, comme un chargement initial.
 
 ```js
 stepper.addEventListener('ar-stepper-step-change', async (e) => {

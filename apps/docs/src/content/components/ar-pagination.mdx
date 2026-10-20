@@ -78,7 +78,7 @@ adaptatif par défaut) : à vous de vérifier que le label et les boutons prev/n
 
 ## Utilisation
 
-Écoutez `ar-pagination-page-change`, chargez la page, puis réassignez `current`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez la page actuelle.
+Écoutez `ar-pagination-page-change`, chargez la page, puis réassignez `current`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez la page actuelle. L'attribut `pending` sert à exprimer une attente qui ne passe pas par l'événement, comme un chargement initial.
 
 ```js
 pagination.addEventListener('ar-pagination-page-change', async (e) => {
