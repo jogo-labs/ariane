@@ -5,6 +5,7 @@ import NarrativeHeading from '../../components/NarrativeHeading.astro';
 
 const tocEntries = [
     { id: 'navigateurs', label: 'Navigateurs',        level: 1 as const },
+    { id: 'frameworks',  label: 'Frameworks',         level: 1 as const },
     { id: 'ssr',         label: 'Rendu serveur (SSR)', level: 1 as const },
 ];
 ---
@@ -14,7 +15,7 @@ const tocEntries = [
         <div class="page-header">
             <h2 class="page-title">Compatibilité</h2>
             <p class="summary">
-                Les navigateurs pris en charge et la position d'Ariane sur le rendu serveur.
+                Les navigateurs pris en charge, la position d'Ariane sur les frameworks et sur le rendu serveur.
             </p>
         </div>
 
@@ -75,10 +76,25 @@ const tocEntries = [
                 encore sur appareil.
             </p>
 
+            <NarrativeHeading id="frameworks">Frameworks</NarrativeHeading>
+            <p>
+                Ariane est faite de Custom Elements natifs : elle ne dépend d'aucun framework et ne
+                livre pas de wrapper. Les pages <a href="/getting-started/frameworks">Frameworks</a> rassemblent des constats d'intégration (React, Next.js, Vue, Angular, Svelte). Elles sont données à titre indicatif : elles
+                décrivent des comportements propres à chaque framework, pas un périmètre de support.
+            </p>
+            <p>
+                Le périmètre pris en charge est celui des composants eux-mêmes : leur comportement et
+                leur accessibilité dans les navigateurs ci-dessus. Un défaut de liaison, de typage
+                ou de rendu qui tient au framework relève de l'application.
+            </p>
+
             <NarrativeHeading id="ssr">Rendu serveur (SSR)</NarrativeHeading>
             <p>
                 Pas de support officiel du rendu serveur pour l'instant : c'est une fonctionnalité à
-                venir. Le support actuel est partiel et n'est pas testé.
+                venir. Le HTML produit contient les balises et leur contenu, pas le shadow DOM des
+                composants : ils se définissent dans le navigateur, une fois le JavaScript chargé.
+                L'import de la librairie ne lève pas d'erreur côté serveur ; le rendu des composants
+                côté serveur n'est ni pris en charge ni testé.
             </p>
         </div>
     </div>

@@ -17,11 +17,11 @@ Web components accessibles (Custom Elements natifs, Lit 3), tags préfixés `ar-
 
 ## Quel fichier ouvrir
 
-| Tâche                                                                                | Fichier                                                                |
-| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| Choisir un composant                                                                 | [references/choosing-components.md](references/choosing-components.md) |
-| Détail d'un composant (API, exemples, accessibilité)                                 | [references/components/index.md](references/components/index.md)       |
-| Installer, charger, préfixe, compatibilité, frameworks (React, Vue, Angular, Svelte) | [references/installation.md](references/installation.md)               |
-| Attendre le chargement, attributs, slots, événements, méthodes, autocomplétion IDE   | [references/usage.md](references/usage.md)                             |
-| Thème, tokens, parts, presets, shadow DOM applicatif                                 | [references/theming.md](references/theming.md)                         |
-| Traductions                                                                          | [references/i18n.md](references/i18n.md)                               |
+| Tâche                                                                                         | Fichier                                                                |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Choisir un composant                                                                          | [references/choosing-components.md](references/choosing-components.md) |
+| Détail d'un composant (API, exemples, accessibilité)                                          | [references/components/index.md](references/components/index.md)       |
+| Installer, charger, préfixe, compatibilité, frameworks (React, Next.js, Vue, Angular, Svelte) | [references/installation.md](references/installation.md)               |
+| Attendre le chargement, attributs, slots, événements, méthodes, autocomplétion IDE            | [references/usage.md](references/usage.md)                             |
+| Thème, tokens, parts, presets, shadow DOM applicatif                                          | [references/theming.md](references/theming.md)                         |
+| Traductions                                                                                   | [references/i18n.md](references/i18n.md)                               |

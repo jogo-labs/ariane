@@ -10,6 +10,8 @@ const tocEntries = [
     { id: 'react-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
     { id: 'react-typage',       label: 'Typage TypeScript',      level: 2 as const },
     { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
+    { id: 'nextjs',  label: 'Next.js', level: 1 as const },
+    { id: 'nextjs-chargement',  label: 'Charger la librairie',   level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
     { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
     { id: 'vue-v-model',      label: 'v-model',                level: 2 as const },
@@ -91,6 +93,34 @@ const codeReactDefineAfterHydration = `// Définir les composants après l'hydra
 useEffect(() => {
     import('@ariane-ui/core');
 }, []);`;
+
+const codeNextLoader = `// components/ArianeLoader.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        void import('@ariane-ui/core');
+    }, []);
+    return null;
+}
+
+// app/layout.tsx : <body><ArianeLoader />{children}</body>`;
+
+const codeNextHeadless = `'use client';
+
+import { useEffect } from 'react';
+import { ArAlert } from '@ariane-ui/core/headless';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        // En développement, StrictMode exécute l'effet deux fois : sans cette garde,
+        // le second define() lève « has already been used with this registry ».
+        if (!customElements.get('acme-alert')) customElements.define('acme-alert', ArAlert);
+    }, []);
+    return null;
+}`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
 <ar-datepicker :isDateDisabled.prop="isSunday" />`;
@@ -201,7 +231,7 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
 <Layout
     title="Frameworks"
-    description="Utiliser les composants Ariane avec React, Vue, Angular ou Svelte."
+    description="Utiliser les composants Ariane avec React, Next.js, Vue, Angular ou Svelte."
     currentPath="/getting-started/frameworks"
     showToc={true}
 >
@@ -272,14 +302,14 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
             <NarrativeSubheading id="react-hydratation">Rendu serveur et hydratation</NarrativeSubheading>
             <p>
-                Avec un rendu serveur suivi de <code>hydrateRoot</code>, deux limites ont été
-                mesurées avec React 19.3. Elles ne concernent pas un rendu uniquement côté client.
+                Avec un rendu serveur suivi de <code>hydrateRoot</code> (par exemple dans Next.js),
+                deux comportements sont à connaître. Ils ne concernent pas un rendu uniquement côté client.
             </p>
             <ul class="narrative-list">
                 <li>
                     <strong>Props posées tardivement.</strong> Sur un élément rendu par le serveur, <code>onar-…</code> et les propriétés JS ne sont posés qu'au premier rendu qui
-                    modifie la prop (relevé avec Next.js 16.4). Écoutez alors par ref, et posez les
-                    propriétés dans un <code>useEffect</code> :
+                    modifie la prop. Écoutez alors par ref, et posez les propriétés dans
+                    un <code>useEffect</code> :
                 </li>
             </ul>
             <pre><code class="language-js" set:text={codeReactHydration} /></pre>
@@ -289,14 +319,33 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                     composant rattache le champ le premier, et l'événement natif <code>change</code>, à la perte de focus, déclenche un <code>onChange</code> de
                     React en plus (même valeur que le précédent, une fois par saisie). Sans
                     conséquence pour un gestionnaire qui ne fait que mettre à jour un état ; à
-                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Parade
-                    vérifiée : définir les composants après l'hydratation.
+                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Pour l'éviter,
+                    définissez les composants après l'hydratation :
                 </li>
             </ul>
             <pre><code class="language-js" set:text={codeReactDefineAfterHydration} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://react.dev/reference/react-dom/components#custom-html-elements"
                 target="_blank" rel="noopener">documentation officielle de React sur les Custom Elements</a>.
+            </p>
+
+            <NarrativeHeading id="nextjs">Next.js</NarrativeHeading>
+            <p>
+                Ariane ne prend pas officiellement en charge le rendu serveur (voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>) : le HTML produit par Next.js contient les balises <code>ar-*</code> et leur contenu, mais pas leur shadow DOM. Les composants se définissent dans le navigateur, une fois le JavaScript chargé. Next.js étant un framework React, les événements, les propriétés, le typage et l'hydratation sont décrits dans la <a href="#react">section React</a>. Ne sont reprises ici que les particularités de l'App Router.
+            </p>
+
+            <NarrativeSubheading id="nextjs-chargement">Charger la librairie</NarrativeSubheading>
+            <p>
+                Chargez la librairie dans un Client Component monté dans le layout, par un <code>import()</code> dans un <code>useEffect</code>. Un import dans un Server Component ne définit rien dans le navigateur.
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextLoader} /></pre>
+            <p>
+                Avec <code>@ariane-ui/core/headless</code>, enregistrez les classes dans le même effet. Gardez le <code>customElements.get</code> : en développement, StrictMode exécute l'effet deux fois.
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextHeadless} /></pre>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://nextjs.org/docs/app/getting-started/server-and-client-components"
+                target="_blank" rel="noopener">documentation officielle de Next.js sur les Server et Client Components</a>.
             </p>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
