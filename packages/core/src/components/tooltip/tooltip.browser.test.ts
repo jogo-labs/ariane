@@ -27,7 +27,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn">x</button>
-                    <ar-tooltip for="btn" show-delay="50">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn" show-delay="50">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -42,7 +42,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn2">x</button>
-                    <ar-tooltip for="btn2" show-delay="0" hide-delay="50">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn2" show-delay="0" hide-delay="50">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -58,7 +58,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn3">x</button>
-                    <ar-tooltip for="btn3" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn3" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -72,7 +72,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn4">x</button>
-                    <ar-tooltip for="btn4" show-delay="0" hide-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn4" show-delay="0" hide-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -92,7 +92,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn5">x</button>
-                    <ar-tooltip for="btn5" show-delay="0" hide-delay="100">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn5" show-delay="0" hide-delay="100">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -115,7 +115,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn6">x</button>
-                    <ar-tooltip for="btn6" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn6" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -136,7 +136,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn7">x</button>
-                    <ar-tooltip for="btn7">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn7">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -147,7 +147,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn8">x</button>
-                    <ar-tooltip for="btn8" without-arrow>Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn8" without-arrow>Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -158,7 +158,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div style="position:relative;padding:100px">
                     <button id="btn9">x</button>
-                    <ar-tooltip for="btn9" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn9" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -178,7 +178,7 @@ describe('ar-tooltip — browser', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn10">x</button>
-                    <ar-tooltip for="btn10" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn10" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;

@@ -11,7 +11,7 @@ import styles from './collapse.styles.js';
  * @summary Affiche un résumé et se déplie pour révéler du contenu additionnel. À utiliser pour divulguer progressivement de l'information, grouper des FAQ, ou masquer des options avancées — combinez plusieurs instances pour un comportement accordéon.
  * @display demo
  *
- * @slot trigger - Élément déclencheur (ignoré si `for` est défini).
+ * @slot trigger - Élément déclencheur (ignoré si `trigger-id` est défini).
  * @slot         - Contenu collapsible.
  *
  * @csspart collapse          - Racine du composant.
@@ -47,7 +47,7 @@ export class ArCollapse extends ArianeElement {
      * ID d'un élément déclencheur externe (light DOM).
      * Quand défini, le slot `trigger` est ignoré.
      */
-    @property({ reflect: true }) for = '';
+    @property({ attribute: 'trigger-id', reflect: true }) triggerId = '';
 
     /** Groupe accordéon — les panels partageant le même `name` se ferment mutuellement. */
     @property({ reflect: true }) name = '';
@@ -97,7 +97,7 @@ export class ArCollapse extends ArianeElement {
     }
 
     override firstUpdated(): void {
-        if (this.for) {
+        if (this.triggerId) {
             this._warnIfBothTriggers();
             this._attachExternalTrigger();
         } else {
@@ -125,9 +125,9 @@ export class ArCollapse extends ArianeElement {
             this.toggleState('animating', this._animating);
         }
         if (!this._initialized) return;
-        if (changed.has('for')) {
+        if (changed.has('triggerId')) {
             this._detachExternalTrigger();
-            if (this.for) {
+            if (this.triggerId) {
                 this._warnIfBothTriggers();
                 this._attachExternalTrigger();
             }
@@ -186,20 +186,20 @@ export class ArCollapse extends ArianeElement {
     }
 
     private _warnIfBothTriggers(): void {
-        if (!this.for) return;
+        if (!this.triggerId) return;
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         if (slot?.assignedElements({ flatten: true }).length) {
             warn(
                 'ar-collapse',
-                'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                'trigger-id et slot="trigger" sont tous les deux définis — trigger-id prend la priorité.',
             );
         }
     }
 
     private _attachExternalTrigger(): void {
-        const el = document.getElementById(this.for);
+        const el = document.getElementById(this.triggerId);
         if (!el) {
-            warn('ar-collapse', `Aucun élément trouvé avec l'id "${this.for}".`);
+            warn('ar-collapse', `Aucun élément trouvé avec l'id "${this.triggerId}".`);
             return;
         }
         this._externalTrigger = el;
@@ -217,7 +217,7 @@ export class ArCollapse extends ArianeElement {
     }
 
     private _handleTriggerSlotChange(): void {
-        if (this.for) {
+        if (this.triggerId) {
             this._warnIfBothTriggers();
             return;
         }
@@ -240,7 +240,7 @@ export class ArCollapse extends ArianeElement {
     };
 
     private get _resolvedTrigger(): HTMLElement | null {
-        if (this.for) return this._externalTrigger;
+        if (this.triggerId) return this._externalTrigger;
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
     }
@@ -256,7 +256,7 @@ export class ArCollapse extends ArianeElement {
         const trigger = this._resolvedTrigger;
         if (!trigger) return;
         if (this.disabled) {
-            if (!this.for) {
+            if (!this.triggerId) {
                 // Trigger interne natif : disabled + aria-disabled
                 trigger.setAttribute('disabled', '');
             }

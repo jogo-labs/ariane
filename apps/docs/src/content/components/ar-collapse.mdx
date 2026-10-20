@@ -48,12 +48,12 @@ variants:
     - name: external-trigger
       label: Trigger externe (for)
       description: |
-          L'attribut `for` accepte l'ID d'un bouton natif situé n'importe où dans la page.
+          L'attribut `trigger-id` accepte l'ID d'un bouton natif situé n'importe où dans la page.
           `aria-expanded` et `aria-controls` sont posés automatiquement sur ce bouton.
       html: |
           <div>
               <button id="ar-doc-collapse-ext" class="ar-btn ar-btn-secondary">Révéler le contenu</button>
-              <ar-collapse for="ar-doc-collapse-ext" style="--ar-collapse-duration:200ms">
+              <ar-collapse trigger-id="ar-doc-collapse-ext" style="--ar-collapse-duration:200ms">
                   <div style="padding-top:0.75rem">
                       <p style="margin:0">Contenu piloté par un trigger externe. Utile quand trigger et panel ne peuvent pas être enveloppés dans un wrapper commun.</p>
                   </div>
@@ -107,7 +107,7 @@ Les critères WCAG suivants sont implémentés :
 
 ### Limitations connues
 
-- **Cross-shadow DOM** : `for` et `aria-controls` reposent sur des IDs résolus dans le document. Si le trigger et le panel se trouvent dans des shadow roots différents, la référence `aria-controls` ne sera pas résolue par les technologies d'assistance. De même, le mode accordéon (`name`) ne fonctionne pas entre shadow roots distincts.
+- **Cross-shadow DOM** : `trigger-id` et `aria-controls` reposent sur des IDs résolus dans le document. Si le trigger et le panel se trouvent dans des shadow roots différents, la référence `aria-controls` ne sera pas résolue par les technologies d'assistance. De même, le mode accordéon (`name`) ne fonctionne pas entre shadow roots distincts.
 - **`aria-controls` → host element** : `aria-controls` pointe sur l'élément `<ar-collapse>` lui-même (pas sur le panel interne du shadow DOM). Les AT qui traversent le shadow DOM (NVDA 2024+, JAWS 2024+, VoiceOver macOS 14+) résolvent correctement la référence vers le contenu. Sur les AT plus anciens, la relation peut être ignorée. Mitigation en attente : `ElementInternals.ariaControlsElements` (référence cross-shadow IDL) sera adoptée quand le support navigateur sera suffisant.
 
 ### À votre charge

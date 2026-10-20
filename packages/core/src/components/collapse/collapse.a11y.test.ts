@@ -69,7 +69,9 @@ describe('ar-collapse — accessibilité', () => {
         });
 
         it('aria-expanded et aria-controls posés sur le bouton natif', async () => {
-            el = await fixture(html`<ar-collapse id="panel-a11y" for="ext-a11y"></ar-collapse>`);
+            el = await fixture(
+                html`<ar-collapse id="panel-a11y" trigger-id="ext-a11y"></ar-collapse>`,
+            );
             expect(btn.getAttribute('aria-expanded')).to.equal('false');
             expect(btn.getAttribute('aria-controls')).to.equal('panel-a11y');
         });

@@ -108,7 +108,7 @@ export class ArCharcounter extends ArianeElement {
     private readonly localize = new LocalizeController(this);
 
     /** ID du champ observé. Requis. */
-    @property({ reflect: true }) for: string | undefined;
+    @property({ attribute: 'for', reflect: true }) htmlFor: string | undefined;
 
     /** Limite de caractères. Requis. */
     @property({ type: Number, reflect: true }) max: number | undefined;
@@ -141,7 +141,7 @@ export class ArCharcounter extends ArianeElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        if (!this.for) {
+        if (!this.htmlFor) {
             warn('ar-charcounter', "l'attribut for est requis.");
         }
         if (this.max === undefined) {
@@ -157,7 +157,7 @@ export class ArCharcounter extends ArianeElement {
 
     override updated(changed: PropertyValues<this>): void {
         // Déjà rattaché au bon champ (connectedCallback, avant le premier rendu) : rien à refaire.
-        if (changed.has('for') && !(this._field && this._field === this._resolveField())) {
+        if (changed.has('htmlFor') && !(this._field && this._field === this._resolveField())) {
             this._detachField();
             // Defer to next microtask so that requestUpdate() (called in _attachField)
             // runs after _$didUpdate() finishes its change-in-update check.
@@ -188,7 +188,7 @@ export class ArCharcounter extends ArianeElement {
      * un framework remplace l'élément du champ (même `id`, nouvel élément).
      */
     refresh(): void {
-        if (!this.isConnected || !this.for) return;
+        if (!this.isConnected || !this.htmlFor) return;
         const field = this._resolveField();
         if (field !== this._field) {
             this._detachField();
@@ -202,21 +202,21 @@ export class ArCharcounter extends ArianeElement {
     }
 
     private _resolveField(): (HTMLInputElement | HTMLTextAreaElement) | null {
-        if (!this.for) return null;
+        if (!this.htmlFor) return null;
         const root = this.getRootNode() as Document | ShadowRoot;
         if (typeof root.getElementById !== 'function') return null;
-        return root.getElementById(this.for) as HTMLInputElement | HTMLTextAreaElement | null;
+        return root.getElementById(this.htmlFor) as HTMLInputElement | HTMLTextAreaElement | null;
     }
 
     private _attachField(): void {
-        if (!this.for) return;
+        if (!this.htmlFor) return;
         const field = this._resolveField();
         if (!field) {
-            if (this._warnedMissingFor !== this.for) {
-                this._warnedMissingFor = this.for;
+            if (this._warnedMissingFor !== this.htmlFor) {
+                this._warnedMissingFor = this.htmlFor;
                 warn(
                     'ar-charcounter',
-                    `Aucun élément avec l'id "${this.for}" pour l'instant : le compteur se rattachera quand il apparaîtra.`,
+                    `Aucun élément avec l'id "${this.htmlFor}" pour l'instant : le compteur se rattachera quand il apparaîtra.`,
                 );
             }
             this._watchForField();

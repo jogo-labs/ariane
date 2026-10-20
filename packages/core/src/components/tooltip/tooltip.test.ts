@@ -11,7 +11,7 @@ describe('ArTooltip', () => {
     describe('rendu', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>('<ar-tooltip trigger-id="btn">Aide</ar-tooltip>');
             mockPopoverPanel(el, 'tooltip');
         });
 
@@ -39,7 +39,7 @@ describe('ArTooltip', () => {
     describe('valeurs par défaut', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>('<ar-tooltip trigger-id="btn">Aide</ar-tooltip>');
         });
 
         it('placement="top"', () => expect(el.placement).toBe('top'));
@@ -52,7 +52,7 @@ describe('ArTooltip', () => {
     describe('ARIA', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="btn">Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>('<ar-tooltip trigger-id="btn">Aide</ar-tooltip>');
         });
 
         it("pose aria-describedby sur le trigger pointant vers l'id de l'hôte", () => {
@@ -68,13 +68,17 @@ describe('ArTooltip', () => {
     describe('without-arrow', () => {
         it('omet le caret quand without-arrow est posé', async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="btn" without-arrow>Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>(
+                '<ar-tooltip trigger-id="btn" without-arrow>Aide</ar-tooltip>',
+            );
             expect(getPart(el, 'arrow')).toBeNull();
         });
 
         it('restitue le caret quand without-arrow est retiré', async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="btn" without-arrow>Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>(
+                '<ar-tooltip trigger-id="btn" without-arrow>Aide</ar-tooltip>',
+            );
             el.withoutArrow = false;
             await waitForUpdate(el);
             expect(getPart(el, 'arrow')).not.toBeNull();
@@ -84,7 +88,9 @@ describe('ArTooltip', () => {
     describe('warn() — trigger introuvable', () => {
         it("affiche un warn si l'ID est introuvable", async () => {
             const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            el = await fixture<ArTooltip>('<ar-tooltip for="id-qui-nexiste-pas">Aide</ar-tooltip>');
+            el = await fixture<ArTooltip>(
+                '<ar-tooltip trigger-id="id-qui-nexiste-pas">Aide</ar-tooltip>',
+            );
             expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('id-qui-nexiste-pas'));
             warnSpy.mockRestore();
         });
@@ -93,16 +99,16 @@ describe('ArTooltip', () => {
     describe('changement de for', () => {
         it("retire aria-describedby de l'ancien trigger", async () => {
             document.body.innerHTML = '<button id="a">a</button><button id="b">b</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="a">Aide</ar-tooltip>');
-            el.for = 'b';
+            el = await fixture<ArTooltip>('<ar-tooltip trigger-id="a">Aide</ar-tooltip>');
+            el.triggerId = 'b';
             await waitForUpdate(el);
             expect(document.getElementById('a')!.hasAttribute('aria-describedby')).toBe(false);
         });
 
         it('pose aria-describedby sur le nouveau trigger', async () => {
             document.body.innerHTML = '<button id="a">a</button><button id="b">b</button>';
-            el = await fixture<ArTooltip>('<ar-tooltip for="a">Aide</ar-tooltip>');
-            el.for = 'b';
+            el = await fixture<ArTooltip>('<ar-tooltip trigger-id="a">Aide</ar-tooltip>');
+            el.triggerId = 'b';
             await waitForUpdate(el);
             expect(document.getElementById('b')!.getAttribute('aria-describedby')).toBe(el.id);
         });
@@ -112,7 +118,7 @@ describe('ArTooltip', () => {
         it('ne schedule pas le show si disabled=true', async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
             el = await fixture<ArTooltip>(
-                '<ar-tooltip for="btn" disabled show-delay="0">Aide</ar-tooltip>',
+                '<ar-tooltip trigger-id="btn" disabled show-delay="0">Aide</ar-tooltip>',
             );
             mockPopoverPanel(el, 'tooltip');
             document.getElementById('btn')!.dispatchEvent(new Event('mouseenter'));
@@ -125,7 +131,7 @@ describe('ArTooltip', () => {
         beforeEach(async () => {
             document.body.innerHTML = '<button id="btn">x</button>';
             el = await fixture<ArTooltip>(
-                '<ar-tooltip id="my-tooltip" for="btn" show-delay="0">Aide</ar-tooltip>',
+                '<ar-tooltip id="my-tooltip" trigger-id="btn" show-delay="0">Aide</ar-tooltip>',
             );
             mockPopoverPanel(el, 'tooltip');
         });

@@ -57,7 +57,7 @@ export class ArTooltip extends ArianeElement {
     static override styles = [styles];
 
     /** ID du trigger dans le light DOM. Requis. */
-    @property({ reflect: true }) for = '';
+    @property({ attribute: 'trigger-id', reflect: true }) triggerId = '';
 
     /** Placement Floating UI (12 valeurs, ex: "top", "bottom-start"). */
     @property({ reflect: true }) placement: ArTooltipPlacement = 'top';
@@ -107,7 +107,7 @@ export class ArTooltip extends ArianeElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        if (changed.has('for')) {
+        if (changed.has('triggerId')) {
             this._detachTrigger();
             this._attachTrigger();
         }
@@ -149,12 +149,12 @@ export class ArTooltip extends ArianeElement {
     }
 
     private _attachTrigger(): void {
-        if (!this.for) return;
+        if (!this.triggerId) return;
         const root = this.getRootNode();
 
-        const trigger = (root as typeof document).getElementById(this.for);
+        const trigger = (root as typeof document).getElementById(this.triggerId);
         if (!trigger) {
-            warn('ar-tooltip', `Aucun élément trouvé avec l'id "${this.for}".`);
+            warn('ar-tooltip', `Aucun élément trouvé avec l'id "${this.triggerId}".`);
             return;
         }
         this._trigger = trigger;

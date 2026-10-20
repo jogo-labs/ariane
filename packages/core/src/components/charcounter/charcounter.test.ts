@@ -174,7 +174,7 @@ describe('ArCharcounter', () => {
         it('retire le listener input au changement de for', async () => {
             document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b"></textarea>';
             el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
-            el.for = 'b';
+            el.htmlFor = 'b';
             await waitForUpdate(el);
             const fieldA = document.getElementById('a') as HTMLTextAreaElement;
             fieldA.value = 'xxx';
@@ -186,7 +186,7 @@ describe('ArCharcounter', () => {
         it('observe le nouveau champ après changement de for', async () => {
             document.body.innerHTML = '<textarea id="a"></textarea><textarea id="b">abc</textarea>';
             el = await fixture('<ar-charcounter for="a" max="100"></ar-charcounter>');
-            el.for = 'b';
+            el.htmlFor = 'b';
             await waitForUpdate(el);
             expect(getPart(el, 'remaining')?.textContent?.trim()).toBe('97');
         });
@@ -288,7 +288,7 @@ describe('ArCharcounter', () => {
             el.remove();
             expect(() => el.refresh()).not.toThrow();
             const detached = document.createElement('ar-charcounter') as ArCharcounter;
-            detached.for = 'f';
+            detached.htmlFor = 'f';
             expect(() => detached.refresh()).not.toThrow();
             expect(document.getElementById('f')!.hasAttribute('aria-describedby')).toBe(false);
         });
@@ -491,7 +491,7 @@ describe('ArCharcounter', () => {
 
         it("n'attend plus l'ancien champ après un changement de for", async () => {
             el = await fixture('<ar-charcounter for="late" max="100"></ar-charcounter>');
-            el.for = 'autre';
+            el.htmlFor = 'autre';
             await waitForUpdate(el);
             await Promise.resolve();
             const field = await insertLate();
@@ -504,7 +504,7 @@ describe('ArCharcounter', () => {
             el.refresh();
             el.refresh();
             expect(spy.mock.calls.filter((c) => String(c[0]).includes('"late"'))).toHaveLength(1);
-            el.for = 'autre';
+            el.htmlFor = 'autre';
             await waitForUpdate(el);
             await Promise.resolve();
             await waitForUpdate(el);

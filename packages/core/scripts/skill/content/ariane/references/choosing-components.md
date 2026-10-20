@@ -58,6 +58,6 @@ API complète (attributs, événements, slots, parts, tokens) : `components/<tag
 - Révéler sur place un contenu sous son résumé (« Voir plus », FAQ, options avancées) → `<ar-collapse>` avec un `<button slot="trigger">`.
 - Accordéon (un seul panneau ouvert à la fois) → plusieurs `<ar-collapse>` partageant le même `name` ; pas de composant conteneur, et pas entre shadow roots distincts.
 - Bouton « Lire la suite » placé sous le texte → `<ar-collapse trigger-position="after">` (ordre DOM, pas CSS `order`).
-- Déclencheur situé ailleurs dans la page → `for` avec l'ID d'un bouton natif, dans le même arbre DOM que le composant.
+- Déclencheur situé ailleurs dans la page → `trigger-id` avec l'ID d'un bouton natif, dans le même arbre DOM que le composant.
 - Un panneau visible à la fois avec tous les intitulés affichés comme onglets → `<ar-tab-group>` ; contenu flottant ancré à un bouton → `<ar-dropdown>` ; tâche qui interrompt le flux → `<ar-dialog>`.
 - Erreur typique : un déclencheur non focusable ou sans nom accessible (texte visible, `aria-label` ou `aria-labelledby`) ; `<ar-collapse>` pose `aria-expanded` et `aria-controls` mais ne rend pas le déclencheur accessible.

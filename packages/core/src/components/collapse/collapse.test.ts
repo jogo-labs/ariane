@@ -23,7 +23,7 @@ describe('ArCollapse', () => {
         });
 
         it('open=false', () => expect(el.open).toBe(false));
-        it('for=""', () => expect(el.for).toBe(''));
+        it('triggerId=""', () => expect(el.triggerId).toBe(''));
         it('name=""', () => expect(el.name).toBe(''));
         it('triggerPosition="before"', () => expect(el.triggerPosition).toBe('before'));
         it('disabled=false', () => expect(el.disabled).toBe(false));
@@ -43,9 +43,9 @@ describe('ArCollapse', () => {
         });
 
         it('for reflète en attribut', async () => {
-            el.for = 'btn';
+            el.triggerId = 'btn';
             await waitForUpdate(el);
-            expect(el.getAttribute('for')).toBe('btn');
+            expect(el.getAttribute('trigger-id')).toBe('btn');
         });
 
         it('name reflète en attribut', async () => {
@@ -357,7 +357,7 @@ describe('ArCollapse', () => {
 
         it('pose aria-expanded et aria-controls sur le bouton externe', async () => {
             document.body.innerHTML = '<button id="ext-btn">Toggle</button>';
-            el = await fixture('<ar-collapse id="panel-1" for="ext-btn"></ar-collapse>');
+            el = await fixture('<ar-collapse id="panel-1" trigger-id="ext-btn"></ar-collapse>');
             await waitForUpdate(el);
             const btn = document.getElementById('ext-btn')!;
             expect(btn.getAttribute('aria-expanded')).toBe('false');
@@ -366,7 +366,7 @@ describe('ArCollapse', () => {
 
         it('un clic sur le bouton externe ouvre le panel', async () => {
             document.body.innerHTML = '<button id="ext-btn2">Toggle</button>';
-            el = await fixture('<ar-collapse for="ext-btn2"></ar-collapse>');
+            el = await fixture('<ar-collapse trigger-id="ext-btn2"></ar-collapse>');
             document.getElementById('ext-btn2')!.click();
             await waitForUpdate(el);
             expect(el.open).toBe(true);
@@ -374,30 +374,30 @@ describe('ArCollapse', () => {
 
         it("émet un warn si l'id est introuvable", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            el = await fixture('<ar-collapse for="inexistant"></ar-collapse>');
+            el = await fixture('<ar-collapse trigger-id="inexistant"></ar-collapse>');
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('inexistant'));
             spy.mockRestore();
         });
 
-        it('émet un warn si for et slot trigger sont tous les deux définis', async () => {
+        it('émet un warn si trigger-id et slot trigger sont tous les deux définis', async () => {
             document.body.innerHTML = '<button id="ext-btn3">Btn</button>';
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture(`
-                <ar-collapse for="ext-btn3">
+                <ar-collapse trigger-id="ext-btn3">
                     <button slot="trigger">Slot btn</button>
                 </ar-collapse>
             `);
             await waitForUpdate(el);
-            expect(spy).toHaveBeenCalledWith(expect.stringContaining('for'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('trigger-id'));
             spy.mockRestore();
         });
 
         it('retire aria-controls du trigger externe lors du changement de for', async () => {
             document.body.innerHTML = '<button id="ext-btn4">Btn</button>';
-            el = await fixture('<ar-collapse for="ext-btn4"></ar-collapse>');
+            el = await fixture('<ar-collapse trigger-id="ext-btn4"></ar-collapse>');
             const btn = document.getElementById('ext-btn4')!;
             expect(btn.getAttribute('aria-controls')).not.toBeNull();
-            el.for = '';
+            el.triggerId = '';
             await waitForUpdate(el);
             expect(btn.getAttribute('aria-controls')).toBeNull();
         });
@@ -513,7 +513,7 @@ describe('ArCollapse', () => {
 
         it('pose aria-disabled sur le bouton externe quand disabled=true', async () => {
             document.body.innerHTML = '<button id="ext-dis">Btn</button>';
-            el = await fixture('<ar-collapse for="ext-dis" disabled></ar-collapse>');
+            el = await fixture('<ar-collapse trigger-id="ext-dis" disabled></ar-collapse>');
             await waitForUpdate(el);
             const btn = document.getElementById('ext-dis')!;
             expect(btn.getAttribute('aria-disabled')).toBe('true');
@@ -521,7 +521,7 @@ describe('ArCollapse', () => {
 
         it('retire aria-disabled du bouton externe quand disabled repasse à false', async () => {
             document.body.innerHTML = '<button id="ext-dis2">Btn</button>';
-            el = await fixture('<ar-collapse for="ext-dis2" disabled></ar-collapse>');
+            el = await fixture('<ar-collapse trigger-id="ext-dis2" disabled></ar-collapse>');
             await waitForUpdate(el);
             el.disabled = false;
             await waitForUpdate(el);

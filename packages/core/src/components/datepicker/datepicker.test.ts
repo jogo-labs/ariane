@@ -46,7 +46,7 @@ describe('ArDatepicker', () => {
 
         it('format vaut "dd/MM/yyyy"', () => expect(el.format).toBe('dd/MM/yyyy'));
         it('disabled vaut false', () => expect(el.disabled).toBe(false));
-        it('readonly vaut false', () => expect(el.readonly).toBe(false));
+        it('readonly vaut false', () => expect(el.readOnly).toBe(false));
         it('open vaut false', () => expect(el.open).toBe(false));
     });
 
@@ -62,7 +62,7 @@ describe('ArDatepicker', () => {
         });
 
         it('readonly se reflète en attribut', async () => {
-            el.readonly = true;
+            el.readOnly = true;
             await waitForUpdate(el);
             expect(el.hasAttribute('readonly')).toBe(true);
         });
@@ -116,7 +116,7 @@ describe('ArDatepicker', () => {
         });
 
         it("readonly bloque l'ouverture", async () => {
-            el.readonly = true;
+            el.readOnly = true;
             await waitForUpdate(el);
             el.open = true;
             await waitForUpdate(el);
