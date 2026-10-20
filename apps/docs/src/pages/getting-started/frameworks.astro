@@ -12,8 +12,6 @@ const tocEntries = [
     { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
     { id: 'nextjs',  label: 'Next.js', level: 1 as const },
     { id: 'nextjs-chargement',  label: 'Charger la librairie',   level: 2 as const },
-    { id: 'nextjs-avant-definition', label: 'Avant la définition', level: 2 as const },
-    { id: 'nextjs-hydratation', label: 'Avertissements d\'hydratation', level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
     { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
     { id: 'vue-v-model',      label: 'v-model',                level: 2 as const },
@@ -123,13 +121,6 @@ export function ArianeLoader() {
     }, []);
     return null;
 }`;
-
-const codeNextDefined = `:not(:defined) {
-    visibility: hidden;
-}`;
-
-const codeNextAlertRole = `<ar-alert variant="success" role="status">Enregistré</ar-alert>
-<ar-alert variant="danger" role="alert">Échec de l'enregistrement</ar-alert>`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
 <ar-datepicker :isDateDisabled.prop="isSunday" />`;
@@ -311,14 +302,14 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
             <NarrativeSubheading id="react-hydratation">Rendu serveur et hydratation</NarrativeSubheading>
             <p>
-                Avec un rendu serveur suivi de <code>hydrateRoot</code>, deux limites ont été
-                mesurées avec React 19.3. Elles ne concernent pas un rendu uniquement côté client.
+                Avec un rendu serveur suivi de <code>hydrateRoot</code> (par exemple dans Next.js),
+                deux comportements sont à connaître. Ils ne concernent pas un rendu uniquement côté client.
             </p>
             <ul class="narrative-list">
                 <li>
                     <strong>Props posées tardivement.</strong> Sur un élément rendu par le serveur, <code>onar-…</code> et les propriétés JS ne sont posés qu'au premier rendu qui
-                    modifie la prop (relevé avec Next.js 16.4). Écoutez alors par ref, et posez les
-                    propriétés dans un <code>useEffect</code> :
+                    modifie la prop. Écoutez alors par ref, et posez les propriétés dans
+                    un <code>useEffect</code> :
                 </li>
             </ul>
             <pre><code class="language-js" set:text={codeReactHydration} /></pre>
@@ -328,8 +319,8 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                     composant rattache le champ le premier, et l'événement natif <code>change</code>, à la perte de focus, déclenche un <code>onChange</code> de
                     React en plus (même valeur que le précédent, une fois par saisie). Sans
                     conséquence pour un gestionnaire qui ne fait que mettre à jour un état ; à
-                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Parade
-                    vérifiée : définir les composants après l'hydratation.
+                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Pour l'éviter,
+                    définissez les composants après l'hydratation :
                 </li>
             </ul>
             <pre><code class="language-js" set:text={codeReactDefineAfterHydration} /></pre>
@@ -356,29 +347,6 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Pour plus d'information sur ce sujet, voir la <a href="https://nextjs.org/docs/app/getting-started/server-and-client-components"
                 target="_blank" rel="noopener">documentation officielle de Next.js sur les Server et Client Components</a>.
             </p>
-
-            <NarrativeSubheading id="nextjs-avant-definition">Contenu avant la définition</NarrativeSubheading>
-            <p>
-                Tant que les composants ne sont pas définis, leur contenu s'affiche tel quel (panneaux d'onglets, contenu replié d'<code>ar-collapse</code>), puis la mise en forme survient d'un coup. Pour l'éviter, masquez les éléments non définis tout en conservant leur place :
-            </p>
-            <pre><code class="language-css" set:text={codeNextDefined} /></pre>
-            <p class="hint">
-                Sans JavaScript, ces éléments restent masqués. Limitez le sélecteur aux composants concernés (<code>ar-tab-panel:not(:defined)</code>) si le contenu doit alors rester lisible.
-            </p>
-
-            <NarrativeSubheading id="nextjs-hydratation">Avertissements d'hydratation</NarrativeSubheading>
-            <p>
-                À leur définition, certains composants écrivent des attributs : <code>role</code> sur <code>ar-alert</code>, <code>slot</code>, <code>id</code>, <code>role</code> et <code>aria-*</code> sur les onglets. Si cette définition précède l'hydratation, React signale en développement que le HTML du serveur ne correspond pas (« A tree hydrated but some attributes of the server rendered HTML didn't match »). L'avertissement n'apparaît pas en production.
-            </p>
-            <ul class="narrative-list">
-                <li>
-                    Chargez la librairie après l'hydratation, comme ci-dessus.
-                </li>
-                <li>
-                    Pour <code>ar-alert</code>, écrivez le <code>role</code> dans le markup : le composant ne remplace jamais un <code>role</code> posé par l'application. Utilisez <code>alert</code> pour une interruption immédiate, <code>status</code> pour une annonce polie.
-                </li>
-            </ul>
-            <pre><code class="language-html" set:text={codeNextAlertRole} /></pre>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
             <p>
