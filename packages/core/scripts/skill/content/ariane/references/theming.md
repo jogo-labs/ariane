@@ -187,9 +187,9 @@ Avec un bundler, copier `presets/buttons.css` et `presets/fields.css` du starter
 
 Si l'application place ses pages ou une partie de son contenu dans un web component avec son propre shadow DOM :
 
-- Les propriétés CSS personnalisées du thème chargé dans le document traversent la frontière par héritage : les tokens fonctionnent sans action.
-- Les règles `::part()` du thème du document ne traversent pas : les composants Ariane dans ce shadow DOM n'ont que leurs tokens. Le thème doit rester chargé au niveau du document (sans lui, aucun token).
-- Pour les `::part()`, adopter une feuille de style dans chaque shadow root concerné (`adoptedStyleSheets`, chargement synchrone, instance partagée, pas de FOUC).
+- Les tokens que le thème pose sur `:root` traversent la frontière par héritage. Les règles dont le sélecteur nomme un tag (`ar-alert[variant=…]` qui pose `--ar-alert-bg`) ne correspondent à aucun élément du shadow root : ces tokens n'y sont pas définis, comme les `::part()`.
+- Le thème doit rester chargé au niveau du document (sans lui, aucun token sur `:root`).
+- Pour les `::part()` et les tokens posés sur un tag, adopter une feuille de style dans chaque shadow root concerné (`adoptedStyleSheets`, chargement synchrone, instance partagée, pas de FOUC).
 
 Pour adopter un thème dans un shadow root, il faut une version JavaScript du CSS : un `CSSStyleSheet` peuplé avec les règles composants (`::part()`, dans `@layer ariane.theme`), sans les tokens `:root` (`:root` ne cible jamais un shadow root). Aucune feuille de thème de départ n'est versionnée. Le starter-kit fournit le script qui la génère : `npm install` puis `npm run build:js` produit `ariane-starter.js`. Pour un autre thème : `node scripts/theme-to-js.js <entrée.css> <sortie.js> --name <identifiant>`, l'export nommé étant l'identifiant donné (`starterTheme` pour `build:js`).
 

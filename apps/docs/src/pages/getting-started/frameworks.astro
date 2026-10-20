@@ -10,6 +10,11 @@ const tocEntries = [
     { id: 'react-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
     { id: 'react-typage',       label: 'Typage TypeScript',      level: 2 as const },
     { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
+    { id: 'nextjs',  label: 'Next.js', level: 1 as const },
+    { id: 'nextjs-chargement',  label: 'Charger la librairie',   level: 2 as const },
+    { id: 'nextjs-avant-definition', label: 'Avant la définition', level: 2 as const },
+    { id: 'nextjs-theme',       label: 'Thème',                  level: 2 as const },
+    { id: 'nextjs-hydratation', label: 'Avertissements d\'hydratation', level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
     { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
     { id: 'vue-v-model',      label: 'v-model',                level: 2 as const },
@@ -91,6 +96,52 @@ const codeReactDefineAfterHydration = `// Définir les composants après l'hydra
 useEffect(() => {
     import('@ariane-ui/core');
 }, []);`;
+
+const codeNextLoader = `// components/ArianeLoader.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        void import('@ariane-ui/core');
+    }, []);
+    return null;
+}
+
+// app/layout.tsx : <body><ArianeLoader />{children}</body>`;
+
+const codeNextHeadless = `'use client';
+
+import { useEffect } from 'react';
+import { ArAlert } from '@ariane-ui/core/headless';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        // En développement, StrictMode exécute l'effet deux fois : sans cette garde,
+        // le second define() lève « has already been used with this registry ».
+        if (!customElements.get('acme-alert')) customElements.define('acme-alert', ArAlert);
+    }, []);
+    return null;
+}`;
+
+const codeNextDefined = `:not(:defined) {
+    visibility: hidden;
+}`;
+
+const codeNextReset = `/* globals.css : déclarer l'ordre des couches avant tout, puis ranger le reset dans la sienne */
+@layer reset, ariane.theme;
+
+@layer reset {
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
+}`;
+
+const codeNextAlertRole = `<ar-alert variant="success" role="status">Enregistré</ar-alert>
+<ar-alert variant="danger" role="alert">Échec de l'enregistrement</ar-alert>`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
 <ar-datepicker :isDateDisabled.prop="isSunday" />`;
@@ -201,7 +252,7 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
 
 <Layout
     title="Frameworks"
-    description="Utiliser les composants Ariane avec React, Vue, Angular ou Svelte."
+    description="Utiliser les composants Ariane avec React, Next.js, Vue, Angular ou Svelte."
     currentPath="/getting-started/frameworks"
     showToc={true}
 >
@@ -298,6 +349,67 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Pour plus d'information sur ce sujet, voir la <a href="https://react.dev/reference/react-dom/components#custom-html-elements"
                 target="_blank" rel="noopener">documentation officielle de React sur les Custom Elements</a>.
             </p>
+
+            <NarrativeHeading id="nextjs">Next.js</NarrativeHeading>
+            <p>
+                Ariane ne prend pas officiellement en charge le rendu serveur (voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>) : le HTML produit par Next.js contient les balises <code>ar-*</code> et leur contenu, mais pas leur shadow DOM. Les composants se définissent dans le navigateur, une fois le JavaScript chargé. Cette section décrit ce que cela implique avec l'App Router, vérifié avec Next.js 16.4 et React 19.3.
+            </p>
+            <p>
+                Next.js étant un framework React, tout ce qui concerne les événements, les propriétés, le typage et l'hydratation se trouve dans la <a href="#react">section React</a>, en particulier <a href="#react-hydratation">Rendu serveur et hydratation</a>. Ne sont reprises ici que les particularités de Next.js.
+            </p>
+
+            <NarrativeSubheading id="nextjs-chargement">Charger la librairie</NarrativeSubheading>
+            <p>
+                Un import statique de <code>@ariane-ui/core</code> s'évalue désormais sans erreur côté serveur. Il ne sert pourtant à rien dans un Server Component : l'import n'a lieu que sur le serveur, les balises restent non définies dans le navigateur. Dans un Client Component, les composants sont bien définis, mais avant l'hydratation (voir <a href="#nextjs-hydratation">Avertissements d'hydratation</a>).
+            </p>
+            <p>
+                Le plus simple est de charger la librairie après l'hydratation, par un <code>import()</code> dans un <code>useEffect</code> d'un Client Component monté dans le layout :
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextLoader} /></pre>
+            <p>
+                Avec <code>@ariane-ui/core/headless</code>, également importable côté serveur, enregistrez les classes dans le même effet. Gardez le <code>customElements.get</code> : en développement, StrictMode exécute l'effet deux fois.
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextHeadless} /></pre>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://nextjs.org/docs/app/getting-started/server-and-client-components"
+                target="_blank" rel="noopener">documentation officielle de Next.js sur les Server et Client Components</a>.
+            </p>
+
+            <NarrativeSubheading id="nextjs-avant-definition">Contenu avant la définition</NarrativeSubheading>
+            <p>
+                Tant que les composants ne sont pas définis, le contenu qu'ils devaient masquer ou mettre en forme est visible tel quel : les panneaux d'<code>ar-tab-group</code>, le contenu replié d'<code>ar-collapse</code>, et une pagination qui occupe 0 pixel de large. Le chargement les met ensuite en forme d'un coup, d'où un saut de mise en page. Masquer les éléments non définis, en conservant leur place, l'évite :
+            </p>
+            <pre><code class="language-css" set:text={codeNextDefined} /></pre>
+            <p class="hint">
+                Vérifié : les éléments sont masqués avant la définition et visibles après. Sans JavaScript, ils restent masqués. Limitez le sélecteur aux composants concernés (<code>ar-tab-panel:not(:defined)</code>, <code>ar-collapse:not(:defined)</code>) si le contenu doit rester lisible dans ce cas.
+            </p>
+
+            <NarrativeSubheading id="nextjs-theme">Thème</NarrativeSubheading>
+            <ul class="narrative-list">
+                <li>
+                    <strong>Le reset du gabarit annule le thème.</strong> Le <code>globals.css</code> généré par <code>create-next-app</code> contient <code>* &#123; padding: 0; margin: 0 &#125;</code>. Hors de toute couche, il l'emporte sur les règles du thème, qui sont dans la couche <code>ariane.theme</code> : le <code>padding</code> d'<code>ar-alert</code> tombe à 0. Rangez le reset dans une couche déclarée avant celle du thème (vérifié : le <code>padding</code> redevient celui du thème) :
+                </li>
+            </ul>
+            <pre><code class="language-css" set:text={codeNextReset} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    <strong>Dans un shadow DOM applicatif</strong> (composant avec son propre shadow root), les tokens posés sur <code>:root</code> traversent, pas ceux que le thème pose sur un tag (par exemple <code>--ar-alert-bg</code> selon <code>variant</code>) : adoptez la feuille du thème dans le shadow root. Voir <a href="/theming/shadow-dom">Dans un shadow DOM applicatif</a>.
+                </li>
+            </ul>
+
+            <NarrativeSubheading id="nextjs-hydratation">Avertissements d'hydratation</NarrativeSubheading>
+            <p>
+                À leur définition, certains composants écrivent des attributs sur leur hôte (<code>ar-alert</code> écrit <code>role</code>) ou sur leurs enfants (<code>ar-tab-group</code>, <code>ar-tab</code> et <code>ar-tab-panel</code> écrivent <code>slot</code>, <code>id</code>, <code>role</code>, <code>aria-*</code>, <code>tabindex</code>, <code>hidden</code>). S'ils sont définis avant l'hydratation, React en développement signale que le HTML du serveur ne correspond pas : « A tree hydrated but some attributes of the server rendered HTML didn't match… ». L'avertissement est absent en production, et aucun dysfonctionnement n'a été mesuré.
+            </p>
+            <ul class="narrative-list">
+                <li>
+                    <strong>Chargement après l'hydratation.</strong> C'est la parade générale (section précédente). Mesure sur des pages mêlant onglets et alertes : 2 chargements sur 20 affichent encore l'avertissement. Le cas est suivi dans <a href="https://github.com/jogo-labs/ariane/issues/345" target="_blank" rel="noopener">#345</a>.
+                </li>
+                <li>
+                    <strong><code>ar-alert</code> : écrivez le <code>role</code>.</strong> Le composant n'écrase jamais un <code>role</code> posé par l'application. Avec un import statique dans un Client Component, l'avertissement apparaît sur 10 chargements sur 10 sans <code>role</code> dans le markup, sur 0 sur 10 avec. Utilisez <code>alert</code> pour une interruption immédiate, <code>status</code> pour une annonce polie.
+                </li>
+            </ul>
+            <pre><code class="language-html" set:text={codeNextAlertRole} /></pre>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
             <p>

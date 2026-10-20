@@ -72,11 +72,10 @@ customElements.define('mon-composant', MonComposant);`;
         <div class="narrative">
             <NarrativeHeading id="pourquoi">Un style appliqué partiellement ?</NarrativeHeading>
             <p>
-                Les <strong>CSS Custom properties</strong> de votre thème chargé dans le document
-                traversent la frontière du shadow DOM par héritage CSS natif.<br />
-                Les règles utilisant <code>::part()</code> par contre ne peuvent pas
-                traverser le shadow DOM de votre composant et les règles de votre thème ne s'appliquent
-                donc pas.<br />
+                Les <strong>CSS Custom properties</strong> que votre thème pose sur <code>:root</code> traversent la frontière du shadow DOM par héritage CSS natif.<br />
+                Les règles dont le sélecteur nomme un composant par contre ne correspondent à aucun
+                élément de votre shadow DOM : les règles <code>::part()</code>, mais aussi les tokens
+                posés sur un tag, comme <code>--ar-alert-bg</code> selon <code>variant</code>.<br />
                 C'est la raison pour laquelle votre thème ne s'applique que partiellement.
             </p>
 
