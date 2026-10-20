@@ -117,6 +117,12 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @cssState readonly  - Le composant est en lecture seule.
  * @cssState has-error - Un message d'erreur est affiché (slot `error`).
  * @cssState pending   - L'application a posé l'attribut `pending` : une réponse est attendue.
+ * @cssState required  - Le champ est obligatoire (`required`).
+ * @cssState optional  - Le champ n'est pas obligatoire.
+ * @cssState user-invalid - Le champ est invalide après une saisie validée par l'utilisateur
+ *   (sélection dans le calendrier, saisie puis perte de focus), une tentative de soumission ou
+ *   `reportValidity()`. Jamais posé par une valeur venant de l'application ; retiré par `form.reset()`.
+ * @cssState user-valid - Le champ est valide après la même interaction.
  *
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-change   - Valeur commitée (blur ou sélection calendrier).
  * @event {CustomEvent<{ id: string | undefined, value: string | null, valueAsDate: Date | null, valid: boolean }>} ar-datepicker-input-complete - Saisie texte complète (valide ou non).
@@ -138,6 +144,7 @@ export class ArDatepicker extends ArianeFormElement {
 
     /** Valeur au premier rendu : celle que `form.reset()` restaure. */
     private _defaultValue = '';
+    private _edited = false;
 
     private readonly _calendar = new CalendarController(this);
     private readonly _hasSlot = new HasSlotController(
@@ -214,6 +221,7 @@ export class ArDatepicker extends ArianeFormElement {
         // Avant le premier rendu, `_defaultValue` n'est pas encore capturé : la valeur courante EST
         // la valeur initiale, et la restaurer à '' la perdrait.
         if (!this.hasUpdated) return;
+        this._edited = false;
         const date = this._defaultValue ? parse(this._defaultValue, 'yyyy-MM-dd').date : null;
         this._calendar.selectedDate = date;
         if (date) {
@@ -247,6 +255,7 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
+        super.updated(changed);
         const hasError = this._hasSlot.test('error');
         this.toggleAttribute('has-error', hasError);
         this.toggleState('has-error', hasError);
@@ -655,6 +664,7 @@ export class ArDatepicker extends ArianeFormElement {
      */
     private _emitNative(previous: string): void {
         if (this.value === previous) return;
+        this.markInteracted();
         this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
         this.dispatchEvent(new Event('change', { bubbles: true }));
     }
@@ -803,6 +813,7 @@ export class ArDatepicker extends ArianeFormElement {
         // L'`input` natif de l'<input> interne est composé : il atteindrait l'hôte avec `value`
         // pas encore à jour. L'hôte émet le sien à la validation (_emitNative).
         e.stopPropagation();
+        this._edited = true;
         const input = e.target as HTMLInputElement;
         const result = parse(input.value, this.format);
 
@@ -833,6 +844,12 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     private _handleBlur(): void {
+        // Saisie modifiée puis quittée, même si le texte revient à la valeur de départ : le champ
+        // est touché (`:state(user-invalid)` / `:state(user-valid)`).
+        if (this._edited) {
+            this._edited = false;
+            this.markInteracted();
+        }
         const raw = this._input?.value ?? '';
         const result = parse(raw, this.format);
 

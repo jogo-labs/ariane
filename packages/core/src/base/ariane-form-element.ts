@@ -1,3 +1,4 @@
+import type { PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { ArianeElement } from './ariane-element.js';
 
@@ -27,6 +28,13 @@ const VALID_STATE = Object.freeze({
  * `internals.setValidity()`, qui écraserait une erreur posée par `setCustomValidity()`), et surcharge
  * `formReset()` pour revenir à sa valeur initiale.
  *
+ * Pose `:state(required)` et `:state(optional)` (selon `required`), `:state(user-invalid)` et
+ * `:state(user-valid)`, que la plateforme n'applique pas à un élément associé à un formulaire. Les
+ * deux derniers suivent la validité une fois le champ « touché » : un appel de
+ * `markInteracted()` par le composant dérivé quand l'utilisateur valide une valeur (jamais pour
+ * une valeur posée par l'application), une tentative de soumission (événement `invalid`) ou
+ * `reportValidity()`. `form.reset()` retire l'interaction.
+ *
  * @internal
  */
 export class ArianeFormElement extends ArianeElement {
@@ -52,6 +60,17 @@ export class ArianeFormElement extends ArianeElement {
     private _componentMessage: string | undefined;
     private _componentAnchor: HTMLElement | undefined;
     private _customMessage = '';
+    private _interacted = false;
+    private _silentCheck = false;
+
+    constructor() {
+        super();
+        // Tentative de soumission : le navigateur émet `invalid` sur chaque champ invalide. Un
+        // `checkValidity()` programmatique en émet aussi, mais n'est pas une interaction.
+        this.addEventListener('invalid', () => {
+            if (!this._silentCheck) this.markInteracted();
+        });
+    }
 
     /** `disabled` explicite ou hérité d'un `<fieldset disabled>` ancêtre. */
     protected get effectiveDisabled(): boolean {
@@ -62,6 +81,13 @@ export class ArianeFormElement extends ArianeElement {
         super.connectedCallback();
         // `internals` n'existe qu'à partir d'ici : applique ce qui a été posé avant la connexion.
         this._applyValidity();
+    }
+
+    override updated(changed: PropertyValues<this>): void {
+        super.updated(changed);
+        this.toggleState('required', this.required);
+        this.toggleState('optional', !this.required);
+        this._syncValidationStates();
     }
 
     /**
@@ -77,7 +103,20 @@ export class ArianeFormElement extends ArianeElement {
      * @internal
      */
     formResetCallback(): void {
+        this._interacted = false;
+        this._syncValidationStates();
         this.formReset();
+    }
+
+    /**
+     * Marque le champ comme touché par l'utilisateur : `:state(user-invalid)` et
+     * `:state(user-valid)` suivent alors sa validité. À appeler quand l'utilisateur a modifié le
+     * champ en validant une valeur, ou l'a modifié puis quitté sans que la valeur change.
+     */
+    protected markInteracted(): void {
+        if (this._interacted) return;
+        this._interacted = true;
+        this._syncValidationStates();
     }
 
     /** Remet le champ à sa valeur initiale. Sans effet par défaut : à surcharger. */
@@ -112,11 +151,17 @@ export class ArianeFormElement extends ArianeElement {
 
     /** Renvoie `true` si le champ est valide ; émet `invalid` sinon. */
     checkValidity(): boolean {
-        return this.internals?.checkValidity() ?? true;
+        this._silentCheck = true;
+        try {
+            return this.internals?.checkValidity() ?? true;
+        } finally {
+            this._silentCheck = false;
+        }
     }
 
     /** Comme `checkValidity()`, et affiche le message de validation du navigateur. */
     reportValidity(): boolean {
+        this.markInteracted();
         return this.internals?.reportValidity() ?? true;
     }
 
@@ -167,5 +212,15 @@ export class ArianeFormElement extends ArianeElement {
                 this._componentAnchor,
             );
         }
+        this._syncValidationStates();
+    }
+
+    /** Comme le natif, un champ désactivé n'est ni valide ni invalide (`willValidate` faux). */
+    private _syncValidationStates(): void {
+        const internals = this.internals;
+        const active = this._interacted && internals?.willValidate === true;
+        const valid = internals?.validity?.valid ?? true;
+        this.toggleState('user-invalid', active && !valid);
+        this.toggleState('user-valid', active && valid);
     }
 }
