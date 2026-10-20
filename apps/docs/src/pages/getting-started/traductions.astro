@@ -90,8 +90,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
         <div class="narrative">
             <NarrativeHeading id="principe">Fonctionnement</NarrativeHeading>
             <p>
-                Ariane s'appuie sur la micro-librairie{' '}
-                <a href="https://github.com/shoelace-style/localize"
+                Ariane s'appuie sur la micro-librairie{' '} <a href="https://github.com/shoelace-style/localize"
                 target="_blank" rel="noopener">@shoelace-style/localize</a> pour fournir un mécanisme de traduction de ses composants.
             </p>
 
@@ -135,8 +134,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
 
             <NarrativeSubheading id="traductions-cdn">Avec le CDN</NarrativeSubheading>
             <p>
-                Consultez{' '}
-                <a
+                Consultez{' '} <a
                     href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                     target="_blank"
                     rel="noopener"
@@ -149,8 +147,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
             </p>
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationCdnImportModule} /></pre>
             <p>
-                Dans votre HTML, importez ensuite l'utilitaire <code>registerTranslation</code> depuis
-                <code>cdn/utils.js</code>. <br />
+                Dans votre HTML, importez ensuite l'utilitaire <code>registerTranslation</code> depuis <code>cdn/utils.js</code>. <br />
                 En environnement de développement, utilisez <code>utils.dev.js</code> et veillez dans ce cas à charger <code>autoloader.dev.js</code> ou <code>index.dev.js</code>. Sinon, la traduction serait enregistrée dans un registre
                 que les composants ne lisent pas, sans erreur visible.
             </p>
@@ -158,8 +155,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
 
             <NarrativeSubheading id="traductions-npm">Avec le paquet npm</NarrativeSubheading>
             <p>
-                Consultez{' '}
-                <a
+                Consultez{' '} <a
                     href="https://github.com/jogo-labs/ariane/blob/main/packages/core/src/translations/fr.ts"
                     target="_blank"
                     rel="noopener"
@@ -168,8 +164,7 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
                 </a>{' '}
                 (la traduction source du package, la plus à jour) pour la liste des termes, et traduisez ceux
                 dont vous avez besoin. <br />
-                Le type <code>Translation</code>, exporté par le package, n'impose que
-                <code>$code</code>, <code>$name</code> et <code>$dir</code> : un terme absent se replie sur la
+                Le type <code>Translation</code>, exporté par le package, n'impose que <code>$code</code>, <code>$name</code> et <code>$dir</code> : un terme absent se replie sur la
                 langue de base (<code>en</code> pour <code>en-GB</code>), puis sur l'anglais intégré. Pour que le compilateur garantisse une traduction complète, et signale les termes ajoutés
                 dans une version ultérieure, typez avec <code>FullTranslation</code> (même export) : un
                 nouveau terme devient alors une erreur de compilation, par choix de votre part.
@@ -183,15 +178,10 @@ import './translations/es.js'; // votre traduction (l'ordre d'import n'a pas d'i
             <pre style="margin-top: 0.85rem"><code class="language-js" set:text={codeCustomTranslationNpmImport} /></pre>
 
             <p class="hint">
-                Avec <code>registerTranslation</code> importé de <code>@ariane-ui/core/utils</code> (ou de
-                <code>cdn/utils.js</code>), les traductions intégrées sont enregistrées à l'import, l'anglais en premier : c'est
-                toujours la langue de repli, complète (c'est la version intégrée : une surcharge de <code>en</code>
-                ne s'applique qu'aux pages en <code>en</code>). Pour <strong>surcharger</strong> une langue fournie
-                (<code>fr</code> ou <code>en</code>), enregistrez un objet partiel avec le même
-                <code>$code</code> : seuls les termes que vous donnez changent, avant ou après le chargement des
-                composants. Une variante régionale s'ajoute avec son code (<code>fr-CA</code> ne s'applique qu'à
-                <code>fr-CA</code>). Ces garanties ne valent pas pour un <code>registerTranslation</code>
-                importé directement de <code>@shoelace-style/localize</code>, où la première traduction enregistrée
+                Avec <code>registerTranslation</code> importé de <code>@ariane-ui/core/utils</code> (ou de <code>cdn/utils.js</code>), les traductions intégrées sont enregistrées à l'import, l'anglais en premier : c'est
+                toujours la langue de repli, complète (c'est la version intégrée : une surcharge de <code>en</code> ne s'applique qu'aux pages en <code>en</code>). Pour <strong>surcharger</strong> une langue fournie
+                (<code>fr</code> ou <code>en</code>), enregistrez un objet partiel avec le même <code>$code</code> : seuls les termes que vous donnez changent, avant ou après le chargement des
+                composants. Une variante régionale s'ajoute avec son code (<code>fr-CA</code> ne s'applique qu'à <code>fr-CA</code>). Ces garanties ne valent pas pour un <code>registerTranslation</code> importé directement de <code>@shoelace-style/localize</code>, où la première traduction enregistrée
                 devient la langue de repli.
             </p>
 

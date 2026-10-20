@@ -115,6 +115,8 @@ variants:
       description: |
           Si le tri échoue, appeler `reject()` — le composant revient à son état précédent
           sans avancer dans le cycle.
+          `reject('Texte')` annonce ce texte tel quel aux lecteurs d'écran, sans le traduire : à
+          localiser par l'application. Sans argument, l'annonce par défaut est utilisée.
       html: |
           <table style="border-collapse:collapse;font-family:inherit;">
               <thead>
