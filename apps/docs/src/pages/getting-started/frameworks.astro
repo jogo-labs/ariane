@@ -16,6 +16,11 @@ const tocEntries = [
     { id: 'vue-typage',       label: 'Typage TypeScript',      level: 2 as const },
     { id: 'vue-theme-sombre', label: 'Thème sombre',           level: 2 as const },
     { id: 'angular', label: 'Angular', level: 1 as const },
+    { id: 'angular-evenements', label: 'Événements et typage',  level: 2 as const },
+    { id: 'angular-proprietes', label: 'for et readonly',        level: 2 as const },
+    { id: 'angular-formulaires', label: 'Formulaires',           level: 2 as const },
+    { id: 'angular-open',       label: 'État ouvert/fermé',      level: 2 as const },
+    { id: 'angular-theme',      label: 'Shadow DOM et budget',   level: 2 as const },
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
 ];
 
@@ -160,6 +165,29 @@ export class AppComponent {
 
     isSunday = (date: Date) => date.getDay() === 0;
 }`;
+
+const codeAngularEvents = `<ar-pagination
+    [total]="10"
+    (ar-pagination-page-changed)="last = $event.detail.to"
+></ar-pagination>`;
+
+const codeAngularAttr = `<ar-charcounter [attr.for]="fieldId" max="200"></ar-charcounter>
+<ar-tooltip [attr.for]="targetId">Aide</ar-tooltip>
+<ar-datepicker [attr.readonly]="locked ? '' : null"></ar-datepicker>`;
+
+const codeAngularForms = `<form #f="ngForm">
+    <ar-datepicker label="Date" name="date" ngDefaultControl [(ngModel)]="date" required>
+    </ar-datepicker>
+</form>
+
+<ar-datepicker label="Date" ngDefaultControl [formControl]="dateControl"></ar-datepicker>`;
+
+const codeAngularOpen = `<button (click)="opened.set(true)">Ouvrir</button>
+<ar-dialog [open]="opened()" (ar-dialog-hidden)="opened.set(false)">…</ar-dialog>`;
+
+const codeAngularBudget = `"budgets": [
+    { "type": "anyComponentStyle", "maximumWarning": "30kB", "maximumError": "60kB" }
+]`;
 
 const codeSvelteScript = `import '@ariane-ui/core';
 
@@ -380,6 +408,58 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 un attribut), donc les valeurs complexes passent sans configuration
                 additionnelle.
             </p>
+
+            <NarrativeSubheading id="angular-evenements">Événements et typage</NarrativeSubheading>
+            <p>
+                Dès que le paquet est importé quelque part dans le projet (le <code>import '@ariane-ui/core'</code> de <code>main.ts</code> suffit), <code>$event</code> est typé : <code>(ar-pagination-page-changed)</code> reçoit un <code>CustomEvent</code> dont le <code>detail</code> est connu, sans cast. Les noms
+                d'événements restent en kebab-case, tels que documentés.
+            </p>
+            <pre><code class="language-html" set:text={codeAngularEvents} /></pre>
+            <p class="hint">
+                Sous <code>CUSTOM_ELEMENTS_SCHEMA</code>, Angular ne vérifie pas les liaisons de propriétés :
+                <code>[curent]="3"</code> (faute de frappe) ou <code>[total]="'dix'"</code> compilent sans erreur. C'est
+                une limite d'Angular, qu'aucun fichier de types ne lève.
+            </p>
+
+            <NarrativeSubheading id="angular-proprietes">for et readonly</NarrativeSubheading>
+            <p>
+                Angular emploie les noms de propriétés du DOM natif : <code>[for]</code> devient <code>htmlFor</code> (celle de <code>label</code>) et <code>[readonly]</code> devient <code>readOnly</code> (celle de <code>input</code>). Les composants Ariane nomment leurs propriétés comme l'attribut (<code>for</code>, <code>readonly</code>) : la liaison vise une propriété qui n'existe pas et elle est ignorée, sans erreur de compilation. <code>ar-charcounter</code> et <code>ar-tooltip</code> ne reçoivent pas leur cible, <code>ar-datepicker</code> n'est pas en lecture seule. Passez par l'attribut.
+            </p>
+            <pre><code class="language-html" set:text={codeAngularAttr} /></pre>
+            <p class="hint">
+                <code>for</code> attend une chaîne (l'<code>id</code> de la cible). <code>readonly</code> est un attribut booléen, comme <code>disabled</code> : il est vrai dès qu'il est présent, quelle que soit sa valeur. Or Angular ne retire un attribut que pour <code>null</code> ou <code>undefined</code> : <code>[attr.readonly]="false"</code> écrit <code>readonly="false"</code>, ce qui est invalide et laisse le champ en lecture seule. Écrivez <code>'' : null</code>, comme ci-dessus.
+            </p>
+
+            <NarrativeSubheading id="angular-formulaires">Formulaires</NarrativeSubheading>
+            <p>
+                <code>ar-datepicker</code> est un champ de formulaire : ajoutez <code>ngDefaultControl</code> pour que <code>ngModel</code>, <code>formControl</code> et <code>[formField]</code> (signal forms) le reconnaissent. Sans lui, Angular lève <code>NG01203: No value accessor</code> à l'exécution. Le composant émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour, ce que l'accesseur par défaut écoute ; la valeur échangée est une date <code>yyyy-MM-dd</code>.
+            </p>
+            <pre><code class="language-html" set:text={codeAngularForms} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    Le modèle suit la valeur validée : à la sélection dans le calendrier, ou à la
+                    validation d'une saisie (Entrée, perte de focus), pas à chaque frappe.
+                </li>
+                <li>
+                    <code>setValue()</code>, <code>reset()</code> et la réinitialisation du formulaire natif sont répercutés dans le champ.
+                </li>
+                <li>
+                    Un <code>ar-charcounter</code> suit le champ qu'il observe, y compris lorsque
+                    la valeur est écrite par programme (<code>ngModel</code>, <code>setValue()</code>).
+                </li>
+            </ul>
+
+            <NarrativeSubheading id="angular-open">État ouvert/fermé</NarrativeSubheading>
+            <p>
+                Un composant peut se fermer seul (Échap, clic en dehors, bouton de fermeture) sans que l'état d'Angular le sache. Si <code>[open]</code> est lié à un signal resté à <code>true</code>, un nouveau clic sur « Ouvrir » réécrit <code>true</code> : Angular ne réaffecte pas une liaison inchangée, et le composant ne se rouvre pas. Resynchronisez l'état sur l'événement de fermeture. Le motif vaut pour <code>ar-dialog</code>, <code>ar-collapse</code>, <code>ar-dropdown</code> et <code>ar-datepicker</code> (<code>ar-*-hidden</code>).
+            </p>
+            <pre><code class="language-html" set:text={codeAngularOpen} /></pre>
+
+            <NarrativeSubheading id="angular-theme">Shadow DOM et budget</NarrativeSubheading>
+            <p>
+                Un composant Angular en <code>ViewEncapsulation.ShadowDom</code> est un shadow DOM applicatif : les tokens du thème du document le traversent, pas les règles <code>::part()</code> (voir <a href="/theming/shadow-dom">Dans un shadow DOM applicatif</a>). Importer la feuille du thème dans le <code>styleUrl</code> du composant fonctionne, mais le <code>ng build</code> de production échoue sur le budget <code>anyComponentStyle</code> (8 kB en erreur par défaut) : la palette seule en pèse plus de 25. Adoptez plutôt une feuille partagée, ou relevez le budget dans <code>angular.json</code> :
+            </p>
+            <pre><code class="language-json" set:text={codeAngularBudget} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://angular.dev/guide/elements"
                 target="_blank" rel="noopener">documentation officielle d'Angular sur les Custom Elements</a>.
