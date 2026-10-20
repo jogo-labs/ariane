@@ -13,7 +13,6 @@ const tocEntries = [
     { id: 'nextjs',  label: 'Next.js', level: 1 as const },
     { id: 'nextjs-chargement',  label: 'Charger la librairie',   level: 2 as const },
     { id: 'nextjs-avant-definition', label: 'Avant la définition', level: 2 as const },
-    { id: 'nextjs-theme',       label: 'Thème',                  level: 2 as const },
     { id: 'nextjs-hydratation', label: 'Avertissements d\'hydratation', level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
     { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
@@ -127,17 +126,6 @@ export function ArianeLoader() {
 
 const codeNextDefined = `:not(:defined) {
     visibility: hidden;
-}`;
-
-const codeNextReset = `/* globals.css : déclarer l'ordre des couches avant tout, puis ranger le reset dans la sienne */
-@layer reset, ariane.theme;
-
-@layer reset {
-    * {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-    }
 }`;
 
 const codeNextAlertRole = `<ar-alert variant="success" role="status">Enregistré</ar-alert>
@@ -384,26 +372,13 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Vérifié : les éléments sont masqués avant la définition et visibles après. Sans JavaScript, ils restent masqués. Limitez le sélecteur aux composants concernés (<code>ar-tab-panel:not(:defined)</code>, <code>ar-collapse:not(:defined)</code>) si le contenu doit rester lisible dans ce cas.
             </p>
 
-            <NarrativeSubheading id="nextjs-theme">Thème</NarrativeSubheading>
-            <ul class="narrative-list">
-                <li>
-                    <strong>Le reset du gabarit annule le thème.</strong> Le <code>globals.css</code> généré par <code>create-next-app</code> contient <code>* &#123; padding: 0; margin: 0 &#125;</code>. Hors de toute couche, il l'emporte sur les règles du thème, qui sont dans la couche <code>ariane.theme</code> : le <code>padding</code> d'<code>ar-alert</code> tombe à 0. Rangez le reset dans une couche déclarée avant celle du thème (vérifié : le <code>padding</code> redevient celui du thème) :
-                </li>
-            </ul>
-            <pre><code class="language-css" set:text={codeNextReset} /></pre>
-            <ul class="narrative-list">
-                <li>
-                    <strong>Dans un shadow DOM applicatif</strong> (composant avec son propre shadow root), les tokens posés sur <code>:root</code> traversent, pas ceux que le thème pose sur un tag (par exemple <code>--ar-alert-bg</code> selon <code>variant</code>) : adoptez la feuille du thème dans le shadow root. Voir <a href="/theming/shadow-dom">Dans un shadow DOM applicatif</a>.
-                </li>
-            </ul>
-
             <NarrativeSubheading id="nextjs-hydratation">Avertissements d'hydratation</NarrativeSubheading>
             <p>
                 À leur définition, certains composants écrivent des attributs sur leur hôte (<code>ar-alert</code> écrit <code>role</code>) ou sur leurs enfants (<code>ar-tab-group</code>, <code>ar-tab</code> et <code>ar-tab-panel</code> écrivent <code>slot</code>, <code>id</code>, <code>role</code>, <code>aria-*</code>, <code>tabindex</code>, <code>hidden</code>). S'ils sont définis avant l'hydratation, React en développement signale que le HTML du serveur ne correspond pas : « A tree hydrated but some attributes of the server rendered HTML didn't match… ». L'avertissement est absent en production, et aucun dysfonctionnement n'a été mesuré.
             </p>
             <ul class="narrative-list">
                 <li>
-                    <strong>Chargement après l'hydratation.</strong> C'est la parade générale (section précédente). Mesure sur des pages mêlant onglets et alertes : 2 chargements sur 20 affichent encore l'avertissement. Le cas est suivi dans <a href="https://github.com/jogo-labs/ariane/issues/345" target="_blank" rel="noopener">#345</a>.
+                    <strong>Chargement après l'hydratation.</strong> C'est la parade générale (voir <a href="#nextjs-chargement">Charger la librairie</a>). Mesure sur des pages mêlant onglets et alertes : 2 chargements sur 20 affichent encore l'avertissement. Le cas est suivi dans <a href="https://github.com/jogo-labs/ariane/issues/345" target="_blank" rel="noopener">#345</a>.
                 </li>
                 <li>
                     <strong><code>ar-alert</code> : écrivez le <code>role</code>.</strong> Le composant n'écrase jamais un <code>role</code> posé par l'application. Avec un import statique dans un Client Component, l'avertissement apparaît sur 10 chargements sur 10 sans <code>role</code> dans le markup, sur 0 sur 10 avec. Utilisez <code>alert</code> pour une interruption immédiate, <code>status</code> pour une annonce polie.
