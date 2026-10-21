@@ -23,6 +23,8 @@ const tocEntries = [
     { id: 'angular-open',       label: 'État ouvert/fermé',      level: 2 as const },
     { id: 'angular-theme',      label: 'Shadow DOM et budget',   level: 2 as const },
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
+    { id: 'svelte-proprietes', label: 'Propriétés et attributs', level: 2 as const },
+    { id: 'svelte-evenements', label: 'Événements et typage',    level: 2 as const },
 ];
 
 const codeReactUsage = `import '@ariane-ui/core';
@@ -214,14 +216,47 @@ const codeAngularBudget = `"budgets": [
     { "type": "anyComponentStyle", "maximumWarning": "30kB", "maximumError": "60kB" }
 ]`;
 
-const codeSvelteScript = `import '@ariane-ui/core';
+const codeSvelteScript = `<script lang="ts">
+    import '@ariane-ui/core';
 
-function onChanged(event) {
-    console.log(event.detail.to);
-}`;
+    let page = $state(1);
 
-const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-page-changed={onChanged} />
+    function onChanged(event: HTMLElementEventMap['ar-pagination-page-changed']) {
+        page = event.detail.to;
+    }
+</script>
+
+<ar-pagination current={page} total={10} onar-pagination-page-changed={onChanged} />
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
+
+const codeSvelteBinding = `<!-- Nombre lié : la propriété vaut 3 -->
+<ar-pagination current={page} total={10} />
+
+<!-- Texte : la propriété vaut la chaîne "3" -->
+<ar-pagination current="3" total="10" />
+
+<!-- kebab-case : attribut texte, la propriété reste undefined, sans erreur -->
+<ar-datepicker is-date-disabled={isSunday} />`;
+
+const codeSvelteLate = `<script lang="ts">
+    import { onMount } from 'svelte';
+
+    let picker: HTMLElement & { isDateDisabled?: (date: Date) => boolean };
+
+    onMount(async () => {
+        await customElements.whenDefined('ar-datepicker');
+        picker.isDateDisabled = (date) => date.getDay() === 0;
+    });
+</script>
+
+<ar-datepicker bind:this={picker} />`;
+
+const codeSvelteForm = `<ar-datepicker
+    name="date"
+    value={date}
+    oninput={(event) => (date = event.currentTarget.value)}
+/>`;
+
 ---
 
 <Layout
@@ -501,16 +536,40 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
             </p>
 
             <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
-            <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
-            <pre><code class="language-js" set:text={codeSvelteScript} /></pre>
-            <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
-            <p class="hint">
-                Svelte affecte les valeurs non-textuelles (comme une fonction) en propriété JS plutôt
-                qu'en attribut dès que la clé correspond à un nom existant sur l'élément — un mécanisme
-                heuristique, pas garanti dans tous les cas (notamment si le composant n'est pas encore
-                chargé au moment du rendu). Vérifiez le comportement sur votre cas d'usage avant de vous
-                y fier pour une valeur critique.
+            <p>
+                Avec Svelte 5, importez le paquet, puis utilisez les composants directement dans le markup :
             </p>
+            <pre><code class="language-html" set:text={codeSvelteScript} /></pre>
+
+            <NarrativeSubheading id="svelte-proprietes">Propriétés et attributs</NarrativeSubheading>
+            <p>
+                Svelte affecte une <strong>propriété</strong> quand la clé existe sur l'élément, sinon il pose un <strong>attribut</strong>. Un nombre se lie plutôt qu'il ne s'écrit : un attribut statique (<code>current="3"</code>) donne la chaîne <code>"3"</code>. Un nom en kebab-case n'existe pas sur l'élément : <code>is-date-disabled={'{fn}'}</code> devient un attribut texte et la propriété reste <code>undefined</code>, sans erreur. Écrivez le nom en camelCase.
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteBinding} /></pre>
+            <p>
+                Si le composant est défini après le rendu (autoloader CDN, import dynamique), la clé n'existe pas encore à ce moment : une fonction (<code>isDateDisabled</code>) ou un booléen en camelCase (<code>closeOnBackdrop={'{true}'}</code>) sont posés comme attributs en minuscules et perdus. Affectez-les alors en propriété une fois le composant défini :
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteLate} /></pre>
+            <p class="hint">
+                Chaque attribut d'Ariane est réfléchi : un sélecteur CSS ou un <code>querySelector</code> fonctionne quelle que soit la forme employée. Sur <code>ar-charcounter</code>, écrivez <code>for</code> : Svelte signale <code>htmlFor</code> comme attribut invalide.
+            </p>
+
+            <NarrativeSubheading id="svelte-evenements">Événements et typage</NarrativeSubheading>
+            <p>
+                Un attribut <code>on…</code> écoute l'événement du même nom : <code>onar-pagination-page-changed</code> écoute <code>ar-pagination-page-changed</code>. La directive <code>on:</code> fonctionne encore mais est dépréciée, et les deux syntaxes ne se mélangent pas dans un même composant.
+            </p>
+            <ul class="narrative-list">
+                <li>
+                    Svelte ne type pas les événements d'un élément personnalisé : annotez le paramètre du gestionnaire. <code>HTMLElementEventMap['ar-pagination-page-changed']</code> donne un <code>detail</code> typé, dès que le paquet est importé.
+                </li>
+                <li>
+                    Svelte ne vérifie ni les noms de propriétés ni leurs valeurs sur ces balises : une faute de frappe ou <code>total="dix"</code> passent sans erreur.
+                </li>
+                <li>
+                    <code>bind:value</code> n'est pas disponible sur un élément personnalisé (erreur de compilation). <code>ar-datepicker</code> émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour : liez <code>value</code> et écoutez l'événement. Sur le champ suivi par un <code>ar-charcounter</code>, le <code>bind:value</code> du champ met à jour le compteur.
+                </li>
+            </ul>
+            <pre><code class="language-html" set:text={codeSvelteForm} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://svelte.dev/docs/svelte/custom-elements"
                 target="_blank" rel="noopener">documentation officielle de Svelte sur les Custom Elements</a>.
