@@ -4,6 +4,7 @@
  * API de validation, erreur personnalisée, fieldset, labels (#325).
  */
 import { expect, fixture } from '@open-wc/testing';
+import { sendKeys } from '@web/test-runner-commands';
 import type { ArDatepicker } from './datepicker.js';
 import './index.js';
 
@@ -198,6 +199,128 @@ describe('ar-datepicker — formulaire', () => {
             await el.updateComplete;
             el.inputElement.dispatchEvent(new Event('blur'));
             expect(seen).to.deep.equal(['input:2026-06-12', 'change:2026-06-12']);
+        });
+    });
+
+    describe('états de validation (#360)', () => {
+        const NAMES = ['required', 'optional', 'user-invalid', 'user-valid'];
+        const states = (el: ArDatepicker): string[] =>
+            NAMES.filter((name) => el.matches(`:state(${name})`));
+        const settle = async (el: ArDatepicker): Promise<void> => {
+            await el.updateComplete;
+            await el.updateComplete;
+        };
+
+        it('required et optional suivent la propriété required', async () => {
+            const { el } = await mount('<ar-datepicker></ar-datepicker>');
+            expect(states(el)).to.deep.equal(['optional']);
+            el.required = true;
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+            el.required = false;
+            await settle(el);
+            expect(states(el)).to.deep.equal(['optional']);
+        });
+
+        it("un champ obligatoire vide n'est ni user-invalid ni user-valid au chargement, ni après focus puis blur", async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            expect(el.matches(':invalid')).to.equal(true);
+            expect(states(el)).to.deep.equal(['required']);
+            el.inputElement.focus();
+            el.inputElement.blur();
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+        });
+
+        it('une saisie valide puis la perte de focus pose user-valid', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.inputElement.focus();
+            await sendKeys({ type: '12/06/2026' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(el.value).to.equal('2026-06-12');
+            expect(states(el)).to.deep.equal(['required', 'user-valid']);
+        });
+
+        it('une saisie effacée puis la perte de focus pose user-invalid', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.inputElement.focus();
+            await sendKeys({ type: '1' });
+            await sendKeys({ press: 'Backspace' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(el.value).to.equal('');
+            expect(states(el)).to.deep.equal(['required', 'user-invalid']);
+        });
+
+        it('une valeur posée par programme ne pose ni user-valid ni user-invalid', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.value = '2026-06-12';
+            await settle(el);
+            expect(el.matches(':valid')).to.equal(true);
+            expect(states(el)).to.deep.equal(['required']);
+            el.value = '';
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+        });
+
+        it("un événement input envoyé sur l'hôte ne marque pas le champ", async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+        });
+
+        it('une sélection dans le calendrier pose user-valid', async () => {
+            const { el } = await mount(
+                '<ar-datepicker required value="2026-06-10"></ar-datepicker>',
+            );
+            el.value = '';
+            await settle(el);
+            el.open = true;
+            await settle(el);
+            el.shadowRoot!.querySelector<HTMLButtonElement>('td button:not([disabled])')!.click();
+            await settle(el);
+            expect(el.value).to.not.equal('');
+            expect(states(el)).to.deep.equal(['required', 'user-valid']);
+        });
+
+        it("une tentative de soumission pose user-invalid ; form.reset() l'efface", async () => {
+            const { form, el } = await mount('<ar-datepicker required name="d"></ar-datepicker>');
+            form.addEventListener('submit', (event) => event.preventDefault());
+            form.requestSubmit();
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required', 'user-invalid']);
+            form.reset();
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+        });
+
+        it('checkValidity() ne touche pas le champ, reportValidity() oui', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            expect(el.checkValidity()).to.equal(false);
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
+            expect(el.reportValidity()).to.equal(false);
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required', 'user-invalid']);
+        });
+
+        it('la validité est suivie après interaction : user-invalid devient user-valid', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.reportValidity();
+            await settle(el);
+            expect(states(el)).to.include('user-invalid');
+            el.value = '2026-06-12';
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required', 'user-valid']);
+        });
+
+        it('un champ désactivé ne porte ni user-valid ni user-invalid', async () => {
+            const { el } = await mount('<ar-datepicker required disabled></ar-datepicker>');
+            el.reportValidity();
+            await settle(el);
+            expect(states(el)).to.deep.equal(['required']);
         });
     });
 });

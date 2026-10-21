@@ -249,6 +249,13 @@ datepicker.addEventListener('ar-datepicker-view-change', async ({ detail }) => {
 - `form.reset()` ramène le champ à sa valeur initiale, celle du premier rendu, texte de saisie compris. Aucun événement de valeur n'est émis ; si le panneau est ouvert, il se ferme avec ses événements habituels (`ar-datepicker-hide`, `ar-datepicker-hidden`).
 - L'API de validation standard est disponible sur l'élément : `checkValidity()`, `reportValidity()`, `validity`, `validationMessage`, `willValidate`, `form` et `labels`.
 - `setCustomValidity(message)` signale une erreur, par exemple une erreur de serveur. Comme sur un `<input>`, elle persiste jusqu'à `setCustomValidity('')` : à l'application de l'effacer, par exemple à la prochaine saisie. Le slot `error` reste l'affichage du message dans la page ; la validité native sert à la validation du formulaire et à la bulle du navigateur.
+- Pour le style, `:invalid` et `:valid` s'appliquent nativement, mais pas `:required`, `:optional`, `:user-invalid` ni `:user-valid`, que la plateforme réserve aux champs natifs. Le composant expose à leur place `:state(required)`, `:state(optional)`, `:state(user-invalid)` et `:state(user-valid)`. Comme `:user-invalid` natif, les deux derniers n'apparaissent qu'après une interaction de l'utilisateur (sélection dans le calendrier, saisie puis perte de focus), une tentative de soumission ou `reportValidity()`, jamais pour une valeur posée par l'application, et `form.reset()` les retire.
+
+```css
+ar-datepicker:state(user-invalid)::part(input) {
+    border-color: var(--couleur-erreur);
+}
+```
 
 ### Intégration masque de saisie
 
