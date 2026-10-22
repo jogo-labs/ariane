@@ -4,16 +4,12 @@
   "tasks": {
     "build:manifest": {
       "dependsOn": ["build:css"],
-      "inputs": ["src/**/*.ts", "cem.config.js"],
+      "inputs": ["src/**/*.ts", "!src/types/elements.generated.ts", "cem.config.js"],
       "outputs": ["dist/custom-elements.json"]
     },
     "generate:types": {
       "dependsOn": ["build:manifest"],
-      "inputs": [
-        "dist/custom-elements.json",
-        "scripts/generate-types.js",
-        "src/components/**/*.ts"
-      ],
+      "inputs": ["scripts/generate-types.js", "src/components/**/*.ts"],
       "outputs": ["src/types/elements.generated.ts"]
     },
     "build:skill": {
@@ -23,17 +19,17 @@
     },
     "build:bundles": {
       "dependsOn": ["build:manifest", "generate:types"],
-      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "inputs": ["src/**/*.ts", "!src/types/elements.generated.ts", "scripts/build-bundles.js"],
       "outputs": ["dist/**", "cdn/**"]
     },
     "build:bundles:dev": {
       "dependsOn": ["build:manifest", "generate:types"],
-      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "inputs": ["src/**/*.ts", "!src/types/elements.generated.ts", "scripts/build-bundles.js"],
       "outputs": ["dist/**", "cdn/**"]
     },
     "build:bundles:prod": {
       "dependsOn": ["build:manifest", "generate:types"],
-      "inputs": ["src/**/*.ts", "scripts/build-bundles.js"],
+      "inputs": ["src/**/*.ts", "!src/types/elements.generated.ts", "scripts/build-bundles.js"],
       "outputs": ["dist/**", "cdn/**"]
     },
     "build:css": {
@@ -42,12 +38,22 @@
     },
     "build:types": {
       "dependsOn": ["build:manifest", "generate:types", "build:bundles"],
-      "inputs": ["src/**/*.ts", "tsconfig.json", "../../tsconfig.base.json"],
+      "inputs": [
+        "src/**/*.ts",
+        "!src/types/elements.generated.ts",
+        "tsconfig.json",
+        "../../tsconfig.base.json"
+      ],
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
     "build:types:dev": {
       "dependsOn": ["build:manifest", "generate:types", "build:bundles:dev"],
-      "inputs": ["src/**/*.ts", "tsconfig.json", "../../tsconfig.base.json"],
+      "inputs": [
+        "src/**/*.ts",
+        "!src/types/elements.generated.ts",
+        "tsconfig.json",
+        "../../tsconfig.base.json"
+      ],
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
     "build": {
@@ -62,6 +68,7 @@
       ],
       "inputs": [
         "src/**/*.ts",
+        "!src/types/elements.generated.ts",
         "src/styles/**/*.css",
         "scripts/build-bundles.js",
         "scripts/build-css.js",
@@ -83,6 +90,7 @@
       ],
       "inputs": [
         "src/**/*.ts",
+        "!src/types/elements.generated.ts",
         "src/styles/**/*.css",
         "scripts/build-bundles.js",
         "scripts/build-css.js",
