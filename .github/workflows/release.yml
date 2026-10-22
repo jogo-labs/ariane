@@ -33,6 +33,11 @@ jobs:
       - name: Test (gate de sécurité avant publication)
         run: npm run test
 
+      # Garde-fou (#391) : l'alpha.15 est partie sans déclarations TypeScript parce que `dist/` avait
+      # été vidé après le build. On vérifie ce que npm empaquetterait, juste avant de publier.
+      - name: Contrôle du paquet (déclarations et exports présents)
+        run: npm run check:package --workspace=packages/core
+
       # Publier le package npm avec provenance via Trusted Publishers (OIDC, sans token).
       #
       # Logique de tagging :
