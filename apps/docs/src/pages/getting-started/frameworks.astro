@@ -296,11 +296,11 @@ const codeSvelteForm = `<ar-datepicker
                 d'Ariane est réfléchi, donc un sélecteur CSS comme <code>[path="e1"]</code> ou un <code>querySelector</code> fonctionne quelle que soit la forme employée.
             </p>
             <p>
-                Une fonction ou un objet se passe directement dans une prop camelCase, à condition
+                Une fonction, un objet ou un booléen se passe directement dans une prop camelCase, à condition
                 que le composant soit défini avant le rendu — ce que garantit l'import ci-dessus.
                 Si la classe est enregistrée plus tard (autoloader CDN, import dynamique), le nom
-                n'existe pas encore sur l'élément : React n'écrit alors qu'un attribut, ignore une
-                fonction et convertit un objet en texte. Dans ce cas, et sur React 18 et antérieur
+                n'existe pas encore sur l'élément : React n'écrit alors qu'un attribut (que le navigateur
+                met en minuscules, donc sans effet), ignore une fonction et convertit un objet en texte. Dans ce cas, et sur React 18 et antérieur
                 (où toute prop est un attribut), passez par une ref :
             </p>
             <pre><code class="language-js" set:text={codeReactProperty} /></pre>
