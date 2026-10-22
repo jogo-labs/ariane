@@ -66,8 +66,10 @@ const loaded = new Set<string>();
 const mutationObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         for (const node of mutation.addedNodes) {
+            // Le nœud et ses descendants : un framework insère un bloc entier d'un coup, et les
+            // éléments personnalisés peuvent être imbriqués dans un nœud qui ne l'est pas.
             if (node.nodeType === Node.ELEMENT_NODE) {
-                scanElement(node as Element);
+                scanNode(node);
             }
         }
     }
