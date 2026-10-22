@@ -214,14 +214,38 @@ const codeAngularBudget = `"budgets": [
     { "type": "anyComponentStyle", "maximumWarning": "30kB", "maximumError": "60kB" }
 ]`;
 
-const codeSvelteScript = `import '@ariane-ui/core';
+const codeSvelteScript = `<script lang="ts">
+    import '@ariane-ui/core';
 
-function onChanged(event) {
-    console.log(event.detail.to);
-}`;
+    let page = $state(1);
 
-const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-page-changed={onChanged} />
+    function onChanged(event: HTMLElementEventMap['ar-pagination-page-changed']) {
+        page = event.detail.to;
+    }
+</script>
+
+<ar-pagination current={page} total={10} onar-pagination-page-changed={onChanged} />
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
+
+const codeSvelteLate = `<script lang="ts">
+    import { onMount } from 'svelte';
+
+    let picker: HTMLElement & { isDateDisabled?: (date: Date) => boolean };
+
+    onMount(async () => {
+        await customElements.whenDefined('ar-datepicker');
+        picker.isDateDisabled = (date) => date.getDay() === 0;
+    });
+</script>
+
+<ar-datepicker bind:this={picker} />`;
+
+const codeSvelteForm = `<ar-datepicker
+    name="date"
+    value={date}
+    oninput={(event) => (date = event.currentTarget.value)}
+/>`;
+
 ---
 
 <Layout
@@ -501,16 +525,18 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
             </p>
 
             <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
-            <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
-            <pre><code class="language-js" set:text={codeSvelteScript} /></pre>
-            <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
-            <p class="hint">
-                Svelte affecte les valeurs non-textuelles (comme une fonction) en propriété JS plutôt
-                qu'en attribut dès que la clé correspond à un nom existant sur l'élément — un mécanisme
-                heuristique, pas garanti dans tous les cas (notamment si le composant n'est pas encore
-                chargé au moment du rendu). Vérifiez le comportement sur votre cas d'usage avant de vous
-                y fier pour une valeur critique.
+            <p>
+                Avec Svelte 5, importez le paquet, puis utilisez les composants directement dans le markup. Svelte ne type pas les événements d'un élément personnalisé : annotez le paramètre du gestionnaire. <code>HTMLElementEventMap['ar-pagination-page-changed']</code> donne un <code>detail</code> typé, dès que le paquet est importé.
             </p>
+            <pre><code class="language-html" set:text={codeSvelteScript} /></pre>
+            <p>
+                Si le composant est défini après le rendu (autoloader CDN, import dynamique), une fonction (<code>isDateDisabled</code>) ou un booléen en camelCase (<code>closeOnBackdrop={'{true}'}</code>) sont posés comme attributs en minuscules et perdus. Affectez-les alors en propriété une fois le composant défini :
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteLate} /></pre>
+            <p>
+                <code>bind:value</code> est refusé sur un élément personnalisé. <code>ar-datepicker</code> émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour : liez <code>value</code> et écoutez l'événement.
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteForm} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://svelte.dev/docs/svelte/custom-elements"
                 target="_blank" rel="noopener">documentation officielle de Svelte sur les Custom Elements</a>.
