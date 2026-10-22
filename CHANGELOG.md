@@ -14,6 +14,12 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.16](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.15...v0.1.0-alpha.16) (2026-10-22)
+
+### Corrigé
+
+- **core:** le paquet publié contient ses déclarations TypeScript (l'alpha.15 en était dépourvue), garde-fou check:package ([#391](https://github.com/jogo-labs/ariane/issues/391)) ([#392](https://github.com/jogo-labs/ariane/issues/392)) ([9da33a3](https://github.com/jogo-labs/ariane/commit/9da33a3ecdfd84d2c388436378b7b72075723daf))
+
 ## [0.1.0-alpha.15](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.14...v0.1.0-alpha.15) (2026-10-22)
 
 ### Changements incompatibles
