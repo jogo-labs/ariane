@@ -2,11 +2,26 @@
 import Layout from '../../layouts/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
 
 const tocEntries = [
     { id: 'react',   label: 'React',   level: 1 as const },
+    { id: 'react-evenements',   label: 'Événements',             level: 2 as const },
+    { id: 'react-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
+    { id: 'react-typage',       label: 'Typage TypeScript',      level: 2 as const },
+    { id: 'react-hydratation',  label: 'Rendu serveur',          level: 2 as const },
+    { id: 'nextjs',  label: 'Next.js', level: 1 as const },
+    { id: 'nextjs-chargement',  label: 'Charger la librairie',   level: 2 as const },
     { id: 'vue',     label: 'Vue',     level: 1 as const },
+    { id: 'vue-proprietes',   label: 'Propriétés et attributs', level: 2 as const },
+    { id: 'vue-v-model',      label: 'v-model',                level: 2 as const },
+    { id: 'vue-typage',       label: 'Typage TypeScript',      level: 2 as const },
+    { id: 'vue-theme-sombre', label: 'Thème sombre',           level: 2 as const },
     { id: 'angular', label: 'Angular', level: 1 as const },
+    { id: 'angular-evenements', label: 'Événements et typage',  level: 2 as const },
+    { id: 'angular-formulaires', label: 'Formulaires',           level: 2 as const },
+    { id: 'angular-open',       label: 'État ouvert/fermé',      level: 2 as const },
+    { id: 'angular-theme',      label: 'Shadow DOM et budget',   level: 2 as const },
     { id: 'svelte',  label: 'Svelte',  level: 1 as const },
 ];
 
@@ -30,12 +45,81 @@ useEffect(() => {
     return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
 }, []);`;
 
-const codeReactProperty = `// Propriété JS complexe : passe toujours par une ref, quelle que soit la version.
+const codeReactProperty = `// Propriété JS complexe : passe par une ref (toujours sur React 18 et antérieur ; avec React 19,
+// seulement si le composant n'est pas encore défini au moment du rendu).
 useEffect(() => {
     if (datepickerRef.current) {
         datepickerRef.current.isDateDisabled = (date) => date.getDay() === 0;
     }
 }, []);`;
+
+const codeReactProps = `import '@ariane-ui/core';
+
+const isSunday = (date) => date.getDay() === 0;
+
+function Booking() {
+    return (
+        <>
+            {/* Noms camelCase : React 19 affecte la propriété */}
+            <ar-datepicker label="Date de départ" isDateDisabled={isSunday} />
+            <ar-dialog closeOnBackdrop />
+
+            {/* Noms kebab-case : React 19 pose l'attribut */}
+            <ar-dialog close-on-backdrop />
+        </>
+    );
+}`;
+
+const codeReactTypes = `// src/ariane.d.ts (ou n'importe quel module du projet)
+import '@ariane-ui/core/react';`;
+
+const codeReactTypesUsage = `<ar-pagination
+    current={page}
+    total={10}
+    onar-pagination-page-changed={(event) => setPage(event.detail.to)} // detail typé
+/>`;
+
+const codeReactHydration = `// Rendu serveur puis hydratation : écoutez par ref plutôt que par onar-…
+useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onChanged = (event) => setPage(event.detail.to);
+    el.addEventListener('ar-pagination-page-changed', onChanged);
+    return () => el.removeEventListener('ar-pagination-page-changed', onChanged);
+}, []);`;
+
+const codeReactDefineAfterHydration = `// Définir les composants après l'hydratation
+useEffect(() => {
+    import('@ariane-ui/core');
+}, []);`;
+
+const codeNextLoader = `// components/ArianeLoader.tsx
+'use client';
+
+import { useEffect } from 'react';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        void import('@ariane-ui/core');
+    }, []);
+    return null;
+}
+
+// app/layout.tsx : <body><ArianeLoader />{children}</body>`;
+
+const codeNextHeadless = `'use client';
+
+import { useEffect } from 'react';
+import { ArAlert } from '@ariane-ui/core/headless';
+
+export function ArianeLoader() {
+    useEffect(() => {
+        // En développement, StrictMode exécute l'effet deux fois : sans cette garde,
+        // le second define() lève « has already been used with this registry ».
+        if (!customElements.get('acme-alert')) customElements.define('acme-alert', ArAlert);
+    }, []);
+    return null;
+}`;
 
 const codeVueTemplate = `<ar-pagination :current="1" :total="10" @ar-pagination-page-changed="onChanged" />
 <ar-datepicker :isDateDisabled.prop="isSunday" />`;
@@ -46,6 +130,35 @@ const codeVueScript = `function onChanged(event) {
 
 function isSunday(date) {
     return date.getDay() === 0;
+}`;
+
+const codeVueKebab = `<!-- Attribut texte : la propriété reste undefined, sans erreur -->
+<ar-datepicker :is-date-disabled="isSunday" />
+
+<!-- Propriété -->
+<ar-datepicker :isDateDisabled.prop="isSunday" />
+<ar-datepicker :is-date-disabled.camel.prop="isSunday" />`;
+
+const codeVueNumbers = `<!-- Nombre lié : la propriété vaut 10 -->
+<ar-pagination :current="page" :total="10" />
+
+<!-- Texte : la propriété vaut la chaîne "10" -->
+<ar-pagination current="1" total="10" />`;
+
+const codeVueModel = `<ar-datepicker v-model="birthDate" name="birth" label="Date de naissance" />
+
+<!-- Sans v-model -->
+<ar-datepicker
+    :value="birthDate"
+    @ar-datepicker-input-change="(event) => (birthDate = event.detail.value ?? '')"
+/>`;
+
+const codeVueTypes = `// src/env.d.ts (ou n'importe quel module du projet)
+import '@ariane-ui/core/vue';`;
+
+const codeVueDark = `/* Le template Vite pose :root { color-scheme: light dark; } hors couche : */
+:root:not([data-theme]) {
+    color-scheme: light dark;
 }`;
 
 const codeViteConfig = `// vite.config.ts — indique à Vue de ne pas traiter les tags ar-* comme des
@@ -82,19 +195,62 @@ export class AppComponent {
     isSunday = (date: Date) => date.getDay() === 0;
 }`;
 
-const codeSvelteScript = `import '@ariane-ui/core';
+const codeAngularEvents = `<ar-pagination
+    [total]="10"
+    (ar-pagination-page-changed)="last = $event.detail.to"
+></ar-pagination>`;
 
-function onChanged(event) {
-    console.log(event.detail.to);
-}`;
+const codeAngularForms = `<form #f="ngForm">
+    <ar-datepicker label="Date" name="date" ngDefaultControl [(ngModel)]="date" required>
+    </ar-datepicker>
+</form>
 
-const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-page-changed={onChanged} />
+<ar-datepicker label="Date" ngDefaultControl [formControl]="dateControl"></ar-datepicker>`;
+
+const codeAngularOpen = `<button (click)="opened.set(true)">Ouvrir</button>
+<ar-dialog [open]="opened()" (ar-dialog-hidden)="opened.set(false)">…</ar-dialog>`;
+
+const codeAngularBudget = `"budgets": [
+    { "type": "anyComponentStyle", "maximumWarning": "30kB", "maximumError": "60kB" }
+]`;
+
+const codeSvelteScript = `<script lang="ts">
+    import '@ariane-ui/core';
+
+    let page = $state(1);
+
+    function onChanged(event: HTMLElementEventMap['ar-pagination-page-changed']) {
+        page = event.detail.to;
+    }
+</script>
+
+<ar-pagination current={page} total={10} onar-pagination-page-changed={onChanged} />
 <ar-datepicker isDateDisabled={(date) => date.getDay() === 0} />`;
+
+const codeSvelteLate = `<script lang="ts">
+    import { onMount } from 'svelte';
+
+    let picker: HTMLElement & { isDateDisabled?: (date: Date) => boolean };
+
+    onMount(async () => {
+        await customElements.whenDefined('ar-datepicker');
+        picker.isDateDisabled = (date) => date.getDay() === 0;
+    });
+</script>
+
+<ar-datepicker bind:this={picker} />`;
+
+const codeSvelteForm = `<ar-datepicker
+    name="date"
+    value={date}
+    oninput={(event) => (date = event.currentTarget.value)}
+/>`;
+
 ---
 
 <Layout
     title="Frameworks"
-    description="Utiliser les composants Ariane avec React, Vue, Angular ou Svelte."
+    description="Utiliser les composants Ariane avec React, Next.js, Vue, Angular ou Svelte."
     currentPath="/getting-started/frameworks"
     showToc={true}
 >
@@ -117,7 +273,9 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 Custom Elements utilisables sans que leur classe soit enregistrée.
             </p>
             <pre><code class="language-js" set:text={codeReactUsage} /></pre>
-            <p class="hint">
+
+            <NarrativeSubheading id="react-evenements">Événements</NarrativeSubheading>
+            <p>
                 Depuis React 19, les Custom Elements sont supportés nativement : un événement
                 personnalisé s'écoute via un préfixe <code>on</code> sensible à la casse
                 (<code>onar-pagination-page-changed</code> écoute l'événement <code>ar-pagination-page-changed</code>).
@@ -125,14 +283,88 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 n'existe pas — passez par une ref et <code>addEventListener</code> :
             </p>
             <pre><code class="language-js" set:text={codeReactEventFallback} /></pre>
+
+            <NarrativeSubheading id="react-proprietes">Propriétés et attributs</NarrativeSubheading>
             <p>
-                Une propriété JS complexe (objet, fonction) passe toujours par une ref, quelle que
-                soit la version :
+                React 19 décide pour chaque prop : si le nom existe sur l'élément, il affecte la <strong>propriété</strong> ; sinon il pose un <strong>attribut</strong> (<code>true</code> donne un attribut vide ; <code>false</code>, <code>undefined</code> ou une fonction retirent l'attribut). Un nom en camelCase
+                (<code>isDateDisabled</code>, <code>closeOnBackdrop</code>) est donc une propriété,
+                et un nom en kebab-case (<code>close-on-backdrop</code>) un attribut.
+            </p>
+            <pre><code class="language-js" set:text={codeReactProps} /></pre>
+            <p>
+                Pour une valeur simple, les deux formes donnent le même résultat : chaque attribut
+                d'Ariane est réfléchi, donc un sélecteur CSS comme <code>[path="e1"]</code> ou un <code>querySelector</code> fonctionne quelle que soit la forme employée.
+            </p>
+            <p>
+                Une fonction, un objet ou un booléen se passe directement dans une prop camelCase, à condition
+                que le composant soit défini avant le rendu — ce que garantit l'import ci-dessus.
+                Si la classe est enregistrée plus tard (autoloader CDN, import dynamique), le nom
+                n'existe pas encore sur l'élément : React n'écrit alors qu'un attribut (que le navigateur
+                met en minuscules, donc sans effet), ignore une fonction et convertit un objet en texte. Dans ce cas, et sur React 18 et antérieur
+                (où toute prop est un attribut), passez par une ref :
             </p>
             <pre><code class="language-js" set:text={codeReactProperty} /></pre>
+
+            <NarrativeSubheading id="react-typage">Typage TypeScript</NarrativeSubheading>
+            <p>
+                Importez une fois, n'importe où dans le projet, le sous-chemin qui ne contient que
+                des types. Il déclare le JSX des balises <code>ar-*</code> : propriétés,
+                attributs en kebab-case et props d'événement <code>onar-…</code>, avec le type de <code>detail</code>.
+            </p>
+            <pre><code class="language-ts" set:text={codeReactTypes} /></pre>
+            <pre><code class="language-js" set:text={codeReactTypesUsage} /></pre>
+            <p class="hint">
+                Les types portent sur les balises par défaut (<code>ar-*</code>) : avec un préfixe
+                personnalisé, ils ne s'appliquent pas. <code>addEventListener('ar-…')</code> est typé
+                dès que le paquet est importé, sans ce sous-chemin.
+            </p>
+
+            <NarrativeSubheading id="react-hydratation">Rendu serveur et hydratation</NarrativeSubheading>
+            <p>
+                Avec un rendu serveur suivi de <code>hydrateRoot</code> (par exemple dans Next.js),
+                deux comportements sont à connaître. Ils ne concernent pas un rendu uniquement côté client.
+            </p>
+            <ul class="narrative-list">
+                <li>
+                    <strong>Props posées tardivement.</strong> Sur un élément rendu par le serveur, <code>onar-…</code> et les propriétés JS ne sont posés qu'au premier rendu qui
+                    modifie la prop. Écoutez alors par ref, et posez les propriétés dans
+                    un <code>useEffect</code> :
+                </li>
+            </ul>
+            <pre><code class="language-js" set:text={codeReactHydration} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    <strong><code>ar-charcounter</code> défini avant l'hydratation.</strong> Le
+                    composant rattache le champ le premier, et l'événement natif <code>change</code>, à la perte de focus, déclenche un <code>onChange</code> de
+                    React en plus (même valeur que le précédent, une fois par saisie). Sans
+                    conséquence pour un gestionnaire qui ne fait que mettre à jour un état ; à
+                    prendre en compte s'il envoie une requête, sauvegarde ou mesure. Pour l'éviter,
+                    définissez les composants après l'hydratation :
+                </li>
+            </ul>
+            <pre><code class="language-js" set:text={codeReactDefineAfterHydration} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://react.dev/reference/react-dom/components#custom-html-elements"
                 target="_blank" rel="noopener">documentation officielle de React sur les Custom Elements</a>.
+            </p>
+
+            <NarrativeHeading id="nextjs">Next.js</NarrativeHeading>
+            <p>
+                Ariane ne prend pas officiellement en charge le rendu serveur (voir <a href="/getting-started/compatibilite#ssr">Compatibilité</a>) : le HTML produit par Next.js contient les balises <code>ar-*</code> et leur contenu, mais pas leur shadow DOM. Les composants se définissent dans le navigateur, une fois le JavaScript chargé. Next.js étant un framework React, les événements, les propriétés, le typage et l'hydratation sont décrits dans la <a href="#react">section React</a>. Ne sont reprises ici que les particularités de l'App Router.
+            </p>
+
+            <NarrativeSubheading id="nextjs-chargement">Charger la librairie</NarrativeSubheading>
+            <p>
+                Chargez la librairie dans un Client Component monté dans le layout, par un <code>import()</code> dans un <code>useEffect</code>. Un import dans un Server Component ne définit rien dans le navigateur.
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextLoader} /></pre>
+            <p>
+                Avec <code>@ariane-ui/core/headless</code>, enregistrez les classes dans le même effet. Gardez le <code>customElements.get</code> : en développement, StrictMode exécute l'effet deux fois.
+            </p>
+            <pre><code class="language-tsx" set:text={codeNextHeadless} /></pre>
+            <p class="hint">
+                Pour plus d'information sur ce sujet, voir la <a href="https://nextjs.org/docs/app/getting-started/server-and-client-components"
+                target="_blank" rel="noopener">documentation officielle de Next.js sur les Server et Client Components</a>.
             </p>
 
             <NarrativeHeading id="vue">Vue</NarrativeHeading>
@@ -146,14 +378,85 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
             <pre><code class="language-html" set:text={codeVueTemplate} /></pre>
             <p>Et le script associé :</p>
             <pre><code class="language-js" set:text={codeVueScript} /></pre>
-            <p class="hint">
-                Vue affecte un binding en propriété JS (plutôt qu'en attribut) uniquement si sa clé
-                correspond exactement à un nom déjà présent sur l'élément — un souci si le composant
-                n'est pas encore chargé au moment du rendu (chargement asynchrone, cas courant avec
-                l'autoloader CDN d'Ariane). Le modificateur <code>.prop</code> force ce comportement de
-                façon fiable, quel que soit le moment du rendu — c'est l'approche recommandée par Vue
-                lui-même pour ce cas.
+
+            <NarrativeSubheading id="vue-proprietes">Propriétés et attributs</NarrativeSubheading>
+            <p>
+                Vue décide pour chaque liaison : si la clé existe sur l'élément, il affecte la <strong>propriété</strong> ; sinon il pose un <strong>attribut</strong>. Un attribut
+                statique (<code>path="e1"</code>) suit la même règle. Le modificateur <code>.prop</code> force la propriété, <code>.attr</code> (ou le préfixe <code>^</code>) force l'attribut.
             </p>
+            <p>
+                Un nom en kebab-case n'existe pas sur l'élément : <code>:is-date-disabled="fn"</code> devient un attribut texte, et la propriété reste <code>undefined</code>, sans erreur
+                ni avertissement. Écrivez le nom en camelCase. <code>.prop</code> ne convertit pas
+                le nom : <code>:is-date-disabled.prop</code> viserait une clé qui n'existe pas, il
+                faut <code>:isDateDisabled.prop</code> ou ajouter <code>.camel</code>.
+            </p>
+            <pre><code class="language-html" set:text={codeVueKebab} /></pre>
+            <p>
+                Pour une fonction ou un objet, préférez <code>.prop</code> : il reste fiable même
+                si le composant n'est pas encore défini au moment du rendu (chargement asynchrone,
+                cas courant avec l'autoloader CDN), alors que la liaison sans modificateur ne
+                devient une propriété que si la classe est déjà enregistrée. C'est aussi
+                l'approche recommandée par Vue pour ce cas.
+            </p>
+            <p>
+                Un nombre se lie plutôt qu'il ne s'écrit : un attribut statique
+                (<code>total="10"</code>) est affecté à la propriété comme une chaîne, alors que <code>:total="10"</code> donne un nombre.
+            </p>
+            <pre><code class="language-html" set:text={codeVueNumbers} /></pre>
+            <p class="hint">
+                Chaque attribut d'Ariane est réfléchi : un sélecteur CSS comme <code>[path="e1"]</code> ou un <code>querySelector</code> fonctionne quelle que soit
+                la forme employée. Les attributs ARIA se posent tels quels : par exemple <code>role="alert"</code> sur une <code>ar-alert</code> pour une annonce immédiate.
+            </p>
+
+            <NarrativeSubheading id="vue-v-model">v-model</NarrativeSubheading>
+            <p>
+                <code>v-model</code> fonctionne sur <code>ar-datepicker</code> : il lit et écrit <code>value</code> (une date au format <code>yyyy-MM-dd</code>). Le composant émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour.
+                Sur un champ suivi par <code>ar-charcounter</code>, le <code>v-model</code> du
+                champ lui-même met à jour le compteur, y compris pour un préremplissage ou un
+                vidage fait par le code.
+            </p>
+            <pre><code class="language-html" set:text={codeVueModel} /></pre>
+            <p class="hint">
+                L'événement <code>ar-datepicker-input-change</code> porte aussi <code>valid</code> (la date respecte-t-elle <code>min</code> et <code>max</code>)
+                et <code>valueAsDate</code>, que <code>v-model</code> ne donne pas.
+            </p>
+
+            <NarrativeSubheading id="vue-typage">Typage TypeScript</NarrativeSubheading>
+            <p>
+                Importez une fois, n'importe où dans le projet, le sous-chemin qui ne contient que
+                des types. Il déclare les balises <code>ar-*</code> (<code>GlobalComponents</code>)
+                avec leurs propriétés et leurs événements, dont le <code>detail</code> est typé.
+                Dans un gabarit, <code>@ar-dialog-hide</code> est typé par <code>onArDialogHide</code>.
+            </p>
+            <pre><code class="language-ts" set:text={codeVueTypes} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    Par défaut, <code>vue-tsc</code> signale une valeur du mauvais type ou hors de
+                    l'union (<code>variant="danger"</code>) et type l'événement reçu par un
+                    gestionnaire.
+                </li>
+                <li>
+                    Avec <code>strictTemplates</code>, un nom d'événement mal orthographié est aussi
+                    signalé. Une propriété au nom mal orthographié ne l'est pas, dans les deux modes.
+                </li>
+                <li>
+                    Avec <code>strictTemplates</code>, <code>v-model</code> sur une balise Ariane est
+                    signalé (<code>vue-tsc</code> le traite comme celui d'un composant Vue) : utilisez <code>:value</code> et l'événement.
+                </li>
+            </ul>
+            <p class="hint">
+                Les types portent sur les balises par défaut (<code>ar-*</code>) : avec un préfixe
+                personnalisé, ils ne s'appliquent pas.
+            </p>
+
+            <NarrativeSubheading id="vue-theme-sombre">Thème sombre</NarrativeSubheading>
+            <p>
+                Le thème sombre manuel passe par <code>data-theme="dark"</code> sur <code>:root</code>. Les règles du thème sont dans une couche CSS
+                (<code>ariane.theme</code>) : un <code>color-scheme</code> posé sur <code>:root</code> sans couche, comme celui du <code>style.css</code> d'un
+                projet Vite, l'emporte et neutralise <code>data-theme</code>. Ne l'appliquez que
+                lorsque <code>data-theme</code> est absent :
+            </p>
+            <pre><code class="language-css" set:text={codeVueDark} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://vuejs.org/guide/extras/web-components.html"
                 target="_blank" rel="noopener">documentation officielle de Vue sur les Custom Elements</a>.
@@ -173,22 +476,67 @@ const codeSvelteMarkup = `<ar-pagination current={1} total={10} onar-pagination-
                 un attribut), donc les valeurs complexes passent sans configuration
                 additionnelle.
             </p>
+
+            <NarrativeSubheading id="angular-evenements">Événements et typage</NarrativeSubheading>
+            <p>
+                Dès que le paquet est importé quelque part dans le projet (le <code>import '@ariane-ui/core'</code> de <code>main.ts</code> suffit), <code>$event</code> est typé : <code>(ar-pagination-page-changed)</code> reçoit un <code>CustomEvent</code> dont le <code>detail</code> est connu, sans cast. Les noms
+                d'événements restent en kebab-case, tels que documentés.
+            </p>
+            <pre><code class="language-html" set:text={codeAngularEvents} /></pre>
+            <p class="hint">
+                Sous <code>CUSTOM_ELEMENTS_SCHEMA</code>, Angular ne vérifie pas les liaisons de propriétés :
+                <code>[curent]="3"</code> (faute de frappe) ou <code>[total]="'dix'"</code> compilent sans erreur. C'est
+                une limite d'Angular, qu'aucun fichier de types ne lève.
+            </p>
+
+            <NarrativeSubheading id="angular-formulaires">Formulaires</NarrativeSubheading>
+            <p>
+                <code>ar-datepicker</code> est un champ de formulaire : ajoutez <code>ngDefaultControl</code> pour que <code>ngModel</code>, <code>formControl</code> et <code>[formField]</code> (signal forms) le reconnaissent. Sans lui, Angular lève <code>NG01203: No value accessor</code> à l'exécution. Le composant émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour, ce que l'accesseur par défaut écoute ; la valeur échangée est une date <code>yyyy-MM-dd</code>.
+            </p>
+            <pre><code class="language-html" set:text={codeAngularForms} /></pre>
+            <ul class="narrative-list">
+                <li>
+                    Le modèle suit la valeur validée : à la sélection dans le calendrier, ou à la
+                    validation d'une saisie (Entrée, perte de focus), pas à chaque frappe.
+                </li>
+                <li>
+                    <code>setValue()</code>, <code>reset()</code> et la réinitialisation du formulaire natif sont répercutés dans le champ.
+                </li>
+                <li>
+                    Un <code>ar-charcounter</code> suit le champ qu'il observe, y compris lorsque
+                    la valeur est écrite par programme (<code>ngModel</code>, <code>setValue()</code>).
+                </li>
+            </ul>
+
+            <NarrativeSubheading id="angular-open">État ouvert/fermé</NarrativeSubheading>
+            <p>
+                Un composant peut se fermer seul (Échap, clic en dehors, bouton de fermeture) sans que l'état d'Angular le sache. Si <code>[open]</code> est lié à un signal resté à <code>true</code>, un nouveau clic sur « Ouvrir » réécrit <code>true</code> : Angular ne réaffecte pas une liaison inchangée, et le composant ne se rouvre pas. Resynchronisez l'état sur l'événement de fermeture. Le motif vaut pour <code>ar-dialog</code>, <code>ar-collapse</code>, <code>ar-dropdown</code> et <code>ar-datepicker</code> (<code>ar-*-hidden</code>).
+            </p>
+            <pre><code class="language-html" set:text={codeAngularOpen} /></pre>
+
+            <NarrativeSubheading id="angular-theme">Shadow DOM et budget</NarrativeSubheading>
+            <p>
+                Un composant Angular en <code>ViewEncapsulation.ShadowDom</code> est un shadow DOM applicatif : les tokens du thème du document le traversent, pas les règles <code>::part()</code> (voir <a href="/theming/shadow-dom">Dans un shadow DOM applicatif</a>). Importer la feuille du thème dans le <code>styleUrl</code> du composant fonctionne, mais le <code>ng build</code> de production échoue sur le budget <code>anyComponentStyle</code> (8 kB en erreur par défaut) : la palette seule en pèse plus de 25. Adoptez plutôt une feuille partagée, ou relevez le budget dans <code>angular.json</code> :
+            </p>
+            <pre><code class="language-json" set:text={codeAngularBudget} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://angular.dev/guide/elements"
                 target="_blank" rel="noopener">documentation officielle d'Angular sur les Custom Elements</a>.
             </p>
 
             <NarrativeHeading id="svelte">Svelte</NarrativeHeading>
-            <p>Importez le paquet, puis utilisez les composants directement dans le markup :</p>
-            <pre><code class="language-js" set:text={codeSvelteScript} /></pre>
-            <pre><code class="language-html" set:text={codeSvelteMarkup} /></pre>
-            <p class="hint">
-                Svelte affecte les valeurs non-textuelles (comme une fonction) en propriété JS plutôt
-                qu'en attribut dès que la clé correspond à un nom existant sur l'élément — un mécanisme
-                heuristique, pas garanti dans tous les cas (notamment si le composant n'est pas encore
-                chargé au moment du rendu). Vérifiez le comportement sur votre cas d'usage avant de vous
-                y fier pour une valeur critique.
+            <p>
+                Avec Svelte 5, importez le paquet, puis utilisez les composants directement dans le markup. Svelte ne type pas les événements d'un élément personnalisé : annotez le paramètre du gestionnaire. <code>HTMLElementEventMap['ar-pagination-page-changed']</code> donne un <code>detail</code> typé, dès que le paquet est importé.
             </p>
+            <pre><code class="language-html" set:text={codeSvelteScript} /></pre>
+            <p>
+                Si le composant est défini après le rendu (autoloader CDN, import dynamique), une fonction (<code>isDateDisabled</code>) ou un booléen en camelCase (<code>closeOnBackdrop={'{true}'}</code>) sont posés comme attributs en minuscules et perdus. Affectez-les alors en propriété une fois le composant défini :
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteLate} /></pre>
+            <p>
+                <code>bind:value</code> est refusé sur un élément personnalisé. <code>ar-datepicker</code> émet <code>input</code> et <code>change</code> sur l'hôte une fois <code>value</code> à jour : liez <code>value</code> et écoutez l'événement.
+            </p>
+            <pre><code class="language-html" set:text={codeSvelteForm} /></pre>
             <p class="hint">
                 Pour plus d'information sur ce sujet, voir la <a href="https://svelte.dev/docs/svelte/custom-elements"
                 target="_blank" rel="noopener">documentation officielle de Svelte sur les Custom Elements</a>.

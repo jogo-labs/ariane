@@ -117,7 +117,8 @@ describe('ariane.css — bordures de survol et de champ inactif', () => {
     for (const state of ['readonly', 'disabled'] as const) {
         it(`ar-datepicker : la bordure du champ ${state} s'aligne sur celle du trigger désactivé`, async () => {
             const el = document.createElement('ar-datepicker') as ArDatepicker;
-            el[state] = true;
+            if (state === 'readonly') el.readOnly = true;
+            else el.disabled = true;
             root.appendChild(el);
             await el.updateComplete;
             const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
@@ -159,7 +160,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
         const scope = document.createElement('div');
         scope.setAttribute('data-theme', theme);
         const el = document.createElement('ar-datepicker') as ArDatepicker;
-        if (opts.readonly) el.readonly = true;
+        if (opts.readonly) el.readOnly = true;
         if (opts.disabled) el.disabled = true;
         const error = document.createElement('span');
         error.slot = 'error';

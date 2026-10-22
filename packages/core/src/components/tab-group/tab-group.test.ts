@@ -19,6 +19,90 @@ describe('ArTabGroup', () => {
     let el: ArTabGroup;
     afterEach(() => el?.remove());
 
+    // ── Identifiants de l'application (#324) ────────────────────────────────
+
+    describe("identifiants posés par l'application", () => {
+        it('conserve les id existants et câble aria-controls / aria-labelledby dessus', async () => {
+            el = await fixture(`
+                <ar-tab-group>
+                    <ar-tab panel="a" id="mon-onglet-a">A</ar-tab>
+                    <ar-tab panel="b" id="mon-onglet-b">B</ar-tab>
+                    <ar-tab-panel name="a" id="mon-panneau-a">PA</ar-tab-panel>
+                    <ar-tab-panel name="b" id="mon-panneau-b">PB</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            await waitForUpdate(el);
+            const tabA = el.querySelector<HTMLElement>('ar-tab[panel="a"]')!;
+            const panelA = el.querySelector<HTMLElement>('ar-tab-panel[name="a"]')!;
+            expect(tabA.id).toBe('mon-onglet-a');
+            expect(panelA.id).toBe('mon-panneau-a');
+            expect(tabA.getAttribute('aria-controls')).toBe('mon-panneau-a');
+            expect(panelA.getAttribute('aria-labelledby')).toBe('mon-onglet-a');
+        });
+
+        it("ne génère un id que pour l'élément qui n'en a pas, et le câblage suit", async () => {
+            el = await fixture(`
+                <ar-tab-group>
+                    <ar-tab panel="a" id="mon-onglet-a">A</ar-tab>
+                    <ar-tab-panel name="a">PA</ar-tab-panel>
+                </ar-tab-group>
+            `);
+            await waitForUpdate(el);
+            const tabA = el.querySelector<HTMLElement>('ar-tab')!;
+            const panelA = el.querySelector<HTMLElement>('ar-tab-panel')!;
+            expect(tabA.id).toBe('mon-onglet-a');
+            expect(panelA.id).not.toBe('');
+            expect(tabA.getAttribute('aria-controls')).toBe(panelA.id);
+            expect(panelA.getAttribute('aria-labelledby')).toBe('mon-onglet-a');
+        });
+
+        it('un id généré reste stable aux synchronisations suivantes', async () => {
+            el = await fixture(DEFAULT_HTML);
+            await waitForUpdate(el);
+            const tabA = el.querySelector<HTMLElement>('ar-tab[panel="a"]')!;
+            const generated = tabA.id;
+            expect(generated).not.toBe('');
+            el.active = 'b';
+            await waitForUpdate(el);
+            expect(tabA.id).toBe(generated);
+        });
+    });
+
+    // ── Réflexion des attributs à vide (#324) ───────────────────────────────
+
+    describe('attributs active et label non réfléchis à vide', () => {
+        it("n'écrit ni active ni label au premier rendu", async () => {
+            el = await fixture(DEFAULT_HTML);
+            await waitForUpdate(el);
+            expect(el.hasAttribute('active')).toBe(false);
+            expect(el.hasAttribute('label')).toBe(false);
+        });
+
+        it('reflète active et label quand ils ont une valeur ; revenus à vide, les attributs restent', async () => {
+            el = await fixture(DEFAULT_HTML);
+            el.active = 'b';
+            el.label = 'Mon groupe';
+            await waitForUpdate(el);
+            expect(el.getAttribute('active')).toBe('b');
+            expect(el.getAttribute('label')).toBe('Mon groupe');
+            el.active = '';
+            el.label = '';
+            await waitForUpdate(el);
+            // Comme un attribut natif (`id`) : une fois posé, l'attribut reste, même vide.
+            expect(el.getAttribute('active')).toBe('');
+            expect(el.getAttribute('label')).toBe('');
+        });
+
+        it('lit toujours les attributs posés dans le HTML', async () => {
+            el = await fixture(
+                '<ar-tab-group active="b" label="Mon groupe"><ar-tab panel="a">A</ar-tab><ar-tab panel="b">B</ar-tab><ar-tab-panel name="a">PA</ar-tab-panel><ar-tab-panel name="b">PB</ar-tab-panel></ar-tab-group>',
+            );
+            await waitForUpdate(el);
+            expect(el.active).toBe('b');
+            expect(el.label).toBe('Mon groupe');
+        });
+    });
+
     // ── Rendu ───────────────────────────────────────────────────────────────
 
     describe('rendu', () => {

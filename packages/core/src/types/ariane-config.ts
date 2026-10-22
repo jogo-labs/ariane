@@ -1,6 +1,9 @@
 /**
  * Contrat de configuration globale exposé par les consommateurs CDN via
- * `window.ARIANE_CONFIG` avant le chargement du script Ariane.
+ * `window.ARIANE_CONFIG` (ou `globalThis.ARIANE_CONFIG`) avant le chargement du script Ariane.
+ *
+ * Module (et non `.d.ts`) pour être émis dans `dist/` et inclus par l'import du paquet : un
+ * fichier `.d.ts` n'est pas copié par `tsc`, la déclaration n'atteignait donc pas les consommateurs.
  */
 interface ArianeConfig {
     /**
@@ -15,6 +18,8 @@ declare global {
     interface Window {
         ARIANE_CONFIG?: ArianeConfig;
     }
+    // `globalThis.ARIANE_CONFIG` : lu sur `globalThis` pour rester valide sans `window` (serveur).
+    var ARIANE_CONFIG: ArianeConfig | undefined;
 }
 
 export {};

@@ -2,10 +2,13 @@
  * Point d'entrée principal du package.
  * Ce fichier est généré/mis à jour par scripts/create-component.js.
  * Pour importer un seul composant (tree-shaking) :
- *   import '@ariane-ui/core/components/alert/index.js';
+ *   import '@ariane-ui/core/dist/components/alert/index.js';
  */
+// Types seulement : augmentation de `HTMLElementEventMap` (événements typés) et de `Window`.
+import './types/elements.generated.js';
+import './types/ariane-config.js';
 export { whenAllDefined, registerTranslation } from './utils/index.js';
-export type { WhenAllDefinedOptions, Translation } from './utils/index.js';
+export type { WhenAllDefinedOptions, Translation, FullTranslation } from './utils/index.js';
 export type { ArEventDetail } from './utils/index.js';
 export { prefersReducedMotion } from './utils/media.js';
 export { HasSlotController } from './controllers/has-slot.controller.js';
@@ -59,4 +62,7 @@ import './components/collapse/index.js';
 export { ArCollapse } from './components/collapse/collapse.js';
 import './components/datepicker/index.js';
 export { ArDatepicker } from './components/datepicker/datepicker.js';
-export type { ArDatepickerInputDetail } from './components/datepicker/datepicker.js';
+export type {
+    ArDatepickerInputDetail,
+    ArDatepickerViewChangeDetail,
+} from './components/datepicker/datepicker.js';

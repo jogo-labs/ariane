@@ -5,11 +5,70 @@ import { announceA11y, clearA11yRegion } from '../../a11y/announce-a11y.js';
 import styles from './charcounter.styles.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 export type CharcounterState = 'normal' | 'warning' | 'error';
+
+type CounterField = HTMLInputElement | HTMLTextAreaElement;
+
+interface ValueWatch {
+    before: PropertyDescriptor | undefined;
+    mine: PropertyDescriptor;
+    listeners: Set<() => void>;
+}
+
+/** Un seul `value` enveloppé par champ, partagé par tous les compteurs qui le suivent. */
+const valueWatches = new WeakMap<CounterField, ValueWatch>();
+
+/**
+ * Un `value` posé par programme (modèle d'un framework, donnée chargée) n'émet aucun événement
+ * `input`, et la plateforme n'offre ni observateur ni événement pour ce cas. Le champ voit donc son
+ * `value` enveloppé, sur l'instance seulement, jusqu'au départ du dernier compteur. Un `value`
+ * propre au champ (suivi de valeur de React) est conservé et appelé.
+ */
+function watchValue(field: CounterField, listener: () => void): void {
+    const existing = valueWatches.get(field);
+    if (existing) {
+        existing.listeners.add(listener);
+        return;
+    }
+    let owner: object | null = field;
+    let inherited: PropertyDescriptor | undefined;
+    while (owner && !(inherited = Object.getOwnPropertyDescriptor(owner, 'value'))) {
+        owner = Object.getPrototypeOf(owner);
+    }
+    if (!inherited?.get || !inherited.set || !inherited.configurable) return;
+    const { get, set } = inherited;
+    const listeners = new Set([listener]);
+    const mine: PropertyDescriptor = {
+        configurable: true,
+        enumerable: inherited.enumerable ?? false,
+        get() {
+            return get.call(this);
+        },
+        set(value: string) {
+            set.call(field, value);
+            listeners.forEach((notify) => notify());
+        },
+    };
+    valueWatches.set(field, {
+        before: Object.getOwnPropertyDescriptor(field, 'value'),
+        mine,
+        listeners,
+    });
+    Object.defineProperty(field, 'value', mine);
+}
+
+function unwatchValue(field: CounterField, listener: () => void): void {
+    const watch = valueWatches.get(field);
+    if (!watch) return;
+    watch.listeners.delete(listener);
+    if (watch.listeners.size > 0) return;
+    valueWatches.delete(field);
+    // Si le framework a redéfini `value` depuis, son descripteur reste en place.
+    if (Object.getOwnPropertyDescriptor(field, 'value')?.set !== watch.mine.set) return;
+    if (watch.before) Object.defineProperty(field, 'value', watch.before);
+    else delete (field as { value?: string }).value;
+}
 
 function pluralize(count: number, label: string): string {
     if (!label.includes('|')) return label;
@@ -49,10 +108,10 @@ export class ArCharcounter extends ArianeElement {
     private readonly localize = new LocalizeController(this);
 
     /** ID du champ observé. Requis. */
-    @property({ reflect: true }) for: string | undefined;
+    @property({ attribute: 'for', reflect: true }) htmlFor: string | undefined;
 
     /** Limite de caractères. Requis. */
-    @property({ type: Number }) max: number | undefined;
+    @property({ type: Number, reflect: true }) max: number | undefined;
 
     /** Nombre de caractères restants déclenchant l'état warning. */
     @property({ attribute: 'warn-threshold', reflect: true, type: Number }) warnThreshold = 20;
@@ -69,6 +128,11 @@ export class ArCharcounter extends ArianeElement {
     private _errorAnnounceTimer: ReturnType<typeof setTimeout> | undefined;
 
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
+    private _form: HTMLFormElement | null = null;
+    private _fieldWatcher: MutationObserver | undefined;
+    private _resetTimer: ReturnType<typeof setTimeout> | undefined;
+    private _warnedMissingFor: string | undefined;
+    private _errorCount: number | undefined;
 
     /** État courant. Readonly — piloté par le composant. */
     get state(): CharcounterState {
@@ -77,7 +141,7 @@ export class ArCharcounter extends ArianeElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
-        if (!this.for) {
+        if (!this.htmlFor) {
             warn('ar-charcounter', "l'attribut for est requis.");
         }
         if (this.max === undefined) {
@@ -92,7 +156,8 @@ export class ArCharcounter extends ArianeElement {
     }
 
     override updated(changed: PropertyValues<this>): void {
-        if (changed.has('for')) {
+        // Déjà rattaché au bon champ (connectedCallback, avant le premier rendu) : rien à refaire.
+        if (changed.has('htmlFor') && !(this._field && this._field === this._resolveField())) {
             this._detachField();
             // Defer to next microtask so that requestUpdate() (called in _attachField)
             // runs after _$didUpdate() finishes its change-in-update check.
@@ -117,29 +182,92 @@ export class ArCharcounter extends ArianeElement {
         this._detachField();
     }
 
-    private _attachField(): void {
-        if (!this.for) return;
-        const root = this.getRootNode();
-        const field = (root as Document | ShadowRoot).getElementById(this.for) as
-            HTMLInputElement | HTMLTextAreaElement | null;
-        if (!field) {
-            warn('ar-charcounter', `Aucun élément trouvé avec l'id "${this.for}".`);
+    /**
+     * Relit le champ observé et met à jour le décompte. Rarement utile : le compteur suit déjà la
+     * saisie, `value` et `form.reset()`. À appeler après un texte inséré par `setRangeText()`, ou si
+     * un framework remplace l'élément du champ (même `id`, nouvel élément).
+     */
+    refresh(): void {
+        if (!this.isConnected || !this.htmlFor) return;
+        const field = this._resolveField();
+        if (field !== this._field) {
+            this._detachField();
+            this._attachField();
             return;
         }
+        if (field) {
+            this._bindForm(field);
+            this._handleInput();
+        }
+    }
+
+    private _resolveField(): (HTMLInputElement | HTMLTextAreaElement) | null {
+        if (!this.htmlFor) return null;
+        const root = this.getRootNode() as Document | ShadowRoot;
+        if (typeof root.getElementById !== 'function') return null;
+        return root.getElementById(this.htmlFor) as HTMLInputElement | HTMLTextAreaElement | null;
+    }
+
+    private _attachField(): void {
+        if (!this.htmlFor) return;
+        const field = this._resolveField();
+        if (!field) {
+            if (this._warnedMissingFor !== this.htmlFor) {
+                this._warnedMissingFor = this.htmlFor;
+                warn(
+                    'ar-charcounter',
+                    `Aucun élément avec l'id "${this.htmlFor}" pour l'instant : le compteur se rattachera quand il apparaîtra.`,
+                );
+            }
+            this._watchForField();
+            return;
+        }
+        this._stopWatchingForField();
         this._field = field;
         this._count = field.value.length;
         this._computeState();
+        // Un nouveau champ n'a pas encore les attributs : l'état peut être inchangé (champ remplacé).
+        if (this._state !== 'normal') this._setLinkedAttributes(this._state);
         this._addAriaDescribedby(field);
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
+        watchValue(field, this._handleInput);
+        this._bindForm(field);
+    }
+
+    /** Suit `reset` sur le formulaire courant du champ (il peut changer sans changer de champ). */
+    private _bindForm(field: HTMLInputElement | HTMLTextAreaElement): void {
+        if (field.form === this._form) return;
+        this._form?.removeEventListener('reset', this._handleFormReset);
+        this._form = field.form;
+        this._form?.addEventListener('reset', this._handleFormReset);
     }
 
     private _detachField(): void {
+        this._stopWatchingForField();
+        clearTimeout(this._resetTimer);
+        this._form?.removeEventListener('reset', this._handleFormReset);
+        this._form = null;
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
+        unwatchValue(this._field, this._handleInput);
         this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;
+    }
+
+    /** Attend l'apparition du champ (rendu après le compteur, `v-if`, `@if`…). */
+    private _watchForField(): void {
+        if (this._fieldWatcher) return;
+        this._fieldWatcher = new MutationObserver(() => {
+            if (this._resolveField()) this._attachField();
+        });
+        this._fieldWatcher.observe(this.getRootNode(), { childList: true, subtree: true });
+    }
+
+    private _stopWatchingForField(): void {
+        this._fieldWatcher?.disconnect();
+        this._fieldWatcher = undefined;
     }
 
     private _ensureId(): string {
@@ -178,6 +306,12 @@ export class ArCharcounter extends ArianeElement {
         this.requestUpdate();
     };
 
+    /** Le navigateur applique la remise à zéro après l'événement `reset` : relire à la tâche suivante. */
+    private readonly _handleFormReset = (): void => {
+        clearTimeout(this._resetTimer);
+        this._resetTimer = setTimeout(() => this.refresh(), 0);
+    };
+
     private _computeState(): void {
         if (this.max === undefined) return;
         const remaining = this.max - this._count;
@@ -193,15 +327,18 @@ export class ArCharcounter extends ArianeElement {
             nextState = 'normal';
         }
 
+        if (nextState !== 'error') this._errorCount = undefined;
         if (nextState !== prevState) {
             this._state = nextState;
+            if (nextState === 'error') this._errorCount = this._count;
             this._announceTransition(nextState, remaining);
             if (nextState === 'normal') {
                 this._clearLinkedAttributes();
             } else {
                 this._setLinkedAttributes(nextState);
             }
-        } else if (nextState === 'error') {
+        } else if (nextState === 'error' && this._count !== this._errorCount) {
+            this._errorCount = this._count;
             clearTimeout(this._errorAnnounceTimer);
             this._errorAnnounceTimer = setTimeout(() => {
                 this._announceTransition(nextState, remaining);

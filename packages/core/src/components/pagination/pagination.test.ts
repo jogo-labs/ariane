@@ -941,13 +941,16 @@ describe('ArPagination', () => {
             document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
         });
 
-        it("n'annonce rien tant que current n'est pas confirmé par le consommateur", async () => {
+        it("n'annonce pas la page tant que current n'est pas confirmé par le consommateur", async () => {
             el = await fixture('<ar-pagination current="3" total="5"></ar-pagination>');
             (requirePart(el, 'prev') as HTMLElement).click();
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
 
-            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+            // Seule l'attente est annoncée, pas la page.
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
         });
 
         it('un clic sur prev confirmé annonce "Page N-1 sur M"', async () => {
@@ -1138,6 +1141,236 @@ describe('ArPagination', () => {
             el = await fixture('<ar-pagination current="8" total="15" lang="en"></ar-pagination>');
             const landmark = el.shadowRoot?.querySelector('#ar-pagination');
             expect(landmark?.textContent).toBe('Pagination, page 8 of 15');
+        });
+    });
+    describe('pending (#327)', () => {
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        const nav = (): HTMLElement => requirePart(el, 'pagination') as HTMLElement;
+
+        it('absent par défaut : pas de aria-busy', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            expect(el.pending).toBe(false);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it('est réfléchi comme attribut booléen', async () => {
+            el = await fixture('<ar-pagination total="5"></ar-pagination>');
+            el.pending = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('pending')).toBe(true);
+        });
+
+        it('pending : aria-busy="true" sur le landmark', async () => {
+            el = await fixture('<ar-pagination current="2" total="5" pending></ar-pagination>');
+            expect(nav().getAttribute('aria-busy')).toBe('true');
+            expect(partContains(nav(), 'pagination')).toBe(true);
+        });
+
+        it('non bloquant : un clic émet toujours ar-pagination-page-change', async () => {
+            el = await fixture('<ar-pagination current="2" total="5" pending></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-change', handler);
+            (requirePart(el, 'next') as HTMLElement).click();
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it("retirer pending retire aria-busy et la part d'état", async () => {
+            el = await fixture('<ar-pagination total="5" pending></ar-pagination>');
+            el.pending = false;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it('annonce polie au passage false → true', async () => {
+            el = await fixture('<ar-pagination total="5"></ar-pagination>');
+            el.pending = true;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
+        });
+
+        it('aucune annonce au montage avec pending, ni au retour à false', async () => {
+            el = await fixture('<ar-pagination total="5" pending></ar-pagination>');
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+            el.pending = false;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+        });
+
+        it("l'annonce suit lang", async () => {
+            el = await fixture('<ar-pagination total="5" lang="en"></ar-pagination>');
+            el.pending = true;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe('Loading…');
+        });
+
+        it('le focus demandé par un clic survit à pending et se pose à la confirmation', async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', () => {
+                el.pending = true;
+            });
+            const shadow = el.shadowRoot as ShadowRoot;
+            (shadow.querySelector('[data-ar-pagination-page="3"]') as HTMLElement).click();
+            await waitForUpdate(el);
+            el.current = 3;
+            el.pending = false;
+            await waitForUpdate(el);
+            const current = shadow.querySelector('span[part~="current"]') as HTMLElement;
+            expect(shadow.activeElement).toBe(current);
+        });
+    });
+
+    describe('attente automatique (#327)', () => {
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+        afterEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+        });
+
+        const nav = (): HTMLElement => requirePart(el, 'pagination') as HTMLElement;
+        const click = async (part: string): Promise<void> => {
+            (requirePart(el, part) as HTMLElement).click();
+            await waitForUpdate(el);
+        };
+
+        it("un page-change non annulé met le composant en attente, sans toucher à l'attribut", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            expect(nav().getAttribute('aria-busy')).toBe('true');
+            expect(el.pending).toBe(false);
+            expect(el.hasAttribute('pending')).toBe(false);
+        });
+
+        it("réassigner current vers une autre page met fin à l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            el.current = 3;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it("réassigner current à la même valeur (échec côté application) met fin à l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            el.current = 2;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it('un page-change annulé ne met pas en attente', async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
+            await click('next');
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it("une réponse synchrone dans le handler n'allume ni attente ni annonce", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            await click('next');
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Page 3 sur 5',
+            );
+        });
+
+        it("l'attribut pending reste à la charge de l'application et prolonge l'attente", async () => {
+            el = await fixture('<ar-pagination current="2" total="5" pending></ar-pagination>');
+            await click('next');
+            el.current = 3;
+            await waitForUpdate(el);
+            expect(nav().getAttribute('aria-busy')).toBe('true');
+            el.pending = false;
+            await waitForUpdate(el);
+            expect(nav().hasAttribute('aria-busy')).toBe(false);
+        });
+
+        it("l'attente automatique est annoncée une seule fois", async () => {
+            el = await fixture('<ar-pagination current="2" total="5"></ar-pagination>');
+            await click('next');
+            await click('next');
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(document.getElementById('ar-live-region-polite')?.textContent).toBe(
+                'Chargement en cours…',
+            );
+        });
+    });
+
+    describe('intégration framework (#327)', () => {
+        it('S-022 : current posé après le premier rendu ne déclenche ni page-changed ni annonce', async () => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
+            el = await fixture('<ar-pagination total="5"></ar-pagination>');
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-changed', handler);
+            el.current = 3;
+            await waitForUpdate(el);
+            await new Promise((resolve) => setTimeout(resolve, 60));
+            expect(handler).not.toHaveBeenCalled();
+            expect(document.getElementById('ar-live-region-polite')).toBeNull();
+        });
+
+        it('S-022 : les changements suivants émettent à nouveau page-changed', async () => {
+            el = await fixture('<ar-pagination total="5"></ar-pagination>');
+            el.current = 3;
+            await waitForUpdate(el);
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-changed', handler);
+            el.current = 4;
+            await waitForUpdate(el);
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('S-022 : une réponse à page-change émet page-changed même depuis la valeur par défaut', async () => {
+            el = await fixture('<ar-pagination total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => {
+                el.current = (e as CustomEvent<ArPaginationPageChangeDetail>).detail.to;
+            });
+            const handler = vi.fn();
+            el.addEventListener('ar-pagination-page-changed', handler);
+            (requirePart(el, 'next') as HTMLElement).click();
+            await waitForUpdate(el);
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('S-029 : le select reflète current après un page-change non annulé et sans réponse', async () => {
+            el = await fixture('<ar-pagination current="3" total="15"></ar-pagination>');
+            // @ts-expect-error accès à un champ privé pour simuler une mesure ResizeObserver
+            el._budget = 2;
+            el.requestUpdate();
+            await waitForUpdate(el);
+            const select = (el.shadowRoot as ShadowRoot).querySelector(
+                'select[part~="select"]',
+            ) as HTMLSelectElement;
+            select.value = '15';
+            select.dispatchEvent(new Event('change'));
+            expect(el.current).toBe(3);
+            expect(select.value).toBe('3');
+        });
+
+        it("S-030 : un page-change annulé n'attire pas le focus lors d'un set programmatique ultérieur", async () => {
+            el = await fixture('<ar-pagination current="1" total="5"></ar-pagination>');
+            el.addEventListener('ar-pagination-page-change', (e) => e.preventDefault());
+            const shadow = el.shadowRoot as ShadowRoot;
+            (shadow.querySelector('[data-ar-pagination-page="4"]') as HTMLElement).click();
+            await waitForUpdate(el);
+            el.current = 4;
+            await waitForUpdate(el);
+            expect(shadow.activeElement).toBeNull();
         });
     });
 });

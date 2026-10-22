@@ -62,6 +62,9 @@ const codeNpmIndividuel = `import '@ariane-ui/core/dist/components/alert/index.j
                 En développement local, utilisez <code>autoloader.dev.js</code> à la place pour obtenir des avertissements détaillés dans la console.</p>
             <p>Les composants sont ensuite utilisables directement, par exemple un composant Alerte :</p>
             <pre><code class="language-html" set:text={codeUsage} /></pre>
+            <p class="hint">
+                L'autoloader reste utilisable dans une application construite avec un framework, avec un ajustement : il définit un composant quand son tag apparaît dans la page, donc après le rendu. Une valeur que le framework a posée avant ce moment est perdue quand elle ne peut pas passer par un attribut texte : une fonction (<code>isDateDisabled</code>) ou un booléen en camelCase (<code>closeOnBackdrop</code>). Affectez-la alors en propriété une fois le composant défini (<code>customElements.whenDefined</code>). Le détail par framework est dans la page <a href="/getting-started/frameworks">Frameworks</a>.
+            </p>
 
             <p>
                 Si vous utilisez beaucoup de composants ou souhaitez éviter les imports dynamiques, vous pouvez également charger tous les composants en une seule requête.

@@ -1025,4 +1025,187 @@ describe('ArDialog', () => {
             expect(heading?.textContent?.trim()).toBe('Dialog');
         });
     });
+
+    // ── pending, report de fermeture et réouverture (#329) ────────────────────
+
+    describe('pending, report de fermeture et réouverture (#329)', () => {
+        const live = (kind: 'polite' | 'assertive'): string | null | undefined =>
+            document.getElementById(`ar-live-region-${kind}`)?.textContent;
+        const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 60));
+        const accept = (): void => {
+            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
+            body.setAttribute('data-ar-accept', '');
+            body.click();
+            body.removeAttribute('data-ar-accept');
+        };
+        const reducedMotion = (): void => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+        };
+
+        beforeEach(async () => {
+            el = await fixture('<ar-dialog label="Titre" open></ar-dialog>');
+        });
+        afterEach(() => vi.restoreAllMocks());
+
+        it('accepted annulé avec pending posé : report, sans secousse ni annonce de blocage', async () => {
+            el.addEventListener('ar-dialog-accepted', (e) => {
+                e.preventDefault();
+                el.pending = true;
+            });
+            accept();
+            await waitForUpdate(el);
+            await settle();
+            expect(el.open).toBe(true);
+            expect(getDialogEl(el).classList.contains('shake')).toBe(false);
+            expect(live('assertive')).toBeFalsy();
+            expect(live('polite')).toBe('Traitement en cours…');
+            expect(getDialogEl(el).getAttribute('aria-busy')).toBe('true');
+        });
+
+        it('accepted annulé sans pending : secousse et annonce de blocage', async () => {
+            el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
+            accept();
+            await waitForUpdate(el);
+            await settle();
+            expect(getDialogEl(el).classList.contains('shake')).toBe(true);
+            expect(live('assertive')).toBe('Fermeture bloquée.');
+        });
+
+        it('hide annulé avec pending posé : report silencieux', async () => {
+            el.addEventListener('ar-dialog-hide', (e) => {
+                e.preventDefault();
+                el.pending = true;
+            });
+            el.open = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(el.open).toBe(true);
+            expect(getDialogEl(el).classList.contains('shake')).toBe(false);
+            expect(live('assertive')).toBeFalsy();
+        });
+
+        it('pendant pending, les tentatives de fermeture sont ignorées en silence', async () => {
+            el.pending = true;
+            await waitForUpdate(el);
+            const seen = vi.fn();
+            for (const name of ['ar-dialog-accepted', 'ar-dialog-dismissed', 'ar-dialog-hide']) {
+                el.addEventListener(name, seen);
+            }
+            accept();
+            (requireShadow(el).querySelector('[data-ar-dismiss]') as HTMLElement).click();
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+            await waitForUpdate(el);
+            await settle();
+            expect(seen).not.toHaveBeenCalled();
+            expect(el.open).toBe(true);
+            expect(getDialogEl(el).classList.contains('shake')).toBe(false);
+            expect(live('assertive')).toBeFalsy();
+        });
+
+        it("pending levé puis open = false par l'application : le dialog se ferme", async () => {
+            reducedMotion();
+            el.pending = true;
+            await waitForUpdate(el);
+            el.pending = false;
+            el.open = false;
+            await waitForUpdate(el);
+            expect(getDialogEl(el).open).toBe(false);
+            expect(el.open).toBe(false);
+        });
+
+        it('pending pose :state(pending), se reflète et ne se pose jamais seul', async () => {
+            el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
+            accept();
+            await waitForUpdate(el);
+            expect(el.pending).toBe(false);
+            el.pending = true;
+            await waitForUpdate(el);
+            expect(el.hasAttribute('pending')).toBe(true);
+            expect(getDialogEl(el).hasAttribute('aria-busy')).toBe(true);
+        });
+
+        it("pending posé dès le montage : pas d'annonce", async () => {
+            el.remove();
+            el = await fixture('<ar-dialog label="Titre" open pending></ar-dialog>');
+            await settle();
+            expect(live('polite')).toBeFalsy();
+        });
+
+        it('lang="en" traduit l\'annonce d\'attente', async () => {
+            el.remove();
+            el = await fixture('<ar-dialog label="Titre" open lang="en"></ar-dialog>');
+            el.pending = true;
+            await waitForUpdate(el);
+            await settle();
+            expect(live('polite')).toBe('Processing…');
+        });
+
+        it('seuls show, hide, dismissed et accepted sont annulables', async () => {
+            el.remove();
+            el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
+            reducedMotion();
+            const cancelable = new Map<string, boolean>();
+            for (const name of [
+                'ar-dialog-show',
+                'ar-dialog-show-prevented',
+                'ar-dialog-shown',
+                'ar-dialog-hide',
+                'ar-dialog-hide-prevented',
+                'ar-dialog-hidden',
+                'ar-dialog-dismissed',
+                'ar-dialog-dismissed-prevented',
+                'ar-dialog-accepted',
+                'ar-dialog-accepted-prevented',
+            ]) {
+                el.addEventListener(name, (e) => {
+                    cancelable.set(name, e.cancelable);
+                    if (name === 'ar-dialog-accepted') e.preventDefault();
+                });
+            }
+            el.open = true;
+            await waitForUpdate(el);
+            accept();
+            await waitForUpdate(el);
+            el.open = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(Object.fromEntries(cancelable)).toMatchObject({
+                'ar-dialog-show': true,
+                'ar-dialog-shown': false,
+                'ar-dialog-hide': true,
+                'ar-dialog-hidden': false,
+                'ar-dialog-accepted': true,
+                'ar-dialog-accepted-prevented': false,
+            });
+        });
+
+        it('open repassé à vrai pendant la fermeture : fermeture abandonnée, hide-prevented', async () => {
+            vi.useFakeTimers();
+            const events: string[] = [];
+            for (const name of [
+                'ar-dialog-hide',
+                'ar-dialog-hide-prevented',
+                'ar-dialog-hidden',
+                'ar-dialog-show',
+            ]) {
+                el.addEventListener(name, () => events.push(name));
+            }
+            el.open = false;
+            await waitForUpdate(el);
+            el.open = true;
+            await waitForUpdate(el);
+            await vi.advanceTimersByTimeAsync(600);
+            vi.useRealTimers();
+            await waitForUpdate(el);
+            expect(el.open).toBe(true);
+            expect(getDialogEl(el).open).toBe(true);
+            expect(getDialogEl(el).classList.contains('closing')).toBe(false);
+            expect(getDialogEl(el).hasAttribute('inert')).toBe(false);
+            expect(events).toStrictEqual(['ar-dialog-hide', 'ar-dialog-hide-prevented']);
+        });
+    });
 });

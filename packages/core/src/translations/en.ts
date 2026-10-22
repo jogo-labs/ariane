@@ -1,7 +1,7 @@
 import { registerTranslation } from '@shoelace-style/localize';
-import type { Translation } from '../types/translation.js';
+import type { FullTranslation } from '../types/translation.js';
 
-const translation: Translation = {
+const translation: FullTranslation = {
     $code: 'en',
     $name: 'English',
     $dir: 'ltr',
@@ -39,6 +39,7 @@ const translation: Translation = {
     sortFailed: (columnLabel) => `${columnLabel}: sort failed.`,
 
     // ── ar-datepicker ────────────────────────────────────────────────────
+    datepickerPending: 'Loading…',
     today: 'Today',
     close: 'Close',
     closeCalendar: 'Close calendar',
@@ -62,10 +63,12 @@ const translation: Translation = {
     pageStatus: (page, total) => `Page ${page} of ${total}`,
     compactPageStatus: (current, total) => `Page ${current} / ${total}`,
     goToPage: 'Go to page',
+    paginationPending: 'Loading…',
     paginationLandmark: (page, total) => `Pagination, page ${page} of ${total}`,
 
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Form steps',
+    stepperPending: 'Loading…',
     stepLabel: (order, isSubstep) => `${isSubstep ? 'sub-' : ''}step ${order}:`,
     currentStepStatus: (current, total) => `Step ${current} / ${total} (in progress)`,
 
@@ -85,10 +88,16 @@ const translation: Translation = {
     // ── ar-dialog ────────────────────────────────────────────────────────
     closeDialog: 'Close dialog',
     closingBlocked: 'Closing blocked.',
+    dialogPending: 'Processing…',
     dialogDefaultLabel: 'Dialog',
 
     // ── ar-alert ─────────────────────────────────────────────────────────
     closeAlert: 'Close alert',
+
+    // ── Form validation ──────────────────────────────────────────────────
+    validationValueMissing: 'Please fill out this field.',
+    validationRangeUnderflow: (min) => `Date must be ${min} or later.`,
+    validationRangeOverflow: (max) => `Date must be ${max} or earlier.`,
 };
 
 registerTranslation(translation);

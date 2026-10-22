@@ -36,7 +36,7 @@ describe('ArDropdown', () => {
         it('placement="bottom-start"', () => expect(el.placement).toBe('bottom-start'));
         it('disabled=false', () => expect(el.disabled).toBe(false));
         it('noScrollLock=false', () => expect(el.noScrollLock).toBe(false));
-        it('for=""', () => expect(el.for).toBe(''));
+        it('triggerId=""', () => expect(el.triggerId).toBe(''));
     });
 
     // ── Attributs reflect ─────────────────────────────────────────────────────
@@ -72,9 +72,9 @@ describe('ArDropdown', () => {
         });
 
         it('for reflète en attribut', async () => {
-            el.for = 'mon-btn';
+            el.triggerId = 'mon-btn';
             await waitForUpdate(el);
-            expect(el.getAttribute('for')).toBe('mon-btn');
+            expect(el.getAttribute('trigger-id')).toBe('mon-btn');
         });
     });
 
@@ -282,13 +282,13 @@ describe('ArDropdown', () => {
         afterEach(() => externalBtn.remove());
 
         it('pose aria-haspopup et aria-expanded sur le trigger externe', async () => {
-            el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
+            el = await fixture('<ar-dropdown trigger-id="test-ext-trigger"></ar-dropdown>');
             expect(externalBtn.getAttribute('aria-haspopup')).toBe('true');
             expect(externalBtn.getAttribute('aria-expanded')).toBe('false');
         });
 
         it('le clic sur le trigger externe ouvre le dropdown', async () => {
-            el = await fixture('<ar-dropdown for="test-ext-trigger"></ar-dropdown>');
+            el = await fixture('<ar-dropdown trigger-id="test-ext-trigger"></ar-dropdown>');
             mockPopoverPanel(el);
 
             externalBtn.click();
@@ -299,7 +299,7 @@ describe('ArDropdown', () => {
 
         it('le slot trigger est ignoré quand for est défini', async () => {
             el = await fixture(`
-                <ar-dropdown for="test-ext-trigger">
+                <ar-dropdown trigger-id="test-ext-trigger">
                     <button slot="trigger" id="slot-btn">Slot</button>
                 </ar-dropdown>
             `);
@@ -309,7 +309,7 @@ describe('ArDropdown', () => {
 
         it("affiche un warn si l'ID est introuvable", async () => {
             const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-            el = await fixture('<ar-dropdown for="id-qui-nexiste-pas"></ar-dropdown>');
+            el = await fixture('<ar-dropdown trigger-id="id-qui-nexiste-pas"></ar-dropdown>');
             expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('id-qui-nexiste-pas'));
             warnSpy.mockRestore();
         });
@@ -378,7 +378,7 @@ describe('ArDropdown', () => {
         it('émet un warn si for pointe vers un ID inexistant (firstUpdated)', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            el = await fixture('<ar-dropdown for="id-qui-nexiste-pas"></ar-dropdown>');
+            el = await fixture('<ar-dropdown trigger-id="id-qui-nexiste-pas"></ar-dropdown>');
 
             expect(spy).toHaveBeenCalledOnce();
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
@@ -389,7 +389,7 @@ describe('ArDropdown', () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             el = await fixture<ArDropdown>('<ar-dropdown></ar-dropdown>');
 
-            el.for = 'id-inconnu';
+            el.triggerId = 'id-inconnu';
             await waitForUpdate(el);
 
             expect(spy).toHaveBeenCalledOnce();
@@ -397,20 +397,20 @@ describe('ArDropdown', () => {
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('id-inconnu'));
         });
 
-        it('émet un warn si for et slot="trigger" sont tous les deux définis', async () => {
+        it('émet un warn si trigger-id et slot="trigger" sont tous les deux définis', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
             const conflictBtn = document.createElement('button');
             conflictBtn.id = 'conflict-warn-btn';
             document.body.appendChild(conflictBtn);
 
             el = await fixture(`
-                <ar-dropdown for="conflict-warn-btn">
+                <ar-dropdown trigger-id="conflict-warn-btn">
                     <button slot="trigger">Slot trigger</button>
                 </ar-dropdown>
             `);
 
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('[ar-dropdown]'));
-            expect(spy).toHaveBeenCalledWith(expect.stringContaining('for'));
+            expect(spy).toHaveBeenCalledWith(expect.stringContaining('trigger-id'));
             expect(spy).toHaveBeenCalledWith(expect.stringContaining('priorité'));
 
             conflictBtn.remove();
@@ -428,7 +428,7 @@ describe('ArDropdown', () => {
                     const root = this.attachShadow({ mode: 'open' });
                     root.innerHTML = `
                         <button id="trigger-in-shadow">Ouvrir</button>
-                        <ar-dropdown for="trigger-in-shadow">
+                        <ar-dropdown trigger-id="trigger-in-shadow">
                             <div>Contenu</div>
                         </ar-dropdown>
                     `;

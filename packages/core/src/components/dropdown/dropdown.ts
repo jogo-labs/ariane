@@ -1,13 +1,15 @@
 import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
 import { property, query } from 'lit/decorators.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { ArDropdownItem } from '../dropdown-item/dropdown-item.js';
 import { warn } from '../../utils/warn.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import panelStyles from '../../styles/shared/panel.styles.js';
 import styles from './dropdown.styles.js';
+
+const DISABLED = ':disabled, [aria-disabled="true"]';
 
 export type ArDropdownPlacement =
     | 'top'
@@ -27,7 +29,7 @@ export type ArDropdownPlacement =
  * @summary Affiche un panneau contextuel déclenché par un bouton, positionné automatiquement autour de lui. À utiliser pour des menus d'actions, des filtres, ou tout contenu additionnel qui ne justifie pas un dialog.
  * @display demo
  *
- * @slot trigger  - Le bouton déclencheur (ignoré si `for` est défini).
+ * @slot trigger  - Le bouton déclencheur (ignoré si `trigger-id` est défini).
  * @slot          - Contenu du panel (libre ou ar-dropdown-item pour le mode menu).
  *
  * @csspart panel - Le panel flottant.
@@ -53,6 +55,7 @@ export type ArDropdownPlacement =
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide           - Émis avant la fermeture. @cancelable
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hide-prevented - Émis si ar-dropdown-hide est annulé.
  * @event {CustomEvent<{ id: string | undefined }>} ar-dropdown-hidden         - Émis après la fermeture.
+ * @event {CustomEvent<{ id: string | undefined, item: ArDropdownItem }>} ar-dropdown-select - En mode menu, à l'activation d'un item (clic, Entrée, Espace) ; `item` est l'`ar-dropdown-item` activé. Sans annulation, le menu se ferme. @cancelable
  *
  * @tagname ar-dropdown
  */
@@ -79,7 +82,7 @@ export class ArDropdown extends ArianeElement {
      * ID d'un élément déclencheur externe (light DOM). Quand défini, le slot
      * `trigger` est ignoré.
      */
-    @property({ reflect: true }) for = '';
+    @property({ attribute: 'trigger-id', reflect: true }) triggerId = '';
 
     @query('[part="panel"]') private _panel!: HTMLElement;
 
@@ -107,19 +110,19 @@ export class ArDropdown extends ArianeElement {
     }
 
     override firstUpdated(): void {
-        if (this.for) {
+        if (this.triggerId) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
             if (slot?.assignedElements({ flatten: true }).length) {
                 warn(
                     'ar-dropdown',
-                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                    'trigger-id et slot="trigger" sont tous les deux définis — trigger-id prend la priorité.',
                 );
             }
         }
         const trigger = this._resolvedTrigger;
         if (trigger && this._panel) {
             this._popover.attach(trigger, this._panel);
-            if (this.for) {
+            if (this.triggerId) {
                 trigger.addEventListener('click', this._handleTriggerClick);
                 this._externalTrigger = trigger;
             }
@@ -139,16 +142,16 @@ export class ArDropdown extends ArianeElement {
         if (changed.has('noScrollLock')) {
             this._popover.setLockScroll(!this.noScrollLock);
         }
-        if (changed.has('for')) {
+        if (changed.has('triggerId')) {
             this._externalTrigger?.removeEventListener('click', this._handleTriggerClick);
             this._externalTrigger = null;
             const newTrigger = this._resolvedTrigger;
-            if (this.for && !newTrigger) {
-                warn('ar-dropdown', `Aucun élément trouvé avec l'id "${this.for}".`);
+            if (this.triggerId && !newTrigger) {
+                warn('ar-dropdown', `Aucun élément trouvé avec l'id "${this.triggerId}".`);
             }
             if (newTrigger && this._panel) {
                 this._popover.attach(newTrigger, this._panel);
-                if (this.for) {
+                if (this.triggerId) {
                     newTrigger.addEventListener('click', this._handleTriggerClick);
                     this._externalTrigger = newTrigger;
                 }
@@ -173,21 +176,21 @@ export class ArDropdown extends ArianeElement {
     }
 
     private get _resolvedTrigger(): HTMLElement | null {
-        if (this.for) {
+        if (this.triggerId) {
             const root = this.getRootNode() as Document | ShadowRoot;
-            return root.getElementById(this.for);
+            return root.getElementById(this.triggerId);
         }
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
         return (slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined) ?? null;
     }
 
     private _handleTriggerSlotChange(): void {
-        if (this.for) {
+        if (this.triggerId) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
             if (slot?.assignedElements({ flatten: true }).length) {
                 warn(
                     'ar-dropdown',
-                    'for et slot="trigger" sont tous les deux définis — for prend la priorité.',
+                    'trigger-id et slot="trigger" sont tous les deux définis — trigger-id prend la priorité.',
                 );
             }
             return;
@@ -228,7 +231,7 @@ export class ArDropdown extends ArianeElement {
         if (this._menuMode) this._activateMenuListeners();
         void this._popover.show().then(() => {
             if (this._menuMode) this._focusMenuItem(0);
-            emitToggleEvent(this, 'ar-dropdown-shown', { cancelable: false });
+            emitEvent(this, 'ar-dropdown-shown');
         });
     }
 
@@ -238,16 +241,36 @@ export class ArDropdown extends ArianeElement {
         this._activeIndex = -1;
         this._popover.hide();
         this._resolvedTrigger?.focus();
-        emitToggleEvent(this, 'ar-dropdown-hidden', { cancelable: false });
+        emitEvent(this, 'ar-dropdown-hidden');
     }
 
     private _activateMenuListeners(): void {
         this._panel?.addEventListener('keydown', this._handleMenuKeyDown);
+        this._panel?.addEventListener('click', this._handleMenuClick);
     }
 
     private _removeMenuListeners(): void {
         this._panel?.removeEventListener('keydown', this._handleMenuKeyDown);
+        this._panel?.removeEventListener('click', this._handleMenuClick);
     }
+
+    /**
+     * Clic, Entrée et Espace aboutissent tous à un `click` natif sur l'élément slotté : un seul
+     * écouteur couvre les trois. L'événement `ar-dropdown-select` est indépendant du clic, qu'il
+     * n'annule jamais.
+     */
+    private _handleMenuClick = (e: MouseEvent): void => {
+        const path = e.composedPath();
+        const item = path.find((n): n is ArDropdownItem => n instanceof ArDropdownItem);
+        if (!item) return;
+        const inside = path.slice(0, path.indexOf(item));
+        if (inside.some((n) => n instanceof Element && n.matches(DISABLED))) return;
+        const selected = emitEvent<{ item: ArDropdownItem }>(this, 'ar-dropdown-select', {
+            cancelable: true,
+            detail: { item },
+        });
+        if (!selected.defaultPrevented) this.open = false;
+    };
 
     private _handlePanelKeyDown = (e: KeyboardEvent): void => {
         if (e.key === 'Escape' || e.key === 'Tab') this.open = false;
@@ -272,6 +295,13 @@ export class ArDropdown extends ArianeElement {
             case 'End':
                 e.preventDefault();
                 this._focusMenuItem(items.length - 1);
+                break;
+            case ' ':
+                // Un lien ne s'active pas à l'Espace nativement, contrairement à un bouton.
+                if (e.target instanceof HTMLAnchorElement) {
+                    e.preventDefault();
+                    e.target.click();
+                }
                 break;
         }
     };

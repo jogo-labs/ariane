@@ -63,7 +63,7 @@ const playgroundVariant = playgroundVariantName
     ? variants.find((v: { name: string }) => v.name === playgroundVariantName)
     : variants[0];
 
-// Préfixe les id= et les data-*-open="id" du playground pour éviter les collisions
+// Préfixe les id= (trigger-id= compris) et les data-*-open="id" du playground pour éviter les collisions
 // avec les aperçus de variantes qui utilisent le même HTML (même IDs).
 const rawPlaygroundHtml = playgroundVariant?.html ?? '';
 const playgroundHtml = rawPlaygroundHtml

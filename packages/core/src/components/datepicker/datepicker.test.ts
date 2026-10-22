@@ -46,7 +46,7 @@ describe('ArDatepicker', () => {
 
         it('format vaut "dd/MM/yyyy"', () => expect(el.format).toBe('dd/MM/yyyy'));
         it('disabled vaut false', () => expect(el.disabled).toBe(false));
-        it('readonly vaut false', () => expect(el.readonly).toBe(false));
+        it('readonly vaut false', () => expect(el.readOnly).toBe(false));
         it('open vaut false', () => expect(el.open).toBe(false));
     });
 
@@ -62,7 +62,7 @@ describe('ArDatepicker', () => {
         });
 
         it('readonly se reflète en attribut', async () => {
-            el.readonly = true;
+            el.readOnly = true;
             await waitForUpdate(el);
             expect(el.hasAttribute('readonly')).toBe(true);
         });
@@ -116,7 +116,7 @@ describe('ArDatepicker', () => {
         });
 
         it("readonly bloque l'ouverture", async () => {
-            el.readonly = true;
+            el.readOnly = true;
             await waitForUpdate(el);
             el.open = true;
             await waitForUpdate(el);
@@ -489,6 +489,62 @@ describe('ArDatepicker', () => {
         });
     });
 
+    describe('réflexion de value (#325)', () => {
+        it('n\'écrit pas value="" au premier rendu, mais reflète une valeur posée', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            await waitForUpdate(el);
+            expect(el.hasAttribute('value')).toBe(false);
+            el.value = '2026-06-12';
+            await waitForUpdate(el);
+            expect(el.getAttribute('value')).toBe('2026-06-12');
+        });
+    });
+
+    describe('formResetCallback (#325)', () => {
+        it('restaure la valeur initiale, remet le texte de saisie et ferme le panneau', async () => {
+            el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-06-02';
+            el.open = true;
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+            expect(el.inputElement.value).toBe('01/05/2026');
+            expect(el.open).toBe(false);
+        });
+
+        it("revient à vide quand il n'y avait pas de valeur initiale", async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-06-02';
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('');
+            expect(el.inputElement.value).toBe('');
+        });
+
+        it('un reset avant le premier rendu conserve la valeur initiale', async () => {
+            el = document.createElement('ar-datepicker') as ArDatepicker;
+            el.setAttribute('value', '2026-05-01');
+            document.body.append(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+        });
+
+        it('la valeur initiale reste celle du premier rendu', async () => {
+            el = await fixture('<ar-datepicker value="2026-05-01"></ar-datepicker>');
+            await waitForUpdate(el);
+            el.value = '2026-07-07';
+            await waitForUpdate(el);
+            el.formResetCallback();
+            await waitForUpdate(el);
+            expect(el.value).toBe('2026-05-01');
+        });
+    });
+
     describe('setValidity / required', () => {
         // happy-dom ne supporte pas attachInternals() ni form.checkValidity() pour les FACE.
         // On injecte un faux ElementInternals via attachInternals pour espionner setValidity.
@@ -519,6 +575,54 @@ describe('ArDatepicker', () => {
                     ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
                 );
                 expect(valueMissingCall).toBeDefined();
+            }),
+        );
+
+        it(
+            'le message de validité obligatoire suit lang="en"',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="en"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Please fill out this field.');
+            }),
+        );
+
+        it(
+            'le message de validité obligatoire suit lang="fr"',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="fr"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Veuillez renseigner ce champ.');
+            }),
+        );
+
+        it(
+            "langue sans traduction : le message de validité se replie sur l'anglais",
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required lang="de"></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call?.[1]).toBe('Please fill out this field.');
+            }),
+        );
+
+        it(
+            '<ar-datepicker required disabled> → aucun message valueMissing',
+            withFakeInternals(async (setValiditySpy) => {
+                el = await fixture('<ar-datepicker required disabled></ar-datepicker>');
+                await waitForUpdate(el);
+                const call = setValiditySpy.mock.calls.find(
+                    ([flags]: [ValidityStateFlags]) => flags?.valueMissing === true,
+                );
+                expect(call).toBeUndefined();
             }),
         );
 
@@ -661,6 +765,274 @@ describe('ArDatepicker', () => {
                 value: null,
                 valueAsDate: null,
                 valid: false,
+            });
+        });
+    });
+    describe('intégration framework (#326)', () => {
+        const selectDay = (day: Date): void =>
+            (el as unknown as { _selectDay(d: Date): void })._selectDay(day);
+        const dayButtons = (): HTMLButtonElement[] =>
+            Array.from(el.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part~="day"]') ?? []);
+
+        describe('événements natifs input/change (S-010)', () => {
+            it("sélection calendrier : input puis change sur l'hôte, value déjà à jour", async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const seen: string[] = [];
+                for (const type of ['input', 'change']) {
+                    el.addEventListener(type, (e) => seen.push(`${type}:${el.value}:${e.bubbles}`));
+                }
+                selectDay(new Date(2026, 5, 12));
+                expect(seen).toStrictEqual(['input:2026-06-12:true', 'change:2026-06-12:true']);
+            });
+
+            it('non annulables', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const events: Event[] = [];
+                el.addEventListener('change', (e) => events.push(e));
+                selectDay(new Date(2026, 5, 12));
+                expect(events[0]?.cancelable).toBe(false);
+            });
+
+            it('validation de saisie au blur : input puis change', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const seen: string[] = [];
+                el.addEventListener('input', () => seen.push('input'));
+                el.addEventListener('change', () => seen.push('change'));
+                el.inputElement.value = '12/06/2026';
+                el.inputElement.dispatchEvent(new Event('blur'));
+                expect(seen).toStrictEqual(['input', 'change']);
+            });
+
+            it("rien au montage ni pour une valeur posée par l'application", async () => {
+                el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+                const handler = vi.fn();
+                el.addEventListener('input', handler);
+                el.addEventListener('change', handler);
+                el.value = '2026-07-01';
+                await waitForUpdate(el);
+                expect(handler).not.toHaveBeenCalled();
+            });
+        });
+
+        it('S-019 : réassigner isDateDisabled rafraîchit la grille sans rouvrir', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            const target = (): HTMLButtonElement | undefined =>
+                dayButtons().find(
+                    (b) => b.textContent?.trim() === '17' && !b.classList.contains('other-month'),
+                );
+            expect(target()?.getAttribute('aria-disabled')).toBeNull();
+            el.isDateDisabled = (d) => d.getDate() === 17;
+            await waitForUpdate(el);
+            expect(target()?.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('S-019 : réassigner max rafraîchit la grille', async () => {
+            el = await fixture('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.open = true;
+            await waitForUpdate(el);
+            el.max = '2026-06-10';
+            await waitForUpdate(el);
+            const day = dayButtons().find(
+                (b) => b.textContent?.trim() === '20' && !b.classList.contains('other-month'),
+            );
+            expect(day?.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('S-020 : ni hide ni hidden au montage', async () => {
+            const template = document.createElement('template');
+            template.innerHTML = '<ar-datepicker></ar-datepicker>';
+            el = template.content.firstElementChild as ArDatepicker;
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-hide', handler);
+            el.addEventListener('ar-datepicker-hidden', handler);
+            document.body.appendChild(el);
+            await waitForUpdate(el);
+            await waitForUpdate(el);
+            expect(handler).not.toHaveBeenCalled();
+        });
+
+        it('S-021 : un seul input-change pour une sélection calendrier suivie du blur', async () => {
+            el = await fixture('<ar-datepicker></ar-datepicker>');
+            const handler = vi.fn();
+            el.addEventListener('ar-datepicker-input-change', handler);
+            selectDay(new Date(2026, 5, 12));
+            await waitForUpdate(el);
+            el.inputElement.dispatchEvent(new Event('blur'));
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        describe('S-024 : min/max pour une saisie clavier', () => {
+            // happy-dom n'a pas ElementInternals : faux attachInternals pour espionner setValidity.
+            const setValidity = vi.fn();
+            const proto = HTMLElement.prototype as unknown as Record<string, unknown>;
+            beforeEach(() => {
+                setValidity.mockClear();
+                proto.attachInternals = () => ({ setFormValue: vi.fn(), setValidity });
+            });
+            afterEach(() => {
+                delete proto.attachInternals;
+            });
+
+            const type = async (text: string): Promise<CustomEvent> => {
+                const handler = vi.fn();
+                el.addEventListener('ar-datepicker-input-change', handler);
+                el.inputElement.value = text;
+                el.inputElement.dispatchEvent(new Event('blur'));
+                await waitForUpdate(el);
+                return handler.mock.calls[0]?.[0] as CustomEvent;
+            };
+            const lastFlags = (): ValidityStateFlags => setValidity.mock.lastCall?.[0];
+
+            it('au-dessus de max : valid false et rangeOverflow', async () => {
+                el = await fixture('<ar-datepicker max="2026-12-31" lang="en"></ar-datepicker>');
+                const event = await type('20/04/2027');
+                expect(event.detail.valid).toBe(false);
+                expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
+                expect(setValidity.mock.lastCall?.[1]).toBe(
+                    'Date must be December 31, 2026 or earlier.',
+                );
+            });
+
+            it('en dessous de min : valid false et rangeUnderflow', async () => {
+                el = await fixture('<ar-datepicker min="2026-06-01"></ar-datepicker>');
+                const event = await type('20/04/2026');
+                expect(event.detail.valid).toBe(false);
+                expect(lastFlags()).toStrictEqual({ rangeUnderflow: true });
+            });
+
+            it('dans la plage : valide', async () => {
+                el = await fixture(
+                    '<ar-datepicker min="2026-06-01" max="2026-12-31"></ar-datepicker>',
+                );
+                const event = await type('20/09/2026');
+                expect(event.detail.valid).toBe(true);
+                expect(lastFlags()).toStrictEqual({});
+            });
+
+            it('changer max après coup réévalue la validité', async () => {
+                el = await fixture('<ar-datepicker value="2026-09-20"></ar-datepicker>');
+                el.max = '2026-06-30';
+                await waitForUpdate(el);
+                expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
+            });
+        });
+    });
+    describe('pending et view-change (#330)', () => {
+        const nav = (part: string): void =>
+            (el.shadowRoot?.querySelector(`[part~="${part}"]`) as HTMLElement).click();
+        const live = (): string | null | undefined =>
+            document.getElementById('ar-live-region-polite')?.textContent;
+        const views = (): Array<{ year: number; month: number }> => {
+            const seen: Array<{ year: number; month: number }> = [];
+            el.addEventListener('ar-datepicker-view-change', (e) =>
+                seen.push((e as CustomEvent<{ year: number; month: number }>).detail),
+            );
+            return seen;
+        };
+
+        beforeEach(() => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+        });
+
+        describe('view-change', () => {
+            it("est émis à l'ouverture avec le mois affiché (1-12)", async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                const seen = views();
+                el.open = true;
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([{ year: 2026, month: 3 }]);
+            });
+
+            it('est émis à chaque navigation (mois, année)', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                const seen = views();
+                nav('next-month');
+                await waitForUpdate(el);
+                nav('prev-year');
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([
+                    { year: 2026, month: 4 },
+                    { year: 2025, month: 4 },
+                ]);
+            });
+
+            it('est émis à la réouverture, même mois', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                el.open = false;
+                await waitForUpdate(el);
+                const seen = views();
+                el.open = true;
+                await waitForUpdate(el);
+                expect(seen).toMatchObject([{ year: 2026, month: 3 }]);
+            });
+
+            it('ne part pas au montage tant que le calendrier est fermé', async () => {
+                const seen: unknown[] = [];
+                document.addEventListener('ar-datepicker-view-change', (e) => seen.push(e), {
+                    once: true,
+                });
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                await waitForUpdate(el);
+                expect(seen).toHaveLength(0);
+            });
+
+            it('ne part pas pour un clic qui laisse le mois inchangé', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15"></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                const seen = views();
+                el.requestUpdate();
+                await waitForUpdate(el);
+                expect(seen).toHaveLength(0);
+            });
+        });
+
+        describe('pending', () => {
+            it('vaut false par défaut et se reflète', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                expect(el.pending).toBe(false);
+                el.pending = true;
+                await waitForUpdate(el);
+                expect(el.hasAttribute('pending')).toBe(true);
+            });
+
+            it('pose aria-busy sur le panneau', async () => {
+                el = await fixture('<ar-datepicker></ar-datepicker>');
+                const panel = getPart(el, 'panel');
+                expect(panel?.hasAttribute('aria-busy')).toBe(false);
+                el.pending = true;
+                await waitForUpdate(el);
+                expect(panel?.getAttribute('aria-busy')).toBe('true');
+                el.pending = false;
+                await waitForUpdate(el);
+                expect(panel?.hasAttribute('aria-busy')).toBe(false);
+            });
+
+            it("annonce l'attente au passage false → true, pas au montage", async () => {
+                el = await fixture('<ar-datepicker pending></ar-datepicker>');
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(live()).toBeFalsy();
+                el.pending = false;
+                await waitForUpdate(el);
+                el.pending = true;
+                await waitForUpdate(el);
+                await new Promise((resolve) => setTimeout(resolve, 60));
+                expect(live()).toBe('Chargement en cours…');
+            });
+
+            it('le composant ne le pose ni ne le retire seul', async () => {
+                el = await fixture('<ar-datepicker value="2026-03-15" pending></ar-datepicker>');
+                el.open = true;
+                await waitForUpdate(el);
+                nav('next-month');
+                await waitForUpdate(el);
+                expect(el.pending).toBe(true);
             });
         });
     });

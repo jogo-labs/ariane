@@ -133,24 +133,34 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     <ar-tab-panel name="attributs">
                         <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
                         <div class="api-list" role="list">
-                            {component.attributes.map((attr, i) => (
-                                <div class="api-row" role="listitem">
-                                    <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
-                                    <div>
-                                        <span class="api-name">
-                                            {attr.name}
-                                            {reflectsByFieldName.get(attr.fieldName ?? attr.name) && (
-                                                <span class="flag">reflète</span>
+                            {component.attributes.map((attr, i) => {
+                                const propName = attr.fieldName ?? attr.name;
+                                return (
+                                    <div class="api-row" role="listitem">
+                                        <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
+                                        <div>
+                                            <span class="api-name">
+                                                {propName}
+                                                {reflectsByFieldName.get(propName) && (
+                                                    <span class="flag">reflète</span>
+                                                )}
+                                            </span>
+                                            {propName !== attr.name && (
+                                                <span class="api-name api-name--attr">{attr.name}</span>
                                             )}
-                                        </span>
-                                        <code class="api-sig">{attr.type?.text ?? '—'}</code>
-                                        {attr.default !== undefined && (
-                                            <code class="api-default">défaut&nbsp;: {attr.default}</code>
-                                        )}
+                                        </div>
+                                        <div>
+                                            <p class="api-desc">{attr.description ?? ''}</p>
+                                            <p class="api-meta">
+                                                <span><span class="api-meta-label">Type</span> <code class="api-meta-type">{attr.type?.text ?? '—'}</code></span>
+                                                {attr.default !== undefined && (
+                                                    <span><span class="api-meta-label">Défaut</span> <code class="api-meta-default">{attr.default}</code></span>
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p class="api-desc">{attr.description ?? ''}</p>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </ar-tab-panel>
                 )}
@@ -532,10 +542,43 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
         padding: 0;
     }
 
+    /* Attribut HTML sous le nom de la propriété, quand ils diffèrent. */
+    .api-name--attr {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 0.78rem;
+        font-weight: var(--doc-font-weight-normal);
+        color: var(--doc-text-muted);
+    }
+
     .api-desc {
         font-size: var(--doc-font-size-sm);
         color: var(--doc-text-muted);
         margin: 0;
+    }
+
+    /* Type et valeur par défaut, sous la description. */
+    .api-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        margin: 0.4rem 0 0;
+        font-size: var(--doc-font-size-xs);
+        color: var(--doc-text-muted);
+    }
+
+    .api-meta-label {
+        font-weight: var(--doc-font-weight-semibold);
+    }
+
+    .api-meta code {
+        font-family: var(--doc-font-mono);
+        background: transparent;
+        padding: 0;
+    }
+
+    .api-meta-type {
+        color: var(--doc-accent);
     }
 
     .api-desc code {

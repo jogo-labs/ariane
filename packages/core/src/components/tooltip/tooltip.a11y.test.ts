@@ -23,7 +23,7 @@ describe('ar-tooltip — accessibilité', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="help">?</button>
-                    <ar-tooltip for="help">Explication</ar-tooltip>
+                    <ar-tooltip trigger-id="help">Explication</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -38,12 +38,12 @@ describe('ar-tooltip — accessibilité', () => {
                 <div>
                     <button id="a">a</button>
                     <button id="b">b</button>
-                    <ar-tooltip for="a">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="a">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
             const btnA = wrapper.querySelector<HTMLElement>('#a')!;
-            el.for = 'b';
+            el.triggerId = 'b';
             await el.updateComplete;
             expect(btnA.hasAttribute('aria-describedby')).to.equal(false);
         });
@@ -56,7 +56,7 @@ describe('ar-tooltip — accessibilité', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn">x</button>
-                    <ar-tooltip for="btn">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -67,7 +67,7 @@ describe('ar-tooltip — accessibilité', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn2">x</button>
-                    <ar-tooltip for="btn2">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn2">Aide</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -78,7 +78,7 @@ describe('ar-tooltip — accessibilité', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn3">x</button>
-                    <ar-tooltip for="btn3">Description accessible</ar-tooltip>
+                    <ar-tooltip trigger-id="btn3">Description accessible</ar-tooltip>
                 </div>
             `);
             const el = wrapper.querySelector<ArTooltip>('ar-tooltip')!;
@@ -97,7 +97,7 @@ describe('ar-tooltip — accessibilité', () => {
             const wrapper = await fixture<HTMLElement>(html`
                 <div>
                     <button id="btn4">x</button>
-                    <ar-tooltip for="btn4" show-delay="0">Aide</ar-tooltip>
+                    <ar-tooltip trigger-id="btn4" show-delay="0">Aide</ar-tooltip>
                 </div>
             `);
             const btn = wrapper.querySelector<HTMLElement>('#btn4')!;

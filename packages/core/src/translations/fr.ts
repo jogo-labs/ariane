@@ -1,7 +1,7 @@
 import { registerTranslation } from '@shoelace-style/localize';
-import type { Translation } from '../types/translation.js';
+import type { FullTranslation } from '../types/translation.js';
 
-const translation: Translation = {
+const translation: FullTranslation = {
     $code: 'fr',
     $name: 'Français',
     $dir: 'ltr',
@@ -39,6 +39,7 @@ const translation: Translation = {
     sortFailed: (columnLabel) => `${columnLabel} : échec du tri.`,
 
     // ── ar-datepicker ────────────────────────────────────────────────────
+    datepickerPending: 'Chargement en cours…',
     today: "Aujourd'hui",
     close: 'Fermer',
     closeCalendar: 'Fermer le calendrier',
@@ -63,10 +64,12 @@ const translation: Translation = {
     pageStatus: (page, total) => `Page ${page} sur ${total}`,
     compactPageStatus: (current, total) => `Page ${current} / ${total}`,
     goToPage: 'Aller à la page',
+    paginationPending: 'Chargement en cours…',
     paginationLandmark: (page, total) => `Pagination, page ${page} sur ${total}`,
 
     // ── ar-stepper ───────────────────────────────────────────────────────
     stepperNavLabel: 'Étapes du formulaire',
+    stepperPending: 'Chargement en cours…',
     stepLabel: (order, isSubstep) => `${isSubstep ? 'sous-' : ''}étape ${order}:`,
     currentStepStatus: (current, total) => `Étape ${current} / ${total} (en cours)`,
 
@@ -86,10 +89,16 @@ const translation: Translation = {
     // ── ar-dialog ────────────────────────────────────────────────────────
     closeDialog: 'Fermer la boîte de dialogue',
     closingBlocked: 'Fermeture bloquée.',
+    dialogPending: 'Traitement en cours…',
     dialogDefaultLabel: 'Dialogue',
 
     // ── ar-alert ─────────────────────────────────────────────────────────
     closeAlert: "Fermer l'alerte",
+
+    // ── Validation des formulaires ───────────────────────────────────────
+    validationValueMissing: 'Veuillez renseigner ce champ.',
+    validationRangeUnderflow: (min) => `La date doit être au plus tôt le ${min}.`,
+    validationRangeOverflow: (max) => `La date doit être au plus tard le ${max}.`,
 };
 
 registerTranslation(translation);

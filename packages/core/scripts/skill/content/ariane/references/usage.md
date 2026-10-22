@@ -116,7 +116,7 @@ Les slots disponibles sont listés par composant dans `components/<tag>.md`. Le 
 
 ## Événements
 
-Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; la colonne Type de `components/<tag>.md` en donne le type exact (`CustomEvent<{ id: string | undefined, … }>`).
+Les composants émettent des `CustomEvent` standards, nommés `<tag>-<nom>` (`ar-pagination-page-changed`, `ar-collapse-shown`). Avec un préfixe personnalisé, seul le tag change : les noms d'événements restent en `ar-*` (`<acme-pagination>` émet `ar-pagination-page-changed`). Ils s'écoutent avec `addEventListener`. `detail` porte les données ; la colonne Type de `components/<tag>.md` en donne le type exact (`CustomEvent<{ id: string | undefined, … }>`).
 
 Tout événement `ar-*` a un `detail` objet portant `event.detail.id` : la valeur de l'attribut `id` de l'hôte au moment de l'émission, telle quelle, `undefined` si l'hôte n'en a pas. `ar-collapse` et `ar-tooltip` génèrent un `id` quand il est absent (liens ARIA) : cet `id` généré est exposé comme n'importe quel autre. Les champs propres à l'événement (`from`, `to`, `active`, `value`…) s'ajoutent à `id`. Poser son propre `id` sur l'hôte en fait un filtre fiable, surtout quand le shadow DOM d'un composant de l'application ramène la cible de l'événement composé à l'hôte de l'application : `event.target` désigne alors l'hôte de l'application plutôt que le composant `ar-*`. Sinon `event.target` suffit.
 
@@ -162,6 +162,10 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 - Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ id, from, to }`.
 - Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé ni pour `-show` ni pour `-hide`).
 
+### Attente d'une réponse (`pending`)
+
+Les composants qui attendent une réponse de l'application utilisent un attribut booléen `pending` (réfléchi, `:state(pending)`, annonce de l'attente) ; son fonctionnement exact est décrit dans la référence de chaque composant.
+
 ## Méthodes
 
 Certaines actions s'appellent directement sur l'élément, une fois le composant défini (voir « Charger avant d'utiliser »). Exemple avec `ar-collapse`, qui expose `show()` et `hide()` :
@@ -193,3 +197,22 @@ Le paquet npm publie des fichiers de données VS Code générés depuis le Custo
 ```
 
 Le manifeste lui-même est exporté sous `@ariane-ui/core/custom-elements.json`.
+
+## Types TypeScript
+
+Importer `@ariane-ui/core` (ou `/headless`) type `addEventListener` : chaque événement `ar-*` reçoit son `CustomEvent<…>`, `detail` compris, sans cast. `window.ARIANE_CONFIG` est aussi déclaré (`import '@ariane-ui/core/utils'` suffit).
+
+```ts
+el.addEventListener('ar-dropdown-select', (event) => {
+    event.detail.item; // ArDropdownItem
+});
+```
+
+Le JSX React et les gabarits Vue se typent en important, une fois dans le projet, un sous-chemin qui ne contient que des types :
+
+```ts
+import '@ariane-ui/core/react'; // JSX : propriétés, attributs et props d'événement `onar-…` (React 19)
+import '@ariane-ui/core/vue'; // GlobalComponents : propriétés et événements (onArDialogHide)
+```
+
+Les types portent sur les balises par défaut (`ar-*`) : avec un préfixe personnalisé, ils ne s'appliquent pas. Sous Angular, `$event` est typé par la carte d'événements ; les propriétés ne sont pas vérifiées sous `CUSTOM_ELEMENTS_SCHEMA`.

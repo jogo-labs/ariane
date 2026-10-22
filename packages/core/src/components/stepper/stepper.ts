@@ -1,4 +1,4 @@
-import { html, type TemplateResult, type CSSResultGroup, type PropertyValues } from 'lit';
+import { html, nothing, type TemplateResult, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 
@@ -17,10 +17,7 @@ import { ArStepperItem } from '../stepper-item/stepper-item.js';
 import { warn } from '../../utils/warn.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 /** Détail de l'événement émis lors d'une demande ou d'une confirmation de changement d'étape */
 export interface ArStepperStepChangeDetail extends ArEventDetail {
@@ -73,6 +70,7 @@ export interface ArStepperStepChangeDetail extends ArEventDetail {
  * @cssprop --ar-panel-show-duration - Durée de l'animation d'ouverture du panel partagé (respecte `prefers-reduced-motion`).
  *
  * @cssState open - Le panel mobile est ouvert.
+ * @cssState pending - Une réponse est attendue : un utilisateur a demandé à changer d'étape ou l'application a posé manuellement l'attribut `pending`.
  *
  * @event {CustomEvent<{ id: string | undefined, from: string, to: string }>} ar-stepper-step-change - Émis avant le
  *   changement d'étape, au clic. Annulable via `preventDefault()` : bloque la navigation,
@@ -91,22 +89,37 @@ export class ArStepper extends ArianeElement {
     /**
      * Chemin de l'étape courante. Doit correspondre au `path` d'un `<ar-stepper-item>`.
      * Mettre à jour cette propriété pour naviguer programmatiquement entre les étapes.
+     *
+     * Toute affectation compte, même vers la même valeur (`hasChanged` toujours vrai) : réassigner
+     * `currentPath` est la réponse de l'application à `ar-stepper-step-change`, y compris pour
+     * signaler un échec (même étape), et met fin à l'attente automatique.
      */
-    @property({ type: String, attribute: 'current-path', reflect: true })
+    @property({ type: String, attribute: 'current-path', reflect: true, hasChanged: () => true })
     currentPath = '';
+
+    /**
+     * Attente d'une réponse, pilotée par l'application. Le composant attend déjà seul la réponse
+     * à chaque `ar-stepper-step-change` non annulé, jusqu'à la prochaine affectation de
+     * `currentPath` : cet attribut sert à exprimer une attente qui ne passe pas par l'événement et
+     * reste à la charge de l'application. Le composant ne le pose ni ne le retire jamais. Non
+     * bloquant. L'attente, manuelle ou automatique, pose `aria-busy="true"` sur la navigation,
+     * l'état `:state(pending)`, et annonce l'attente au passage `false → true`.
+     */
+    @property({ type: Boolean, reflect: true })
+    pending = false;
 
     /**
      * Mode de navigation : `create` (formulaire de création) ou `edit` (modification).
      * Détermine quelles étapes sont accessibles au clic.
      */
-    @property({ type: String, attribute: 'mode', useDefault: true })
+    @property({ type: String, attribute: 'mode', reflect: true, useDefault: true })
     mode: 'create' | 'edit' = 'create';
 
     /**
      * Active le mode "scroll follow" : la propriété `current-path` se met à jour
      * automatiquement quand l'utilisateur scrolle vers une section de la page.
      */
-    @property({ type: Boolean, attribute: 'follow-scroll' })
+    @property({ type: Boolean, attribute: 'follow-scroll', reflect: true })
     followScroll = false;
 
     /**
@@ -143,6 +156,16 @@ export class ArStepper extends ArianeElement {
     @state()
     private _isDesktop = false;
 
+    // Attente automatique d'une réponse : posée à chaque demande de changement d'étape, levée à
+    // la prochaine affectation de `currentPath` ou si la demande est annulée.
+    @state()
+    private _awaiting = false;
+    private _wasPending = false;
+    // Faux tant que `currentPath` n'a été fourni ni avant le premier rendu ni par une demande de
+    // changement d'étape : le premier `currentPath` posé après coup est alors la valeur initiale
+    // d'un framework qui lie ses propriétés après le premier rendu, pas une transition.
+    private _currentSettled = false;
+
     @query('[part="trigger"]') private _dropdownTrigger?: HTMLElement;
     @query('[part="panel"]') private _dropdownPanel?: HTMLElement;
 
@@ -158,7 +181,14 @@ export class ArStepper extends ArianeElement {
     // empiriquement contre @lit/reactive-element (hasUpdated est assigné dans _$didUpdate()
     // avant l'appel à updated()). Même pattern que ArPagination._hasRenderedOnce.
     private _hasRenderedOnce = false;
+    // Cible du transfert de focus : posée au clic, conservée jusqu'au prochain `currentPath`
+    // égal à cette cible (confirmation éventuellement asynchrone). Effacée si la demande est
+    // annulée, remplacée par un nouveau clic, ou si le focus quitte le stepper.
     private _pendingFocusPath: string | undefined;
+    private readonly _onFocusOut = (event: FocusEvent) => {
+        const next = event.relatedTarget;
+        if (next instanceof Node && !this.contains(next)) this._pendingFocusPath = undefined;
+    };
     private readonly _onMediaQueryChange = (event: MediaQueryListEvent) => {
         this.applyResponsiveMode(event.matches);
     };
@@ -220,6 +250,7 @@ export class ArStepper extends ArianeElement {
         }
 
         this.addEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
+        this.addEventListener('focusout', this._onFocusOut);
         this.setupResponsiveMode();
 
         // Fallback pour les items déjà présents dans le DOM avant que le provider soit prêt.
@@ -238,6 +269,7 @@ export class ArStepper extends ArianeElement {
 
     override disconnectedCallback() {
         this.removeEventListener('scroll-follow-change', this.handleScrollChange as EventListener);
+        this.removeEventListener('focusout', this._onFocusOut);
         this.teardownResponsiveMode();
         super.disconnectedCallback();
     }
@@ -263,13 +295,23 @@ export class ArStepper extends ArianeElement {
                 });
             }
         }
+        if (this._isPending !== this._wasPending) {
+            this._wasPending = this._isPending;
+            this.toggleState('pending', this._isPending);
+            if (this._hasRenderedOnce && this._isPending) {
+                announceA11y(this.localize.term('stepperPending'), 'polite');
+            }
+        }
         if (this._hasRenderedOnce && changed.has('currentPath')) {
             const from = changed.get('currentPath') as string;
             const to = this.currentPath;
-            if (from !== to) {
+            if (!this._currentSettled) {
+                this._currentSettled = true;
+            } else if (from !== to) {
                 this._emitChanged({ from, to });
                 announceA11y(this.navigation.currentNode?.label ?? to, 'polite');
                 if (to === this._pendingFocusPath) {
+                    this._pendingFocusPath = undefined;
                     // L'item cible vient de recevoir son nouveau render-state (indicatorState,
                     // isLink…) via pushItemRenderState() dans willUpdate(), mais son propre
                     // cycle de rendu (LitElement séparé, Task 2) n'a pas encore tourné : son
@@ -278,13 +320,21 @@ export class ArStepper extends ArianeElement {
                     // point d'être remplacé (ce qui perdrait le focus).
                     const item = this.navigation.currentNode?.item;
                     if (item) {
-                        void item.updateComplete.then(() => item.focusControl());
+                        void item.updateComplete.then(() => {
+                            item.focusControl();
+                            // Mobile, panneau fermé : l'étape n'est pas focalisable, le trigger
+                            // (qui affiche l'étape courante) reprend le focus.
+                            if (!item.shadowRoot?.activeElement) this._dropdownTrigger?.focus();
+                        });
                     }
                 }
             }
         }
         this._hasRenderedOnce = true;
-        this._pendingFocusPath = undefined;
+    }
+
+    private get _isPending(): boolean {
+        return this.pending || this._awaiting;
     }
 
     private _attachDropdown(): boolean {
@@ -303,11 +353,17 @@ export class ArStepper extends ArianeElement {
     // willUpdate() s'exécute AVANT le rendu : les requestUpdate() déclenchés ici
     // (via setCurrentPath, setEnabled) sont mergés dans le cycle courant → 0 update parasite.
     protected override willUpdate(changed: PropertyValues<this>) {
-        if (changed.has('currentPath') || this.navigation.tree.length) {
-            this._currentStepIndex = this.computeCurrentStepIndex();
+        if (!this._hasRenderedOnce) {
+            this._currentSettled = this.currentPath !== '' || this.hasAttribute('current-path');
         }
+        // L'arbre doit connaître le nouveau chemin avant d'en déduire l'index affiché (trigger
+        // mobile), sinon libellé et statut ont un changement de retard.
         if (changed.has('currentPath')) {
             this.navigation.setCurrentPath(this.currentPath);
+            this._awaiting = false;
+        }
+        if (changed.has('currentPath') || this.navigation.tree.length) {
+            this._currentStepIndex = this.computeCurrentStepIndex();
         }
         if (changed.has('followScroll')) {
             this.scrollFollow.setEnabled(this.followScroll);
@@ -345,7 +401,12 @@ export class ArStepper extends ArianeElement {
                   onToggle: this._onDropdownToggle,
               });
 
-        return html` <nav part="stepper" role="navigation" aria-labelledby="label-nav">
+        return html` <nav
+            part="stepper"
+            role="navigation"
+            aria-labelledby="label-nav"
+            aria-busy=${this._isPending ? 'true' : nothing}
+        >
             <p id="label-nav" class="sr-only">${this.localize.term('stepperNavLabel')}</p>
             ${content}
         </nav>`;
@@ -488,6 +549,8 @@ export class ArStepper extends ArianeElement {
 
     private onItemActivated(item: ArStepperItem, event: MouseEvent): void {
         this._pendingFocusPath = item.path;
+        this._currentSettled = true;
+        this._awaiting = true;
 
         const proceed = !emitEvent(this, 'ar-stepper-step-change', {
             cancelable: true,
@@ -495,18 +558,13 @@ export class ArStepper extends ArianeElement {
         }).defaultPrevented;
         if (!proceed) {
             this._pendingFocusPath = undefined;
+            this._awaiting = false;
             event.preventDefault();
         }
-
-        // Force un cycle de rendu même si aucune propriété réactive ne change : c'est ce
-        // cycle qui, dans updated(), valide (ou expire) l'intention de focus — garantit la
-        // fenêtre "un seul cycle" même si le consommateur ignore l'event. Placé après le
-        // dispatchEvent pour laisser une chance à une mutation synchrone/quasi-synchrone
-        // (ex. Vue nextTick) du consommateur d'être planifiée dans le même cycle Lit.
-        this.requestUpdate();
     }
 
     private handleScrollChange = (event: CustomEvent<string>): void => {
+        this._currentSettled = true;
         this.currentPath = event.detail;
     };
 }

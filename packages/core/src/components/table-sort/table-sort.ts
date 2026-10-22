@@ -6,9 +6,6 @@ import { warn } from '../../utils/warn.js';
 import { emitEvent, type ArEventDetail } from '../../utils/emit-event.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
 import { ArianeElement } from '../../base/ariane-element.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/fr.js';
-import '../../translations/en.js';
 import { defineInternalTooltip } from '../../internal/tooltip-internal.js';
 
 export type TableSortType = 'alpha' | 'numeric' | 'date';
@@ -39,7 +36,6 @@ function nextOrder(current: TableSortOrder): TableSortOrder {
  * @slot - Libellé de la colonne.
  *
  * @csspart sort-button    - Le bouton déclencheur.
- * @csspart sort-button--pending - Le bouton pendant l'attente de confirmation (variante d'état de `sort-button`).
  * @csspart action-button - Porté par `sort-button` : bouton qui déclenche une action ponctuelle.
  * @csspart indicator - L'icône de direction de tri.
  *
@@ -60,12 +56,19 @@ export class ArTableSort extends ArianeElement {
     /** Type de tri — influe sur les labels accessibles. */
     @property({ reflect: true }) type: TableSortType = 'alpha';
 
-    /** Ordre actuel. Ne pas modifier directement — utiliser confirm() ou reject(). */
-    @property({ reflect: true }) order: TableSortOrder = 'none';
+    /**
+     * Ordre actuel. Pilotable par l'application (`el.order = …`) ou via `confirm()` / `reject()`.
+     * L'affecter, même à la même valeur, répond à la demande de tri en attente : `pending` est
+     * levé et le résultat annoncé (`sortApplied` si `order` est l'ordre demandé, sinon `sortFailed`).
+     */
+    @property({ reflect: true, hasChanged: () => true }) order: TableSortOrder = 'none';
 
     /**
-     * Vrai quand un tri a été demandé et attend confirmation.
-     * @readonly Piloté par le composant — ne pas modifier directement.
+     * Vrai quand un tri a été demandé et attend confirmation. Le composant le pose au clic ; il
+     * se lève par `confirm()`, `reject()`, `reset()`, en affectant `order` ou en le remettant à
+     * `false`. L'attente est annoncée (`sortPending`) au passage à `true`. Levé par l'application,
+     * le résultat est annoncé : `sortApplied` si `order` est devenu l'ordre demandé, sinon
+     * `sortFailed`. Posé sans clic, aucun résultat n'est annoncé.
      */
     @property({ reflect: true, type: Boolean }) pending = false;
 
@@ -82,10 +85,30 @@ export class ArTableSort extends ArianeElement {
         this._syncParentTh();
     }
 
+    override willUpdate(changed: Map<string, unknown>): void {
+        // Affecter `order` (même à la même valeur) répond à la demande en attente.
+        if (changed.has('order') && this._pendingOrder) this.pending = false;
+    }
+
     override updated(changed: Map<string, unknown>): void {
         if (changed.has('order')) this._syncParentTh();
         if (changed.has('pending')) {
             this.toggleState('pending', this.pending);
+            // `false` explicite : pas d'annonce pour un `pending` posé dès le montage.
+            if (this.pending && changed.get('pending') === false) {
+                announceA11y(this.localize.term('sortPending'));
+            }
+        }
+        // Demande encore en cours alors que pending est levé : ni confirm() ni reject() ne sont
+        // passés, c'est l'application qui a répondu par les propriétés.
+        if (this._pendingOrder && !this.pending) {
+            const requested = this._pendingOrder;
+            this._pendingOrder = null;
+            announceA11y(
+                this.order === requested
+                    ? this.localize.term('sortApplied', this._getColumnLabel(), requested)
+                    : this.localize.term('sortFailed', this._getColumnLabel()),
+            );
         }
     }
 
@@ -99,8 +122,15 @@ export class ArTableSort extends ArianeElement {
         announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), newOrder));
     }
 
-    /** Remet le tri à "none" et annonce le reset aux lecteurs d'écran. Sans effet si déjà "none". */
+    /**
+     * Annule la demande en attente, sans annonce, puis remet le tri à "none" et annonce le reset
+     * aux lecteurs d'écran. Sans effet sur l'ordre si déjà "none".
+     */
     reset(): void {
+        if (this._pendingOrder) {
+            this._pendingOrder = null;
+            this.pending = false;
+        }
         if (this.order === 'none') return;
         this.order = 'none';
         announceA11y(this.localize.term('sortApplied', this._getColumnLabel(), 'none'));
@@ -108,7 +138,8 @@ export class ArTableSort extends ArianeElement {
 
     /**
      * Annule le pending order. Sans effet si pending est false.
-     * @param reason Message annoncé aux lecteurs d'écran. Par défaut : "échec du tri".
+     * @param reason Message annoncé tel quel aux lecteurs d'écran (non traduit : à localiser par
+     * l'application). Par défaut : le terme `sortFailed`.
      */
     reject(reason?: string): void {
         if (!this._pendingOrder) return;
@@ -172,7 +203,7 @@ export class ArTableSort extends ArianeElement {
         const label = this._getActionLabel();
         return html`
             <button
-                part="sort-button action-button${this.pending ? ' sort-button--pending' : ''}"
+                part="sort-button action-button"
                 type="button"
                 aria-disabled=${this.pending ? 'true' : nothing}
                 @click=${this._handleClick}
@@ -181,7 +212,7 @@ export class ArTableSort extends ArianeElement {
                 <slot></slot>
                 <span part="indicator" aria-hidden="true"></span>
             </button>
-            <ariane-internal-tooltip for=${this._buttonId}>${label}</ariane-internal-tooltip>
+            <ariane-internal-tooltip trigger-id=${this._buttonId}>${label}</ariane-internal-tooltip>
         `;
     }
 }

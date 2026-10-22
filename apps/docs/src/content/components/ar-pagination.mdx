@@ -64,8 +64,8 @@ import WcagRef from '../../components/WcagRef.astro';
 - **`current` et `total` doivent rester cohérents.** Une valeur `current` hors de `[1, total]`
   produit un état visuellement incohérent non corrigé par le composant.
 - **`current` ne change que si vous le réassignez.** Le focus et l'annonce aria-live suivent
-  cette réassignation — mettez-la à jour de façon synchrone (voir la section Utilisation) pour
-  qu'ils restent cohérents avec l'action de l'utilisateur.
+  cette réassignation — faites-la une fois le nouveau contenu chargé, y compris en cas d'échec
+  (voir la section Utilisation) : le composant reste en attente jusque-là.
 
 ## Comportement responsive
 
@@ -78,12 +78,11 @@ adaptatif par défaut) : à vous de vérifier que le label et les boutons prev/n
 
 ## Utilisation
 
-Lorsque l'utilisateur souhaite changer de page, un événement `ar-pagination-page-change` est émis avec `{ from, to }` dans `event.detail`.
-Mettez à jour la propriété `current` du composant avec `event.detail.to` une fois le nouveau contenu chargé pour synchroniser l'état du composant de pagination.
+Écoutez `ar-pagination-page-change`, chargez la page, puis réassignez `current`. Le composant reste en attente jusqu'à cette réassignation : en cas d'échec, réassignez la page actuelle. L'attribut `pending` sert à exprimer une attente qui ne passe pas par l'événement, comme un chargement initial.
 
 ```js
-document.addEventListener('ar-pagination-page-change', (e) => {
-    /* Mettez à jour le contenu de la page, puis la page active du composant */
-    e.target.current = e.detail.to;
+pagination.addEventListener('ar-pagination-page-change', async (e) => {
+    const ok = await loadPage(e.detail.to);
+    pagination.current = ok ? e.detail.to : pagination.current;
 });
 ```

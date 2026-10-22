@@ -138,13 +138,6 @@ Le calendrier **mémorise la position de navigation** entre les ouvertures : moi
 
 La navigation via les boutons précédent/suivant (souris) synchronise `focusedDate` sur le même numéro de jour dans le nouveau mois (clampé en fin de mois). Le focus clavier reprend là où la navigation souris s'est arrêtée.
 
-### Saisie texte
-
-L'input accepte une saisie libre dans le format défini par la prop `format` (défaut : `dd/MM/yyyy`). La saisie et le calendrier sont synchronisés en permanence.
-
-- `ar-datepicker-input-complete` — émis dès que la saisie est structurellement complète (que la date soit valide ou non). Le `detail` contient `{ value, valueAsDate, valid }`.
-- `ar-datepicker-input-change` — émis au `blur` ou lors d'une sélection via le calendrier, avec la même structure de `detail`.
-
 ### Largeur du champ de saisie
 
 `--ar-datepicker-input-max-width` vaut par défaut une valeur calculée à partir de la longueur de `format`, indépendante de la largeur du hint (qui peut rester plus large). Si vous la surchargez, gardez-la cohérente avec le contenu attendu dans le champ, notamment évitez d'agrandir le champ de manière exagérée.
@@ -164,6 +157,8 @@ L'input accepte une saisie libre dans le format défini par la prop `format` (d�
 L'état d'erreur est géré via le **slot `error`**. Quand ce slot a du contenu, l'attribut `has-error` est automatiquement reflété sur l'hôte, ce qui permet de styler l'input en erreur. Ciblez le custom state `ar-datepicker:state(has-error)::part(input)`. Sur Chrome et Edge avant la version 125, le composant expose l'état sous sa forme préfixée, `ar-datepicker:--has-error::part(input)`. L'attribut `has-error` est un dernier recours, surtout destiné à lire ou à piloter l'état depuis JavaScript.
 
 Le composant applique lui-même la couleur de bordure d'erreur de l'input ; un thème personnalisé qui fixe la couleur de bordure de `::part(input)` doit donc exclure l'état d'erreur (`ar-datepicker:not(:state(has-error))::part(input)`), sinon sa règle l'emporte sur celle du composant.
+
+`min` et `max` valent aussi pour une date saisie au clavier : hors plage, `valid` vaut `false` dans le `detail` des événements `ar-datepicker-input-complete` et `ar-datepicker-input-change`, et le champ porte l'erreur de validité native `rangeUnderflow` ou `rangeOverflow` (donc `form.checkValidity()` échoue). `value` garde la date saisie.
 
 La distinction `complete` vs `valid` dans le `detail` de `ar-datepicker-input-complete` permet de n'afficher l'erreur qu'une fois la saisie terminée :
 
@@ -186,6 +181,22 @@ Les jours désactivés reçoivent `aria-disabled="true"` (jamais l'attribut nati
 rester dans la grille de navigation). Contrairement à `min`/`max`, `isDateDisabled` n'est pas décrit
 dans le hint par défaut : ses règles étant arbitraires, il n'existe pas de formulation générique — à
 documenter via le slot `hint` si nécessaire.
+
+### Jours chargés à la demande
+
+Si les jours indisponibles dépendent du mois affiché et viennent d'un chargement, écoutez `ar-datepicker-view-change` : il est émis à l'ouverture et à chaque changement de mois. Posez `pending` le temps du chargement, puis réassignez `isDateDisabled` :
+
+```js
+datepicker.addEventListener('ar-datepicker-view-change', async ({ detail }) => {
+    datepicker.pending = true;
+    try {
+        const unavailable = await loadUnavailableDays(detail.year, detail.month);
+        datepicker.isDateDisabled = (d) => unavailable.has(d.toISOString().slice(0, 10));
+    } finally {
+        datepicker.pending = false;
+    }
+});
+```
 
 ### Formulaires
 
@@ -232,6 +243,19 @@ documenter via le slot `hint` si nécessaire.
         </tr>
     </tbody>
 </table>
+
+`name` est réfléchi en attribut : `<ar-datepicker name="date">` soumet sa valeur aussi quand un framework le pose comme propriété (React 19). Les autres comportements sont ceux d'un champ natif :
+
+- `form.reset()` ramène le champ à sa valeur initiale, celle du premier rendu, texte de saisie compris. Aucun événement de valeur n'est émis ; si le panneau est ouvert, il se ferme avec ses événements habituels (`ar-datepicker-hide`, `ar-datepicker-hidden`).
+- L'API de validation standard est disponible sur l'élément : `checkValidity()`, `reportValidity()`, `validity`, `validationMessage`, `willValidate`, `form` et `labels`.
+- `setCustomValidity(message)` signale une erreur, par exemple une erreur de serveur. Comme sur un `<input>`, elle persiste jusqu'à `setCustomValidity('')` : à l'application de l'effacer, par exemple à la prochaine saisie. Le slot `error` reste l'affichage du message dans la page ; la validité native sert à la validation du formulaire et à la bulle du navigateur.
+- Pour le style, `:invalid` et `:valid` s'appliquent nativement, mais pas `:required`, `:optional`, `:user-invalid` ni `:user-valid`, que la plateforme réserve aux champs natifs. Le composant expose à leur place `:state(required)`, `:state(optional)`, `:state(user-invalid)` et `:state(user-valid)`. Comme `:user-invalid` natif, les deux derniers n'apparaissent qu'après une interaction de l'utilisateur (sélection dans le calendrier, saisie puis perte de focus), une tentative de soumission ou `reportValidity()`, jamais pour une valeur posée par l'application, et `form.reset()` les retire.
+
+```css
+ar-datepicker:state(user-invalid)::part(input) {
+    border-color: var(--couleur-erreur);
+}
+```
 
 ### Intégration masque de saisie
 

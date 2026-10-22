@@ -129,8 +129,7 @@ const codeVsCodeSettings = `{
 
             <NarrativeHeading id="attributs">Attributs & propriétés</NarrativeHeading>
             <p>
-                Comme tout élément HTML, les composants Ariane se configurent par <strong>attributs</strong>
-                (valeur texte, visible dans le HTML) ou par <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
+                Comme tout élément HTML, les composants Ariane se configurent par <strong>attributs</strong> (valeur texte, visible dans le HTML) ou par <strong>propriétés</strong> JavaScript (n'importe quelle valeur,
                 y compris un objet ou une fonction).
             </p>
             <pre><code class="language-html" set:text={codeAttribute} /></pre>
@@ -181,6 +180,9 @@ const codeVsCodeSettings = `{
                 événement DOM :
             </p>
             <pre><code class="language-js" set:text={codeEventListener} /></pre>
+            <p>
+                Avec un <a href="/theming/tag-customization">préfixe personnalisé</a>, seul le tag change : les noms d'événements restent en <code>ar-*</code> (<code>&lt;acme-pagination&gt;</code> émet <code>ar-pagination-page-changed</code>).
+            </p>
             <p>
                 Les événements <strong>annulables</strong> sont indiqués dans la section « Événements » de la <strong>Référence API</strong>.
             </p>

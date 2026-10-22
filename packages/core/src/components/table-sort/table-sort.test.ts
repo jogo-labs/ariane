@@ -199,18 +199,6 @@ describe('ArTableSort', () => {
             await waitForUpdate(el);
             expect(requirePart(el, 'sort-button').getAttribute('aria-disabled')).toBe('true');
         });
-
-        it('émet part="sort-button sort-button--pending" pendant pending', async () => {
-            el = await fixture('<ar-table-sort></ar-table-sort>');
-            (requirePart(el, 'sort-button') as HTMLElement).click();
-            await waitForUpdate(el);
-            expect(requirePart(el, 'sort-button--pending')).not.toBeNull();
-        });
-
-        it("n'émet pas sort-button--pending avant le clic", async () => {
-            el = await fixture('<ar-table-sort></ar-table-sort>');
-            expect(getPart(el, 'sort-button--pending')).toBeNull();
-        });
     });
 
     // ── confirm() ─────────────────────────────────────────────────────────
@@ -287,6 +275,135 @@ describe('ArTableSort', () => {
             el.reset();
             await waitForUpdate(el);
             expect(el.order).toBe('none');
+        });
+    });
+
+    describe('modèle contrôlé (#331)', () => {
+        const live = (): string | null | undefined =>
+            document.getElementById('ar-live-region-polite')?.textContent;
+        const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 60));
+        const click = async (): Promise<void> => {
+            (el.shadowRoot?.querySelector('button') as HTMLButtonElement).click();
+            await waitForUpdate(el);
+        };
+
+        beforeEach(async () => {
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+            el = await fixture('<ar-table-sort>Nom</ar-table-sort>');
+        });
+
+        it("pending levé par l'application avec order = ordre demandé : annonce le tri appliqué", async () => {
+            await click();
+            el.order = 'asc';
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it("pending levé par l'application sans changer order : annonce l'échec", async () => {
+            await click();
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : échec du tri.');
+        });
+
+        it("la demande est soldée : un second pending false n'annonce plus rien", async () => {
+            await click();
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            document.querySelectorAll('[data-ar-live-region]').forEach((n) => n.remove());
+            el.pending = true;
+            await waitForUpdate(el);
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Tri en cours…');
+        });
+
+        it("pending posé sans clic : l'attente est annoncée, pas l'issue", async () => {
+            el.pending = true;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Tri en cours…');
+            el.pending = false;
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Tri en cours…');
+        });
+
+        it("annonce l'attente au clic, pas au montage", async () => {
+            el = await fixture('<ar-table-sort pending>Nom</ar-table-sort>');
+            await settle();
+            expect(live()).toBeFalsy();
+            el.pending = false;
+            await waitForUpdate(el);
+            await click();
+            await settle();
+            expect(live()).toBe('Tri en cours…');
+        });
+
+        it("affecter order à l'ordre demandé lève pending et annonce le tri appliqué", async () => {
+            await click();
+            el.order = 'asc';
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it("réaffecter l'ordre actuel lève pending et annonce l'échec", async () => {
+            await click();
+            el.order = 'none';
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(live()).toBe('Nom : échec du tri.');
+        });
+
+        it('affecter order sans demande en cours ne touche pas à pending', async () => {
+            el.pending = true;
+            await waitForUpdate(el);
+            el.order = 'desc';
+            await waitForUpdate(el);
+            expect(el.pending).toBe(true);
+        });
+
+        it("confirm() n'annonce qu'une fois", async () => {
+            await click();
+            el.confirm();
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Nom : tri croissant appliqué');
+        });
+
+        it('reject(reason) annonce reason tel quel', async () => {
+            await click();
+            el.reject('Serveur indisponible');
+            await waitForUpdate(el);
+            await settle();
+            expect(live()).toBe('Serveur indisponible');
+        });
+
+        it('reset() annule la demande en attente, même si order est déjà none', async () => {
+            await click();
+            el.reset();
+            await waitForUpdate(el);
+            await settle();
+            expect(el.pending).toBe(false);
+            expect(el.order).toBe('none');
+            expect(live()).toBe('Tri en cours…');
+            el.confirm();
+            expect(el.order).toBe('none');
+        });
+
+        it("reset() ne touche pas à un pending posé par l'application", async () => {
+            el.pending = true;
+            el.reset();
+            await waitForUpdate(el);
+            expect(el.pending).toBe(true);
         });
     });
 

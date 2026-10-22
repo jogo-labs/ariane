@@ -6,6 +6,9 @@
  *   import { ArAlert } from '@ariane-ui/core/headless';
  *   customElements.define('acme-alert', ArAlert);
  */
+// Types seulement : augmentation de `HTMLElementEventMap` (événements typés) et de `Window`.
+import './types/elements.generated.js';
+import './types/ariane-config.js';
 export { ArAlert } from './components/alert/alert.js';
 export { ArBreadcrumb } from './components/breadcrumb/breadcrumb.js';
 export { ArBreadcrumbItem } from './components/breadcrumb-item/breadcrumb-item.js';

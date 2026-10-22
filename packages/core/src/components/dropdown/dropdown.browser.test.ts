@@ -10,6 +10,7 @@
  *   - Retour du focus au trigger à la fermeture
  */
 import { fixture, html, expect, aTimeout } from '@open-wc/testing';
+import { sendKeys } from '@web/test-runner-commands';
 import type { ArDropdown } from './dropdown.js';
 import './index.js';
 import '../dropdown-item/index.js';
@@ -197,6 +198,97 @@ describe('ar-dropdown — browser', () => {
     });
 
     // ── Fallback CSS d'accessibilité ─────────────────────────────────────────
+
+    // ── ar-dropdown-select (#333) ─────────────────────────────────────────────
+
+    describe('ar-dropdown-select', () => {
+        let selected: CustomEvent[];
+
+        const menu = async (second = '<button id="i2">Item 2</button>'): Promise<void> => {
+            el = await fixture(html`
+                <ar-dropdown id="menu">
+                    <button slot="trigger">Menu</button>
+                    <ar-dropdown-item><button id="i1">Item 1</button></ar-dropdown-item>
+                    <ar-dropdown-item .innerHTML=${second}></ar-dropdown-item>
+                </ar-dropdown>
+            `);
+            selected = [];
+            el.addEventListener('ar-dropdown-select', (e) => selected.push(e as CustomEvent));
+            await openDropdown(el);
+        };
+        const control = (selector: string): HTMLElement => {
+            const found = el.querySelector<HTMLElement>(selector);
+            if (!found) throw new Error(`${selector} introuvable`);
+            return found;
+        };
+
+        it('est émis au clic avec id et item, et ferme le menu', async () => {
+            await menu();
+            control('#i1').click();
+            await aTimeout(20);
+            expect(selected).to.have.length(1);
+            expect(selected[0].detail.id).to.equal('menu');
+            expect(selected[0].detail.item === control('#i1').parentElement).to.equal(true);
+            expect(el.open).to.equal(false);
+        });
+
+        it('est émis à Entrée et à Espace sur un bouton', async () => {
+            await menu();
+            await sendKeys({ press: 'Enter' });
+            await aTimeout(20);
+            expect(selected).to.have.length(1);
+            await openDropdown(el);
+            await sendKeys({ press: 'Space' });
+            await aTimeout(20);
+            expect(selected).to.have.length(2);
+        });
+
+        it("Espace sur un lien active le lien et émet l'événement", async () => {
+            await menu('<a id="i2" href="#espace">Item 2</a>');
+            control('#i2').focus();
+            await sendKeys({ press: 'Space' });
+            await aTimeout(20);
+            expect(selected).to.have.length(1);
+            expect(location.hash).to.equal('#espace');
+            history.replaceState(null, '', location.pathname + location.search);
+        });
+
+        it("annulé, le menu reste ouvert et le clic natif de l'item n'est pas annulé", async () => {
+            await menu();
+            el.addEventListener('ar-dropdown-select', (e) => e.preventDefault());
+            let nativePrevented = true;
+            control('#i1').addEventListener('click', (e) => {
+                nativePrevented = e.defaultPrevented;
+            });
+            control('#i1').click();
+            await aTimeout(20);
+            expect(el.open).to.equal(true);
+            expect(nativePrevented).to.equal(false);
+        });
+
+        it("n'est pas émis pour un item désactivé ni pour les flèches", async () => {
+            await menu('<button id="i2" disabled>Item 2</button>');
+            await sendKeys({ press: 'ArrowDown' });
+            control('#i2').click();
+            await aTimeout(20);
+            expect(selected).to.have.length(0);
+            expect(el.open).to.equal(true);
+        });
+
+        it("n'est pas émis hors mode menu", async () => {
+            el = await fixture(html`
+                <ar-dropdown>
+                    <button slot="trigger">Menu</button>
+                    <button id="free">Action</button>
+                </ar-dropdown>
+            `);
+            const seen: Event[] = [];
+            el.addEventListener('ar-dropdown-select', (e) => seen.push(e));
+            await openDropdown(el);
+            control('#free').click();
+            expect(seen).to.have.length(0);
+        });
+    });
 
     describe('fallback CSS sans thème chargé', () => {
         it('le panel a un fond, un texte et une bordure visibles même sans ariane.css', async () => {

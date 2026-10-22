@@ -1,7 +1,7 @@
 import { type TemplateResult, html, nothing, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property, query, state } from 'lit/decorators.js';
 import { ToggleController } from '../../controllers/toggle.controller.js';
-import { emitToggleEvent } from '../../utils/toggle-events.js';
+import { emitEvent } from '../../utils/emit-event.js';
 import { ArianeElement } from '../../base/ariane-element.js';
 import { ContextProvider } from '@lit/context';
 import utilitiesStyles from '../../styles/utilities.styles.js';
@@ -13,9 +13,6 @@ import { breadcrumbContext } from '../../context/breadcrumb.context.js';
 import { ArBreadcrumbItem } from '../breadcrumb-item/breadcrumb-item.js';
 import { AnchoredController } from '../../controllers/anchored.controller.js';
 import { LocalizeController } from '../../controllers/localize.controller.js';
-// fr avant en : la première traduction enregistrée devient le repli de la lib pour les langues non reconnues.
-import '../../translations/fr.js';
-import '../../translations/en.js';
 
 /**
  * @summary Affiche un fil de liens qui montre à l'utilisateur sa position dans la hiérarchie du site, avec un affichage adapté au mobile et au desktop.
@@ -315,13 +312,13 @@ export class ArBreadcrumb extends ArianeElement {
 
     private _onShow(): void {
         void this._popover.show().then(() => {
-            emitToggleEvent(this, 'ar-breadcrumb-shown', { cancelable: false });
+            emitEvent(this, 'ar-breadcrumb-shown');
         });
     }
 
     private _onHide(): void {
         this._popover.hide();
-        emitToggleEvent(this, 'ar-breadcrumb-hidden', { cancelable: false });
+        emitEvent(this, 'ar-breadcrumb-hidden');
     }
 
     private _handleMediaChange = (): void => {

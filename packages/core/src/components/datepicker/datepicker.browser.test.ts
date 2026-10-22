@@ -612,11 +612,11 @@ describe('ar-datepicker — browser', () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
             expect(el.matches(':state(readonly)')).to.equal(false);
 
-            el.readonly = true;
+            el.readOnly = true;
             await el.updateComplete;
             expect(el.matches(':state(readonly)')).to.equal(true);
 
-            el.readonly = false;
+            el.readOnly = false;
             await el.updateComplete;
             expect(el.matches(':state(readonly)')).to.equal(false);
         });
@@ -639,6 +639,36 @@ describe('ar-datepicker — browser', () => {
             );
             await el.updateComplete;
             expect(el.matches(':state(has-error)')).to.equal(true);
+        });
+    });
+
+    describe('message de validité localisé', () => {
+        let el: ArDatepicker;
+        afterEach(() => el?.remove());
+
+        const message = (): string =>
+            (el as unknown as { internals: ElementInternals }).internals.validationMessage;
+
+        it('suit un changement de langue de la page à chaud', async () => {
+            el = await fixture(html`<ar-datepicker required></ar-datepicker>`);
+            expect(message()).to.equal('Veuillez renseigner ce champ.');
+
+            document.documentElement.lang = 'en';
+            try {
+                // Le MutationObserver du registre de traductions déclenche requestUpdate().
+                await aTimeout(0);
+                await el.updateComplete;
+                expect(message()).to.equal('Please fill out this field.');
+            } finally {
+                document.documentElement.lang = 'fr';
+            }
+        });
+
+        it("repasse à vide quand une date est saisie : plus de message d'erreur", async () => {
+            el = await fixture(html`<ar-datepicker required></ar-datepicker>`);
+            el.value = '2026-06-12';
+            await el.updateComplete;
+            expect(message()).to.equal('');
         });
     });
 });
