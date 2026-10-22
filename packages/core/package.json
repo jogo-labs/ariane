@@ -47,7 +47,7 @@
     "!dist/browser-test-utils.*"
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:manifest && npm run generate:types && npm run build:skill && npm run build:bundles && npm run check:cdn && npm run check:skill && npm run build:types && npm run test:types",
+    "build": "npm run build:css && npm run build:manifest && npm run generate:types && npm run build:skill && npm run build:bundles && npm run check:cdn && npm run check:skill && npm run build:types && npm run check:package && npm run test:types",
     "build:dev": "npm run build:css && npm run build:manifest && npm run generate:types && npm run build:bundles:dev && npm run build:types",
     "build:manifest": "cem analyze --config cem.config.js",
     "build:bundles": "node scripts/build-bundles.js",
@@ -68,7 +68,8 @@
     "lint": "eslint src",
     "create": "node scripts/create-component.js",
     "generate:types": "node scripts/generate-types.js",
-    "test:types": "tsc -p types-tests/tsconfig.json"
+    "test:types": "tsc -p types-tests/tsconfig.json",
+    "check:package": "node scripts/check-package.js"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.0",

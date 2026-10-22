@@ -52,6 +52,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Reproduit l'enchaînement de release.yml (build puis test via Turbo) : si le test relance
+      # build:bundles, dist/ est vidé et le paquet part sans déclarations (#391).
+      - name: Paquet complet après build et test (enchaînement de la release)
+        run: |
+          npx turbo run test --filter=@ariane-ui/docs
+          npm run check:package --workspace=packages/core
+
       - name: Smoke test — générateur starter-kit demo
         run: node scripts/starter-kit/generate-starter-demo.js --dry-run
 
