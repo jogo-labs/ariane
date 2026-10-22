@@ -14,6 +14,50 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.15](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.14...v0.1.0-alpha.15) (2026-10-22)
+
+### Changements incompatibles
+
+- **core:** l'attribut `for` de ar-tooltip, ar-dropdown et ar-collapse est renommé `trigger-id` (propriété `triggerId`) ; les propriétés `for` d'ar-charcounter et `readonly` d'ar-datepicker deviennent `htmlFor` et `readOnly` (leurs attributs ne changent pas).
+- **core:** l'attribut et la propriété urgent d'ar-alert sont supprimés ; utiliser
+  l'attribut role standard (role="alert" ou role="status"). Un role posé par l'application n'est
+  plus écrasé par le composant.
+- **core:** la langue de repli passe du français à l'anglais : une langue sans traduction
+  s'affiche en anglais.
+- **core:** la part sort-button--pending d'ar-table-sort est retirée, cibler :state(pending)::part(sort-button) à la place.
+- **core:** le champ dialog d'ar-dialog devient privé (_dialog), il n'est plus exposé.
+  Les événements shown, hidden et les -prevented ne sont plus annulables.
+- **core:** Translation est désormais partiel (lire un terme d'un objet Translation donne
+  string | undefined) ; utiliser FullTranslation pour des termes toujours présents.
+- **core:** les exports `./themes/*.css` et `./themes/*.js` sont retirés du paquet npm (thème interne), ainsi que les utilitaires de test ; le thème de départ est celui du starter-kit.
+- **core:** l'export `./presets/*.css` est retiré du paquet npm ; les presets (`buttons.css`, `fields.css`) sont distribués par le starter-kit.
+
+### Ajouté
+
+- **core:** ar-alert écrit role sans écraser celui de l'application, urgent supprimé ([#334](https://github.com/jogo-labs/ariane/issues/334)), references [#143](https://github.com/jogo-labs/ariane/issues/143) [#352](https://github.com/jogo-labs/ariane/issues/352)
+- **core:** ar-datepicker, pending et événement view-change ([#330](https://github.com/jogo-labs/ariane/issues/330)) ([#364](https://github.com/jogo-labs/ariane/issues/364)) ([99b427a](https://github.com/jogo-labs/ariane/commit/99b427ad01019b37a45614ad523afa5efb7d5a19))
+- **core:** ar-dialog, pending, report de fermeture et réouverture ([#329](https://github.com/jogo-labs/ariane/issues/329)) ([#368](https://github.com/jogo-labs/ariane/issues/368)) ([43aa4f2](https://github.com/jogo-labs/ariane/commit/43aa4f2e9d873473956c4050783955094b9284f6))
+- **core:** ar-dropdown, événement ar-dropdown-select ([#333](https://github.com/jogo-labs/ariane/issues/333)) ([#367](https://github.com/jogo-labs/ariane/issues/367)) ([4bbea0c](https://github.com/jogo-labs/ariane/commit/4bbea0cf4bea5881e399aac80474bc9e1094431d))
+- **core:** ar-pagination, pending et corrections d'intégration framework ([#327](https://github.com/jogo-labs/ariane/issues/327)) ([#361](https://github.com/jogo-labs/ariane/issues/361)) ([fd2b707](https://github.com/jogo-labs/ariane/commit/fd2b707007085bdf0deb3f85ff7bac1828d34f5f))
+- **core:** ar-stepper, attente automatique et corrections d'intégration framework ([#328](https://github.com/jogo-labs/ariane/issues/328)) ([#363](https://github.com/jogo-labs/ariane/issues/363)) ([7aea39e](https://github.com/jogo-labs/ariane/commit/7aea39e07307669bc7d12d9e54c522ec1f6b0e9e))
+- **core:** ar-table-sort, modèle contrôlé et reset() ([#331](https://github.com/jogo-labs/ariane/issues/331)) ([#365](https://github.com/jogo-labs/ariane/issues/365)) ([2015b22](https://github.com/jogo-labs/ariane/commit/2015b220033e3853a196e255cde997ea7d342b09))
+- **core:** ArianeFormElement porte propriétés, validation et réinitialisation ([#325](https://github.com/jogo-labs/ariane/issues/325)) ([7e7966e](https://github.com/jogo-labs/ariane/commit/7e7966ea12ba0a41d53413d299db415a0476c603))
+- **core:** états required, optional, user-invalid et user-valid des champs ([#360](https://github.com/jogo-labs/ariane/issues/360)) ([#384](https://github.com/jogo-labs/ariane/issues/384)) ([9383f70](https://github.com/jogo-labs/ariane/commit/9383f70a54d8d7e70efaba55be490899251ec87c))
+- **core:** reflète en attribut 14 réglages primitifs ([#374](https://github.com/jogo-labs/ariane/issues/374)) ([#375](https://github.com/jogo-labs/ariane/issues/375)) ([a5c7f49](https://github.com/jogo-labs/ariane/commit/a5c7f4938ee6c379ba2848829fff888bc2e2c669))
+- **core:** Translation tolérant, repli en anglais et message de validité localisé ([#335](https://github.com/jogo-labs/ariane/issues/335))
+- **core:** trigger-id, htmlFor et readOnly, tableau d'API à deux noms ([#380](https://github.com/jogo-labs/ariane/issues/380)) ([#383](https://github.com/jogo-labs/ariane/issues/383))
+- **core:** types générés depuis le CEM, sous-chemins react et vue, ARIANE_CONFIG ([#336](https://github.com/jogo-labs/ariane/issues/336)) ([#371](https://github.com/jogo-labs/ariane/issues/371)) ([e8d44b9](https://github.com/jogo-labs/ariane/commit/e8d44b9d4f9a18fc13b4085e010e2136dd19d407))
+
+### Corrigé
+
+- **core:** ar-charcounter suit les valeurs posées par programme, refresh(), reset ([#332](https://github.com/jogo-labs/ariane/issues/332)) ([997ed1e](https://github.com/jogo-labs/ariane/commit/997ed1eb2d7edbd6847823645dde594f3fcb5ebe)), references [#339](https://github.com/jogo-labs/ariane/issues/339) [#341](https://github.com/jogo-labs/ariane/issues/341)
+- **core:** ar-datepicker, événements natifs et corrections de comportement ([#326](https://github.com/jogo-labs/ariane/issues/326)) ([#359](https://github.com/jogo-labs/ariane/issues/359)) ([d5d091f](https://github.com/jogo-labs/ariane/commit/d5d091f5c323411a1c3a867b3448035b06875a94))
+- **core:** ar-tab-group rattache les onglets existants, respecte les id de l'application ([#324](https://github.com/jogo-labs/ariane/issues/324)) ([41e329b](https://github.com/jogo-labs/ariane/commit/41e329bfa758a27aa5f2d29b2a79f66ed47797a2))
+- **core:** l'autoloader CDN charge les éléments imbriqués dans un nœud ajouté ([#386](https://github.com/jogo-labs/ariane/issues/386)) ([#387](https://github.com/jogo-labs/ariane/issues/387)) ([b6c7c14](https://github.com/jogo-labs/ariane/commit/b6c7c14a17b58893e497cd6281257d6db2602272))
+- **core:** l'import de la librairie ne lève plus côté serveur ([#323](https://github.com/jogo-labs/ariane/issues/323)) ([2093c93](https://github.com/jogo-labs/ariane/commit/2093c9355bd0310e2c0516b0e41847359ed18134))
+- **core:** paquet npm sans thème interne ni utilitaires de test ([#337](https://github.com/jogo-labs/ariane/issues/337)) ([8aab50c](https://github.com/jogo-labs/ariane/commit/8aab50ceaf4c450ccc36be8100f41896fb5f5df9))
+- **core:** presets CSS retirés du paquet npm, distribués par le starter-kit ([#355](https://github.com/jogo-labs/ariane/issues/355)) ([b7544dc](https://github.com/jogo-labs/ariane/commit/b7544dc81c916276552bdb06b1e5940a95d20eef))
+
 ## [0.1.0-alpha.14](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.13...v0.1.0-alpha.14) (2026-10-09)
 
 ### Ajouté
