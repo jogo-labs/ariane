@@ -885,20 +885,20 @@ describe('ArDatepicker', () => {
             };
             const lastFlags = (): ValidityStateFlags => setValidity.mock.lastCall?.[0];
 
-            it('au-dessus de max : valid false et rangeOverflow', async () => {
+            it('au-dessus de max : rangeOverflow, la date reste plausible (valid true)', async () => {
                 el = await fixture('<ar-datepicker max="2026-12-31" lang="en"></ar-datepicker>');
                 const event = await type('20/04/2027');
-                expect(event.detail.valid).toBe(false);
+                expect(event.detail.valid).toBe(true);
                 expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
                 expect(setValidity.mock.lastCall?.[1]).toBe(
                     'Date must be December 31, 2026 or earlier.',
                 );
             });
 
-            it('en dessous de min : valid false et rangeUnderflow', async () => {
+            it('en dessous de min : rangeUnderflow, la date reste plausible (valid true)', async () => {
                 el = await fixture('<ar-datepicker min="2026-06-01"></ar-datepicker>');
                 const event = await type('20/04/2026');
-                expect(event.detail.valid).toBe(false);
+                expect(event.detail.valid).toBe(true);
                 expect(lastFlags()).toStrictEqual({ rangeUnderflow: true });
             });
 

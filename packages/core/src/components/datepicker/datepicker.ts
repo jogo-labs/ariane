@@ -27,7 +27,7 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
     value: string | null;
     /** Date saisie, `null` si absente ou invalide */
     valueAsDate: Date | null;
-    /** `false` si la saisie n'est pas une date valide */
+    /** `false` si la saisie n'est pas une date plausible (32/01/2026). Les bornes `min` et `max` relèvent de `validity`. */
     valid: boolean;
 }
 
@@ -42,8 +42,8 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  *                     via aria-describedby. Un contenu personnalisé remplace entièrement le
  *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
  *                     si nécessaire.
- * @slot error       - Message d'erreur de l'application. Déclenche has-error sur le host et remplace
- *                     le message de validité affiché par défaut.
+ * @slot error       - Message d'erreur de l'application. Déclenche has-error sur le host, et est
+ *                     lié à l'input par aria-describedby.
  * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le texte
  *                     traduit par défaut).
  * @slot close-label - Contenu riche du bouton « Fermer » (icône + texte, remplace le texte
@@ -114,8 +114,8 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @cssState open      - Le calendrier est ouvert.
  * @cssState disabled  - Le composant est désactivé.
  * @cssState readonly  - Le composant est en lecture seule.
- * @cssState has-error - Un message d'erreur est affiché : celui du slot `error`, ou à défaut le
- *   message de validité du composant une fois le champ touché (voir `user-invalid`).
+ * @cssState has-error - Le champ est en erreur : le slot `error` est rempli, ou le champ est invalide
+ *   après interaction (voir `user-invalid`). L'input porte alors `aria-invalid`.
  * @cssState pending   - L'application a posé l'attribut `pending` : une réponse est attendue.
  * @cssState required  - Le champ est obligatoire (`required`).
  * @cssState optional  - Le champ n'est pas obligatoire.
@@ -264,7 +264,7 @@ export class ArDatepicker extends ArianeFormElement {
 
     override updated(changed: PropertyValues<this>): void {
         super.updated(changed);
-        const hasError = this._hasSlot.test('error') || this._errorMessage() !== '';
+        const hasError = this._hasError();
         this.toggleAttribute('has-error', hasError);
         this.toggleState('has-error', hasError);
 
@@ -349,8 +349,8 @@ export class ArDatepicker extends ArianeFormElement {
         const todayLabel = this.localize.term('today');
         const closeLabel = this.localize.term('close');
         const closeAriaLabel = this.localize.term('closeCalendar');
-        const errorMessage = this._errorMessage();
-        const hasError = this._hasSlot.test('error') || errorMessage !== '';
+        const hasSlotError = this._hasSlot.test('error');
+        const hasError = hasSlotError || this._isUserInvalid();
         const formattedExample = this._formatExample();
         const formatLine = this.localize.term('expectedFormat', this.format, formattedExample);
         const rangeText = this._rangeText(locale);
@@ -384,7 +384,7 @@ export class ArDatepicker extends ArianeFormElement {
                         autocomplete=${this.autocomplete || nothing}
                         placeholder=${this.placeholder || nothing}
                         aria-labelledby="dp-label-${this._uid}"
-                        aria-describedby=${`dp-hint-${this._uid}${hasError ? ` dp-error-${this._uid}` : ''}`}
+                        aria-describedby=${`dp-hint-${this._uid}${hasSlotError ? ` dp-error-${this._uid}` : ''}`}
                         @input=${this._handleInput}
                         @blur=${this._handleBlur}
                     />
@@ -417,8 +417,8 @@ export class ArDatepicker extends ArianeFormElement {
                 <p part="hint" id="dp-hint-${this._uid}">
                     <slot name="hint">${defaultHint}</slot>
                 </p>
-                <p part="error" id="dp-error-${this._uid}" role=${hasError ? 'alert' : nothing}>
-                    <slot name="error">${errorMessage}</slot>
+                <p part="error" id="dp-error-${this._uid}" role=${hasSlotError ? 'alert' : nothing}>
+                    <slot name="error"></slot>
                 </p>
 
                 <div
@@ -829,7 +829,7 @@ export class ArDatepicker extends ArianeFormElement {
                 detail: {
                     value: result.valid && result.date ? this._toIso(result.date) : null,
                     valueAsDate: result.date,
-                    valid: result.valid && this._rangeFlag(result.date) === null,
+                    valid: result.valid,
                 },
             });
 
@@ -872,7 +872,7 @@ export class ArDatepicker extends ArianeFormElement {
         if ((isoValue ?? '') === previous && (isoValue !== null || raw === '')) return;
         this.value = isoValue ?? '';
 
-        this._emitChange(result.date, result.valid && this._rangeFlag(result.date) === null);
+        this._emitChange(result.date, result.valid);
         this._emitNative(previous);
     }
     private _handlePanelKeyDown(e: KeyboardEvent): void {
@@ -1062,12 +1062,17 @@ export class ArDatepicker extends ArianeFormElement {
     }
 
     /**
-     * Message d'erreur affiché par le composant : le message de validité, une fois le champ touché.
-     * Vide quand l'application fournit le slot `error`, qui a toujours la priorité.
+     * Invalide une fois le champ touché : même condition que `:state(user-invalid)`, calculée ici
+     * plutôt que lue sur `internals`, dont la validité n'est posée qu'après le rendu.
      */
-    private _errorMessage(): string {
-        if (this._hasSlot.test('error') || !this.interacted || this.effectiveDisabled) return '';
-        return this.customValidityMessage || this._ownValidity()?.message || '';
+    private _isUserInvalid(): boolean {
+        if (!this.interacted || this.effectiveDisabled) return false;
+        return this.customValidityMessage !== '' || this._ownValidity() !== null;
+    }
+
+    /** En erreur : le slot `error` est rempli par l'application, ou le champ est invalide et touché. */
+    private _hasError(): boolean {
+        return this._hasSlot.test('error') || this._isUserInvalid();
     }
 
     private _syncFormValue(): void {
