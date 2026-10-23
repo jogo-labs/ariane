@@ -89,6 +89,7 @@ const codeReset = `<form>
                     <p>Cette validation s'exécute dans le navigateur : <code>novalidate</code> sur le formulaire la désactive, et elle ne remplace pas la validation côté serveur.</p>
                 </div>
             </ar-alert>
+            <p class="hint">Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation" target="_blank" rel="noopener">documentation de la validation des contraintes sur MDN</a> et la <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation" target="_blank" rel="noopener">spécification HTML</a>.</p>
 
             <NarrativeSubheading id="obligatoire">Champs obligatoires</NarrativeSubheading>
             <p>L'attribut <code>required</code> bloque la soumission tant que le champ est vide, et l'annonce aux technologies d'assistance. Ariane n'ajoute aucun indicateur visuel : voir <a href="#styler">Styler les états</a> pour afficher un astérisque ou un texte.</p>
@@ -96,7 +97,7 @@ const codeReset = `<form>
             <NarrativeSubheading id="api-validation">Interroger la validité</NarrativeSubheading>
             <p>L'API de validation standard est disponible sur l'élément :</p>
             <pre><code class="language-js" set:text={codeApi} /></pre>
-            <p class="hint"><code>validity</code> indique la contrainte en cause (<code>valueMissing</code>, <code>rangeUnderflow</code>, <code>rangeOverflow</code>, <code>customError</code>…). <code>form</code>, <code>labels</code> et <code>willValidate</code> sont aussi disponibles, comme sur un champ natif.</p>
+            <p class="hint"><a href="https://developer.mozilla.org/en-US/docs/Web/API/ValidityState" target="_blank" rel="noopener"><code>validity</code></a> indique la contrainte en cause (<code>valueMissing</code>, <code>rangeUnderflow</code>, <code>rangeOverflow</code>, <code>customError</code>…). <code>form</code>, <code>labels</code> et <code>willValidate</code> sont aussi disponibles, comme sur un champ natif.</p>
 
             <NarrativeSubheading id="erreur-perso">Messages d'erreur personnalisés</NarrativeSubheading>
             <p><code>setCustomValidity()</code> signale une erreur que le navigateur ne peut pas connaître, par exemple un refus du serveur. Le formulaire n'est plus soumis tant que l'erreur est là :</p>
