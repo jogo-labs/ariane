@@ -14,6 +14,12 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.17](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.16...v0.1.0-alpha.17) (2026-10-23)
+
+### Corrigé
+
+- **core:** ar-charcounter restaure son id dans aria-describedby quand le gabarit le réécrit ([#395](https://github.com/jogo-labs/ariane/issues/395)) ([7420e9a](https://github.com/jogo-labs/ariane/commit/7420e9aec9d7fad0d92e74996814c50f11adce70)), closes [#394](https://github.com/jogo-labs/ariane/issues/394)
+
 ## [0.1.0-alpha.16](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.15...v0.1.0-alpha.16) (2026-10-22)
 
 ### Corrigé
