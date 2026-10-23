@@ -164,7 +164,7 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 
 ### Attente d'une réponse (`pending`)
 
-Les composants qui attendent une réponse de l'application utilisent un attribut booléen `pending` (réfléchi, `:state(pending)`, annonce de l'attente) ; son fonctionnement exact est décrit dans la référence de chaque composant.
+Les composants qui attendent une réponse de l'application utilisent un attribut booléen `pending` (réfléchi, `:state(pending)`, annonce de l'attente) ; son fonctionnement exact est décrit dans la référence de chaque composant. Pour `ar-dialog`, `pending` se pose directement sur l'élément dans le gestionnaire de l'événement annulé, avant tout `await` : une liaison d'attribut mise à jour au rendu suivant arrive trop tard.
 
 ## Méthodes
 
