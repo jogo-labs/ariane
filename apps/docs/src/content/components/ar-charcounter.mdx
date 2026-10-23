@@ -77,7 +77,6 @@ Les critères WCAG suivants sont implémentés :
 
 ### À votre charge
 
-- **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js

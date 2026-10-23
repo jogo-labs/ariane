@@ -907,6 +907,32 @@ describe('ArCharcounter', () => {
             expect(ids.filter((i) => i === 'my-counter')).toHaveLength(1);
         });
 
+        it("restaure son id quand le gabarit d'un framework réécrit l'attribut (#394)", async () => {
+            document.body.innerHTML = '<textarea id="f" aria-describedby="hint"></textarea>';
+            el = await fixture(
+                '<ar-charcounter id="my-counter" for="f" max="200"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            field.setAttribute('aria-describedby', 'hint erreur');
+            await Promise.resolve();
+            expect(field.getAttribute('aria-describedby')).toBe('hint erreur my-counter');
+            field.removeAttribute('aria-describedby');
+            await Promise.resolve();
+            expect(field.getAttribute('aria-describedby')).toBe('my-counter');
+        });
+
+        it('ne restaure plus son id une fois détaché', async () => {
+            document.body.innerHTML = '<textarea id="f"></textarea>';
+            el = await fixture(
+                '<ar-charcounter id="my-counter" for="f" max="200"></ar-charcounter>',
+            );
+            const field = document.getElementById('f') as HTMLTextAreaElement;
+            el.remove();
+            field.setAttribute('aria-describedby', 'hint');
+            await Promise.resolve();
+            expect(field.getAttribute('aria-describedby')).toBe('hint');
+        });
+
         it('retire son id de aria-describedby au disconnectedCallback', async () => {
             document.body.innerHTML = '<textarea id="f"></textarea>';
             el = await fixture('<ar-charcounter for="f" max="200"></ar-charcounter>');
