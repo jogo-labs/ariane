@@ -92,7 +92,8 @@ const codeReset = `<form>
             </ar-alert>
 
             <NarrativeSubheading id="obligatoire">Champs obligatoires</NarrativeSubheading>
-            <p>L'attribut <code>required</code> bloque la soumission tant que le champ est vide, et l'annonce aux technologies d'assistance. Ariane n'ajoute aucun indicateur visuel : voir <a href="#styler">Styler les états</a> pour afficher un astérisque ou un texte.</p>
+            <p>L'attribut <code>required</code> bloque la soumission tant que le champ est vide, et l'annonce aux technologies d'assistance. Ariane n'affiche aucun indicateur : voir <a href="#styler">Styler les états</a> pour ajouter un astérisque ou un texte.</p>
+            <p class="hint">Bien qu'afficher un indicateur du caractère obligatoire ne soit pas exigé par les critères d'accessibilité, il est utile à l'utilisateur. Si vous en ajoutez un, expliquez-le en haut du formulaire, par exemple « * champs obligatoires ».</p>
 
             <NarrativeSubheading id="api-validation">Interroger la validité</NarrativeSubheading>
             <p>L'API de validation standard est disponible sur l'élément :</p>
