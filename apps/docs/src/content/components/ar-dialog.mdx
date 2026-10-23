@@ -115,7 +115,7 @@ variants:
           </ar-dialog>
     - name: stacked
       label: Dialogs empilés
-      description: Ouverture d'un second dialog depuis le premier — scroll lock et focus sont coordonnés. Escape ne ferme que le dialog au sommet.
+      description: Ouverture d'un second dialog depuis le premier — scroll lock et focus sont coordonnés. Le scroll de la page reste verrouillé tant qu'un dialog est ouvert, et n'est relâché qu'à la fermeture du dernier. Escape ne ferme que le dialog au sommet.
       html: |
           <button class="ar-btn ar-btn-primary" data-ar-dialog-open="demo-stacked-1">Ouvrir le dialog</button>
           <ar-dialog id="demo-stacked-1" label="Dialog principal">
@@ -250,7 +250,7 @@ Pour enregistrer avant de fermer, annulez `ar-dialog-accepted` et posez `pending
 ```js
 dialog.addEventListener('ar-dialog-accepted', async (e) => {
     e.preventDefault();
-    dialog.pending = true;
+    dialog.pending = true; // avant le premier await
     try {
         await save();
         dialog.open = false;
@@ -260,6 +260,4 @@ dialog.addEventListener('ar-dialog-accepted', async (e) => {
 });
 ```
 
-### Dialogs empilés
-
-Le verrouillage du scroll de la page est partagé entre tous les dialogs ouverts : il n'est relâché que lorsque le dernier dialog de la pile se ferme. Voir la variante « Dialogs empilés » pour le comportement de `Escape` et la coordination du focus.
+Le dialog lit `pending` dès le retour du gestionnaire : posez-le directement sur l'élément, avant tout `await`. Un `pending` que votre code applicatif ne reflète sur l'élément qu'après coup (liaison d'attribut mise à jour au prochain rendu, par exemple) arrive trop tard : le dialog a déjà traité l'annulation comme un blocage, avec sa secousse et son annonce. Une liaison peut ensuite refléter l'état affiché, mais elle ne remplace pas cette écriture.

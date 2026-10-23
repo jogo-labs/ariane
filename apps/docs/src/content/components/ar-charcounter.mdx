@@ -47,7 +47,7 @@ variants:
           automatiquement la forme selon le nombre de caractères restants. Le même label
           est utilisé dans les annonces `aria-live` : l'annonce de passage en avertissement
           dit par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
-          Sans pipe, le label est utilisé tel quel (compatibilité descendante).
+          Sans pipe, le label est utilisé tel quel, quel que soit le nombre.
       html: |
           <div class="ar-field-group" style="max-width:400px;">
               <label class="ar-label" for="cc-label">Bio</label>
@@ -77,7 +77,6 @@ Les critères WCAG suivants sont implémentés :
 
 ### À votre charge
 
-- **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
