@@ -152,17 +152,7 @@ el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
 
 ### Formulaires
 
-`ar-datepicker` participe aux formulaires natifs (`name`, `required`, `readonly`, `disabled`, comme un champ natif) et expose l'API de validation standard (`checkValidity()`, `reportValidity()`, `validity`…).
-
-- `form.reset()` ramène le champ à sa valeur initiale, texte de saisie compris, sans événement de valeur ; un panneau ouvert se ferme avec ses événements habituels.
-- `setCustomValidity(message)` signale une erreur, par exemple venue du serveur. Comme sur un `<input>`, elle persiste jusqu'à `setCustomValidity('')`. Le slot `error` reste l'affichage du message dans la page.
-- Seuls `:invalid` et `:valid` s'appliquent nativement. À la place de `:required`, `:optional`, `:user-invalid` et `:user-valid`, le composant expose `:state(required)`, `:state(optional)`, `:state(user-invalid)` et `:state(user-valid)`. Comme en natif, les deux derniers n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou `reportValidity()`.
-
-```css
-ar-datepicker:state(user-invalid)::part(input) {
-    border-color: var(--couleur-erreur);
-}
-```
+`ar-datepicker` se comporte comme un champ de formulaire natif : soumission, validation, états et réinitialisation sont décrits dans la page [Formulaires](/getting-started/controles-de-formulaire). Propre au datepicker, `form.reset()` ramène aussi le texte de saisie à son état initial, et un panneau ouvert se ferme avec ses événements habituels (`ar-datepicker-hide`, `ar-datepicker-hidden`).
 
 ### Intégration masque de saisie
 
