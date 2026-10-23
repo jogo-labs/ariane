@@ -250,7 +250,7 @@ Pour enregistrer avant de fermer, annulez `ar-dialog-accepted` et posez `pending
 ```js
 dialog.addEventListener('ar-dialog-accepted', async (e) => {
     e.preventDefault();
-    dialog.pending = true;
+    dialog.pending = true; // avant le premier await
     try {
         await save();
         dialog.open = false;
@@ -259,6 +259,8 @@ dialog.addEventListener('ar-dialog-accepted', async (e) => {
     }
 });
 ```
+
+Le dialog lit `pending` dès le retour du gestionnaire : posez-le directement sur l'élément, avant tout `await`. Un `pending` que votre code applicatif ne reflète sur l'élément qu'après coup (liaison d'attribut mise à jour au prochain rendu, par exemple) arrive trop tard : le dialog a déjà traité l'annulation comme un blocage, avec sa secousse et son annonce. Une liaison peut ensuite refléter l'état affiché, mais elle ne remplace pas cette écriture.
 
 ### Dialogs empilés
 
