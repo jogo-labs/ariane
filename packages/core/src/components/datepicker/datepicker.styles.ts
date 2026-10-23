@@ -42,10 +42,6 @@ export default css`
         pointer-events: none;
     }
 
-    :host([has-error]) [part~='input'] {
-        border-color: var(--ar-datepicker-input-error-border-color);
-    }
-
     /* Masqué (pas retiré du DOM) quand le slot error est vide : évite un espace
        vide superflu dans le gap de [part~='datepicker'], tout en gardant le
        <slot> présent pour que HasSlotController détecte un ajout dynamique

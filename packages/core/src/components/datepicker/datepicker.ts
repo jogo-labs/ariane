@@ -75,7 +75,6 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @csspart action-button - Porté par les 4 boutons de navigation (`nav-button`) et les 2 boutons
  *   du footer (`footer-button`) : bouton qui déclenche une action ponctuelle.
  *
- * @cssprop --ar-datepicker-error-color - Couleur du message d'erreur.
  * @cssprop --ar-datepicker-input-max-width - Largeur maximale du champ de saisie. Par défaut,
  *   une valeur calculée à partir de la longueur de `format`.
  * @cssprop --ar-datepicker-panel-max-width - Largeur maximale du popover (valeur propre, non cascadée depuis --ar-panel-max-width ; repli `25rem` si aucun thème n'est chargé, évite que la grille de ~35 jours s'étale sur toute la largeur de la page).
@@ -99,7 +98,6 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @cssprop --ar-datepicker-day-focus-border-color - Couleur de bordure de la cellule jour en focus (roving tabindex). Purement cosmétique : l'indicateur de focus WCAG 2.4.7 est garanti indépendamment par --ar-datepicker-day-focus-ring-color/-width/-offset. Repli transparent si aucun thème n'est chargé.
  * @cssprop --ar-datepicker-day-selected-bg - Fond du jour sélectionné. Repli `Highlight` si aucun thème n'est chargé (sinon indiscernable des jours non sélectionnés).
  * @cssprop --ar-datepicker-day-selected-color - Couleur texte du jour sélectionné. Repli `HighlightText` si aucun thème n'est chargé.
- * @cssprop --ar-datepicker-input-error-border-color - Bordure input en état d'erreur.
  * @cssprop --ar-datepicker-nav-button-focus-ring-color - Couleur de l'anneau de focus des boutons de navigation (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-datepicker-footer-button-focus-ring-color - Couleur de l'anneau de focus des boutons du footer (cascade vers --ar-focus-ring-color). Repli `ButtonText` si aucun thème n'est chargé (WCAG 2.4.7).
  * @cssprop --ar-panel-bg - Fond du panel partagé. Repli système `Canvas` si aucun thème n'est chargé.
