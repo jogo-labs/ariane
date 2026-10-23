@@ -130,6 +130,7 @@ export class ArCharcounter extends ArianeElement {
     private _field: (HTMLInputElement | HTMLTextAreaElement) | null = null;
     private _form: HTMLFormElement | null = null;
     private _fieldWatcher: MutationObserver | undefined;
+    private _describedbyWatcher: MutationObserver | undefined;
     private _resetTimer: ReturnType<typeof setTimeout> | undefined;
     private _warnedMissingFor: string | undefined;
     private _errorCount: number | undefined;
@@ -229,6 +230,12 @@ export class ArCharcounter extends ArianeElement {
         // Un nouveau champ n'a pas encore les attributs : l'état peut être inchangé (champ remplacé).
         if (this._state !== 'normal') this._setLinkedAttributes(this._state);
         this._addAriaDescribedby(field);
+        // Un gabarit de framework qui réécrit l'attribut retire notre id : le restaurer.
+        this._describedbyWatcher = new MutationObserver(() => this._addAriaDescribedby(field));
+        this._describedbyWatcher.observe(field, {
+            attributes: true,
+            attributeFilter: ['aria-describedby'],
+        });
         this.requestUpdate();
         field.addEventListener('input', this._handleInput);
         watchValue(field, this._handleInput);
@@ -251,6 +258,8 @@ export class ArCharcounter extends ArianeElement {
         if (!this._field) return;
         this._field.removeEventListener('input', this._handleInput);
         unwatchValue(this._field, this._handleInput);
+        this._describedbyWatcher?.disconnect();
+        this._describedbyWatcher = undefined;
         this._removeAriaDescribedby(this._field);
         this._clearLinkedAttributes();
         this._field = null;

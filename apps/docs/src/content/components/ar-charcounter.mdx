@@ -64,7 +64,7 @@ import WcagRef from '../../components/WcagRef.astro';
 
 `ar-charcounter` gère les annonces et états sémantiques sans intervention de votre part :
 
-- Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés.
+- Le composant **ajoute automatiquement son `id` à l'attribut `aria-describedby` du champ observé** — et le retire au `disconnectedCallback`. Si le composant ne possède pas d'`id`, un identifiant unique est généré. Les ids déjà présents sur le champ sont préservés, et l'`id` du compteur est réinséré si un gabarit de framework réécrit l'attribut.
 - Une région `aria-live="polite"` annonce le passage en état `warning` avec le nombre de caractères restants et le label pluralisé — par exemple _"1 caractère restant"_ ou _"12 caractères restants"_.
 - Une région `aria-live="assertive"` annonce le dépassement avec son ampleur dès que l'état `error` est atteint — par exemple _"Limite dépassée de 1 caractère"_ ou _"Limite dépassée de 3 caractères"_.
 - Les régions `aria-live` sont vidées au retour à l'état `normal` (ou lors de la transition `error → warning`), ce qui garantit la ré-annonce si l'utilisateur repasse dans le même état.
@@ -77,7 +77,6 @@ Les critères WCAG suivants sont implémentés :
 
 ### À votre charge
 
-- **`aria-describedby` géré par votre framework.** Si un gabarit (`[attr.aria-describedby]`, `:aria-describedby`, `aria-describedby={…}`) réécrit l'attribut du champ, il retire l'`id` du compteur. Le gabarit doit alors l'inclure : donnez un `id` explicite à `<ar-charcounter>` pour pouvoir le citer.
 - `ar-charcounter` ne pose pas `aria-invalid` sur le champ. Ce comportement est laissé à votre charge car l'invalidité sémantique doit généralement être déclenchée à des moments précis — au `blur` ou à la soumission du formulaire — et non en temps réel. Pour signaler l'erreur à la soumission :
 
 ```js
