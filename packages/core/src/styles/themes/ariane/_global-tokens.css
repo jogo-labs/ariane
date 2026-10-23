@@ -107,6 +107,12 @@
         color-mix(in oklab, var(--ar-color-vault), white 10%)
     );
     --ar-input-readonly-bg: var(--ar-color-bg-subtle);
+    /* Champ en erreur (voir shared/_field-state.css). Texte : --ar-color-danger-text, calibré
+       pour le contraste AA sur texte, comme ar-alert et ar-charcounter. Bordure :
+       --ar-color-danger-40 ne donne que 2,38:1 sur --ar-color-vault en sombre (seuil non
+       textuel 3:1), danger-70 (7,58:1) est le palier correct côté sombre. */
+    --ar-input-error-color: var(--ar-color-danger-text);
+    --ar-input-error-border-color: light-dark(var(--ar-color-danger-50), var(--ar-color-danger-70));
     /* Bordure d'un champ inactif (désactivé ou en lecture seule). Un contrôle
        désactivé est exempté du contraste non textuel (WCAG 1.4.11) : la valeur est
        celle du bouton désactivé, pour que deux contrôles accolés (champ + bouton

@@ -7,22 +7,6 @@
     --ar-datepicker-distance: var(--ar-anchor-distance);
     --ar-datepicker-offset: var(--ar-anchor-offset);
 
-    /* -- Champ texte + message d'erreur (au-dessus/en-dessous de l'input) -- */
-    /* --ar-color-danger-text (pas red-50/red-40 directement) : même convention que
-               ar-alert/ar-charcounter, calibré pour le contraste AA sur texte (axe-core).
-               --ar-color-danger-text est déjà light-dark() en interne — un second
-               light-dark() ici pointait par erreur sur --ar-color-red-40 en sombre
-               (2,38:1 sur --ar-color-vault, échec AA) au lieu de --ar-color-danger-70
-               (7,58:1) que le token calibré aurait donné. */
-    --ar-datepicker-error-color: var(--ar-color-danger-text);
-    /* --ar-color-danger-40 (red-40) sur --ar-color-vault ne donne que 2,38:1 en sombre
-               (seuil non-texte 3:1) — même erreur que --ar-datepicker-error-color ci-dessus,
-               danger-70 (7,58:1) est le palier correct côté sombre. */
-    --ar-datepicker-input-error-border-color: light-dark(
-        var(--ar-color-danger-50),
-        var(--ar-color-danger-70)
-    );
-
     /* -- Panel calendrier (conteneur du header + grille + footer) -- */
     /* Valeur propre, volontairement non cascadée depuis --ar-panel-max-width (bloc partagé
                dropdown/breadcrumb/stepper) : le panel calendrier datepicker a toujours nécessité une
@@ -188,7 +172,7 @@ ar-datepicker {
 
     &::part(error) {
         font-size: var(--ar-font-size-sm);
-        color: var(--ar-datepicker-error-color);
+        color: var(--ar-input-error-color);
     }
 
     /* -- Champ texte : l'input lui-même -- */
@@ -209,16 +193,11 @@ ar-datepicker {
         transition: border-color 0.15s ease;
     }
 
-    /* Les règles de couleur de bordure du `::part(input)` ci-dessous (côté document)
-       l'emportent sur la règle d'erreur interne du composant, `:host([has-error])
-       [part~='input']` : elles excluent donc `:state(has-error)` au lieu de réénoncer la
-       couleur d'erreur. Un thème personnalisé qui fixe la couleur de bordure de l'input
-       doit faire de même. */
-    &:not(:state(has-error))::part(input) {
+    &::part(input) {
         border-color: var(--ar-input-border-color);
     }
 
-    &:not(:state(has-error))::part(input):read-only {
+    &::part(input):read-only {
         border-color: var(--ar-input-inactive-border-color);
     }
 
@@ -227,7 +206,7 @@ ar-datepicker {
         cursor: default;
     }
 
-    &:not(:state(has-error))::part(input):disabled {
+    &::part(input):disabled {
         border-color: var(--ar-input-inactive-border-color);
     }
 
@@ -242,10 +221,7 @@ ar-datepicker {
         outline-offset: var(--ar-focus-ring-offset);
     }
 
-    /* Même spécificité que les règles read-only/disabled ci-dessus : l'ordre décide, le
-       focus l'emporte. En erreur, aucune couleur n'est posée ici : la bordure reste celle
-       de l'erreur et l'outline ci-dessus reste l'indicateur de focus. */
-    &:not(:state(has-error))::part(input):focus-visible {
+    &::part(input):focus-visible {
         border-color: var(--ar-color-interactive);
     }
 
