@@ -172,6 +172,136 @@ describe('ar-datepicker — formulaire', () => {
         });
     });
 
+    describe("message d'erreur, has-error et aria-invalid (#404)", () => {
+        const settle = async (el: ArDatepicker): Promise<void> => {
+            await el.updateComplete;
+            await el.updateComplete;
+        };
+        const errorText = (el: ArDatepicker): string =>
+            el.shadowRoot!.querySelector('[part="error"]')!.textContent!.trim();
+        const typeAndBlur = async (el: ArDatepicker, text: string): Promise<void> => {
+            el.inputElement.focus();
+            await sendKeys({ type: text });
+            el.inputElement.blur();
+            await settle(el);
+        };
+
+        it('aucune erreur affichée au chargement, même pour un champ obligatoire vide', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            expect(el.matches(':state(has-error)')).to.equal(false);
+            expect(errorText(el)).to.equal('');
+            expect(el.inputElement.hasAttribute('aria-invalid')).to.equal(false);
+        });
+
+        it('un champ obligatoire vidé puis quitté affiche le message de validité, avec aria-invalid', async () => {
+            const { el } = await mount('<ar-datepicker required></ar-datepicker>');
+            el.inputElement.focus();
+            await sendKeys({ type: '1' });
+            await sendKeys({ press: 'Backspace' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(el.matches(':state(has-error)')).to.equal(true);
+            expect(errorText(el)).to.equal('Veuillez renseigner ce champ.');
+            expect(el.inputElement.getAttribute('aria-invalid')).to.equal('true');
+            const errorId = el.shadowRoot!.querySelector('[part="error"]')!.id;
+            expect(el.inputElement.getAttribute('aria-describedby')).to.contain(errorId);
+            expect(el.shadowRoot!.querySelector('[part="error"]')!.getAttribute('role')).to.equal(
+                'alert',
+            );
+        });
+
+        it('un texte non reconnu pose badInput, garde le texte et affiche le message', async () => {
+            const { form, el } = await mount('<ar-datepicker name="d"></ar-datepicker>');
+            await typeAndBlur(el, 'abc');
+            expect(el.validity.badInput).to.equal(true);
+            expect(form.checkValidity()).to.equal(false);
+            expect(el.value).to.equal('');
+            expect(el.inputElement.value).to.equal('abc');
+            expect(el.matches(':state(user-invalid)')).to.equal(true);
+            expect(errorText(el)).to.equal(
+                `Date non reconnue. Format attendu : dd/MM/yyyy (ex. 31/12/${new Date().getFullYear()}).`,
+            );
+            expect(el.inputElement.getAttribute('aria-invalid')).to.equal('true');
+        });
+
+        it('le texte non reconnu est conservé aussi quand le champ avait une valeur', async () => {
+            const { el } = await mount('<ar-datepicker value="2026-06-12"></ar-datepicker>');
+            el.inputElement.focus();
+            el.inputElement.select();
+            await sendKeys({ type: 'abc' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(el.value).to.equal('');
+            expect(el.inputElement.value).to.equal('abc');
+            expect(el.validity.badInput).to.equal(true);
+        });
+
+        it('corriger la saisie retire badInput, le message et aria-invalid', async () => {
+            const { el } = await mount('<ar-datepicker></ar-datepicker>');
+            await typeAndBlur(el, 'abc');
+            expect(el.validity.badInput).to.equal(true);
+            el.inputElement.focus();
+            el.inputElement.select();
+            await sendKeys({ type: '12/06/2026' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(el.validity.badInput).to.equal(false);
+            expect(el.value).to.equal('2026-06-12');
+            expect(el.matches(':state(has-error)')).to.equal(false);
+            expect(errorText(el)).to.equal('');
+            expect(el.inputElement.hasAttribute('aria-invalid')).to.equal(false);
+        });
+
+        it('une date hors plage saisie affiche le message de plage', async () => {
+            const { el } = await mount('<ar-datepicker min="2026-06-01"></ar-datepicker>');
+            await typeAndBlur(el, '01/01/2026');
+            expect(el.validity.rangeUnderflow).to.equal(true);
+            expect(errorText(el)).to.equal(el.validationMessage);
+            expect(errorText(el)).to.contain('au plus tôt');
+        });
+
+        it("le slot error de l'application prime sur le message du composant", async () => {
+            const { el } = await mount(
+                '<ar-datepicker required><span slot="error">Message applicatif</span></ar-datepicker>',
+            );
+            el.inputElement.focus();
+            await sendKeys({ type: '1' });
+            await sendKeys({ press: 'Backspace' });
+            el.inputElement.blur();
+            await settle(el);
+            expect(errorText(el)).to.equal('');
+            expect(el.querySelector('[slot="error"]')!.assignedSlot).to.not.equal(null);
+            expect(el.matches(':state(has-error)')).to.equal(true);
+        });
+
+        it("setCustomValidity s'affiche une fois le champ touché, sans slot", async () => {
+            const { el } = await mount('<ar-datepicker name="d"></ar-datepicker>');
+            el.setCustomValidity('Date indisponible');
+            await settle(el);
+            expect(errorText(el)).to.equal('');
+            el.reportValidity();
+            await settle(el);
+            expect(errorText(el)).to.equal('Date indisponible');
+            expect(el.matches(':state(has-error)')).to.equal(true);
+            el.setCustomValidity('');
+            await settle(el);
+            expect(errorText(el)).to.equal('');
+        });
+
+        it('form.reset() retire le message et aria-invalid', async () => {
+            const { form, el } = await mount('<ar-datepicker name="d"></ar-datepicker>');
+            await typeAndBlur(el, 'abc');
+            expect(errorText(el)).to.not.equal('');
+            form.reset();
+            await settle(el);
+            expect(el.validity.badInput).to.equal(false);
+            expect(el.inputElement.value).to.equal('');
+            expect(errorText(el)).to.equal('');
+            expect(el.matches(':state(has-error)')).to.equal(false);
+            expect(el.inputElement.hasAttribute('aria-invalid')).to.equal(false);
+        });
+    });
+
     describe('intégration framework (#326)', () => {
         it('saisie hors max : rangeOverflow, checkValidity() faux, value conservée', async () => {
             const { form, el } = await mount(

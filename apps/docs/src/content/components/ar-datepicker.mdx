@@ -140,7 +140,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 
 ### Validation
 
-Un contenu dans le slot `error` met le composant en erreur : l'état `ar-datepicker:state(has-error)::part(input)` permet de styler l'input.
+Une fois le champ touché, une saisie invalide affiche un message sous le champ : champ obligatoire vide, date hors de `min`/`max`, texte non reconnu ou erreur posée par `setCustomValidity()`. Le slot `error` le remplace par un message de l'application. Dans les deux cas le composant est en erreur : l'input porte `aria-invalid` et l'état `ar-datepicker:state(has-error)` permet de le styler (`::part(input)`, `::part(label)`).
 
 `complete` et `valid` dans le `detail` de `ar-datepicker-input-complete` permettent de n'afficher l'erreur qu'une fois la saisie terminée :
 

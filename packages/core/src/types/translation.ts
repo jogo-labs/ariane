@@ -85,6 +85,7 @@ export interface FullTranslation extends BaseTranslation {
     validationValueMissing: string;
     validationRangeUnderflow: (min: string) => string;
     validationRangeOverflow: (max: string) => string;
+    validationBadInput: (format: string, example: string) => string;
 }
 
 /**

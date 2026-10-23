@@ -99,6 +99,8 @@ const translation: FullTranslation = {
     validationValueMissing: 'Veuillez renseigner ce champ.',
     validationRangeUnderflow: (min) => `La date doit être au plus tôt le ${min}.`,
     validationRangeOverflow: (max) => `La date doit être au plus tard le ${max}.`,
+    validationBadInput: (format, example) =>
+        `Date non reconnue. Format attendu : ${format} (ex. ${example}).`,
 };
 
 registerTranslation(translation);

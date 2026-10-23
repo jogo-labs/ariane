@@ -216,7 +216,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             );
         });
 
-        it(`un champ invalide après interaction a la bordure et le label d'erreur (${theme})`, async () => {
+        it(`un champ invalide après interaction, sans slot error, a la bordure et le label d'erreur (${theme})`, async () => {
             const scope = document.createElement('div');
             scope.setAttribute('data-theme', theme);
             const el = document.createElement('ar-datepicker') as ArDatepicker;
@@ -229,7 +229,6 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             el.dispatchEvent(new Event('invalid'));
             await el.updateComplete;
             expect(el.matches(':state(user-invalid)')).to.equal(true);
-            expect(el.hasAttribute('has-error')).to.equal(false);
             const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
             const label = el.shadowRoot!.querySelector<HTMLElement>('[part~="label"]')!;
             await new Promise((r) => setTimeout(r, 250)); // fin de la transition de bordure
