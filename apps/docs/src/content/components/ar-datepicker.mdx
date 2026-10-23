@@ -140,7 +140,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 
 ### Validation
 
-Un contenu dans le slot `error` met le composant en erreur : l'état `ar-datepicker:state(has-error)::part(input)` permet de styler l'input. Le composant applique lui-même la bordure d'erreur : un thème qui fixe la couleur de bordure de `::part(input)` doit exclure cet état (`ar-datepicker:not(:state(has-error))::part(input)`), sinon sa règle l'emporte.
+Un contenu dans le slot `error` met le composant en erreur : l'état `ar-datepicker:state(has-error)::part(input)` permet de styler l'input.
 
 `complete` et `valid` dans le `detail` de `ar-datepicker-input-complete` permettent de n'afficher l'erreur qu'une fois la saisie terminée :
 
