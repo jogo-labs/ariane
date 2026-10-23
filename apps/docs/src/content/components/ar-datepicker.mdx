@@ -40,6 +40,18 @@ variants:
             max="2026-12-31"
             lang="fr-FR"
           ></ar-datepicker>
+    - name: disabled-dates
+      label: Dates désactivées
+      description: >
+          `isDateDisabled` désactive des jours selon une règle libre, ici les week-ends. Le hint
+          par défaut ne les décrit pas.
+      html: |
+          <ar-datepicker id="demo-disabled-dates" label="Date de rendez-vous" lang="fr-FR"></ar-datepicker>
+          <script>
+              document.getElementById('demo-disabled-dates').isDateDisabled = function (date) {
+                  return date.getDay() === 0 || date.getDay() === 6;
+              };
+          </script>
     - name: language-and-format
       label: Langue et format
       description: L'attribut `lang` pilote les textes et les formats, sauf le label de l'input.
@@ -128,39 +140,13 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 
 ### Validation
 
-Un contenu dans le slot `error` met le composant en erreur : l'état `ar-datepicker:state(has-error)::part(input)` permet de styler l'input (avant Chrome et Edge 125 : `ar-datepicker:--has-error::part(input)`). Le composant applique lui-même la bordure d'erreur : un thème qui fixe la couleur de bordure de `::part(input)` doit exclure cet état (`ar-datepicker:not(:state(has-error))::part(input)`), sinon sa règle l'emporte.
-
-`min` et `max` valent aussi pour une saisie au clavier : hors plage, `valid` vaut `false` dans le `detail` des événements `ar-datepicker-input-complete` et `ar-datepicker-input-change`, et le champ porte `rangeUnderflow` ou `rangeOverflow` (`form.checkValidity()` échoue). `value` garde la date saisie.
+Un contenu dans le slot `error` met le composant en erreur : l'état `ar-datepicker:state(has-error)::part(input)` permet de styler l'input. Le composant applique lui-même la bordure d'erreur : un thème qui fixe la couleur de bordure de `::part(input)` doit exclure cet état (`ar-datepicker:not(:state(has-error))::part(input)`), sinon sa règle l'emporte.
 
 `complete` et `valid` dans le `detail` de `ar-datepicker-input-complete` permettent de n'afficher l'erreur qu'une fois la saisie terminée :
 
 ```js
 el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
     errorSlot.hidden = detail.valid;
-});
-```
-
-### Dates désactivées
-
-En complément de `min`/`max`, `isDateDisabled` couvre des règles arbitraires. Les jours concernés reçoivent `aria-disabled="true"` ; le hint par défaut ne les décrit pas, à préciser via le slot `hint` si nécessaire.
-
-```js
-el.isDateDisabled = (d) => d.getDay() === 0 || d.getDay() === 6; // week-ends
-```
-
-### Jours chargés à la demande
-
-`ar-datepicker-view-change` est émis à l'ouverture et à chaque changement de mois. Posez `pending` le temps du chargement, puis réassignez `isDateDisabled` :
-
-```js
-datepicker.addEventListener('ar-datepicker-view-change', async ({ detail }) => {
-    datepicker.pending = true;
-    try {
-        const unavailable = await loadUnavailableDays(detail.year, detail.month);
-        datepicker.isDateDisabled = (d) => unavailable.has(d.toISOString().slice(0, 10));
-    } finally {
-        datepicker.pending = false;
-    }
 });
 ```
 
