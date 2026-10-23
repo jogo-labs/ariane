@@ -71,7 +71,7 @@ const codeReset = `<form>
     <div class="page-container">
         <div class="page-header">
             <h2 class="page-title">Contrôles de formulaire</h2>
-            <p class="summary">Les champs de formulaire d'Ariane se comportent comme des champs natifs : ils se soumettent avec leur formulaire, se valident avec l'API standard du navigateur et se réinitialisent avec lui. Cette page décrit ce contrat commun, une fois pour tous les champs.</p>
+            <p class="summary">Les champs de formulaire d'Ariane se comportent comme des champs natifs : ils se soumettent avec leur formulaire, se valident avec l'API standard du navigateur et se réinitialisent avec lui.</p>
         </div>
 
         <div class="narrative">
@@ -83,13 +83,13 @@ const codeReset = `<form>
 
             <NarrativeHeading id="validation">Validation</NarrativeHeading>
             <p>Un formulaire contenant un champ invalide n'est pas soumis : le navigateur place le focus sur le premier champ en erreur et affiche son message, dans la langue du composant (cf. <a href="/getting-started/traductions">Traductions</a>). Les contraintes viennent des attributs du champ (<code>required</code>, <code>min</code> et <code>max</code> pour une date…), documentés dans la page de chaque composant.</p>
+            <p>Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation" target="_blank" rel="noopener">documentation de la validation des contraintes sur MDN</a> et la <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation" target="_blank" rel="noopener">spécification HTML</a>.</p>
             <ar-alert variant="warning" without-notification class="doc-callout-alert">
                 <p class="doc-callout-alert-title">À savoir</p>
                 <div class="doc-callout-alert-content">
                     <p>Cette validation s'exécute dans le navigateur : <code>novalidate</code> sur le formulaire la désactive, et elle ne remplace pas la validation côté serveur.</p>
                 </div>
             </ar-alert>
-            <p class="hint">Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation" target="_blank" rel="noopener">documentation de la validation des contraintes sur MDN</a> et la <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation" target="_blank" rel="noopener">spécification HTML</a>.</p>
 
             <NarrativeSubheading id="obligatoire">Champs obligatoires</NarrativeSubheading>
             <p>L'attribut <code>required</code> bloque la soumission tant que le champ est vide, et l'annonce aux technologies d'assistance. Ariane n'ajoute aucun indicateur visuel : voir <a href="#styler">Styler les états</a> pour afficher un astérisque ou un texte.</p>
