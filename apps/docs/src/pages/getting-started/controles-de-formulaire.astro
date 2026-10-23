@@ -56,8 +56,8 @@ ar-datepicker:state(required)::part(label)::after {
   content: ' *';
 }
 
-/* Erreur visible une fois que l'utilisateur a interagi */
-ar-datepicker:state(user-invalid)::part(input) {
+/* Champ en erreur, une fois que l'utilisateur a interagi */
+ar-datepicker:state(has-error)::part(input) {
   border-color: var(--couleur-erreur);
 }`;
 
@@ -104,7 +104,7 @@ const codeReset = `<form>
             <p><code>setCustomValidity()</code> signale une erreur que le navigateur ne peut pas connaître, par exemple un refus du serveur. Le formulaire n'est plus soumis tant que l'erreur est là :</p>
             <pre><code class="language-js" set:text={codeCustomValidity} /></pre>
             <p>Comme sur un <code>&lt;input&gt;</code>, l'erreur persiste jusqu'à <code>setCustomValidity('')</code>, même après une nouvelle saisie ou une réinitialisation du formulaire : c'est à l'application de l'effacer.</p>
-            <p>Pour afficher le message dans la page, utilisez le slot <code>error</code> du composant. Il est annoncé aux lecteurs d'écran, mais n'a aucun effet sur la validité du formulaire :</p>
+            <p>Le composant n'affiche pas de message : pour en afficher un dans la page, utilisez le slot <code>error</code>. Un élément extérieur au composant ne peut pas être référencé par <code>aria-describedby</code> depuis l'intérieur de son shadow DOM : le slot le relie au champ, et il est annoncé aux lecteurs d'écran. Il n'a aucun effet sur la validité du formulaire :</p>
             <pre><code class="language-html" set:text={codeErrorSlot} /></pre>
 
             <NarrativeHeading id="styler">Styler les états</NarrativeHeading>
@@ -112,6 +112,7 @@ const codeReset = `<form>
             <ul>
                 <li><code>:state(required)</code> et <code>:state(optional)</code> : selon l'attribut <code>required</code>.</li>
                 <li><code>:state(user-invalid)</code> et <code>:state(user-valid)</code> : comme <code>:user-invalid</code> et <code>:user-valid</code>, ils n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou <code>reportValidity()</code>. Une valeur posée par l'application ne les déclenche pas.</li>
+                <li><code>:state(has-error)</code> : le champ est en erreur, parce que le slot <code>error</code> est rempli ou parce qu'il est invalide après une interaction (comme <code>user-invalid</code>). Il porte alors <code>aria-invalid</code>. C'est l'état à cibler pour colorer un champ en erreur, quelle que soit l'origine de l'erreur.</li>
             </ul>
             <pre><code class="language-css" set:text={codeStates} /></pre>
 
