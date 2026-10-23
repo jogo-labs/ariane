@@ -87,7 +87,7 @@ const codeReset = `<form>
             <ar-alert variant="warning" without-notification class="doc-callout-alert">
                 <p class="doc-callout-alert-title">À savoir</p>
                 <div class="doc-callout-alert-content">
-                    <p>Cette validation s'exécute dans le navigateur : <code>novalidate</code> sur le formulaire la désactive, et elle ne remplace pas la validation côté serveur.</p>
+                    <p>Cette validation s'exécute dans le navigateur et ne remplace pas la validation côté serveur. <code>novalidate</code> sur le formulaire l'empêche de bloquer la soumission, mais la validité reste évaluée : <code>:invalid</code>, <code>checkValidity()</code> et <code>:state(user-invalid)</code> après une interaction restent disponibles. Seule la tentative de soumission ne marque plus les champs.</p>
                 </div>
             </ar-alert>
 
