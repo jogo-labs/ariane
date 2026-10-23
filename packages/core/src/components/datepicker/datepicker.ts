@@ -177,7 +177,11 @@ export class ArDatepicker extends ArianeFormElement {
     @property({ reflect: true, useDefault: true }) min = '';
     /** Date maximale sélectionnable (ISO `yyyy-MM-dd`). */
     @property({ reflect: true, useDefault: true }) max = '';
-    /** Callback de désactivation arbitraire — retourne `true` pour désactiver un jour. */
+    /**
+     * Prédicat fourni par l'application : retourne `true` quand un jour doit être désactivé. S'ajoute
+     * aux règles `min` et `max`. Propriété JavaScript uniquement, à poser comme propriété et non comme
+     * attribut ; réassignez-la pour que le calendrier en tienne compte.
+     */
     @property({ attribute: false }) isDateDisabled: ((date: Date) => boolean) | undefined =
         undefined;
     /** Texte placeholder de l'input. */

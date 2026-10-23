@@ -6,7 +6,7 @@
  * Toutes les sections (attributs, events, CSS parts, CSS props, slots) sont auto-générées.
  * Ajouter une annotation JSDoc dans le composant TS → apparaît ici automatiquement.
  */
-import { type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
+import { type CemAttribute, type CemDeclaration, getPublicMethods } from '../utils/cem-types.ts';
 import { eventDetailType, isCancelableEvent, stripCancelableMarker } from '../utils/events.ts';
 import { getSlug } from '../utils/tag-name.ts';
 import { isTransversePart } from '../utils/transverse-roles.ts';
@@ -36,6 +36,19 @@ const hasTransverseParts = (component.cssParts ?? []).some((p) =>
 );
 const hasStateParts = (component.cssParts ?? []).some((p) => isStatePart(p.name));
 
+// Propriétés publiques sans attribut (JavaScript uniquement, ex. une fonction) : absentes de
+// `attributes` dans le CEM, mais elles font partie de l'API de configuration. Les accesseurs en
+// lecture seule restent hors de cette liste.
+const jsOnlyProps: CemAttribute[] = (component.members ?? [])
+    .filter((m) => m.kind === 'field' && !m.privacy && !m.static && !m.readonly && !m.attribute)
+    .map((m) => ({
+        name: m.name,
+        type: m.type,
+        description: m.description,
+        default: m.default === 'undefined' ? undefined : m.default,
+    }));
+const apiAttributes = [...(component.attributes ?? []), ...jsOnlyProps];
+
 const reflectsByFieldName = new Map(
     (component.members ?? []).map((m) => [m.name, m.reflects === true]),
 );
@@ -50,8 +63,8 @@ interface ApiCategory {
 // dans son code) vs API de thémification (comment le styliser depuis l'extérieur) — deux
 // publics différents, deux ar-tab-group séparés plutôt qu'un seul mélangeant les deux.
 const usageCategories: ApiCategory[] = [
-    component.attributes && component.attributes.length > 0
-        ? { key: 'attributs', label: 'Attributs et propriétés', count: component.attributes.length }
+    apiAttributes.length > 0
+        ? { key: 'attributs', label: 'Attributs et propriétés', count: apiAttributes.length }
         : null,
     component.slots && component.slots.length > 0
         ? { key: 'slots', label: 'Slots', count: component.slots.length }
@@ -129,15 +142,15 @@ const codeImportNpm = `import '@ariane-ui/core/dist/components/${slug}/index.js'
                     </ar-tab>
                 ))}
 
-                {component.attributes && component.attributes.length > 0 && (
+                {apiAttributes.length > 0 && (
                     <ar-tab-panel name="attributs">
                         <h4 id="api-attributs" class="sr-only">Attributs et propriétés</h4>
                         <div class="api-list" role="list">
-                            {component.attributes.map((attr, i) => {
+                            {apiAttributes.map((attr, i) => {
                                 const propName = attr.fieldName ?? attr.name;
                                 return (
                                     <div class="api-row" role="listitem">
-                                        <span class="sr-only">{i + 1} sur {component.attributes!.length}</span>
+                                        <span class="sr-only">{i + 1} sur {apiAttributes.length}</span>
                                         <div>
                                             <span class="api-name">
                                                 {propName}
