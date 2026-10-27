@@ -14,8 +14,7 @@ variants:
     - name: with-error
       label: Avec erreur
       description: >
-          Un slot `error` rempli pose `:state(has-error)` et `aria-invalid` sur l'input ; le message est
-          relié au champ par `aria-describedby`.
+          Lorsque le slot "error" est rempli, le composant expose `:state(has-error)`.
       html: |
           <ar-datepicker label="Date de naissance">
             <span slot="error">Date invalide ou hors plage autorisée</span>
