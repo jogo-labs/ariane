@@ -10,6 +10,7 @@ const tocEntries = [
     { id: 'obligatoire',     label: 'Champs obligatoires',       level: 2 as const },
     { id: 'api-validation',  label: 'Interroger la validité',    level: 2 as const },
     { id: 'erreur-perso',    label: 'Messages d\'erreur personnalisés', level: 2 as const },
+    { id: 'annoncer',        label: 'Annoncer les erreurs',      level: 2 as const },
     { id: 'styler',          label: 'Styler les états',          level: 1 as const },
     { id: 'reinitialisation', label: 'Réinitialisation',         level: 1 as const },
 ];
@@ -49,6 +50,10 @@ champ.addEventListener('ar-datepicker-input-change', () => champ.setCustomValidi
 
 const codeErrorSlot = `<ar-datepicker label="Date de naissance">
   <span slot="error">Cette date est déjà réservée.</span>
+</ar-datepicker>`;
+
+const codeErrorAlert = `<ar-datepicker label="Date de naissance">
+  <span slot="error" role="alert">Cette date est déjà réservée.</span>
 </ar-datepicker>`;
 
 const codeStates = `/* Indicateur de champ obligatoire */
@@ -111,6 +116,12 @@ const codeReset = `<form>
             <p>Comme sur un <code>&lt;input&gt;</code>, l'erreur persiste jusqu'à <code>setCustomValidity('')</code>, même après une nouvelle saisie ou une réinitialisation du formulaire : c'est à l'application de l'effacer.</p>
             <p>Le composant n'affiche pas de message : pour en afficher un dans la page, utilisez le slot <code>error</code>. Un élément extérieur au composant ne peut pas être référencé par <code>aria-describedby</code> depuis l'intérieur de son shadow DOM : le slot le relie au champ, et il est annoncé aux lecteurs d'écran. Il n'a aucun effet sur la validité du formulaire :</p>
             <pre><code class="language-html" set:text={codeErrorSlot} /></pre>
+
+            <NarrativeSubheading id="annoncer">Annoncer les erreurs</NarrativeSubheading>
+            <p>Le composant ne pose aucun rôle live sur le slot <code>error</code> : le message est relié au champ par <code>aria-describedby</code> et lu quand le champ reçoit le focus. À la soumission d'un formulaire, un <code>role="alert"</code> par champ déclencherait autant d'annonces qui s'interrompent. Affichez plutôt un récapitulatif des erreurs en tête du formulaire, annoncé une seule fois et avec un lien vers chaque champ, puis placez le focus sur ce récapitulatif ou sur le premier champ en erreur.</p>
+            <p>Pour annoncer un message dès son apparition, par exemple pour une validation en direct, posez le rôle sur votre propre élément :</p>
+            <pre><code class="language-html" set:text={codeErrorAlert} /></pre>
+            <p class="hint">Pour plus d'information sur ce sujet, voir le <a href="https://www.w3.org/WAI/tutorials/forms/notifications/" target="_blank" rel="noopener">tutoriel sur les notifications de formulaire du W3C</a>.</p>
 
             <NarrativeHeading id="styler">Styler les états</NarrativeHeading>
             <p><code>:invalid</code> et <code>:valid</code> s'appliquent nativement. La plateforme réserve les autres pseudo-classes de formulaire aux champs natifs : Ariane expose à leur place des états personnalisés, ciblés avec <code>:state()</code>.</p>

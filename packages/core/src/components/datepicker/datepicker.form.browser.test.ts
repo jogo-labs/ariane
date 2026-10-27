@@ -214,7 +214,7 @@ describe('ar-datepicker — formulaire', () => {
             expect(el.matches(':state(user-invalid)')).to.equal(false);
             expect(el.inputElement.getAttribute('aria-invalid')).to.equal('true');
             expect(el.inputElement.getAttribute('aria-describedby')).to.contain(errorPart(el)!.id);
-            expect(errorPart(el)!.getAttribute('role')).to.equal('alert');
+            expect(errorPart(el)!.hasAttribute('role')).to.equal(false);
         });
 
         it('un texte non reconnu pose badInput et user-invalid, et garde le texte', async () => {

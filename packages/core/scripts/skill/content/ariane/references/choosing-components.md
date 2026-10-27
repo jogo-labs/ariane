@@ -41,7 +41,7 @@ API complète (attributs, événements, slots, parts, tokens) : `components/<tag
 - Contenu riche ou cliquable lié à un déclencheur → `<ar-dropdown>`, pas `<ar-tooltip>` (contenu `role="tooltip"` non interactif).
 - Tâche qui exige l'attention et interrompt le flux (confirmer, remplir, choisir) → `<ar-dialog>` ; `data-ar-accept` et `data-ar-dismiss` sur les boutons distinguent confirmation et annulation.
 - Panneau latéral glissant depuis le bord (ex. filtres de recherche) → `<ar-dialog mode="drawer">` ; fenêtre centrée avec backdrop → `mode="modal"` (défaut).
-- Erreur de saisie d'un `<ar-datepicker>` → contenu dans son slot `error`, déjà enveloppé dans un `role="alert"` et annoncé automatiquement.
+- Erreur de saisie d'un `<ar-datepicker>` → contenu dans son slot `error`, relié à l'input par `aria-describedby` (lu au focus du champ, sans rôle live) ; à la soumission, un récapitulatif des erreurs et le focus sur le premier champ en erreur plutôt qu'un `role="alert"` par champ.
 - Formulaire avec un `<ar-datepicker>` → `name` (posé en attribut ou en propriété) l'inscrit dans `FormData`, `form.reset()` restaure sa valeur initiale, il expose l'API de validation standard (`checkValidity()`, `validity`, `setCustomValidity(message)` pour une erreur de serveur, qui persiste jusqu'à `setCustomValidity('')`).
 - Erreur typique : attendre un bouton de fermeture sur `<ar-alert>` sans `next-focus` ; il n'est rendu que si `next-focus` désigne l'ID de l'élément qui recevra le focus, et la fermeture retire l'alerte du DOM sans moyen de la réafficher.
 

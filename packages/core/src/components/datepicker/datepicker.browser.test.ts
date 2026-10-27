@@ -368,11 +368,11 @@ describe('ar-datepicker — browser', () => {
             expect(el.shadowRoot!.querySelector('slot[name="error"]')).to.not.equal(null);
         });
 
-        it('rend part=error avec role=alert quand le slot error est rempli au montage', async () => {
+        it('rend part=error, sans role live, quand le slot error est rempli au montage', async () => {
             el = await fixture(
                 html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
             );
-            expect(errorPart(el)!.getAttribute('role')).to.equal('alert');
+            expect(errorPart(el)!.hasAttribute('role')).to.equal(false);
             expect(errorPart(el)!.querySelector('slot[name="error"]')).to.not.equal(null);
         });
 

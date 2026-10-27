@@ -417,7 +417,7 @@ export class ArDatepicker extends ArianeFormElement {
                 </p>
                 ${
                     hasSlotError
-                        ? html`<p part="error" id="dp-error-${this._uid}" role="alert">
+                        ? html`<p part="error" id="dp-error-${this._uid}">
                               <slot name="error"></slot>
                           </p>`
                         : html`<slot name="error"></slot>`
