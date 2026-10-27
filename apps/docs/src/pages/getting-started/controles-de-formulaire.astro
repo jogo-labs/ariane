@@ -56,7 +56,12 @@ ar-datepicker:state(required)::part(label)::after {
   content: ' *';
 }
 
-/* Champ en erreur, une fois que l'utilisateur a interagi */
+/* Validation du navigateur : champ invalide après une interaction */
+ar-datepicker:state(user-invalid)::part(input) {
+  border-color: var(--couleur-erreur);
+}
+
+/* Messages de l'application dans le slot error */
 ar-datepicker:state(has-error)::part(input) {
   border-color: var(--couleur-erreur);
 }`;
@@ -112,9 +117,10 @@ const codeReset = `<form>
             <ul>
                 <li><code>:state(required)</code> et <code>:state(optional)</code> : selon l'attribut <code>required</code>.</li>
                 <li><code>:state(user-invalid)</code> et <code>:state(user-valid)</code> : comme <code>:user-invalid</code> et <code>:user-valid</code>, ils n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou <code>reportValidity()</code>. Une valeur posée par l'application ne les déclenche pas.</li>
-                <li><code>:state(has-error)</code> : le champ est en erreur, parce que le slot <code>error</code> est rempli ou parce qu'il est invalide après une interaction (comme <code>user-invalid</code>). Il porte alors <code>aria-invalid</code>. C'est l'état à cibler pour colorer un champ en erreur, quelle que soit l'origine de l'erreur.</li>
+                <li><code>:state(has-error)</code> : le slot <code>error</code> est rempli, l'application affiche une erreur. Il ne dépend pas de la validité du champ.</li>
             </ul>
             <pre><code class="language-css" set:text={codeStates} /></pre>
+            <p>Le choix dépend de la manière de valider. Avec la validation du navigateur, ciblez <code>:state(user-invalid)</code>. Si vous désactivez cette validation (<code>novalidate</code>) pour afficher vos propres messages dans le slot <code>error</code>, ciblez <code>:state(has-error)</code>. Dans les deux cas, l'input porte <code>aria-invalid</code>, comme le fait un champ natif invalide après interaction.</p>
 
             <NarrativeHeading id="reinitialisation">Réinitialisation</NarrativeHeading>
             <p><code>form.reset()</code> et un bouton <code>type="reset"</code> ramènent le champ à sa valeur initiale, celle du premier rendu. Aucun événement de valeur n'est émis, et les états <code>user-invalid</code> et <code>user-valid</code> sont retirés.</p>

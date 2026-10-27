@@ -42,7 +42,7 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  *                     via aria-describedby. Un contenu personnalisé remplace entièrement le
  *                     texte par défaut, y compris la mention de la plage — à répéter manuellement
  *                     si nécessaire.
- * @slot error       - Message d'erreur de l'application. Déclenche has-error sur le host, et est
+ * @slot error       - Message d'erreur de l'application. Déclenche l'état has-error, et est
  *                     lié à l'input par aria-describedby.
  * @slot today-label - Contenu riche du bouton « Aujourd'hui » (icône + texte, remplace le texte
  *                     traduit par défaut).
@@ -114,8 +114,8 @@ export interface ArDatepickerInputDetail extends ArEventDetail {
  * @cssState open      - Le calendrier est ouvert.
  * @cssState disabled  - Le composant est désactivé.
  * @cssState readonly  - Le composant est en lecture seule.
- * @cssState has-error - Le champ est en erreur : le slot `error` est rempli, ou le champ est invalide
- *   après interaction (voir `user-invalid`). L'input porte alors `aria-invalid`.
+ * @cssState has-error - Le slot `error` est rempli : l'application affiche une erreur. Indépendant de la
+ *   validité du champ (voir `user-invalid`).
  * @cssState pending   - L'application a posé l'attribut `pending` : une réponse est attendue.
  * @cssState required  - Le champ est obligatoire (`required`).
  * @cssState optional  - Le champ n'est pas obligatoire.
@@ -264,9 +264,7 @@ export class ArDatepicker extends ArianeFormElement {
 
     override updated(changed: PropertyValues<this>): void {
         super.updated(changed);
-        const hasError = this._hasError();
-        this.toggleAttribute('has-error', hasError);
-        this.toggleState('has-error', hasError);
+        this.toggleState('has-error', this._hasSlot.test('error'));
 
         // `open` initial à false : pas de transition, donc ni hide ni hidden au montage.
         if (changed.has('open') && (this.open || changed.get('open') !== undefined)) {
@@ -350,7 +348,7 @@ export class ArDatepicker extends ArianeFormElement {
         const closeLabel = this.localize.term('close');
         const closeAriaLabel = this.localize.term('closeCalendar');
         const hasSlotError = this._hasSlot.test('error');
-        const hasError = hasSlotError || this._isUserInvalid();
+        const ariaInvalid = hasSlotError || this._isUserInvalid();
         const formattedExample = this._formatExample();
         const formatLine = this.localize.term('expectedFormat', this.format, formattedExample);
         const rangeText = this._rangeText(locale);
@@ -380,7 +378,7 @@ export class ArDatepicker extends ArianeFormElement {
                         ?disabled=${this.effectiveDisabled}
                         ?readonly=${this.readOnly}
                         aria-required=${this.required ? 'true' : nothing}
-                        aria-invalid=${hasError ? 'true' : nothing}
+                        aria-invalid=${ariaInvalid ? 'true' : nothing}
                         autocomplete=${this.autocomplete || nothing}
                         placeholder=${this.placeholder || nothing}
                         aria-labelledby="dp-label-${this._uid}"
@@ -417,9 +415,13 @@ export class ArDatepicker extends ArianeFormElement {
                 <p part="hint" id="dp-hint-${this._uid}">
                     <slot name="hint">${defaultHint}</slot>
                 </p>
-                <p part="error" id="dp-error-${this._uid}" role=${hasSlotError ? 'alert' : nothing}>
-                    <slot name="error"></slot>
-                </p>
+                ${
+                    hasSlotError
+                        ? html`<p part="error" id="dp-error-${this._uid}" role="alert">
+                              <slot name="error"></slot>
+                          </p>`
+                        : html`<slot name="error"></slot>`
+                }
 
                 <div
                     part="panel"
@@ -1068,11 +1070,6 @@ export class ArDatepicker extends ArianeFormElement {
     private _isUserInvalid(): boolean {
         if (!this.interacted || this.effectiveDisabled) return false;
         return this.customValidityMessage !== '' || this._ownValidity() !== null;
-    }
-
-    /** En erreur : le slot `error` est rempli par l'application, ou le champ est invalide et touché. */
-    private _hasError(): boolean {
-        return this._hasSlot.test('error') || this._isUserInvalid();
     }
 
     private _syncFormValue(): void {

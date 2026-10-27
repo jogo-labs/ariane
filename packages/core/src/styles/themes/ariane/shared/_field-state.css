@@ -1,5 +1,6 @@
-/* Champs en erreur, communs à tous les champs de formulaire. `has-error` couvre le slot `error`
-   rempli et le champ invalide après interaction (`user-invalid`).
+/* Champs en erreur, communs à tous les champs de formulaire. `has-error` : l'application affiche une
+   erreur (slot `error` rempli). Pour un style piloté par la validation du navigateur, cibler
+   `:state(user-invalid)` à la place.
    Les règles ciblent l'état, pas la balise : un nouveau champ (ou un préfixe de tags
    personnalisé) est couvert sans les réécrire. Les pseudo-classes `:read-only`, `:disabled` et
    `:focus-visible` sont listées pour que l'erreur l'emporte sur les bordures propres à ces
