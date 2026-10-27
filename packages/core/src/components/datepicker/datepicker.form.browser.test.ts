@@ -232,6 +232,21 @@ describe('ar-datepicker — formulaire', () => {
             );
         });
 
+        it('le message de plage suit un changement de langue du document', async () => {
+            const { el } = await mount(
+                '<ar-datepicker value="2026-01-01" min="2026-06-10"></ar-datepicker>',
+            );
+            expect(el.validationMessage).to.equal('La date doit être au plus tôt le 10 juin 2026.');
+            document.documentElement.lang = 'en';
+            try {
+                await new Promise((r) => setTimeout(r, 50));
+                await el.updateComplete;
+                expect(el.validationMessage).to.equal('Date must be June 10, 2026 or later.');
+            } finally {
+                document.documentElement.lang = 'fr';
+            }
+        });
+
         it('le texte non reconnu est conservé aussi quand le champ avait une valeur', async () => {
             const { el } = await mount('<ar-datepicker value="2026-06-12"></ar-datepicker>');
             el.inputElement.focus();

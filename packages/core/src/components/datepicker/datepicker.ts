@@ -308,9 +308,8 @@ export class ArDatepicker extends ArianeFormElement {
             changed.has('disabled') ||
             (changed as Map<PropertyKey, unknown>).has('_formDisabled') ||
             // Le message de validité est localisé : un changement de lang (mise à jour sans
-            // propriété modifiée) doit le recalculer tant que le champ est obligatoire et vide.
-            (this.required && !this.value) ||
-            this._badInput
+            // propriété modifiée) doit le recalculer tant que le champ est invalide.
+            this._ownValidity() !== null
         ) {
             this._syncFormValue();
         }
