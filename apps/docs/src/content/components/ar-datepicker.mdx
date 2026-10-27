@@ -13,7 +13,9 @@ variants:
           ></ar-datepicker>
     - name: with-error
       label: Avec erreur
-      description: État d'erreur visible via le slot error.
+      description: >
+          Un slot `error` rempli pose `:state(has-error)` et `aria-invalid` sur l'input ; le message est
+          relié au champ par `aria-describedby`.
       html: |
           <ar-datepicker label="Date de naissance">
             <span slot="error">Date invalide ou hors plage autorisée</span>
@@ -74,6 +76,7 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 - Navigation clavier complète dans la grille de jours (<WcagRef criterion="2.1.1" summary="Keyboard : toutes les fonctionnalités sont accessibles au clavier." />)
 - Focus piégé dans le dialog calendrier lors de son ouverture, restitué à l'input à la fermeture (<WcagRef criterion="2.1.2" summary="No Keyboard Trap : le focus peut être déplacé hors du composant." />)
 - Le slot `error` est relié à l'input par `aria-describedby` : le message est lu quand le champ reçoit le focus (<WcagRef criterion="1.3.1" summary="Info and Relationships : les informations et relations présentées visuellement sont aussi disponibles par programme." />)
+- `aria-invalid="true"` sur l'input quand le slot `error` est rempli ou quand le champ est invalide après une interaction, comme un champ natif
 - `aria-disabled="true"` sur les jours hors plage et les jours désactivés (<WcagRef criterion="4.1.2" summary="Name, Role, Value : les états des éléments interactifs sont communiqués aux AT." />)
 - Le hint par défaut donne un exemple de date formatée et, avec `min` ou `max`, la plage sélectionnable (<WcagRef criterion="3.3.2" summary="Labels or Instructions : des instructions sont fournies lorsque le contenu nécessite une saisie de l'utilisateur." />)
 
@@ -138,18 +141,6 @@ Le calendrier suit le pattern [APG Date Picker Dialog](https://www.w3.org/WAI/AR
 ### Largeur du champ de saisie
 
 `--ar-datepicker-input-max-width` est calculé par défaut d'après la longueur de `format`, indépendamment de la largeur du hint. Si vous le surchargez, restez proche du contenu attendu dans le champ.
-
-### Validation
-
-Le composant n'affiche pas de message de lui-même : le slot `error` accueille celui de l'application, relié à l'input par `aria-describedby` et annoncé aux lecteurs d'écran. Un slot rempli pose l'état `ar-datepicker:state(has-error)`, qui permet de styler l'input, le label ou l'erreur (`::part(input)`, `::part(label)`, `::part(error)`). Pour un style piloté par la validation du navigateur, ciblez plutôt `:state(user-invalid)` (voir [Formulaires](/getting-started/controles-de-formulaire)). L'input porte `aria-invalid` dans les deux cas.
-
-`ar-datepicker-input-complete` n'est émis qu'une fois la saisie complète, et son `detail.valid` indique si c'est une date plausible (pas le 32/01/2026) : de quoi n'afficher l'erreur qu'à ce moment. Les bornes `min` et `max` relèvent de la validité du champ, pas de `valid` :
-
-```js
-el.addEventListener('ar-datepicker-input-complete', ({ detail }) => {
-    errorSlot.hidden = detail.valid;
-});
-```
 
 ### Formulaires
 
