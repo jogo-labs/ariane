@@ -101,6 +101,7 @@ const translation: FullTranslation = {
     validationRangeOverflow: (max) => `La date doit être au plus tard le ${max}.`,
     validationBadInput: (format, example) =>
         `Date non reconnue. Format attendu : ${format} (ex. ${example}).`,
+    validationStepMismatch: "Cette date n'est pas disponible.",
 };
 
 registerTranslation(translation);
