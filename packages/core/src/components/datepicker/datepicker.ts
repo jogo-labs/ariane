@@ -183,7 +183,8 @@ export class ArDatepicker extends ArianeFormElement {
     @property({ reflect: true, useDefault: true }) max = '';
     /**
      * Prédicat fourni par l'application : retourne `true` quand un jour doit être désactivé. S'ajoute
-     * aux règles `min` et `max`. Propriété JavaScript uniquement, à poser comme propriété et non comme
+     * aux règles `min` et `max`. Une date refusée par le prédicat, même saisie à la main, rend le champ
+     * invalide (`stepMismatch`). Propriété JavaScript uniquement, à poser comme propriété et non comme
      * attribut ; réassignez-la pour que le calendrier en tienne compte.
      */
     @property({ attribute: false }) isDateDisabled: ((date: Date) => boolean) | undefined =
@@ -304,6 +305,7 @@ export class ArDatepicker extends ArianeFormElement {
             changed.has('value') ||
             changed.has('min') ||
             changed.has('max') ||
+            changed.has('isDateDisabled') ||
             changed.has('required') ||
             changed.has('disabled') ||
             (changed as Map<PropertyKey, unknown>).has('_formDisabled') ||
@@ -1034,7 +1036,7 @@ export class ArDatepicker extends ArianeFormElement {
             return {
                 flags: { badInput: true },
                 message: this.localize.term(
-                    'validationBadInput',
+                    'datepickerValidationBadInput',
                     this.format,
                     this._formatExample(),
                 ),
@@ -1048,6 +1050,15 @@ export class ArDatepicker extends ArianeFormElement {
         }
         const date = this.value ? parse(this.value, 'yyyy-MM-dd').date : null;
         const flag = this._rangeFlag(date);
+        // Hors plage, la date est déjà refusée par min/max ; ici, une date de la plage que
+        // l'application exclut. stepMismatch : le plus proche des drapeaux natifs (valeur hors
+        // de l'ensemble des valeurs permises).
+        if (date && !flag && this.isDateDisabled?.(date)) {
+            return {
+                flags: { stepMismatch: true },
+                message: this.localize.term('datepickerValidationStepMismatch'),
+            };
+        }
         if (!date || !flag) return null;
         const bound = this._formatOrdinalDate(
             parse(flag === 'rangeUnderflow' ? this.min : this.max, 'yyyy-MM-dd').date as Date,
@@ -1057,8 +1068,8 @@ export class ArDatepicker extends ArianeFormElement {
             flags: { [flag]: true },
             message:
                 flag === 'rangeUnderflow'
-                    ? this.localize.term('validationRangeUnderflow', bound)
-                    : this.localize.term('validationRangeOverflow', bound),
+                    ? this.localize.term('datepickerValidationRangeUnderflow', bound)
+                    : this.localize.term('datepickerValidationRangeOverflow', bound),
         };
     }
 

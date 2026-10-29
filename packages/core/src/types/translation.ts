@@ -81,11 +81,14 @@ export interface FullTranslation extends BaseTranslation {
     closeAlert: string;
     // Validation des formulaires — messages de validité native (`validationMessage`, bulle du
     // navigateur), pas le contenu du slot `error`. Nom = `validation` + drapeau de ValidityState
-    // avec majuscule initiale (`validationValueMissing`, `validationRangeUnderflow`…).
+    // avec majuscule initiale, seulement si le texte vaut pour tout champ (`validationValueMissing`).
+    // Un message propre à un composant porte son nom (`datepickerValidationRangeUnderflow`…) : un
+    // autre composant ajoute les siens sans entrer en conflit.
     validationValueMissing: string;
-    validationRangeUnderflow: (min: string) => string;
-    validationRangeOverflow: (max: string) => string;
-    validationBadInput: (format: string, example: string) => string;
+    datepickerValidationRangeUnderflow: (min: string) => string;
+    datepickerValidationRangeOverflow: (max: string) => string;
+    datepickerValidationBadInput: (format: string, example: string) => string;
+    datepickerValidationStepMismatch: string;
 }
 
 /**

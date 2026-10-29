@@ -314,6 +314,59 @@ describe('ar-datepicker — formulaire', () => {
         });
     });
 
+    describe('isDateDisabled et validité (#408)', () => {
+        const weekend = (d: Date): boolean => d.getDay() === 0 || d.getDay() === 6;
+        const typeAndBlur = async (el: ArDatepicker, text: string): Promise<void> => {
+            el.inputElement.focus();
+            await sendKeys({ type: text });
+            el.inputElement.blur();
+            await el.updateComplete;
+            await el.updateComplete;
+        };
+
+        it('une date interdite saisie à la main rend le champ invalide (stepMismatch)', async () => {
+            const { form, el } = await mount('<ar-datepicker name="d"></ar-datepicker>');
+            el.isDateDisabled = weekend;
+            await el.updateComplete;
+            await typeAndBlur(el, '31/10/2026'); // samedi
+            expect(el.validity.stepMismatch).to.equal(true);
+            expect(el.validationMessage).to.equal("Cette date n'est pas disponible.");
+            expect(form.checkValidity()).to.equal(false);
+            expect(el.matches(':state(user-invalid)')).to.equal(true);
+            expect(el.inputElement.getAttribute('aria-invalid')).to.equal('true');
+        });
+
+        it('une date autorisée reste valide', async () => {
+            const { form, el } = await mount('<ar-datepicker name="d"></ar-datepicker>');
+            el.isDateDisabled = weekend;
+            await el.updateComplete;
+            await typeAndBlur(el, '30/10/2026'); // vendredi
+            expect(el.validity.valid).to.equal(true);
+            expect(form.checkValidity()).to.equal(true);
+        });
+
+        it('réassigner le prédicat met à jour la validité', async () => {
+            const { el } = await mount('<ar-datepicker value="2026-10-31"></ar-datepicker>');
+            expect(el.validity.valid).to.equal(true);
+            el.isDateDisabled = weekend;
+            await el.updateComplete;
+            expect(el.validity.stepMismatch).to.equal(true);
+            el.isDateDisabled = () => false;
+            await el.updateComplete;
+            expect(el.validity.valid).to.equal(true);
+        });
+
+        it('hors plage, min et max priment sur le prédicat', async () => {
+            const { el } = await mount(
+                '<ar-datepicker value="2026-10-31" max="2026-10-01"></ar-datepicker>',
+            );
+            el.isDateDisabled = weekend;
+            await el.updateComplete;
+            expect(el.validity.rangeOverflow).to.equal(true);
+            expect(el.validity.stepMismatch).to.equal(false);
+        });
+    });
+
     describe('intégration framework (#326)', () => {
         it('saisie hors max : rangeOverflow, checkValidity() faux, value conservée', async () => {
             const { form, el } = await mount(

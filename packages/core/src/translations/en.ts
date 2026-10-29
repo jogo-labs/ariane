@@ -96,10 +96,11 @@ const translation: FullTranslation = {
 
     // ── Form validation ──────────────────────────────────────────────────
     validationValueMissing: 'Please fill out this field.',
-    validationRangeUnderflow: (min) => `Date must be ${min} or later.`,
-    validationRangeOverflow: (max) => `Date must be ${max} or earlier.`,
-    validationBadInput: (format, example) =>
+    datepickerValidationRangeUnderflow: (min) => `Date must be ${min} or later.`,
+    datepickerValidationRangeOverflow: (max) => `Date must be ${max} or earlier.`,
+    datepickerValidationBadInput: (format, example) =>
         `Date not recognized. Expected format: ${format} (e.g. ${example}).`,
+    datepickerValidationStepMismatch: 'This date is not available.',
 };
 
 registerTranslation(translation);
