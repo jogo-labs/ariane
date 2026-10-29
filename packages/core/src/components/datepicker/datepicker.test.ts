@@ -28,7 +28,10 @@ describe('ArDatepicker', () => {
         it('contient un div part="panel"', () => expect(getPart(el, 'panel')).not.toBeNull());
         it('contient un label part="label"', () => expect(getPart(el, 'label')).not.toBeNull());
         it('contient un p part="hint"', () => expect(getPart(el, 'hint')).not.toBeNull());
-        it('contient un p part="error"', () => expect(getPart(el, 'error')).not.toBeNull());
+        it('ne rend pas part="error" quand le slot error est vide', () => {
+            expect(getPart(el, 'error')).toBeNull();
+            expect(el.shadowRoot?.querySelector('slot[name="error"]')).not.toBeNull();
+        });
         it('contient un div racine part="datepicker" enveloppant tout le contenu', () => {
             const root = getPart(el, 'datepicker');
             expect(root).not.toBeNull();
@@ -67,14 +70,14 @@ describe('ArDatepicker', () => {
             expect(el.hasAttribute('readonly')).toBe(true);
         });
 
-        it('has-error se reflète quand le slot error a du contenu', async () => {
+        it('rend part="error" quand le slot error a du contenu', async () => {
             el = await fixture(`
                 <ar-datepicker>
                     <span slot="error">Date invalide</span>
                 </ar-datepicker>
             `);
             await waitForUpdate(el);
-            expect(el.hasAttribute('has-error')).toBe(true);
+            expect(getPart(el, 'error')).not.toBeNull();
         });
     });
 
@@ -222,20 +225,20 @@ describe('ArDatepicker', () => {
     });
 
     describe('slots et ARIA', () => {
-        it('has-error absent quand slot error est vide', async () => {
+        it('aucun part=error quand le slot error est vide', async () => {
             el = await fixture('<ar-datepicker></ar-datepicker>');
             await waitForUpdate(el);
-            expect(el.hasAttribute('has-error')).toBe(false);
+            expect(getPart(el, 'error')).toBeNull();
         });
 
-        it('has-error présent quand slot error a du contenu', async () => {
+        it('part=error présent quand le slot error a du contenu', async () => {
             el = await fixture(`
                 <ar-datepicker>
                     <span slot="error">Erreur</span>
                 </ar-datepicker>
             `);
             await waitForUpdate(el);
-            expect(el.hasAttribute('has-error')).toBe(true);
+            expect(getPart(el, 'error')).not.toBeNull();
         });
 
         it("aria-describedby de l'input pointe vers les IDs internes", async () => {
@@ -885,20 +888,20 @@ describe('ArDatepicker', () => {
             };
             const lastFlags = (): ValidityStateFlags => setValidity.mock.lastCall?.[0];
 
-            it('au-dessus de max : valid false et rangeOverflow', async () => {
+            it('au-dessus de max : rangeOverflow, la date reste plausible (valid true)', async () => {
                 el = await fixture('<ar-datepicker max="2026-12-31" lang="en"></ar-datepicker>');
                 const event = await type('20/04/2027');
-                expect(event.detail.valid).toBe(false);
+                expect(event.detail.valid).toBe(true);
                 expect(lastFlags()).toStrictEqual({ rangeOverflow: true });
                 expect(setValidity.mock.lastCall?.[1]).toBe(
                     'Date must be December 31, 2026 or earlier.',
                 );
             });
 
-            it('en dessous de min : valid false et rangeUnderflow', async () => {
+            it('en dessous de min : rangeUnderflow, la date reste plausible (valid true)', async () => {
                 el = await fixture('<ar-datepicker min="2026-06-01"></ar-datepicker>');
                 const event = await type('20/04/2026');
-                expect(event.detail.valid).toBe(false);
+                expect(event.detail.valid).toBe(true);
                 expect(lastFlags()).toStrictEqual({ rangeUnderflow: true });
             });
 

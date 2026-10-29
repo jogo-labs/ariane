@@ -98,6 +98,8 @@ const translation: FullTranslation = {
     validationValueMissing: 'Please fill out this field.',
     validationRangeUnderflow: (min) => `Date must be ${min} or later.`,
     validationRangeOverflow: (max) => `Date must be ${max} or earlier.`,
+    validationBadInput: (format, example) =>
+        `Date not recognized. Expected format: ${format} (e.g. ${example}).`,
 };
 
 registerTranslation(translation);

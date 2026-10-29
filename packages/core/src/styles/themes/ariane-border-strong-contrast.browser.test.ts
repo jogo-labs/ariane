@@ -170,7 +170,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
         root.appendChild(scope);
         await el.updateComplete;
         await el.updateComplete;
-        expect(el.hasAttribute('has-error')).to.equal(true);
+        expect(el.matches(':state(has-error)')).to.equal(true);
         const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
         return { el, input, scope };
     }
@@ -216,31 +216,6 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             );
         });
 
-        it(`un champ invalide après interaction a la bordure et le label d'erreur (${theme})`, async () => {
-            const scope = document.createElement('div');
-            scope.setAttribute('data-theme', theme);
-            const el = document.createElement('ar-datepicker') as ArDatepicker;
-            el.required = true;
-            el.label = 'Date';
-            scope.appendChild(el);
-            root.appendChild(scope);
-            await el.updateComplete;
-            // Comme une tentative de soumission : le champ émet `invalid`, sans prendre le focus.
-            el.dispatchEvent(new Event('invalid'));
-            await el.updateComplete;
-            expect(el.matches(':state(user-invalid)')).to.equal(true);
-            expect(el.hasAttribute('has-error')).to.equal(false);
-            const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
-            const label = el.shadowRoot!.querySelector<HTMLElement>('[part~="label"]')!;
-            await new Promise((r) => setTimeout(r, 250)); // fin de la transition de bordure
-            expect(getComputedStyle(input).borderTopColor).to.equal(
-                resolveToken(scope, '--ar-input-error-border-color'),
-            );
-            expect(getComputedStyle(label).color).to.equal(
-                resolveToken(scope, '--ar-input-error-color'),
-            );
-        });
-
         it(`l'erreur l'emporte sur la bordure d'un champ désactivé (${theme})`, async () => {
             const { input, scope } = await mountInvalid(theme, { disabled: true });
             expect(getComputedStyle(input).borderTopColor).to.equal(
@@ -255,7 +230,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             scope.appendChild(el);
             root.appendChild(scope);
             await el.updateComplete;
-            expect(el.hasAttribute('has-error')).to.equal(false);
+            expect(el.matches(':state(has-error)')).to.equal(false);
             const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
             expect(getComputedStyle(input).borderTopColor).to.equal(
                 resolveToken(scope, '--ar-color-border-strong'),

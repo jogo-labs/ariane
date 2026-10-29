@@ -10,6 +10,7 @@ const tocEntries = [
     { id: 'obligatoire',     label: 'Champs obligatoires',       level: 2 as const },
     { id: 'api-validation',  label: 'Interroger la validité',    level: 2 as const },
     { id: 'erreur-perso',    label: 'Messages d\'erreur personnalisés', level: 2 as const },
+    { id: 'annoncer',        label: 'Annoncer les erreurs',      level: 2 as const },
     { id: 'styler',          label: 'Styler les états',          level: 1 as const },
     { id: 'reinitialisation', label: 'Réinitialisation',         level: 1 as const },
 ];
@@ -51,13 +52,22 @@ const codeErrorSlot = `<ar-datepicker label="Date de naissance">
   <span slot="error">Cette date est déjà réservée.</span>
 </ar-datepicker>`;
 
+const codeErrorAlert = `<ar-datepicker label="Date de naissance">
+  <span slot="error" role="alert">Cette date est déjà réservée.</span>
+</ar-datepicker>`;
+
 const codeStates = `/* Indicateur de champ obligatoire */
 ar-datepicker:state(required)::part(label)::after {
   content: ' *';
 }
 
-/* Erreur visible une fois que l'utilisateur a interagi */
+/* Validation du navigateur : champ invalide après une interaction */
 ar-datepicker:state(user-invalid)::part(input) {
+  border-color: var(--couleur-erreur);
+}
+
+/* Messages de l'application dans le slot error */
+ar-datepicker:state(has-error)::part(input) {
   border-color: var(--couleur-erreur);
 }`;
 
@@ -82,7 +92,7 @@ const codeReset = `<form>
             <pre><code class="language-html" set:text={codeFieldset} /></pre>
 
             <NarrativeHeading id="validation">Validation</NarrativeHeading>
-            <p>Un formulaire contenant un champ invalide n'est pas soumis : le navigateur place le focus sur le premier champ en erreur et affiche son message, dans la langue du composant (cf. <a href="/getting-started/traductions">Traductions</a>). Les contraintes viennent des attributs du champ (<code>required</code>, <code>min</code> et <code>max</code> pour une date…), documentés dans la page de chaque composant.</p>
+            <p>Un formulaire contenant un champ invalide n'est pas soumis : le navigateur place le focus sur le premier champ en erreur et affiche son message. Ce texte vient des traductions du composant et suit son attribut <code>lang</code> : le navigateur ne localise pas le message d'un champ personnalisé, contrairement à un champ natif. Pour une langue non fournie, ou pour reformuler un message, voir <a href="/getting-started/traductions#traductions">Créer votre propre traduction</a> (les termes <code>validation…</code>). Les contraintes viennent des attributs du champ (<code>required</code>, <code>min</code> et <code>max</code> pour une date…), documentés dans la page de chaque composant.</p>
             <p>Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation" target="_blank" rel="noopener">documentation de la validation des contraintes sur MDN</a> et la <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation" target="_blank" rel="noopener">spécification HTML</a>.</p>
             <ar-alert variant="warning" without-notification class="doc-callout-alert">
                 <p class="doc-callout-alert-title">À savoir</p>
@@ -104,16 +114,24 @@ const codeReset = `<form>
             <p><code>setCustomValidity()</code> signale une erreur que le navigateur ne peut pas connaître, par exemple un refus du serveur. Le formulaire n'est plus soumis tant que l'erreur est là :</p>
             <pre><code class="language-js" set:text={codeCustomValidity} /></pre>
             <p>Comme sur un <code>&lt;input&gt;</code>, l'erreur persiste jusqu'à <code>setCustomValidity('')</code>, même après une nouvelle saisie ou une réinitialisation du formulaire : c'est à l'application de l'effacer.</p>
-            <p>Pour afficher le message dans la page, utilisez le slot <code>error</code> du composant. Il est annoncé aux lecteurs d'écran, mais n'a aucun effet sur la validité du formulaire :</p>
+            <p>Le composant n'affiche pas de message : pour en afficher un dans la page, utilisez le slot <code>error</code>. Un élément extérieur au composant ne peut pas être référencé par <code>aria-describedby</code> depuis l'intérieur de son shadow DOM : le slot le relie au champ, et il est annoncé aux lecteurs d'écran. Il n'a aucun effet sur la validité du formulaire :</p>
             <pre><code class="language-html" set:text={codeErrorSlot} /></pre>
+
+            <NarrativeSubheading id="annoncer">Annoncer les erreurs</NarrativeSubheading>
+            <p>Le composant ne pose aucun rôle live sur le slot <code>error</code> : le message est relié au champ par <code>aria-describedby</code> et lu quand le champ reçoit le focus. À la soumission d'un formulaire, un <code>role="alert"</code> par champ déclencherait autant d'annonces qui s'interrompent. Affichez plutôt un récapitulatif des erreurs en tête du formulaire, annoncé une seule fois et avec un lien vers chaque champ, puis placez le focus sur ce récapitulatif ou sur le premier champ en erreur.</p>
+            <p>Pour annoncer un message dès son apparition, par exemple pour une validation en direct, posez le rôle sur votre propre élément :</p>
+            <pre><code class="language-html" set:text={codeErrorAlert} /></pre>
+            <p class="hint">Pour plus d'information sur ce sujet, voir le <a href="https://www.w3.org/WAI/tutorials/forms/notifications/" target="_blank" rel="noopener">tutoriel sur les notifications de formulaire du W3C</a>.</p>
 
             <NarrativeHeading id="styler">Styler les états</NarrativeHeading>
             <p><code>:invalid</code> et <code>:valid</code> s'appliquent nativement. La plateforme réserve les autres pseudo-classes de formulaire aux champs natifs : Ariane expose à leur place des états personnalisés, ciblés avec <code>:state()</code>.</p>
             <ul>
                 <li><code>:state(required)</code> et <code>:state(optional)</code> : selon l'attribut <code>required</code>.</li>
                 <li><code>:state(user-invalid)</code> et <code>:state(user-valid)</code> : comme <code>:user-invalid</code> et <code>:user-valid</code>, ils n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou <code>reportValidity()</code>. Une valeur posée par l'application ne les déclenche pas.</li>
+                <li><code>:state(has-error)</code> : le slot <code>error</code> est rempli, l'application affiche une erreur. Il ne dépend pas de la validité du champ.</li>
             </ul>
             <pre><code class="language-css" set:text={codeStates} /></pre>
+            <p>Le choix dépend de la manière de valider. Avec la validation du navigateur, ciblez <code>:state(user-invalid)</code>. Si vous désactivez cette validation (<code>novalidate</code>) pour afficher vos propres messages dans le slot <code>error</code>, ciblez <code>:state(has-error)</code>. Dans les deux cas, l'input porte <code>aria-invalid</code>, comme le fait un champ natif invalide après interaction.</p>
 
             <NarrativeHeading id="reinitialisation">Réinitialisation</NarrativeHeading>
             <p><code>form.reset()</code> et un bouton <code>type="reset"</code> ramènent le champ à sa valeur initiale, celle du premier rendu. Aucun événement de valeur n'est émis, et les états <code>user-invalid</code> et <code>user-valid</code> sont retirés.</p>
