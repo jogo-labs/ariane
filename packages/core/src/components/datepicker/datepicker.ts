@@ -1036,7 +1036,7 @@ export class ArDatepicker extends ArianeFormElement {
             return {
                 flags: { badInput: true },
                 message: this.localize.term(
-                    'validationBadInput',
+                    'datepickerValidationBadInput',
                     this.format,
                     this._formatExample(),
                 ),
@@ -1056,7 +1056,7 @@ export class ArDatepicker extends ArianeFormElement {
         if (date && !flag && this.isDateDisabled?.(date)) {
             return {
                 flags: { stepMismatch: true },
-                message: this.localize.term('validationStepMismatch'),
+                message: this.localize.term('datepickerValidationStepMismatch'),
             };
         }
         if (!date || !flag) return null;
@@ -1068,8 +1068,8 @@ export class ArDatepicker extends ArianeFormElement {
             flags: { [flag]: true },
             message:
                 flag === 'rangeUnderflow'
-                    ? this.localize.term('validationRangeUnderflow', bound)
-                    : this.localize.term('validationRangeOverflow', bound),
+                    ? this.localize.term('datepickerValidationRangeUnderflow', bound)
+                    : this.localize.term('datepickerValidationRangeOverflow', bound),
         };
     }
 
