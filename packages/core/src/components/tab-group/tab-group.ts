@@ -63,7 +63,11 @@ export class ArTabGroup extends ArianeElement {
             this._syncAll();
         },
         unregisterTab: (tab: ArTab) => {
-            const wasActive = tab.panel === this.active;
+            // Un onglet déplacé, seul ou avec son groupe, se désinscrit puis se réinscrit : à ce
+            // moment il est déjà reconnecté (déplacement atomique) ou son groupe est déconnecté.
+            // Ce n'est pas un retrait, l'onglet actif ne change pas.
+            const removed = this.isConnected && !tab.isConnected;
+            const wasActive = removed && tab.panel === this.active;
             this._tabs = this._tabs.filter((t) => t !== tab);
             this._syncAll();
             if (wasActive) {

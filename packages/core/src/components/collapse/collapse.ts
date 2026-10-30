@@ -94,6 +94,12 @@ export class ArCollapse extends ArianeElement {
         if (!this.id) {
             this.id = `ar-collapse-${++ArCollapse._idCounter}`;
         }
+        // Reconnexion (élément déplacé) : le premier montage est câblé par `firstUpdated()`.
+        if (this.hasUpdated) {
+            if (this.triggerId) this._attachExternalTrigger();
+            else this._handleTriggerSlotChange();
+            this._syncTriggerAria();
+        }
     }
 
     override firstUpdated(): void {

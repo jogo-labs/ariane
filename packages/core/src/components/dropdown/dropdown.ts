@@ -109,6 +109,18 @@ export class ArDropdown extends ArianeElement {
         });
     }
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        // Reconnexion (élément déplacé) : le premier montage est câblé par `firstUpdated()`.
+        if (!this.hasUpdated || !this.triggerId) return;
+        const trigger = this._resolvedTrigger;
+        if (trigger && this._panel) {
+            this._popover.attach(trigger, this._panel);
+            trigger.addEventListener('click', this._handleTriggerClick);
+            this._externalTrigger = trigger;
+        }
+    }
+
     override firstUpdated(): void {
         if (this.triggerId) {
             const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');

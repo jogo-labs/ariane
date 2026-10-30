@@ -100,6 +100,12 @@ export class ArTooltip extends ArianeElement {
     private _showTimer = 0;
     private _hideTimer = 0;
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        // Reconnexion (élément déplacé) : le premier montage est câblé par `firstUpdated()`.
+        if (this.hasUpdated) this._attachTrigger();
+    }
+
     override firstUpdated(): void {
         this._attachTrigger();
         const arrowEl = this.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]') ?? null;
