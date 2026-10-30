@@ -110,6 +110,16 @@ Merger `main` dans `dev` pour que la branche de développement soit à jour avec
 git checkout dev && git merge origin/main --no-edit && git push origin dev
 ```
 
+### 6. Resynchroniser le starter-kit
+
+Après la publication, régénérer la démo, le thème et les presets du dépôt frère `ariane-starter-kit` (checkout à côté de `ariane`), relire le diff, puis pousser. Sans cette étape, le starter-kit garde la version précédente (alpha.16 et alpha.17 l'avaient sautée).
+
+```bash
+npm run generate:starter-demo -- --repo ../ariane-starter-kit
+git -C ../ariane-starter-kit show --stat HEAD
+git -C ../ariane-starter-kit push origin main   # après relecture du diff
+```
+
 ## Points d'attention
 
 - Ne jamais commiter le bump directement sur `dev` — toujours via branche `release/`

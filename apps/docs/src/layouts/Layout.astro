@@ -99,14 +99,14 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
 
             /* Cible d'ancre (lien TOC, hash d'URL) : réserve l'espace du header
                sticky pour que le titre/la section visée n'atterrisse pas dessous.
-               La bannière alpha n'est pas sticky (position: relative, défile avec
+               La bannière de statut n'est pas sticky (position: relative, défile avec
                le contenu) — seul --doc-header-h compte une fois qu'on a scrollé.
                Couvre les titres narratifs (h2/h3 de NarrativeHeading/Subheading),
                les titres sr-only de l'API (ComponentApi.astro), et les <section
                id> qui servent elles-mêmes de cible (Exemples, Playground,
                Référence API dans Playground.astro). */
             :where(.heading-anchor, article, section, .section-title, .subsection-title)[id] {
-                scroll-margin-top: calc(var(--doc-header-h) + var(--doc-alpha-banner-h) + 1rem);
+                scroll-margin-top: calc(var(--doc-header-h) + var(--doc-status-banner-h) + 1rem);
             }
 
             .narrative a {
@@ -204,9 +204,9 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
                 .skip-link--nav-desktop { display: none; }
             }
 
-            .alpha-banner {
+            .status-banner {
                 width:           100%;
-                min-height:      var(--doc-alpha-banner-h);
+                min-height:      var(--doc-status-banner-h);
                 background: var(--doc-ember);
                 color: var(--doc-ink);
                 text-align:      center;
@@ -381,8 +381,8 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
 
             .nav-column {
                 position:   sticky;
-                top:        calc(var(--doc-header-h) + var(--doc-alpha-banner-h));
-                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
+                top:        calc(var(--doc-header-h) + var(--doc-status-banner-h));
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-status-banner-h));
                 overflow-y: auto;
                 display:    flex;
                 flex-direction: column;
@@ -437,8 +437,8 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
 
             .toc-column {
                 position:   sticky;
-                top:        calc(var(--doc-header-h) + var(--doc-alpha-banner-h));
-                max-height: calc(100vh - var(--doc-header-h) - var(--doc-alpha-banner-h));
+                top:        calc(var(--doc-header-h) + var(--doc-status-banner-h));
+                max-height: calc(100vh - var(--doc-header-h) - var(--doc-status-banner-h));
                 overflow-y: auto;
                 padding:    3rem 1rem 3rem 0;
                 min-width:  0;
@@ -499,8 +499,8 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
 
         <!-- Header permanent (desktop + mobile) -->
         <header class="site-header">
-            <div class="alpha-banner" role="status">
-                Librairie en cours de développement — API instable, ne pas utiliser en production. <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
+            <div class="status-banner" role="status">
+                Version bêta — l'API peut encore évoluer. <a href="https://github.com/jogo-labs/ariane/issues" target="_blank" rel="noopener noreferrer">Signaler un problème</a>
             </div>
             <div class="header-container">
                 <div class="header-left">

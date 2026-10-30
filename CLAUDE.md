@@ -52,5 +52,5 @@ Le thème des démos de la doc est généré au build du site (`/themes/doc-demo
 
 ## Notes
 
-Dépréciation : `warnDeprecated(tag, member, msg)` depuis `src/utils/deprecated.ts` + `@deprecated` JSDoc — pas nécessaire en alpha.
+Dépréciation : `warnDeprecated(tag, member, msg)` depuis `src/utils/deprecated.ts` + `@deprecated` JSDoc — pas nécessaire en alpha. À partir de la bêta, toute suppression ou renommage d'API publique passe d'abord par une dépréciation d'une version, sauf défaut avéré (signalé au changelog).
 Si un correctif échoue 3 fois de suite, remettre en cause la demande avant de continuer.
