@@ -20,6 +20,13 @@ function getDialogEl(el: ArDialog): HTMLDialogElement {
 describe('ArDialog', () => {
     let el: ArDialog;
 
+    /** Région d'annonce active : dans le dialog ouvert (modal), sinon dans le document. */
+    const liveText = (kind: 'polite' | 'assertive'): string | null | undefined =>
+        (
+            el.shadowRoot?.querySelector(`[data-ar-live-region="${kind}"]`) ??
+            document.getElementById(`ar-live-region-${kind}`)
+        )?.textContent;
+
     afterEach(() => {
         el?.remove();
         document.querySelectorAll('[data-ar-live-region]').forEach((node) => node.remove());
@@ -515,9 +522,7 @@ describe('ArDialog', () => {
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
 
-            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
-                'Fermeture bloquée.',
-            );
+            expect(liveText('assertive')).toBe('Fermeture bloquée.');
         });
     });
 
@@ -1014,9 +1019,7 @@ describe('ArDialog', () => {
             el.open = false;
             await waitForUpdate(el);
             await new Promise((resolve) => setTimeout(resolve, 60));
-            expect(document.getElementById('ar-live-region-assertive')?.textContent).toBe(
-                'Closing blocked.',
-            );
+            expect(liveText('assertive')).toBe('Closing blocked.');
         });
 
         it('lang="en" traduit le titre de repli quand label est vide', async () => {
@@ -1029,8 +1032,7 @@ describe('ArDialog', () => {
     // ── pending, report de fermeture et réouverture (#329) ────────────────────
 
     describe('pending, report de fermeture et réouverture (#329)', () => {
-        const live = (kind: 'polite' | 'assertive'): string | null | undefined =>
-            document.getElementById(`ar-live-region-${kind}`)?.textContent;
+        const live = liveText;
         const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 60));
         const accept = (): void => {
             const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;

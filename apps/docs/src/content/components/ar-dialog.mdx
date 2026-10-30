@@ -152,7 +152,7 @@ import WcagRef from '../../components/WcagRef.astro';
 
 ### Pris en charge automatiquement
 
-- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby`, `aria-describedby` et `aria-modal`.
+- Élément `<dialog>` natif avec `role="dialog"`, `aria-labelledby` et `aria-modal`.
 - Quand `without-header` est actif, `aria-label` (basé sur `label`) remplace `aria-labelledby` — le nom accessible reste garanti même sans header visible.
 - Le focus est déplacé à l'ouverture sur l'élément portant `autofocus`, ou à défaut sur le premier élément focalisable, ou sur le bouton de fermeture si aucun n'est présent, ou sur le `<dialog>` lui-même si le header est absent — conforme
     <WcagRef
