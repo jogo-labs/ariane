@@ -28,7 +28,7 @@ Si applicable, ajoutez des captures pour illustrer le problème.
 
 - **Navigateur** : [ex: Chrome 120, Firefox 121]
 - **OS** : [ex: macOS 15, Windows 11]
-- **Version du package** : [ex: 0.1.0-alpha.1]
+- **Version du package** : [ex: 0.2.0-beta.1]
 - **Technologie d'assistance** (si problème d'accessibilité) : [ex: NVDA + Firefox, VoiceOver + Safari]
 
 ## Contexte additionnel
