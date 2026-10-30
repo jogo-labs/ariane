@@ -1,4 +1,5 @@
 import { LitElement } from 'lit';
+import { property } from 'lit/decorators.js';
 import { toggleState } from '../utils/internals-state.js';
 
 /**
@@ -9,6 +10,14 @@ import { toggleState } from '../utils/internals-state.js';
  */
 export class ArianeElement extends LitElement {
     protected internals: ElementInternals | undefined;
+
+    /**
+     * `lang` natif rendu réactif : changer l'attribut relance le rendu, donc les textes traduits
+     * (`LocalizeController` lit `host.lang` sans l'observer). Réfléchi pour que `el.lang = 'en'` écrive
+     * l'attribut comme le fait la propriété native.
+     * @internal
+     */
+    @property({ reflect: true }) override lang!: string;
 
     override connectedCallback(): void {
         super.connectedCallback();
