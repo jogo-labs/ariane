@@ -5,7 +5,7 @@ description: "Dans un projet qui utilise Ariane (`@ariane-ui/core`, balises `ar-
 
 # Ariane
 
-Web components accessibles (Custom Elements natifs, Lit 3), tags préfixés `ar-`, paquet `@ariane-ui/core` en alpha. Headless : aucun style visuel par défaut, l'apparence vient d'un thème CSS. Conçu mobile-first.
+Web components accessibles (Custom Elements natifs, Lit 3), tags préfixés `ar-`, paquet `@ariane-ui/core` en bêta. Headless : aucun style visuel par défaut, l'apparence vient d'un thème CSS. Conçu mobile-first.
 
 ## Règles qui évitent les erreurs fréquentes
 

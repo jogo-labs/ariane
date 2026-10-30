@@ -73,7 +73,7 @@
     --doc-focus: light-dark(var(--doc-ink), var(--doc-ember));
     --doc-header-bg: light-dark(rgba(255, 255, 255, 0.92), rgba(25, 29, 46, 0.92));
     --doc-header-h: 3.25rem;
-    --doc-alpha-banner-h: 2rem;
+    --doc-status-banner-h: 2rem;
 
     /* ─── Rayons (vocabulaire rationalisé sur --ar-border-radius-*) ────── */
     --doc-radius-sm: 4px;
@@ -122,7 +122,7 @@
 
     /* ─── Statut de maturité — jamais l'ambre d'accent : un badge de
        statut n'est pas un élément actif/interactif. ────────────────── */
-    --doc-alpha: light-dark(#8f5f00, var(--doc-ember));
+    --doc-beta: light-dark(#8f5f00, var(--doc-ember));
     --doc-stable: light-dark(#2f6b45, #7fd3a2);
 
     /* ─── Surface secondaire (barres de contrôle, encarts) ──────────── */

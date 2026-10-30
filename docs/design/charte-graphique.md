@@ -100,7 +100,7 @@ vocabulaire que le motif de la home. Voir
 | `--doc-rail-live` | segment « parcouru » (amorces, puces, actif) |
 | `--doc-bead`      | la perle (position courante)                 |
 | `--doc-bead-ring` | détourage de la perle sur son fond           |
-| `--doc-alpha`     | statut de maturité « alpha »                 |
+| `--doc-beta`      | statut de maturité « bêta »                  |
 | `--doc-stable`    | statut de maturité « stable »                |
 | `--doc-surface`   | fond de zone secondaire                      |
 
