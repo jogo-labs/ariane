@@ -1,0 +1,147 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import NarrativeHeading from '../../components/NarrativeHeading.astro';
+import NarrativeSubheading from '../../components/NarrativeSubheading.astro';
+
+const tocEntries = [
+    { id: 'principe',        label: 'Un champ comme un autre',   level: 1 as const },
+    { id: 'validation',      label: 'Validation',                level: 1 as const },
+    { id: 'obligatoire',     label: 'Champs obligatoires',       level: 2 as const },
+    { id: 'api-validation',  label: 'Interroger la validité',    level: 2 as const },
+    { id: 'erreur-perso',    label: 'Messages d\'erreur personnalisés', level: 2 as const },
+    { id: 'annoncer',        label: 'Annoncer les erreurs',      level: 2 as const },
+    { id: 'styler',          label: 'Styler les états',          level: 1 as const },
+    { id: 'reinitialisation', label: 'Réinitialisation',         level: 1 as const },
+];
+
+const codeForm = `<form id="inscription">
+  <ar-datepicker name="naissance" label="Date de naissance" required></ar-datepicker>
+  <button type="submit">Envoyer</button>
+</form>
+
+<script>
+  document.getElementById('inscription').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    console.log(data.get('naissance')); // "2026-06-12"
+  });
+</script>`;
+
+const codeFieldset = `<fieldset disabled>
+  <!-- Désactivé par le fieldset, exclu de FormData -->
+  <ar-datepicker name="naissance" label="Date de naissance"></ar-datepicker>
+</fieldset>`;
+
+const codeApi = `const champ = document.querySelector('ar-datepicker');
+
+champ.checkValidity();    // true ou false, sans rien afficher
+champ.reportValidity();   // idem, et affiche le message du navigateur
+champ.validity.valueMissing; // true si le champ est obligatoire et vide
+champ.validationMessage;  // "Veuillez renseigner ce champ."`;
+
+const codeCustomValidity = `const champ = document.querySelector('ar-datepicker');
+
+// Après un refus du serveur, par exemple
+champ.setCustomValidity('Cette date est déjà réservée.');
+
+// À l'application d'effacer l'erreur, par exemple à la prochaine saisie
+champ.addEventListener('ar-datepicker-input-change', () => champ.setCustomValidity(''));`;
+
+const codeErrorSlot = `<ar-datepicker label="Date de naissance">
+  <span slot="error">Cette date est déjà réservée.</span>
+</ar-datepicker>`;
+
+const codeErrorAlert = `<ar-datepicker label="Date de naissance">
+  <span slot="error" role="alert">Cette date est déjà réservée.</span>
+</ar-datepicker>`;
+
+const codeStates = `/* Indicateur de champ obligatoire */
+ar-datepicker:state(required)::part(label)::after {
+  content: ' *';
+}
+
+/* Validation du navigateur : champ invalide après une interaction */
+ar-datepicker:state(user-invalid)::part(input) {
+  border-color: var(--couleur-erreur);
+}
+
+/* Messages de l'application dans le slot error */
+ar-datepicker:state(has-error)::part(input) {
+  border-color: var(--couleur-erreur);
+}`;
+
+const codeReset = `<form>
+  <ar-datepicker name="naissance" value="2026-06-12" label="Date de naissance"></ar-datepicker>
+  <button type="reset">Réinitialiser</button>
+</form>`;
+---
+
+<Layout title="Contrôles de formulaire" currentPath="/getting-started/controles-de-formulaire" showToc={true}>
+    <div class="page-container">
+        <div class="page-header">
+            <h2 class="page-title">Contrôles de formulaire</h2>
+            <p class="summary">Les champs de formulaire d'Ariane se comportent comme des champs natifs : ils se soumettent avec leur formulaire, se valident avec l'API standard du navigateur et se réinitialisent avec lui.</p>
+        </div>
+
+        <div class="narrative">
+            <NarrativeHeading id="principe">Un champ comme un autre</NarrativeHeading>
+            <p>Un champ Ariane est un élément associé au formulaire qui le contient. Sa valeur entre dans <code>FormData</code> sous l'attribut <code>name</code>, comme celle d'un <code>&lt;input&gt;</code> :</p>
+            <pre><code class="language-html" set:text={codeForm} /></pre>
+            <p class="hint">Sans attribut <code>name</code>, la valeur n'est pas soumise. Un champ <code>disabled</code> n'est ni soumis ni validé, y compris lorsqu'il est désactivé par un <code>&lt;fieldset disabled&gt;</code> parent :</p>
+            <pre><code class="language-html" set:text={codeFieldset} /></pre>
+
+            <NarrativeHeading id="validation">Validation</NarrativeHeading>
+            <p>Un formulaire contenant un champ invalide n'est pas soumis : le navigateur place le focus sur le premier champ en erreur et affiche son message. Ce texte vient des traductions du composant et suit son attribut <code>lang</code> : le navigateur ne localise pas le message d'un champ personnalisé, contrairement à un champ natif. Pour une langue non fournie, ou pour reformuler un message, voir <a href="/getting-started/traductions#traductions">Créer votre propre traduction</a> (les termes <code>validation…</code>). Les contraintes viennent des attributs du champ (<code>required</code>, <code>min</code> et <code>max</code> pour une date…), documentés dans la page de chaque composant.</p>
+            <p>Pour plus d'information sur ce sujet, voir la <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Constraint_validation" target="_blank" rel="noopener">documentation de la validation des contraintes sur MDN</a> et la <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation" target="_blank" rel="noopener">spécification HTML</a>.</p>
+            <ar-alert variant="warning" without-notification class="doc-callout-alert">
+                <p class="doc-callout-alert-title">À savoir</p>
+                <div class="doc-callout-alert-content">
+                    <p>Cette validation s'exécute dans le navigateur et ne remplace pas la validation côté serveur. <code>novalidate</code> sur le formulaire l'empêche de bloquer la soumission, mais la validité reste évaluée : <code>:invalid</code>, <code>checkValidity()</code> et <code>:state(user-invalid)</code> après une interaction restent disponibles. Seule la tentative de soumission ne marque plus les champs.</p>
+                </div>
+            </ar-alert>
+
+            <NarrativeSubheading id="obligatoire">Champs obligatoires</NarrativeSubheading>
+            <p>L'attribut <code>required</code> bloque la soumission tant que le champ est vide, et l'annonce aux technologies d'assistance. Ariane n'affiche aucun indicateur : voir <a href="#styler">Styler les états</a> pour ajouter un astérisque ou un texte.</p>
+            <p class="hint">Bien qu'afficher un indicateur du caractère obligatoire ne soit pas exigé par les critères d'accessibilité, il est utile à l'utilisateur. Si vous en ajoutez un, expliquez-le en haut du formulaire, par exemple « * champs obligatoires ».</p>
+
+            <NarrativeSubheading id="api-validation">Interroger la validité</NarrativeSubheading>
+            <p>L'API de validation standard est disponible sur l'élément :</p>
+            <pre><code class="language-js" set:text={codeApi} /></pre>
+            <p class="hint"><a href="https://developer.mozilla.org/en-US/docs/Web/API/ValidityState" target="_blank" rel="noopener"><code>validity</code></a> indique la contrainte en cause (<code>valueMissing</code>, <code>rangeUnderflow</code>, <code>rangeOverflow</code>, <code>customError</code>…). <code>form</code>, <code>labels</code> et <code>willValidate</code> sont aussi disponibles, comme sur un champ natif.</p>
+
+            <NarrativeSubheading id="erreur-perso">Messages d'erreur personnalisés</NarrativeSubheading>
+            <p><code>setCustomValidity()</code> signale une erreur que le navigateur ne peut pas connaître, par exemple un refus du serveur. Le formulaire n'est plus soumis tant que l'erreur est là :</p>
+            <pre><code class="language-js" set:text={codeCustomValidity} /></pre>
+            <p>Comme sur un <code>&lt;input&gt;</code>, l'erreur persiste jusqu'à <code>setCustomValidity('')</code>, même après une nouvelle saisie ou une réinitialisation du formulaire : c'est à l'application de l'effacer.</p>
+            <p>Le composant n'affiche pas de message : pour en afficher un dans la page, utilisez le slot <code>error</code>. Un élément extérieur au composant ne peut pas être référencé par <code>aria-describedby</code> depuis l'intérieur de son shadow DOM : le slot le relie au champ, et il est annoncé aux lecteurs d'écran. Il n'a aucun effet sur la validité du formulaire :</p>
+            <pre><code class="language-html" set:text={codeErrorSlot} /></pre>
+
+            <NarrativeSubheading id="annoncer">Annoncer les erreurs</NarrativeSubheading>
+            <p>Le composant ne pose aucun rôle live sur le slot <code>error</code> : le message est relié au champ par <code>aria-describedby</code> et lu quand le champ reçoit le focus. À la soumission d'un formulaire, un <code>role="alert"</code> par champ déclencherait autant d'annonces qui s'interrompent. Affichez plutôt un récapitulatif des erreurs en tête du formulaire, annoncé une seule fois et avec un lien vers chaque champ, puis placez le focus sur ce récapitulatif ou sur le premier champ en erreur.</p>
+            <p>Pour annoncer un message dès son apparition, par exemple pour une validation en direct, posez le rôle sur votre propre élément :</p>
+            <pre><code class="language-html" set:text={codeErrorAlert} /></pre>
+            <p class="hint">Pour plus d'information sur ce sujet, voir le <a href="https://www.w3.org/WAI/tutorials/forms/notifications/" target="_blank" rel="noopener">tutoriel sur les notifications de formulaire du W3C</a>.</p>
+
+            <NarrativeHeading id="styler">Styler les états</NarrativeHeading>
+            <p><code>:invalid</code> et <code>:valid</code> s'appliquent nativement. La plateforme réserve les autres pseudo-classes de formulaire aux champs natifs : Ariane expose à leur place des états personnalisés, ciblés avec <code>:state()</code>.</p>
+            <ul>
+                <li><code>:state(required)</code> et <code>:state(optional)</code> : selon l'attribut <code>required</code>.</li>
+                <li><code>:state(user-invalid)</code> et <code>:state(user-valid)</code> : comme <code>:user-invalid</code> et <code>:user-valid</code>, ils n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou <code>reportValidity()</code>. Une valeur posée par l'application ne les déclenche pas.</li>
+                <li><code>:state(has-error)</code> : le slot <code>error</code> est rempli, l'application affiche une erreur. Il ne dépend pas de la validité du champ.</li>
+            </ul>
+            <pre><code class="language-css" set:text={codeStates} /></pre>
+            <p>Le choix dépend de la manière de valider. Avec la validation du navigateur, ciblez <code>:state(user-invalid)</code>. Si vous désactivez cette validation (<code>novalidate</code>) pour afficher vos propres messages dans le slot <code>error</code>, ciblez <code>:state(has-error)</code>. Dans les deux cas, l'input porte <code>aria-invalid</code>, comme le fait un champ natif invalide après interaction.</p>
+
+            <NarrativeHeading id="reinitialisation">Réinitialisation</NarrativeHeading>
+            <p><code>form.reset()</code> et un bouton <code>type="reset"</code> ramènent le champ à sa valeur initiale, celle du premier rendu. Aucun événement de valeur n'est émis, et les états <code>user-invalid</code> et <code>user-valid</code> sont retirés.</p>
+            <pre><code class="language-html" set:text={codeReset} /></pre>
+        </div>
+    </div>
+
+    <TableOfContents entries={tocEntries} slot="toc" />
+</Layout>
+
+<style>
+    @import '../../styles/doc-prose.css';
+</style>

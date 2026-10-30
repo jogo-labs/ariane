@@ -56,6 +56,13 @@ describe('presets/fields.css', () => {
         return getComputedStyle(probe).borderTopColor;
     }
 
+    function errorBorder(): string {
+        const probe = document.createElement('div');
+        probe.style.borderTop = '1px solid var(--ar-input-error-border-color)';
+        container.appendChild(probe);
+        return getComputedStyle(probe).borderTopColor;
+    }
+
     function makeLabel(): HTMLLabelElement {
         const el = document.createElement('label');
         el.className = 'ar-label';
@@ -97,9 +104,7 @@ describe('presets/fields.css', () => {
         const input = makeInput('input') as HTMLInputElement;
         input.readOnly = true;
         input.setAttribute('aria-invalid', 'true');
-        expect(roundColor(getComputedStyle(input).borderColor)).to.equal(
-            'oklch(0.4827 0.158 25.74)',
-        );
+        expect(getComputedStyle(input).borderColor).to.equal(errorBorder());
     });
 
     it('ar-input consomme --ar-color-bg et --ar-color-text', () => {
@@ -114,12 +119,32 @@ describe('presets/fields.css', () => {
         expect(getComputedStyle(textarea).resize).to.equal('vertical');
     });
 
-    it('ar-input avec aria-invalid consomme --ar-color-danger-text', () => {
+    it('ar-input avec aria-invalid consomme --ar-input-error-border-color', () => {
         const input = makeInput('input');
         input.setAttribute('aria-invalid', 'true');
-        expect(roundColor(getComputedStyle(input).borderColor)).to.equal(
-            'oklch(0.4827 0.158 25.74)',
-        );
+        expect(getComputedStyle(input).borderColor).to.equal(errorBorder());
+    });
+
+    it("le texte d'un ar-input invalide garde sa couleur", () => {
+        const input = makeInput('input');
+        const before = getComputedStyle(input).color;
+        input.setAttribute('aria-invalid', 'true');
+        expect(getComputedStyle(input).color).to.equal(before);
+    });
+
+    it("le label d'un ar-field-group dont le champ est invalide consomme --ar-input-error-color", () => {
+        const group = document.createElement('div');
+        group.className = 'ar-field-group';
+        group.innerHTML = '<label class="ar-label">L</label><input class="ar-input">';
+        container.appendChild(group);
+        const label = group.querySelector('label')!;
+        const normal = getComputedStyle(label).color;
+        group.querySelector('input')!.setAttribute('aria-invalid', 'true');
+        const probe = document.createElement('div');
+        probe.style.color = 'var(--ar-input-error-color)';
+        container.appendChild(probe);
+        expect(getComputedStyle(label).color).to.equal(getComputedStyle(probe).color);
+        expect(normal).to.not.equal(getComputedStyle(label).color);
     });
 
     it('ar-label consomme --ar-color-text par défaut', () => {

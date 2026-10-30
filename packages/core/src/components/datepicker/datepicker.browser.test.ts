@@ -358,25 +358,27 @@ describe('ar-datepicker — browser', () => {
 
     // ── Affichage conditionnel du slot error (#210) ──────────────────────────
 
-    describe('affichage conditionnel du slot error', () => {
-        it("part=error est masqué quand le slot est vide (pas d'espace superflu dans le gap)", async () => {
+    describe('rendu conditionnel du slot error', () => {
+        const errorPart = (el: ArDatepicker): HTMLElement | null =>
+            el.shadowRoot!.querySelector<HTMLElement>('[part="error"]');
+
+        it("n'ajoute aucun élément quand le slot est vide (pas d'espace superflu dans le gap)", async () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
-            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
-            expect(getComputedStyle(error!).display).to.equal('none');
+            expect(errorPart(el)).to.equal(null);
+            expect(el.shadowRoot!.querySelector('slot[name="error"]')).to.not.equal(null);
         });
 
-        it('part=error redevient visible quand le slot error est rempli au montage', async () => {
+        it('rend part=error, sans role live, quand le slot error est rempli au montage', async () => {
             el = await fixture(
                 html`<ar-datepicker><span slot="error">Erreur</span></ar-datepicker>`,
             );
-            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
-            expect(getComputedStyle(error!).display).to.equal('block');
+            expect(errorPart(el)!.hasAttribute('role')).to.equal(false);
+            expect(errorPart(el)!.querySelector('slot[name="error"]')).to.not.equal(null);
         });
 
-        it('part=error redevient visible quand le slot error est rempli dynamiquement après coup', async () => {
+        it('rend puis retire part=error quand le slot error change après coup', async () => {
             el = await fixture(html`<ar-datepicker></ar-datepicker>`);
-            const error = el.shadowRoot?.querySelector<HTMLElement>('[part="error"]');
-            expect(getComputedStyle(error!).display).to.equal('none');
+            expect(errorPart(el)).to.equal(null);
 
             const span = document.createElement('span');
             span.slot = 'error';
@@ -386,9 +388,14 @@ describe('ar-datepicker — browser', () => {
             // attendre son passage avant de vérifier le requestUpdate() qu'il déclenche.
             await aTimeout(0);
             await el.updateComplete;
+            expect(errorPart(el)).to.not.equal(null);
+            expect(el.matches(':state(has-error)')).to.equal(true);
 
-            expect(getComputedStyle(error!).display).to.equal('block');
-            expect(el.hasAttribute('has-error')).to.equal(true);
+            span.remove();
+            await aTimeout(0);
+            await el.updateComplete;
+            expect(errorPart(el)).to.equal(null);
+            expect(el.matches(':state(has-error)')).to.equal(false);
         });
     });
 

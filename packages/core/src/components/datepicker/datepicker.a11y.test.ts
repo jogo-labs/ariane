@@ -113,23 +113,19 @@ describe('ar-datepicker — accessibilité', () => {
         expect(selected?.length).to.equal(0);
     });
 
-    // ── role="alert" ──────────────────────────────────────────────────────────
+    // ── pas de région live sur le message d'erreur ────────────────────────────
 
-    it('role="alert" absent sur le wrapper error quand le slot est vide', async () => {
-        el = await fixture(html`<ar-datepicker></ar-datepicker>`);
-        const alertEl = el.shadowRoot?.querySelector('[role="alert"]');
-        expect(alertEl, 'role="alert" ne doit pas être présent sans erreur').to.equal(null);
-    });
-
-    it('role="alert" présent sur le wrapper error quand le slot error est rempli', async () => {
+    it('le wrapper error ne pose aucun role live, même avec le slot error rempli', async () => {
         el = await fixture(html`
             <ar-datepicker>
                 <span slot="error">Date invalide</span>
             </ar-datepicker>
         `);
         await el.updateComplete;
-        const alertEl = el.shadowRoot?.querySelector('[role="alert"]');
-        expect(alertEl, 'role="alert" doit être présent avec une erreur').to.not.equal(null);
+        const wrapper = el.shadowRoot?.querySelector('[part="error"]');
+        expect(wrapper, 'le wrapper existe quand le slot est rempli').to.not.equal(null);
+        expect(wrapper?.hasAttribute('role')).to.equal(false);
+        expect(el.shadowRoot?.querySelector('[role="alert"], [aria-live]')).to.equal(null);
     });
 
     // ── role="dialog" sur le panel ────────────────────────────────────────────

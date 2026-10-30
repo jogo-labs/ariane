@@ -68,6 +68,23 @@ function apiSections(decl, level) {
             ]),
         ),
     );
+    // Propriétés publiques sans attribut (ex. une fonction) : absentes de `attributes` dans le CEM.
+    add(
+        'Propriétés JavaScript',
+        table(
+            ['Propriété', 'Type', 'Description'],
+            (decl.members ?? [])
+                .filter(
+                    (m) =>
+                        m.kind === 'field' &&
+                        !m.privacy &&
+                        !m.static &&
+                        !m.readonly &&
+                        !m.attribute,
+                )
+                .map((m) => [code(m.name), code(m.type?.text), m.description]),
+        ),
+    );
     add(
         'Slots',
         table(

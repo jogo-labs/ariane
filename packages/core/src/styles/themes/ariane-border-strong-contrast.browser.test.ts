@@ -170,7 +170,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
         root.appendChild(scope);
         await el.updateComplete;
         await el.updateComplete;
-        expect(el.hasAttribute('has-error')).to.equal(true);
+        expect(el.matches(':state(has-error)')).to.equal(true);
         const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
         return { el, input, scope };
     }
@@ -178,7 +178,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
     for (const theme of ['light', 'dark']) {
         it(`la bordure du champ en erreur est celle du token d'erreur (${theme})`, async () => {
             const { input, scope } = await mountInvalid(theme);
-            const error = resolveToken(scope, '--ar-datepicker-input-error-border-color');
+            const error = resolveToken(scope, '--ar-input-error-border-color');
             const border = getComputedStyle(input).borderTopColor;
             expect(border).to.equal(error);
             expect(border).not.to.equal(resolveToken(scope, '--ar-color-border-strong'));
@@ -187,14 +187,14 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
 
         it(`la bordure d'erreur atteint 3:1 contre le fond de page (${theme})`, async () => {
             const { scope } = await mountInvalid(theme);
-            const error = resolveToken(scope, '--ar-datepicker-input-error-border-color');
+            const error = resolveToken(scope, '--ar-input-error-border-color');
             expect(contrastRatio(error, resolveToken(scope, '--ar-color-bg'))).to.be.at.least(3);
         });
 
         it(`l'erreur l'emporte sur la bordure d'un champ read-only (${theme})`, async () => {
             const { input, scope } = await mountInvalid(theme, { readonly: true });
             expect(getComputedStyle(input).borderTopColor).to.equal(
-                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+                resolveToken(scope, '--ar-input-error-border-color'),
             );
         });
 
@@ -204,14 +204,22 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             expect(input.matches(':focus-visible')).to.equal(true);
             // Pas de transition en cours : la couleur d'erreur était déjà la valeur calculée.
             expect(getComputedStyle(input).borderTopColor).to.equal(
-                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+                resolveToken(scope, '--ar-input-error-border-color'),
+            );
+        });
+
+        it(`le label d'un champ en erreur prend la couleur d'erreur (${theme})`, async () => {
+            const { el, scope } = await mountInvalid(theme);
+            const label = el.shadowRoot!.querySelector<HTMLElement>('[part~="label"]')!;
+            expect(getComputedStyle(label).color).to.equal(
+                resolveToken(scope, '--ar-input-error-color'),
             );
         });
 
         it(`l'erreur l'emporte sur la bordure d'un champ désactivé (${theme})`, async () => {
             const { input, scope } = await mountInvalid(theme, { disabled: true });
             expect(getComputedStyle(input).borderTopColor).to.equal(
-                resolveToken(scope, '--ar-datepicker-input-error-border-color'),
+                resolveToken(scope, '--ar-input-error-border-color'),
             );
         });
 
@@ -222,7 +230,7 @@ describe("ariane.css — bordure d'erreur du champ ar-datepicker (#312)", () => 
             scope.appendChild(el);
             root.appendChild(scope);
             await el.updateComplete;
-            expect(el.hasAttribute('has-error')).to.equal(false);
+            expect(el.matches(':state(has-error)')).to.equal(false);
             const input = el.shadowRoot!.querySelector<HTMLInputElement>('[part~="input"]')!;
             expect(getComputedStyle(input).borderTopColor).to.equal(
                 resolveToken(scope, '--ar-color-border-strong'),

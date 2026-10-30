@@ -57,9 +57,11 @@
             pointer-events: none;
         }
 
+        /* Même signal et mêmes tokens que `:state(has-error)` des composants : l'application
+           déclare l'erreur. Pour un style piloté par la validation du navigateur, cibler
+           `:user-invalid` à la place. */
         &[aria-invalid='true'] {
-            border-color: var(--ar-color-danger-text);
-            color: var(--ar-color-danger-text);
+            border-color: var(--ar-input-error-border-color);
         }
     }
 
@@ -83,6 +85,11 @@
 
     .ar-label[data-ar-char-state='error'] {
         color: var(--ar-color-danger-text);
+    }
+
+    /* Label d'un champ en erreur : le champ doit être dans le même `.ar-field-group`. */
+    .ar-field-group:has([aria-invalid='true']) > .ar-label {
+        color: var(--ar-input-error-color);
     }
 
     /* Empile label + champ + éléments liés (compteur, hint…) avec un espacement

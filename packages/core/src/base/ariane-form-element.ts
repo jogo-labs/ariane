@@ -105,6 +105,7 @@ export class ArianeFormElement extends ArianeElement {
     formResetCallback(): void {
         this._interacted = false;
         this._syncValidationStates();
+        this.requestUpdate();
         this.formReset();
     }
 
@@ -117,6 +118,17 @@ export class ArianeFormElement extends ArianeElement {
         if (this._interacted) return;
         this._interacted = true;
         this._syncValidationStates();
+        this.requestUpdate();
+    }
+
+    /** Vrai une fois le champ « touché » (voir `markInteracted()`), faux après `form.reset()`. */
+    protected get interacted(): boolean {
+        return this._interacted;
+    }
+
+    /** Message posé par `setCustomValidity()`, vide si aucune erreur personnalisée. */
+    protected get customValidityMessage(): string {
+        return this._customMessage;
     }
 
     /** Remet le champ à sa valeur initiale. Sans effet par défaut : à surcharger. */
@@ -173,6 +185,7 @@ export class ArianeFormElement extends ArianeElement {
     setCustomValidity(message: string): void {
         this._customMessage = message;
         this._applyValidity();
+        this.requestUpdate();
     }
 
     /**

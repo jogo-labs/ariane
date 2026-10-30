@@ -1,0 +1,19 @@
+/* Champs en erreur, communs à tous les champs de formulaire. `has-error` : l'application affiche une
+   erreur (slot `error` rempli). Pour un style piloté par la validation du navigateur, cibler
+   `:state(user-invalid)` à la place.
+   Les règles ciblent l'état, pas la balise : un nouveau champ (ou un préfixe de tags
+   personnalisé) est couvert sans les réécrire. Les pseudo-classes `:read-only`, `:disabled` et
+   `:focus-visible` sont listées pour que l'erreur l'emporte sur les bordures propres à ces
+   états, posées par le thème de chaque composant avec une spécificité plus élevée. */
+:state(has-error) {
+    &::part(input),
+    &::part(input):read-only,
+    &::part(input):disabled,
+    &::part(input):focus-visible {
+        border-color: var(--ar-input-error-border-color);
+    }
+
+    &::part(label) {
+        color: var(--ar-input-error-color);
+    }
+}

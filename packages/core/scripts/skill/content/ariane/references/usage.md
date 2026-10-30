@@ -185,6 +185,15 @@ Certaines actions s'appellent directement sur l'élément, une fois le composant
 
 `show()` est sans effet si le composant est déjà ouvert, en cours d'animation ou `disabled` ; `hide()` est sans effet s'il est déjà fermé. Les méthodes disponibles par composant sont dans `components/<tag>.md`.
 
+## Champs de formulaire
+
+Un champ de formulaire (`ar-datepicker`) se comporte comme un champ natif : sa valeur entre dans `FormData` sous l'attribut `name` (sans `name`, elle n'est pas soumise), `disabled` l'exclut du formulaire et de la validation, y compris via un `<fieldset disabled>` parent.
+
+- Validation : `required`, les bornes (`min`, `max`) et `isDateDisabled` bloquent la soumission avec un message traduit. L'API standard est disponible : `checkValidity()`, `reportValidity()`, `validity`, `validationMessage`. `novalidate` la désactive, et elle ne remplace pas la validation serveur.
+- Erreur applicative : `setCustomValidity(message)` bloque la soumission jusqu'à `setCustomValidity('')`, à appeler par l'application. Le composant n'affiche aucun message : le slot `error` l'affiche dans la page, relié au champ par `aria-describedby` (lu au focus du champ, sans rôle live ; un `role="alert"` s'ajoute sur l'élément slotté si on veut une annonce), sans effet sur la validité. Un slot rempli pose `:state(has-error)` (à cibler avec la validation désactivée par `novalidate`), la validité du navigateur pose `:state(user-invalid)` ; l'input porte `aria-invalid` dans les deux cas.
+- Style : `:invalid` et `:valid` natifs ; à la place de `:required`, `:optional`, `:user-invalid` et `:user-valid`, utiliser `:state(required)`, `:state(optional)`, `:state(user-invalid)` et `:state(user-valid)`. Les deux derniers n'apparaissent qu'après une interaction de l'utilisateur, une tentative de soumission ou `reportValidity()`.
+- `form.reset()` ramène le champ à sa valeur initiale, sans événement de valeur.
+
 ## Autocomplétion IDE
 
 Le paquet npm publie des fichiers de données VS Code générés depuis le Custom Elements Manifest : autocomplétion des tags `ar-*`, de leurs attributs et des custom properties CSS `--ar-*`. À référencer dans le `.vscode/settings.json` du projet :
