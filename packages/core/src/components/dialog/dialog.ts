@@ -248,6 +248,19 @@ export class ArDialog extends ArianeElement {
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
 
+    override connectedCallback(): void {
+        super.connectedCallback();
+        // Reconnexion d'un dialog ouvert (élément déplacé) : le <dialog> natif reste ouvert mais
+        // sort de la couche modale (Échap inerte, scroll libre). On le rouvre en modal, sans
+        // ré-émettre ar-dialog-show ni ar-dialog-shown.
+        if (this.hasUpdated && this.open && this._dialog?.open) {
+            this._dialog.close();
+            this._dialog.showModal();
+            this._addOpenListeners();
+            this._freezeScroll();
+        }
+    }
+
     override disconnectedCallback(): void {
         super.disconnectedCallback();
         this._removeOpenListeners();

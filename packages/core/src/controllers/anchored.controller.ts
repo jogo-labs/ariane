@@ -20,6 +20,11 @@ export interface AnchoredControllerOptions {
 export class AnchoredController implements ReactiveController {
     private readonly _host: HTMLElement;
     private _trigger: HTMLElement | null = null;
+    /** Dernière attache, rejouée à la reconnexion de l'hôte (élément déplacé dans le DOM). */
+    private _attachArgs: { trigger: HTMLElement; panel: HTMLElement; anchor?: HTMLElement } | null =
+        null;
+    /** Le panneau était ouvert à la déconnexion : il est rouvert à la reconnexion. */
+    private _reopenOnConnect = false;
     private _scrollLocks: HTMLElement[] = [];
     private _opts: Required<Omit<AnchoredControllerOptions, 'onExternalClose' | 'cssVarPrefix'>> & {
         onExternalClose?: () => void;
@@ -61,6 +66,7 @@ export class AnchoredController implements ReactiveController {
 
     attach(trigger: HTMLElement, panel: HTMLElement, anchor?: HTMLElement): void {
         // Precondition: call hide() before re-attaching to avoid stale scroll-lock refs.
+        this._attachArgs = { trigger, panel, ...(anchor !== undefined && { anchor }) };
         this._trigger = trigger;
         this._popover.attach(trigger, panel, anchor);
         const haspopup = this._opts.popupMode === 'dialog' ? 'dialog' : 'true';
@@ -108,9 +114,19 @@ export class AnchoredController implements ReactiveController {
         return Number.isFinite(parsed) ? parsed : 0;
     }
 
-    hostConnected(): void {}
+    hostConnected(): void {
+        // Premier montage : rien à rejouer, le composant attache dans `firstUpdated()`.
+        if (!this._attachArgs) return;
+        const { trigger, panel, anchor } = this._attachArgs;
+        this.attach(trigger, panel, anchor);
+        if (this._reopenOnConnect) {
+            this._reopenOnConnect = false;
+            void this.show();
+        }
+    }
 
     hostDisconnected(): void {
+        this._reopenOnConnect = this._popover.isOpen;
         this._popover.destroy();
         this._releaseScrollLocks();
     }
