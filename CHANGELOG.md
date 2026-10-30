@@ -14,6 +14,28 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
 ---
 
+## [0.1.0-alpha.18](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.17...v0.1.0-alpha.18) (2026-10-30)
+
+### Changements incompatibles
+
+- **core:** l'attribut has-error n'est plus reflété (utiliser :state(has-error)) et has-error ne s'applique plus à un champ invalide sans slot error (utiliser :state(user-invalid)). Le conteneur du slot error n'a plus role alert et n'existe que quand le slot est rempli. detail.valid vaut true pour une date plausible hors de min et max, il valait false. Un texte non reconnu rend le champ invalide (badInput) et n'est plus effacé quand le champ avait une valeur.
+- **core:** les propriétés CSS --ar-datepicker-input-error-border-color et --ar-datepicker-error-color sont supprimées, remplacées par --ar-input-error-border-color et --ar-input-error-color. Sans thème, un champ en erreur n'a plus de bordure colorée.
+- **core:** les termes de traduction validationRangeUnderflow et validationRangeOverflow sont renommés datepickerValidationRangeUnderflow et datepickerValidationRangeOverflow ; les termes datepickerValidationBadInput et datepickerValidationStepMismatch sont ajoutés au type Translation. Une date refusée par isDateDisabled rend maintenant le champ invalide (stepMismatch), saisie à la main ou posée par value ; elle était valide.
+
+### Ajouté
+
+- **core:** ar-datepicker, has-error signale un champ en erreur, badInput et aria-invalid ([#404](https://github.com/jogo-labs/ariane/issues/404))
+
+### Corrigé
+
+- **core:** ar-datepicker, une date refusée par isDateDisabled rend le champ invalide ([#408](https://github.com/jogo-labs/ariane/issues/408))
+- **core:** lang réactif sur la base, les textes traduits suivent l'attribut du composant ([#407](https://github.com/jogo-labs/ariane/issues/407)) ([4aafead](https://github.com/jogo-labs/ariane/commit/4aafeada0dc86d1b071bc5f08497b0bef7d913bb))
+
+### Modifié
+
+- **core:** preset fields, un champ aria-invalid prend les tokens d'erreur des composants ([#404](https://github.com/jogo-labs/ariane/issues/404)) ([0137808](https://github.com/jogo-labs/ariane/commit/0137808be77d67136a8ba6949b7066ad3889c488))
+- **core:** présentation d'erreur des champs portée par le thème ([#405](https://github.com/jogo-labs/ariane/issues/405)) ([7cd7683](https://github.com/jogo-labs/ariane/commit/7cd7683392f3135c297be251db34740b0f16fe42)), references [#404](https://github.com/jogo-labs/ariane/issues/404)
+
 ## [0.1.0-alpha.17](https://github.com/jogo-labs/ariane/compare/v0.1.0-alpha.16...v0.1.0-alpha.17) (2026-10-23)
 
 ### Corrigé
