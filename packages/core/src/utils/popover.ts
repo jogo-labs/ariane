@@ -86,6 +86,7 @@ export class Popover {
         panel.showPopover();
         this._isOpen = true;
         this._listenOutsidePointer();
+        this._listenEscape();
         this._host.requestUpdate();
         this._cleanupAutoUpdate = autoUpdate(this._trigger, this._panel, async () => {
             await this._position();
@@ -98,6 +99,7 @@ export class Popover {
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
         this._unlistenOutsidePointer();
+        this._unlistenEscape();
         const panel = this._panel as PopoverPanel;
         if (typeof panel.hidePopover === 'function') panel.hidePopover();
         this._isOpen = false;
@@ -108,6 +110,7 @@ export class Popover {
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
         this._unlistenOutsidePointer();
+        this._unlistenEscape();
         if (this._isOpen && this._panel) {
             const panel = this._panel as PopoverPanel;
             if (typeof panel.hidePopover === 'function') panel.hidePopover();
@@ -133,6 +136,7 @@ export class Popover {
         this._cleanupAutoUpdate?.();
         this._cleanupAutoUpdate = null;
         this._unlistenOutsidePointer();
+        this._unlistenEscape();
         (this._panel as PopoverPanel | null)?.hidePopover?.();
         this._isOpen = false;
         this._opts.onExternalClose?.();
@@ -156,6 +160,26 @@ export class Popover {
             true,
         );
     }
+
+    /**
+     * Tant qu'un popup est ouvert, Échap lui appartient : `preventDefault()` signale aux couches
+     * parentes (un `ar-dialog` qui contient le popup) qu'il est déjà consommé, sans bloquer la
+     * propagation pour les écouteurs de l'application. `preventDefault()` annule aussi la
+     * fermeture native d'un popover `auto` : elle est donc faite ici.
+     */
+    private _listenEscape(): void {
+        this._host.ownerDocument.addEventListener('keydown', this._onEscape);
+    }
+
+    private _unlistenEscape(): void {
+        this._host.ownerDocument.removeEventListener('keydown', this._onEscape);
+    }
+
+    private _onEscape = (e: KeyboardEvent): void => {
+        if (e.key !== 'Escape' || !this._isOpen) return;
+        e.preventDefault();
+        if (this._opts.popoverType === 'auto') this._dismiss();
+    };
 
     private _onOutsidePointerDown = (e: PointerEvent): void => {
         if (!this._isOpen || !this._panel) return;

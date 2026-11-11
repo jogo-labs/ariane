@@ -3,7 +3,7 @@ import { property, query, state } from 'lit/decorators.js';
 import utilitiesStyles from '../../styles/utilities.styles.js';
 import resetStyles from '../../styles/components/reset.styles.js';
 import styles from './dialog.styles.js';
-import { announceA11y } from '../../a11y/announce-a11y.js';
+import { announceA11y, popAnnounceHost, pushAnnounceHost } from '../../a11y/announce-a11y.js';
 import { HasSlotController } from '../../controllers/has-slot.controller.js';
 import { prefersReducedMotion } from '../../utils/media.js';
 import { acquireScrollLock, releaseScrollLock } from '../../utils/scroll-lock.js';
@@ -34,6 +34,37 @@ const CANCELABLE_EVENTS = new Set<ArDialogEvents>([
 ]);
 
 const _dialogStack: ArDialog[] = [];
+
+/**
+ * Dernière cible d'un `pointerdown`. Safari ne donne pas le focus à un bouton cliqué :
+ * `document.activeElement` vaut alors `body` à l'ouverture, et le focus ne retournerait nulle part
+ * à la fermeture.
+ */
+let _lastPointerTarget: Element | null = null;
+let _trackingPointer = false;
+
+function trackPointerTarget(): void {
+    if (_trackingPointer || typeof document === 'undefined') return;
+    _trackingPointer = true;
+    document.addEventListener(
+        'pointerdown',
+        (event) => {
+            const target = event.composedPath()[0];
+            _lastPointerTarget = target instanceof Element ? target : null;
+        },
+        true,
+    );
+}
+
+/** Élément à refocaliser à la fermeture : celui qui a le focus, à défaut la cible du dernier clic. */
+function focusReturnTarget(): Element | null {
+    const active = document.activeElement;
+    if (active && active !== document.body) return active;
+    const clicked = _lastPointerTarget?.closest(
+        'button, a[href], input, select, textarea, summary, [tabindex]',
+    );
+    return clicked?.isConnected ? clicked : active;
+}
 
 if (typeof document !== 'undefined') {
     document.addEventListener(
@@ -250,6 +281,7 @@ export class ArDialog extends ArianeElement {
 
     override connectedCallback(): void {
         super.connectedCallback();
+        trackPointerTarget();
         // Reconnexion d'un dialog ouvert (élément déplacé) : le <dialog> natif reste ouvert mais
         // sort de la couche modale (Échap inerte, scroll libre). On le rouvre en modal, sans
         // ré-émettre ar-dialog-show ni ar-dialog-shown.
@@ -327,7 +359,6 @@ export class ArDialog extends ArianeElement {
                 role="dialog"
                 aria-labelledby=${this.withoutHeader ? nothing : 'dialog-heading'}
                 aria-label=${this.withoutHeader ? headingLabel : nothing}
-                aria-describedby="dialog-body"
                 aria-modal="true"
                 aria-busy=${this.pending ? 'true' : nothing}
                 ?inert=${!this.open || this._isClosing}
@@ -378,7 +409,7 @@ export class ArDialog extends ArianeElement {
                               </button>
                           </header>`
                 }
-                <div part="body" id="dialog-body">
+                <div part="body">
                     <slot></slot>
                 </div>
                 ${
@@ -399,6 +430,7 @@ export class ArDialog extends ArianeElement {
         if (!_dialogStack.includes(this)) {
             _dialogStack.push(this);
             acquireScrollLock(document.body);
+            pushAnnounceHost(this._dialog);
         }
     }
 
@@ -408,6 +440,7 @@ export class ArDialog extends ArianeElement {
         if (idx === -1) return;
         _dialogStack.splice(idx, 1);
         releaseScrollLock(document.body);
+        popAnnounceHost(this._dialog);
     }
 
     // ── Events ─────────────────────────────────────────────────────────────────
@@ -433,12 +466,14 @@ export class ArDialog extends ArianeElement {
         });
     }
 
+    // `window` et non `document` : l'écouteur passe après ceux de `document`, dont ceux des popups
+    // ouverts dans le dialog, qui consomment Échap avec `preventDefault()` (voir `Popover`).
     private _addOpenListeners() {
-        document.addEventListener('keydown', this._handleDocumentKeyDown);
+        window.addEventListener('keydown', this._handleWindowKeyDown);
     }
 
     private _removeOpenListeners() {
-        document.removeEventListener('keydown', this._handleDocumentKeyDown);
+        window.removeEventListener('keydown', this._handleWindowKeyDown);
     }
 
     // ── Interaction handlers ───────────────────────────────────────────────────
@@ -462,7 +497,6 @@ export class ArDialog extends ArianeElement {
         );
 
         if (dismissed || accepted) {
-            event.stopPropagation();
             // Une réponse est déjà attendue : la nouvelle tentative est ignorée en silence.
             if (this.pending) return;
             const e = this._emit(dismissed ? 'ar-dialog-dismissed' : 'ar-dialog-accepted');
@@ -475,12 +509,12 @@ export class ArDialog extends ArianeElement {
                 return;
             }
 
-            event.stopPropagation();
             this._close();
         }
     };
 
-    private _handleDocumentKeyDown = (event: KeyboardEvent) => {
+    private _handleWindowKeyDown = (event: KeyboardEvent) => {
+        if (event.defaultPrevented) return;
         if (event.key === 'Escape' && this.open && !this._isClosing) {
             // N'intercepte Escape que si ce dialog est au sommet de la pile (dialogs empilés)
             if (_dialogStack[_dialogStack.length - 1] !== this) return;
@@ -491,7 +525,7 @@ export class ArDialog extends ArianeElement {
     };
 
     private _handleDialogCancel = (event: Event) => {
-        // Toujours annulé : la gestion Escape est déléguée à _handleDocumentKeyDown pour
+        // Toujours annulé : la gestion Escape est déléguée à _handleWindowKeyDown pour
         // respecter la pile de dialogs (_dialogStack) et les animations de fermeture.
         event.preventDefault();
     };
@@ -513,7 +547,7 @@ export class ArDialog extends ArianeElement {
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
         this._warnIfNoCloseMechanism();
-        this._triggerElement = document.activeElement;
+        this._triggerElement = focusReturnTarget();
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
             this._triggerElement = null;
