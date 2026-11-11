@@ -29,7 +29,7 @@ const codeDropdown = `<ar-dropdown>
     <ar-dropdown-item><button>Supprimer</button></ar-dropdown-item>
 </ar-dropdown>`;
 
-const codeDialog = `<button data-ar-dialog-open="mon-dialog" class="ar-btn ar-btn-secondary">Ouvrir la fenêtre</button>
+const codeDialog = `<button data-ar-dialog="open#mon-dialog" class="ar-btn ar-btn-secondary">Ouvrir la fenêtre</button>
 <ar-dialog id="mon-dialog" label="Informations importantes">
     <p>Votre session expirera dans 5 minutes.</p>
 </ar-dialog>`;
@@ -449,7 +449,7 @@ const codeDatepicker = `<ar-datepicker
                                     </div>
                                     <div class="try-preview-stage doc-demo">
                                         <button
-                                            data-ar-dialog-open="mon-dialog"
+                                            data-ar-dialog="open#mon-dialog"
                                             class="ar-btn ar-btn-secondary"
                                             >Ouvrir la fenêtre</button
                                         >

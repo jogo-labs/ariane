@@ -60,8 +60,9 @@ describe('ar-dialog — accessibilité', () => {
     });
 
     it('le bouton fermer a un nom accessible via sr-only', () => {
-        const closeBtn = requireShadow(el).querySelector('[data-ar-dismiss]');
-        if (!(closeBtn instanceof HTMLElement)) throw new Error('[data-ar-dismiss] introuvable');
+        const closeBtn = requireShadow(el).querySelector('[data-ar-dialog="close"]');
+        if (!(closeBtn instanceof HTMLElement))
+            throw new Error('[data-ar-dialog="close"] introuvable');
         const label = closeBtn.querySelector('.sr-only');
         expect(label).not.to.equal(null);
         if (!label) throw new Error('.sr-only introuvable');

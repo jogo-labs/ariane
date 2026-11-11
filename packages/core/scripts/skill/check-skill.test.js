@@ -253,7 +253,7 @@ describe('checkSkill', () => {
                     type: { text: 'CustomEvent<{ id: string | undefined }>' },
                 },
                 {
-                    name: 'ar-dialog-accepted',
+                    name: 'ar-dialog-hidden',
                     type: { text: 'CustomEvent<{ id: string | undefined, value: number }>' },
                 },
             ]);
