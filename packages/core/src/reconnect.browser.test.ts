@@ -226,7 +226,7 @@ describe('composants déplacés dans le DOM', () => {
     describe('ar-dialog', () => {
         it('un dialog ouvert puis déplacé reste modal et bloque le scroll', async () => {
             const el = await fixture<ArDialog>(html`
-                <ar-dialog open><button data-ar-dismiss>Fermer</button></ar-dialog>
+                <ar-dialog open><button data-ar-dialog="close">Fermer</button></ar-dialog>
             `);
             await aTimeout(300);
             const shown: Event[] = [];

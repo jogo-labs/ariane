@@ -194,7 +194,7 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
                desktop la nav est une colonne visible, un simple <a href>
                suffit ; sur mobile elle est masquée dans l'ar-dialog tant
                qu'il n'est pas ouvert — la variante mobile est un bouton qui
-               l'ouvre (data-ar-dialog-open) au lieu de sauter vers une
+               l'ouvre (data-ar-dialog="open#id") au lieu de sauter vers une
                cible non focusable. Une seule des deux existe dans l'ordre
                de tabulation à la fois. */
             @media (min-width: 821px) {
@@ -506,7 +506,7 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
                 <div class="header-left">
                     <!-- Burger : visible uniquement en mobile, et seulement si nav présente -->
                     {showNav && (
-                        <button class="icon-btn icon-btn--nav" id="burger-btn" data-ar-dialog-open="site-nav-column-mobile" aria-label="Ouvrir la navigation">
+                        <button class="icon-btn icon-btn--nav" id="burger-btn" data-ar-dialog="open#site-nav-column-mobile" aria-label="Ouvrir la navigation">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <line x1="3" y1="6" x2="21" y2="6"/>
                                 <line x1="3" y1="12" x2="21" y2="12"/>
@@ -601,7 +601,7 @@ const canonicalUrl = isProduction ? new URL(Astro.url.pathname, Astro.site).href
                     {showNav && (
                         <>
                             <a href="#site-nav-column" class="skip-link skip-link--nav-desktop">Aller à la liste des composants</a>
-                            <button type="button" class="skip-link skip-link--nav-mobile" data-ar-dialog-open="site-nav-column-mobile">Ouvrir la liste des composants</button>
+                            <button type="button" class="skip-link skip-link--nav-mobile" data-ar-dialog="open#site-nav-column-mobile">Ouvrir la liste des composants</button>
                         </>
                     )}
                     {showToc && <a href="#toc" class="skip-link">Aller au menu de la page</a>}

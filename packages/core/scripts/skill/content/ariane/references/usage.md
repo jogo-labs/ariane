@@ -158,7 +158,6 @@ collapse.addEventListener('ar-collapse-show-prevented', () => {
 ```
 
 - Ces événements remontent (`bubbles`) et traversent le shadow DOM (`composed`) ; leur `detail` est `{ id }` (l'`id` de l'hôte, ou `undefined`).
-- `ar-dialog-dismissed` et `ar-dialog-accepted` (clic sur un élément portant `data-ar-dismiss` ou `data-ar-accept`) sont aussi annulables.
 - Autre motif : `-change` annulable puis `-changed` après effet. `ar-pagination-page-change` (annulable : `current` ne change pas) précède `ar-pagination-page-changed` (non annulable, émis quand `current` a réellement changé). `ar-stepper-step-change` est annulable et bloque la navigation. `detail` de ces événements : `{ id, from, to }`.
 - Vérifier dans `components/<tag>.md` si un événement donné existe et s'il est annulable : tous les composants n'ont pas le motif complet (`ar-datepicker-show` et `-hide` sont annulables, sans événement `-prevented` listé ni pour `-show` ni pour `-hide`).
 

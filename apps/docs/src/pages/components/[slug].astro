@@ -63,12 +63,12 @@ const playgroundVariant = playgroundVariantName
     ? variants.find((v: { name: string }) => v.name === playgroundVariantName)
     : variants[0];
 
-// Préfixe les id= (trigger-id= compris) et les data-*-open="id" du playground pour éviter les collisions
+// Préfixe les id= (trigger-id= compris) et les data-ar-dialog="verbe#id" du playground pour éviter les collisions
 // avec les aperçus de variantes qui utilisent le même HTML (même IDs).
 const rawPlaygroundHtml = playgroundVariant?.html ?? '';
 const playgroundHtml = rawPlaygroundHtml
     .replace(/\bid="([\w-]+)"/g, 'id="pg-$1"')
-    .replace(/\bdata-ar-dialog-open="([\w-]+)"/g, 'data-ar-dialog-open="pg-$1"')
+    .replace(/\bdata-ar-dialog="(open|close)#([\w-]+)"/g, 'data-ar-dialog="$1#pg-$2"')
     .replace(/\bfor="([\w-]+)"/g, 'for="pg-$1"')
     .replace(/\bgetElementById\((['"])([\w-]+)\1\)/g, "getElementById('pg-$2')");
 

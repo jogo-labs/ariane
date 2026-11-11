@@ -103,12 +103,12 @@ describe('ar-dialog — interactions', () => {
         });
     });
 
-    describe('clics sur data-ar-accept et data-ar-dismiss', () => {
+    describe('boutons data-ar-dialog', () => {
         it("atteignent le document : l'application peut les écouter", async () => {
             await fixture<ArDialog>(html`
                 <ar-dialog open label="D">
-                    <button id="cancel-btn" data-ar-dismiss>Annuler</button>
-                    <button id="ok-btn" data-ar-accept>Valider</button>
+                    <button id="cancel-btn" data-ar-dialog="close">Annuler</button>
+                    <button id="ok-btn" data-ar-dialog="close" value="ok">Valider</button>
                 </ar-dialog>
             `);
             await aTimeout(300);
@@ -122,6 +122,94 @@ describe('ar-dialog — interactions', () => {
             await aTimeout(CLOSE_MS);
             document.removeEventListener('click', listener);
             expect(seen).to.deep.equal(['ok-btn']);
+        });
+
+        it("le bouton d'un dialog imbriqué ne ferme que son dialog (DOM léger, vrai navigateur)", async () => {
+            const outer = await fixture<ArDialog>(html`
+                <ar-dialog open label="Extérieur" id="outer">
+                    <ar-dialog open label="Intérieur" id="inner">
+                        <button id="inner-close" data-ar-dialog="close">Fermer</button>
+                    </ar-dialog>
+                </ar-dialog>
+            `);
+            await aTimeout(300);
+            const inner = outer.querySelector<ArDialog>('#inner')!;
+            document.getElementById('inner-close')!.click();
+            await aTimeout(CLOSE_MS);
+            expect(inner.open).to.equal(false);
+            expect(outer.open).to.equal(true);
+        });
+
+        it('open#id ouvre le dialog visé et detail.source est le bouton', async () => {
+            const dialog = await fixture<ArDialog>(html`
+                <div>
+                    <button id="opener" data-ar-dialog="open#target">Ouvrir</button>
+                    <ar-dialog id="target" label="D"><button>Ok</button></ar-dialog>
+                </div>
+            `).then((root) => root.querySelector<ArDialog>('#target')!);
+            let source: Element | undefined;
+            dialog.addEventListener('ar-dialog-show', (e) => {
+                source = (e as CustomEvent<{ source: Element }>).detail.source;
+            });
+            document.getElementById('opener')!.click();
+            await aTimeout(300);
+            expect(dialog.open).to.equal(true);
+            expect(source).to.equal(document.getElementById('opener'));
+        });
+    });
+
+    describe('<form method="dialog">', () => {
+        it('le bouton de soumission ferme le dialog : source = bouton, returnValue = sa value', async () => {
+            const dialog = await fixture<ArDialog>(html`
+                <ar-dialog open label="D">
+                    <form method="dialog">
+                        <button id="save" value="saved">Enregistrer</button>
+                        <button id="cancel" value="cancel" formnovalidate>Annuler</button>
+                    </form>
+                </ar-dialog>
+            `);
+            await aTimeout(300);
+            const details: { source: Element; returnValue: string }[] = [];
+            dialog.addEventListener('ar-dialog-hidden', (e) => {
+                details.push((e as CustomEvent<(typeof details)[number]>).detail);
+            });
+            document.getElementById('save')!.click();
+            await aTimeout(CLOSE_MS);
+            expect(dialog.open).to.equal(false);
+            expect(dialog.returnValue).to.equal('saved');
+            expect(details).to.have.length(1);
+            expect(details[0]!.source).to.equal(document.getElementById('save'));
+            expect(details[0]!.returnValue).to.equal('saved');
+        });
+
+        it('un champ invalide bloque la soumission : le dialog reste ouvert (validation du navigateur)', async () => {
+            const dialog = await fixture<ArDialog>(html`
+                <ar-dialog open label="D">
+                    <form method="dialog">
+                        <input required name="n" />
+                        <button id="save" value="saved">Enregistrer</button>
+                    </form>
+                </ar-dialog>
+            `);
+            await aTimeout(300);
+            document.getElementById('save')!.click();
+            await aTimeout(CLOSE_MS);
+            expect(dialog.open).to.equal(true);
+        });
+
+        it("hide annulé par l'application garde le dialog ouvert (enregistrement refusé)", async () => {
+            const dialog = await fixture<ArDialog>(html`
+                <ar-dialog open label="D">
+                    <form method="dialog">
+                        <button id="save" value="saved">Enregistrer</button>
+                    </form>
+                </ar-dialog>
+            `);
+            await aTimeout(300);
+            dialog.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
+            document.getElementById('save')!.click();
+            await aTimeout(CLOSE_MS);
+            expect(dialog.open).to.equal(true);
         });
     });
 

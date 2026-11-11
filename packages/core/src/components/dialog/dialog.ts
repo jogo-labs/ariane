@@ -19,19 +19,13 @@ export type ArDialogEvents =
     | 'ar-dialog-shown'
     | 'ar-dialog-hide'
     | 'ar-dialog-hide-prevented'
-    | 'ar-dialog-hidden'
-    | 'ar-dialog-dismissed'
-    | 'ar-dialog-dismissed-prevented'
-    | 'ar-dialog-accepted'
-    | 'ar-dialog-accepted-prevented';
+    | 'ar-dialog-hidden';
+
+/** `detail` de tous les événements du dialog : l'élément à l'origine du changement et la valeur de retour. */
+export type ArDialogDetail = ArEventDetail & { source: Element; returnValue: string };
 
 /** Les seuls événements annulables, `@cancelable` dans le JSDoc de `ArDialog`. */
-const CANCELABLE_EVENTS = new Set<ArDialogEvents>([
-    'ar-dialog-show',
-    'ar-dialog-hide',
-    'ar-dialog-dismissed',
-    'ar-dialog-accepted',
-]);
+const CANCELABLE_EVENTS = new Set<ArDialogEvents>(['ar-dialog-show', 'ar-dialog-hide']);
 
 const _dialogStack: ArDialog[] = [];
 
@@ -66,15 +60,69 @@ function focusReturnTarget(): Element | null {
     return clicked?.isConnected ? clicked : active;
 }
 
+/** Élément (bouton, soumetteur) à l'origine de l'ouverture ou de la fermeture à venir, lu par le dialog. */
+const _commandSource = new WeakMap<ArDialog, Element>();
+
+/** `verbe` ou `verbe#id` : on coupe au premier `#`, l'id peut donc contenir `#` ou `:` (ex. `:r0:`). */
+function parseCommand(value: string): { verb: string; id: string } {
+    const i = value.indexOf('#');
+    return i < 0
+        ? { verb: value.trim(), id: '' }
+        : { verb: value.slice(0, i).trim(), id: value.slice(i + 1).trim() };
+}
+
+/** Ouvre ou ferme `dialog` au nom de `source`, comme une assignation de `open` qui saurait qui la demande. */
+function runCommand(dialog: ArDialog, verb: 'open' | 'close', source: Element, value = ''): void {
+    if (verb === 'open') {
+        if (dialog.open) return;
+        _commandSource.set(dialog, source);
+        dialog.open = true;
+        return;
+    }
+    // Une réponse est déjà attendue : la nouvelle tentative est ignorée en silence.
+    if (!dialog.open || dialog.pending) return;
+    _commandSource.set(dialog, source);
+    dialog.returnValue = value;
+    dialog.open = false;
+}
+
 if (typeof document !== 'undefined') {
     document.addEventListener(
         'click',
         (e: MouseEvent) => {
-            const trigger = (e.target as Element).closest('[data-ar-dialog-open]');
-            if (!trigger) return;
-            const id = trigger.getAttribute('data-ar-dialog-open');
-            const target = id ? document.getElementById(id) : null;
-            if (target instanceof ArDialog) target.open = true;
+            const path = e.composedPath();
+            const at = path.findIndex(
+                (n) => n instanceof Element && n.hasAttribute('data-ar-dialog'),
+            );
+            if (at < 0) return;
+            const trigger = path[at] as Element;
+            const attr = trigger.getAttribute('data-ar-dialog') ?? '';
+            const { verb, id } = parseCommand(attr);
+            if (verb !== 'open' && verb !== 'close') {
+                warn(
+                    'ar-dialog',
+                    `data-ar-dialog="${attr}" : verbe inconnu (attendu : open ou close).`,
+                );
+                return;
+            }
+            let dialog: unknown;
+            if (id) {
+                const root = trigger.getRootNode() as Document | ShadowRoot;
+                dialog = root.getElementById?.(id) ?? document.getElementById(id);
+            } else if (verb === 'close') {
+                // Le plus proche dialog qui contient le bouton (le bouton d'un dialog imbriqué ne ferme que lui).
+                dialog = path.slice(at + 1).find((n) => n instanceof ArDialog);
+            }
+            if (!(dialog instanceof ArDialog)) {
+                warn(
+                    'ar-dialog',
+                    id
+                        ? `data-ar-dialog="${attr}" : aucun ar-dialog avec l'id "${id}".`
+                        : `data-ar-dialog="${attr}" : ${verb === 'open' ? 'open demande un id (open#id)' : "le bouton n'est dans aucun ar-dialog"}.`,
+                );
+                return;
+            }
+            runCommand(dialog, verb, trigger, (trigger as HTMLButtonElement).value ?? '');
         },
         { capture: true },
     );
@@ -113,16 +161,12 @@ if (typeof document !== 'undefined') {
  * @cssState open - Le dialog est ouvert.
  * @cssState pending - L'application a posé l'attribut `pending` : une réponse est attendue avant de fermer.
  *
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show - Émis avant l'ouverture. @cancelable
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide - Émis avant la fermeture. @cancelable
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé, ou si `open` repasse à `true` pendant l'animation de fermeture (la fermeture est alors abandonnée). Sauf report par `pending`, le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-hidden - Émis après la fermeture (après animation).
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed - Émis lors d'un clic sur data-ar-dismiss. @cancelable
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-dismissed-prevented - Émis si ar-dialog-dismissed est annulé.
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-accepted - Émis lors d'un clic sur data-ar-accept. @cancelable
- * @event {CustomEvent<{ id: string | undefined }>} ar-dialog-accepted-prevented - Émis si ar-dialog-accepted est annulé.
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-show - Émis avant l'ouverture. `detail.source` : le bouton `data-ar-dialog="open#id"` cliqué, sinon le dialog. @cancelable
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-show-prevented - Émis si ar-dialog-show est annulé.
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-shown - Émis après l'ouverture (après updateComplete).
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-hide - Émis avant la fermeture. `detail.source` : le bouton `data-ar-dialog="close"` cliqué (ou le bouton qui a soumis un `<form method="dialog">`), sinon le dialog (Échap, backdrop, `open = false`) ; `detail.returnValue` : sa `value`, sinon `''`. @cancelable
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-hide-prevented - Émis si ar-dialog-hide est annulé, ou si `open` repasse à `true` pendant l'animation de fermeture (la fermeture est alors abandonnée). Sauf report par `pending`, le composant secoue le dialog et annonce `prevented-message` aux lecteurs d'écran.
+ * @event {CustomEvent<{ id: string | undefined; source: Element; returnValue: string }>} ar-dialog-hidden - Émis après la fermeture (après animation).
  *
  * @tagname ar-dialog
  */
@@ -182,7 +226,7 @@ export class ArDialog extends ArianeElement {
 
     /**
      * Attente d'une réponse, pilotée par l'application : posé dans le gestionnaire d'un
-     * `ar-dialog-accepted` (ou `-dismissed`, `-hide`) annulé, il reporte la fermeture au lieu de la
+     * `ar-dialog-hide` annulé, il reporte la fermeture au lieu de la
      * bloquer. Le composant n'agit alors ni par secousse ni par annonce de blocage, ignore en silence
      * les nouvelles tentatives de fermeture (clic, Échap, backdrop) et pose `aria-busy="true"` sur le
      * dialogue, l'état `:state(pending)` et une annonce polie de l'attente. L'application le lève
@@ -193,7 +237,7 @@ export class ArDialog extends ArianeElement {
 
     /**
      * Message annoncé aux lecteurs d'écran quand une fermeture est bloquée
-     * (événements `ar-dialog-hide-prevented`, `ar-dialog-dismissed-prevented`, `ar-dialog-accepted-prevented`).
+     * (événement `ar-dialog-hide-prevented`).
      * Traduit automatiquement selon `lang` si non personnalisé.
      */
     @property({ reflect: true, useDefault: true, attribute: 'prevented-message' })
@@ -206,10 +250,20 @@ export class ArDialog extends ArianeElement {
     @property({ reflect: true, useDefault: true, attribute: 'close-label' })
     closeLabel: string | undefined = undefined;
 
+    /**
+     * Valeur de retour de la dernière fermeture, comme `HTMLDialogElement.returnValue` : la `value`
+     * du bouton `data-ar-dialog="close"` cliqué ou du bouton qui a soumis un `<form method="dialog">`,
+     * sinon `''` (Échap, backdrop, `open = false`). Remise à `''` à l'ouverture.
+     */
+    returnValue = '';
+
     // ── Private state ──────────────────────────────────────────────────────────
 
     @query('dialog', true)
     private _dialog!: HTMLDialogElement;
+
+    /** Élément à l'origine de l'ouverture ou de la fermeture en cours (`detail.source`). */
+    private _source: Element = this;
 
     /** Cible du dernier pointerdown, pour distinguer un vrai clic backdrop d'un drag. */
     private _pointerDownTarget: EventTarget | null = null;
@@ -268,12 +322,12 @@ export class ArDialog extends ArianeElement {
         if (this._hasWarnedNoCloseMechanism) return;
         if (!this.withoutHeader) return;
         if (this.closeOnBackdrop) return;
-        if (this.querySelector('[data-ar-dismiss], [data-ar-accept]')) return;
+        if (this.querySelector('[data-ar-dialog^="close"], form[method="dialog"]')) return;
 
         this._hasWarnedNoCloseMechanism = true;
         warn(
             'ar-dialog',
-            'without-header est actif sans close-on-backdrop ni élément [data-ar-dismiss]/[data-ar-accept] dans le contenu : seule la touche Échap permet de fermer ce dialog.',
+            'without-header est actif sans close-on-backdrop ni élément [data-ar-dialog="close"] ou <form method="dialog"> dans le contenu : seule la touche Échap permet de fermer ce dialog.',
         );
     }
 
@@ -282,6 +336,7 @@ export class ArDialog extends ArianeElement {
     override connectedCallback(): void {
         super.connectedCallback();
         trackPointerTarget();
+        this.addEventListener('submit', this._handleSubmit);
         // Reconnexion d'un dialog ouvert (élément déplacé) : le <dialog> natif reste ouvert mais
         // sort de la couche modale (Échap inerte, scroll libre). On le rouvre en modal, sans
         // ré-émettre ar-dialog-show ni ar-dialog-shown.
@@ -295,6 +350,7 @@ export class ArDialog extends ArianeElement {
 
     override disconnectedCallback(): void {
         super.disconnectedCallback();
+        this.removeEventListener('submit', this._handleSubmit);
         this._removeOpenListeners();
         if (this.open || this._isClosing) this._unfreezeScroll();
     }
@@ -388,7 +444,7 @@ export class ArDialog extends ArianeElement {
                               <button
                                   part="close-button action-button"
                                   type="button"
-                                  data-ar-dismiss
+                                  data-ar-dialog="close"
                               >
                                   <slot name="close-icon">
                                       <svg
@@ -445,8 +501,17 @@ export class ArDialog extends ArianeElement {
 
     // ── Events ─────────────────────────────────────────────────────────────────
 
-    private _emit(name: ArDialogEvents): CustomEvent<ArEventDetail> {
-        return emitEvent(this, name, { cancelable: CANCELABLE_EVENTS.has(name) });
+    private _emit(name: ArDialogEvents): CustomEvent<ArDialogDetail> {
+        return emitEvent(this, name, {
+            cancelable: CANCELABLE_EVENTS.has(name),
+            detail: { source: this._source, returnValue: this.returnValue },
+        });
+    }
+
+    /** Reprend l'élément posé par `runCommand` pour cette ouverture ou fermeture, sinon le dialog. */
+    private _takeSource(): void {
+        this._source = _commandSource.get(this) ?? this;
+        _commandSource.delete(this);
     }
 
     private _announcePrevented(): void {
@@ -483,33 +548,6 @@ export class ArDialog extends ArianeElement {
         // Sur desktop, _handleDialogPointerUp déjà traité ; _close() est idempotent via _isClosing.
         if (this.closeOnBackdrop && event.target === this._dialog) {
             this._requestClose();
-            return;
-        }
-
-        const path = event.composedPath() as Element[];
-        const stopAt = path.indexOf(this._dialog);
-        const inner = stopAt >= 0 ? path.slice(0, stopAt) : path;
-        const dismissed = inner.find(
-            (n): n is HTMLElement => n instanceof HTMLElement && n.hasAttribute('data-ar-dismiss'),
-        );
-        const accepted = inner.find(
-            (n): n is HTMLElement => n instanceof HTMLElement && n.hasAttribute('data-ar-accept'),
-        );
-
-        if (dismissed || accepted) {
-            // Une réponse est déjà attendue : la nouvelle tentative est ignorée en silence.
-            if (this.pending) return;
-            const e = this._emit(dismissed ? 'ar-dialog-dismissed' : 'ar-dialog-accepted');
-            if (e.defaultPrevented) {
-                const prevented = dismissed
-                    ? 'ar-dialog-dismissed-prevented'
-                    : 'ar-dialog-accepted-prevented';
-                this._emit(prevented);
-                this._signalBlocked();
-                return;
-            }
-
-            this._close();
         }
     };
 
@@ -530,6 +568,18 @@ export class ArDialog extends ArianeElement {
         event.preventDefault();
     };
 
+    // Le <form> est dans le DOM léger : pour le navigateur il n'a pas de <dialog> ancêtre, et
+    // `method="dialog"` ne ferme rien. Le dialog le plus proche du formulaire s'en charge.
+    private _handleSubmit = (event: SubmitEvent) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        const submitter = event.submitter as HTMLButtonElement | null;
+        if ((submitter?.formMethod || form.method) !== 'dialog') return;
+        if (event.composedPath().find((n) => n instanceof ArDialog) !== this) return;
+        event.preventDefault();
+        runCommand(this, 'close', submitter ?? form, submitter?.value ?? '');
+    };
+
     private _handleDialogPointerDown = (event: PointerEvent) => {
         this._pointerDownTarget = event.target;
     };
@@ -547,6 +597,8 @@ export class ArDialog extends ArianeElement {
     /** Ouvre le dialog natif, gèle le scroll et enregistre le listener clavier. */
     private _show(): void {
         this._warnIfNoCloseMechanism();
+        this._takeSource();
+        this.returnValue = '';
         this._triggerElement = focusReturnTarget();
         const showEvent = this._emit('ar-dialog-show');
         if (showEvent.defaultPrevented) {
@@ -592,7 +644,8 @@ export class ArDialog extends ArianeElement {
             firstFocusable.focus();
         } else {
             (
-                this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dismiss]') ?? this._dialog
+                this.shadowRoot?.querySelector<HTMLElement>('[data-ar-dialog="close"]') ??
+                this._dialog
             )?.focus();
         }
     }
@@ -616,8 +669,10 @@ export class ArDialog extends ArianeElement {
     /** Déclenche l'animation de fermeture et attend animationend avant de clore. */
     private _close(): void {
         if (this._isClosing) return;
+        this._takeSource();
         const hideEvent = this._emit('ar-dialog-hide');
         if (hideEvent.defaultPrevented) {
+            this.returnValue = '';
             this.open = true;
             this._emit('ar-dialog-hide-prevented');
             this._signalBlocked();

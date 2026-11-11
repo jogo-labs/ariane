@@ -63,8 +63,8 @@ describe('ArDialog', () => {
             expect(getPart(el, 'footer')).toBeNull();
         });
 
-        it('contient un bouton close avec data-ar-dismiss', () => {
-            expect(requireShadow(el).querySelector('[data-ar-dismiss]')).not.toBeNull();
+        it('contient un bouton close avec data-ar-dialog="close"', () => {
+            expect(requireShadow(el).querySelector('[data-ar-dialog="close"]')).not.toBeNull();
         });
 
         it('contient part="close-button action-button"', () => {
@@ -75,7 +75,7 @@ describe('ArDialog', () => {
 
         it("le bouton close n'a pas d'aria-describedby", async () => {
             el = await fixture('<ar-dialog></ar-dialog>');
-            const closeBtn = requireShadow(el).querySelector('[data-ar-dismiss]');
+            const closeBtn = requireShadow(el).querySelector('[data-ar-dialog="close"]');
             expect(closeBtn).not.toBeNull();
             expect((closeBtn as HTMLElement).hasAttribute('aria-describedby')).toBe(false);
         });
@@ -196,7 +196,7 @@ describe('ArDialog', () => {
             expect(getPart(el, 'header')).toBeNull();
             expect(getPart(el, 'title')).toBeNull();
             expect(getPart(el, 'close-button')).toBeNull();
-            expect(requireShadow(el).querySelector('[data-ar-dismiss]')).toBeNull();
+            expect(requireShadow(el).querySelector('[data-ar-dialog="close"]')).toBeNull();
         });
 
         it('le dialog et le body restent présents quand without-header est actif', async () => {
@@ -292,7 +292,7 @@ describe('ArDialog', () => {
             `);
             const header = getPart(el, 'header') as HTMLElement;
             const wrapper = getPart(el, 'header-actions');
-            const closeBtn = header.querySelector('[data-ar-dismiss]');
+            const closeBtn = header.querySelector('[data-ar-dialog="close"]');
             expect(wrapper).not.toBeNull();
             expect(closeBtn).not.toBeNull();
             const position = wrapper!.compareDocumentPosition(closeBtn!);
@@ -526,55 +526,139 @@ describe('ArDialog', () => {
         });
     });
 
-    // ── data-ar-dismiss / data-ar-accept ──────────────────────────────────────
+    // ── data-ar-dialog="close" ────────────────────────────────────────────────
 
-    describe('dismiss / accept', () => {
+    describe('commande close', () => {
         beforeEach(async () => {
             el = await fixture('<ar-dialog open></ar-dialog>');
         });
 
-        it('clic sur data-ar-dismiss émet ar-dialog-dismissed et ferme', async () => {
+        const closeButton = () =>
+            requireShadow(el).querySelector('[data-ar-dialog="close"]') as HTMLButtonElement;
+
+        it('le bouton de fermeture émet ar-dialog-hide avec lui-même comme source, et ferme', async () => {
             const handler = vi.fn();
-            el.addEventListener('ar-dialog-dismissed', handler);
-            (requireShadow(el).querySelector('[data-ar-dismiss]') as HTMLElement).click();
+            el.addEventListener('ar-dialog-hide', handler);
+            closeButton().click();
             await waitForUpdate(el);
             expect(handler).toHaveBeenCalledOnce();
+            expect(handler.mock.calls[0]?.[0].detail.source).toBe(closeButton());
+            expect(handler.mock.calls[0]?.[0].detail.returnValue).toBe('');
         });
 
-        it('clic sur data-ar-accept émet ar-dialog-accepted', async () => {
-            // happy-dom ne propage pas les clicks slottés dans le shadow DOM.
-            // On simule data-ar-accept sur un élément shadow DOM (même code path que composedPath).
+        it('un bouton close#id hors du dialog ferme ce dialog, returnValue = value du bouton', async () => {
+            el.id = 'close-ext';
+            const btn = document.createElement('button');
+            btn.setAttribute('data-ar-dialog', 'close#close-ext');
+            btn.value = 'ok';
+            document.body.appendChild(btn);
             const handler = vi.fn();
-            el.addEventListener('ar-dialog-accepted', handler);
-            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
-            body.setAttribute('data-ar-accept', '');
-            body.click();
-            body.removeAttribute('data-ar-accept');
+            el.addEventListener('ar-dialog-hide', handler);
+            btn.click();
             await waitForUpdate(el);
-            expect(handler).toHaveBeenCalledOnce();
+            expect(handler.mock.calls[0]?.[0].detail).toMatchObject({
+                source: btn,
+                returnValue: 'ok',
+            });
+            expect(el.returnValue).toBe('ok');
+            btn.remove();
         });
 
-        it('ar-dialog-dismissed annulable émet ar-dialog-dismissed-prevented', async () => {
+        it('Échap et open = false ont le dialog pour source et une returnValue vide', async () => {
+            const handler = vi.fn();
+            el.addEventListener('ar-dialog-hide', handler);
+            el.open = false;
+            await waitForUpdate(el);
+            expect(handler.mock.calls[0]?.[0].detail).toMatchObject({
+                source: el,
+                returnValue: '',
+            });
+        });
+
+        it('hide annulé : le dialog reste ouvert, hide-prevented émis, returnValue remise à vide', async () => {
             const prevented = vi.fn();
-            el.addEventListener('ar-dialog-dismissed', (e) => e.preventDefault());
-            el.addEventListener('ar-dialog-dismissed-prevented', prevented);
-            (requireShadow(el).querySelector('[data-ar-dismiss]') as HTMLElement).click();
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
+            el.addEventListener('ar-dialog-hide-prevented', prevented);
+            el.returnValue = 'stale';
+            closeButton().click();
             await waitForUpdate(el);
             expect(prevented).toHaveBeenCalledOnce();
             expect(el.open).toBe(true);
+            expect(el.returnValue).toBe('');
         });
 
-        it('ar-dialog-accepted annulable émet ar-dialog-accepted-prevented', async () => {
-            const prevented = vi.fn();
-            el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
-            el.addEventListener('ar-dialog-accepted-prevented', prevented);
-            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
-            body.setAttribute('data-ar-accept', '');
-            body.click();
-            body.removeAttribute('data-ar-accept');
+        it('returnValue est remise à vide à la réouverture', async () => {
+            vi.spyOn(window, 'matchMedia').mockReturnValue({
+                matches: true,
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+            el.open = false;
             await waitForUpdate(el);
-            expect(prevented).toHaveBeenCalledOnce();
+            await waitForUpdate(el);
+            expect(el.open).toBe(false);
+            el.returnValue = 'ok';
+            el.open = true;
+            await waitForUpdate(el);
+            expect(el.returnValue).toBe('');
+            vi.restoreAllMocks();
+        });
+
+        it('close sans id dans un dialog imbriqué ne ferme que le plus proche', async () => {
+            const outer = await fixture<ArDialog>(
+                '<ar-dialog open id="outer"><ar-dialog open id="inner"><button data-ar-dialog="close" id="b">x</button></ar-dialog></ar-dialog>',
+            );
+            const inner = outer.querySelector('ar-dialog') as ArDialog;
+            const hidden = vi.fn();
+            outer.addEventListener('ar-dialog-hide', (e) => {
+                if ((e.target as Element).id === 'outer') hidden();
+            });
+            (outer.querySelector('#b') as HTMLElement).click();
+            await waitForUpdate(inner);
+            expect(inner.open).toBe(false);
+            expect(outer.open).toBe(true);
+            expect(hidden).not.toHaveBeenCalled();
+        });
+
+        it('ignore un bouton close tant que pending est posé', async () => {
+            const handler = vi.fn();
+            el.pending = true;
+            await waitForUpdate(el);
+            el.addEventListener('ar-dialog-hide', handler);
+            closeButton().click();
+            await waitForUpdate(el);
+            expect(handler).not.toHaveBeenCalled();
             expect(el.open).toBe(true);
+        });
+
+        it('un <form method="dialog"> soumis ferme le dialog, source = soumetteur, returnValue = sa value', async () => {
+            const host = await fixture<ArDialog>(
+                '<ar-dialog open><form method="dialog"><button id="ok" value="confirm">OK</button></form></ar-dialog>',
+            );
+            const handler = vi.fn();
+            host.addEventListener('ar-dialog-hide', handler);
+            const form = host.querySelector('form') as HTMLFormElement;
+            const submitter = host.querySelector('#ok') as HTMLButtonElement;
+            const event = new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter });
+            form.dispatchEvent(event);
+            await waitForUpdate(host);
+            expect(event.defaultPrevented).toBe(true);
+            expect(handler.mock.calls[0]?.[0].detail).toMatchObject({
+                source: submitter,
+                returnValue: 'confirm',
+            });
+        });
+
+        it('un formulaire sans method="dialog" est laissé tel quel', async () => {
+            const host = await fixture<ArDialog>(
+                '<ar-dialog open><form method="post"><button id="ok">OK</button></form></ar-dialog>',
+            );
+            const form = host.querySelector('form') as HTMLFormElement;
+            const event = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+            form.dispatchEvent(event);
+            await waitForUpdate(host);
+            expect(event.defaultPrevented).toBe(false);
+            expect(host.open).toBe(true);
         });
     });
 
@@ -676,8 +760,10 @@ describe('ArDialog', () => {
 
         it('déplace le focus sur le bouton fermer si aucun élément focalisable dans le slot', async () => {
             el = await fixture('<ar-dialog><p>Texte</p></ar-dialog>');
-            const closeBtn = requireShadow(el).querySelector<HTMLElement>('[data-ar-dismiss]');
-            if (!closeBtn) throw new Error('[data-ar-dismiss] introuvable');
+            const closeBtn = requireShadow(el).querySelector<HTMLElement>(
+                '[data-ar-dialog="close"]',
+            );
+            if (!closeBtn) throw new Error('[data-ar-dialog="close"] introuvable');
             const focusSpy = vi.spyOn(closeBtn, 'focus');
             el.open = true;
             await waitForUpdate(el);
@@ -733,18 +819,43 @@ describe('ArDialog', () => {
 
     // ── Trigger externe ───────────────────────────────────────────────────────
 
-    describe('trigger externe data-ar-dialog-open', () => {
-        it('un bouton data-ar-dialog-open="id" ouvre le dialog correspondant', async () => {
-            el = await fixture('<ar-dialog id="test-dialog-ext"></ar-dialog>');
+    describe('commande open (trigger externe)', () => {
+        const trigger = (value: string) => {
             const btn = document.createElement('button');
-            btn.setAttribute('data-ar-dialog-open', 'test-dialog-ext');
+            btn.setAttribute('data-ar-dialog', value);
             document.body.appendChild(btn);
+            return btn;
+        };
+
+        it('un bouton open#id ouvre le dialog correspondant, source = le bouton', async () => {
+            el = await fixture('<ar-dialog id="test-dialog-ext"></ar-dialog>');
+            const btn = trigger('open#test-dialog-ext');
+            const handler = vi.fn();
+            el.addEventListener('ar-dialog-show', handler);
 
             btn.click();
             await waitForUpdate(el);
             expect(el.open).toBe(true);
+            expect(handler.mock.calls[0]?.[0].detail.source).toBe(btn);
 
             btn.remove();
+        });
+
+        it("l'id peut contenir « : » et « # » (open#:r0:, open#a#b)", async () => {
+            el = await fixture('<ar-dialog id=":r0:"></ar-dialog>');
+            const other = await fixture<ArDialog>('<ar-dialog id="a#b"></ar-dialog>');
+            const one = trigger('open#:r0:');
+            const two = trigger('open#a#b');
+
+            one.click();
+            two.click();
+            await waitForUpdate(el);
+            await waitForUpdate(other);
+            expect(el.open).toBe(true);
+            expect(other.open).toBe(true);
+
+            one.remove();
+            two.remove();
         });
 
         it('le module se charge sans erreur (guard SSR)', () => {
@@ -753,17 +864,32 @@ describe('ArDialog', () => {
             expect(customElements.get('ar-dialog')).toBeDefined();
         });
 
-        it("ignore un trigger data-ar-dialog-open si l'id ne correspond à aucun dialog", async () => {
+        it("ignore un trigger si l'id ne correspond à aucun dialog", async () => {
             el = await fixture('<ar-dialog id="dialog-existant"></ar-dialog>');
-            const btn = document.createElement('button');
-            btn.setAttribute('data-ar-dialog-open', 'dialog-introuvable');
-            document.body.appendChild(btn);
+            const btn = trigger('open#dialog-introuvable');
 
             btn.click();
             await waitForUpdate(el);
 
             expect(el.open).toBe(false);
             btn.remove();
+        });
+
+        it('open sans id et un verbe inconnu avertissent sans rien ouvrir', async () => {
+            el = await fixture('<ar-dialog id="d"></ar-dialog>');
+            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const sansId = trigger('open');
+            const inconnu = trigger('toggle#d');
+
+            sansId.click();
+            inconnu.click();
+            await waitForUpdate(el);
+
+            expect(el.open).toBe(false);
+            expect(warnSpy).toHaveBeenCalledTimes(2);
+            warnSpy.mockRestore();
+            sansId.remove();
+            inconnu.remove();
         });
     });
 
@@ -920,7 +1046,7 @@ describe('ArDialog', () => {
             vi.restoreAllMocks();
         });
 
-        it('émet un warn si without-header sans close-on-backdrop ni data-ar-dismiss/accept', async () => {
+        it('émet un warn si without-header sans close-on-backdrop ni data-ar-dialog="close"', async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
             await fixture('<ar-dialog without-header label="Titre" open></ar-dialog>');
@@ -940,12 +1066,12 @@ describe('ArDialog', () => {
             expect(closeWarns).toHaveLength(0);
         });
 
-        it("n'émet pas ce warn si un élément data-ar-dismiss est présent dans le contenu", async () => {
+        it("n'émet pas ce warn si un bouton data-ar-dialog close est présent dans le contenu", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
             await fixture(`
                 <ar-dialog without-header label="Titre" open>
-                    <button data-ar-dismiss>Fermer</button>
+                    <button data-ar-dialog="close">Fermer</button>
                 </ar-dialog>
             `);
 
@@ -953,12 +1079,12 @@ describe('ArDialog', () => {
             expect(closeWarns).toHaveLength(0);
         });
 
-        it("n'émet pas ce warn si un élément data-ar-accept est présent dans le contenu", async () => {
+        it("n'émet pas ce warn si un formulaire method=dialog est présent dans le contenu", async () => {
             const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
             await fixture(`
                 <ar-dialog without-header label="Titre" open>
-                    <button data-ar-accept>Confirmer</button>
+                    <form method="dialog"><button>Confirmer</button></form>
                 </ar-dialog>
             `);
 
@@ -1035,10 +1161,7 @@ describe('ArDialog', () => {
         const live = liveText;
         const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 60));
         const accept = (): void => {
-            const body = requireShadow(el).querySelector('[part="body"]') as HTMLElement;
-            body.setAttribute('data-ar-accept', '');
-            body.click();
-            body.removeAttribute('data-ar-accept');
+            (requireShadow(el).querySelector('[data-ar-dialog="close"]') as HTMLElement).click();
         };
         const reducedMotion = (): void => {
             vi.spyOn(window, 'matchMedia').mockReturnValue({
@@ -1053,8 +1176,8 @@ describe('ArDialog', () => {
         });
         afterEach(() => vi.restoreAllMocks());
 
-        it('accepted annulé avec pending posé : report, sans secousse ni annonce de blocage', async () => {
-            el.addEventListener('ar-dialog-accepted', (e) => {
+        it('hide annulé par un clic avec pending posé : report, sans secousse ni annonce de blocage', async () => {
+            el.addEventListener('ar-dialog-hide', (e) => {
                 e.preventDefault();
                 el.pending = true;
             });
@@ -1068,8 +1191,8 @@ describe('ArDialog', () => {
             expect(getDialogEl(el).getAttribute('aria-busy')).toBe('true');
         });
 
-        it('accepted annulé sans pending : secousse et annonce de blocage', async () => {
-            el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
+        it('hide annulé par un clic sans pending : secousse et annonce de blocage', async () => {
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
             accept();
             await waitForUpdate(el);
             await settle();
@@ -1094,11 +1217,8 @@ describe('ArDialog', () => {
             el.pending = true;
             await waitForUpdate(el);
             const seen = vi.fn();
-            for (const name of ['ar-dialog-accepted', 'ar-dialog-dismissed', 'ar-dialog-hide']) {
-                el.addEventListener(name, seen);
-            }
+            el.addEventListener('ar-dialog-hide', seen);
             accept();
-            (requireShadow(el).querySelector('[data-ar-dismiss]') as HTMLElement).click();
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
             await waitForUpdate(el);
             await settle();
@@ -1120,7 +1240,7 @@ describe('ArDialog', () => {
         });
 
         it('pending pose :state(pending), se reflète et ne se pose jamais seul', async () => {
-            el.addEventListener('ar-dialog-accepted', (e) => e.preventDefault());
+            el.addEventListener('ar-dialog-hide', (e) => e.preventDefault());
             accept();
             await waitForUpdate(el);
             expect(el.pending).toBe(false);
@@ -1146,11 +1266,12 @@ describe('ArDialog', () => {
             expect(live('polite')).toBe('Processing…');
         });
 
-        it('seuls show, hide, dismissed et accepted sont annulables', async () => {
+        it('seuls show et hide sont annulables', async () => {
             el.remove();
             el = await fixture('<ar-dialog label="Titre"></ar-dialog>');
             reducedMotion();
             const cancelable = new Map<string, boolean>();
+            let blocked = false;
             for (const name of [
                 'ar-dialog-show',
                 'ar-dialog-show-prevented',
@@ -1158,14 +1279,13 @@ describe('ArDialog', () => {
                 'ar-dialog-hide',
                 'ar-dialog-hide-prevented',
                 'ar-dialog-hidden',
-                'ar-dialog-dismissed',
-                'ar-dialog-dismissed-prevented',
-                'ar-dialog-accepted',
-                'ar-dialog-accepted-prevented',
             ]) {
                 el.addEventListener(name, (e) => {
                     cancelable.set(name, e.cancelable);
-                    if (name === 'ar-dialog-accepted') e.preventDefault();
+                    if (name === 'ar-dialog-hide' && !blocked) {
+                        blocked = true;
+                        e.preventDefault();
+                    }
                 });
             }
             el.open = true;
@@ -1180,8 +1300,7 @@ describe('ArDialog', () => {
                 'ar-dialog-shown': false,
                 'ar-dialog-hide': true,
                 'ar-dialog-hidden': false,
-                'ar-dialog-accepted': true,
-                'ar-dialog-accepted-prevented': false,
+                'ar-dialog-hide-prevented': false,
             });
         });
 
